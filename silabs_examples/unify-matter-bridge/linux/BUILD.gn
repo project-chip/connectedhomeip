@@ -41,7 +41,6 @@ config("unify-config") {
 static_library("unify-matter-bridge-lib") {
 
   sources = [
-    "src/matter_data_storage.cpp",
     "src/attribute_state_cache.cpp",
     "src/cluster_translator/bridged_device_basic_info_attribute_translator.cpp",
     "src/cluster_translator/group_command_translator.cpp",
@@ -50,15 +49,17 @@ static_library("unify-matter-bridge-lib") {
     "src/device_type_mapper/matter_device_translator.cpp",
     "src/device_type_mapper/matter_device_types_clusters_list_updated.inc",
     "src/dummy.cpp",
-    "src/matter_bridge_config.c",
     "src/matter_bridge_cli.cpp",
+    "src/matter_bridge_config.c",
+    "src/matter_data_storage.cpp",
     "src/matter_node_state_monitor/matter_cluster_interactor.cpp",
     "src/matter_node_state_monitor/matter_endpoint_builder.cpp",
     "src/matter_node_state_monitor/matter_node_state_monitor.cpp",
-    "zap-handlers/gen/command_translator.cpp",
+    "src/uic_mqtt_wrapper.cpp",
     "zap-handlers/gen/attribute_translator.cpp",
-    "zap-handlers/gen/unify_accessors.cpp",
-    "src/uic_mqtt_wrapper.cpp"
+    "zap-handlers/gen/attribute_type_size.cpp",
+    "zap-handlers/gen/command_translator.cpp",
+    "zap-handlers/gen/unify_accessors.cpp"
   ]
 
   public_deps = [

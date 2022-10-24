@@ -18,7 +18,7 @@
 class UnifyEmberInterface
 {
 protected:
-    chip::EndpointId last_returned_available_endpoint_id = FIXED_ENDPOINT_COUNT;
+    chip::EndpointId last_returned_available_endpoint_id = FIXED_ENDPOINT_COUNT - 1;
     const char * LOG_TAG                                 = "Unify Ember Interface";
 
 public:

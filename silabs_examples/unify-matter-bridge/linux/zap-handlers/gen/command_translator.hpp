@@ -87,14 +87,6 @@ public:
     {}
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & HandlerContext) override;
 };
-class ActionsClusterCommandHandler : public command_translator_interface
-{
-public:
-    ActionsClusterCommandHandler(const matter_node_state_monitor & node_state_monitor, UicMqtt & uic_mqtt) :
-        command_translator_interface(node_state_monitor, chip::app::Clusters::Actions::Id, "Actions", uic_mqtt)
-    {}
-    void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & HandlerContext) override;
-};
 class BasicClusterCommandHandler : public command_translator_interface
 {
 public:
@@ -217,15 +209,6 @@ public:
     {}
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & HandlerContext) override;
 };
-class EthernetNetworkDiagnosticsClusterCommandHandler : public command_translator_interface
-{
-public:
-    EthernetNetworkDiagnosticsClusterCommandHandler(const matter_node_state_monitor & node_state_monitor, UicMqtt & uic_mqtt) :
-        command_translator_interface(node_state_monitor, chip::app::Clusters::EthernetNetworkDiagnostics::Id,
-                                     "EthernetNetworkDiagnostics", uic_mqtt)
-    {}
-    void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & HandlerContext) override;
-};
 class TimeSynchronizationClusterCommandHandler : public command_translator_interface
 {
 public:
@@ -235,29 +218,11 @@ public:
     {}
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & HandlerContext) override;
 };
-class BridgedDeviceBasicClusterCommandHandler : public command_translator_interface
-{
-public:
-    BridgedDeviceBasicClusterCommandHandler(const matter_node_state_monitor & node_state_monitor, UicMqtt & uic_mqtt) :
-        command_translator_interface(node_state_monitor, chip::app::Clusters::BridgedDeviceBasic::Id, "BridgedDeviceBasic",
-                                     uic_mqtt)
-    {}
-    void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & HandlerContext) override;
-};
 class SwitchClusterCommandHandler : public command_translator_interface
 {
 public:
     SwitchClusterCommandHandler(const matter_node_state_monitor & node_state_monitor, UicMqtt & uic_mqtt) :
         command_translator_interface(node_state_monitor, chip::app::Clusters::Switch::Id, "Switch", uic_mqtt)
-    {}
-    void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & HandlerContext) override;
-};
-class AdministratorCommissioningClusterCommandHandler : public command_translator_interface
-{
-public:
-    AdministratorCommissioningClusterCommandHandler(const matter_node_state_monitor & node_state_monitor, UicMqtt & uic_mqtt) :
-        command_translator_interface(node_state_monitor, chip::app::Clusters::AdministratorCommissioning::Id,
-                                     "AdministratorCommissioning", uic_mqtt)
     {}
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & HandlerContext) override;
 };
@@ -360,15 +325,6 @@ public:
     {}
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & HandlerContext) override;
 };
-class PumpConfigurationAndControlClusterCommandHandler : public command_translator_interface
-{
-public:
-    PumpConfigurationAndControlClusterCommandHandler(const matter_node_state_monitor & node_state_monitor, UicMqtt & uic_mqtt) :
-        command_translator_interface(node_state_monitor, chip::app::Clusters::PumpConfigurationAndControl::Id,
-                                     "PumpConfigurationAndControl", uic_mqtt)
-    {}
-    void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & HandlerContext) override;
-};
 class ThermostatClusterCommandHandler : public command_translator_interface
 {
 public:
@@ -400,15 +356,6 @@ class ColorControlClusterCommandHandler : public command_translator_interface
 public:
     ColorControlClusterCommandHandler(const matter_node_state_monitor & node_state_monitor, UicMqtt & uic_mqtt) :
         command_translator_interface(node_state_monitor, chip::app::Clusters::ColorControl::Id, "ColorControl", uic_mqtt)
-    {}
-    void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & HandlerContext) override;
-};
-class BallastConfigurationClusterCommandHandler : public command_translator_interface
-{
-public:
-    BallastConfigurationClusterCommandHandler(const matter_node_state_monitor & node_state_monitor, UicMqtt & uic_mqtt) :
-        command_translator_interface(node_state_monitor, chip::app::Clusters::BallastConfiguration::Id, "BallastConfiguration",
-                                     uic_mqtt)
     {}
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & HandlerContext) override;
 };
@@ -567,14 +514,6 @@ public:
     ElectricalMeasurementClusterCommandHandler(const matter_node_state_monitor & node_state_monitor, UicMqtt & uic_mqtt) :
         command_translator_interface(node_state_monitor, chip::app::Clusters::ElectricalMeasurement::Id, "ElectricalMeasurement",
                                      uic_mqtt)
-    {}
-    void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & HandlerContext) override;
-};
-class FaultInjectionClusterCommandHandler : public command_translator_interface
-{
-public:
-    FaultInjectionClusterCommandHandler(const matter_node_state_monitor & node_state_monitor, UicMqtt & uic_mqtt) :
-        command_translator_interface(node_state_monitor, chip::app::Clusters::FaultInjection::Id, "FaultInjection", uic_mqtt)
     {}
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & HandlerContext) override;
 };

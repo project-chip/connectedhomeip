@@ -69,7 +69,7 @@ nlohmann::json inline to_json(const uint64_t & value)
 template <typename T>
 nlohmann::json inline to_json(chip::app::DataModel::Nullable<T> & value)
 {
-    if (value.HasValidValue())
+    if ((!value.IsNull()) && value.HasValidValue())
     {
         return to_json(value.Value());
     }
@@ -289,96 +289,6 @@ nlohmann::json inline to_json(const chip::app::Clusters::LevelControl::StepMode 
 
 /***************************** Struct Converted FIXME**************/
 //
-
-/***************************** Bitmap Converter FIXME**************/
-//
-// template<> nlohmann::json to_json(const chip::BitFlags<Actions::CommandBits, uint8_t>& value) {
-//    return "{\"no bitmap support\"}";
-//}
-//
-
-/***************************** Struct Converted FIXME**************/
-//
-// template<> nlohmann::json inline to_json(const Actions::Structs::ActionStruct::Type& value) {
-//    return "no struct support";
-//}
-//
-// template<> nlohmann::json inline to_json(const Actions::Structs::EndpointListStruct::Type& value) {
-//    return "no struct support";
-//}
-//
-
-template <>
-nlohmann::json inline to_json(const chip::app::Clusters::Actions::ActionErrorEnum & value)
-{
-    switch (value)
-    {
-    case chip::app::Clusters::Actions::ActionErrorEnum::kUnknown:
-        return "Unknown";
-    case chip::app::Clusters::Actions::ActionErrorEnum::kInterrupted:
-        return "Interrupted";
-    default:
-        return "{}";
-    }
-}
-
-template <>
-nlohmann::json inline to_json(const chip::app::Clusters::Actions::ActionStateEnum & value)
-{
-    switch (value)
-    {
-    case chip::app::Clusters::Actions::ActionStateEnum::kInactive:
-        return "Inactive";
-    case chip::app::Clusters::Actions::ActionStateEnum::kActive:
-        return "Active";
-    case chip::app::Clusters::Actions::ActionStateEnum::kPaused:
-        return "Paused";
-    case chip::app::Clusters::Actions::ActionStateEnum::kDisabled:
-        return "Disabled";
-    default:
-        return "{}";
-    }
-}
-
-template <>
-nlohmann::json inline to_json(const chip::app::Clusters::Actions::ActionTypeEnum & value)
-{
-    switch (value)
-    {
-    case chip::app::Clusters::Actions::ActionTypeEnum::kOther:
-        return "Other";
-    case chip::app::Clusters::Actions::ActionTypeEnum::kScene:
-        return "Scene";
-    case chip::app::Clusters::Actions::ActionTypeEnum::kSequence:
-        return "Sequence";
-    case chip::app::Clusters::Actions::ActionTypeEnum::kAutomation:
-        return "Automation";
-    case chip::app::Clusters::Actions::ActionTypeEnum::kException:
-        return "Exception";
-    case chip::app::Clusters::Actions::ActionTypeEnum::kNotification:
-        return "Notification";
-    case chip::app::Clusters::Actions::ActionTypeEnum::kAlarm:
-        return "Alarm";
-    default:
-        return "{}";
-    }
-}
-
-template <>
-nlohmann::json inline to_json(const chip::app::Clusters::Actions::EndpointListTypeEnum & value)
-{
-    switch (value)
-    {
-    case chip::app::Clusters::Actions::EndpointListTypeEnum::kOther:
-        return "Other";
-    case chip::app::Clusters::Actions::EndpointListTypeEnum::kRoom:
-        return "Room";
-    case chip::app::Clusters::Actions::EndpointListTypeEnum::kZone:
-        return "Zone";
-    default:
-        return "{}";
-    }
-}
 
 /***************************** Bitmap Converter FIXME**************/
 //
@@ -1198,42 +1108,6 @@ nlohmann::json inline to_json(const chip::app::Clusters::WiFiNetworkDiagnostics:
 
 /***************************** Struct Converted FIXME**************/
 //
-
-template <>
-nlohmann::json inline to_json(const chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType & value)
-{
-    switch (value)
-    {
-    case chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType::k10m:
-        return "10m";
-    case chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType::k100m:
-        return "100m";
-    case chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType::k1000m:
-        return "1000m";
-    case chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType::k25g:
-        return "25g";
-    case chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType::k5g:
-        return "5g";
-    case chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType::k10g:
-        return "10g";
-    case chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType::k40g:
-        return "40g";
-    case chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType::k100g:
-        return "100g";
-    case chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType::k200g:
-        return "200g";
-    case chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType::k400g:
-        return "400g";
-    default:
-        return "{}";
-    }
-}
-
-/***************************** Bitmap Converter FIXME**************/
-//
-
-/***************************** Struct Converted FIXME**************/
-//
 // template<> nlohmann::json inline to_json(const TimeSynchronization::Structs::DstOffsetType::Type& value) {
 //    return "no struct support";
 //}
@@ -1309,12 +1183,6 @@ nlohmann::json inline to_json(const chip::app::Clusters::TimeSynchronization::Ti
 
 /***************************** Bitmap Converter FIXME**************/
 //
-
-/***************************** Struct Converted FIXME**************/
-//
-
-/***************************** Bitmap Converter FIXME**************/
-//
 // template<> nlohmann::json to_json(const chip::BitFlags<Switch::SwitchFeature, uint8_t>& value) {
 //    return "{\"no bitmap support\"}";
 //}
@@ -1322,44 +1190,6 @@ nlohmann::json inline to_json(const chip::app::Clusters::TimeSynchronization::Ti
 
 /***************************** Struct Converted FIXME**************/
 //
-
-/***************************** Bitmap Converter FIXME**************/
-//
-
-/***************************** Struct Converted FIXME**************/
-//
-
-template <>
-nlohmann::json inline to_json(const chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus & value)
-{
-    switch (value)
-    {
-    case chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen:
-        return "WindowNotOpen";
-    case chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen:
-        return "EnhancedWindowOpen";
-    case chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen:
-        return "BasicWindowOpen";
-    default:
-        return "{}";
-    }
-}
-
-template <>
-nlohmann::json inline to_json(const chip::app::Clusters::AdministratorCommissioning::StatusCode & value)
-{
-    switch (value)
-    {
-    case chip::app::Clusters::AdministratorCommissioning::StatusCode::kBusy:
-        return "Busy";
-    case chip::app::Clusters::AdministratorCommissioning::StatusCode::kPAKEParameterError:
-        return "PAKEParameterError";
-    case chip::app::Clusters::AdministratorCommissioning::StatusCode::kWindowNotOpen:
-        return "WindowNotOpen";
-    default:
-        return "{}";
-    }
-}
 
 /***************************** Bitmap Converter FIXME**************/
 //
@@ -1847,7 +1677,7 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::DlStatus & va
     case chip::app::Clusters::DoorLock::DlStatus::kDuplicate:
         return "Duplicate";
     case chip::app::Clusters::DoorLock::DlStatus::kOccupied:
-        return "Occupied";
+        return "SensedOccupancy";
     case chip::app::Clusters::DoorLock::DlStatus::kInvalidField:
         return "InvalidField";
     case chip::app::Clusters::DoorLock::DlStatus::kResourceExhausted:
@@ -2153,56 +1983,6 @@ nlohmann::json inline to_json(const chip::app::Clusters::WindowCovering::Type & 
 
 /***************************** Bitmap Converter FIXME**************/
 //
-// template<> nlohmann::json to_json(const chip::BitFlags<PumpConfigurationAndControl::PumpStatus, uint8_t>& value) {
-//    return "{\"no bitmap support\"}";
-//}
-//
-
-/***************************** Struct Converted FIXME**************/
-//
-
-template <>
-nlohmann::json inline to_json(const chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode & value)
-{
-    switch (value)
-    {
-    case chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode::kConstantSpeed:
-        return "ConstantSpeed";
-    case chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode::kConstantPressure:
-        return "ConstantPressure";
-    case chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode::kProportionalPressure:
-        return "ProportionalPressure";
-    case chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode::kConstantFlow:
-        return "ConstantFlow";
-    case chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode::kConstantTemperature:
-        return "ConstantTemperature";
-    case chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode::kAutomatic:
-        return "Automatic";
-    default:
-        return "{}";
-    }
-}
-
-template <>
-nlohmann::json inline to_json(const chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode & value)
-{
-    switch (value)
-    {
-    case chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode::kNormal:
-        return "Normal";
-    case chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode::kMinimum:
-        return "Minimum";
-    case chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode::kMaximum:
-        return "Maximum";
-    case chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode::kLocal:
-        return "Local";
-    default:
-        return "{}";
-    }
-}
-
-/***************************** Bitmap Converter FIXME**************/
-//
 // template<> nlohmann::json to_json(const chip::BitFlags<Thermostat::DayOfWeek, uint8_t>& value) {
 //    return "{\"no bitmap support\"}";
 //}
@@ -2433,7 +2213,7 @@ nlohmann::json inline to_json(const chip::app::Clusters::ColorControl::ColorMode
     case chip::app::Clusters::ColorControl::ColorMode::kCurrentXAndCurrentY:
         return "CurrentXAndCurrentY";
     case chip::app::Clusters::ColorControl::ColorMode::kColorTemperature:
-        return "ColorTemperature";
+        return "ColorTemperatureMireds";
     default:
         return "{}";
     }
@@ -2516,12 +2296,6 @@ nlohmann::json inline to_json(const chip::app::Clusters::ColorControl::Saturatio
         return "{}";
     }
 }
-
-/***************************** Bitmap Converter FIXME**************/
-//
-
-/***************************** Struct Converted FIXME**************/
-//
 
 /***************************** Bitmap Converter FIXME**************/
 //
@@ -3184,29 +2958,3 @@ nlohmann::json inline to_json(const chip::app::Clusters::ApplicationBasic::Appli
 
 /***************************** Struct Converted FIXME**************/
 //
-
-/***************************** Bitmap Converter FIXME**************/
-//
-
-/***************************** Struct Converted FIXME**************/
-//
-
-template <>
-nlohmann::json inline to_json(const chip::app::Clusters::FaultInjection::FaultType & value)
-{
-    switch (value)
-    {
-    case chip::app::Clusters::FaultInjection::FaultType::kUnspecified:
-        return "Unspecified";
-    case chip::app::Clusters::FaultInjection::FaultType::kSystemFault:
-        return "SystemFault";
-    case chip::app::Clusters::FaultInjection::FaultType::kInetFault:
-        return "InetFault";
-    case chip::app::Clusters::FaultInjection::FaultType::kChipFault:
-        return "ChipFault";
-    case chip::app::Clusters::FaultInjection::FaultType::kCertFault:
-        return "CertFault";
-    default:
-        return "{}";
-    }
-}

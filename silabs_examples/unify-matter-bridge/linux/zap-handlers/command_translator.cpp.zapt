@@ -55,14 +55,14 @@ void {{asUpperCamelCase label}}ClusterCommandHandler::InvokeCommand(
         {{#isOptional}}
         if( data.{{asLowerCamelCase label}}.HasValue() ) {
           try {
-          payload["{{asUpperCamelCase label}}"] = to_json(data.{{asLowerCamelCase label}}.Value());
+          payload["{{matterToUclBitmapElem (asUpperCamelCase label)}}"] = to_json(data.{{asLowerCamelCase label}}.Value());
           } catch (std::exception &ex) {
           sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
           }
         }
         {{else}}
           try {
-          payload["{{asUpperCamelCase label}}"] = to_json(data.{{asLowerCamelCase label}});
+          payload["{{matterToUclBitmapElem (asUpperCamelCase label)}}"] = to_json(data.{{asLowerCamelCase label}});
           } catch (std::exception &ex) {
           sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
           }

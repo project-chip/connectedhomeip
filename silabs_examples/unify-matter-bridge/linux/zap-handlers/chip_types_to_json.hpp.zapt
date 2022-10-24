@@ -69,7 +69,7 @@ nlohmann::json inline to_json(const uint64_t & value)
 template <typename T>
 nlohmann::json inline to_json(chip::app::DataModel::Nullable<T> & value)
 {
-    if (value.HasValidValue())
+    if ((!value.IsNull()) && value.HasValidValue())
     {
         return to_json(value.Value());
     }
@@ -98,7 +98,7 @@ nlohmann::json inline to_json(chip::app::DataModel::Nullable<T> & value)
 template<> nlohmann::json inline to_json(const chip::app::Clusters::{{asUpperCamelCase parent.label}}::{{label}}& value) {
     switch( value ) {
         {{#zcl_enum_items}}
-        case chip::app::Clusters::{{asUpperCamelCase parent.parent.label}}::{{parent.label}}::k{{asUpperCamelCase label}}: return "{{asUpperCamelCase label}}";
+        case chip::app::Clusters::{{asUpperCamelCase parent.parent.label}}::{{parent.label}}::k{{asUpperCamelCase label}}: return "{{matterToUclBitmapElem (asUpperCamelCase label)}}";
         {{/zcl_enum_items}}
         default: return "{}";
     }

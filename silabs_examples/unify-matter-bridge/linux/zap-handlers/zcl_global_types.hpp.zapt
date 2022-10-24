@@ -1,0 +1,35 @@
+{{zap_header}}
+
+#ifndef __ZCL_GLOBAL_TYPES__
+#define __ZCL_GLOBAL_TYPES__
+
+// ZCL enums
+{{#zcl_enums}}
+    {{#if (isStrEqual (asUpperCamelCase label) "LevelControlOptions")}}
+    // Because Matter xml files sometimes has bitmaps defined as <enum> this handles creating bitmap defines for those.
+    // TODO: change matching on "LevelControlOptions" to match on if it is a BITMAPn type
+        {{#zcl_enum_items}}
+#define ZCL_BITMAP_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}} ({{value}})
+#define ZCL_BITMAP_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}}_OFFSET ({{asOffset value}})
+        {{/zcl_enum_items}}
+    {{else}}
+        {{#if (overrideEnumType (asUpperCamelCase label))}}
+// Enum for {{label}}
+typedef enum ZclEnum{{asType label}} : {{asUnderlyingZclType name}}  {
+            {{#zcl_enum_items}}
+{{indent}}ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}} = {{value}},
+            {{/zcl_enum_items}}
+} ZclEnum{{asType label}};
+        {{/if}}
+    {{/if}}
+{{/zcl_enums}}
+
+// ZCL bitmaps
+{{#zcl_bitmaps}}
+    {{#zcl_bitmap_items}}
+#define ZCL_BITMAP_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}} ({{mask}})
+#define ZCL_BITMAP_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}}_OFFSET ({{asOffset mask}})
+    {{/zcl_bitmap_items}}
+{{/zcl_bitmaps}}
+
+#endif

@@ -12,6 +12,7 @@
  *
  ******************************************************************************/
 #include "app/data-model/NullObject.h"
+#include "zcl_global_types.hpp"
 
 // Default translation
 template <typename T>
@@ -19,7 +20,7 @@ std::optional<T> from_json(const nlohmann::json & value)
 {
     return std::nullopt;
 }
-/***************************** Simple types Convertes **************/
+/***************************** Simple type Convertes **************/
 
 template <>
 inline std::optional<bool> from_json(const nlohmann::json & value)
@@ -60,7 +61,7 @@ inline std::optional<uint64_t> from_json(const nlohmann::json & value)
     return value;
 }
 template <>
-inline std::optional<chip::app::DataModel::Nullable<int>> from_json(const nlohmann::json & value)
+inline std::optional<chip::app::DataModel::Nullable<int8_t>> from_json(const nlohmann::json & value)
 {
     if (value.is_null())
     {
@@ -68,7 +69,43 @@ inline std::optional<chip::app::DataModel::Nullable<int>> from_json(const nlohma
     }
     else
     {
-        return chip::app::DataModel::Nullable<int>(value);
+        return chip::app::DataModel::Nullable<int8_t>(value);
+    }
+}
+template <>
+inline std::optional<chip::app::DataModel::Nullable<int16_t>> from_json(const nlohmann::json & value)
+{
+    if (value.is_null())
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        return chip::app::DataModel::Nullable<int16_t>(value);
+    }
+}
+template <>
+inline std::optional<chip::app::DataModel::Nullable<int32_t>> from_json(const nlohmann::json & value)
+{
+    if (value.is_null())
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        return chip::app::DataModel::Nullable<int32_t>(value);
+    }
+}
+template <>
+inline std::optional<chip::app::DataModel::Nullable<int64_t>> from_json(const nlohmann::json & value)
+{
+    if (value.is_null())
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        return chip::app::DataModel::Nullable<int64_t>(value);
     }
 }
 template <>
@@ -119,10 +156,10 @@ inline std::optional<chip::app::DataModel::Nullable<uint64_t>> from_json(const n
         return chip::app::DataModel::Nullable<uint64_t>(value);
     }
 }
-/***************************** Bitmap Convertes **************/
+/***************************** Bitmap Converters **************/
 //
-//
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 template <>
@@ -147,7 +184,6 @@ inline std::optional<Identify::IdentifyEffectIdentifier> from_json(const nlohman
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<Identify::IdentifyEffectVariant> from_json(const nlohmann::json & value)
 {
@@ -165,7 +201,6 @@ inline std::optional<Identify::IdentifyEffectVariant> from_json(const nlohmann::
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<Identify::IdentifyIdentifyType> from_json(const nlohmann::json & value)
 {
@@ -188,13 +223,14 @@ inline std::optional<Identify::IdentifyIdentifyType> from_json(const nlohmann::j
         return std::nullopt;
     }
 }
-
 //
 // template<> inline nlohmann::json to_json(const chip::BitFlags<Groups::GroupClusterFeature, uint8_t>& value) {
 //    return "{\"no bitmap support\"}";
 //}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 
 //
@@ -202,7 +238,9 @@ inline std::optional<Identify::IdentifyIdentifyType> from_json(const nlohmann::j
 //    return "{\"no bitmap support\"}";
 //}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const Scenes::Structs::AttributeValuePair::Type& value) {
 //    return "no struct support";
@@ -220,15 +258,19 @@ inline std::optional<Identify::IdentifyIdentifyType> from_json(const nlohmann::j
 //    return "{\"no bitmap support\"}";
 //}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<OnOff::OnOffFeature, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<OnOff::SceneFeatures, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 
 template <>
@@ -251,7 +293,6 @@ inline std::optional<OnOff::OnOffDelayedAllOffEffectVariant> from_json(const nlo
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<OnOff::OnOffDyingLightEffectVariant> from_json(const nlohmann::json & value)
 {
@@ -270,7 +311,6 @@ inline std::optional<OnOff::OnOffDyingLightEffectVariant> from_json(const nlohma
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<OnOff::OnOffEffectIdentifier> from_json(const nlohmann::json & value)
 {
@@ -289,7 +329,6 @@ inline std::optional<OnOff::OnOffEffectIdentifier> from_json(const nlohmann::jso
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<OnOff::OnOffStartUpOnOff> from_json(const nlohmann::json & value)
 {
@@ -309,9 +348,9 @@ inline std::optional<OnOff::OnOffStartUpOnOff> from_json(const nlohmann::json & 
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 //
@@ -319,7 +358,9 @@ inline std::optional<OnOff::OnOffStartUpOnOff> from_json(const nlohmann::json & 
 //    return "{\"no bitmap support\"}";
 //}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 
 template <>
@@ -340,7 +381,6 @@ inline std::optional<LevelControl::MoveMode> from_json(const nlohmann::json & va
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<LevelControl::StepMode> from_json(const nlohmann::json & value)
 {
@@ -359,17 +399,19 @@ inline std::optional<LevelControl::StepMode> from_json(const nlohmann::json & va
         return std::nullopt;
     }
 }
-
-//
-/***************************** Struct Convertes **************/
 //
 
-//
-/***************************** Struct Convertes **************/
+/***************************** Struct Converters **************/
 //
 
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
+//
+
+//
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const Descriptor::Structs::DeviceTypeStruct::Type& value) {
 //    return "no struct support";
@@ -378,7 +420,8 @@ inline std::optional<LevelControl::StepMode> from_json(const nlohmann::json & va
 //
 
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const Binding::Structs::TargetStruct::Type& value) {
 //    return "no struct support";
@@ -387,7 +430,8 @@ inline std::optional<LevelControl::StepMode> from_json(const nlohmann::json & va
 //
 
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const AccessControl::Structs::Target::Type& value) {
 //    return "no struct support";
@@ -424,7 +468,6 @@ inline std::optional<AccessControl::AuthMode> from_json(const nlohmann::json & v
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<AccessControl::ChangeTypeEnum> from_json(const nlohmann::json & value)
 {
@@ -444,7 +487,6 @@ inline std::optional<AccessControl::ChangeTypeEnum> from_json(const nlohmann::js
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<AccessControl::Privilege> from_json(const nlohmann::json & value)
 {
@@ -466,13 +508,14 @@ inline std::optional<AccessControl::Privilege> from_json(const nlohmann::json & 
         return std::nullopt;
     }
 }
-
 //
 // template<> inline nlohmann::json to_json(const chip::BitFlags<Actions::CommandBits, uint8_t>& value) {
 //    return "{\"no bitmap support\"}";
 //}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const Actions::Structs::ActionStruct::Type& value) {
 //    return "no struct support";
@@ -503,7 +546,6 @@ inline std::optional<Actions::ActionErrorEnum> from_json(const nlohmann::json & 
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<Actions::ActionStateEnum> from_json(const nlohmann::json & value)
 {
@@ -524,7 +566,6 @@ inline std::optional<Actions::ActionStateEnum> from_json(const nlohmann::json & 
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<Actions::ActionTypeEnum> from_json(const nlohmann::json & value)
 {
@@ -545,7 +586,6 @@ inline std::optional<Actions::ActionTypeEnum> from_json(const nlohmann::json & v
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<Actions::EndpointListTypeEnum> from_json(const nlohmann::json & value)
 {
@@ -565,9 +605,9 @@ inline std::optional<Actions::EndpointListTypeEnum> from_json(const nlohmann::js
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const Basic::Structs::CapabilityMinimaStruct::Type& value) {
 //    return "no struct support";
@@ -576,7 +616,8 @@ inline std::optional<Actions::EndpointListTypeEnum> from_json(const nlohmann::js
 //
 
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 template <>
@@ -598,7 +639,6 @@ inline std::optional<OtaSoftwareUpdateProvider::OTAApplyUpdateAction> from_json(
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<OtaSoftwareUpdateProvider::OTADownloadProtocol> from_json(const nlohmann::json & value)
 {
@@ -619,7 +659,6 @@ inline std::optional<OtaSoftwareUpdateProvider::OTADownloadProtocol> from_json(c
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<OtaSoftwareUpdateProvider::OTAQueryStatus> from_json(const nlohmann::json & value)
 {
@@ -640,9 +679,9 @@ inline std::optional<OtaSoftwareUpdateProvider::OTAQueryStatus> from_json(const 
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type& value) {
 //    return "no struct support";
@@ -669,7 +708,6 @@ inline std::optional<OtaSoftwareUpdateRequestor::OTAAnnouncementReason> from_jso
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<OtaSoftwareUpdateRequestor::OTAChangeReasonEnum> from_json(const nlohmann::json & value)
 {
@@ -691,7 +729,6 @@ inline std::optional<OtaSoftwareUpdateRequestor::OTAChangeReasonEnum> from_json(
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> from_json(const nlohmann::json & value)
 {
@@ -717,13 +754,14 @@ inline std::optional<OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> from_json(c
         return std::nullopt;
     }
 }
-
-//
-/***************************** Struct Convertes **************/
 //
 
+/***************************** Struct Converters **************/
 //
-/***************************** Struct Convertes **************/
+
+//
+
+/***************************** Struct Converters **************/
 //
 
 template <>
@@ -754,7 +792,6 @@ inline std::optional<TimeFormatLocalization::CalendarType> from_json(const nlohm
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<TimeFormatLocalization::HourFormat> from_json(const nlohmann::json & value)
 {
@@ -773,13 +810,14 @@ inline std::optional<TimeFormatLocalization::HourFormat> from_json(const nlohman
         return std::nullopt;
     }
 }
-
 //
 // template<> inline nlohmann::json to_json(const chip::BitFlags<UnitLocalization::UnitLocalizationFeature, uint8_t>& value) {
 //    return "{\"no bitmap support\"}";
 //}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 
 template <>
@@ -801,9 +839,9 @@ inline std::optional<UnitLocalization::TempUnit> from_json(const nlohmann::json 
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 //
@@ -811,7 +849,9 @@ inline std::optional<UnitLocalization::TempUnit> from_json(const nlohmann::json 
 //    return "{\"no bitmap support\"}";
 //}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const PowerSource::Structs::BatChargeFaultChangeType::Type& value) {
 //    return "no struct support";
@@ -856,7 +896,6 @@ inline std::optional<PowerSource::BatChargeFault> from_json(const nlohmann::json
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<PowerSource::BatChargeLevel> from_json(const nlohmann::json & value)
 {
@@ -876,7 +915,6 @@ inline std::optional<PowerSource::BatChargeLevel> from_json(const nlohmann::json
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<PowerSource::BatChargeState> from_json(const nlohmann::json & value)
 {
@@ -897,7 +935,6 @@ inline std::optional<PowerSource::BatChargeState> from_json(const nlohmann::json
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<PowerSource::BatFault> from_json(const nlohmann::json & value)
 {
@@ -917,7 +954,6 @@ inline std::optional<PowerSource::BatFault> from_json(const nlohmann::json & val
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<PowerSource::BatReplaceability> from_json(const nlohmann::json & value)
 {
@@ -938,7 +974,6 @@ inline std::optional<PowerSource::BatReplaceability> from_json(const nlohmann::j
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<PowerSource::PowerSourceStatus> from_json(const nlohmann::json & value)
 {
@@ -959,7 +994,6 @@ inline std::optional<PowerSource::PowerSourceStatus> from_json(const nlohmann::j
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<PowerSource::WiredCurrentType> from_json(const nlohmann::json & value)
 {
@@ -978,7 +1012,6 @@ inline std::optional<PowerSource::WiredCurrentType> from_json(const nlohmann::js
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<PowerSource::WiredFault> from_json(const nlohmann::json & value)
 {
@@ -998,9 +1031,9 @@ inline std::optional<PowerSource::WiredFault> from_json(const nlohmann::json & v
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const GeneralCommissioning::Structs::BasicCommissioningInfo::Type& value) {
 //    return "no struct support";
@@ -1029,7 +1062,6 @@ inline std::optional<GeneralCommissioning::CommissioningError> from_json(const n
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<GeneralCommissioning::RegulatoryLocationType> from_json(const nlohmann::json & value)
 {
@@ -1049,18 +1081,20 @@ inline std::optional<GeneralCommissioning::RegulatoryLocationType> from_json(con
         return std::nullopt;
     }
 }
-
 //
 // template<> inline nlohmann::json to_json(const chip::BitFlags<NetworkCommissioning::NetworkCommissioningFeature, uint8_t>& value)
 // {
 //    return "{\"no bitmap support\"}";
 //}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<NetworkCommissioning::WiFiSecurity, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const NetworkCommissioning::Structs::NetworkInfo::Type& value) {
 //    return "no struct support";
@@ -1107,7 +1141,6 @@ inline std::optional<NetworkCommissioning::NetworkCommissioningStatus> from_json
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<NetworkCommissioning::WiFiBand> from_json(const nlohmann::json & value)
 {
@@ -1127,9 +1160,9 @@ inline std::optional<NetworkCommissioning::WiFiBand> from_json(const nlohmann::j
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 template <>
@@ -1151,7 +1184,6 @@ inline std::optional<DiagnosticLogs::LogsIntent> from_json(const nlohmann::json 
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DiagnosticLogs::LogsStatus> from_json(const nlohmann::json & value)
 {
@@ -1171,7 +1203,6 @@ inline std::optional<DiagnosticLogs::LogsStatus> from_json(const nlohmann::json 
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DiagnosticLogs::LogsTransferProtocol> from_json(const nlohmann::json & value)
 {
@@ -1190,9 +1221,9 @@ inline std::optional<DiagnosticLogs::LogsTransferProtocol> from_json(const nlohm
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const GeneralDiagnostics::Structs::NetworkInterfaceType::Type& value) {
 //    return "no struct support";
@@ -1223,7 +1254,6 @@ inline std::optional<GeneralDiagnostics::BootReasonType> from_json(const nlohman
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<GeneralDiagnostics::HardwareFaultType> from_json(const nlohmann::json & value)
 {
@@ -1251,7 +1281,6 @@ inline std::optional<GeneralDiagnostics::HardwareFaultType> from_json(const nloh
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<GeneralDiagnostics::InterfaceType> from_json(const nlohmann::json & value)
 {
@@ -1273,7 +1302,6 @@ inline std::optional<GeneralDiagnostics::InterfaceType> from_json(const nlohmann
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<GeneralDiagnostics::NetworkFaultType> from_json(const nlohmann::json & value)
 {
@@ -1294,7 +1322,6 @@ inline std::optional<GeneralDiagnostics::NetworkFaultType> from_json(const nlohm
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<GeneralDiagnostics::RadioFaultType> from_json(const nlohmann::json & value)
 {
@@ -1318,13 +1345,14 @@ inline std::optional<GeneralDiagnostics::RadioFaultType> from_json(const nlohman
         return std::nullopt;
     }
 }
-
 //
 // template<> inline nlohmann::json to_json(const chip::BitFlags<SoftwareDiagnostics::SoftwareDiagnosticsFeature, uint8_t>& value) {
 //    return "{\"no bitmap support\"}";
 //}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const SoftwareDiagnostics::Structs::ThreadMetrics::Type& value) {
 //    return "no struct support";
@@ -1338,7 +1366,9 @@ inline std::optional<GeneralDiagnostics::RadioFaultType> from_json(const nlohman
 //    return "{\"no bitmap support\"}";
 //}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const ThreadNetworkDiagnostics::Structs::NeighborTable::Type& value) {
 //    return "no struct support";
@@ -1381,7 +1411,6 @@ inline std::optional<ThreadNetworkDiagnostics::NetworkFault> from_json(const nlo
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<ThreadNetworkDiagnostics::RoutingRole> from_json(const nlohmann::json & value)
 {
@@ -1405,7 +1434,6 @@ inline std::optional<ThreadNetworkDiagnostics::RoutingRole> from_json(const nloh
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<ThreadNetworkDiagnostics::ThreadConnectionStatus> from_json(const nlohmann::json & value)
 {
@@ -1424,9 +1452,9 @@ inline std::optional<ThreadNetworkDiagnostics::ThreadConnectionStatus> from_json
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 template <>
@@ -1449,7 +1477,6 @@ inline std::optional<WiFiNetworkDiagnostics::AssociationFailureCause> from_json(
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<WiFiNetworkDiagnostics::SecurityType> from_json(const nlohmann::json & value)
 {
@@ -1472,7 +1499,6 @@ inline std::optional<WiFiNetworkDiagnostics::SecurityType> from_json(const nlohm
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<WiFiNetworkDiagnostics::WiFiConnectionStatus> from_json(const nlohmann::json & value)
 {
@@ -1491,7 +1517,6 @@ inline std::optional<WiFiNetworkDiagnostics::WiFiConnectionStatus> from_json(con
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<WiFiNetworkDiagnostics::WiFiVersionType> from_json(const nlohmann::json & value)
 {
@@ -1514,9 +1539,9 @@ inline std::optional<WiFiNetworkDiagnostics::WiFiVersionType> from_json(const nl
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 template <>
@@ -1540,9 +1565,9 @@ inline std::optional<EthernetNetworkDiagnostics::PHYRateType> from_json(const nl
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const TimeSynchronization::Structs::DstOffsetType::Type& value) {
 //    return "no struct support";
@@ -1576,7 +1601,6 @@ inline std::optional<TimeSynchronization::GranularityEnum> from_json(const nlohm
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<TimeSynchronization::TimeSourceEnum> from_json(const nlohmann::json & value)
 {
@@ -1610,9 +1634,9 @@ inline std::optional<TimeSynchronization::TimeSourceEnum> from_json(const nlohma
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 //
@@ -1620,11 +1644,14 @@ inline std::optional<TimeSynchronization::TimeSourceEnum> from_json(const nlohma
 //    return "{\"no bitmap support\"}";
 //}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 template <>
@@ -1646,7 +1673,6 @@ inline std::optional<AdministratorCommissioning::CommissioningWindowStatus> from
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<AdministratorCommissioning::StatusCode> from_json(const nlohmann::json & value)
 {
@@ -1666,9 +1692,9 @@ inline std::optional<AdministratorCommissioning::StatusCode> from_json(const nlo
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const OperationalCredentials::Structs::FabricDescriptor::Type& value) {
 //    return "no struct support";
@@ -1707,9 +1733,9 @@ inline std::optional<OperationalCredentials::OperationalCertStatus> from_json(co
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const GroupKeyManagement::Structs::GroupInfoMapStruct::Type& value) {
 //    return "no struct support";
@@ -1745,9 +1771,9 @@ inline std::optional<GroupKeyManagement::GroupKeySecurityPolicy> from_json(const
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const FixedLabel::Structs::LabelStruct::Type& value) {
 //    return "no struct support";
@@ -1756,7 +1782,8 @@ inline std::optional<GroupKeyManagement::GroupKeySecurityPolicy> from_json(const
 //
 
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const UserLabel::Structs::LabelStruct::Type& value) {
 //    return "no struct support";
@@ -1765,19 +1792,23 @@ inline std::optional<GroupKeyManagement::GroupKeySecurityPolicy> from_json(const
 //
 
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 //
@@ -1785,7 +1816,9 @@ inline std::optional<GroupKeyManagement::GroupKeySecurityPolicy> from_json(const
 //    return "{\"no bitmap support\"}";
 //}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const ModeSelect::Structs::SemanticTag::Type& value) {
 //    return "no struct support";
@@ -1803,63 +1836,79 @@ inline std::optional<GroupKeyManagement::GroupKeySecurityPolicy> from_json(const
 //    return "{\"no bitmap support\"}";
 //}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<DoorLock::DlCredentialRulesSupport, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<DoorLock::DlDaysMaskMap, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<DoorLock::DlDefaultConfigurationRegister, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<DoorLock::DlKeypadOperationEventMask, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<DoorLock::DlKeypadProgrammingEventMask, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<DoorLock::DlLocalProgrammingFeatures, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<DoorLock::DlManualOperationEventMask, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<DoorLock::DlRFIDOperationEventMask, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<DoorLock::DlRFIDProgrammingEventMask, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<DoorLock::DlRemoteOperationEventMask, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<DoorLock::DlRemoteProgrammingEventMask, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<DoorLock::DlSupportedOperatingModes, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<DoorLock::DoorLockDayOfWeek, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<DoorLock::DoorLockFeature, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const DoorLock::Structs::DlCredential::Type& value) {
 //    return "no struct support";
@@ -1891,7 +1940,6 @@ inline std::optional<DoorLock::DlAlarmCode> from_json(const nlohmann::json & val
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DoorLock::DlCredentialRule> from_json(const nlohmann::json & value)
 {
@@ -1911,7 +1959,6 @@ inline std::optional<DoorLock::DlCredentialRule> from_json(const nlohmann::json 
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DoorLock::DlCredentialType> from_json(const nlohmann::json & value)
 {
@@ -1934,7 +1981,6 @@ inline std::optional<DoorLock::DlCredentialType> from_json(const nlohmann::json 
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DoorLock::DlDataOperationType> from_json(const nlohmann::json & value)
 {
@@ -1954,7 +2000,6 @@ inline std::optional<DoorLock::DlDataOperationType> from_json(const nlohmann::js
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DoorLock::DlDoorState> from_json(const nlohmann::json & value)
 {
@@ -1977,7 +2022,6 @@ inline std::optional<DoorLock::DlDoorState> from_json(const nlohmann::json & val
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DoorLock::DlLockDataType> from_json(const nlohmann::json & value)
 {
@@ -2003,7 +2047,6 @@ inline std::optional<DoorLock::DlLockDataType> from_json(const nlohmann::json & 
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DoorLock::DlLockOperationType> from_json(const nlohmann::json & value)
 {
@@ -2024,7 +2067,6 @@ inline std::optional<DoorLock::DlLockOperationType> from_json(const nlohmann::js
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DoorLock::DlLockState> from_json(const nlohmann::json & value)
 {
@@ -2044,7 +2086,6 @@ inline std::optional<DoorLock::DlLockState> from_json(const nlohmann::json & val
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DoorLock::DlLockType> from_json(const nlohmann::json & value)
 {
@@ -2072,7 +2113,6 @@ inline std::optional<DoorLock::DlLockType> from_json(const nlohmann::json & valu
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DoorLock::DlOperatingMode> from_json(const nlohmann::json & value)
 {
@@ -2094,7 +2134,6 @@ inline std::optional<DoorLock::DlOperatingMode> from_json(const nlohmann::json &
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DoorLock::DlOperationError> from_json(const nlohmann::json & value)
 {
@@ -2116,7 +2155,6 @@ inline std::optional<DoorLock::DlOperationError> from_json(const nlohmann::json 
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DoorLock::DlOperationSource> from_json(const nlohmann::json & value)
 {
@@ -2143,7 +2181,6 @@ inline std::optional<DoorLock::DlOperationSource> from_json(const nlohmann::json
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DoorLock::DlStatus> from_json(const nlohmann::json & value)
 {
@@ -2164,7 +2201,6 @@ inline std::optional<DoorLock::DlStatus> from_json(const nlohmann::json & value)
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DoorLock::DlUserStatus> from_json(const nlohmann::json & value)
 {
@@ -2184,7 +2220,6 @@ inline std::optional<DoorLock::DlUserStatus> from_json(const nlohmann::json & va
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DoorLock::DlUserType> from_json(const nlohmann::json & value)
 {
@@ -2211,7 +2246,6 @@ inline std::optional<DoorLock::DlUserType> from_json(const nlohmann::json & valu
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DoorLock::DoorLockOperationEventCode> from_json(const nlohmann::json & value)
 {
@@ -2243,7 +2277,6 @@ inline std::optional<DoorLock::DoorLockOperationEventCode> from_json(const nlohm
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DoorLock::DoorLockProgrammingEventCode> from_json(const nlohmann::json & value)
 {
@@ -2267,7 +2300,6 @@ inline std::optional<DoorLock::DoorLockProgrammingEventCode> from_json(const nlo
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DoorLock::DoorLockSetPinOrIdStatus> from_json(const nlohmann::json & value)
 {
@@ -2288,7 +2320,6 @@ inline std::optional<DoorLock::DoorLockSetPinOrIdStatus> from_json(const nlohman
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DoorLock::DoorLockUserStatus> from_json(const nlohmann::json & value)
 {
@@ -2309,7 +2340,6 @@ inline std::optional<DoorLock::DoorLockUserStatus> from_json(const nlohmann::jso
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<DoorLock::DoorLockUserType> from_json(const nlohmann::json & value)
 {
@@ -2332,29 +2362,34 @@ inline std::optional<DoorLock::DoorLockUserType> from_json(const nlohmann::json 
         return std::nullopt;
     }
 }
-
 //
 // template<> inline nlohmann::json to_json(const chip::BitFlags<WindowCovering::ConfigStatus, uint8_t>& value) {
 //    return "{\"no bitmap support\"}";
 //}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<WindowCovering::Feature, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<WindowCovering::Mode, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<WindowCovering::OperationalStatus, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<WindowCovering::SafetyStatus, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 
 template <>
@@ -2398,7 +2433,6 @@ inline std::optional<WindowCovering::EndProductType> from_json(const nlohmann::j
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<WindowCovering::Type> from_json(const nlohmann::json & value)
 {
@@ -2426,9 +2460,9 @@ inline std::optional<WindowCovering::Type> from_json(const nlohmann::json & valu
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 //
@@ -2436,7 +2470,9 @@ inline std::optional<WindowCovering::Type> from_json(const nlohmann::json & valu
 //    return "{\"no bitmap support\"}";
 //}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 
 template <>
@@ -2461,7 +2497,6 @@ inline std::optional<PumpConfigurationAndControl::PumpControlMode> from_json(con
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<PumpConfigurationAndControl::PumpOperationMode> from_json(const nlohmann::json & value)
 {
@@ -2482,21 +2517,24 @@ inline std::optional<PumpConfigurationAndControl::PumpOperationMode> from_json(c
         return std::nullopt;
     }
 }
-
 //
 // template<> inline nlohmann::json to_json(const chip::BitFlags<Thermostat::DayOfWeek, uint8_t>& value) {
 //    return "{\"no bitmap support\"}";
 //}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<Thermostat::ModeForSequence, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<Thermostat::ThermostatFeature, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const Thermostat::Structs::ThermostatScheduleTransition::Type& value) {
 //    return "no struct support";
@@ -2523,7 +2561,6 @@ inline std::optional<Thermostat::SetpointAdjustMode> from_json(const nlohmann::j
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<Thermostat::ThermostatControlSequence> from_json(const nlohmann::json & value)
 {
@@ -2546,7 +2583,6 @@ inline std::optional<Thermostat::ThermostatControlSequence> from_json(const nloh
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<Thermostat::ThermostatRunningMode> from_json(const nlohmann::json & value)
 {
@@ -2566,7 +2602,6 @@ inline std::optional<Thermostat::ThermostatRunningMode> from_json(const nlohmann
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<Thermostat::ThermostatSystemMode> from_json(const nlohmann::json & value)
 {
@@ -2590,25 +2625,29 @@ inline std::optional<Thermostat::ThermostatSystemMode> from_json(const nlohmann:
         return std::nullopt;
     }
 }
-
 //
 // template<> inline nlohmann::json to_json(const chip::BitFlags<FanControl::FanControlFeature, uint8_t>& value) {
 //    return "{\"no bitmap support\"}";
 //}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<FanControl::RockSupportMask, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<FanControl::WindSettingMask, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<FanControl::WindSupportMask, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 
 template <>
@@ -2633,7 +2672,6 @@ inline std::optional<FanControl::FanModeSequenceType> from_json(const nlohmann::
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<FanControl::FanModeType> from_json(const nlohmann::json & value)
 {
@@ -2654,9 +2692,9 @@ inline std::optional<FanControl::FanModeType> from_json(const nlohmann::json & v
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 //
@@ -2664,15 +2702,19 @@ inline std::optional<FanControl::FanModeType> from_json(const nlohmann::json & v
 //    return "{\"no bitmap support\"}";
 //}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<ColorControl::ColorControlFeature, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<ColorControl::ColorLoopUpdateFlags, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 
 template <>
@@ -2694,7 +2736,6 @@ inline std::optional<ColorControl::ColorLoopAction> from_json(const nlohmann::js
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<ColorControl::ColorLoopDirection> from_json(const nlohmann::json & value)
 {
@@ -2713,7 +2754,6 @@ inline std::optional<ColorControl::ColorLoopDirection> from_json(const nlohmann:
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<ColorControl::ColorMode> from_json(const nlohmann::json & value)
 {
@@ -2733,7 +2773,6 @@ inline std::optional<ColorControl::ColorMode> from_json(const nlohmann::json & v
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<ColorControl::HueDirection> from_json(const nlohmann::json & value)
 {
@@ -2754,7 +2793,6 @@ inline std::optional<ColorControl::HueDirection> from_json(const nlohmann::json 
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<ColorControl::HueMoveMode> from_json(const nlohmann::json & value)
 {
@@ -2774,7 +2812,6 @@ inline std::optional<ColorControl::HueMoveMode> from_json(const nlohmann::json &
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<ColorControl::HueStepMode> from_json(const nlohmann::json & value)
 {
@@ -2793,7 +2830,6 @@ inline std::optional<ColorControl::HueStepMode> from_json(const nlohmann::json &
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<ColorControl::SaturationMoveMode> from_json(const nlohmann::json & value)
 {
@@ -2813,7 +2849,6 @@ inline std::optional<ColorControl::SaturationMoveMode> from_json(const nlohmann:
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<ColorControl::SaturationStepMode> from_json(const nlohmann::json & value)
 {
@@ -2832,13 +2867,14 @@ inline std::optional<ColorControl::SaturationStepMode> from_json(const nlohmann:
         return std::nullopt;
     }
 }
-
-//
-/***************************** Struct Convertes **************/
 //
 
+/***************************** Struct Converters **************/
 //
-/***************************** Struct Convertes **************/
+
+//
+
+/***************************** Struct Converters **************/
 //
 
 template <>
@@ -2859,9 +2895,9 @@ inline std::optional<IlluminanceMeasurement::LightSensorType> from_json(const nl
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 //
@@ -2869,23 +2905,29 @@ inline std::optional<IlluminanceMeasurement::LightSensorType> from_json(const nl
 //    return "{\"no bitmap support\"}";
 //}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 //
@@ -2893,7 +2935,9 @@ inline std::optional<IlluminanceMeasurement::LightSensorType> from_json(const nl
 //    return "{\"no bitmap support\"}";
 //}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const Channel::Structs::ChannelInfo::Type& value) {
 //    return "no struct support";
@@ -2925,7 +2969,6 @@ inline std::optional<Channel::ChannelStatusEnum> from_json(const nlohmann::json 
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<Channel::LineupInfoTypeEnum> from_json(const nlohmann::json & value)
 {
@@ -2943,9 +2986,9 @@ inline std::optional<Channel::LineupInfoTypeEnum> from_json(const nlohmann::json
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const TargetNavigator::Structs::TargetInfo::Type& value) {
 //    return "no struct support";
@@ -2972,13 +3015,14 @@ inline std::optional<TargetNavigator::TargetNavigatorStatusEnum> from_json(const
         return std::nullopt;
     }
 }
-
 //
 // template<> inline nlohmann::json to_json(const chip::BitFlags<MediaPlayback::MediaPlaybackFeature, uint8_t>& value) {
 //    return "{\"no bitmap support\"}";
 //}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const MediaPlayback::Structs::PlaybackPosition::Type& value) {
 //    return "no struct support";
@@ -3008,7 +3052,6 @@ inline std::optional<MediaPlayback::MediaPlaybackStatusEnum> from_json(const nlo
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<MediaPlayback::PlaybackStateEnum> from_json(const nlohmann::json & value)
 {
@@ -3029,13 +3072,14 @@ inline std::optional<MediaPlayback::PlaybackStateEnum> from_json(const nlohmann:
         return std::nullopt;
     }
 }
-
 //
 // template<> inline nlohmann::json to_json(const chip::BitFlags<MediaInput::MediaInputFeature, uint8_t>& value) {
 //    return "{\"no bitmap support\"}";
 //}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const MediaInput::Structs::InputInfo::Type& value) {
 //    return "no struct support";
@@ -3065,9 +3109,9 @@ inline std::optional<MediaInput::InputTypeEnum> from_json(const nlohmann::json &
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 //
@@ -3075,7 +3119,9 @@ inline std::optional<MediaInput::InputTypeEnum> from_json(const nlohmann::json &
 //    return "{\"no bitmap support\"}";
 //}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 
 template <>
@@ -3180,7 +3226,6 @@ inline std::optional<KeypadInput::CecKeyCode> from_json(const nlohmann::json & v
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<KeypadInput::KeypadInputStatusEnum> from_json(const nlohmann::json & value)
 {
@@ -3200,17 +3245,19 @@ inline std::optional<KeypadInput::KeypadInputStatusEnum> from_json(const nlohman
         return std::nullopt;
     }
 }
-
 //
 // template<> inline nlohmann::json to_json(const chip::BitFlags<ContentLauncher::ContentLauncherFeature, uint8_t>& value) {
 //    return "{\"no bitmap support\"}";
 //}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<ContentLauncher::SupportedStreamingProtocol, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const ContentLauncher::Structs::Dimension::Type& value) {
 //    return "no struct support";
@@ -3262,7 +3309,6 @@ inline std::optional<ContentLauncher::ContentLaunchStatusEnum> from_json(const n
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<ContentLauncher::MetricTypeEnum> from_json(const nlohmann::json & value)
 {
@@ -3281,7 +3327,6 @@ inline std::optional<ContentLauncher::MetricTypeEnum> from_json(const nlohmann::
         return std::nullopt;
     }
 }
-
 template <>
 inline std::optional<ContentLauncher::ParameterEnum> from_json(const nlohmann::json & value)
 {
@@ -3311,13 +3356,14 @@ inline std::optional<ContentLauncher::ParameterEnum> from_json(const nlohmann::j
         return std::nullopt;
     }
 }
-
 //
 // template<> inline nlohmann::json to_json(const chip::BitFlags<AudioOutput::AudioOutputFeature, uint8_t>& value) {
 //    return "{\"no bitmap support\"}";
 //}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const AudioOutput::Structs::OutputInfo::Type& value) {
 //    return "no struct support";
@@ -3344,13 +3390,14 @@ inline std::optional<AudioOutput::OutputTypeEnum> from_json(const nlohmann::json
         return std::nullopt;
     }
 }
-
 //
 // template<> inline nlohmann::json to_json(const chip::BitFlags<ApplicationLauncher::ApplicationLauncherFeature, uint8_t>& value) {
 //    return "{\"no bitmap support\"}";
 //}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const ApplicationLauncher::Structs::Application::Type& value) {
 //    return "no struct support";
@@ -3382,9 +3429,9 @@ inline std::optional<ApplicationLauncher::ApplicationLauncherStatusEnum> from_js
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const ApplicationBasic::Structs::ApplicationBasicApplication::Type& value) {
 //    return "no struct support";
@@ -3412,13 +3459,14 @@ inline std::optional<ApplicationBasic::ApplicationStatusEnum> from_json(const nl
         return std::nullopt;
     }
 }
-
-//
-/***************************** Struct Convertes **************/
 //
 
+/***************************** Struct Converters **************/
 //
-/***************************** Struct Convertes **************/
+
+//
+
+/***************************** Struct Converters **************/
 //
 
 //
@@ -3426,23 +3474,29 @@ inline std::optional<ApplicationBasic::ApplicationStatusEnum> from_json(const nl
 //    return "{\"no bitmap support\"}";
 //}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<TestCluster::Bitmap32MaskMap, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<TestCluster::Bitmap64MaskMap, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<TestCluster::Bitmap8MaskMap, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
+//
 // template<> inline nlohmann::json to_json(const chip::BitFlags<TestCluster::SimpleBitmap, uint8_t>& value) {
-//     return "{\"no bitmap support\"}";
-// }
+//    return "{\"no bitmap support\"}";
+//}
 
-/***************************** Struct Convertes **************/
+//
+
+/***************************** Struct Converters **************/
 //
 // template<> inline nlohmann::json to_json(const TestCluster::Structs::SimpleStruct::Type& value) {
 //    return "no struct support";
@@ -3500,9 +3554,9 @@ inline std::optional<TestCluster::SimpleEnum> from_json(const nlohmann::json & v
         return std::nullopt;
     }
 }
-
 //
-/***************************** Struct Convertes **************/
+
+/***************************** Struct Converters **************/
 //
 
 template <>
@@ -3521,6 +3575,2521 @@ inline std::optional<FaultInjection::FaultType> from_json(const nlohmann::json &
     }
     else
     {
+        return std::nullopt;
+    }
+}
+
+// ZCL global enums
+template <>
+inline std::optional<ZclEnumColorMode> from_json(const nlohmann::json & value)
+{
+    const std::map<std::string, ZclEnumColorMode> table = {
+        { "CurrentHueAndCurrentSaturation", ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION },
+        { "CurrentXAndCurrentY", ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y },
+        { "ColorTemperature", ZCL_COLOR_MODE_COLOR_TEMPERATURE },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end())
+    {
+        return i->second;
+    }
+    else
+    {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<ZclEnumEnhancedColorMode> from_json(const nlohmann::json & value)
+{
+    const std::map<std::string, ZclEnumEnhancedColorMode> table = {
+        { "CurrentHueAndCurrentSaturation", ZCL_ENHANCED_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION },
+        { "CurrentXAndCurrentY", ZCL_ENHANCED_COLOR_MODE_CURRENT_X_AND_CURRENT_Y },
+        { "ColorTemperature", ZCL_ENHANCED_COLOR_MODE_COLOR_TEMPERATURE },
+        { "EnhancedCurrentHueAndCurrentSaturation", ZCL_ENHANCED_COLOR_MODE_ENHANCED_CURRENT_HUE_AND_CURRENT_SATURATION },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end())
+    {
+        return i->second;
+    }
+    else
+    {
+        return std::nullopt;
+    }
+}
+// Because some bitmaps are defined as <enum> in Matter xml files, this handles translating bitmaps for them.
+// TODO: Check if is enum instead of LevelControlOptions
+std::optional<uint8_t> from_json_LevelControlOptions(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["ExecuteIfOff"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF;
+        }
+        if (value["CoupleColorTempToLevel"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_LEVEL_CONTROL_OPTIONS_COUPLE_COLOR_TEMP_TO_LEVEL;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<ZclEnumOccupancySensorType> from_json(const nlohmann::json & value)
+{
+    const std::map<std::string, ZclEnumOccupancySensorType> table = {
+        { "PIR", ZCL_OCCUPANCY_SENSOR_TYPE_PIR },
+        { "Ultrasonic", ZCL_OCCUPANCY_SENSOR_TYPE_ULTRASONIC },
+        { "pirAndUltrasonic", ZCL_OCCUPANCY_SENSOR_TYPE_PIR_AND_ULTRASONIC },
+        { "physicalContact", ZCL_OCCUPANCY_SENSOR_TYPE_PHYSICAL_CONTACT },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end())
+    {
+        return i->second;
+    }
+    else
+    {
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_AlarmMask(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["GeneralHwFault"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_ALARM_MASK_GENERAL_HW_FAULT;
+        }
+        if (value["GeneralSwFault"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_ALARM_MASK_GENERAL_SW_FAULT;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_ApplicationLauncherFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["ApplicationPlatform"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_APPLICATION_LAUNCHER_FEATURE_APPLICATION_PLATFORM;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_AudioOutputFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["NameUpdates"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_AUDIO_OUTPUT_FEATURE_NAME_UPDATES;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_BallastStatus(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["NonOperational"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BALLAST_STATUS_NON_OPERATIONAL;
+        }
+        if (value["LampNotInSocket"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BALLAST_STATUS_LAMP_NOT_IN_SOCKET;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_BarrierControlCapabilities(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["PartialBarrier"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BARRIER_CONTROL_CAPABILITIES_PARTIAL_BARRIER;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint16_t> from_json_BarrierControlSafetyStatus(const nlohmann::json & value)
+{
+    uint16_t bitmap_value = 0x00;
+    try
+    {
+        if (value["RemoteLockout"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BARRIER_CONTROL_SAFETY_STATUS_REMOTE_LOCKOUT;
+        }
+        if (value["TemperDetected"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BARRIER_CONTROL_SAFETY_STATUS_TEMPER_DETECTED;
+        }
+        if (value["FailedCommunication"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BARRIER_CONTROL_SAFETY_STATUS_FAILED_COMMUNICATION;
+        }
+        if (value["PositionFailure"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BARRIER_CONTROL_SAFETY_STATUS_POSITION_FAILURE;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_BatteryAlarmMask(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["VoltageTooLow"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BATTERY_ALARM_MASK_VOLTAGE_TOO_LOW;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint16_t> from_json_Bitmap16MaskMap(const nlohmann::json & value)
+{
+    uint16_t bitmap_value = 0x00;
+    try
+    {
+        if (value["MaskVal1"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BITMAP16_MASK_MAP_MASK_VAL1;
+        }
+        if (value["MaskVal2"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BITMAP16_MASK_MAP_MASK_VAL2;
+        }
+        if (value["MaskVal3"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BITMAP16_MASK_MAP_MASK_VAL3;
+        }
+        if (value["MaskVal4"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BITMAP16_MASK_MAP_MASK_VAL4;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_Bitmap32MaskMap(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["MaskVal1"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BITMAP32_MASK_MAP_MASK_VAL1;
+        }
+        if (value["MaskVal2"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BITMAP32_MASK_MAP_MASK_VAL2;
+        }
+        if (value["MaskVal3"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BITMAP32_MASK_MAP_MASK_VAL3;
+        }
+        if (value["MaskVal4"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BITMAP32_MASK_MAP_MASK_VAL4;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint64_t> from_json_Bitmap64MaskMap(const nlohmann::json & value)
+{
+    uint64_t bitmap_value = 0x00;
+    try
+    {
+        if (value["MaskVal1"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BITMAP64_MASK_MAP_MASK_VAL1;
+        }
+        if (value["MaskVal2"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BITMAP64_MASK_MAP_MASK_VAL2;
+        }
+        if (value["MaskVal3"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BITMAP64_MASK_MAP_MASK_VAL3;
+        }
+        if (value["MaskVal4"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BITMAP64_MASK_MAP_MASK_VAL4;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_Bitmap8MaskMap(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["MaskVal1"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BITMAP8_MASK_MAP_MASK_VAL1;
+        }
+        if (value["MaskVal2"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BITMAP8_MASK_MAP_MASK_VAL2;
+        }
+        if (value["MaskVal3"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BITMAP8_MASK_MAP_MASK_VAL3;
+        }
+        if (value["MaskVal4"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_BITMAP8_MASK_MAP_MASK_VAL4;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_ChannelFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["ChannelList"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_CHANNEL_FEATURE_CHANNEL_LIST;
+        }
+        if (value["LineupInfo"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_CHANNEL_FEATURE_LINEUP_INFO;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint16_t> from_json_ColorCapabilities(const nlohmann::json & value)
+{
+    uint16_t bitmap_value = 0x00;
+    try
+    {
+        if (value["HueSaturationSupported"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COLOR_CAPABILITIES_HUE_SATURATION_SUPPORTED;
+        }
+        if (value["EnhancedHueSupported"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COLOR_CAPABILITIES_ENHANCED_HUE_SUPPORTED;
+        }
+        if (value["ColorLoopSupported"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COLOR_CAPABILITIES_COLOR_LOOP_SUPPORTED;
+        }
+        if (value["XYSupported"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COLOR_CAPABILITIES_XY_ATTRIBUTES_SUPPORTED;
+        }
+        if (value["ColorTemperatureSupported"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COLOR_CAPABILITIES_COLOR_TEMPERATURE_SUPPORTED;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_ColorControlFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["HueAndSaturation"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COLOR_CONTROL_FEATURE_HUE_AND_SATURATION;
+        }
+        if (value["EnhancedHue"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COLOR_CONTROL_FEATURE_ENHANCED_HUE;
+        }
+        if (value["ColorLoop"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COLOR_CONTROL_FEATURE_COLOR_LOOP;
+        }
+        if (value["Xy"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COLOR_CONTROL_FEATURE_XY;
+        }
+        if (value["ColorTemperatureMireds"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COLOR_CONTROL_FEATURE_COLOR_TEMPERATURE;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_ColorLoopUpdateFlags(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["UpdateAction"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COLOR_LOOP_UPDATE_FLAGS_UPDATE_ACTION;
+        }
+        if (value["UpdateDirection"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COLOR_LOOP_UPDATE_FLAGS_UPDATE_DIRECTION;
+        }
+        if (value["UpdateTime"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COLOR_LOOP_UPDATE_FLAGS_UPDATE_TIME;
+        }
+        if (value["UpdateStartHue"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COLOR_LOOP_UPDATE_FLAGS_UPDATE_START_HUE;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint16_t> from_json_CommandBits(const nlohmann::json & value)
+{
+    uint16_t bitmap_value = 0x00;
+    try
+    {
+        if (value["InstantAction"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COMMAND_BITS_INSTANT_ACTION;
+        }
+        if (value["InstantActionWithTransition"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COMMAND_BITS_INSTANT_ACTION_WITH_TRANSITION;
+        }
+        if (value["StartAction"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COMMAND_BITS_START_ACTION;
+        }
+        if (value["StartActionWithDuration"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COMMAND_BITS_START_ACTION_WITH_DURATION;
+        }
+        if (value["StopAction"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COMMAND_BITS_STOP_ACTION;
+        }
+        if (value["PauseAction"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COMMAND_BITS_PAUSE_ACTION;
+        }
+        if (value["PauseActionWithDuration"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COMMAND_BITS_PAUSE_ACTION_WITH_DURATION;
+        }
+        if (value["ResumeAction"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COMMAND_BITS_RESUME_ACTION;
+        }
+        if (value["EnableAction"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COMMAND_BITS_ENABLE_ACTION;
+        }
+        if (value["EnableActionWithDuration"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COMMAND_BITS_ENABLE_ACTION_WITH_DURATION;
+        }
+        if (value["DisableAction"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COMMAND_BITS_DISABLE_ACTION;
+        }
+        if (value["DisableActionWithDuration"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_COMMAND_BITS_DISABLE_ACTION_WITH_DURATION;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_ConfigStatus(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Operational"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_CONFIG_STATUS_OPERATIONAL;
+        }
+        if (value["OnlineReserved"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_CONFIG_STATUS_ONLINE_RESERVED;
+        }
+        if (value["LiftMovementReversed"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_CONFIG_STATUS_LIFT_MOVEMENT_REVERSED;
+        }
+        if (value["LiftPositionAware"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_CONFIG_STATUS_LIFT_POSITION_AWARE;
+        }
+        if (value["TiltPositionAware"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_CONFIG_STATUS_TILT_POSITION_AWARE;
+        }
+        if (value["LiftEncoderControlled"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_CONFIG_STATUS_LIFT_ENCODER_CONTROLLED;
+        }
+        if (value["TiltEncoderControlled"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_CONFIG_STATUS_TILT_ENCODER_CONTROLLED;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_ContentLauncherFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["ContentSearch"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_CONTENT_LAUNCHER_FEATURE_CONTENT_SEARCH;
+        }
+        if (value["URLPlayback"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_CONTENT_LAUNCHER_FEATURE_URL_PLAYBACK;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_DayOfWeek(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Sunday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DAY_OF_WEEK_SUNDAY;
+        }
+        if (value["Monday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DAY_OF_WEEK_MONDAY;
+        }
+        if (value["Tuesday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DAY_OF_WEEK_TUESDAY;
+        }
+        if (value["Wednesday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DAY_OF_WEEK_WEDNESDAY;
+        }
+        if (value["Thursday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DAY_OF_WEEK_THURSDAY;
+        }
+        if (value["Friday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DAY_OF_WEEK_FRIDAY;
+        }
+        if (value["Saturday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DAY_OF_WEEK_SATURDAY;
+        }
+        if (value["AwayOrVacation"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DAY_OF_WEEK_AWAY_OR_VACATION;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_DeviceTempAlarmMask(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["TooLow"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DEVICE_TEMP_ALARM_MASK_TOO_LOW;
+        }
+        if (value["TooHigh"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DEVICE_TEMP_ALARM_MASK_TOO_HIGH;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_DlCredentialRuleMask(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Single"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_CREDENTIAL_RULE_MASK_SINGLE;
+        }
+        if (value["Dual"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_CREDENTIAL_RULE_MASK_DUAL;
+        }
+        if (value["Tri"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_CREDENTIAL_RULE_MASK_TRI;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_DlCredentialRulesSupport(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Single"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_CREDENTIAL_RULES_SUPPORT_SINGLE;
+        }
+        if (value["Dual"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_CREDENTIAL_RULES_SUPPORT_DUAL;
+        }
+        if (value["Tri"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_CREDENTIAL_RULES_SUPPORT_TRI;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_DlDaysMaskMap(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Sunday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_DAYS_MASK_MAP_SUNDAY;
+        }
+        if (value["Monday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_DAYS_MASK_MAP_MONDAY;
+        }
+        if (value["Tuesday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_DAYS_MASK_MAP_TUESDAY;
+        }
+        if (value["Wednesday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_DAYS_MASK_MAP_WEDNESDAY;
+        }
+        if (value["Thursday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_DAYS_MASK_MAP_THURSDAY;
+        }
+        if (value["Friday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_DAYS_MASK_MAP_FRIDAY;
+        }
+        if (value["Saturday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_DAYS_MASK_MAP_SATURDAY;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint16_t> from_json_DlDefaultConfigurationRegister(const nlohmann::json & value)
+{
+    uint16_t bitmap_value = 0x00;
+    try
+    {
+        if (value["EnableLocalProgrammingEnabled"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_DEFAULT_CONFIGURATION_REGISTER_ENABLE_LOCAL_PROGRAMMING_ENABLED;
+        }
+        if (value["KeypadInterfaceDefaultAccessEnabled"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_DEFAULT_CONFIGURATION_REGISTER_KEYPAD_INTERFACE_DEFAULT_ACCESS_ENABLED;
+        }
+        if (value["RemoteInterfaceDefaultAccessIsEnabled"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_DEFAULT_CONFIGURATION_REGISTER_REMOTE_INTERFACE_DEFAULT_ACCESS_IS_ENABLED;
+        }
+        if (value["SoundEnabled"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_DEFAULT_CONFIGURATION_REGISTER_SOUND_ENABLED;
+        }
+        if (value["AutoRelockTimeSet"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_DEFAULT_CONFIGURATION_REGISTER_AUTO_RELOCK_TIME_SET;
+        }
+        if (value["LEDSettingsSet"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_DEFAULT_CONFIGURATION_REGISTER_LED_SETTINGS_SET;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint16_t> from_json_DlKeypadOperationEventMask(const nlohmann::json & value)
+{
+    uint16_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Unknown"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_KEYPAD_OPERATION_EVENT_MASK_UNKNOWN;
+        }
+        if (value["Lock"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_KEYPAD_OPERATION_EVENT_MASK_LOCK;
+        }
+        if (value["Unlock"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_KEYPAD_OPERATION_EVENT_MASK_UNLOCK;
+        }
+        if (value["LockInvalidPIN"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_KEYPAD_OPERATION_EVENT_MASK_LOCK_INVALID_PIN;
+        }
+        if (value["LockInvalidSchedule"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_KEYPAD_OPERATION_EVENT_MASK_LOCK_INVALID_SCHEDULE;
+        }
+        if (value["UnlockInvalidCode"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_KEYPAD_OPERATION_EVENT_MASK_UNLOCK_INVALID_CODE;
+        }
+        if (value["UnlockInvalidSchedule"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_KEYPAD_OPERATION_EVENT_MASK_UNLOCK_INVALID_SCHEDULE;
+        }
+        if (value["NonAccessUserOpEvent"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_KEYPAD_OPERATION_EVENT_MASK_NON_ACCESS_USER_OP_EVENT;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint16_t> from_json_DlKeypadProgrammingEventMask(const nlohmann::json & value)
+{
+    uint16_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Unknown"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_KEYPAD_PROGRAMMING_EVENT_MASK_UNKNOWN;
+        }
+        if (value["ProgrammingPINChanged"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_KEYPAD_PROGRAMMING_EVENT_MASK_PROGRAMMING_PIN_CHANGED;
+        }
+        if (value["PINAdded"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_KEYPAD_PROGRAMMING_EVENT_MASK_PIN_ADDED;
+        }
+        if (value["PINCleared"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_KEYPAD_PROGRAMMING_EVENT_MASK_PIN_CLEARED;
+        }
+        if (value["PINChanged"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_KEYPAD_PROGRAMMING_EVENT_MASK_PIN_CHANGED;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_DlLocalProgrammingFeatures(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["AddUsersCredentialsSchedulesLocally"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_LOCAL_PROGRAMMING_FEATURES_ADD_USERS_CREDENTIALS_SCHEDULES_LOCALLY;
+        }
+        if (value["ModifyUsersCredentialsSchedulesLocally"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_LOCAL_PROGRAMMING_FEATURES_MODIFY_USERS_CREDENTIALS_SCHEDULES_LOCALLY;
+        }
+        if (value["ClearUsersCredentialsSchedulesLocally"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_LOCAL_PROGRAMMING_FEATURES_CLEAR_USERS_CREDENTIALS_SCHEDULES_LOCALLY;
+        }
+        if (value["AdjustLockSettingsLocally"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_LOCAL_PROGRAMMING_FEATURES_ADJUST_LOCK_SETTINGS_LOCALLY;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint16_t> from_json_DlManualOperationEventMask(const nlohmann::json & value)
+{
+    uint16_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Unknown"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_MANUAL_OPERATION_EVENT_MASK_UNKNOWN;
+        }
+        if (value["ThumbturnLock"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_MANUAL_OPERATION_EVENT_MASK_THUMBTURN_LOCK;
+        }
+        if (value["ThumbturnUnlock"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_MANUAL_OPERATION_EVENT_MASK_THUMBTURN_UNLOCK;
+        }
+        if (value["OneTouchLock"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_MANUAL_OPERATION_EVENT_MASK_ONE_TOUCH_LOCK;
+        }
+        if (value["KeyLock"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_MANUAL_OPERATION_EVENT_MASK_KEY_LOCK;
+        }
+        if (value["KeyUnlock"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_MANUAL_OPERATION_EVENT_MASK_KEY_UNLOCK;
+        }
+        if (value["AutoLock"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_MANUAL_OPERATION_EVENT_MASK_AUTO_LOCK;
+        }
+        if (value["ScheduleLock"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_MANUAL_OPERATION_EVENT_MASK_SCHEDULE_LOCK;
+        }
+        if (value["ScheduleUnlock"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_MANUAL_OPERATION_EVENT_MASK_SCHEDULE_UNLOCK;
+        }
+        if (value["ManualLock"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_MANUAL_OPERATION_EVENT_MASK_MANUAL_LOCK;
+        }
+        if (value["ManualUnlock"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_MANUAL_OPERATION_EVENT_MASK_MANUAL_UNLOCK;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint16_t> from_json_DlRFIDOperationEventMask(const nlohmann::json & value)
+{
+    uint16_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Unknown"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_RFID_OPERATION_EVENT_MASK_UNKNOWN;
+        }
+        if (value["Lock"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_RFID_OPERATION_EVENT_MASK_LOCK;
+        }
+        if (value["Unlock"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_RFID_OPERATION_EVENT_MASK_UNLOCK;
+        }
+        if (value["LockInvalidRFID"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_RFID_OPERATION_EVENT_MASK_LOCK_INVALID_RFID;
+        }
+        if (value["LockInvalidSchedule"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_RFID_OPERATION_EVENT_MASK_LOCK_INVALID_SCHEDULE;
+        }
+        if (value["UnlockInvalidRFID"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_RFID_OPERATION_EVENT_MASK_UNLOCK_INVALID_RFID;
+        }
+        if (value["UnlockInvalidSchedule"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_RFID_OPERATION_EVENT_MASK_UNLOCK_INVALID_SCHEDULE;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint16_t> from_json_DlRFIDProgrammingEventMask(const nlohmann::json & value)
+{
+    uint16_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Unknown"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_RFID_PROGRAMMING_EVENT_MASK_UNKNOWN;
+        }
+        if (value["RFIDCodeAdded"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_RFID_PROGRAMMING_EVENT_MASK_RFID_CODE_ADDED;
+        }
+        if (value["RFIDCodeCleared"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_RFID_PROGRAMMING_EVENT_MASK_RFID_CODE_CLEARED;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint16_t> from_json_DlRemoteOperationEventMask(const nlohmann::json & value)
+{
+    uint16_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Unknown"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_REMOTE_OPERATION_EVENT_MASK_UNKNOWN;
+        }
+        if (value["Lock"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_REMOTE_OPERATION_EVENT_MASK_LOCK;
+        }
+        if (value["Unlock"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_REMOTE_OPERATION_EVENT_MASK_UNLOCK;
+        }
+        if (value["LockInvalidCode"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_REMOTE_OPERATION_EVENT_MASK_LOCK_INVALID_CODE;
+        }
+        if (value["LockInvalidSchedule"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_REMOTE_OPERATION_EVENT_MASK_LOCK_INVALID_SCHEDULE;
+        }
+        if (value["UnlockInvalidCode"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_REMOTE_OPERATION_EVENT_MASK_UNLOCK_INVALID_CODE;
+        }
+        if (value["UnlockInvalidSchedule"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_REMOTE_OPERATION_EVENT_MASK_UNLOCK_INVALID_SCHEDULE;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint16_t> from_json_DlRemoteProgrammingEventMask(const nlohmann::json & value)
+{
+    uint16_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Unknown"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_REMOTE_PROGRAMMING_EVENT_MASK_UNKNOWN;
+        }
+        if (value["ProgrammingPINChanged"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_REMOTE_PROGRAMMING_EVENT_MASK_PROGRAMMING_PIN_CHANGED;
+        }
+        if (value["PINAdded"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_REMOTE_PROGRAMMING_EVENT_MASK_PIN_ADDED;
+        }
+        if (value["PINCleared"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_REMOTE_PROGRAMMING_EVENT_MASK_PIN_CLEARED;
+        }
+        if (value["PINChanged"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_REMOTE_PROGRAMMING_EVENT_MASK_PIN_CHANGED;
+        }
+        if (value["RFIDCodeAdded"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_REMOTE_PROGRAMMING_EVENT_MASK_RFID_CODE_ADDED;
+        }
+        if (value["RFIDCodeCleared"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_REMOTE_PROGRAMMING_EVENT_MASK_RFID_CODE_CLEARED;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint16_t> from_json_DlSupportedOperatingModes(const nlohmann::json & value)
+{
+    uint16_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Normal"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_SUPPORTED_OPERATING_MODES_NORMAL;
+        }
+        if (value["Vacation"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_SUPPORTED_OPERATING_MODES_VACATION;
+        }
+        if (value["Privacy"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_SUPPORTED_OPERATING_MODES_PRIVACY;
+        }
+        if (value["NoRemoteLockUnlock"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_SUPPORTED_OPERATING_MODES_NO_REMOTE_LOCK_UNLOCK;
+        }
+        if (value["Passage"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DL_SUPPORTED_OPERATING_MODES_PASSAGE;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_DoorLockDayOfWeek(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Sunday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DOOR_LOCK_DAY_OF_WEEK_SUNDAY;
+        }
+        if (value["Monday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DOOR_LOCK_DAY_OF_WEEK_MONDAY;
+        }
+        if (value["Tuesday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DOOR_LOCK_DAY_OF_WEEK_TUESDAY;
+        }
+        if (value["Wednesday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DOOR_LOCK_DAY_OF_WEEK_WEDNESDAY;
+        }
+        if (value["Thursday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DOOR_LOCK_DAY_OF_WEEK_THURSDAY;
+        }
+        if (value["Friday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DOOR_LOCK_DAY_OF_WEEK_FRIDAY;
+        }
+        if (value["Saturday"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DOOR_LOCK_DAY_OF_WEEK_SATURDAY;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_DoorLockFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["PINCredentials"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DOOR_LOCK_FEATURE_PIN_CREDENTIALS;
+        }
+        if (value["RFIDCredentials"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DOOR_LOCK_FEATURE_RFID_CREDENTIALS;
+        }
+        if (value["FingerCredentials"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DOOR_LOCK_FEATURE_FINGER_CREDENTIALS;
+        }
+        if (value["Logging"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DOOR_LOCK_FEATURE_LOGGING;
+        }
+        if (value["WeekDaySchedules"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DOOR_LOCK_FEATURE_WEEK_DAY_SCHEDULES;
+        }
+        if (value["DoorPositionSensor"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DOOR_LOCK_FEATURE_DOOR_POSITION_SENSOR;
+        }
+        if (value["FaceCredentials"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DOOR_LOCK_FEATURE_FACE_CREDENTIALS;
+        }
+        if (value["CredentialsOTA"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DOOR_LOCK_FEATURE_CREDENTIALS_OTA;
+        }
+        if (value["UsersManagement"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DOOR_LOCK_FEATURE_USERS_MANAGEMENT;
+        }
+        if (value["Notifications"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DOOR_LOCK_FEATURE_NOTIFICATIONS;
+        }
+        if (value["YearDaySchedules"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DOOR_LOCK_FEATURE_YEAR_DAY_SCHEDULES;
+        }
+        if (value["HolidaySchedules"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_DOOR_LOCK_FEATURE_HOLIDAY_SCHEDULES;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_EnergyFormatting(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["NumberOfDigitsToTheRightOfTheDecimalPoint"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_ENERGY_FORMATTING_NUMBER_OF_DIGITS_TO_THE_RIGHT_OF_THE_DECIMAL_POINT;
+        }
+        if (value["NumberOfDigitsToTheLeftOfTheDecimalPoint"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_ENERGY_FORMATTING_NUMBER_OF_DIGITS_TO_THE_LEFT_OF_THE_DECIMAL_POINT;
+        }
+        if (value["SuppressLeadingZeros"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_ENERGY_FORMATTING_SUPPRESS_LEADING_ZEROS;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_EthernetNetworkDiagnosticsFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["PacketCounts"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_ETHERNET_NETWORK_DIAGNOSTICS_FEATURE_PACKET_COUNTS;
+        }
+        if (value["ErrorCounts"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_ETHERNET_NETWORK_DIAGNOSTICS_FEATURE_ERROR_COUNTS;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_FanControlFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["MultiSpeed"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_FAN_CONTROL_FEATURE_MULTI_SPEED;
+        }
+        if (value["Auto"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_FAN_CONTROL_FEATURE_AUTO;
+        }
+        if (value["Rocking"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_FAN_CONTROL_FEATURE_ROCKING;
+        }
+        if (value["Wind"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_FAN_CONTROL_FEATURE_WIND;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_Feature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Lift"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_FEATURE_LIFT;
+        }
+        if (value["Tilt"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_FEATURE_TILT;
+        }
+        if (value["PositionAwareLift"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_FEATURE_POSITION_AWARE_LIFT;
+        }
+        if (value["AbsolutePosition"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_FEATURE_ABSOLUTE_POSITION;
+        }
+        if (value["PositionAwareTilt"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_FEATURE_POSITION_AWARE_TILT;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_GroupClusterFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["GroupNames"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_GROUP_CLUSTER_FEATURE_GROUP_NAMES;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint16_t> from_json_IasZoneStatus(const nlohmann::json & value)
+{
+    uint16_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Alarm1"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_IAS_ZONE_STATUS_ALARM1;
+        }
+        if (value["Alarm2"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_IAS_ZONE_STATUS_ALARM2;
+        }
+        if (value["Tamper"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_IAS_ZONE_STATUS_TAMPER;
+        }
+        if (value["Battery"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_IAS_ZONE_STATUS_BATTERY;
+        }
+        if (value["SupervisionReports"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_IAS_ZONE_STATUS_SUPERVISION_REPORTS;
+        }
+        if (value["RestoreReports"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_IAS_ZONE_STATUS_RESTORE_REPORTS;
+        }
+        if (value["Trouble"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_IAS_ZONE_STATUS_TROUBLE;
+        }
+        if (value["Ac"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_IAS_ZONE_STATUS_AC;
+        }
+        if (value["Test"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_IAS_ZONE_STATUS_TEST;
+        }
+        if (value["BatteryDefect"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_IAS_ZONE_STATUS_BATTERY_DEFECT;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_KeypadInputFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["NavigationKeyCodes"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_KEYPAD_INPUT_FEATURE_NAVIGATION_KEY_CODES;
+        }
+        if (value["LocationKeys"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_KEYPAD_INPUT_FEATURE_LOCATION_KEYS;
+        }
+        if (value["NumberKeys"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_KEYPAD_INPUT_FEATURE_NUMBER_KEYS;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_LampAlarmMode(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["LampBurnHours"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_LAMP_ALARM_MODE_LAMP_BURN_HOURS;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_LevelControlFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["OnOff"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_LEVEL_CONTROL_FEATURE_ON_OFF;
+        }
+        if (value["Lighting"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_LEVEL_CONTROL_FEATURE_LIGHTING;
+        }
+        if (value["Frequency"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_LEVEL_CONTROL_FEATURE_FREQUENCY;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_MainsAlarmMask(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["VoltageTooLow"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_MAINS_ALARM_MASK_VOLTAGE_TOO_LOW;
+        }
+        if (value["VoltageTooHigh"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_MAINS_ALARM_MASK_VOLTAGE_TOO_HIGH;
+        }
+        if (value["MainsPowerSupplyLost"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_MAINS_ALARM_MASK_MAINS_POWER_SUPPLY_LOST;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_MediaInputFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["NameUpdates"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_MEDIA_INPUT_FEATURE_NAME_UPDATES;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_MediaPlaybackFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["AdvancedSeek"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_MEDIA_PLAYBACK_FEATURE_ADVANCED_SEEK;
+        }
+        if (value["VariableSpeed"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_MEDIA_PLAYBACK_FEATURE_VARIABLE_SPEED;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_Mode(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["MotorDirectionReversed"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_MODE_MOTOR_DIRECTION_REVERSED;
+        }
+        if (value["CalibrationMode"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_MODE_CALIBRATION_MODE;
+        }
+        if (value["MaintenanceMode"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_MODE_MAINTENANCE_MODE;
+        }
+        if (value["LedFeedback"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_MODE_LED_FEEDBACK;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_ModeForSequence(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["HeatSetpointFieldPresent"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_MODE_FOR_SEQUENCE_HEAT_SETPOINT_FIELD_PRESENT;
+        }
+        if (value["CoolSetpointFieldPresent"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_MODE_FOR_SEQUENCE_COOL_SETPOINT_FIELD_PRESENT;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_ModeSelectFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Deponoff"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_MODE_SELECT_FEATURE_DEPONOFF;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_NetworkCommissioningFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["WiFiNetworkInterface"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_NETWORK_COMMISSIONING_FEATURE_WI_FI_NETWORK_INTERFACE;
+        }
+        if (value["ThreadNetworkInterface"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_NETWORK_COMMISSIONING_FEATURE_THREAD_NETWORK_INTERFACE;
+        }
+        if (value["EthernetNetworkInterface"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_NETWORK_COMMISSIONING_FEATURE_ETHERNET_NETWORK_INTERFACE;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_Occupancy(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["SensedOccupancy"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_OCCUPANCY_OCCUPIED;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_OccupancySensorTypeBitmap(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["PIR"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_OCCUPANCY_SENSOR_TYPE_BITMAP_PIR;
+        }
+        if (value["Ultrasonic"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_OCCUPANCY_SENSOR_TYPE_BITMAP_ULTRASONIC;
+        }
+        if (value["PhysicalContact"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_OCCUPANCY_SENSOR_TYPE_BITMAP_PHYSICAL_CONTACT;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_OnOffControl(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["AcceptOnlyWhenOn"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_ON_OFF_CONTROL_ACCEPT_ONLY_WHEN_ON;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_OnOffFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Lighting"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_ON_OFF_FEATURE_LIGHTING;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_OperationalStatus(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Global"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_OPERATIONAL_STATUS_GLOBAL;
+        }
+        if (value["Lift"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_OPERATIONAL_STATUS_LIFT;
+        }
+        if (value["Tilt"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_OPERATIONAL_STATUS_TILT;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_PowerSourceFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Wired"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_POWER_SOURCE_FEATURE_WIRED;
+        }
+        if (value["Battery"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_POWER_SOURCE_FEATURE_BATTERY;
+        }
+        if (value["Rechargeable"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_POWER_SOURCE_FEATURE_RECHARGEABLE;
+        }
+        if (value["Replaceable"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_POWER_SOURCE_FEATURE_REPLACEABLE;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_PressureFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Ext"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_PRESSURE_FEATURE_EXT;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint16_t> from_json_PumpStatus(const nlohmann::json & value)
+{
+    uint16_t bitmap_value = 0x00;
+    try
+    {
+        if (value["DeviceFault"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_PUMP_STATUS_DEVICE_FAULT;
+        }
+        if (value["Supplyfault"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_PUMP_STATUS_SUPPLYFAULT;
+        }
+        if (value["SpeedLow"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_PUMP_STATUS_SPEED_LOW;
+        }
+        if (value["SpeedHigh"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_PUMP_STATUS_SPEED_HIGH;
+        }
+        if (value["LocalOverride"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_PUMP_STATUS_LOCAL_OVERRIDE;
+        }
+        if (value["Running"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_PUMP_STATUS_RUNNING;
+        }
+        if (value["RemotePressure"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_PUMP_STATUS_REMOTE_PRESSURE;
+        }
+        if (value["RemoteFlow"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_PUMP_STATUS_REMOTE_FLOW;
+        }
+        if (value["RemoteTemperature"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_PUMP_STATUS_REMOTE_TEMPERATURE;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_RockSupportMask(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["RockLeftRight"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_ROCK_SUPPORT_MASK_ROCK_LEFT_RIGHT;
+        }
+        if (value["RockUpDown"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_ROCK_SUPPORT_MASK_ROCK_UP_DOWN;
+        }
+        if (value["RockRound"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_ROCK_SUPPORT_MASK_ROCK_ROUND;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint16_t> from_json_SafetyStatus(const nlohmann::json & value)
+{
+    uint16_t bitmap_value = 0x00;
+    try
+    {
+        if (value["RemoteLockout"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SAFETY_STATUS_REMOTE_LOCKOUT;
+        }
+        if (value["TamperDetection"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SAFETY_STATUS_TAMPER_DETECTION;
+        }
+        if (value["FailedCommunication"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SAFETY_STATUS_FAILED_COMMUNICATION;
+        }
+        if (value["PositionFailure"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SAFETY_STATUS_POSITION_FAILURE;
+        }
+        if (value["ThermalProtection"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SAFETY_STATUS_THERMAL_PROTECTION;
+        }
+        if (value["ObstacleDetected"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SAFETY_STATUS_OBSTACLE_DETECTED;
+        }
+        if (value["Power"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SAFETY_STATUS_POWER;
+        }
+        if (value["StopInput"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SAFETY_STATUS_STOP_INPUT;
+        }
+        if (value["MotorJammed"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SAFETY_STATUS_MOTOR_JAMMED;
+        }
+        if (value["HardwareFailure"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SAFETY_STATUS_HARDWARE_FAILURE;
+        }
+        if (value["ManualOperation"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SAFETY_STATUS_MANUAL_OPERATION;
+        }
+        if (value["Protection"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SAFETY_STATUS_PROTECTION;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_SceneFeatures(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["SceneNames"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SCENE_FEATURES_SCENE_NAMES;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_ScenesCopyMode(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["CopyAllScenes"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SCENES_COPY_MODE_COPY_ALL_SCENES;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_ShadeClosureStatus(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Operational"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SHADE_CLOSURE_STATUS_OPERATIONAL;
+        }
+        if (value["Adjusting"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SHADE_CLOSURE_STATUS_ADJUSTING;
+        }
+        if (value["Opening"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SHADE_CLOSURE_STATUS_OPENING;
+        }
+        if (value["MotorOpening"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SHADE_CLOSURE_STATUS_MOTOR_OPENING;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_SimpleBitmap(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["ValueA"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SIMPLE_BITMAP_VALUE_A;
+        }
+        if (value["ValueB"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SIMPLE_BITMAP_VALUE_B;
+        }
+        if (value["ValueC"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SIMPLE_BITMAP_VALUE_C;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_SoftwareDiagnosticsFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["WaterMarks"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SOFTWARE_DIAGNOSTICS_FEATURE_WATER_MARKS;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_SquawkInfo(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Mode"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SQUAWK_INFO_MODE;
+        }
+        if (value["Strobe"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SQUAWK_INFO_STROBE;
+        }
+        if (value["Level"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SQUAWK_INFO_LEVEL;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint16_t> from_json_StartTime(const nlohmann::json & value)
+{
+    uint16_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Minutes"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_START_TIME_MINUTES;
+        }
+        if (value["TimeEncoding"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_START_TIME_TIME_ENCODING;
+        }
+        if (value["Hours"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_START_TIME_HOURS;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_SupportedStreamingProtocol(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Dash"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SUPPORTED_STREAMING_PROTOCOL_DASH;
+        }
+        if (value["Hls"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SUPPORTED_STREAMING_PROTOCOL_HLS;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_SwitchFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["LatchingSwitch"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SWITCH_FEATURE_LATCHING_SWITCH;
+        }
+        if (value["MomentarySwitch"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SWITCH_FEATURE_MOMENTARY_SWITCH;
+        }
+        if (value["MomentarySwitchRelease"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SWITCH_FEATURE_MOMENTARY_SWITCH_RELEASE;
+        }
+        if (value["MomentarySwitchLongPress"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SWITCH_FEATURE_MOMENTARY_SWITCH_LONG_PRESS;
+        }
+        if (value["MomentarySwitchMultiPress"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_SWITCH_FEATURE_MOMENTARY_SWITCH_MULTI_PRESS;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_ThermostatAlarmMask(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["InitializationFailure"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_ALARM_MASK_INITIALIZATION_FAILURE;
+        }
+        if (value["HardwareFailure"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_ALARM_MASK_HARDWARE_FAILURE;
+        }
+        if (value["SelfcalibrationFailure"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_ALARM_MASK_SELFCALIBRATION_FAILURE;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_ThermostatFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Heating"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_FEATURE_HEATING;
+        }
+        if (value["Cooling"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_FEATURE_COOLING;
+        }
+        if (value["Occupancy"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_FEATURE_OCCUPANCY;
+        }
+        if (value["Schedule"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_FEATURE_SCHEDULE;
+        }
+        if (value["Setback"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_FEATURE_SETBACK;
+        }
+        if (value["Automode"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_FEATURE_AUTOMODE;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_ThermostatOccupancy(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["SensedOccupancy"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_OCCUPANCY_OCCUPIED;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint16_t> from_json_ThermostatRunningState(const nlohmann::json & value)
+{
+    uint16_t bitmap_value = 0x00;
+    try
+    {
+        if (value["HeatStateOn"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_RUNNING_STATE_HEAT_STATE_ON;
+        }
+        if (value["CoolStateOn"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_RUNNING_STATE_COOL_STATE_ON;
+        }
+        if (value["FanStateOn"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_RUNNING_STATE_FAN_STATE_ON;
+        }
+        if (value["HeatSecondStageStateOn"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_RUNNING_STATE_HEAT_SECOND_STAGE_STATE_ON;
+        }
+        if (value["CoolSecondStageStateOn"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_RUNNING_STATE_COOL_SECOND_STAGE_STATE_ON;
+        }
+        if (value["FanSecondStageStateOn"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_RUNNING_STATE_FAN_SECOND_STAGE_STATE_ON;
+        }
+        if (value["FanThirdStageStateOn"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_RUNNING_STATE_FAN_THIRD_STAGE_STATE_ON;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_ThermostatSensing(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["LocalTempSensedRemotely"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_SENSING_LOCAL_TEMP_SENSED_REMOTELY;
+        }
+        if (value["OutdoorTempSensedRemotely"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_SENSING_OUTDOOR_TEMP_SENSED_REMOTELY;
+        }
+        if (value["OccupancySensedRemotely"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THERMOSTAT_SENSING_OCCUPANCY_SENSED_REMOTELY;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_ThreadNetworkDiagnosticsFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["PacketCounts"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THREAD_NETWORK_DIAGNOSTICS_FEATURE_PACKET_COUNTS;
+        }
+        if (value["ErrorCounts"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THREAD_NETWORK_DIAGNOSTICS_FEATURE_ERROR_COUNTS;
+        }
+        if (value["MLECounts"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THREAD_NETWORK_DIAGNOSTICS_FEATURE_MLE_COUNTS;
+        }
+        if (value["MACCounts"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_THREAD_NETWORK_DIAGNOSTICS_FEATURE_MAC_COUNTS;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_TimeStatusMask(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["MasterClock"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_TIME_STATUS_MASK_MASTER_CLOCK;
+        }
+        if (value["Synchronized"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_TIME_STATUS_MASK_SYNCHRONIZED;
+        }
+        if (value["MasterZoneDst"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_TIME_STATUS_MASK_MASTER_ZONE_DST;
+        }
+        if (value["Superseding"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_TIME_STATUS_MASK_SUPERSEDING;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_UnitLocalizationFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["TemperatureUnit"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_UNIT_LOCALIZATION_FEATURE_TEMPERATURE_UNIT;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_WarningInfo(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Mode"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_WARNING_INFO_MODE;
+        }
+        if (value["Strobe"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_WARNING_INFO_STROBE;
+        }
+        if (value["SirenLevel"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_WARNING_INFO_SIREN_LEVEL;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_WiFiNetworkDiagnosticsFeature(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        if (value["PacketCounts"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_WI_FI_NETWORK_DIAGNOSTICS_FEATURE_PACKET_COUNTS;
+        }
+        if (value["ErrorCounts"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_WI_FI_NETWORK_DIAGNOSTICS_FEATURE_ERROR_COUNTS;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_WiFiSecurity(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["Unencrypted"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_WI_FI_SECURITY_UNENCRYPTED;
+        }
+        if (value["WepPersonal"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_WI_FI_SECURITY_WEP_PERSONAL;
+        }
+        if (value["WpaPersonal"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_WI_FI_SECURITY_WPA_PERSONAL;
+        }
+        if (value["Wpa2Personal"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_WI_FI_SECURITY_WPA2_PERSONAL;
+        }
+        if (value["Wpa3Personal"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_WI_FI_SECURITY_WPA3_PERSONAL;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_WindSettingMask(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["SleepWind"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_WIND_SETTING_MASK_SLEEP_WIND;
+        }
+        if (value["NaturalWind"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_WIND_SETTING_MASK_NATURAL_WIND;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_WindSupportMask(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["SleepWind"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_WIND_SUPPORT_MASK_SLEEP_WIND;
+        }
+        if (value["NaturalWind"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_WIND_SUPPORT_MASK_NATURAL_WIND;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint16_t> from_json_bitmap16(const nlohmann::json & value)
+{
+    uint16_t bitmap_value = 0x00;
+    try
+    {
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_bitmap24(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint32_t> from_json_bitmap32(const nlohmann::json & value)
+{
+    uint32_t bitmap_value = 0x00;
+    try
+    {
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint64_t> from_json_bitmap64(const nlohmann::json & value)
+{
+    uint64_t bitmap_value = 0x00;
+    try
+    {
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_bitmap8(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
         return std::nullopt;
     }
 }

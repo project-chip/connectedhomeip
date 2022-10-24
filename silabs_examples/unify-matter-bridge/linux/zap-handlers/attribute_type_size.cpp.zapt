@@ -1,0 +1,88 @@
+/******************************************************************************
+ * # License
+ * <b>Copyright 2022 Silicon Laboratories Inc. www.silabs.com</b>
+ ******************************************************************************
+ * The licensor of this software is Silicon Laboratories Inc. Your use of this
+ * software is governed by the terms of Silicon Labs Master Software License
+ * Agreement (MSLA) available at
+ * www.silabs.com/about-us/legal/master-software-license-agreement. This
+ * software is distributed to you in Source Code format and is governed by the
+ * sections of the MSLA applicable to Source Code.
+ *
+ *****************************************************************************/
+
+#include "attribute_type_size.hpp"
+#include "matter.h"
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+
+// ZCL attribute types
+{{#zcl_atomics}}
+constexpr uint8_t ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES = {{asHex atomicId 2}};
+{{/zcl_atomics}}
+
+// ZCL attribute sizes
+{{#zcl_atomics}}
+{{#if size}}
+constexpr uint8_t ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES_SIZE = {{size}};
+{{/if}}
+{{/zcl_atomics}}
+
+// Setting the attribute tpe size which is not defined in 'chip-type.xml'
+constexpr uint8_t ZCL_NO_DATA_ATTRIBUTE_TYPES_SIZE = 0;
+constexpr uint8_t ZCL_OCTET_STRING_ATTRIBUTE_TYPES_SIZE = 32;
+constexpr uint8_t ZCL_CHAR_STRING_ATTRIBUTE_TYPES_SIZE = 32;
+constexpr uint8_t ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPES_SIZE = 32;
+constexpr uint8_t ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPES_SIZE = 32;
+constexpr uint8_t ZCL_STRUCT_ATTRIBUTE_TYPES_SIZE = 254;
+constexpr uint8_t ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE = 254;
+
+{{#zcl_clusters}}
+{{#if (supportedCluster label)}}
+
+{{#zcl_bitmaps}}
+constexpr uint8_t ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
+constexpr uint8_t ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES_SIZE  = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
+{{/zcl_bitmaps}}
+
+{{#zcl_enums}}
+constexpr uint8_t ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES = ZCL_ENUM8_ATTRIBUTE_TYPES;
+constexpr uint8_t ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES_SIZE = ZCL_ENUM8_ATTRIBUTE_TYPES_SIZE;
+{{/zcl_enums}}
+
+{{#zcl_structs}}
+{{#if (supportedStruct name)}}
+constexpr uint8_t ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES = ZCL_STRUCT_ATTRIBUTE_TYPES;
+constexpr uint8_t ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES_SIZE = ZCL_STRUCT_ATTRIBUTE_TYPES_SIZE;
+{{/if}}
+{{/zcl_structs}}
+
+{{/if}}
+{{/zcl_clusters}}
+
+attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_id)
+{
+  switch(cluster_id) 
+  {
+    {{#zcl_clusters}}
+     {{#if (supportedCluster label)}}
+      case chip::app::Clusters::{{asUpperCamelCase label}}::Id: {
+        switch(attribute_id) 
+        {
+         {{#zcl_attributes_server}}
+            case {{asUpperCamelCase parent.label}}::Attributes::{{asUpperCamelCase label}}::Id: {
+              return {ZCL_{{asDelimitedMacro type}}_ATTRIBUTE_TYPES, ZCL_{{asDelimitedMacro type}}_ATTRIBUTE_TYPES_SIZE};
+             }
+         {{/zcl_attributes_server}}
+        default:
+          return {ZCL_BOOLEAN_ATTRIBUTE_TYPES, 0x01};
+        }
+      }
+     {{/if}}
+    {{/zcl_clusters}}
+    default:
+      return {ZCL_BOOLEAN_ATTRIBUTE_TYPES, 0x01};
+  }
+}

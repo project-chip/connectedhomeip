@@ -50,7 +50,18 @@ void matter_node_state_monitor::on_unify_node_added(
 {
   for (const auto &[ep_id, ep]: node.endpoints) {
     uint8_t count_number_of_clusters_matched_to_matter = 0;
+
+    // TODO: This is a temporary solution to ignore endpoints with only the group cluster.
+    if (ep.clusters.size() <= 2 && (ep.clusters.begin()->first == "Groups" || ep.clusters.begin()->first == "NameAndLocation")) {
+      sl_log_warning(LOG_TAG, "Ignoring endpoint %d from UNID %s with only the 'Groups' or 'NameAndLocation' clusters", ep_id, node.unid.c_str());
+      continue;
+    }
+
     for (const auto &[cluster_name, cluster]: ep.clusters) {
+      // Skip clusters that doesn't have attributes
+      if (cluster.attributes.empty()) {
+        continue;
+      }
       if (matter_device_translator.get_cluster_id(cluster_name).has_value()) {
         count_number_of_clusters_matched_to_matter++;
       }

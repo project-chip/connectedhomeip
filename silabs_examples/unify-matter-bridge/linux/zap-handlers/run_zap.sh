@@ -1,4 +1,4 @@
-
+#!/bin/bash
 pushd ../../../../
 
 ./scripts/tools/zap/generate.py -t silabs_examples/unify-matter-bridge/linux/zap-handlers/bridge-templates.json \

@@ -59,7 +59,7 @@ const static std::unordered_map<std::string, uint32_t> basic_information_map {
 BridgedDeviceBasicInfoAttributeAccess::BridgedDeviceBasicInfoAttributeAccess(
   matter_node_state_monitor &node_state_monitor) :
   attribute_translator_interface(node_state_monitor,
-                                 chip::app::Clusters::BridgedDeviceBasic::Id)
+                                 chip::app::Clusters::BridgedDeviceBasic::Id, "attr_translator_BridgedDeviceBasic")
 
 {
   //Register the an event listener for reachable state update
@@ -153,6 +153,15 @@ CHIP_ERROR BridgedDeviceBasicInfoAttributeAccess::Read(
           = attribute_state_cache::get_instance()
               .get<Reachable::TypeInfo::Type>(attr_path);
         return aEncoder.Encode(state);
+      }
+      case FeatureMap::Id: {
+        uint32_t map = 0;
+        return aEncoder.Encode(map);
+      }
+      case ClusterRevision::Id: {
+        // Update version if bridged-device-basic.xml version is changed
+        uint16_t revision = 1;
+        return aEncoder.Encode(revision);
       }
     }
   } catch (const std::out_of_range &e) {

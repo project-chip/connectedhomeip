@@ -53,5 +53,21 @@
             "name": "Attribute Accessor Source",
             "output": "unify_accessors.cpp"
         }
+        ,
+        {
+            "path": "attribute_type_size.hpp.zapt",
+            "name": "Attribute Type/Size Header",
+            "output": "attribute_type_size.hpp"
+        },
+        {
+            "path": "attribute_type_size.cpp.zapt",
+            "name": "Attribute Type/Size Source",
+            "output": "attribute_type_size.cpp"
+        },
+        {
+            "path": "zcl_global_types.hpp.zapt",
+            "name": "ZCL Global Enum and Bitmap types",
+            "output": "zcl_global_types.hpp"
+        }
     ]
 }

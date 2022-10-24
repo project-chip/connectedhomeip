@@ -47,30 +47,25 @@ IdentifyAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribute
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::IdentifyTime::Id: { // type is int16u
             MN::IdentifyTime::TypeInfo::Type value;
             UN::IdentifyTime::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::IdentifyType::Id: { // type is enum8
             MN::IdentifyType::TypeInfo::Type value;
             UN::IdentifyType::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -107,8 +102,7 @@ CHIP_ERROR IdentifyAttributeAccess::Write(const ConcreteDataAttributePath & aPat
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -146,7 +140,6 @@ void IdentifyAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::Identify::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int16u
@@ -219,54 +212,45 @@ ScenesAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeVa
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::SceneCount::Id: { // type is int8u
             MN::SceneCount::TypeInfo::Type value;
             UN::SceneCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CurrentScene::Id: { // type is int8u
             MN::CurrentScene::TypeInfo::Type value;
             UN::CurrentScene::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CurrentGroup::Id: { // type is group_id
             MN::CurrentGroup::TypeInfo::Type value;
             UN::CurrentGroup::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SceneValid::Id: { // type is boolean
             MN::SceneValid::TypeInfo::Type value;
             UN::SceneValid::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::NameSupport::Id: { // type is bitmap8
             MN::NameSupport::TypeInfo::Type value;
             UN::NameSupport::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::LastConfiguredBy::Id: { // type is node_id
             MN::LastConfiguredBy::TypeInfo::Type value;
             UN::LastConfiguredBy::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -303,8 +287,7 @@ CHIP_ERROR ScenesAttributeAccess::Write(const ConcreteDataAttributePath & aPath,
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -342,7 +325,6 @@ void ScenesAttributeAccess::reported_updated(const bridged_endpoint * ep, const 
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath        = ConcreteAttributePath(node_matter_endpoint, Clusters::Scenes::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int8u
@@ -471,48 +453,41 @@ OnOffAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeVal
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::OnOff::Id: { // type is boolean
             MN::OnOff::TypeInfo::Type value;
             UN::OnOff::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::GlobalSceneControl::Id: { // type is boolean
             MN::GlobalSceneControl::TypeInfo::Type value;
             UN::GlobalSceneControl::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OnTime::Id: { // type is int16u
             MN::OnTime::TypeInfo::Type value;
             UN::OnTime::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OffWaitTime::Id: { // type is int16u
             MN::OffWaitTime::TypeInfo::Type value;
             UN::OffWaitTime::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::StartUpOnOff::Id: { // type is OnOffStartUpOnOff
             MN::StartUpOnOff::TypeInfo::Type value;
             UN::StartUpOnOff::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            // Set hardcoded FeatureMap values for OnOff
+            value = 1;
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -549,8 +524,7 @@ CHIP_ERROR OnOffAttributeAccess::Write(const ConcreteDataAttributePath & aPath, 
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -588,7 +562,6 @@ void OnOffAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath        = ConcreteAttributePath(node_matter_endpoint, Clusters::OnOff::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is boolean
@@ -703,30 +676,25 @@ OnOffSwitchConfigurationAttributeAccess::Read(const ConcreteReadAttributePath & 
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::SwitchType::Id: { // type is enum8
             MN::SwitchType::TypeInfo::Type value;
             UN::SwitchType::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SwitchActions::Id: { // type is enum8
             MN::SwitchActions::TypeInfo::Type value;
             UN::SwitchActions::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -763,8 +731,7 @@ CHIP_ERROR OnOffSwitchConfigurationAttributeAccess::Write(const ConcreteDataAttr
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -803,7 +770,6 @@ void OnOffSwitchConfigurationAttributeAccess::reported_updated(const bridged_end
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::OnOffSwitchConfiguration::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is enum8
@@ -878,102 +844,86 @@ LevelControlAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attri
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::CurrentLevel::Id: { // type is int8u
             MN::CurrentLevel::TypeInfo::Type value;
             UN::CurrentLevel::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RemainingTime::Id: { // type is int16u
             MN::RemainingTime::TypeInfo::Type value;
             UN::RemainingTime::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MinLevel::Id: { // type is int8u
             MN::MinLevel::TypeInfo::Type value;
             UN::MinLevel::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MaxLevel::Id: { // type is int8u
             MN::MaxLevel::TypeInfo::Type value;
             UN::MaxLevel::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CurrentFrequency::Id: { // type is int16u
             MN::CurrentFrequency::TypeInfo::Type value;
             UN::CurrentFrequency::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MinFrequency::Id: { // type is int16u
             MN::MinFrequency::TypeInfo::Type value;
             UN::MinFrequency::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MaxFrequency::Id: { // type is int16u
             MN::MaxFrequency::TypeInfo::Type value;
             UN::MaxFrequency::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Options::Id: { // type is bitmap8
             MN::Options::TypeInfo::Type value;
             UN::Options::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OnOffTransitionTime::Id: { // type is int16u
             MN::OnOffTransitionTime::TypeInfo::Type value;
             UN::OnOffTransitionTime::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OnLevel::Id: { // type is int8u
             MN::OnLevel::TypeInfo::Type value;
             UN::OnLevel::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OnTransitionTime::Id: { // type is int16u
             MN::OnTransitionTime::TypeInfo::Type value;
             UN::OnTransitionTime::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OffTransitionTime::Id: { // type is int16u
             MN::OffTransitionTime::TypeInfo::Type value;
             UN::OffTransitionTime::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DefaultMoveRate::Id: { // type is int8u
             MN::DefaultMoveRate::TypeInfo::Type value;
             UN::DefaultMoveRate::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::StartUpCurrentLevel::Id: { // type is int8u
             MN::StartUpCurrentLevel::TypeInfo::Type value;
             UN::StartUpCurrentLevel::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            // Set hardcoded FeatureMap values for LevelControl
+            value = 3;
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -1010,8 +960,7 @@ CHIP_ERROR LevelControlAttributeAccess::Write(const ConcreteDataAttributePath & 
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -1049,7 +998,6 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::LevelControl::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int8u
@@ -1290,72 +1238,60 @@ BinaryInputBasicAttributeAccess::Read(const ConcreteReadAttributePath & aPath, A
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::ActiveText::Id: { // type is char_string
             MN::ActiveText::TypeInfo::Type value;
             UN::ActiveText::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Description::Id: { // type is char_string
             MN::Description::TypeInfo::Type value;
             UN::Description::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::InactiveText::Id: { // type is char_string
             MN::InactiveText::TypeInfo::Type value;
             UN::InactiveText::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OutOfService::Id: { // type is boolean
             MN::OutOfService::TypeInfo::Type value;
             UN::OutOfService::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Polarity::Id: { // type is enum8
             MN::Polarity::TypeInfo::Type value;
             UN::Polarity::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PresentValue::Id: { // type is boolean
             MN::PresentValue::TypeInfo::Type value;
             UN::PresentValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Reliability::Id: { // type is enum8
             MN::Reliability::TypeInfo::Type value;
             UN::Reliability::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::StatusFlags::Id: { // type is bitmap8
             MN::StatusFlags::TypeInfo::Type value;
             UN::StatusFlags::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ApplicationType::Id: { // type is int32u
             MN::ApplicationType::TypeInfo::Type value;
             UN::ApplicationType::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -1392,8 +1328,7 @@ CHIP_ERROR BinaryInputBasicAttributeAccess::Write(const ConcreteDataAttributePat
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -1432,7 +1367,6 @@ void BinaryInputBasicAttributeAccess::reported_updated(const bridged_endpoint * 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::BinaryInputBasic::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is char_string
@@ -1603,18 +1537,15 @@ PulseWidthModulationAttributeAccess::Read(const ConcreteReadAttributePath & aPat
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -1651,8 +1582,7 @@ CHIP_ERROR PulseWidthModulationAttributeAccess::Write(const ConcreteDataAttribut
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -1691,7 +1621,6 @@ void PulseWidthModulationAttributeAccess::reported_updated(const bridged_endpoin
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::PulseWidthModulation::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is bitmap32
@@ -1727,159 +1656,6 @@ void PulseWidthModulationAttributeAccess::reported_updated(const bridged_endpoin
 }
 
 CHIP_ERROR
-ActionsAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    namespace MN = chip::app::Clusters::Actions::Attributes;
-    namespace UN = unify::matter_bridge::Actions::Attributes;
-    if (aPath.mClusterId != Clusters::Actions::Id)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
-
-        case MN::SetupURL::Id: { // type is long_char_string
-            MN::SetupURL::TypeInfo::Type value;
-            UN::SetupURL::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::FeatureMap::Id: { // type is bitmap32
-            MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::ClusterRevision::Id: { // type is int16u
-            MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-        }
-    } catch (const std::out_of_range & e)
-    {
-        sl_log_info(LOG_TAG,
-                    "The request attribute Path is not found in the attribute state "
-                    "contanier, %s\n",
-                    e.what());
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ActionsAttributeAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    using namespace chip::app::Clusters::Actions;
-
-    if (aPath.mClusterId != Clusters::Actions::Id)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
-
-    if (!unify_node)
-    {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-
-    std::string attribute_name;
-    nlohmann::json jsn;
-
-    switch (aPath.mAttributeId)
-    {
-    }
-
-    if (!attribute_name.empty())
-    {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/Actions/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
-        uic_mqtt_publish(topic.c_str(), payload_str.c_str(), payload_str.length(), true);
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void ActionsAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                              const std::string & attribute, const nlohmann::json & unify_value)
-{
-    namespace MN = chip::app::Clusters::Actions::Attributes;
-    namespace UN = unify::matter_bridge::Actions::Attributes;
-
-    auto cluster_id = device_translator::instance().get_cluster_id(cluster);
-
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::Actions::Id))
-    {
-        return;
-    }
-
-    // get attribute id
-    auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
-
-    if (!attribute_id.has_value())
-    {
-        return;
-    }
-
-    chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
-    ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::Actions::Id, attribute_id.value());
-
-    switch (attribute_id.value())
-    {
-    // type is long_char_string
-    case MN::SetupURL::Id: {
-        using T                = MN::SetupURL::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "SetupURL attribute value is %s", unify_value.dump().c_str());
-            UN::SetupURL::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Actions::Id, MN::SetupURL::Id,
-                                                   ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is bitmap32
-    case MN::FeatureMap::Id: {
-        using T                = MN::FeatureMap::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
-            UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Actions::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16u
-    case MN::ClusterRevision::Id: {
-        using T                = MN::ClusterRevision::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
-            UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Actions::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-    }
-}
-
-CHIP_ERROR
 BasicAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     namespace MN = chip::app::Clusters::Basic::Attributes;
@@ -1890,132 +1666,110 @@ BasicAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeVal
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::DataModelRevision::Id: { // type is int16u
             MN::DataModelRevision::TypeInfo::Type value;
             UN::DataModelRevision::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::VendorName::Id: { // type is char_string
             MN::VendorName::TypeInfo::Type value;
             UN::VendorName::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::VendorID::Id: { // type is vendor_id
             MN::VendorID::TypeInfo::Type value;
             UN::VendorID::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ProductName::Id: { // type is char_string
             MN::ProductName::TypeInfo::Type value;
             UN::ProductName::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ProductID::Id: { // type is int16u
             MN::ProductID::TypeInfo::Type value;
             UN::ProductID::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::NodeLabel::Id: { // type is char_string
             MN::NodeLabel::TypeInfo::Type value;
             UN::NodeLabel::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Location::Id: { // type is char_string
             MN::Location::TypeInfo::Type value;
             UN::Location::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::HardwareVersion::Id: { // type is int16u
             MN::HardwareVersion::TypeInfo::Type value;
             UN::HardwareVersion::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::HardwareVersionString::Id: { // type is char_string
             MN::HardwareVersionString::TypeInfo::Type value;
             UN::HardwareVersionString::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SoftwareVersion::Id: { // type is int32u
             MN::SoftwareVersion::TypeInfo::Type value;
             UN::SoftwareVersion::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SoftwareVersionString::Id: { // type is char_string
             MN::SoftwareVersionString::TypeInfo::Type value;
             UN::SoftwareVersionString::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ManufacturingDate::Id: { // type is char_string
             MN::ManufacturingDate::TypeInfo::Type value;
             UN::ManufacturingDate::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PartNumber::Id: { // type is char_string
             MN::PartNumber::TypeInfo::Type value;
             UN::PartNumber::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ProductURL::Id: { // type is long_char_string
             MN::ProductURL::TypeInfo::Type value;
             UN::ProductURL::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ProductLabel::Id: { // type is char_string
             MN::ProductLabel::TypeInfo::Type value;
             UN::ProductLabel::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SerialNumber::Id: { // type is char_string
             MN::SerialNumber::TypeInfo::Type value;
             UN::SerialNumber::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::LocalConfigDisabled::Id: { // type is boolean
             MN::LocalConfigDisabled::TypeInfo::Type value;
             UN::LocalConfigDisabled::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Reachable::Id: { // type is boolean
             MN::Reachable::TypeInfo::Type value;
             UN::Reachable::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::UniqueID::Id: { // type is char_string
             MN::UniqueID::TypeInfo::Type value;
             UN::UniqueID::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -2052,8 +1806,7 @@ CHIP_ERROR BasicAttributeAccess::Write(const ConcreteDataAttributePath & aPath, 
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -2091,7 +1844,6 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath        = ConcreteAttributePath(node_matter_endpoint, Clusters::Basic::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int16u
@@ -2403,18 +2155,15 @@ OtaSoftwareUpdateProviderAttributeAccess::Read(const ConcreteReadAttributePath &
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -2452,8 +2201,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderAttributeAccess::Write(const ConcreteDataAtt
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -2492,7 +2240,6 @@ void OtaSoftwareUpdateProviderAttributeAccess::reported_updated(const bridged_en
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::OtaSoftwareUpdateProvider::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is bitmap32
@@ -2539,36 +2286,30 @@ OtaSoftwareUpdateRequestorAttributeAccess::Read(const ConcreteReadAttributePath 
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::UpdatePossible::Id: { // type is boolean
             MN::UpdatePossible::TypeInfo::Type value;
             UN::UpdatePossible::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::UpdateState::Id: { // type is OTAUpdateStateEnum
             MN::UpdateState::TypeInfo::Type value;
             UN::UpdateState::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::UpdateStateProgress::Id: { // type is int8u
             MN::UpdateStateProgress::TypeInfo::Type value;
             UN::UpdateStateProgress::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -2606,8 +2347,7 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttributeAccess::Write(const ConcreteDataAt
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -2646,7 +2386,6 @@ void OtaSoftwareUpdateRequestorAttributeAccess::reported_updated(const bridged_e
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is boolean
@@ -2738,24 +2477,20 @@ LocalizationConfigurationAttributeAccess::Read(const ConcreteReadAttributePath &
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::ActiveLocale::Id: { // type is char_string
             MN::ActiveLocale::TypeInfo::Type value;
             UN::ActiveLocale::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -2793,8 +2528,7 @@ CHIP_ERROR LocalizationConfigurationAttributeAccess::Write(const ConcreteDataAtt
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -2833,7 +2567,6 @@ void LocalizationConfigurationAttributeAccess::reported_updated(const bridged_en
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::LocalizationConfiguration::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is char_string
@@ -2895,30 +2628,25 @@ TimeFormatLocalizationAttributeAccess::Read(const ConcreteReadAttributePath & aP
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::HourFormat::Id: { // type is HourFormat
             MN::HourFormat::TypeInfo::Type value;
             UN::HourFormat::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ActiveCalendarType::Id: { // type is CalendarType
             MN::ActiveCalendarType::TypeInfo::Type value;
             UN::ActiveCalendarType::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -2955,8 +2683,7 @@ CHIP_ERROR TimeFormatLocalizationAttributeAccess::Write(const ConcreteDataAttrib
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -2995,7 +2722,6 @@ void TimeFormatLocalizationAttributeAccess::reported_updated(const bridged_endpo
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::TimeFormatLocalization::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is HourFormat
@@ -3070,24 +2796,20 @@ UnitLocalizationAttributeAccess::Read(const ConcreteReadAttributePath & aPath, A
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::TemperatureUnit::Id: { // type is TempUnit
             MN::TemperatureUnit::TypeInfo::Type value;
             UN::TemperatureUnit::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -3124,8 +2846,7 @@ CHIP_ERROR UnitLocalizationAttributeAccess::Write(const ConcreteDataAttributePat
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -3164,7 +2885,6 @@ void UnitLocalizationAttributeAccess::reported_updated(const bridged_endpoint * 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::UnitLocalization::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is TempUnit
@@ -3223,18 +2943,15 @@ PowerSourceConfigurationAttributeAccess::Read(const ConcreteReadAttributePath & 
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -3271,8 +2988,7 @@ CHIP_ERROR PowerSourceConfigurationAttributeAccess::Write(const ConcreteDataAttr
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -3311,7 +3027,6 @@ void PowerSourceConfigurationAttributeAccess::reported_updated(const bridged_end
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::PowerSourceConfiguration::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is bitmap32
@@ -3357,186 +3072,155 @@ PowerSourceAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::Status::Id: { // type is PowerSourceStatus
             MN::Status::TypeInfo::Type value;
             UN::Status::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Order::Id: { // type is int8u
             MN::Order::TypeInfo::Type value;
             UN::Order::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Description::Id: { // type is char_string
             MN::Description::TypeInfo::Type value;
             UN::Description::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::WiredAssessedInputVoltage::Id: { // type is int32u
             MN::WiredAssessedInputVoltage::TypeInfo::Type value;
             UN::WiredAssessedInputVoltage::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::WiredAssessedInputFrequency::Id: { // type is int16u
             MN::WiredAssessedInputFrequency::TypeInfo::Type value;
             UN::WiredAssessedInputFrequency::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::WiredCurrentType::Id: { // type is WiredCurrentType
             MN::WiredCurrentType::TypeInfo::Type value;
             UN::WiredCurrentType::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::WiredAssessedCurrent::Id: { // type is int32u
             MN::WiredAssessedCurrent::TypeInfo::Type value;
             UN::WiredAssessedCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::WiredNominalVoltage::Id: { // type is int32u
             MN::WiredNominalVoltage::TypeInfo::Type value;
             UN::WiredNominalVoltage::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::WiredMaximumCurrent::Id: { // type is int32u
             MN::WiredMaximumCurrent::TypeInfo::Type value;
             UN::WiredMaximumCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::WiredPresent::Id: { // type is boolean
             MN::WiredPresent::TypeInfo::Type value;
             UN::WiredPresent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BatVoltage::Id: { // type is int32u
             MN::BatVoltage::TypeInfo::Type value;
             UN::BatVoltage::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BatPercentRemaining::Id: { // type is int8u
             MN::BatPercentRemaining::TypeInfo::Type value;
             UN::BatPercentRemaining::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BatTimeRemaining::Id: { // type is int32u
             MN::BatTimeRemaining::TypeInfo::Type value;
             UN::BatTimeRemaining::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BatChargeLevel::Id: { // type is BatChargeLevel
             MN::BatChargeLevel::TypeInfo::Type value;
             UN::BatChargeLevel::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BatReplacementNeeded::Id: { // type is boolean
             MN::BatReplacementNeeded::TypeInfo::Type value;
             UN::BatReplacementNeeded::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BatReplaceability::Id: { // type is BatReplaceability
             MN::BatReplaceability::TypeInfo::Type value;
             UN::BatReplaceability::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BatPresent::Id: { // type is boolean
             MN::BatPresent::TypeInfo::Type value;
             UN::BatPresent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BatReplacementDescription::Id: { // type is char_string
             MN::BatReplacementDescription::TypeInfo::Type value;
             UN::BatReplacementDescription::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BatCommonDesignation::Id: { // type is int32u
             MN::BatCommonDesignation::TypeInfo::Type value;
             UN::BatCommonDesignation::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BatANSIDesignation::Id: { // type is char_string
             MN::BatANSIDesignation::TypeInfo::Type value;
             UN::BatANSIDesignation::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BatIECDesignation::Id: { // type is char_string
             MN::BatIECDesignation::TypeInfo::Type value;
             UN::BatIECDesignation::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BatApprovedChemistry::Id: { // type is int32u
             MN::BatApprovedChemistry::TypeInfo::Type value;
             UN::BatApprovedChemistry::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BatCapacity::Id: { // type is int32u
             MN::BatCapacity::TypeInfo::Type value;
             UN::BatCapacity::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BatQuantity::Id: { // type is int8u
             MN::BatQuantity::TypeInfo::Type value;
             UN::BatQuantity::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BatChargeState::Id: { // type is BatChargeState
             MN::BatChargeState::TypeInfo::Type value;
             UN::BatChargeState::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BatTimeToFullCharge::Id: { // type is int32u
             MN::BatTimeToFullCharge::TypeInfo::Type value;
             UN::BatTimeToFullCharge::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BatFunctionalWhileCharging::Id: { // type is boolean
             MN::BatFunctionalWhileCharging::TypeInfo::Type value;
             UN::BatFunctionalWhileCharging::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BatChargingCurrent::Id: { // type is int32u
             MN::BatChargingCurrent::TypeInfo::Type value;
             UN::BatChargingCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -3573,8 +3257,7 @@ CHIP_ERROR PowerSourceAttributeAccess::Write(const ConcreteDataAttributePath & a
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -3612,7 +3295,6 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::PowerSource::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is PowerSourceStatus
@@ -4053,42 +3735,35 @@ GeneralCommissioningAttributeAccess::Read(const ConcreteReadAttributePath & aPat
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::Breadcrumb::Id: { // type is int64u
             MN::Breadcrumb::TypeInfo::Type value;
             UN::Breadcrumb::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RegulatoryConfig::Id: { // type is RegulatoryLocationType
             MN::RegulatoryConfig::TypeInfo::Type value;
             UN::RegulatoryConfig::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::LocationCapability::Id: { // type is RegulatoryLocationType
             MN::LocationCapability::TypeInfo::Type value;
             UN::LocationCapability::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SupportsConcurrentConnection::Id: { // type is boolean
             MN::SupportsConcurrentConnection::TypeInfo::Type value;
             UN::SupportsConcurrentConnection::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -4125,8 +3800,7 @@ CHIP_ERROR GeneralCommissioningAttributeAccess::Write(const ConcreteDataAttribut
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -4165,7 +3839,6 @@ void GeneralCommissioningAttributeAccess::reported_updated(const bridged_endpoin
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::GeneralCommissioning::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int64u
@@ -4270,18 +3943,15 @@ DiagnosticLogsAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Att
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -4318,8 +3988,7 @@ CHIP_ERROR DiagnosticLogsAttributeAccess::Write(const ConcreteDataAttributePath 
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -4358,7 +4027,6 @@ void DiagnosticLogsAttributeAccess::reported_updated(const bridged_endpoint * ep
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::DiagnosticLogs::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is bitmap32
@@ -4403,48 +4071,40 @@ GeneralDiagnosticsAttributeAccess::Read(const ConcreteReadAttributePath & aPath,
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::RebootCount::Id: { // type is int16u
             MN::RebootCount::TypeInfo::Type value;
             UN::RebootCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::UpTime::Id: { // type is int64u
             MN::UpTime::TypeInfo::Type value;
             UN::UpTime::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TotalOperationalHours::Id: { // type is int32u
             MN::TotalOperationalHours::TypeInfo::Type value;
             UN::TotalOperationalHours::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BootReasons::Id: { // type is enum8
             MN::BootReasons::TypeInfo::Type value;
             UN::BootReasons::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TestEventTriggersEnabled::Id: { // type is boolean
             MN::TestEventTriggersEnabled::TypeInfo::Type value;
             UN::TestEventTriggersEnabled::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -4481,8 +4141,7 @@ CHIP_ERROR GeneralDiagnosticsAttributeAccess::Write(const ConcreteDataAttributeP
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -4521,7 +4180,6 @@ void GeneralDiagnosticsAttributeAccess::reported_updated(const bridged_endpoint 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::GeneralDiagnostics::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int16u
@@ -4638,36 +4296,30 @@ SoftwareDiagnosticsAttributeAccess::Read(const ConcreteReadAttributePath & aPath
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::CurrentHeapFree::Id: { // type is int64u
             MN::CurrentHeapFree::TypeInfo::Type value;
             UN::CurrentHeapFree::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CurrentHeapUsed::Id: { // type is int64u
             MN::CurrentHeapUsed::TypeInfo::Type value;
             UN::CurrentHeapUsed::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CurrentHeapHighWatermark::Id: { // type is int64u
             MN::CurrentHeapHighWatermark::TypeInfo::Type value;
             UN::CurrentHeapHighWatermark::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -4704,8 +4356,7 @@ CHIP_ERROR SoftwareDiagnosticsAttributeAccess::Write(const ConcreteDataAttribute
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -4744,7 +4395,6 @@ void SoftwareDiagnosticsAttributeAccess::reported_updated(const bridged_endpoint
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::SoftwareDiagnostics::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int64u
@@ -4832,366 +4482,305 @@ ThreadNetworkDiagnosticsAttributeAccess::Read(const ConcreteReadAttributePath & 
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::Channel::Id: { // type is int16u
             MN::Channel::TypeInfo::Type value;
             UN::Channel::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RoutingRole::Id: { // type is RoutingRole
             MN::RoutingRole::TypeInfo::Type value;
             UN::RoutingRole::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::NetworkName::Id: { // type is char_string
             MN::NetworkName::TypeInfo::Type value;
             UN::NetworkName::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PanId::Id: { // type is int16u
             MN::PanId::TypeInfo::Type value;
             UN::PanId::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ExtendedPanId::Id: { // type is int64u
             MN::ExtendedPanId::TypeInfo::Type value;
             UN::ExtendedPanId::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MeshLocalPrefix::Id: { // type is octet_string
             MN::MeshLocalPrefix::TypeInfo::Type value;
             UN::MeshLocalPrefix::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OverrunCount::Id: { // type is int64u
             MN::OverrunCount::TypeInfo::Type value;
             UN::OverrunCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PartitionId::Id: { // type is int32u
             MN::PartitionId::TypeInfo::Type value;
             UN::PartitionId::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Weighting::Id: { // type is int8u
             MN::Weighting::TypeInfo::Type value;
             UN::Weighting::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DataVersion::Id: { // type is int8u
             MN::DataVersion::TypeInfo::Type value;
             UN::DataVersion::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::StableDataVersion::Id: { // type is int8u
             MN::StableDataVersion::TypeInfo::Type value;
             UN::StableDataVersion::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::LeaderRouterId::Id: { // type is int8u
             MN::LeaderRouterId::TypeInfo::Type value;
             UN::LeaderRouterId::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DetachedRoleCount::Id: { // type is int16u
             MN::DetachedRoleCount::TypeInfo::Type value;
             UN::DetachedRoleCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ChildRoleCount::Id: { // type is int16u
             MN::ChildRoleCount::TypeInfo::Type value;
             UN::ChildRoleCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RouterRoleCount::Id: { // type is int16u
             MN::RouterRoleCount::TypeInfo::Type value;
             UN::RouterRoleCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::LeaderRoleCount::Id: { // type is int16u
             MN::LeaderRoleCount::TypeInfo::Type value;
             UN::LeaderRoleCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AttachAttemptCount::Id: { // type is int16u
             MN::AttachAttemptCount::TypeInfo::Type value;
             UN::AttachAttemptCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PartitionIdChangeCount::Id: { // type is int16u
             MN::PartitionIdChangeCount::TypeInfo::Type value;
             UN::PartitionIdChangeCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BetterPartitionAttachAttemptCount::Id: { // type is int16u
             MN::BetterPartitionAttachAttemptCount::TypeInfo::Type value;
             UN::BetterPartitionAttachAttemptCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ParentChangeCount::Id: { // type is int16u
             MN::ParentChangeCount::TypeInfo::Type value;
             UN::ParentChangeCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TxTotalCount::Id: { // type is int32u
             MN::TxTotalCount::TypeInfo::Type value;
             UN::TxTotalCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TxUnicastCount::Id: { // type is int32u
             MN::TxUnicastCount::TypeInfo::Type value;
             UN::TxUnicastCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TxBroadcastCount::Id: { // type is int32u
             MN::TxBroadcastCount::TypeInfo::Type value;
             UN::TxBroadcastCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TxAckRequestedCount::Id: { // type is int32u
             MN::TxAckRequestedCount::TypeInfo::Type value;
             UN::TxAckRequestedCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TxAckedCount::Id: { // type is int32u
             MN::TxAckedCount::TypeInfo::Type value;
             UN::TxAckedCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TxNoAckRequestedCount::Id: { // type is int32u
             MN::TxNoAckRequestedCount::TypeInfo::Type value;
             UN::TxNoAckRequestedCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TxDataCount::Id: { // type is int32u
             MN::TxDataCount::TypeInfo::Type value;
             UN::TxDataCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TxDataPollCount::Id: { // type is int32u
             MN::TxDataPollCount::TypeInfo::Type value;
             UN::TxDataPollCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TxBeaconCount::Id: { // type is int32u
             MN::TxBeaconCount::TypeInfo::Type value;
             UN::TxBeaconCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TxBeaconRequestCount::Id: { // type is int32u
             MN::TxBeaconRequestCount::TypeInfo::Type value;
             UN::TxBeaconRequestCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TxOtherCount::Id: { // type is int32u
             MN::TxOtherCount::TypeInfo::Type value;
             UN::TxOtherCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TxRetryCount::Id: { // type is int32u
             MN::TxRetryCount::TypeInfo::Type value;
             UN::TxRetryCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TxDirectMaxRetryExpiryCount::Id: { // type is int32u
             MN::TxDirectMaxRetryExpiryCount::TypeInfo::Type value;
             UN::TxDirectMaxRetryExpiryCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TxIndirectMaxRetryExpiryCount::Id: { // type is int32u
             MN::TxIndirectMaxRetryExpiryCount::TypeInfo::Type value;
             UN::TxIndirectMaxRetryExpiryCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TxErrCcaCount::Id: { // type is int32u
             MN::TxErrCcaCount::TypeInfo::Type value;
             UN::TxErrCcaCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TxErrAbortCount::Id: { // type is int32u
             MN::TxErrAbortCount::TypeInfo::Type value;
             UN::TxErrAbortCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TxErrBusyChannelCount::Id: { // type is int32u
             MN::TxErrBusyChannelCount::TypeInfo::Type value;
             UN::TxErrBusyChannelCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RxTotalCount::Id: { // type is int32u
             MN::RxTotalCount::TypeInfo::Type value;
             UN::RxTotalCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RxUnicastCount::Id: { // type is int32u
             MN::RxUnicastCount::TypeInfo::Type value;
             UN::RxUnicastCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RxBroadcastCount::Id: { // type is int32u
             MN::RxBroadcastCount::TypeInfo::Type value;
             UN::RxBroadcastCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RxDataCount::Id: { // type is int32u
             MN::RxDataCount::TypeInfo::Type value;
             UN::RxDataCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RxDataPollCount::Id: { // type is int32u
             MN::RxDataPollCount::TypeInfo::Type value;
             UN::RxDataPollCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RxBeaconCount::Id: { // type is int32u
             MN::RxBeaconCount::TypeInfo::Type value;
             UN::RxBeaconCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RxBeaconRequestCount::Id: { // type is int32u
             MN::RxBeaconRequestCount::TypeInfo::Type value;
             UN::RxBeaconRequestCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RxOtherCount::Id: { // type is int32u
             MN::RxOtherCount::TypeInfo::Type value;
             UN::RxOtherCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RxAddressFilteredCount::Id: { // type is int32u
             MN::RxAddressFilteredCount::TypeInfo::Type value;
             UN::RxAddressFilteredCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RxDestAddrFilteredCount::Id: { // type is int32u
             MN::RxDestAddrFilteredCount::TypeInfo::Type value;
             UN::RxDestAddrFilteredCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RxDuplicatedCount::Id: { // type is int32u
             MN::RxDuplicatedCount::TypeInfo::Type value;
             UN::RxDuplicatedCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RxErrNoFrameCount::Id: { // type is int32u
             MN::RxErrNoFrameCount::TypeInfo::Type value;
             UN::RxErrNoFrameCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RxErrUnknownNeighborCount::Id: { // type is int32u
             MN::RxErrUnknownNeighborCount::TypeInfo::Type value;
             UN::RxErrUnknownNeighborCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RxErrInvalidSrcAddrCount::Id: { // type is int32u
             MN::RxErrInvalidSrcAddrCount::TypeInfo::Type value;
             UN::RxErrInvalidSrcAddrCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RxErrSecCount::Id: { // type is int32u
             MN::RxErrSecCount::TypeInfo::Type value;
             UN::RxErrSecCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RxErrFcsCount::Id: { // type is int32u
             MN::RxErrFcsCount::TypeInfo::Type value;
             UN::RxErrFcsCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RxErrOtherCount::Id: { // type is int32u
             MN::RxErrOtherCount::TypeInfo::Type value;
             UN::RxErrOtherCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ActiveTimestamp::Id: { // type is int64u
             MN::ActiveTimestamp::TypeInfo::Type value;
             UN::ActiveTimestamp::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PendingTimestamp::Id: { // type is int64u
             MN::PendingTimestamp::TypeInfo::Type value;
             UN::PendingTimestamp::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Delay::Id: { // type is int32u
             MN::Delay::TypeInfo::Type value;
             UN::Delay::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ChannelPage0Mask::Id: { // type is octet_string
             MN::ChannelPage0Mask::TypeInfo::Type value;
             UN::ChannelPage0Mask::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -5228,8 +4817,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsAttributeAccess::Write(const ConcreteDataAttr
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -5268,7 +4856,6 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int16u
@@ -6180,96 +5767,80 @@ WiFiNetworkDiagnosticsAttributeAccess::Read(const ConcreteReadAttributePath & aP
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::Bssid::Id: { // type is octet_string
             MN::Bssid::TypeInfo::Type value;
             UN::Bssid::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SecurityType::Id: { // type is SecurityType
             MN::SecurityType::TypeInfo::Type value;
             UN::SecurityType::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::WiFiVersion::Id: { // type is WiFiVersionType
             MN::WiFiVersion::TypeInfo::Type value;
             UN::WiFiVersion::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ChannelNumber::Id: { // type is int16u
             MN::ChannelNumber::TypeInfo::Type value;
             UN::ChannelNumber::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Rssi::Id: { // type is int8s
             MN::Rssi::TypeInfo::Type value;
             UN::Rssi::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BeaconLostCount::Id: { // type is int32u
             MN::BeaconLostCount::TypeInfo::Type value;
             UN::BeaconLostCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BeaconRxCount::Id: { // type is int32u
             MN::BeaconRxCount::TypeInfo::Type value;
             UN::BeaconRxCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PacketMulticastRxCount::Id: { // type is int32u
             MN::PacketMulticastRxCount::TypeInfo::Type value;
             UN::PacketMulticastRxCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PacketMulticastTxCount::Id: { // type is int32u
             MN::PacketMulticastTxCount::TypeInfo::Type value;
             UN::PacketMulticastTxCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PacketUnicastRxCount::Id: { // type is int32u
             MN::PacketUnicastRxCount::TypeInfo::Type value;
             UN::PacketUnicastRxCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PacketUnicastTxCount::Id: { // type is int32u
             MN::PacketUnicastTxCount::TypeInfo::Type value;
             UN::PacketUnicastTxCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CurrentMaxRate::Id: { // type is int64u
             MN::CurrentMaxRate::TypeInfo::Type value;
             UN::CurrentMaxRate::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OverrunCount::Id: { // type is int64u
             MN::OverrunCount::TypeInfo::Type value;
             UN::OverrunCount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -6306,8 +5877,7 @@ CHIP_ERROR WiFiNetworkDiagnosticsAttributeAccess::Write(const ConcreteDataAttrib
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -6346,7 +5916,6 @@ void WiFiNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_endpo
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is octet_string
@@ -6572,330 +6141,6 @@ void WiFiNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_endpo
 }
 
 CHIP_ERROR
-EthernetNetworkDiagnosticsAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    namespace MN = chip::app::Clusters::EthernetNetworkDiagnostics::Attributes;
-    namespace UN = unify::matter_bridge::EthernetNetworkDiagnostics::Attributes;
-    if (aPath.mClusterId != Clusters::EthernetNetworkDiagnostics::Id)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
-
-        case MN::PHYRate::Id: { // type is PHYRateType
-            MN::PHYRate::TypeInfo::Type value;
-            UN::PHYRate::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::FullDuplex::Id: { // type is boolean
-            MN::FullDuplex::TypeInfo::Type value;
-            UN::FullDuplex::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::PacketRxCount::Id: { // type is int64u
-            MN::PacketRxCount::TypeInfo::Type value;
-            UN::PacketRxCount::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::PacketTxCount::Id: { // type is int64u
-            MN::PacketTxCount::TypeInfo::Type value;
-            UN::PacketTxCount::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::TxErrCount::Id: { // type is int64u
-            MN::TxErrCount::TypeInfo::Type value;
-            UN::TxErrCount::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::CollisionCount::Id: { // type is int64u
-            MN::CollisionCount::TypeInfo::Type value;
-            UN::CollisionCount::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::OverrunCount::Id: { // type is int64u
-            MN::OverrunCount::TypeInfo::Type value;
-            UN::OverrunCount::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::CarrierDetect::Id: { // type is boolean
-            MN::CarrierDetect::TypeInfo::Type value;
-            UN::CarrierDetect::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::TimeSinceReset::Id: { // type is int64u
-            MN::TimeSinceReset::TypeInfo::Type value;
-            UN::TimeSinceReset::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::FeatureMap::Id: { // type is bitmap32
-            MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::ClusterRevision::Id: { // type is int16u
-            MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-        }
-    } catch (const std::out_of_range & e)
-    {
-        sl_log_info(LOG_TAG,
-                    "The request attribute Path is not found in the attribute state "
-                    "contanier, %s\n",
-                    e.what());
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsAttributeAccess::Write(const ConcreteDataAttributePath & aPath,
-                                                            AttributeValueDecoder & aDecoder)
-{
-    using namespace chip::app::Clusters::EthernetNetworkDiagnostics;
-
-    if (aPath.mClusterId != Clusters::EthernetNetworkDiagnostics::Id)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
-
-    if (!unify_node)
-    {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-
-    std::string attribute_name;
-    nlohmann::json jsn;
-
-    switch (aPath.mAttributeId)
-    {
-    }
-
-    if (!attribute_name.empty())
-    {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/EthernetNetworkDiagnostics/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
-        uic_mqtt_publish(topic.c_str(), payload_str.c_str(), payload_str.length(), true);
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void EthernetNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                                                 const std::string & attribute, const nlohmann::json & unify_value)
-{
-    namespace MN = chip::app::Clusters::EthernetNetworkDiagnostics::Attributes;
-    namespace UN = unify::matter_bridge::EthernetNetworkDiagnostics::Attributes;
-
-    auto cluster_id = device_translator::instance().get_cluster_id(cluster);
-
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::EthernetNetworkDiagnostics::Id))
-    {
-        return;
-    }
-
-    // get attribute id
-    auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
-
-    if (!attribute_id.has_value())
-    {
-        return;
-    }
-
-    chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
-    ConcreteAttributePath attrpath =
-        ConcreteAttributePath(node_matter_endpoint, Clusters::EthernetNetworkDiagnostics::Id, attribute_id.value());
-
-    switch (attribute_id.value())
-    {
-    // type is PHYRateType
-    case MN::PHYRate::Id: {
-        using T                = MN::PHYRate::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "PHYRate attribute value is %s", unify_value.dump().c_str());
-            UN::PHYRate::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::EthernetNetworkDiagnostics::Id, MN::PHYRate::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is boolean
-    case MN::FullDuplex::Id: {
-        using T                = MN::FullDuplex::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "FullDuplex attribute value is %s", unify_value.dump().c_str());
-            UN::FullDuplex::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::EthernetNetworkDiagnostics::Id,
-                                                   MN::FullDuplex::Id, ZCL_BOOLEAN_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int64u
-    case MN::PacketRxCount::Id: {
-        using T                = MN::PacketRxCount::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "PacketRxCount attribute value is %s", unify_value.dump().c_str());
-            UN::PacketRxCount::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::EthernetNetworkDiagnostics::Id,
-                                                   MN::PacketRxCount::Id, ZCL_INT64U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int64u
-    case MN::PacketTxCount::Id: {
-        using T                = MN::PacketTxCount::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "PacketTxCount attribute value is %s", unify_value.dump().c_str());
-            UN::PacketTxCount::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::EthernetNetworkDiagnostics::Id,
-                                                   MN::PacketTxCount::Id, ZCL_INT64U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int64u
-    case MN::TxErrCount::Id: {
-        using T                = MN::TxErrCount::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "TxErrCount attribute value is %s", unify_value.dump().c_str());
-            UN::TxErrCount::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::EthernetNetworkDiagnostics::Id,
-                                                   MN::TxErrCount::Id, ZCL_INT64U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int64u
-    case MN::CollisionCount::Id: {
-        using T                = MN::CollisionCount::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "CollisionCount attribute value is %s", unify_value.dump().c_str());
-            UN::CollisionCount::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::EthernetNetworkDiagnostics::Id,
-                                                   MN::CollisionCount::Id, ZCL_INT64U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int64u
-    case MN::OverrunCount::Id: {
-        using T                = MN::OverrunCount::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "OverrunCount attribute value is %s", unify_value.dump().c_str());
-            UN::OverrunCount::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::EthernetNetworkDiagnostics::Id,
-                                                   MN::OverrunCount::Id, ZCL_INT64U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is boolean
-    case MN::CarrierDetect::Id: {
-        using T                = MN::CarrierDetect::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "CarrierDetect attribute value is %s", unify_value.dump().c_str());
-            UN::CarrierDetect::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::EthernetNetworkDiagnostics::Id,
-                                                   MN::CarrierDetect::Id, ZCL_BOOLEAN_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int64u
-    case MN::TimeSinceReset::Id: {
-        using T                = MN::TimeSinceReset::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "TimeSinceReset attribute value is %s", unify_value.dump().c_str());
-            UN::TimeSinceReset::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::EthernetNetworkDiagnostics::Id,
-                                                   MN::TimeSinceReset::Id, ZCL_INT64U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is bitmap32
-    case MN::FeatureMap::Id: {
-        using T                = MN::FeatureMap::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
-            UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::EthernetNetworkDiagnostics::Id,
-                                                   MN::FeatureMap::Id, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16u
-    case MN::ClusterRevision::Id: {
-        using T                = MN::ClusterRevision::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
-            UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::EthernetNetworkDiagnostics::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-    }
-}
-
-CHIP_ERROR
 TimeSynchronizationAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     namespace MN = chip::app::Clusters::TimeSynchronization::Attributes;
@@ -6906,66 +6151,55 @@ TimeSynchronizationAttributeAccess::Read(const ConcreteReadAttributePath & aPath
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::UTCTime::Id: { // type is epoch_us
             MN::UTCTime::TypeInfo::Type value;
             UN::UTCTime::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Granularity::Id: { // type is GranularityEnum
             MN::Granularity::TypeInfo::Type value;
             UN::Granularity::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TimeSource::Id: { // type is TimeSourceEnum
             MN::TimeSource::TypeInfo::Type value;
             UN::TimeSource::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TrustedTimeNodeId::Id: { // type is node_id
             MN::TrustedTimeNodeId::TypeInfo::Type value;
             UN::TrustedTimeNodeId::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DefaultNtp::Id: { // type is char_string
             MN::DefaultNtp::TypeInfo::Type value;
             UN::DefaultNtp::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::LocalTime::Id: { // type is epoch_us
             MN::LocalTime::TypeInfo::Type value;
             UN::LocalTime::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TimeZoneDatabase::Id: { // type is boolean
             MN::TimeZoneDatabase::TypeInfo::Type value;
             UN::TimeZoneDatabase::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::NtpServerPort::Id: { // type is int16u
             MN::NtpServerPort::TypeInfo::Type value;
             UN::NtpServerPort::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -7002,8 +6236,7 @@ CHIP_ERROR TimeSynchronizationAttributeAccess::Write(const ConcreteDataAttribute
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -7042,7 +6275,6 @@ void TimeSynchronizationAttributeAccess::reported_updated(const bridged_endpoint
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::TimeSynchronization::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is epoch_us
@@ -7191,443 +6423,6 @@ void TimeSynchronizationAttributeAccess::reported_updated(const bridged_endpoint
 }
 
 CHIP_ERROR
-BridgedDeviceBasicAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    namespace MN = chip::app::Clusters::BridgedDeviceBasic::Attributes;
-    namespace UN = unify::matter_bridge::BridgedDeviceBasic::Attributes;
-    if (aPath.mClusterId != Clusters::BridgedDeviceBasic::Id)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
-
-        case MN::VendorName::Id: { // type is char_string
-            MN::VendorName::TypeInfo::Type value;
-            UN::VendorName::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::VendorID::Id: { // type is vendor_id
-            MN::VendorID::TypeInfo::Type value;
-            UN::VendorID::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::ProductName::Id: { // type is char_string
-            MN::ProductName::TypeInfo::Type value;
-            UN::ProductName::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::NodeLabel::Id: { // type is char_string
-            MN::NodeLabel::TypeInfo::Type value;
-            UN::NodeLabel::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::HardwareVersion::Id: { // type is int16u
-            MN::HardwareVersion::TypeInfo::Type value;
-            UN::HardwareVersion::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::HardwareVersionString::Id: { // type is char_string
-            MN::HardwareVersionString::TypeInfo::Type value;
-            UN::HardwareVersionString::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::SoftwareVersion::Id: { // type is int32u
-            MN::SoftwareVersion::TypeInfo::Type value;
-            UN::SoftwareVersion::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::SoftwareVersionString::Id: { // type is char_string
-            MN::SoftwareVersionString::TypeInfo::Type value;
-            UN::SoftwareVersionString::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::ManufacturingDate::Id: { // type is char_string
-            MN::ManufacturingDate::TypeInfo::Type value;
-            UN::ManufacturingDate::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::PartNumber::Id: { // type is char_string
-            MN::PartNumber::TypeInfo::Type value;
-            UN::PartNumber::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::ProductURL::Id: { // type is long_char_string
-            MN::ProductURL::TypeInfo::Type value;
-            UN::ProductURL::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::ProductLabel::Id: { // type is char_string
-            MN::ProductLabel::TypeInfo::Type value;
-            UN::ProductLabel::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::SerialNumber::Id: { // type is char_string
-            MN::SerialNumber::TypeInfo::Type value;
-            UN::SerialNumber::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::Reachable::Id: { // type is boolean
-            MN::Reachable::TypeInfo::Type value;
-            UN::Reachable::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::UniqueID::Id: { // type is char_string
-            MN::UniqueID::TypeInfo::Type value;
-            UN::UniqueID::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::FeatureMap::Id: { // type is bitmap32
-            MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::ClusterRevision::Id: { // type is int16u
-            MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-        }
-    } catch (const std::out_of_range & e)
-    {
-        sl_log_info(LOG_TAG,
-                    "The request attribute Path is not found in the attribute state "
-                    "contanier, %s\n",
-                    e.what());
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR BridgedDeviceBasicAttributeAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    using namespace chip::app::Clusters::BridgedDeviceBasic;
-
-    if (aPath.mClusterId != Clusters::BridgedDeviceBasic::Id)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
-
-    if (!unify_node)
-    {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-
-    std::string attribute_name;
-    nlohmann::json jsn;
-
-    switch (aPath.mAttributeId)
-    {
-    }
-
-    if (!attribute_name.empty())
-    {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/BridgedDeviceBasic/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
-        uic_mqtt_publish(topic.c_str(), payload_str.c_str(), payload_str.length(), true);
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void BridgedDeviceBasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                                         const std::string & attribute, const nlohmann::json & unify_value)
-{
-    namespace MN = chip::app::Clusters::BridgedDeviceBasic::Attributes;
-    namespace UN = unify::matter_bridge::BridgedDeviceBasic::Attributes;
-
-    auto cluster_id = device_translator::instance().get_cluster_id(cluster);
-
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::BridgedDeviceBasic::Id))
-    {
-        return;
-    }
-
-    // get attribute id
-    auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
-
-    if (!attribute_id.has_value())
-    {
-        return;
-    }
-
-    chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
-    ConcreteAttributePath attrpath =
-        ConcreteAttributePath(node_matter_endpoint, Clusters::BridgedDeviceBasic::Id, attribute_id.value());
-
-    switch (attribute_id.value())
-    {
-    // type is char_string
-    case MN::VendorName::Id: {
-        using T                = MN::VendorName::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "VendorName attribute value is %s", unify_value.dump().c_str());
-            UN::VendorName::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BridgedDeviceBasic::Id, MN::VendorName::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is vendor_id
-    case MN::VendorID::Id: {
-        using T                = MN::VendorID::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "VendorID attribute value is %s", unify_value.dump().c_str());
-            UN::VendorID::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BridgedDeviceBasic::Id, MN::VendorID::Id,
-                                                   ZCL_VENDOR_ID_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is char_string
-    case MN::ProductName::Id: {
-        using T                = MN::ProductName::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "ProductName attribute value is %s", unify_value.dump().c_str());
-            UN::ProductName::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BridgedDeviceBasic::Id, MN::ProductName::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is char_string
-    case MN::NodeLabel::Id: {
-        using T                = MN::NodeLabel::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "NodeLabel attribute value is %s", unify_value.dump().c_str());
-            UN::NodeLabel::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BridgedDeviceBasic::Id, MN::NodeLabel::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16u
-    case MN::HardwareVersion::Id: {
-        using T                = MN::HardwareVersion::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "HardwareVersion attribute value is %s", unify_value.dump().c_str());
-            UN::HardwareVersion::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BridgedDeviceBasic::Id, MN::HardwareVersion::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is char_string
-    case MN::HardwareVersionString::Id: {
-        using T                = MN::HardwareVersionString::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "HardwareVersionString attribute value is %s", unify_value.dump().c_str());
-            UN::HardwareVersionString::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BridgedDeviceBasic::Id,
-                                                   MN::HardwareVersionString::Id, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int32u
-    case MN::SoftwareVersion::Id: {
-        using T                = MN::SoftwareVersion::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "SoftwareVersion attribute value is %s", unify_value.dump().c_str());
-            UN::SoftwareVersion::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BridgedDeviceBasic::Id, MN::SoftwareVersion::Id,
-                                                   ZCL_INT32U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is char_string
-    case MN::SoftwareVersionString::Id: {
-        using T                = MN::SoftwareVersionString::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "SoftwareVersionString attribute value is %s", unify_value.dump().c_str());
-            UN::SoftwareVersionString::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BridgedDeviceBasic::Id,
-                                                   MN::SoftwareVersionString::Id, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is char_string
-    case MN::ManufacturingDate::Id: {
-        using T                = MN::ManufacturingDate::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "ManufacturingDate attribute value is %s", unify_value.dump().c_str());
-            UN::ManufacturingDate::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BridgedDeviceBasic::Id,
-                                                   MN::ManufacturingDate::Id, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is char_string
-    case MN::PartNumber::Id: {
-        using T                = MN::PartNumber::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "PartNumber attribute value is %s", unify_value.dump().c_str());
-            UN::PartNumber::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BridgedDeviceBasic::Id, MN::PartNumber::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is long_char_string
-    case MN::ProductURL::Id: {
-        using T                = MN::ProductURL::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "ProductURL attribute value is %s", unify_value.dump().c_str());
-            UN::ProductURL::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BridgedDeviceBasic::Id, MN::ProductURL::Id,
-                                                   ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is char_string
-    case MN::ProductLabel::Id: {
-        using T                = MN::ProductLabel::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "ProductLabel attribute value is %s", unify_value.dump().c_str());
-            UN::ProductLabel::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BridgedDeviceBasic::Id, MN::ProductLabel::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is char_string
-    case MN::SerialNumber::Id: {
-        using T                = MN::SerialNumber::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "SerialNumber attribute value is %s", unify_value.dump().c_str());
-            UN::SerialNumber::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BridgedDeviceBasic::Id, MN::SerialNumber::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is boolean
-    case MN::Reachable::Id: {
-        using T                = MN::Reachable::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "Reachable attribute value is %s", unify_value.dump().c_str());
-            UN::Reachable::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BridgedDeviceBasic::Id, MN::Reachable::Id,
-                                                   ZCL_BOOLEAN_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is char_string
-    case MN::UniqueID::Id: {
-        using T                = MN::UniqueID::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "UniqueID attribute value is %s", unify_value.dump().c_str());
-            UN::UniqueID::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BridgedDeviceBasic::Id, MN::UniqueID::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is bitmap32
-    case MN::FeatureMap::Id: {
-        using T                = MN::FeatureMap::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
-            UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BridgedDeviceBasic::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16u
-    case MN::ClusterRevision::Id: {
-        using T                = MN::ClusterRevision::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
-            UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BridgedDeviceBasic::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-    }
-}
-
-CHIP_ERROR
 SwitchAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     namespace MN = chip::app::Clusters::Switch::Attributes;
@@ -7638,36 +6433,30 @@ SwitchAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeVa
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::NumberOfPositions::Id: { // type is int8u
             MN::NumberOfPositions::TypeInfo::Type value;
             UN::NumberOfPositions::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CurrentPosition::Id: { // type is int8u
             MN::CurrentPosition::TypeInfo::Type value;
             UN::CurrentPosition::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MultiPressMax::Id: { // type is int8u
             MN::MultiPressMax::TypeInfo::Type value;
             UN::MultiPressMax::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -7704,8 +6493,7 @@ CHIP_ERROR SwitchAttributeAccess::Write(const ConcreteDataAttributePath & aPath,
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -7743,7 +6531,6 @@ void SwitchAttributeAccess::reported_updated(const bridged_endpoint * ep, const 
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath        = ConcreteAttributePath(node_matter_endpoint, Clusters::Switch::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int8u
@@ -7820,205 +6607,6 @@ void SwitchAttributeAccess::reported_updated(const bridged_endpoint * ep, const 
 }
 
 CHIP_ERROR
-AdministratorCommissioningAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    namespace MN = chip::app::Clusters::AdministratorCommissioning::Attributes;
-    namespace UN = unify::matter_bridge::AdministratorCommissioning::Attributes;
-    if (aPath.mClusterId != Clusters::AdministratorCommissioning::Id)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
-
-        case MN::WindowStatus::Id: { // type is CommissioningWindowStatus
-            MN::WindowStatus::TypeInfo::Type value;
-            UN::WindowStatus::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::AdminFabricIndex::Id: { // type is fabric_idx
-            MN::AdminFabricIndex::TypeInfo::Type value;
-            UN::AdminFabricIndex::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::AdminVendorId::Id: { // type is int16u
-            MN::AdminVendorId::TypeInfo::Type value;
-            UN::AdminVendorId::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::FeatureMap::Id: { // type is bitmap32
-            MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::ClusterRevision::Id: { // type is int16u
-            MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-        }
-    } catch (const std::out_of_range & e)
-    {
-        sl_log_info(LOG_TAG,
-                    "The request attribute Path is not found in the attribute state "
-                    "contanier, %s\n",
-                    e.what());
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR AdministratorCommissioningAttributeAccess::Write(const ConcreteDataAttributePath & aPath,
-                                                            AttributeValueDecoder & aDecoder)
-{
-    using namespace chip::app::Clusters::AdministratorCommissioning;
-
-    if (aPath.mClusterId != Clusters::AdministratorCommissioning::Id)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
-
-    if (!unify_node)
-    {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-
-    std::string attribute_name;
-    nlohmann::json jsn;
-
-    switch (aPath.mAttributeId)
-    {
-    }
-
-    if (!attribute_name.empty())
-    {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/AdministratorCommissioning/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
-        uic_mqtt_publish(topic.c_str(), payload_str.c_str(), payload_str.length(), true);
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void AdministratorCommissioningAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                                                 const std::string & attribute, const nlohmann::json & unify_value)
-{
-    namespace MN = chip::app::Clusters::AdministratorCommissioning::Attributes;
-    namespace UN = unify::matter_bridge::AdministratorCommissioning::Attributes;
-
-    auto cluster_id = device_translator::instance().get_cluster_id(cluster);
-
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::AdministratorCommissioning::Id))
-    {
-        return;
-    }
-
-    // get attribute id
-    auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
-
-    if (!attribute_id.has_value())
-    {
-        return;
-    }
-
-    chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
-    ConcreteAttributePath attrpath =
-        ConcreteAttributePath(node_matter_endpoint, Clusters::AdministratorCommissioning::Id, attribute_id.value());
-
-    switch (attribute_id.value())
-    {
-    // type is CommissioningWindowStatus
-    case MN::WindowStatus::Id: {
-        using T                = MN::WindowStatus::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "WindowStatus attribute value is %s", unify_value.dump().c_str());
-            UN::WindowStatus::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::AdministratorCommissioning::Id,
-                                                   MN::WindowStatus::Id, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is fabric_idx
-    case MN::AdminFabricIndex::Id: {
-        using T                = MN::AdminFabricIndex::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "AdminFabricIndex attribute value is %s", unify_value.dump().c_str());
-            UN::AdminFabricIndex::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::AdministratorCommissioning::Id,
-                                                   MN::AdminFabricIndex::Id, ZCL_FABRIC_IDX_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16u
-    case MN::AdminVendorId::Id: {
-        using T                = MN::AdminVendorId::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "AdminVendorId attribute value is %s", unify_value.dump().c_str());
-            UN::AdminVendorId::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::AdministratorCommissioning::Id,
-                                                   MN::AdminVendorId::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is bitmap32
-    case MN::FeatureMap::Id: {
-        using T                = MN::FeatureMap::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
-            UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::AdministratorCommissioning::Id,
-                                                   MN::FeatureMap::Id, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16u
-    case MN::ClusterRevision::Id: {
-        using T                = MN::ClusterRevision::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
-            UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::AdministratorCommissioning::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-    }
-}
-
-CHIP_ERROR
 OperationalCredentialsAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     namespace MN = chip::app::Clusters::OperationalCredentials::Attributes;
@@ -8029,36 +6617,30 @@ OperationalCredentialsAttributeAccess::Read(const ConcreteReadAttributePath & aP
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::SupportedFabrics::Id: { // type is int8u
             MN::SupportedFabrics::TypeInfo::Type value;
             UN::SupportedFabrics::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CommissionedFabrics::Id: { // type is int8u
             MN::CommissionedFabrics::TypeInfo::Type value;
             UN::CommissionedFabrics::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CurrentFabricIndex::Id: { // type is int8u
             MN::CurrentFabricIndex::TypeInfo::Type value;
             UN::CurrentFabricIndex::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -8095,8 +6677,7 @@ CHIP_ERROR OperationalCredentialsAttributeAccess::Write(const ConcreteDataAttrib
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -8135,7 +6716,6 @@ void OperationalCredentialsAttributeAccess::reported_updated(const bridged_endpo
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::OperationalCredentials::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int8u
@@ -8226,30 +6806,25 @@ GroupKeyManagementAttributeAccess::Read(const ConcreteReadAttributePath & aPath,
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::MaxGroupsPerFabric::Id: { // type is int16u
             MN::MaxGroupsPerFabric::TypeInfo::Type value;
             UN::MaxGroupsPerFabric::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MaxGroupKeysPerFabric::Id: { // type is int16u
             MN::MaxGroupKeysPerFabric::TypeInfo::Type value;
             UN::MaxGroupKeysPerFabric::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -8286,8 +6861,7 @@ CHIP_ERROR GroupKeyManagementAttributeAccess::Write(const ConcreteDataAttributeP
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -8326,7 +6900,6 @@ void GroupKeyManagementAttributeAccess::reported_updated(const bridged_endpoint 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::GroupKeyManagement::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int16u
@@ -8401,18 +6974,15 @@ FixedLabelAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -8449,8 +7019,7 @@ CHIP_ERROR FixedLabelAttributeAccess::Write(const ConcreteDataAttributePath & aP
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -8488,7 +7057,6 @@ void FixedLabelAttributeAccess::reported_updated(const bridged_endpoint * ep, co
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::FixedLabel::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is bitmap32
@@ -8533,18 +7101,15 @@ UserLabelAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribut
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -8581,8 +7146,7 @@ CHIP_ERROR UserLabelAttributeAccess::Write(const ConcreteDataAttributePath & aPa
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -8620,7 +7184,6 @@ void UserLabelAttributeAccess::reported_updated(const bridged_endpoint * ep, con
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::UserLabel::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is bitmap32
@@ -8665,18 +7228,15 @@ ProxyConfigurationAttributeAccess::Read(const ConcreteReadAttributePath & aPath,
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -8713,8 +7273,7 @@ CHIP_ERROR ProxyConfigurationAttributeAccess::Write(const ConcreteDataAttributeP
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -8753,7 +7312,6 @@ void ProxyConfigurationAttributeAccess::reported_updated(const bridged_endpoint 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::ProxyConfiguration::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is bitmap32
@@ -8798,18 +7356,15 @@ ProxyDiscoveryAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Att
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -8846,8 +7401,7 @@ CHIP_ERROR ProxyDiscoveryAttributeAccess::Write(const ConcreteDataAttributePath 
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -8886,7 +7440,6 @@ void ProxyDiscoveryAttributeAccess::reported_updated(const bridged_endpoint * ep
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::ProxyDiscovery::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is bitmap32
@@ -8931,18 +7484,15 @@ ProxyValidAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -8979,8 +7529,7 @@ CHIP_ERROR ProxyValidAttributeAccess::Write(const ConcreteDataAttributePath & aP
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -9018,7 +7567,6 @@ void ProxyValidAttributeAccess::reported_updated(const bridged_endpoint * ep, co
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::ProxyValid::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is bitmap32
@@ -9063,24 +7611,20 @@ BooleanStateAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attri
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::StateValue::Id: { // type is boolean
             MN::StateValue::TypeInfo::Type value;
             UN::StateValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -9117,8 +7661,7 @@ CHIP_ERROR BooleanStateAttributeAccess::Write(const ConcreteDataAttributePath & 
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -9156,7 +7699,6 @@ void BooleanStateAttributeAccess::reported_updated(const bridged_endpoint * ep, 
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::BooleanState::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is boolean
@@ -9215,48 +7757,40 @@ ModeSelectAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::Description::Id: { // type is char_string
             MN::Description::TypeInfo::Type value;
             UN::Description::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::StandardNamespace::Id: { // type is enum16
             MN::StandardNamespace::TypeInfo::Type value;
             UN::StandardNamespace::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CurrentMode::Id: { // type is int8u
             MN::CurrentMode::TypeInfo::Type value;
             UN::CurrentMode::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::StartUpMode::Id: { // type is int8u
             MN::StartUpMode::TypeInfo::Type value;
             UN::StartUpMode::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OnMode::Id: { // type is int8u
             MN::OnMode::TypeInfo::Type value;
             UN::OnMode::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -9293,8 +7827,7 @@ CHIP_ERROR ModeSelectAttributeAccess::Write(const ConcreteDataAttributePath & aP
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -9332,7 +7865,6 @@ void ModeSelectAttributeAccess::reported_updated(const bridged_endpoint * ep, co
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::ModeSelect::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is char_string
@@ -9447,234 +7979,195 @@ DoorLockAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribute
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::LockState::Id: { // type is DlLockState
             MN::LockState::TypeInfo::Type value;
             UN::LockState::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::LockType::Id: { // type is DlLockType
             MN::LockType::TypeInfo::Type value;
             UN::LockType::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ActuatorEnabled::Id: { // type is boolean
             MN::ActuatorEnabled::TypeInfo::Type value;
             UN::ActuatorEnabled::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DoorState::Id: { // type is DlDoorState
             MN::DoorState::TypeInfo::Type value;
             UN::DoorState::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DoorOpenEvents::Id: { // type is int32u
             MN::DoorOpenEvents::TypeInfo::Type value;
             UN::DoorOpenEvents::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DoorClosedEvents::Id: { // type is int32u
             MN::DoorClosedEvents::TypeInfo::Type value;
             UN::DoorClosedEvents::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OpenPeriod::Id: { // type is int16u
             MN::OpenPeriod::TypeInfo::Type value;
             UN::OpenPeriod::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::NumberOfTotalUsersSupported::Id: { // type is int16u
             MN::NumberOfTotalUsersSupported::TypeInfo::Type value;
             UN::NumberOfTotalUsersSupported::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::NumberOfPINUsersSupported::Id: { // type is int16u
             MN::NumberOfPINUsersSupported::TypeInfo::Type value;
             UN::NumberOfPINUsersSupported::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::NumberOfRFIDUsersSupported::Id: { // type is int16u
             MN::NumberOfRFIDUsersSupported::TypeInfo::Type value;
             UN::NumberOfRFIDUsersSupported::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::NumberOfWeekDaySchedulesSupportedPerUser::Id: { // type is int8u
             MN::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo::Type value;
             UN::NumberOfWeekDaySchedulesSupportedPerUser::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::NumberOfYearDaySchedulesSupportedPerUser::Id: { // type is int8u
             MN::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo::Type value;
             UN::NumberOfYearDaySchedulesSupportedPerUser::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::NumberOfHolidaySchedulesSupported::Id: { // type is int8u
             MN::NumberOfHolidaySchedulesSupported::TypeInfo::Type value;
             UN::NumberOfHolidaySchedulesSupported::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MaxPINCodeLength::Id: { // type is int8u
             MN::MaxPINCodeLength::TypeInfo::Type value;
             UN::MaxPINCodeLength::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MinPINCodeLength::Id: { // type is int8u
             MN::MinPINCodeLength::TypeInfo::Type value;
             UN::MinPINCodeLength::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MaxRFIDCodeLength::Id: { // type is int8u
             MN::MaxRFIDCodeLength::TypeInfo::Type value;
             UN::MaxRFIDCodeLength::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MinRFIDCodeLength::Id: { // type is int8u
             MN::MinRFIDCodeLength::TypeInfo::Type value;
             UN::MinRFIDCodeLength::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CredentialRulesSupport::Id: { // type is DlCredentialRuleMask
             MN::CredentialRulesSupport::TypeInfo::Type value;
             UN::CredentialRulesSupport::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::NumberOfCredentialsSupportedPerUser::Id: { // type is int8u
             MN::NumberOfCredentialsSupportedPerUser::TypeInfo::Type value;
             UN::NumberOfCredentialsSupportedPerUser::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Language::Id: { // type is char_string
             MN::Language::TypeInfo::Type value;
             UN::Language::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::LEDSettings::Id: { // type is int8u
             MN::LEDSettings::TypeInfo::Type value;
             UN::LEDSettings::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AutoRelockTime::Id: { // type is int32u
             MN::AutoRelockTime::TypeInfo::Type value;
             UN::AutoRelockTime::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SoundVolume::Id: { // type is int8u
             MN::SoundVolume::TypeInfo::Type value;
             UN::SoundVolume::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OperatingMode::Id: { // type is DlOperatingMode
             MN::OperatingMode::TypeInfo::Type value;
             UN::OperatingMode::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SupportedOperatingModes::Id: { // type is DlSupportedOperatingModes
             MN::SupportedOperatingModes::TypeInfo::Type value;
             UN::SupportedOperatingModes::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DefaultConfigurationRegister::Id: { // type is DlDefaultConfigurationRegister
             MN::DefaultConfigurationRegister::TypeInfo::Type value;
             UN::DefaultConfigurationRegister::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::EnableLocalProgramming::Id: { // type is boolean
             MN::EnableLocalProgramming::TypeInfo::Type value;
             UN::EnableLocalProgramming::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::EnableOneTouchLocking::Id: { // type is boolean
             MN::EnableOneTouchLocking::TypeInfo::Type value;
             UN::EnableOneTouchLocking::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::EnableInsideStatusLED::Id: { // type is boolean
             MN::EnableInsideStatusLED::TypeInfo::Type value;
             UN::EnableInsideStatusLED::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::EnablePrivacyModeButton::Id: { // type is boolean
             MN::EnablePrivacyModeButton::TypeInfo::Type value;
             UN::EnablePrivacyModeButton::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::LocalProgrammingFeatures::Id: { // type is DlLocalProgrammingFeatures
             MN::LocalProgrammingFeatures::TypeInfo::Type value;
             UN::LocalProgrammingFeatures::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::WrongCodeEntryLimit::Id: { // type is int8u
             MN::WrongCodeEntryLimit::TypeInfo::Type value;
             UN::WrongCodeEntryLimit::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::UserCodeTemporaryDisableTime::Id: { // type is int8u
             MN::UserCodeTemporaryDisableTime::TypeInfo::Type value;
             UN::UserCodeTemporaryDisableTime::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SendPINOverTheAir::Id: { // type is boolean
             MN::SendPINOverTheAir::TypeInfo::Type value;
             UN::SendPINOverTheAir::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RequirePINforRemoteOperation::Id: { // type is boolean
             MN::RequirePINforRemoteOperation::TypeInfo::Type value;
             UN::RequirePINforRemoteOperation::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ExpiringUserTimeout::Id: { // type is int16u
             MN::ExpiringUserTimeout::TypeInfo::Type value;
             UN::ExpiringUserTimeout::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -9711,8 +8204,7 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPat
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -9750,7 +8242,6 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::DoorLock::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is DlLockState
@@ -10307,150 +8798,125 @@ WindowCoveringAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Att
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::Type::Id: { // type is Type
             MN::Type::TypeInfo::Type value;
             UN::Type::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PhysicalClosedLimitLift::Id: { // type is int16u
             MN::PhysicalClosedLimitLift::TypeInfo::Type value;
             UN::PhysicalClosedLimitLift::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PhysicalClosedLimitTilt::Id: { // type is int16u
             MN::PhysicalClosedLimitTilt::TypeInfo::Type value;
             UN::PhysicalClosedLimitTilt::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CurrentPositionLift::Id: { // type is int16u
             MN::CurrentPositionLift::TypeInfo::Type value;
             UN::CurrentPositionLift::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CurrentPositionTilt::Id: { // type is int16u
             MN::CurrentPositionTilt::TypeInfo::Type value;
             UN::CurrentPositionTilt::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::NumberOfActuationsLift::Id: { // type is int16u
             MN::NumberOfActuationsLift::TypeInfo::Type value;
             UN::NumberOfActuationsLift::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::NumberOfActuationsTilt::Id: { // type is int16u
             MN::NumberOfActuationsTilt::TypeInfo::Type value;
             UN::NumberOfActuationsTilt::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ConfigStatus::Id: { // type is ConfigStatus
             MN::ConfigStatus::TypeInfo::Type value;
             UN::ConfigStatus::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CurrentPositionLiftPercentage::Id: { // type is Percent
             MN::CurrentPositionLiftPercentage::TypeInfo::Type value;
             UN::CurrentPositionLiftPercentage::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CurrentPositionTiltPercentage::Id: { // type is Percent
             MN::CurrentPositionTiltPercentage::TypeInfo::Type value;
             UN::CurrentPositionTiltPercentage::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OperationalStatus::Id: { // type is OperationalStatus
             MN::OperationalStatus::TypeInfo::Type value;
             UN::OperationalStatus::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TargetPositionLiftPercent100ths::Id: { // type is Percent100ths
             MN::TargetPositionLiftPercent100ths::TypeInfo::Type value;
             UN::TargetPositionLiftPercent100ths::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TargetPositionTiltPercent100ths::Id: { // type is Percent100ths
             MN::TargetPositionTiltPercent100ths::TypeInfo::Type value;
             UN::TargetPositionTiltPercent100ths::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::EndProductType::Id: { // type is EndProductType
             MN::EndProductType::TypeInfo::Type value;
             UN::EndProductType::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CurrentPositionLiftPercent100ths::Id: { // type is Percent100ths
             MN::CurrentPositionLiftPercent100ths::TypeInfo::Type value;
             UN::CurrentPositionLiftPercent100ths::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CurrentPositionTiltPercent100ths::Id: { // type is Percent100ths
             MN::CurrentPositionTiltPercent100ths::TypeInfo::Type value;
             UN::CurrentPositionTiltPercent100ths::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::InstalledOpenLimitLift::Id: { // type is int16u
             MN::InstalledOpenLimitLift::TypeInfo::Type value;
             UN::InstalledOpenLimitLift::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::InstalledClosedLimitLift::Id: { // type is int16u
             MN::InstalledClosedLimitLift::TypeInfo::Type value;
             UN::InstalledClosedLimitLift::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::InstalledOpenLimitTilt::Id: { // type is int16u
             MN::InstalledOpenLimitTilt::TypeInfo::Type value;
             UN::InstalledOpenLimitTilt::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::InstalledClosedLimitTilt::Id: { // type is int16u
             MN::InstalledClosedLimitTilt::TypeInfo::Type value;
             UN::InstalledClosedLimitTilt::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Mode::Id: { // type is Mode
             MN::Mode::TypeInfo::Type value;
             UN::Mode::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SafetyStatus::Id: { // type is SafetyStatus
             MN::SafetyStatus::TypeInfo::Type value;
             UN::SafetyStatus::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -10487,8 +8953,7 @@ CHIP_ERROR WindowCoveringAttributeAccess::Write(const ConcreteDataAttributePath 
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -10527,7 +8992,6 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::WindowCovering::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is Type
@@ -10634,8 +9098,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
     }
         // type is ConfigStatus
     case MN::ConfigStatus::Id: {
-        using T                = MN::ConfigStatus::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
+        std::optional<uint8_t> value = from_json_ConfigStatus(unify_value);
 
         if (value.has_value())
         {
@@ -10678,8 +9141,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
     }
         // type is OperationalStatus
     case MN::OperationalStatus::Id: {
-        using T                = MN::OperationalStatus::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
+        std::optional<uint8_t> value = from_json_OperationalStatus(unify_value);
 
         if (value.has_value())
         {
@@ -10826,8 +9288,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
     }
         // type is Mode
     case MN::Mode::Id: {
-        using T                = MN::Mode::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
+        std::optional<uint8_t> value = from_json_Mode(unify_value);
 
         if (value.has_value())
         {
@@ -10840,8 +9301,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
     }
         // type is SafetyStatus
     case MN::SafetyStatus::Id: {
-        using T                = MN::SafetyStatus::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
+        std::optional<uint16_t> value = from_json_SafetyStatus(unify_value);
 
         if (value.has_value())
         {
@@ -10894,78 +9354,65 @@ BarrierControlAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Att
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::BarrierMovingState::Id: { // type is enum8
             MN::BarrierMovingState::TypeInfo::Type value;
             UN::BarrierMovingState::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BarrierSafetyStatus::Id: { // type is bitmap16
             MN::BarrierSafetyStatus::TypeInfo::Type value;
             UN::BarrierSafetyStatus::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BarrierCapabilities::Id: { // type is bitmap8
             MN::BarrierCapabilities::TypeInfo::Type value;
             UN::BarrierCapabilities::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BarrierOpenEvents::Id: { // type is int16u
             MN::BarrierOpenEvents::TypeInfo::Type value;
             UN::BarrierOpenEvents::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BarrierCloseEvents::Id: { // type is int16u
             MN::BarrierCloseEvents::TypeInfo::Type value;
             UN::BarrierCloseEvents::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BarrierCommandOpenEvents::Id: { // type is int16u
             MN::BarrierCommandOpenEvents::TypeInfo::Type value;
             UN::BarrierCommandOpenEvents::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BarrierCommandCloseEvents::Id: { // type is int16u
             MN::BarrierCommandCloseEvents::TypeInfo::Type value;
             UN::BarrierCommandCloseEvents::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BarrierOpenPeriod::Id: { // type is int16u
             MN::BarrierOpenPeriod::TypeInfo::Type value;
             UN::BarrierOpenPeriod::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BarrierClosePeriod::Id: { // type is int16u
             MN::BarrierClosePeriod::TypeInfo::Type value;
             UN::BarrierClosePeriod::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::BarrierPosition::Id: { // type is int8u
             MN::BarrierPosition::TypeInfo::Type value;
             UN::BarrierPosition::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -11002,8 +9449,7 @@ CHIP_ERROR BarrierControlAttributeAccess::Write(const ConcreteDataAttributePath 
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -11042,7 +9488,6 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::BarrierControl::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is enum8
@@ -11219,622 +9664,6 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
 }
 
 CHIP_ERROR
-PumpConfigurationAndControlAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    namespace MN = chip::app::Clusters::PumpConfigurationAndControl::Attributes;
-    namespace UN = unify::matter_bridge::PumpConfigurationAndControl::Attributes;
-    if (aPath.mClusterId != Clusters::PumpConfigurationAndControl::Id)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
-
-        case MN::MaxPressure::Id: { // type is int16s
-            MN::MaxPressure::TypeInfo::Type value;
-            UN::MaxPressure::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::MaxSpeed::Id: { // type is int16u
-            MN::MaxSpeed::TypeInfo::Type value;
-            UN::MaxSpeed::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::MaxFlow::Id: { // type is int16u
-            MN::MaxFlow::TypeInfo::Type value;
-            UN::MaxFlow::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::MinConstPressure::Id: { // type is int16s
-            MN::MinConstPressure::TypeInfo::Type value;
-            UN::MinConstPressure::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::MaxConstPressure::Id: { // type is int16s
-            MN::MaxConstPressure::TypeInfo::Type value;
-            UN::MaxConstPressure::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::MinCompPressure::Id: { // type is int16s
-            MN::MinCompPressure::TypeInfo::Type value;
-            UN::MinCompPressure::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::MaxCompPressure::Id: { // type is int16s
-            MN::MaxCompPressure::TypeInfo::Type value;
-            UN::MaxCompPressure::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::MinConstSpeed::Id: { // type is int16u
-            MN::MinConstSpeed::TypeInfo::Type value;
-            UN::MinConstSpeed::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::MaxConstSpeed::Id: { // type is int16u
-            MN::MaxConstSpeed::TypeInfo::Type value;
-            UN::MaxConstSpeed::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::MinConstFlow::Id: { // type is int16u
-            MN::MinConstFlow::TypeInfo::Type value;
-            UN::MinConstFlow::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::MaxConstFlow::Id: { // type is int16u
-            MN::MaxConstFlow::TypeInfo::Type value;
-            UN::MaxConstFlow::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::MinConstTemp::Id: { // type is int16s
-            MN::MinConstTemp::TypeInfo::Type value;
-            UN::MinConstTemp::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::MaxConstTemp::Id: { // type is int16s
-            MN::MaxConstTemp::TypeInfo::Type value;
-            UN::MaxConstTemp::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::PumpStatus::Id: { // type is PumpStatus
-            MN::PumpStatus::TypeInfo::Type value;
-            UN::PumpStatus::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::EffectiveOperationMode::Id: { // type is PumpOperationMode
-            MN::EffectiveOperationMode::TypeInfo::Type value;
-            UN::EffectiveOperationMode::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::EffectiveControlMode::Id: { // type is PumpControlMode
-            MN::EffectiveControlMode::TypeInfo::Type value;
-            UN::EffectiveControlMode::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::Capacity::Id: { // type is int16s
-            MN::Capacity::TypeInfo::Type value;
-            UN::Capacity::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::Speed::Id: { // type is int16u
-            MN::Speed::TypeInfo::Type value;
-            UN::Speed::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::LifetimeRunningHours::Id: { // type is int24u
-            MN::LifetimeRunningHours::TypeInfo::Type value;
-            UN::LifetimeRunningHours::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::Power::Id: { // type is int24u
-            MN::Power::TypeInfo::Type value;
-            UN::Power::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::LifetimeEnergyConsumed::Id: { // type is int32u
-            MN::LifetimeEnergyConsumed::TypeInfo::Type value;
-            UN::LifetimeEnergyConsumed::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::OperationMode::Id: { // type is PumpOperationMode
-            MN::OperationMode::TypeInfo::Type value;
-            UN::OperationMode::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::ControlMode::Id: { // type is PumpControlMode
-            MN::ControlMode::TypeInfo::Type value;
-            UN::ControlMode::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::FeatureMap::Id: { // type is bitmap32
-            MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::ClusterRevision::Id: { // type is int16u
-            MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-        }
-    } catch (const std::out_of_range & e)
-    {
-        sl_log_info(LOG_TAG,
-                    "The request attribute Path is not found in the attribute state "
-                    "contanier, %s\n",
-                    e.what());
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PumpConfigurationAndControlAttributeAccess::Write(const ConcreteDataAttributePath & aPath,
-                                                             AttributeValueDecoder & aDecoder)
-{
-    using namespace chip::app::Clusters::PumpConfigurationAndControl;
-
-    if (aPath.mClusterId != Clusters::PumpConfigurationAndControl::Id)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
-
-    if (!unify_node)
-    {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-
-    std::string attribute_name;
-    nlohmann::json jsn;
-
-    switch (aPath.mAttributeId)
-    {
-    }
-
-    if (!attribute_name.empty())
-    {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/PumpConfigurationAndControl/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
-        uic_mqtt_publish(topic.c_str(), payload_str.c_str(), payload_str.length(), true);
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void PumpConfigurationAndControlAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                                                  const std::string & attribute, const nlohmann::json & unify_value)
-{
-    namespace MN = chip::app::Clusters::PumpConfigurationAndControl::Attributes;
-    namespace UN = unify::matter_bridge::PumpConfigurationAndControl::Attributes;
-
-    auto cluster_id = device_translator::instance().get_cluster_id(cluster);
-
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::PumpConfigurationAndControl::Id))
-    {
-        return;
-    }
-
-    // get attribute id
-    auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
-
-    if (!attribute_id.has_value())
-    {
-        return;
-    }
-
-    chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
-    ConcreteAttributePath attrpath =
-        ConcreteAttributePath(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id, attribute_id.value());
-
-    switch (attribute_id.value())
-    {
-    // type is int16s
-    case MN::MaxPressure::Id: {
-        using T                = MN::MaxPressure::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "MaxPressure attribute value is %s", unify_value.dump().c_str());
-            UN::MaxPressure::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::MaxPressure::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16u
-    case MN::MaxSpeed::Id: {
-        using T                = MN::MaxSpeed::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "MaxSpeed attribute value is %s", unify_value.dump().c_str());
-            UN::MaxSpeed::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::MaxSpeed::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16u
-    case MN::MaxFlow::Id: {
-        using T                = MN::MaxFlow::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "MaxFlow attribute value is %s", unify_value.dump().c_str());
-            UN::MaxFlow::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id, MN::MaxFlow::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16s
-    case MN::MinConstPressure::Id: {
-        using T                = MN::MinConstPressure::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "MinConstPressure attribute value is %s", unify_value.dump().c_str());
-            UN::MinConstPressure::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::MinConstPressure::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16s
-    case MN::MaxConstPressure::Id: {
-        using T                = MN::MaxConstPressure::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "MaxConstPressure attribute value is %s", unify_value.dump().c_str());
-            UN::MaxConstPressure::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::MaxConstPressure::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16s
-    case MN::MinCompPressure::Id: {
-        using T                = MN::MinCompPressure::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "MinCompPressure attribute value is %s", unify_value.dump().c_str());
-            UN::MinCompPressure::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::MinCompPressure::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16s
-    case MN::MaxCompPressure::Id: {
-        using T                = MN::MaxCompPressure::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "MaxCompPressure attribute value is %s", unify_value.dump().c_str());
-            UN::MaxCompPressure::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::MaxCompPressure::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16u
-    case MN::MinConstSpeed::Id: {
-        using T                = MN::MinConstSpeed::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "MinConstSpeed attribute value is %s", unify_value.dump().c_str());
-            UN::MinConstSpeed::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::MinConstSpeed::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16u
-    case MN::MaxConstSpeed::Id: {
-        using T                = MN::MaxConstSpeed::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "MaxConstSpeed attribute value is %s", unify_value.dump().c_str());
-            UN::MaxConstSpeed::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::MaxConstSpeed::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16u
-    case MN::MinConstFlow::Id: {
-        using T                = MN::MinConstFlow::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "MinConstFlow attribute value is %s", unify_value.dump().c_str());
-            UN::MinConstFlow::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::MinConstFlow::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16u
-    case MN::MaxConstFlow::Id: {
-        using T                = MN::MaxConstFlow::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "MaxConstFlow attribute value is %s", unify_value.dump().c_str());
-            UN::MaxConstFlow::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::MaxConstFlow::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16s
-    case MN::MinConstTemp::Id: {
-        using T                = MN::MinConstTemp::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "MinConstTemp attribute value is %s", unify_value.dump().c_str());
-            UN::MinConstTemp::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::MinConstTemp::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16s
-    case MN::MaxConstTemp::Id: {
-        using T                = MN::MaxConstTemp::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "MaxConstTemp attribute value is %s", unify_value.dump().c_str());
-            UN::MaxConstTemp::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::MaxConstTemp::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is PumpStatus
-    case MN::PumpStatus::Id: {
-        using T                = MN::PumpStatus::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "PumpStatus attribute value is %s", unify_value.dump().c_str());
-            UN::PumpStatus::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::PumpStatus::Id, ZCL_BITMAP16_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is PumpOperationMode
-    case MN::EffectiveOperationMode::Id: {
-        using T                = MN::EffectiveOperationMode::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "EffectiveOperationMode attribute value is %s", unify_value.dump().c_str());
-            UN::EffectiveOperationMode::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::EffectiveOperationMode::Id, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is PumpControlMode
-    case MN::EffectiveControlMode::Id: {
-        using T                = MN::EffectiveControlMode::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "EffectiveControlMode attribute value is %s", unify_value.dump().c_str());
-            UN::EffectiveControlMode::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::EffectiveControlMode::Id, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16s
-    case MN::Capacity::Id: {
-        using T                = MN::Capacity::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "Capacity attribute value is %s", unify_value.dump().c_str());
-            UN::Capacity::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::Capacity::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16u
-    case MN::Speed::Id: {
-        using T                = MN::Speed::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "Speed attribute value is %s", unify_value.dump().c_str());
-            UN::Speed::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id, MN::Speed::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int24u
-    case MN::LifetimeRunningHours::Id: {
-        using T                = MN::LifetimeRunningHours::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "LifetimeRunningHours attribute value is %s", unify_value.dump().c_str());
-            UN::LifetimeRunningHours::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::LifetimeRunningHours::Id, ZCL_INT24U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int24u
-    case MN::Power::Id: {
-        using T                = MN::Power::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "Power attribute value is %s", unify_value.dump().c_str());
-            UN::Power::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id, MN::Power::Id,
-                                                   ZCL_INT24U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int32u
-    case MN::LifetimeEnergyConsumed::Id: {
-        using T                = MN::LifetimeEnergyConsumed::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "LifetimeEnergyConsumed attribute value is %s", unify_value.dump().c_str());
-            UN::LifetimeEnergyConsumed::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::LifetimeEnergyConsumed::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is PumpOperationMode
-    case MN::OperationMode::Id: {
-        using T                = MN::OperationMode::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "OperationMode attribute value is %s", unify_value.dump().c_str());
-            UN::OperationMode::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::OperationMode::Id, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is PumpControlMode
-    case MN::ControlMode::Id: {
-        using T                = MN::ControlMode::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "ControlMode attribute value is %s", unify_value.dump().c_str());
-            UN::ControlMode::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::ControlMode::Id, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is bitmap32
-    case MN::FeatureMap::Id: {
-        using T                = MN::FeatureMap::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
-            UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::FeatureMap::Id, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16u
-    case MN::ClusterRevision::Id: {
-        using T                = MN::ClusterRevision::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
-            UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PumpConfigurationAndControl::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-    }
-}
-
-CHIP_ERROR
 ThermostatAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     namespace MN = chip::app::Clusters::Thermostat::Attributes;
@@ -11845,312 +9674,260 @@ ThermostatAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::LocalTemperature::Id: { // type is int16s
             MN::LocalTemperature::TypeInfo::Type value;
             UN::LocalTemperature::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OutdoorTemperature::Id: { // type is int16s
             MN::OutdoorTemperature::TypeInfo::Type value;
             UN::OutdoorTemperature::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Occupancy::Id: { // type is bitmap8
             MN::Occupancy::TypeInfo::Type value;
             UN::Occupancy::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AbsMinHeatSetpointLimit::Id: { // type is int16s
             MN::AbsMinHeatSetpointLimit::TypeInfo::Type value;
             UN::AbsMinHeatSetpointLimit::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AbsMaxHeatSetpointLimit::Id: { // type is int16s
             MN::AbsMaxHeatSetpointLimit::TypeInfo::Type value;
             UN::AbsMaxHeatSetpointLimit::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AbsMinCoolSetpointLimit::Id: { // type is int16s
             MN::AbsMinCoolSetpointLimit::TypeInfo::Type value;
             UN::AbsMinCoolSetpointLimit::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AbsMaxCoolSetpointLimit::Id: { // type is int16s
             MN::AbsMaxCoolSetpointLimit::TypeInfo::Type value;
             UN::AbsMaxCoolSetpointLimit::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PICoolingDemand::Id: { // type is int8u
             MN::PICoolingDemand::TypeInfo::Type value;
             UN::PICoolingDemand::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PIHeatingDemand::Id: { // type is int8u
             MN::PIHeatingDemand::TypeInfo::Type value;
             UN::PIHeatingDemand::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::HVACSystemTypeConfiguration::Id: { // type is bitmap8
             MN::HVACSystemTypeConfiguration::TypeInfo::Type value;
             UN::HVACSystemTypeConfiguration::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::LocalTemperatureCalibration::Id: { // type is int8s
             MN::LocalTemperatureCalibration::TypeInfo::Type value;
             UN::LocalTemperatureCalibration::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OccupiedCoolingSetpoint::Id: { // type is int16s
             MN::OccupiedCoolingSetpoint::TypeInfo::Type value;
             UN::OccupiedCoolingSetpoint::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OccupiedHeatingSetpoint::Id: { // type is int16s
             MN::OccupiedHeatingSetpoint::TypeInfo::Type value;
             UN::OccupiedHeatingSetpoint::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::UnoccupiedCoolingSetpoint::Id: { // type is int16s
             MN::UnoccupiedCoolingSetpoint::TypeInfo::Type value;
             UN::UnoccupiedCoolingSetpoint::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::UnoccupiedHeatingSetpoint::Id: { // type is int16s
             MN::UnoccupiedHeatingSetpoint::TypeInfo::Type value;
             UN::UnoccupiedHeatingSetpoint::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MinHeatSetpointLimit::Id: { // type is int16s
             MN::MinHeatSetpointLimit::TypeInfo::Type value;
             UN::MinHeatSetpointLimit::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MaxHeatSetpointLimit::Id: { // type is int16s
             MN::MaxHeatSetpointLimit::TypeInfo::Type value;
             UN::MaxHeatSetpointLimit::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MinCoolSetpointLimit::Id: { // type is int16s
             MN::MinCoolSetpointLimit::TypeInfo::Type value;
             UN::MinCoolSetpointLimit::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MaxCoolSetpointLimit::Id: { // type is int16s
             MN::MaxCoolSetpointLimit::TypeInfo::Type value;
             UN::MaxCoolSetpointLimit::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MinSetpointDeadBand::Id: { // type is int8s
             MN::MinSetpointDeadBand::TypeInfo::Type value;
             UN::MinSetpointDeadBand::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RemoteSensing::Id: { // type is bitmap8
             MN::RemoteSensing::TypeInfo::Type value;
             UN::RemoteSensing::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ControlSequenceOfOperation::Id: { // type is ThermostatControlSequence
             MN::ControlSequenceOfOperation::TypeInfo::Type value;
             UN::ControlSequenceOfOperation::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SystemMode::Id: { // type is enum8
             MN::SystemMode::TypeInfo::Type value;
             UN::SystemMode::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ThermostatRunningMode::Id: { // type is enum8
             MN::ThermostatRunningMode::TypeInfo::Type value;
             UN::ThermostatRunningMode::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::StartOfWeek::Id: { // type is enum8
             MN::StartOfWeek::TypeInfo::Type value;
             UN::StartOfWeek::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::NumberOfWeeklyTransitions::Id: { // type is int8u
             MN::NumberOfWeeklyTransitions::TypeInfo::Type value;
             UN::NumberOfWeeklyTransitions::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::NumberOfDailyTransitions::Id: { // type is int8u
             MN::NumberOfDailyTransitions::TypeInfo::Type value;
             UN::NumberOfDailyTransitions::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TemperatureSetpointHold::Id: { // type is enum8
             MN::TemperatureSetpointHold::TypeInfo::Type value;
             UN::TemperatureSetpointHold::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TemperatureSetpointHoldDuration::Id: { // type is int16u
             MN::TemperatureSetpointHoldDuration::TypeInfo::Type value;
             UN::TemperatureSetpointHoldDuration::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ThermostatProgrammingOperationMode::Id: { // type is bitmap8
             MN::ThermostatProgrammingOperationMode::TypeInfo::Type value;
             UN::ThermostatProgrammingOperationMode::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ThermostatRunningState::Id: { // type is bitmap16
             MN::ThermostatRunningState::TypeInfo::Type value;
             UN::ThermostatRunningState::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SetpointChangeSource::Id: { // type is enum8
             MN::SetpointChangeSource::TypeInfo::Type value;
             UN::SetpointChangeSource::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SetpointChangeAmount::Id: { // type is int16s
             MN::SetpointChangeAmount::TypeInfo::Type value;
             UN::SetpointChangeAmount::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SetpointChangeSourceTimestamp::Id: { // type is utc
             MN::SetpointChangeSourceTimestamp::TypeInfo::Type value;
             UN::SetpointChangeSourceTimestamp::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OccupiedSetback::Id: { // type is int8u
             MN::OccupiedSetback::TypeInfo::Type value;
             UN::OccupiedSetback::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OccupiedSetbackMin::Id: { // type is int8u
             MN::OccupiedSetbackMin::TypeInfo::Type value;
             UN::OccupiedSetbackMin::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OccupiedSetbackMax::Id: { // type is int8u
             MN::OccupiedSetbackMax::TypeInfo::Type value;
             UN::OccupiedSetbackMax::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::UnoccupiedSetback::Id: { // type is int8u
             MN::UnoccupiedSetback::TypeInfo::Type value;
             UN::UnoccupiedSetback::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::UnoccupiedSetbackMin::Id: { // type is int8u
             MN::UnoccupiedSetbackMin::TypeInfo::Type value;
             UN::UnoccupiedSetbackMin::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::UnoccupiedSetbackMax::Id: { // type is int8u
             MN::UnoccupiedSetbackMax::TypeInfo::Type value;
             UN::UnoccupiedSetbackMax::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::EmergencyHeatDelta::Id: { // type is int8u
             MN::EmergencyHeatDelta::TypeInfo::Type value;
             UN::EmergencyHeatDelta::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ACType::Id: { // type is enum8
             MN::ACType::TypeInfo::Type value;
             UN::ACType::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ACCapacity::Id: { // type is int16u
             MN::ACCapacity::TypeInfo::Type value;
             UN::ACCapacity::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ACRefrigerantType::Id: { // type is enum8
             MN::ACRefrigerantType::TypeInfo::Type value;
             UN::ACRefrigerantType::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ACCompressorType::Id: { // type is enum8
             MN::ACCompressorType::TypeInfo::Type value;
             UN::ACCompressorType::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ACErrorCode::Id: { // type is bitmap32
             MN::ACErrorCode::TypeInfo::Type value;
             UN::ACErrorCode::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ACLouverPosition::Id: { // type is enum8
             MN::ACLouverPosition::TypeInfo::Type value;
             UN::ACLouverPosition::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ACCoilTemperature::Id: { // type is int16s
             MN::ACCoilTemperature::TypeInfo::Type value;
             UN::ACCoilTemperature::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ACCapacityformat::Id: { // type is enum8
             MN::ACCapacityformat::TypeInfo::Type value;
             UN::ACCapacityformat::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -12187,8 +9964,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -12226,7 +10002,6 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::Thermostat::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int16s
@@ -12259,8 +10034,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is bitmap8
     case MN::Occupancy::Id: {
-        using T                = MN::Occupancy::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
+        std::optional<uint8_t> value = from_json_Occupancy(unify_value);
 
         if (value.has_value())
         {
@@ -12659,8 +10433,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is bitmap16
     case MN::ThermostatRunningState::Id: {
-        using T                = MN::ThermostatRunningState::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
+        std::optional<uint16_t> value = from_json_ThermostatRunningState(unify_value);
 
         if (value.has_value())
         {
@@ -12966,84 +10739,70 @@ FanControlAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::FanMode::Id: { // type is FanModeType
             MN::FanMode::TypeInfo::Type value;
             UN::FanMode::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FanModeSequence::Id: { // type is FanModeSequenceType
             MN::FanModeSequence::TypeInfo::Type value;
             UN::FanModeSequence::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PercentSetting::Id: { // type is int8u
             MN::PercentSetting::TypeInfo::Type value;
             UN::PercentSetting::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PercentCurrent::Id: { // type is int8u
             MN::PercentCurrent::TypeInfo::Type value;
             UN::PercentCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SpeedMax::Id: { // type is int8u
             MN::SpeedMax::TypeInfo::Type value;
             UN::SpeedMax::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SpeedSetting::Id: { // type is int8u
             MN::SpeedSetting::TypeInfo::Type value;
             UN::SpeedSetting::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SpeedCurrent::Id: { // type is int8u
             MN::SpeedCurrent::TypeInfo::Type value;
             UN::SpeedCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RockSupport::Id: { // type is bitmap8
             MN::RockSupport::TypeInfo::Type value;
             UN::RockSupport::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RockSetting::Id: { // type is bitmap8
             MN::RockSetting::TypeInfo::Type value;
             UN::RockSetting::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::WindSupport::Id: { // type is bitmap8
             MN::WindSupport::TypeInfo::Type value;
             UN::WindSupport::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::WindSetting::Id: { // type is bitmap8
             MN::WindSetting::TypeInfo::Type value;
             UN::WindSetting::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -13080,8 +10839,7 @@ CHIP_ERROR FanControlAttributeAccess::Write(const ConcreteDataAttributePath & aP
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -13119,7 +10877,6 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint * ep, co
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::FanControl::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is FanModeType
@@ -13318,36 +11075,30 @@ ThermostatUserInterfaceConfigurationAttributeAccess::Read(const ConcreteReadAttr
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::TemperatureDisplayMode::Id: { // type is enum8
             MN::TemperatureDisplayMode::TypeInfo::Type value;
             UN::TemperatureDisplayMode::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::KeypadLockout::Id: { // type is enum8
             MN::KeypadLockout::TypeInfo::Type value;
             UN::KeypadLockout::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ScheduleProgrammingVisibility::Id: { // type is enum8
             MN::ScheduleProgrammingVisibility::TypeInfo::Type value;
             UN::ScheduleProgrammingVisibility::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -13385,8 +11136,7 @@ CHIP_ERROR ThermostatUserInterfaceConfigurationAttributeAccess::Write(const Conc
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -13426,7 +11176,6 @@ void ThermostatUserInterfaceConfigurationAttributeAccess::reported_updated(const
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is enum8
@@ -13518,330 +11267,288 @@ ColorControlAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attri
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::CurrentHue::Id: { // type is int8u
             MN::CurrentHue::TypeInfo::Type value;
             UN::CurrentHue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CurrentSaturation::Id: { // type is int8u
             MN::CurrentSaturation::TypeInfo::Type value;
             UN::CurrentSaturation::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RemainingTime::Id: { // type is int16u
             MN::RemainingTime::TypeInfo::Type value;
             UN::RemainingTime::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CurrentX::Id: { // type is int16u
             MN::CurrentX::TypeInfo::Type value;
             UN::CurrentX::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CurrentY::Id: { // type is int16u
             MN::CurrentY::TypeInfo::Type value;
             UN::CurrentY::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DriftCompensation::Id: { // type is enum8
             MN::DriftCompensation::TypeInfo::Type value;
             UN::DriftCompensation::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CompensationText::Id: { // type is char_string
             MN::CompensationText::TypeInfo::Type value;
             UN::CompensationText::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ColorTemperatureMireds::Id: { // type is int16u
             MN::ColorTemperatureMireds::TypeInfo::Type value;
             UN::ColorTemperatureMireds::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ColorMode::Id: { // type is enum8
             MN::ColorMode::TypeInfo::Type value;
             UN::ColorMode::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Options::Id: { // type is bitmap8
             MN::Options::TypeInfo::Type value;
             UN::Options::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::NumberOfPrimaries::Id: { // type is int8u
             MN::NumberOfPrimaries::TypeInfo::Type value;
             UN::NumberOfPrimaries::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Primary1X::Id: { // type is int16u
             MN::Primary1X::TypeInfo::Type value;
             UN::Primary1X::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Primary1Y::Id: { // type is int16u
             MN::Primary1Y::TypeInfo::Type value;
             UN::Primary1Y::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Primary1Intensity::Id: { // type is int8u
             MN::Primary1Intensity::TypeInfo::Type value;
             UN::Primary1Intensity::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Primary2X::Id: { // type is int16u
             MN::Primary2X::TypeInfo::Type value;
             UN::Primary2X::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Primary2Y::Id: { // type is int16u
             MN::Primary2Y::TypeInfo::Type value;
             UN::Primary2Y::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Primary2Intensity::Id: { // type is int8u
             MN::Primary2Intensity::TypeInfo::Type value;
             UN::Primary2Intensity::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Primary3X::Id: { // type is int16u
             MN::Primary3X::TypeInfo::Type value;
             UN::Primary3X::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Primary3Y::Id: { // type is int16u
             MN::Primary3Y::TypeInfo::Type value;
             UN::Primary3Y::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Primary3Intensity::Id: { // type is int8u
             MN::Primary3Intensity::TypeInfo::Type value;
             UN::Primary3Intensity::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Primary4X::Id: { // type is int16u
             MN::Primary4X::TypeInfo::Type value;
             UN::Primary4X::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Primary4Y::Id: { // type is int16u
             MN::Primary4Y::TypeInfo::Type value;
             UN::Primary4Y::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Primary4Intensity::Id: { // type is int8u
             MN::Primary4Intensity::TypeInfo::Type value;
             UN::Primary4Intensity::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Primary5X::Id: { // type is int16u
             MN::Primary5X::TypeInfo::Type value;
             UN::Primary5X::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Primary5Y::Id: { // type is int16u
             MN::Primary5Y::TypeInfo::Type value;
             UN::Primary5Y::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Primary5Intensity::Id: { // type is int8u
             MN::Primary5Intensity::TypeInfo::Type value;
             UN::Primary5Intensity::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Primary6X::Id: { // type is int16u
             MN::Primary6X::TypeInfo::Type value;
             UN::Primary6X::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Primary6Y::Id: { // type is int16u
             MN::Primary6Y::TypeInfo::Type value;
             UN::Primary6Y::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Primary6Intensity::Id: { // type is int8u
             MN::Primary6Intensity::TypeInfo::Type value;
             UN::Primary6Intensity::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::WhitePointX::Id: { // type is int16u
             MN::WhitePointX::TypeInfo::Type value;
             UN::WhitePointX::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::WhitePointY::Id: { // type is int16u
             MN::WhitePointY::TypeInfo::Type value;
             UN::WhitePointY::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ColorPointRX::Id: { // type is int16u
             MN::ColorPointRX::TypeInfo::Type value;
             UN::ColorPointRX::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ColorPointRY::Id: { // type is int16u
             MN::ColorPointRY::TypeInfo::Type value;
             UN::ColorPointRY::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ColorPointRIntensity::Id: { // type is int8u
             MN::ColorPointRIntensity::TypeInfo::Type value;
             UN::ColorPointRIntensity::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ColorPointGX::Id: { // type is int16u
             MN::ColorPointGX::TypeInfo::Type value;
             UN::ColorPointGX::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ColorPointGY::Id: { // type is int16u
             MN::ColorPointGY::TypeInfo::Type value;
             UN::ColorPointGY::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ColorPointGIntensity::Id: { // type is int8u
             MN::ColorPointGIntensity::TypeInfo::Type value;
             UN::ColorPointGIntensity::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ColorPointBX::Id: { // type is int16u
             MN::ColorPointBX::TypeInfo::Type value;
             UN::ColorPointBX::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ColorPointBY::Id: { // type is int16u
             MN::ColorPointBY::TypeInfo::Type value;
             UN::ColorPointBY::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ColorPointBIntensity::Id: { // type is int8u
             MN::ColorPointBIntensity::TypeInfo::Type value;
             UN::ColorPointBIntensity::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::EnhancedCurrentHue::Id: { // type is int16u
             MN::EnhancedCurrentHue::TypeInfo::Type value;
             UN::EnhancedCurrentHue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::EnhancedColorMode::Id: { // type is enum8
             MN::EnhancedColorMode::TypeInfo::Type value;
             UN::EnhancedColorMode::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ColorLoopActive::Id: { // type is int8u
             MN::ColorLoopActive::TypeInfo::Type value;
             UN::ColorLoopActive::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ColorLoopDirection::Id: { // type is int8u
             MN::ColorLoopDirection::TypeInfo::Type value;
             UN::ColorLoopDirection::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ColorLoopTime::Id: { // type is int16u
             MN::ColorLoopTime::TypeInfo::Type value;
             UN::ColorLoopTime::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ColorLoopStartEnhancedHue::Id: { // type is int16u
             MN::ColorLoopStartEnhancedHue::TypeInfo::Type value;
             UN::ColorLoopStartEnhancedHue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ColorLoopStoredEnhancedHue::Id: { // type is int16u
             MN::ColorLoopStoredEnhancedHue::TypeInfo::Type value;
             UN::ColorLoopStoredEnhancedHue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ColorCapabilities::Id: { // type is bitmap16
             MN::ColorCapabilities::TypeInfo::Type value;
             UN::ColorCapabilities::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ColorTempPhysicalMinMireds::Id: { // type is int16u
             MN::ColorTempPhysicalMinMireds::TypeInfo::Type value;
             UN::ColorTempPhysicalMinMireds::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ColorTempPhysicalMaxMireds::Id: { // type is int16u
             MN::ColorTempPhysicalMaxMireds::TypeInfo::Type value;
             UN::ColorTempPhysicalMaxMireds::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CoupleColorTempToLevelMinMireds::Id: { // type is int16u
             MN::CoupleColorTempToLevelMinMireds::TypeInfo::Type value;
             UN::CoupleColorTempToLevelMinMireds::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::StartUpColorTemperatureMireds::Id: { // type is int16u
             MN::StartUpColorTemperatureMireds::TypeInfo::Type value;
             UN::StartUpColorTemperatureMireds::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            {
+                ConcreteAttributePath cc_atrpath =
+                    ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, MN::ColorCapabilities::Id);
+                MN::ColorCapabilities::TypeInfo::Type colorControlCapabilities;
+                if (EMBER_ZCL_STATUS_SUCCESS == UN::ColorCapabilities::Get(cc_atrpath, colorControlCapabilities))
+                {
+                    value = static_cast<MN::FeatureMap::TypeInfo::Type>(colorControlCapabilities);
+                }
+                else
+                {
+                    sl_log_warning(LOG_TAG, "Failed to read ColorCapabilities, setting featuremap to HueSaturationSupported");
+                    value = 1;
+                }
+            }
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -13878,8 +11585,7 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath & 
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -13917,7 +11623,6 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::ColorControl::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int8u
@@ -14034,7 +11739,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is enum8
     case MN::ColorMode::Id: {
-        using T                = MN::ColorMode::TypeInfo::Type;
+        using T                = ZclEnumColorMode;
         std::optional<T> value = from_json<T>(unify_value);
 
         if (value.has_value())
@@ -14496,7 +12201,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is enum8
     case MN::EnhancedColorMode::Id: {
-        using T                = MN::EnhancedColorMode::TypeInfo::Type;
+        using T                = ZclEnumEnhancedColorMode;
         std::optional<T> value = from_json<T>(unify_value);
 
         if (value.has_value())
@@ -14582,8 +12287,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is bitmap16
     case MN::ColorCapabilities::Id: {
-        using T                = MN::ColorCapabilities::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
+        std::optional<uint16_t> value = from_json_ColorCapabilities(unify_value);
 
         if (value.has_value())
         {
@@ -14686,426 +12390,6 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
 }
 
 CHIP_ERROR
-BallastConfigurationAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    namespace MN = chip::app::Clusters::BallastConfiguration::Attributes;
-    namespace UN = unify::matter_bridge::BallastConfiguration::Attributes;
-    if (aPath.mClusterId != Clusters::BallastConfiguration::Id)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
-
-        case MN::PhysicalMinLevel::Id: { // type is int8u
-            MN::PhysicalMinLevel::TypeInfo::Type value;
-            UN::PhysicalMinLevel::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::PhysicalMaxLevel::Id: { // type is int8u
-            MN::PhysicalMaxLevel::TypeInfo::Type value;
-            UN::PhysicalMaxLevel::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::BallastStatus::Id: { // type is bitmap8
-            MN::BallastStatus::TypeInfo::Type value;
-            UN::BallastStatus::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::MinLevel::Id: { // type is int8u
-            MN::MinLevel::TypeInfo::Type value;
-            UN::MinLevel::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::MaxLevel::Id: { // type is int8u
-            MN::MaxLevel::TypeInfo::Type value;
-            UN::MaxLevel::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::IntrinsicBalanceFactor::Id: { // type is int8u
-            MN::IntrinsicBalanceFactor::TypeInfo::Type value;
-            UN::IntrinsicBalanceFactor::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::BallastFactorAdjustment::Id: { // type is int8u
-            MN::BallastFactorAdjustment::TypeInfo::Type value;
-            UN::BallastFactorAdjustment::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::LampQuantity::Id: { // type is int8u
-            MN::LampQuantity::TypeInfo::Type value;
-            UN::LampQuantity::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::LampType::Id: { // type is char_string
-            MN::LampType::TypeInfo::Type value;
-            UN::LampType::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::LampManufacturer::Id: { // type is char_string
-            MN::LampManufacturer::TypeInfo::Type value;
-            UN::LampManufacturer::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::LampRatedHours::Id: { // type is int24u
-            MN::LampRatedHours::TypeInfo::Type value;
-            UN::LampRatedHours::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::LampBurnHours::Id: { // type is int24u
-            MN::LampBurnHours::TypeInfo::Type value;
-            UN::LampBurnHours::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::LampAlarmMode::Id: { // type is bitmap8
-            MN::LampAlarmMode::TypeInfo::Type value;
-            UN::LampAlarmMode::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::LampBurnHoursTripPoint::Id: { // type is int24u
-            MN::LampBurnHoursTripPoint::TypeInfo::Type value;
-            UN::LampBurnHoursTripPoint::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::FeatureMap::Id: { // type is bitmap32
-            MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::ClusterRevision::Id: { // type is int16u
-            MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-        }
-    } catch (const std::out_of_range & e)
-    {
-        sl_log_info(LOG_TAG,
-                    "The request attribute Path is not found in the attribute state "
-                    "contanier, %s\n",
-                    e.what());
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR BallastConfigurationAttributeAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    using namespace chip::app::Clusters::BallastConfiguration;
-
-    if (aPath.mClusterId != Clusters::BallastConfiguration::Id)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
-
-    if (!unify_node)
-    {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-
-    std::string attribute_name;
-    nlohmann::json jsn;
-
-    switch (aPath.mAttributeId)
-    {
-    }
-
-    if (!attribute_name.empty())
-    {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/BallastConfiguration/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
-        uic_mqtt_publish(topic.c_str(), payload_str.c_str(), payload_str.length(), true);
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void BallastConfigurationAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                                           const std::string & attribute, const nlohmann::json & unify_value)
-{
-    namespace MN = chip::app::Clusters::BallastConfiguration::Attributes;
-    namespace UN = unify::matter_bridge::BallastConfiguration::Attributes;
-
-    auto cluster_id = device_translator::instance().get_cluster_id(cluster);
-
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::BallastConfiguration::Id))
-    {
-        return;
-    }
-
-    // get attribute id
-    auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
-
-    if (!attribute_id.has_value())
-    {
-        return;
-    }
-
-    chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
-    ConcreteAttributePath attrpath =
-        ConcreteAttributePath(node_matter_endpoint, Clusters::BallastConfiguration::Id, attribute_id.value());
-
-    switch (attribute_id.value())
-    {
-    // type is int8u
-    case MN::PhysicalMinLevel::Id: {
-        using T                = MN::PhysicalMinLevel::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "PhysicalMinLevel attribute value is %s", unify_value.dump().c_str());
-            UN::PhysicalMinLevel::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BallastConfiguration::Id,
-                                                   MN::PhysicalMinLevel::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int8u
-    case MN::PhysicalMaxLevel::Id: {
-        using T                = MN::PhysicalMaxLevel::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "PhysicalMaxLevel attribute value is %s", unify_value.dump().c_str());
-            UN::PhysicalMaxLevel::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BallastConfiguration::Id,
-                                                   MN::PhysicalMaxLevel::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is bitmap8
-    case MN::BallastStatus::Id: {
-        using T                = MN::BallastStatus::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "BallastStatus attribute value is %s", unify_value.dump().c_str());
-            UN::BallastStatus::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BallastConfiguration::Id, MN::BallastStatus::Id,
-                                                   ZCL_BITMAP8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int8u
-    case MN::MinLevel::Id: {
-        using T                = MN::MinLevel::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "MinLevel attribute value is %s", unify_value.dump().c_str());
-            UN::MinLevel::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BallastConfiguration::Id, MN::MinLevel::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int8u
-    case MN::MaxLevel::Id: {
-        using T                = MN::MaxLevel::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "MaxLevel attribute value is %s", unify_value.dump().c_str());
-            UN::MaxLevel::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BallastConfiguration::Id, MN::MaxLevel::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int8u
-    case MN::IntrinsicBalanceFactor::Id: {
-        using T                = MN::IntrinsicBalanceFactor::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "IntrinsicBalanceFactor attribute value is %s", unify_value.dump().c_str());
-            UN::IntrinsicBalanceFactor::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BallastConfiguration::Id,
-                                                   MN::IntrinsicBalanceFactor::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int8u
-    case MN::BallastFactorAdjustment::Id: {
-        using T                = MN::BallastFactorAdjustment::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "BallastFactorAdjustment attribute value is %s", unify_value.dump().c_str());
-            UN::BallastFactorAdjustment::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BallastConfiguration::Id,
-                                                   MN::BallastFactorAdjustment::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int8u
-    case MN::LampQuantity::Id: {
-        using T                = MN::LampQuantity::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "LampQuantity attribute value is %s", unify_value.dump().c_str());
-            UN::LampQuantity::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BallastConfiguration::Id, MN::LampQuantity::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is char_string
-    case MN::LampType::Id: {
-        using T                = MN::LampType::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "LampType attribute value is %s", unify_value.dump().c_str());
-            UN::LampType::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BallastConfiguration::Id, MN::LampType::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is char_string
-    case MN::LampManufacturer::Id: {
-        using T                = MN::LampManufacturer::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "LampManufacturer attribute value is %s", unify_value.dump().c_str());
-            UN::LampManufacturer::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BallastConfiguration::Id,
-                                                   MN::LampManufacturer::Id, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int24u
-    case MN::LampRatedHours::Id: {
-        using T                = MN::LampRatedHours::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "LampRatedHours attribute value is %s", unify_value.dump().c_str());
-            UN::LampRatedHours::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BallastConfiguration::Id, MN::LampRatedHours::Id,
-                                                   ZCL_INT24U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int24u
-    case MN::LampBurnHours::Id: {
-        using T                = MN::LampBurnHours::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "LampBurnHours attribute value is %s", unify_value.dump().c_str());
-            UN::LampBurnHours::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BallastConfiguration::Id, MN::LampBurnHours::Id,
-                                                   ZCL_INT24U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is bitmap8
-    case MN::LampAlarmMode::Id: {
-        using T                = MN::LampAlarmMode::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "LampAlarmMode attribute value is %s", unify_value.dump().c_str());
-            UN::LampAlarmMode::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BallastConfiguration::Id, MN::LampAlarmMode::Id,
-                                                   ZCL_BITMAP8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int24u
-    case MN::LampBurnHoursTripPoint::Id: {
-        using T                = MN::LampBurnHoursTripPoint::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "LampBurnHoursTripPoint attribute value is %s", unify_value.dump().c_str());
-            UN::LampBurnHoursTripPoint::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BallastConfiguration::Id,
-                                                   MN::LampBurnHoursTripPoint::Id, ZCL_INT24U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is bitmap32
-    case MN::FeatureMap::Id: {
-        using T                = MN::FeatureMap::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
-            UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BallastConfiguration::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16u
-    case MN::ClusterRevision::Id: {
-        using T                = MN::ClusterRevision::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
-            UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BallastConfiguration::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-    }
-}
-
-CHIP_ERROR
 IlluminanceMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     namespace MN = chip::app::Clusters::IlluminanceMeasurement::Attributes;
@@ -15116,48 +12400,40 @@ IlluminanceMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aP
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::MeasuredValue::Id: { // type is int16u
             MN::MeasuredValue::TypeInfo::Type value;
             UN::MeasuredValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MinMeasuredValue::Id: { // type is int16u
             MN::MinMeasuredValue::TypeInfo::Type value;
             UN::MinMeasuredValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MaxMeasuredValue::Id: { // type is int16u
             MN::MaxMeasuredValue::TypeInfo::Type value;
             UN::MaxMeasuredValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Tolerance::Id: { // type is int16u
             MN::Tolerance::TypeInfo::Type value;
             UN::Tolerance::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::LightSensorType::Id: { // type is enum8
             MN::LightSensorType::TypeInfo::Type value;
             UN::LightSensorType::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -15194,8 +12470,7 @@ CHIP_ERROR IlluminanceMeasurementAttributeAccess::Write(const ConcreteDataAttrib
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -15234,7 +12509,6 @@ void IlluminanceMeasurementAttributeAccess::reported_updated(const bridged_endpo
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int16u
@@ -15354,42 +12628,35 @@ TemperatureMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aP
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::MeasuredValue::Id: { // type is int16s
             MN::MeasuredValue::TypeInfo::Type value;
             UN::MeasuredValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MinMeasuredValue::Id: { // type is int16s
             MN::MinMeasuredValue::TypeInfo::Type value;
             UN::MinMeasuredValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MaxMeasuredValue::Id: { // type is int16s
             MN::MaxMeasuredValue::TypeInfo::Type value;
             UN::MaxMeasuredValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Tolerance::Id: { // type is int16u
             MN::Tolerance::TypeInfo::Type value;
             UN::Tolerance::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -15426,8 +12693,7 @@ CHIP_ERROR TemperatureMeasurementAttributeAccess::Write(const ConcreteDataAttrib
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -15466,7 +12732,6 @@ void TemperatureMeasurementAttributeAccess::reported_updated(const bridged_endpo
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::TemperatureMeasurement::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int16s
@@ -15571,72 +12836,60 @@ PressureMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aPath
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::MeasuredValue::Id: { // type is int16s
             MN::MeasuredValue::TypeInfo::Type value;
             UN::MeasuredValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MinMeasuredValue::Id: { // type is int16s
             MN::MinMeasuredValue::TypeInfo::Type value;
             UN::MinMeasuredValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MaxMeasuredValue::Id: { // type is int16s
             MN::MaxMeasuredValue::TypeInfo::Type value;
             UN::MaxMeasuredValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Tolerance::Id: { // type is int16u
             MN::Tolerance::TypeInfo::Type value;
             UN::Tolerance::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ScaledValue::Id: { // type is int16s
             MN::ScaledValue::TypeInfo::Type value;
             UN::ScaledValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MinScaledValue::Id: { // type is int16s
             MN::MinScaledValue::TypeInfo::Type value;
             UN::MinScaledValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MaxScaledValue::Id: { // type is int16s
             MN::MaxScaledValue::TypeInfo::Type value;
             UN::MaxScaledValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ScaledTolerance::Id: { // type is int16u
             MN::ScaledTolerance::TypeInfo::Type value;
             UN::ScaledTolerance::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Scale::Id: { // type is int8s
             MN::Scale::TypeInfo::Type value;
             UN::Scale::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -15673,8 +12926,7 @@ CHIP_ERROR PressureMeasurementAttributeAccess::Write(const ConcreteDataAttribute
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -15713,7 +12965,6 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::PressureMeasurement::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int16s
@@ -15886,42 +13137,35 @@ FlowMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aPath, At
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::MeasuredValue::Id: { // type is int16u
             MN::MeasuredValue::TypeInfo::Type value;
             UN::MeasuredValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MinMeasuredValue::Id: { // type is int16u
             MN::MinMeasuredValue::TypeInfo::Type value;
             UN::MinMeasuredValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MaxMeasuredValue::Id: { // type is int16u
             MN::MaxMeasuredValue::TypeInfo::Type value;
             UN::MaxMeasuredValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Tolerance::Id: { // type is int16u
             MN::Tolerance::TypeInfo::Type value;
             UN::Tolerance::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -15958,8 +13202,7 @@ CHIP_ERROR FlowMeasurementAttributeAccess::Write(const ConcreteDataAttributePath
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -15998,7 +13241,6 @@ void FlowMeasurementAttributeAccess::reported_updated(const bridged_endpoint * e
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::FlowMeasurement::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int16u
@@ -16099,42 +13341,35 @@ RelativeHumidityMeasurementAttributeAccess::Read(const ConcreteReadAttributePath
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::MeasuredValue::Id: { // type is int16u
             MN::MeasuredValue::TypeInfo::Type value;
             UN::MeasuredValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MinMeasuredValue::Id: { // type is int16u
             MN::MinMeasuredValue::TypeInfo::Type value;
             UN::MinMeasuredValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MaxMeasuredValue::Id: { // type is int16u
             MN::MaxMeasuredValue::TypeInfo::Type value;
             UN::MaxMeasuredValue::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Tolerance::Id: { // type is int16u
             MN::Tolerance::TypeInfo::Type value;
             UN::Tolerance::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -16172,8 +13407,7 @@ CHIP_ERROR RelativeHumidityMeasurementAttributeAccess::Write(const ConcreteDataA
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -16212,7 +13446,6 @@ void RelativeHumidityMeasurementAttributeAccess::reported_updated(const bridged_
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::RelativeHumidityMeasurement::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int16u
@@ -16319,90 +13552,75 @@ OccupancySensingAttributeAccess::Read(const ConcreteReadAttributePath & aPath, A
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::Occupancy::Id: { // type is bitmap8
             MN::Occupancy::TypeInfo::Type value;
             UN::Occupancy::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OccupancySensorType::Id: { // type is enum8
             MN::OccupancySensorType::TypeInfo::Type value;
             UN::OccupancySensorType::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OccupancySensorTypeBitmap::Id: { // type is bitmap8
             MN::OccupancySensorTypeBitmap::TypeInfo::Type value;
             UN::OccupancySensorTypeBitmap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PirOccupiedToUnoccupiedDelay::Id: { // type is int16u
             MN::PirOccupiedToUnoccupiedDelay::TypeInfo::Type value;
             UN::PirOccupiedToUnoccupiedDelay::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PirUnoccupiedToOccupiedDelay::Id: { // type is int16u
             MN::PirUnoccupiedToOccupiedDelay::TypeInfo::Type value;
             UN::PirUnoccupiedToOccupiedDelay::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PirUnoccupiedToOccupiedThreshold::Id: { // type is int8u
             MN::PirUnoccupiedToOccupiedThreshold::TypeInfo::Type value;
             UN::PirUnoccupiedToOccupiedThreshold::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::UltrasonicOccupiedToUnoccupiedDelay::Id: { // type is int16u
             MN::UltrasonicOccupiedToUnoccupiedDelay::TypeInfo::Type value;
             UN::UltrasonicOccupiedToUnoccupiedDelay::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::UltrasonicUnoccupiedToOccupiedDelay::Id: { // type is int16u
             MN::UltrasonicUnoccupiedToOccupiedDelay::TypeInfo::Type value;
             UN::UltrasonicUnoccupiedToOccupiedDelay::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::UltrasonicUnoccupiedToOccupiedThreshold::Id: { // type is int8u
             MN::UltrasonicUnoccupiedToOccupiedThreshold::TypeInfo::Type value;
             UN::UltrasonicUnoccupiedToOccupiedThreshold::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PhysicalContactOccupiedToUnoccupiedDelay::Id: { // type is int16u
             MN::PhysicalContactOccupiedToUnoccupiedDelay::TypeInfo::Type value;
             UN::PhysicalContactOccupiedToUnoccupiedDelay::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PhysicalContactUnoccupiedToOccupiedDelay::Id: { // type is int16u
             MN::PhysicalContactUnoccupiedToOccupiedDelay::TypeInfo::Type value;
             UN::PhysicalContactUnoccupiedToOccupiedDelay::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PhysicalContactUnoccupiedToOccupiedThreshold::Id: { // type is int8u
             MN::PhysicalContactUnoccupiedToOccupiedThreshold::TypeInfo::Type value;
             UN::PhysicalContactUnoccupiedToOccupiedThreshold::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -16439,8 +13657,7 @@ CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePat
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -16479,13 +13696,11 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::OccupancySensing::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is bitmap8
     case MN::Occupancy::Id: {
-        using T                = MN::Occupancy::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
+        std::optional<uint8_t> value = from_json_Occupancy(unify_value);
 
         if (value.has_value())
         {
@@ -16498,7 +13713,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * 
     }
         // type is enum8
     case MN::OccupancySensorType::Id: {
-        using T                = MN::OccupancySensorType::TypeInfo::Type;
+        using T                = ZclEnumOccupancySensorType;
         std::optional<T> value = from_json<T>(unify_value);
 
         if (value.has_value())
@@ -16513,8 +13728,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * 
     }
         // type is bitmap8
     case MN::OccupancySensorTypeBitmap::Id: {
-        using T                = MN::OccupancySensorTypeBitmap::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
+        std::optional<uint8_t> value = from_json_OccupancySensorTypeBitmap(unify_value);
 
         if (value.has_value())
         {
@@ -16703,24 +13917,20 @@ WakeOnLanAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribut
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::MACAddress::Id: { // type is char_string
             MN::MACAddress::TypeInfo::Type value;
             UN::MACAddress::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -16757,8 +13967,7 @@ CHIP_ERROR WakeOnLanAttributeAccess::Write(const ConcreteDataAttributePath & aPa
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -16796,7 +14005,6 @@ void WakeOnLanAttributeAccess::reported_updated(const bridged_endpoint * ep, con
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::WakeOnLan::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is char_string
@@ -16855,18 +14063,15 @@ ChannelAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeV
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -16903,8 +14108,7 @@ CHIP_ERROR ChannelAttributeAccess::Write(const ConcreteDataAttributePath & aPath
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -16942,7 +14146,6 @@ void ChannelAttributeAccess::reported_updated(const bridged_endpoint * ep, const
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::Channel::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is bitmap32
@@ -16987,24 +14190,20 @@ TargetNavigatorAttributeAccess::Read(const ConcreteReadAttributePath & aPath, At
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::CurrentTarget::Id: { // type is int8u
             MN::CurrentTarget::TypeInfo::Type value;
             UN::CurrentTarget::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -17041,8 +14240,7 @@ CHIP_ERROR TargetNavigatorAttributeAccess::Write(const ConcreteDataAttributePath
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -17081,7 +14279,6 @@ void TargetNavigatorAttributeAccess::reported_updated(const bridged_endpoint * e
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::TargetNavigator::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int8u
@@ -17140,54 +14337,45 @@ MediaPlaybackAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attr
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::CurrentState::Id: { // type is PlaybackStateEnum
             MN::CurrentState::TypeInfo::Type value;
             UN::CurrentState::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::StartTime::Id: { // type is epoch_us
             MN::StartTime::TypeInfo::Type value;
             UN::StartTime::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Duration::Id: { // type is int64u
             MN::Duration::TypeInfo::Type value;
             UN::Duration::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PlaybackSpeed::Id: { // type is single
             MN::PlaybackSpeed::TypeInfo::Type value;
             UN::PlaybackSpeed::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SeekRangeEnd::Id: { // type is int64u
             MN::SeekRangeEnd::TypeInfo::Type value;
             UN::SeekRangeEnd::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::SeekRangeStart::Id: { // type is int64u
             MN::SeekRangeStart::TypeInfo::Type value;
             UN::SeekRangeStart::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -17224,8 +14412,7 @@ CHIP_ERROR MediaPlaybackAttributeAccess::Write(const ConcreteDataAttributePath &
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -17263,7 +14450,6 @@ void MediaPlaybackAttributeAccess::reported_updated(const bridged_endpoint * ep,
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::MediaPlayback::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is PlaybackStateEnum
@@ -17392,24 +14578,20 @@ MediaInputAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::CurrentInput::Id: { // type is int8u
             MN::CurrentInput::TypeInfo::Type value;
             UN::CurrentInput::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -17446,8 +14628,7 @@ CHIP_ERROR MediaInputAttributeAccess::Write(const ConcreteDataAttributePath & aP
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -17485,7 +14666,6 @@ void MediaInputAttributeAccess::reported_updated(const bridged_endpoint * ep, co
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::MediaInput::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int8u
@@ -17544,18 +14724,15 @@ LowPowerAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribute
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -17592,8 +14769,7 @@ CHIP_ERROR LowPowerAttributeAccess::Write(const ConcreteDataAttributePath & aPat
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -17631,7 +14807,6 @@ void LowPowerAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::LowPower::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is bitmap32
@@ -17676,18 +14851,15 @@ KeypadInputAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -17724,8 +14896,7 @@ CHIP_ERROR KeypadInputAttributeAccess::Write(const ConcreteDataAttributePath & a
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -17763,7 +14934,6 @@ void KeypadInputAttributeAccess::reported_updated(const bridged_endpoint * ep, c
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::KeypadInput::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is bitmap32
@@ -17808,24 +14978,20 @@ ContentLauncherAttributeAccess::Read(const ConcreteReadAttributePath & aPath, At
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::SupportedStreamingProtocols::Id: { // type is bitmap32
             MN::SupportedStreamingProtocols::TypeInfo::Type value;
             UN::SupportedStreamingProtocols::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -17862,8 +15028,7 @@ CHIP_ERROR ContentLauncherAttributeAccess::Write(const ConcreteDataAttributePath
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -17902,7 +15067,6 @@ void ContentLauncherAttributeAccess::reported_updated(const bridged_endpoint * e
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::ContentLauncher::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is bitmap32
@@ -17962,24 +15126,20 @@ AudioOutputAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::CurrentOutput::Id: { // type is int8u
             MN::CurrentOutput::TypeInfo::Type value;
             UN::CurrentOutput::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -18016,8 +15176,7 @@ CHIP_ERROR AudioOutputAttributeAccess::Write(const ConcreteDataAttributePath & a
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -18055,7 +15214,6 @@ void AudioOutputAttributeAccess::reported_updated(const bridged_endpoint * ep, c
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::AudioOutput::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is int8u
@@ -18114,18 +15272,15 @@ ApplicationLauncherAttributeAccess::Read(const ConcreteReadAttributePath & aPath
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -18162,8 +15317,7 @@ CHIP_ERROR ApplicationLauncherAttributeAccess::Write(const ConcreteDataAttribute
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -18202,7 +15356,6 @@ void ApplicationLauncherAttributeAccess::reported_updated(const bridged_endpoint
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::ApplicationLauncher::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is bitmap32
@@ -18247,54 +15400,45 @@ ApplicationBasicAttributeAccess::Read(const ConcreteReadAttributePath & aPath, A
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::VendorName::Id: { // type is char_string
             MN::VendorName::TypeInfo::Type value;
             UN::VendorName::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::VendorID::Id: { // type is vendor_id
             MN::VendorID::TypeInfo::Type value;
             UN::VendorID::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ApplicationName::Id: { // type is char_string
             MN::ApplicationName::TypeInfo::Type value;
             UN::ApplicationName::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ProductID::Id: { // type is int16u
             MN::ProductID::TypeInfo::Type value;
             UN::ProductID::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Status::Id: { // type is ApplicationStatusEnum
             MN::Status::TypeInfo::Type value;
             UN::Status::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ApplicationVersion::Id: { // type is char_string
             MN::ApplicationVersion::TypeInfo::Type value;
             UN::ApplicationVersion::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -18331,8 +15475,7 @@ CHIP_ERROR ApplicationBasicAttributeAccess::Write(const ConcreteDataAttributePat
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -18371,7 +15514,6 @@ void ApplicationBasicAttributeAccess::reported_updated(const bridged_endpoint * 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::ApplicationBasic::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is char_string
@@ -18500,18 +15642,15 @@ AccountLoginAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attri
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -18548,8 +15687,7 @@ CHIP_ERROR AccountLoginAttributeAccess::Write(const ConcreteDataAttributePath & 
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -18587,7 +15725,6 @@ void AccountLoginAttributeAccess::reported_updated(const bridged_endpoint * ep, 
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::AccountLogin::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is bitmap32
@@ -18632,786 +15769,655 @@ ElectricalMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aPa
     }
 
     ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
     try
     {
         switch (aPath.mAttributeId)
         {
-
         case MN::MeasurementType::Id: { // type is bitmap32
             MN::MeasurementType::TypeInfo::Type value;
             UN::MeasurementType::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DcVoltage::Id: { // type is int16s
             MN::DcVoltage::TypeInfo::Type value;
             UN::DcVoltage::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DcVoltageMin::Id: { // type is int16s
             MN::DcVoltageMin::TypeInfo::Type value;
             UN::DcVoltageMin::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DcVoltageMax::Id: { // type is int16s
             MN::DcVoltageMax::TypeInfo::Type value;
             UN::DcVoltageMax::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DcCurrent::Id: { // type is int16s
             MN::DcCurrent::TypeInfo::Type value;
             UN::DcCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DcCurrentMin::Id: { // type is int16s
             MN::DcCurrentMin::TypeInfo::Type value;
             UN::DcCurrentMin::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DcCurrentMax::Id: { // type is int16s
             MN::DcCurrentMax::TypeInfo::Type value;
             UN::DcCurrentMax::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DcPower::Id: { // type is int16s
             MN::DcPower::TypeInfo::Type value;
             UN::DcPower::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DcPowerMin::Id: { // type is int16s
             MN::DcPowerMin::TypeInfo::Type value;
             UN::DcPowerMin::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DcPowerMax::Id: { // type is int16s
             MN::DcPowerMax::TypeInfo::Type value;
             UN::DcPowerMax::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DcVoltageMultiplier::Id: { // type is int16u
             MN::DcVoltageMultiplier::TypeInfo::Type value;
             UN::DcVoltageMultiplier::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DcVoltageDivisor::Id: { // type is int16u
             MN::DcVoltageDivisor::TypeInfo::Type value;
             UN::DcVoltageDivisor::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DcCurrentMultiplier::Id: { // type is int16u
             MN::DcCurrentMultiplier::TypeInfo::Type value;
             UN::DcCurrentMultiplier::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DcCurrentDivisor::Id: { // type is int16u
             MN::DcCurrentDivisor::TypeInfo::Type value;
             UN::DcCurrentDivisor::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DcPowerMultiplier::Id: { // type is int16u
             MN::DcPowerMultiplier::TypeInfo::Type value;
             UN::DcPowerMultiplier::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::DcPowerDivisor::Id: { // type is int16u
             MN::DcPowerDivisor::TypeInfo::Type value;
             UN::DcPowerDivisor::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AcFrequency::Id: { // type is int16u
             MN::AcFrequency::TypeInfo::Type value;
             UN::AcFrequency::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AcFrequencyMin::Id: { // type is int16u
             MN::AcFrequencyMin::TypeInfo::Type value;
             UN::AcFrequencyMin::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AcFrequencyMax::Id: { // type is int16u
             MN::AcFrequencyMax::TypeInfo::Type value;
             UN::AcFrequencyMax::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::NeutralCurrent::Id: { // type is int16u
             MN::NeutralCurrent::TypeInfo::Type value;
             UN::NeutralCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TotalActivePower::Id: { // type is int32s
             MN::TotalActivePower::TypeInfo::Type value;
             UN::TotalActivePower::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TotalReactivePower::Id: { // type is int32s
             MN::TotalReactivePower::TypeInfo::Type value;
             UN::TotalReactivePower::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::TotalApparentPower::Id: { // type is int32u
             MN::TotalApparentPower::TypeInfo::Type value;
             UN::TotalApparentPower::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Measured1stHarmonicCurrent::Id: { // type is int16s
             MN::Measured1stHarmonicCurrent::TypeInfo::Type value;
             UN::Measured1stHarmonicCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Measured3rdHarmonicCurrent::Id: { // type is int16s
             MN::Measured3rdHarmonicCurrent::TypeInfo::Type value;
             UN::Measured3rdHarmonicCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Measured5thHarmonicCurrent::Id: { // type is int16s
             MN::Measured5thHarmonicCurrent::TypeInfo::Type value;
             UN::Measured5thHarmonicCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Measured7thHarmonicCurrent::Id: { // type is int16s
             MN::Measured7thHarmonicCurrent::TypeInfo::Type value;
             UN::Measured7thHarmonicCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Measured9thHarmonicCurrent::Id: { // type is int16s
             MN::Measured9thHarmonicCurrent::TypeInfo::Type value;
             UN::Measured9thHarmonicCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::Measured11thHarmonicCurrent::Id: { // type is int16s
             MN::Measured11thHarmonicCurrent::TypeInfo::Type value;
             UN::Measured11thHarmonicCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MeasuredPhase1stHarmonicCurrent::Id: { // type is int16s
             MN::MeasuredPhase1stHarmonicCurrent::TypeInfo::Type value;
             UN::MeasuredPhase1stHarmonicCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MeasuredPhase3rdHarmonicCurrent::Id: { // type is int16s
             MN::MeasuredPhase3rdHarmonicCurrent::TypeInfo::Type value;
             UN::MeasuredPhase3rdHarmonicCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MeasuredPhase5thHarmonicCurrent::Id: { // type is int16s
             MN::MeasuredPhase5thHarmonicCurrent::TypeInfo::Type value;
             UN::MeasuredPhase5thHarmonicCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MeasuredPhase7thHarmonicCurrent::Id: { // type is int16s
             MN::MeasuredPhase7thHarmonicCurrent::TypeInfo::Type value;
             UN::MeasuredPhase7thHarmonicCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MeasuredPhase9thHarmonicCurrent::Id: { // type is int16s
             MN::MeasuredPhase9thHarmonicCurrent::TypeInfo::Type value;
             UN::MeasuredPhase9thHarmonicCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::MeasuredPhase11thHarmonicCurrent::Id: { // type is int16s
             MN::MeasuredPhase11thHarmonicCurrent::TypeInfo::Type value;
             UN::MeasuredPhase11thHarmonicCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AcFrequencyMultiplier::Id: { // type is int16u
             MN::AcFrequencyMultiplier::TypeInfo::Type value;
             UN::AcFrequencyMultiplier::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AcFrequencyDivisor::Id: { // type is int16u
             MN::AcFrequencyDivisor::TypeInfo::Type value;
             UN::AcFrequencyDivisor::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PowerMultiplier::Id: { // type is int32u
             MN::PowerMultiplier::TypeInfo::Type value;
             UN::PowerMultiplier::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PowerDivisor::Id: { // type is int32u
             MN::PowerDivisor::TypeInfo::Type value;
             UN::PowerDivisor::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::HarmonicCurrentMultiplier::Id: { // type is int8s
             MN::HarmonicCurrentMultiplier::TypeInfo::Type value;
             UN::HarmonicCurrentMultiplier::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PhaseHarmonicCurrentMultiplier::Id: { // type is int8s
             MN::PhaseHarmonicCurrentMultiplier::TypeInfo::Type value;
             UN::PhaseHarmonicCurrentMultiplier::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::InstantaneousVoltage::Id: { // type is int16s
             MN::InstantaneousVoltage::TypeInfo::Type value;
             UN::InstantaneousVoltage::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::InstantaneousLineCurrent::Id: { // type is int16u
             MN::InstantaneousLineCurrent::TypeInfo::Type value;
             UN::InstantaneousLineCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::InstantaneousActiveCurrent::Id: { // type is int16s
             MN::InstantaneousActiveCurrent::TypeInfo::Type value;
             UN::InstantaneousActiveCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::InstantaneousReactiveCurrent::Id: { // type is int16s
             MN::InstantaneousReactiveCurrent::TypeInfo::Type value;
             UN::InstantaneousReactiveCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::InstantaneousPower::Id: { // type is int16s
             MN::InstantaneousPower::TypeInfo::Type value;
             UN::InstantaneousPower::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsVoltage::Id: { // type is int16u
             MN::RmsVoltage::TypeInfo::Type value;
             UN::RmsVoltage::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsVoltageMin::Id: { // type is int16u
             MN::RmsVoltageMin::TypeInfo::Type value;
             UN::RmsVoltageMin::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsVoltageMax::Id: { // type is int16u
             MN::RmsVoltageMax::TypeInfo::Type value;
             UN::RmsVoltageMax::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsCurrent::Id: { // type is int16u
             MN::RmsCurrent::TypeInfo::Type value;
             UN::RmsCurrent::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsCurrentMin::Id: { // type is int16u
             MN::RmsCurrentMin::TypeInfo::Type value;
             UN::RmsCurrentMin::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsCurrentMax::Id: { // type is int16u
             MN::RmsCurrentMax::TypeInfo::Type value;
             UN::RmsCurrentMax::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ActivePower::Id: { // type is int16s
             MN::ActivePower::TypeInfo::Type value;
             UN::ActivePower::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ActivePowerMin::Id: { // type is int16s
             MN::ActivePowerMin::TypeInfo::Type value;
             UN::ActivePowerMin::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ActivePowerMax::Id: { // type is int16s
             MN::ActivePowerMax::TypeInfo::Type value;
             UN::ActivePowerMax::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ReactivePower::Id: { // type is int16s
             MN::ReactivePower::TypeInfo::Type value;
             UN::ReactivePower::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ApparentPower::Id: { // type is int16u
             MN::ApparentPower::TypeInfo::Type value;
             UN::ApparentPower::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PowerFactor::Id: { // type is int8s
             MN::PowerFactor::TypeInfo::Type value;
             UN::PowerFactor::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AverageRmsVoltageMeasurementPeriod::Id: { // type is int16u
             MN::AverageRmsVoltageMeasurementPeriod::TypeInfo::Type value;
             UN::AverageRmsVoltageMeasurementPeriod::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AverageRmsUnderVoltageCounter::Id: { // type is int16u
             MN::AverageRmsUnderVoltageCounter::TypeInfo::Type value;
             UN::AverageRmsUnderVoltageCounter::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsExtremeOverVoltagePeriod::Id: { // type is int16u
             MN::RmsExtremeOverVoltagePeriod::TypeInfo::Type value;
             UN::RmsExtremeOverVoltagePeriod::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsExtremeUnderVoltagePeriod::Id: { // type is int16u
             MN::RmsExtremeUnderVoltagePeriod::TypeInfo::Type value;
             UN::RmsExtremeUnderVoltagePeriod::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsVoltageSagPeriod::Id: { // type is int16u
             MN::RmsVoltageSagPeriod::TypeInfo::Type value;
             UN::RmsVoltageSagPeriod::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsVoltageSwellPeriod::Id: { // type is int16u
             MN::RmsVoltageSwellPeriod::TypeInfo::Type value;
             UN::RmsVoltageSwellPeriod::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AcVoltageMultiplier::Id: { // type is int16u
             MN::AcVoltageMultiplier::TypeInfo::Type value;
             UN::AcVoltageMultiplier::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AcVoltageDivisor::Id: { // type is int16u
             MN::AcVoltageDivisor::TypeInfo::Type value;
             UN::AcVoltageDivisor::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AcCurrentMultiplier::Id: { // type is int16u
             MN::AcCurrentMultiplier::TypeInfo::Type value;
             UN::AcCurrentMultiplier::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AcCurrentDivisor::Id: { // type is int16u
             MN::AcCurrentDivisor::TypeInfo::Type value;
             UN::AcCurrentDivisor::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AcPowerMultiplier::Id: { // type is int16u
             MN::AcPowerMultiplier::TypeInfo::Type value;
             UN::AcPowerMultiplier::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AcPowerDivisor::Id: { // type is int16u
             MN::AcPowerDivisor::TypeInfo::Type value;
             UN::AcPowerDivisor::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::OverloadAlarmsMask::Id: { // type is bitmap8
             MN::OverloadAlarmsMask::TypeInfo::Type value;
             UN::OverloadAlarmsMask::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::VoltageOverload::Id: { // type is int16s
             MN::VoltageOverload::TypeInfo::Type value;
             UN::VoltageOverload::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::CurrentOverload::Id: { // type is int16s
             MN::CurrentOverload::TypeInfo::Type value;
             UN::CurrentOverload::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AcOverloadAlarmsMask::Id: { // type is bitmap16
             MN::AcOverloadAlarmsMask::TypeInfo::Type value;
             UN::AcOverloadAlarmsMask::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AcVoltageOverload::Id: { // type is int16s
             MN::AcVoltageOverload::TypeInfo::Type value;
             UN::AcVoltageOverload::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AcCurrentOverload::Id: { // type is int16s
             MN::AcCurrentOverload::TypeInfo::Type value;
             UN::AcCurrentOverload::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AcActivePowerOverload::Id: { // type is int16s
             MN::AcActivePowerOverload::TypeInfo::Type value;
             UN::AcActivePowerOverload::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AcReactivePowerOverload::Id: { // type is int16s
             MN::AcReactivePowerOverload::TypeInfo::Type value;
             UN::AcReactivePowerOverload::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AverageRmsOverVoltage::Id: { // type is int16s
             MN::AverageRmsOverVoltage::TypeInfo::Type value;
             UN::AverageRmsOverVoltage::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AverageRmsUnderVoltage::Id: { // type is int16s
             MN::AverageRmsUnderVoltage::TypeInfo::Type value;
             UN::AverageRmsUnderVoltage::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsExtremeOverVoltage::Id: { // type is int16s
             MN::RmsExtremeOverVoltage::TypeInfo::Type value;
             UN::RmsExtremeOverVoltage::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsExtremeUnderVoltage::Id: { // type is int16s
             MN::RmsExtremeUnderVoltage::TypeInfo::Type value;
             UN::RmsExtremeUnderVoltage::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsVoltageSag::Id: { // type is int16s
             MN::RmsVoltageSag::TypeInfo::Type value;
             UN::RmsVoltageSag::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsVoltageSwell::Id: { // type is int16s
             MN::RmsVoltageSwell::TypeInfo::Type value;
             UN::RmsVoltageSwell::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::LineCurrentPhaseB::Id: { // type is int16u
             MN::LineCurrentPhaseB::TypeInfo::Type value;
             UN::LineCurrentPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ActiveCurrentPhaseB::Id: { // type is int16s
             MN::ActiveCurrentPhaseB::TypeInfo::Type value;
             UN::ActiveCurrentPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ReactiveCurrentPhaseB::Id: { // type is int16s
             MN::ReactiveCurrentPhaseB::TypeInfo::Type value;
             UN::ReactiveCurrentPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsVoltagePhaseB::Id: { // type is int16u
             MN::RmsVoltagePhaseB::TypeInfo::Type value;
             UN::RmsVoltagePhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsVoltageMinPhaseB::Id: { // type is int16u
             MN::RmsVoltageMinPhaseB::TypeInfo::Type value;
             UN::RmsVoltageMinPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsVoltageMaxPhaseB::Id: { // type is int16u
             MN::RmsVoltageMaxPhaseB::TypeInfo::Type value;
             UN::RmsVoltageMaxPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsCurrentPhaseB::Id: { // type is int16u
             MN::RmsCurrentPhaseB::TypeInfo::Type value;
             UN::RmsCurrentPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsCurrentMinPhaseB::Id: { // type is int16u
             MN::RmsCurrentMinPhaseB::TypeInfo::Type value;
             UN::RmsCurrentMinPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsCurrentMaxPhaseB::Id: { // type is int16u
             MN::RmsCurrentMaxPhaseB::TypeInfo::Type value;
             UN::RmsCurrentMaxPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ActivePowerPhaseB::Id: { // type is int16s
             MN::ActivePowerPhaseB::TypeInfo::Type value;
             UN::ActivePowerPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ActivePowerMinPhaseB::Id: { // type is int16s
             MN::ActivePowerMinPhaseB::TypeInfo::Type value;
             UN::ActivePowerMinPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ActivePowerMaxPhaseB::Id: { // type is int16s
             MN::ActivePowerMaxPhaseB::TypeInfo::Type value;
             UN::ActivePowerMaxPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ReactivePowerPhaseB::Id: { // type is int16s
             MN::ReactivePowerPhaseB::TypeInfo::Type value;
             UN::ReactivePowerPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ApparentPowerPhaseB::Id: { // type is int16u
             MN::ApparentPowerPhaseB::TypeInfo::Type value;
             UN::ApparentPowerPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PowerFactorPhaseB::Id: { // type is int8s
             MN::PowerFactorPhaseB::TypeInfo::Type value;
             UN::PowerFactorPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AverageRmsVoltageMeasurementPeriodPhaseB::Id: { // type is int16u
             MN::AverageRmsVoltageMeasurementPeriodPhaseB::TypeInfo::Type value;
             UN::AverageRmsVoltageMeasurementPeriodPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AverageRmsOverVoltageCounterPhaseB::Id: { // type is int16u
             MN::AverageRmsOverVoltageCounterPhaseB::TypeInfo::Type value;
             UN::AverageRmsOverVoltageCounterPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AverageRmsUnderVoltageCounterPhaseB::Id: { // type is int16u
             MN::AverageRmsUnderVoltageCounterPhaseB::TypeInfo::Type value;
             UN::AverageRmsUnderVoltageCounterPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsExtremeOverVoltagePeriodPhaseB::Id: { // type is int16u
             MN::RmsExtremeOverVoltagePeriodPhaseB::TypeInfo::Type value;
             UN::RmsExtremeOverVoltagePeriodPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsExtremeUnderVoltagePeriodPhaseB::Id: { // type is int16u
             MN::RmsExtremeUnderVoltagePeriodPhaseB::TypeInfo::Type value;
             UN::RmsExtremeUnderVoltagePeriodPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsVoltageSagPeriodPhaseB::Id: { // type is int16u
             MN::RmsVoltageSagPeriodPhaseB::TypeInfo::Type value;
             UN::RmsVoltageSagPeriodPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsVoltageSwellPeriodPhaseB::Id: { // type is int16u
             MN::RmsVoltageSwellPeriodPhaseB::TypeInfo::Type value;
             UN::RmsVoltageSwellPeriodPhaseB::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::LineCurrentPhaseC::Id: { // type is int16u
             MN::LineCurrentPhaseC::TypeInfo::Type value;
             UN::LineCurrentPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ActiveCurrentPhaseC::Id: { // type is int16s
             MN::ActiveCurrentPhaseC::TypeInfo::Type value;
             UN::ActiveCurrentPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ReactiveCurrentPhaseC::Id: { // type is int16s
             MN::ReactiveCurrentPhaseC::TypeInfo::Type value;
             UN::ReactiveCurrentPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsVoltagePhaseC::Id: { // type is int16u
             MN::RmsVoltagePhaseC::TypeInfo::Type value;
             UN::RmsVoltagePhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsVoltageMinPhaseC::Id: { // type is int16u
             MN::RmsVoltageMinPhaseC::TypeInfo::Type value;
             UN::RmsVoltageMinPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsVoltageMaxPhaseC::Id: { // type is int16u
             MN::RmsVoltageMaxPhaseC::TypeInfo::Type value;
             UN::RmsVoltageMaxPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsCurrentPhaseC::Id: { // type is int16u
             MN::RmsCurrentPhaseC::TypeInfo::Type value;
             UN::RmsCurrentPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsCurrentMinPhaseC::Id: { // type is int16u
             MN::RmsCurrentMinPhaseC::TypeInfo::Type value;
             UN::RmsCurrentMinPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsCurrentMaxPhaseC::Id: { // type is int16u
             MN::RmsCurrentMaxPhaseC::TypeInfo::Type value;
             UN::RmsCurrentMaxPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ActivePowerPhaseC::Id: { // type is int16s
             MN::ActivePowerPhaseC::TypeInfo::Type value;
             UN::ActivePowerPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ActivePowerMinPhaseC::Id: { // type is int16s
             MN::ActivePowerMinPhaseC::TypeInfo::Type value;
             UN::ActivePowerMinPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ActivePowerMaxPhaseC::Id: { // type is int16s
             MN::ActivePowerMaxPhaseC::TypeInfo::Type value;
             UN::ActivePowerMaxPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ReactivePowerPhaseC::Id: { // type is int16s
             MN::ReactivePowerPhaseC::TypeInfo::Type value;
             UN::ReactivePowerPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ApparentPowerPhaseC::Id: { // type is int16u
             MN::ApparentPowerPhaseC::TypeInfo::Type value;
             UN::ApparentPowerPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::PowerFactorPhaseC::Id: { // type is int8s
             MN::PowerFactorPhaseC::TypeInfo::Type value;
             UN::PowerFactorPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AverageRmsVoltageMeasurementPeriodPhaseC::Id: { // type is int16u
             MN::AverageRmsVoltageMeasurementPeriodPhaseC::TypeInfo::Type value;
             UN::AverageRmsVoltageMeasurementPeriodPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AverageRmsOverVoltageCounterPhaseC::Id: { // type is int16u
             MN::AverageRmsOverVoltageCounterPhaseC::TypeInfo::Type value;
             UN::AverageRmsOverVoltageCounterPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::AverageRmsUnderVoltageCounterPhaseC::Id: { // type is int16u
             MN::AverageRmsUnderVoltageCounterPhaseC::TypeInfo::Type value;
             UN::AverageRmsUnderVoltageCounterPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsExtremeOverVoltagePeriodPhaseC::Id: { // type is int16u
             MN::RmsExtremeOverVoltagePeriodPhaseC::TypeInfo::Type value;
             UN::RmsExtremeOverVoltagePeriodPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsExtremeUnderVoltagePeriodPhaseC::Id: { // type is int16u
             MN::RmsExtremeUnderVoltagePeriodPhaseC::TypeInfo::Type value;
             UN::RmsExtremeUnderVoltagePeriodPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsVoltageSagPeriodPhaseC::Id: { // type is int16u
             MN::RmsVoltageSagPeriodPhaseC::TypeInfo::Type value;
             UN::RmsVoltageSagPeriodPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::RmsVoltageSwellPeriodPhaseC::Id: { // type is int16u
             MN::RmsVoltageSwellPeriodPhaseC::TypeInfo::Type value;
             UN::RmsVoltageSwellPeriodPhaseC::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             UN::FeatureMap::Get(atrpath, value);
             return aEncoder.Encode(value);
         }
-
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             UN::ClusterRevision::Get(atrpath, value);
@@ -19448,8 +16454,7 @@ CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttribu
     nlohmann::json jsn;
 
     switch (aPath.mAttributeId)
-    {
-    }
+    {}
 
     if (!attribute_name.empty())
     {
@@ -19488,7 +16493,6 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath =
         ConcreteAttributePath(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, attribute_id.value());
-
     switch (attribute_id.value())
     {
     // type is bitmap32
@@ -21415,139 +18419,6 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
                                                    MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
                                                    reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-    }
-}
-
-CHIP_ERROR
-FaultInjectionAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    namespace MN = chip::app::Clusters::FaultInjection::Attributes;
-    namespace UN = unify::matter_bridge::FaultInjection::Attributes;
-    if (aPath.mClusterId != Clusters::FaultInjection::Id)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
-
-        case MN::FeatureMap::Id: { // type is bitmap32
-            MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-
-        case MN::ClusterRevision::Id: { // type is int16u
-            MN::ClusterRevision::TypeInfo::Type value;
-            UN::ClusterRevision::Get(atrpath, value);
-            return aEncoder.Encode(value);
-        }
-        }
-    } catch (const std::out_of_range & e)
-    {
-        sl_log_info(LOG_TAG,
-                    "The request attribute Path is not found in the attribute state "
-                    "contanier, %s\n",
-                    e.what());
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR FaultInjectionAttributeAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    using namespace chip::app::Clusters::FaultInjection;
-
-    if (aPath.mClusterId != Clusters::FaultInjection::Id)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
-
-    if (!unify_node)
-    {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-
-    std::string attribute_name;
-    nlohmann::json jsn;
-
-    switch (aPath.mAttributeId)
-    {
-    }
-
-    if (!attribute_name.empty())
-    {
-        std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/FaultInjection/Attributes/" + attribute_name + "/Desired";
-        payload_str = jsn.dump();
-        uic_mqtt_publish(topic.c_str(), payload_str.c_str(), payload_str.length(), true);
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void FaultInjectionAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                                     const std::string & attribute, const nlohmann::json & unify_value)
-{
-    namespace MN = chip::app::Clusters::FaultInjection::Attributes;
-    namespace UN = unify::matter_bridge::FaultInjection::Attributes;
-
-    auto cluster_id = device_translator::instance().get_cluster_id(cluster);
-
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::FaultInjection::Id))
-    {
-        return;
-    }
-
-    // get attribute id
-    auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
-
-    if (!attribute_id.has_value())
-    {
-        return;
-    }
-
-    chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
-    ConcreteAttributePath attrpath =
-        ConcreteAttributePath(node_matter_endpoint, Clusters::FaultInjection::Id, attribute_id.value());
-
-    switch (attribute_id.value())
-    {
-    // type is bitmap32
-    case MN::FeatureMap::Id: {
-        using T                = MN::FeatureMap::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
-            UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FaultInjection::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
-        }
-        break;
-    }
-        // type is int16u
-    case MN::ClusterRevision::Id: {
-        using T                = MN::ClusterRevision::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value())
-        {
-            sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
-            UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FaultInjection::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
         }
         break;
     }

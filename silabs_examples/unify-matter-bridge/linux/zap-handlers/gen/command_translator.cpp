@@ -425,24 +425,21 @@ void OnOffClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerC
         cmd = "Off";
         Commands::Off::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     case Commands::On::Id: {
         cmd = "On";
         Commands::On::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     case Commands::Toggle::Id: {
         cmd = "Toggle";
         Commands::Toggle::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     case Commands::OffWithEffect::Id: {
@@ -471,8 +468,7 @@ void OnOffClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerC
         cmd = "OnWithRecallGlobalScene";
         Commands::OnWithRecallGlobalScene::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     case Commands::OnWithTimedOff::Id: {
@@ -534,8 +530,7 @@ void OnOffSwitchConfigurationClusterCommandHandler::InvokeCommand(CommandHandler
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -885,8 +880,7 @@ void BinaryInputBasicClusterCommandHandler::InvokeCommand(CommandHandlerInterfac
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -916,374 +910,7 @@ void PulseWidthModulationClusterCommandHandler::InvokeCommand(CommandHandlerInte
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
-
-    if (!cmd.empty())
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::Success);
-        send_unify_mqtt_cmd(ctxt, cmd, payload);
-        sl_log_debug(LOG_TAG, "Mapped [%] command to unify dotdot data model", cmd.c_str());
-    }
-    else
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-    }
-    ctxt.SetCommandHandled();
-}
-
-void ActionsClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext & ctxt)
-{
-    using namespace chip::app::Clusters::Actions;
-
-    auto unify_node = m_node_state_monitor.bridged_endpoint(ctxt.mRequestPath.mEndpointId);
-    if (!unify_node)
-    {
-        sl_log_info(LOG_TAG, "The endpoint [%i] is not a part of unify matter bridge node", ctxt.mRequestPath.mEndpointId);
-        return;
-    }
-
-    std::string cmd;
-    nlohmann::json payload = {};
-
-    switch (ctxt.mRequestPath.mCommandId)
-    {
-    case Commands::InstantAction::Id: {
-        cmd = "InstantAction";
-        Commands::InstantAction::DecodableType data;
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-            try
-            {
-                payload["ActionID"] = to_json(data.actionID);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            if (data.invokeID.HasValue())
-            {
-                try
-                {
-                    payload["InvokeID"] = to_json(data.invokeID.Value());
-                } catch (std::exception & ex)
-                {
-                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
-                }
-            }
-        }
-    }
-    break;
-    case Commands::InstantActionWithTransition::Id: {
-        cmd = "InstantActionWithTransition";
-        Commands::InstantActionWithTransition::DecodableType data;
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-            try
-            {
-                payload["ActionID"] = to_json(data.actionID);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            if (data.invokeID.HasValue())
-            {
-                try
-                {
-                    payload["InvokeID"] = to_json(data.invokeID.Value());
-                } catch (std::exception & ex)
-                {
-                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
-                }
-            }
-            try
-            {
-                payload["TransitionTime"] = to_json(data.transitionTime);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-        }
-    }
-    break;
-    case Commands::StartAction::Id: {
-        cmd = "StartAction";
-        Commands::StartAction::DecodableType data;
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-            try
-            {
-                payload["ActionID"] = to_json(data.actionID);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            if (data.invokeID.HasValue())
-            {
-                try
-                {
-                    payload["InvokeID"] = to_json(data.invokeID.Value());
-                } catch (std::exception & ex)
-                {
-                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
-                }
-            }
-        }
-    }
-    break;
-    case Commands::StartActionWithDuration::Id: {
-        cmd = "StartActionWithDuration";
-        Commands::StartActionWithDuration::DecodableType data;
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-            try
-            {
-                payload["ActionID"] = to_json(data.actionID);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            if (data.invokeID.HasValue())
-            {
-                try
-                {
-                    payload["InvokeID"] = to_json(data.invokeID.Value());
-                } catch (std::exception & ex)
-                {
-                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
-                }
-            }
-            try
-            {
-                payload["Duration"] = to_json(data.duration);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-        }
-    }
-    break;
-    case Commands::StopAction::Id: {
-        cmd = "StopAction";
-        Commands::StopAction::DecodableType data;
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-            try
-            {
-                payload["ActionID"] = to_json(data.actionID);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            if (data.invokeID.HasValue())
-            {
-                try
-                {
-                    payload["InvokeID"] = to_json(data.invokeID.Value());
-                } catch (std::exception & ex)
-                {
-                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
-                }
-            }
-        }
-    }
-    break;
-    case Commands::PauseAction::Id: {
-        cmd = "PauseAction";
-        Commands::PauseAction::DecodableType data;
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-            try
-            {
-                payload["ActionID"] = to_json(data.actionID);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            if (data.invokeID.HasValue())
-            {
-                try
-                {
-                    payload["InvokeID"] = to_json(data.invokeID.Value());
-                } catch (std::exception & ex)
-                {
-                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
-                }
-            }
-        }
-    }
-    break;
-    case Commands::PauseActionWithDuration::Id: {
-        cmd = "PauseActionWithDuration";
-        Commands::PauseActionWithDuration::DecodableType data;
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-            try
-            {
-                payload["ActionID"] = to_json(data.actionID);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            if (data.invokeID.HasValue())
-            {
-                try
-                {
-                    payload["InvokeID"] = to_json(data.invokeID.Value());
-                } catch (std::exception & ex)
-                {
-                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
-                }
-            }
-            try
-            {
-                payload["Duration"] = to_json(data.duration);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-        }
-    }
-    break;
-    case Commands::ResumeAction::Id: {
-        cmd = "ResumeAction";
-        Commands::ResumeAction::DecodableType data;
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-            try
-            {
-                payload["ActionID"] = to_json(data.actionID);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            if (data.invokeID.HasValue())
-            {
-                try
-                {
-                    payload["InvokeID"] = to_json(data.invokeID.Value());
-                } catch (std::exception & ex)
-                {
-                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
-                }
-            }
-        }
-    }
-    break;
-    case Commands::EnableAction::Id: {
-        cmd = "EnableAction";
-        Commands::EnableAction::DecodableType data;
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-            try
-            {
-                payload["ActionID"] = to_json(data.actionID);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            if (data.invokeID.HasValue())
-            {
-                try
-                {
-                    payload["InvokeID"] = to_json(data.invokeID.Value());
-                } catch (std::exception & ex)
-                {
-                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
-                }
-            }
-        }
-    }
-    break;
-    case Commands::EnableActionWithDuration::Id: {
-        cmd = "EnableActionWithDuration";
-        Commands::EnableActionWithDuration::DecodableType data;
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-            try
-            {
-                payload["ActionID"] = to_json(data.actionID);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            if (data.invokeID.HasValue())
-            {
-                try
-                {
-                    payload["InvokeID"] = to_json(data.invokeID.Value());
-                } catch (std::exception & ex)
-                {
-                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
-                }
-            }
-            try
-            {
-                payload["Duration"] = to_json(data.duration);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-        }
-    }
-    break;
-    case Commands::DisableAction::Id: {
-        cmd = "DisableAction";
-        Commands::DisableAction::DecodableType data;
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-            try
-            {
-                payload["ActionID"] = to_json(data.actionID);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            if (data.invokeID.HasValue())
-            {
-                try
-                {
-                    payload["InvokeID"] = to_json(data.invokeID.Value());
-                } catch (std::exception & ex)
-                {
-                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
-                }
-            }
-        }
-    }
-    break;
-    case Commands::DisableActionWithDuration::Id: {
-        cmd = "DisableActionWithDuration";
-        Commands::DisableActionWithDuration::DecodableType data;
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-            try
-            {
-                payload["ActionID"] = to_json(data.actionID);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            if (data.invokeID.HasValue())
-            {
-                try
-                {
-                    payload["InvokeID"] = to_json(data.invokeID.Value());
-                } catch (std::exception & ex)
-                {
-                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
-                }
-            }
-            try
-            {
-                payload["Duration"] = to_json(data.duration);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-        }
-    }
-    break;
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -1318,8 +945,7 @@ void BasicClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerC
         cmd = "MfgSpecificPing";
         Commands::MfgSpecificPing::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     }
@@ -1580,8 +1206,7 @@ void LocalizationConfigurationClusterCommandHandler::InvokeCommand(CommandHandle
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -1611,8 +1236,7 @@ void TimeFormatLocalizationClusterCommandHandler::InvokeCommand(CommandHandlerIn
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -1642,8 +1266,7 @@ void UnitLocalizationClusterCommandHandler::InvokeCommand(CommandHandlerInterfac
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -1673,8 +1296,7 @@ void PowerSourceConfigurationClusterCommandHandler::InvokeCommand(CommandHandler
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -1704,8 +1326,7 @@ void PowerSourceClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Ha
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -1791,8 +1412,7 @@ void GeneralCommissioningClusterCommandHandler::InvokeCommand(CommandHandlerInte
         cmd = "CommissioningComplete";
         Commands::CommissioningComplete::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     }
@@ -1943,8 +1563,7 @@ void SoftwareDiagnosticsClusterCommandHandler::InvokeCommand(CommandHandlerInter
         cmd = "ResetWatermarks";
         Commands::ResetWatermarks::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     }
@@ -1982,8 +1601,7 @@ void ThreadNetworkDiagnosticsClusterCommandHandler::InvokeCommand(CommandHandler
         cmd = "ResetCounts";
         Commands::ResetCounts::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     }
@@ -2021,47 +1639,7 @@ void WiFiNetworkDiagnosticsClusterCommandHandler::InvokeCommand(CommandHandlerIn
         cmd = "ResetCounts";
         Commands::ResetCounts::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
-    }
-    break;
-    }
-
-    if (!cmd.empty())
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::Success);
-        send_unify_mqtt_cmd(ctxt, cmd, payload);
-        sl_log_debug(LOG_TAG, "Mapped [%] command to unify dotdot data model", cmd.c_str());
-    }
-    else
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-    }
-    ctxt.SetCommandHandled();
-}
-
-void EthernetNetworkDiagnosticsClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext & ctxt)
-{
-    using namespace chip::app::Clusters::EthernetNetworkDiagnostics;
-
-    auto unify_node = m_node_state_monitor.bridged_endpoint(ctxt.mRequestPath.mEndpointId);
-    if (!unify_node)
-    {
-        sl_log_info(LOG_TAG, "The endpoint [%i] is not a part of unify matter bridge node", ctxt.mRequestPath.mEndpointId);
-        return;
-    }
-
-    std::string cmd;
-    nlohmann::json payload = {};
-
-    switch (ctxt.mRequestPath.mCommandId)
-    {
-    case Commands::ResetCounts::Id: {
-        cmd = "ResetCounts";
-        Commands::ResetCounts::DecodableType data;
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     }
@@ -2142,37 +1720,6 @@ void TimeSynchronizationClusterCommandHandler::InvokeCommand(CommandHandlerInter
     ctxt.SetCommandHandled();
 }
 
-void BridgedDeviceBasicClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext & ctxt)
-{
-    using namespace chip::app::Clusters::BridgedDeviceBasic;
-
-    auto unify_node = m_node_state_monitor.bridged_endpoint(ctxt.mRequestPath.mEndpointId);
-    if (!unify_node)
-    {
-        sl_log_info(LOG_TAG, "The endpoint [%i] is not a part of unify matter bridge node", ctxt.mRequestPath.mEndpointId);
-        return;
-    }
-
-    std::string cmd;
-    nlohmann::json payload = {};
-
-    switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
-
-    if (!cmd.empty())
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::Success);
-        send_unify_mqtt_cmd(ctxt, cmd, payload);
-        sl_log_debug(LOG_TAG, "Mapped [%] command to unify dotdot data model", cmd.c_str());
-    }
-    else
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-    }
-    ctxt.SetCommandHandled();
-}
-
 void SwitchClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext & ctxt)
 {
     using namespace chip::app::Clusters::Switch;
@@ -2188,105 +1735,7 @@ void SwitchClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
-
-    if (!cmd.empty())
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::Success);
-        send_unify_mqtt_cmd(ctxt, cmd, payload);
-        sl_log_debug(LOG_TAG, "Mapped [%] command to unify dotdot data model", cmd.c_str());
-    }
-    else
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-    }
-    ctxt.SetCommandHandled();
-}
-
-void AdministratorCommissioningClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext & ctxt)
-{
-    using namespace chip::app::Clusters::AdministratorCommissioning;
-
-    auto unify_node = m_node_state_monitor.bridged_endpoint(ctxt.mRequestPath.mEndpointId);
-    if (!unify_node)
-    {
-        sl_log_info(LOG_TAG, "The endpoint [%i] is not a part of unify matter bridge node", ctxt.mRequestPath.mEndpointId);
-        return;
-    }
-
-    std::string cmd;
-    nlohmann::json payload = {};
-
-    switch (ctxt.mRequestPath.mCommandId)
-    {
-    case Commands::OpenCommissioningWindow::Id: {
-        cmd = "OpenCommissioningWindow";
-        Commands::OpenCommissioningWindow::DecodableType data;
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-            try
-            {
-                payload["CommissioningTimeout"] = to_json(data.commissioningTimeout);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try
-            {
-                payload["PAKEVerifier"] = to_json(data.PAKEVerifier);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try
-            {
-                payload["Discriminator"] = to_json(data.discriminator);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try
-            {
-                payload["Iterations"] = to_json(data.iterations);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try
-            {
-                payload["Salt"] = to_json(data.salt);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-        }
-    }
-    break;
-    case Commands::OpenBasicCommissioningWindow::Id: {
-        cmd = "OpenBasicCommissioningWindow";
-        Commands::OpenBasicCommissioningWindow::DecodableType data;
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-            try
-            {
-                payload["CommissioningTimeout"] = to_json(data.commissioningTimeout);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-        }
-    }
-    break;
-    case Commands::RevokeCommissioning::Id: {
-        cmd = "RevokeCommissioning";
-        Commands::RevokeCommissioning::DecodableType data;
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
-    }
-    break;
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -2609,8 +2058,7 @@ void FixedLabelClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Han
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -2640,8 +2088,7 @@ void UserLabelClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Hand
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -2671,8 +2118,7 @@ void ProxyConfigurationClusterCommandHandler::InvokeCommand(CommandHandlerInterf
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -2702,8 +2148,7 @@ void ProxyDiscoveryClusterCommandHandler::InvokeCommand(CommandHandlerInterface:
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -2733,8 +2178,7 @@ void ProxyValidClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Han
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -2764,8 +2208,7 @@ void BooleanStateClusterCommandHandler::InvokeCommand(CommandHandlerInterface::H
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -3352,24 +2795,21 @@ void WindowCoveringClusterCommandHandler::InvokeCommand(CommandHandlerInterface:
         cmd = "UpOrOpen";
         Commands::UpOrOpen::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     case Commands::DownOrClose::Id: {
         cmd = "DownOrClose";
         Commands::DownOrClose::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     case Commands::StopMotion::Id: {
         cmd = "StopMotion";
         Commands::StopMotion::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     case Commands::GoToLiftValue::Id: {
@@ -3482,41 +2922,9 @@ void BarrierControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface:
         cmd = "BarrierControlStop";
         Commands::BarrierControlStop::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
-    }
-
-    if (!cmd.empty())
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::Success);
-        send_unify_mqtt_cmd(ctxt, cmd, payload);
-        sl_log_debug(LOG_TAG, "Mapped [%] command to unify dotdot data model", cmd.c_str());
-    }
-    else
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-    }
-    ctxt.SetCommandHandled();
-}
-
-void PumpConfigurationAndControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext & ctxt)
-{
-    using namespace chip::app::Clusters::PumpConfigurationAndControl;
-
-    auto unify_node = m_node_state_monitor.bridged_endpoint(ctxt.mRequestPath.mEndpointId);
-    if (!unify_node)
-    {
-        sl_log_info(LOG_TAG, "The endpoint [%i] is not a part of unify matter bridge node", ctxt.mRequestPath.mEndpointId);
-        return;
-    }
-
-    std::string cmd;
-    nlohmann::json payload = {};
-
-    switch (ctxt.mRequestPath.mCommandId)
-    {
     }
 
     if (!cmd.empty())
@@ -3632,8 +3040,7 @@ void ThermostatClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Han
         cmd = "ClearWeeklySchedule";
         Commands::ClearWeeklySchedule::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     }
@@ -3666,8 +3073,7 @@ void FanControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Han
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -3697,8 +3103,7 @@ void ThermostatUserInterfaceConfigurationClusterCommandHandler::InvokeCommand(Co
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -4138,7 +3543,7 @@ void ColorControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface::H
         {
             try
             {
-                payload["ColorTemperature"] = to_json(data.colorTemperature);
+                payload["ColorTemperatureMireds"] = to_json(data.colorTemperature);
             } catch (std::exception & ex)
             {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
@@ -4533,37 +3938,6 @@ void ColorControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface::H
     ctxt.SetCommandHandled();
 }
 
-void BallastConfigurationClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext & ctxt)
-{
-    using namespace chip::app::Clusters::BallastConfiguration;
-
-    auto unify_node = m_node_state_monitor.bridged_endpoint(ctxt.mRequestPath.mEndpointId);
-    if (!unify_node)
-    {
-        sl_log_info(LOG_TAG, "The endpoint [%i] is not a part of unify matter bridge node", ctxt.mRequestPath.mEndpointId);
-        return;
-    }
-
-    std::string cmd;
-    nlohmann::json payload = {};
-
-    switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
-
-    if (!cmd.empty())
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::Success);
-        send_unify_mqtt_cmd(ctxt, cmd, payload);
-        sl_log_debug(LOG_TAG, "Mapped [%] command to unify dotdot data model", cmd.c_str());
-    }
-    else
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-    }
-    ctxt.SetCommandHandled();
-}
-
 void IlluminanceMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext & ctxt)
 {
     using namespace chip::app::Clusters::IlluminanceMeasurement;
@@ -4579,8 +3953,7 @@ void IlluminanceMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerIn
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -4610,8 +3983,7 @@ void TemperatureMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerIn
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -4641,8 +4013,7 @@ void PressureMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInter
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -4672,8 +4043,7 @@ void FlowMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInterface
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -4703,8 +4073,7 @@ void RelativeHumidityMeasurementClusterCommandHandler::InvokeCommand(CommandHand
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -4734,8 +4103,7 @@ void OccupancySensingClusterCommandHandler::InvokeCommand(CommandHandlerInterfac
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -4765,8 +4133,7 @@ void WakeOnLanClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Hand
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -4940,64 +4307,56 @@ void MediaPlaybackClusterCommandHandler::InvokeCommand(CommandHandlerInterface::
         cmd = "Play";
         Commands::Play::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     case Commands::Pause::Id: {
         cmd = "Pause";
         Commands::Pause::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     case Commands::StopPlayback::Id: {
         cmd = "StopPlayback";
         Commands::StopPlayback::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     case Commands::StartOver::Id: {
         cmd = "StartOver";
         Commands::StartOver::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     case Commands::Previous::Id: {
         cmd = "Previous";
         Commands::Previous::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     case Commands::Next::Id: {
         cmd = "Next";
         Commands::Next::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     case Commands::Rewind::Id: {
         cmd = "Rewind";
         Commands::Rewind::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     case Commands::FastForward::Id: {
         cmd = "FastForward";
         Commands::FastForward::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     case Commands::SkipForward::Id: {
@@ -5095,16 +4454,14 @@ void MediaInputClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Han
         cmd = "ShowInputStatus";
         Commands::ShowInputStatus::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     case Commands::HideInputStatus::Id: {
         cmd = "HideInputStatus";
         Commands::HideInputStatus::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     case Commands::RenameInput::Id: {
@@ -5164,8 +4521,7 @@ void LowPowerClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
         cmd = "Sleep";
         Commands::Sleep::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     }
@@ -5496,8 +4852,7 @@ void ApplicationBasicClusterCommandHandler::InvokeCommand(CommandHandlerInterfac
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {
-    }
+    {}
 
     if (!cmd.empty())
     {
@@ -5569,8 +4924,7 @@ void AccountLoginClusterCommandHandler::InvokeCommand(CommandHandlerInterface::H
         cmd = "Logout";
         Commands::Logout::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     }
@@ -5608,8 +4962,7 @@ void ElectricalMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInt
         cmd = "GetProfileInfoCommand";
         Commands::GetProfileInfoCommand::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-        }
+        {}
     }
     break;
     case Commands::GetMeasurementProfileCommand::Id: {
@@ -5634,109 +4987,6 @@ void ElectricalMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInt
             try
             {
                 payload["NumberOfIntervals"] = to_json(data.numberOfIntervals);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-        }
-    }
-    break;
-    }
-
-    if (!cmd.empty())
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::Success);
-        send_unify_mqtt_cmd(ctxt, cmd, payload);
-        sl_log_debug(LOG_TAG, "Mapped [%] command to unify dotdot data model", cmd.c_str());
-    }
-    else
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-    }
-    ctxt.SetCommandHandled();
-}
-
-void FaultInjectionClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext & ctxt)
-{
-    using namespace chip::app::Clusters::FaultInjection;
-
-    auto unify_node = m_node_state_monitor.bridged_endpoint(ctxt.mRequestPath.mEndpointId);
-    if (!unify_node)
-    {
-        sl_log_info(LOG_TAG, "The endpoint [%i] is not a part of unify matter bridge node", ctxt.mRequestPath.mEndpointId);
-        return;
-    }
-
-    std::string cmd;
-    nlohmann::json payload = {};
-
-    switch (ctxt.mRequestPath.mCommandId)
-    {
-    case Commands::FailAtFault::Id: {
-        cmd = "FailAtFault";
-        Commands::FailAtFault::DecodableType data;
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-            try
-            {
-                payload["Type"] = to_json(data.type);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try
-            {
-                payload["Id"] = to_json(data.id);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try
-            {
-                payload["NumCallsToSkip"] = to_json(data.numCallsToSkip);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try
-            {
-                payload["NumCallsToFail"] = to_json(data.numCallsToFail);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try
-            {
-                payload["TakeMutex"] = to_json(data.takeMutex);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-        }
-    }
-    break;
-    case Commands::FailRandomlyAtFault::Id: {
-        cmd = "FailRandomlyAtFault";
-        Commands::FailRandomlyAtFault::DecodableType data;
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {
-            try
-            {
-                payload["Type"] = to_json(data.type);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try
-            {
-                payload["Id"] = to_json(data.id);
-            } catch (std::exception & ex)
-            {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try
-            {
-                payload["Percentage"] = to_json(data.percentage);
             } catch (std::exception & ex)
             {
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());

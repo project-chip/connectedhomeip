@@ -27,7 +27,8 @@ class IdentifyAttributeAccess : public attribute_translator_interface
 {
 public:
     IdentifyAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::Identify::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::Identify::Id, "attr_translator_Identify")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -43,7 +44,8 @@ class ScenesAttributeAccess : public attribute_translator_interface
 {
 public:
     ScenesAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::Scenes::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::Scenes::Id, "attr_translator_Scenes")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -59,7 +61,8 @@ class OnOffAttributeAccess : public attribute_translator_interface
 {
 public:
     OnOffAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::OnOff::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::OnOff::Id, "attr_translator_OnOff")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -75,7 +78,9 @@ class OnOffSwitchConfigurationAttributeAccess : public attribute_translator_inte
 {
 public:
     OnOffSwitchConfigurationAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::OnOffSwitchConfiguration::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::OnOffSwitchConfiguration::Id,
+                                       "attr_translator_OnOffSwitchConfiguration")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -94,7 +99,8 @@ class LevelControlAttributeAccess : public attribute_translator_interface
 {
 public:
     LevelControlAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::LevelControl::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::LevelControl::Id, "attr_translator_LevelControl")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -110,7 +116,9 @@ class BinaryInputBasicAttributeAccess : public attribute_translator_interface
 {
 public:
     BinaryInputBasicAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::BinaryInputBasic::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::BinaryInputBasic::Id,
+                                       "attr_translator_BinaryInputBasic")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -126,7 +134,9 @@ class PulseWidthModulationAttributeAccess : public attribute_translator_interfac
 {
 public:
     PulseWidthModulationAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::PulseWidthModulation::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::PulseWidthModulation::Id,
+                                       "attr_translator_PulseWidthModulation")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -138,27 +148,12 @@ private:
 
     std::vector<const char *> unify_cluster_names() const override { return std::vector<const char *>({ "PulseWidthModulation" }); }
 };
-class ActionsAttributeAccess : public attribute_translator_interface
-{
-public:
-    ActionsAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::Actions::Id)
-    {}
-
-    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
-
-private:
-    void reported_updated(const bridged_endpoint * ep, const std::string & cluster, const std::string & attribute,
-                          const nlohmann::json & unify_value) override;
-
-    std::vector<const char *> unify_cluster_names() const override { return std::vector<const char *>({ "Actions" }); }
-};
 class BasicAttributeAccess : public attribute_translator_interface
 {
 public:
     BasicAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::Basic::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::Basic::Id, "attr_translator_Basic")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -174,7 +169,9 @@ class OtaSoftwareUpdateProviderAttributeAccess : public attribute_translator_int
 {
 public:
     OtaSoftwareUpdateProviderAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::OtaSoftwareUpdateProvider::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::OtaSoftwareUpdateProvider::Id,
+                                       "attr_translator_OtaSoftwareUpdateProvider")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -193,7 +190,9 @@ class OtaSoftwareUpdateRequestorAttributeAccess : public attribute_translator_in
 {
 public:
     OtaSoftwareUpdateRequestorAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::OtaSoftwareUpdateRequestor::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::OtaSoftwareUpdateRequestor::Id,
+                                       "attr_translator_OtaSoftwareUpdateRequestor")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -212,7 +211,9 @@ class LocalizationConfigurationAttributeAccess : public attribute_translator_int
 {
 public:
     LocalizationConfigurationAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::LocalizationConfiguration::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::LocalizationConfiguration::Id,
+                                       "attr_translator_LocalizationConfiguration")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -231,7 +232,9 @@ class TimeFormatLocalizationAttributeAccess : public attribute_translator_interf
 {
 public:
     TimeFormatLocalizationAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::TimeFormatLocalization::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::TimeFormatLocalization::Id,
+                                       "attr_translator_TimeFormatLocalization")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -250,7 +253,9 @@ class UnitLocalizationAttributeAccess : public attribute_translator_interface
 {
 public:
     UnitLocalizationAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::UnitLocalization::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::UnitLocalization::Id,
+                                       "attr_translator_UnitLocalization")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -266,7 +271,9 @@ class PowerSourceConfigurationAttributeAccess : public attribute_translator_inte
 {
 public:
     PowerSourceConfigurationAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::PowerSourceConfiguration::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::PowerSourceConfiguration::Id,
+                                       "attr_translator_PowerSourceConfiguration")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -285,7 +292,8 @@ class PowerSourceAttributeAccess : public attribute_translator_interface
 {
 public:
     PowerSourceAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::PowerSource::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::PowerSource::Id, "attr_translator_PowerSource")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -301,7 +309,9 @@ class GeneralCommissioningAttributeAccess : public attribute_translator_interfac
 {
 public:
     GeneralCommissioningAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::GeneralCommissioning::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::GeneralCommissioning::Id,
+                                       "attr_translator_GeneralCommissioning")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -317,7 +327,9 @@ class DiagnosticLogsAttributeAccess : public attribute_translator_interface
 {
 public:
     DiagnosticLogsAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::DiagnosticLogs::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::DiagnosticLogs::Id,
+                                       "attr_translator_DiagnosticLogs")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -333,7 +345,9 @@ class GeneralDiagnosticsAttributeAccess : public attribute_translator_interface
 {
 public:
     GeneralDiagnosticsAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::GeneralDiagnostics::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::GeneralDiagnostics::Id,
+                                       "attr_translator_GeneralDiagnostics")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -349,7 +363,9 @@ class SoftwareDiagnosticsAttributeAccess : public attribute_translator_interface
 {
 public:
     SoftwareDiagnosticsAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::SoftwareDiagnostics::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::SoftwareDiagnostics::Id,
+                                       "attr_translator_SoftwareDiagnostics")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -365,7 +381,9 @@ class ThreadNetworkDiagnosticsAttributeAccess : public attribute_translator_inte
 {
 public:
     ThreadNetworkDiagnosticsAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ThreadNetworkDiagnostics::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ThreadNetworkDiagnostics::Id,
+                                       "attr_translator_ThreadNetworkDiagnostics")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -384,7 +402,9 @@ class WiFiNetworkDiagnosticsAttributeAccess : public attribute_translator_interf
 {
 public:
     WiFiNetworkDiagnosticsAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::WiFiNetworkDiagnostics::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::WiFiNetworkDiagnostics::Id,
+                                       "attr_translator_WiFiNetworkDiagnostics")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -399,30 +419,13 @@ private:
         return std::vector<const char *>({ "WiFiNetworkDiagnostics" });
     }
 };
-class EthernetNetworkDiagnosticsAttributeAccess : public attribute_translator_interface
-{
-public:
-    EthernetNetworkDiagnosticsAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::EthernetNetworkDiagnostics::Id)
-    {}
-
-    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
-
-private:
-    void reported_updated(const bridged_endpoint * ep, const std::string & cluster, const std::string & attribute,
-                          const nlohmann::json & unify_value) override;
-
-    std::vector<const char *> unify_cluster_names() const override
-    {
-        return std::vector<const char *>({ "EthernetNetworkDiagnostics" });
-    }
-};
 class TimeSynchronizationAttributeAccess : public attribute_translator_interface
 {
 public:
     TimeSynchronizationAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::TimeSynchronization::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::TimeSynchronization::Id,
+                                       "attr_translator_TimeSynchronization")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -434,27 +437,12 @@ private:
 
     std::vector<const char *> unify_cluster_names() const override { return std::vector<const char *>({ "TimeSynchronization" }); }
 };
-class BridgedDeviceBasicAttributeAccess : public attribute_translator_interface
-{
-public:
-    BridgedDeviceBasicAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::BridgedDeviceBasic::Id)
-    {}
-
-    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
-
-private:
-    void reported_updated(const bridged_endpoint * ep, const std::string & cluster, const std::string & attribute,
-                          const nlohmann::json & unify_value) override;
-
-    std::vector<const char *> unify_cluster_names() const override { return std::vector<const char *>({ "BridgedDeviceBasic" }); }
-};
 class SwitchAttributeAccess : public attribute_translator_interface
 {
 public:
     SwitchAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::Switch::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::Switch::Id, "attr_translator_Switch")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -466,30 +454,13 @@ private:
 
     std::vector<const char *> unify_cluster_names() const override { return std::vector<const char *>({ "Switch" }); }
 };
-class AdministratorCommissioningAttributeAccess : public attribute_translator_interface
-{
-public:
-    AdministratorCommissioningAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::AdministratorCommissioning::Id)
-    {}
-
-    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
-
-private:
-    void reported_updated(const bridged_endpoint * ep, const std::string & cluster, const std::string & attribute,
-                          const nlohmann::json & unify_value) override;
-
-    std::vector<const char *> unify_cluster_names() const override
-    {
-        return std::vector<const char *>({ "AdministratorCommissioning" });
-    }
-};
 class OperationalCredentialsAttributeAccess : public attribute_translator_interface
 {
 public:
     OperationalCredentialsAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::OperationalCredentials::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::OperationalCredentials::Id,
+                                       "attr_translator_OperationalCredentials")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -508,7 +479,9 @@ class GroupKeyManagementAttributeAccess : public attribute_translator_interface
 {
 public:
     GroupKeyManagementAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::GroupKeyManagement::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::GroupKeyManagement::Id,
+                                       "attr_translator_GroupKeyManagement")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -524,7 +497,8 @@ class FixedLabelAttributeAccess : public attribute_translator_interface
 {
 public:
     FixedLabelAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::FixedLabel::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::FixedLabel::Id, "attr_translator_FixedLabel")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -540,7 +514,8 @@ class UserLabelAttributeAccess : public attribute_translator_interface
 {
 public:
     UserLabelAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::UserLabel::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::UserLabel::Id, "attr_translator_UserLabel")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -556,7 +531,9 @@ class ProxyConfigurationAttributeAccess : public attribute_translator_interface
 {
 public:
     ProxyConfigurationAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ProxyConfiguration::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ProxyConfiguration::Id,
+                                       "attr_translator_ProxyConfiguration")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -572,7 +549,9 @@ class ProxyDiscoveryAttributeAccess : public attribute_translator_interface
 {
 public:
     ProxyDiscoveryAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ProxyDiscovery::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ProxyDiscovery::Id,
+                                       "attr_translator_ProxyDiscovery")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -588,7 +567,8 @@ class ProxyValidAttributeAccess : public attribute_translator_interface
 {
 public:
     ProxyValidAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ProxyValid::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ProxyValid::Id, "attr_translator_ProxyValid")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -604,7 +584,8 @@ class BooleanStateAttributeAccess : public attribute_translator_interface
 {
 public:
     BooleanStateAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::BooleanState::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::BooleanState::Id, "attr_translator_BooleanState")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -620,7 +601,8 @@ class ModeSelectAttributeAccess : public attribute_translator_interface
 {
 public:
     ModeSelectAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ModeSelect::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ModeSelect::Id, "attr_translator_ModeSelect")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -636,7 +618,8 @@ class DoorLockAttributeAccess : public attribute_translator_interface
 {
 public:
     DoorLockAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::DoorLock::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::DoorLock::Id, "attr_translator_DoorLock")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -652,7 +635,9 @@ class WindowCoveringAttributeAccess : public attribute_translator_interface
 {
 public:
     WindowCoveringAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::WindowCovering::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::WindowCovering::Id,
+                                       "attr_translator_WindowCovering")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -668,7 +653,9 @@ class BarrierControlAttributeAccess : public attribute_translator_interface
 {
 public:
     BarrierControlAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::BarrierControl::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::BarrierControl::Id,
+                                       "attr_translator_BarrierControl")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -680,30 +667,12 @@ private:
 
     std::vector<const char *> unify_cluster_names() const override { return std::vector<const char *>({ "BarrierControl" }); }
 };
-class PumpConfigurationAndControlAttributeAccess : public attribute_translator_interface
-{
-public:
-    PumpConfigurationAndControlAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::PumpConfigurationAndControl::Id)
-    {}
-
-    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
-
-private:
-    void reported_updated(const bridged_endpoint * ep, const std::string & cluster, const std::string & attribute,
-                          const nlohmann::json & unify_value) override;
-
-    std::vector<const char *> unify_cluster_names() const override
-    {
-        return std::vector<const char *>({ "PumpConfigurationAndControl" });
-    }
-};
 class ThermostatAttributeAccess : public attribute_translator_interface
 {
 public:
     ThermostatAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::Thermostat::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::Thermostat::Id, "attr_translator_Thermostat")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -719,7 +688,8 @@ class FanControlAttributeAccess : public attribute_translator_interface
 {
 public:
     FanControlAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::FanControl::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::FanControl::Id, "attr_translator_FanControl")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -735,7 +705,9 @@ class ThermostatUserInterfaceConfigurationAttributeAccess : public attribute_tra
 {
 public:
     ThermostatUserInterfaceConfigurationAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ThermostatUserInterfaceConfiguration::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ThermostatUserInterfaceConfiguration::Id,
+                                       "attr_translator_ThermostatUserInterfaceConfiguration")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -754,7 +726,8 @@ class ColorControlAttributeAccess : public attribute_translator_interface
 {
 public:
     ColorControlAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ColorControl::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ColorControl::Id, "attr_translator_ColorControl")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -766,27 +739,13 @@ private:
 
     std::vector<const char *> unify_cluster_names() const override { return std::vector<const char *>({ "ColorControl" }); }
 };
-class BallastConfigurationAttributeAccess : public attribute_translator_interface
-{
-public:
-    BallastConfigurationAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::BallastConfiguration::Id)
-    {}
-
-    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
-
-private:
-    void reported_updated(const bridged_endpoint * ep, const std::string & cluster, const std::string & attribute,
-                          const nlohmann::json & unify_value) override;
-
-    std::vector<const char *> unify_cluster_names() const override { return std::vector<const char *>({ "BallastConfiguration" }); }
-};
 class IlluminanceMeasurementAttributeAccess : public attribute_translator_interface
 {
 public:
     IlluminanceMeasurementAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::IlluminanceMeasurement::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::IlluminanceMeasurement::Id,
+                                       "attr_translator_IlluminanceMeasurement")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -805,7 +764,9 @@ class TemperatureMeasurementAttributeAccess : public attribute_translator_interf
 {
 public:
     TemperatureMeasurementAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::TemperatureMeasurement::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::TemperatureMeasurement::Id,
+                                       "attr_translator_TemperatureMeasurement")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -824,7 +785,9 @@ class PressureMeasurementAttributeAccess : public attribute_translator_interface
 {
 public:
     PressureMeasurementAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::PressureMeasurement::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::PressureMeasurement::Id,
+                                       "attr_translator_PressureMeasurement")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -840,7 +803,9 @@ class FlowMeasurementAttributeAccess : public attribute_translator_interface
 {
 public:
     FlowMeasurementAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::FlowMeasurement::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::FlowMeasurement::Id,
+                                       "attr_translator_FlowMeasurement")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -856,7 +821,9 @@ class RelativeHumidityMeasurementAttributeAccess : public attribute_translator_i
 {
 public:
     RelativeHumidityMeasurementAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::RelativeHumidityMeasurement::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::RelativeHumidityMeasurement::Id,
+                                       "attr_translator_RelativeHumidityMeasurement")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -875,7 +842,9 @@ class OccupancySensingAttributeAccess : public attribute_translator_interface
 {
 public:
     OccupancySensingAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::OccupancySensing::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::OccupancySensing::Id,
+                                       "attr_translator_OccupancySensing")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -891,7 +860,8 @@ class WakeOnLanAttributeAccess : public attribute_translator_interface
 {
 public:
     WakeOnLanAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::WakeOnLan::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::WakeOnLan::Id, "attr_translator_WakeOnLan")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -907,7 +877,8 @@ class ChannelAttributeAccess : public attribute_translator_interface
 {
 public:
     ChannelAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::Channel::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::Channel::Id, "attr_translator_Channel")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -923,7 +894,9 @@ class TargetNavigatorAttributeAccess : public attribute_translator_interface
 {
 public:
     TargetNavigatorAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::TargetNavigator::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::TargetNavigator::Id,
+                                       "attr_translator_TargetNavigator")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -939,7 +912,8 @@ class MediaPlaybackAttributeAccess : public attribute_translator_interface
 {
 public:
     MediaPlaybackAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::MediaPlayback::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::MediaPlayback::Id, "attr_translator_MediaPlayback")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -955,7 +929,8 @@ class MediaInputAttributeAccess : public attribute_translator_interface
 {
 public:
     MediaInputAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::MediaInput::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::MediaInput::Id, "attr_translator_MediaInput")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -971,7 +946,8 @@ class LowPowerAttributeAccess : public attribute_translator_interface
 {
 public:
     LowPowerAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::LowPower::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::LowPower::Id, "attr_translator_LowPower")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -987,7 +963,8 @@ class KeypadInputAttributeAccess : public attribute_translator_interface
 {
 public:
     KeypadInputAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::KeypadInput::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::KeypadInput::Id, "attr_translator_KeypadInput")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -1003,7 +980,9 @@ class ContentLauncherAttributeAccess : public attribute_translator_interface
 {
 public:
     ContentLauncherAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ContentLauncher::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ContentLauncher::Id,
+                                       "attr_translator_ContentLauncher")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -1019,7 +998,8 @@ class AudioOutputAttributeAccess : public attribute_translator_interface
 {
 public:
     AudioOutputAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::AudioOutput::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::AudioOutput::Id, "attr_translator_AudioOutput")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -1035,7 +1015,9 @@ class ApplicationLauncherAttributeAccess : public attribute_translator_interface
 {
 public:
     ApplicationLauncherAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ApplicationLauncher::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ApplicationLauncher::Id,
+                                       "attr_translator_ApplicationLauncher")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -1051,7 +1033,9 @@ class ApplicationBasicAttributeAccess : public attribute_translator_interface
 {
 public:
     ApplicationBasicAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ApplicationBasic::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ApplicationBasic::Id,
+                                       "attr_translator_ApplicationBasic")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -1067,7 +1051,8 @@ class AccountLoginAttributeAccess : public attribute_translator_interface
 {
 public:
     AccountLoginAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::AccountLogin::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::AccountLogin::Id, "attr_translator_AccountLogin")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -1083,7 +1068,9 @@ class ElectricalMeasurementAttributeAccess : public attribute_translator_interfa
 {
 public:
     ElectricalMeasurementAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ElectricalMeasurement::Id)
+        attribute_translator_interface(node_state_monitor, chip::app::Clusters::ElectricalMeasurement::Id,
+                                       "attr_translator_ElectricalMeasurement")
+
     {}
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -1097,21 +1084,5 @@ private:
     {
         return std::vector<const char *>({ "ElectricalMeasurement" });
     }
-};
-class FaultInjectionAttributeAccess : public attribute_translator_interface
-{
-public:
-    FaultInjectionAttributeAccess(matter_node_state_monitor & node_state_monitor) :
-        attribute_translator_interface(node_state_monitor, chip::app::Clusters::FaultInjection::Id)
-    {}
-
-    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
-
-private:
-    void reported_updated(const bridged_endpoint * ep, const std::string & cluster, const std::string & attribute,
-                          const nlohmann::json & unify_value) override;
-
-    std::vector<const char *> unify_cluster_names() const override { return std::vector<const char *>({ "FaultInjection" }); }
 };
 } // namespace unify::matter_bridge

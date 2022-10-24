@@ -43,10 +43,11 @@ class attribute_translator_interface :
 {
   public:
   attribute_translator_interface(matter_node_state_monitor &node_state_monitor,
-                                 chip::ClusterId id) :
+                                 chip::ClusterId id, const char *log_tag) :
     chip::app::AttributeAccessInterface(
       chip::Optional<chip::EndpointId>::Missing(), id),
-    m_node_state_monitor(node_state_monitor)
+    m_node_state_monitor(node_state_monitor),
+    LOG_TAG(log_tag)
   {
     registerAttributeAccessOverride(this);
 
@@ -82,7 +83,7 @@ class attribute_translator_interface :
   matter_node_state_monitor &m_node_state_monitor;
 
   private:
-  const char *LOG_TAG = "attribute_cluster_server";
+  const char *LOG_TAG;
 
   void on_mqtt_message_cb(const char *topic,
                           const char *message,
@@ -122,16 +123,16 @@ class attribute_translator_interface :
         nlohmann::json jsn = nlohmann::json::parse(msg);
         reported_updated(unify_node, cluster, attribute, jsn["value"]);
       } catch (const nlohmann::json::parse_error &e) {
-        sl_log_info(LOG_TAG,
+        sl_log_warning(LOG_TAG,
                     "It was not possible to parse incoming attribute state "
                     "update since the message payload is not json, %s\n",
                     e.what());
       } catch (const nlohmann::json::type_error &e) {
-        sl_log_info(
+        sl_log_warning(
           LOG_TAG,
           "It was not possible to parse incoming attribute state update since "
-          "the value of different type or key is not present, %s\n",
-          e.what());
+          "the value of different type or key is not present, %s\n%s\n",
+          e.what(), msg.c_str());
       }
     } else {
       sl_log_debug(LOG_TAG, "Unknown attributes [%s]", attribute.c_str());

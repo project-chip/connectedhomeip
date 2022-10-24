@@ -32,17 +32,29 @@ function asUpperCamelCaseUnify(label, options) {
 }
 
 function supportedCluster(clusterName) {
+  clusterName = asUpperCamelCaseUnify(clusterName)
   switch (clusterName) {
-    case "Network Commissioning": return false
+    case "NetworkCommissioning": return false
     case "Groups": return false   
-    case "Test Cluster": return false
+    case "TestCluster": return false
     case "Descriptor": return false
     case "Binding": return false
-    case "Access Control": return false
-    case "AdministratorCommissioning": false
-    case "Bridged Device Basic": false
-    case "Actions": false
-    case "Ethernet Network Diagnostics": false
+    case "AccessControl": return false
+    case "AdministratorCommissioning": return false
+    case "BridgedDeviceBasic": return false
+    case "Actions": return false
+    case "EthernetNetworkDiagnostics": return false
+    case "BallastConfiguration": return false
+    case "DeviceTemperatureConfiguration": return false
+    case "PumpConfigurationAndControl": return false
+    case "FaultInjection": return false
+    default: return true
+  }
+}
+
+function supportedStruct(structName) {
+  switch (structName) {
+    case "LabelStruct": return false
     default: return true
   }
 }
@@ -54,6 +66,43 @@ function matterClusterConversion(clusterName) {
   }
 }
 
+function overrideEnumType(typeName) {
+  switch (typeName) {
+    // Occupancy
+    case "OccupancySensorType": return true
+    // ColorControl
+    case "ColorMode": return true
+    case "EnhancedColorMode": return true
+    default: return false
+  }
+}
+
+function overrideBitmapType(typeName) {
+  switch (typeName) {
+    case "StartTime": return false
+    default: return true
+  }
+}
+
+/** Because the Matter and UCL "dotdot" xml differ in bitmap element names,
+ *  this function maps Matter to UCL names  */
+function matterToUclBitmapElem(name) {
+  switch (name) {
+    // Occupancy
+    case "Occupied": return "SensedOccupancy"
+    case "Pir": return "PIR"
+    // ColorControl
+    case "XYAttributesSupported": return "XYSupported"
+    case "ColorTemperature": return "ColorTemperatureMireds"
+    default: return name
+  }
+}
+
+
 exports.matterClusterConversion = matterClusterConversion
 exports.supportedCluster = supportedCluster
-exports.asUpperCamelCaseUnify = asUpperCamelCaseUnify;
+exports.asUpperCamelCaseUnify = asUpperCamelCaseUnify
+exports.supportedStruct = supportedStruct
+exports.overrideEnumType = overrideEnumType
+exports.overrideBitmapType = overrideBitmapType
+exports.matterToUclBitmapElem = matterToUclBitmapElem
