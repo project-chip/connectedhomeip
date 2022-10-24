@@ -581,6 +581,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         // Just drop this message; if we delivered it to our delegate it might
         // try to send another message-needing-an-ack in response, which would
         // violate our internal invariants.
+        ChipLogError(ExchangeManager, "Dropping message without piggyback ack when we are waiting for an ack.");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
