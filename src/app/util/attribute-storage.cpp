@@ -295,42 +295,6 @@ bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType)
     return dataType == ZCL_ARRAY_ATTRIBUTE_TYPE;
 }
 
-// This function is used to call the per-cluster default response callback
-void emberAfClusterDefaultResponseCallback(EndpointId endpoint, ClusterId clusterId, CommandId commandId, EmberAfStatus status,
-                                           uint8_t clientServerMask)
-{
-    const EmberAfCluster * cluster = emberAfFindCluster(endpoint, clusterId, clientServerMask);
-    if (cluster != nullptr)
-    {
-        EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_DEFAULT_RESPONSE_FUNCTION);
-        if (f != nullptr)
-        {
-            ((EmberAfDefaultResponseFunction) f)(endpoint, commandId, status);
-        }
-    }
-}
-
-// This function is used to call the per-cluster message sent callback
-void emberAfClusterMessageSentCallback(const MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen,
-                                       uint8_t * message, EmberStatus status)
-{
-    if (apsFrame != nullptr && message != nullptr && msgLen != 0)
-    {
-        const EmberAfCluster * cluster = emberAfFindCluster(
-            apsFrame->sourceEndpoint, apsFrame->clusterId,
-            (((message[0] & ZCL_FRAME_CONTROL_DIRECTION_MASK) == ZCL_FRAME_CONTROL_SERVER_TO_CLIENT) ? CLUSTER_MASK_SERVER
-                                                                                                     : CLUSTER_MASK_CLIENT));
-        if (cluster != nullptr)
-        {
-            EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_MESSAGE_SENT_FUNCTION);
-            if (f != nullptr)
-            {
-                ((EmberAfMessageSentFunction) f)(destination, apsFrame, msgLen, message, status);
-            }
-        }
-    }
-}
-
 // This function is used to call the per-cluster attribute changed callback
 void emAfClusterAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
@@ -358,8 +322,8 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttribut
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     // Casting and calling a function pointer on the same line results in ignoring the return
     // of the call on gcc-arm-none-eabi-9-2019-q4-major
-    EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback)(
-        emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
+    EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback) (emberAfFindClusterFunction(
+        cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
     if (f != nullptr)
     {
         status = f(attributePath, attributeType, size, value);
