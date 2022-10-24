@@ -35,10 +35,6 @@ void __attribute__((weak)) emberAf{{asUpperCamelCase name}}ClusterInitCallback(E
 // Non-Cluster Related Callbacks
 //
 
-void __attribute__((weak)) emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
-
-void __attribute__((weak)) emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
-
 EmberAfAttributeWritePermission __attribute__((weak)) emberAfAllowNetworkWriteAttributeCallback(
     EndpointId endpoint, ClusterId clusterId,
                                                                           AttributeId attributeId,

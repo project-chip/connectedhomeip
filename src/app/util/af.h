@@ -562,31 +562,6 @@ EmberStatus emberAfBroadcastPermitJoin(uint8_t duration);
 //@{
 
 /**
- * @brief A function used to add a task to the task register.
- */
-#define emberAfAddToCurrentAppTasks(x) emberAfAddToCurrentAppTasksCallback(x)
-
-/**
- * @brief A function used to remove a task from the task register.
- */
-#define emberAfRemoveFromCurrentAppTasks(x) emberAfRemoveFromCurrentAppTasksCallback(x)
-
-/**
- * @brief A macro used to retrieve the bitmask of all application
- * frameowrk tasks currently in progress. This can be useful for debugging if
- * some task is holding the device out of hibernation.
- */
-#define emberAfCurrentAppTasks() emberAfGetCurrentAppTasksCallback()
-
-/**
- * @brief a function used to run the application framework's
- *        event mechanism. This function passes the application
- *        framework's event tables to the ember stack's event
- *        processing code.
- */
-void emberAfRunEvents(void);
-
-/**
  * @brief Friendly define for use in the scheduling or canceling client events
  * with emberAfScheduleClusterTick() and emberAfDeactivateClusterTick().
  */

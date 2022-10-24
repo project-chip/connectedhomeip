@@ -155,29 +155,6 @@ bool emberAf{{asUpperCamelCase parent.label}}Cluster{{asUpperCamelCase name}}Cal
 {{/zcl_commands}}
 {{/zcl_clusters}}
 
-/** @brief Add To Current App Tasks
- *
- * This function is only useful to sleepy end devices.  This function will note
- * the passed item as part of a set of tasks the application has outstanding
- * (e.g. message sent requiring APS acknwoledgement).  This will affect how the
- * application behaves with regard to sleeping and polling.  Until the
- * outstanding task is completed, the device may poll more frequently and sleep
- * less often.
- */
-void emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks);
-
-/** @brief Remove From Current App Tasks
- *
- * This function is only useful to sleepy end devices.  This function will
- * remove the passed item from the set of tasks the application has outstanding
- * (e.g. message sent requiring APS acknwoledgement).  This will affect how the
- * application behaves with regard to sleeping and polling.  Removing the item
- * from the list of outstanding tasks may allow the device to sleep longer and
- * poll less frequently.  If there are other outstanding tasks the system may
- * still have to stay away and poll more often.
- */
-void emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks);
-
 /** @brief Allow Network Write Attribute
  *
  * This function is called by the application framework before it writes an
