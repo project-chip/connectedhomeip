@@ -97,7 +97,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -150,7 +150,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -289,7 +289,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -335,7 +335,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -402,7 +402,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -448,7 +448,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -506,7 +506,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -557,7 +557,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -745,7 +745,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -792,7 +792,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -839,7 +839,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -885,7 +885,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -932,7 +932,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -992,7 +992,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -1038,7 +1038,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -1161,7 +1161,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -1208,7 +1208,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -1258,7 +1258,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -1421,7 +1421,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -1479,7 +1479,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -1537,7 +1537,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -1590,7 +1590,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -1648,7 +1648,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -1701,7 +1701,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -2005,7 +2005,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -2064,7 +2064,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -2124,7 +2124,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -2175,7 +2175,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -2233,7 +2233,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -2292,7 +2292,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -2352,7 +2352,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -2403,7 +2403,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -2453,7 +2453,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -3360,7 +3360,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -3415,7 +3415,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -3469,7 +3469,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -3524,7 +3524,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -3578,7 +3578,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -3632,7 +3632,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -3687,7 +3687,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -3741,7 +3741,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -3795,7 +3795,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -3850,7 +3850,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -3904,7 +3904,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -3959,7 +3959,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -4098,7 +4098,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -4460,7 +4460,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -4507,7 +4507,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -4558,7 +4558,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -4674,7 +4674,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -5494,7 +5494,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -5545,7 +5545,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -5604,7 +5604,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -5780,7 +5780,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -5831,7 +5831,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -5881,7 +5881,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -5931,7 +5931,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -5981,7 +5981,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -6032,7 +6032,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -6221,7 +6221,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -6329,7 +6329,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -6516,7 +6516,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -6663,7 +6663,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -7283,7 +7283,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -7502,7 +7502,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -7965,7 +7965,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -8018,7 +8018,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -8079,7 +8079,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -8206,7 +8206,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -8254,7 +8254,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -8304,7 +8304,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -8358,7 +8358,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -8408,7 +8408,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -8454,7 +8454,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -8500,7 +8500,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -8550,7 +8550,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -8744,7 +8744,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -8790,7 +8790,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -8840,7 +8840,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -8909,7 +8909,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -9281,7 +9281,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -9482,7 +9482,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -9540,7 +9540,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -9597,7 +9597,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -9654,7 +9654,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -9701,7 +9701,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -9752,7 +9752,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -9805,7 +9805,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -9852,7 +9852,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -9903,7 +9903,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -9957,7 +9957,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -10003,7 +10003,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -10053,7 +10053,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -10141,7 +10141,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -10187,7 +10187,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -10240,7 +10240,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -10315,7 +10315,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -10364,7 +10364,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -10424,7 +10424,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -11183,7 +11183,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -11241,7 +11241,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -11299,7 +11299,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -11349,7 +11349,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -11399,7 +11399,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -11449,7 +11449,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -11499,7 +11499,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -11801,7 +11801,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -11859,7 +11859,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -12484,7 +12484,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -12572,7 +12572,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -12621,7 +12621,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -12679,7 +12679,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -14120,7 +14120,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -14174,7 +14174,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -14229,7 +14229,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -14282,7 +14282,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -14336,7 +14336,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -14391,7 +14391,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -14445,7 +14445,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -14499,7 +14499,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -14552,7 +14552,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -14606,7 +14606,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -14659,7 +14659,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -14714,7 +14714,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -14768,7 +14768,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -14823,7 +14823,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -14877,7 +14877,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -14935,7 +14935,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -14986,7 +14986,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -15042,7 +15042,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -15099,7 +15099,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -17134,7 +17134,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -17185,7 +17185,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -17235,7 +17235,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -17366,7 +17366,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -17494,7 +17494,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -17549,7 +17549,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -17604,7 +17604,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -17659,7 +17659,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -17714,7 +17714,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -17769,7 +17769,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -17824,7 +17824,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -17879,7 +17879,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -17925,7 +17925,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -17971,7 +17971,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -18017,7 +18017,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -18180,7 +18180,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -18238,7 +18238,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -18296,7 +18296,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -18347,7 +18347,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -18478,7 +18478,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -18581,7 +18581,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -18741,7 +18741,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -18885,7 +18885,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -19029,7 +19029,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -19080,7 +19080,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -19204,7 +19204,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -19251,7 +19251,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -19298,7 +19298,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -19560,7 +19560,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -19614,7 +19614,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -19675,7 +19675,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -19790,7 +19790,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -19842,7 +19842,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -21145,7 +21145,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -21203,7 +21203,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -21258,7 +21258,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -21316,7 +21316,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -21363,7 +21363,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -21409,7 +21409,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -21667,7 +21667,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -21720,7 +21720,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -21777,7 +21777,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -21853,7 +21853,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -21920,7 +21920,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -22074,7 +22074,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -22254,7 +22254,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -22321,7 +22321,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -22368,7 +22368,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -22424,7 +22424,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -22642,7 +22642,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -22695,7 +22695,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -22756,7 +22756,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -22811,7 +22811,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -22859,7 +22859,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
@@ -22909,7 +22909,7 @@ using chip::SessionHandle;
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    if ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending) {
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
