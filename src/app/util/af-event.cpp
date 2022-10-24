@@ -180,17 +180,6 @@ EmberStatus emberAfScheduleClusterTick(EndpointId endpoint, ClusterId clusterId,
                                        (sleepControl == EMBER_AF_STAY_AWAKE ? EMBER_AF_STAY_AWAKE : EMBER_AF_OK_TO_SLEEP));
 }
 
-EmberStatus emberAfScheduleClientTickExtended(EndpointId endpoint, ClusterId clusterId, uint32_t delayMs,
-                                              EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl)
-{
-    return emberAfScheduleTickExtended(endpoint, clusterId, EMBER_AF_CLIENT_CLUSTER_TICK, delayMs, pollControl, sleepControl);
-}
-
-EmberStatus emberAfScheduleClientTick(EndpointId endpoint, ClusterId clusterId, uint32_t delayMs)
-{
-    return emberAfScheduleClientTickExtended(endpoint, clusterId, delayMs, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP);
-}
-
 EmberStatus emberAfScheduleServerTickExtended(EndpointId endpoint, ClusterId clusterId, uint32_t delayMs,
                                               EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl)
 {
@@ -211,11 +200,6 @@ EmberStatus emberAfDeactivateClusterTick(EndpointId endpoint, ClusterId clusterI
         return EMBER_SUCCESS;
     }
     return EMBER_BAD_ARGUMENT;
-}
-
-EmberStatus emberAfDeactivateClientTick(EndpointId endpoint, ClusterId clusterId)
-{
-    return emberAfDeactivateClusterTick(endpoint, clusterId, EMBER_AF_CLIENT_CLUSTER_TICK);
 }
 
 EmberStatus emberAfDeactivateServerTick(EndpointId endpoint, ClusterId clusterId)
