@@ -323,17 +323,6 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, c
                                                     const EmberAfAttributeMetadata * attributeMetadata,
                                                     uint8_t * buffer);
 
-/** @brief Get Current Time
- *
- * This callback is called when device attempts to get current time from the
- * hardware. If this device has means to retrieve exact time, then this method
- * should implement it. If the callback can't provide the exact time it should
- * return 0 to indicate failure. Default action is to return 0, which indicates
- * that device does not have access to real time.
- *
- */
-uint32_t emberAfGetCurrentTimeCallback();
-
 /** @brief Get Endpoint Info
  *
  * This function is a callback to an application implemented endpoint that
@@ -360,18 +349,6 @@ bool emberAfGetEndpointInfoCallback(chip::EndpointId endpoint, uint8_t * returnN
  *
  */
 void emberAfRegistrationAbortCallback();
-
-/** @brief Interpan Send Message
- *
- * This function will send a raw MAC message with interpan frame format using
- * the passed parameters.
- *
- * @param header Interpan header info  Ver.: always
- * @param messageLength The length of the message received or to send  Ver.:
- * always
- * @param message The message data received or to send.  Ver.: always
- */
-EmberStatus emberAfInterpanSendMessageCallback(EmberAfInterpanHeader * header, uint16_t messageLength, uint8_t * message);
 
 /** @brief Start Move
  *
