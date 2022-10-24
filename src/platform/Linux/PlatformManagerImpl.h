@@ -26,7 +26,7 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
 
-#if CHIP_WITH_GIO
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 #include <gio/gio.h>
 #endif
 
@@ -51,6 +51,29 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+
+    /**
+     * @brief Executes a callback in the GLib main loop thread.
+     *
+     * @param[in] callback The callback to execute.
+     * @param[in] userData User data to pass to the callback.
+     * @param[in] wait If true, the function will block until the callback has been executed.
+     * @returns CHIP_NO_ERROR if the callback was successfully executed.
+     */
+    CHIP_ERROR RunOnGLibMainLoopThread(GSourceFunc callback, void * userData, bool wait = false);
+
+    /**
+     * @brief Convenience method to require less casts to void pointers.
+     */
+    template <class T>
+    CHIP_ERROR ScheduleOnGLibMainLoopThread(int (*callback)(T *), T * userData, bool wait = false)
+    {
+        return RunOnGLibMainLoopThread(G_SOURCE_FUNC(callback), userData, wait);
+    }
+
+#endif
+
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
 private:
@@ -73,6 +96,15 @@ private:
     // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
     // This should be removed or find a better place once we deprecate the rendezvous session.
     static void WiFiIPChangeListener();
+#endif
+
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+    struct GLibMainLoopDeleter
+    {
+        void operator()(GMainLoop * loop) { g_main_loop_unref(loop); }
+    };
+    using UniqueGLibMainLoop = std::unique_ptr<GMainLoop, GLibMainLoopDeleter>;
+    UniqueGLibMainLoop mGLibMainLoop;
 #endif
 };
 

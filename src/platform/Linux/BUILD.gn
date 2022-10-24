@@ -93,8 +93,6 @@ static_library("Linux") {
       "bluez/ChipDeviceScanner.h",
       "bluez/Helper.cpp",
       "bluez/Helper.h",
-      "bluez/MainLoop.cpp",
-      "bluez/MainLoop.h",
       "bluez/Types.h",
     ]
   }

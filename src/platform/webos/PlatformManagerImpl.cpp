@@ -24,6 +24,17 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <arpa/inet.h>
+#include <dirent.h>
+#include <errno.h>
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
+#include <net/if.h>
+#include <netinet/in.h>
+#include <unistd.h>
+
+#include <thread>
+
 #include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Events.h>
 #include <lib/support/CHIPMem.h>
@@ -35,21 +46,6 @@
 #include <platform/webos/DeviceInstanceInfoProviderImpl.h>
 #include <platform/webos/DiagnosticDataProviderImpl.h>
 
-#include <thread>
-
-#include <arpa/inet.h>
-#include <dirent.h>
-#include <errno.h>
-#include <linux/netlink.h>
-#include <linux/rtnetlink.h>
-#include <net/if.h>
-#include <netinet/in.h>
-#include <unistd.h>
-
-#if CHIP_WITH_GIO
-#include <gio/gio.h>
-#endif
-
 using namespace ::chip::app::Clusters;
 
 namespace chip {
@@ -59,15 +55,14 @@ PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 namespace {
 
-#if CHIP_WITH_GIO
-void GDBus_Thread()
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+void * GLibMainLoopThread(void * loop)
 {
-    GMainLoop * loop = g_main_loop_new(nullptr, false);
-
-    g_main_loop_run(loop);
-    g_main_loop_unref(loop);
+    g_main_loop_run(static_cast<GMainLoop *>(loop));
+    return nullptr;
 }
 #endif
+
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -147,9 +142,10 @@ void PlatformManagerImpl::WiFiIPChangeListener()
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
-#if CHIP_WITH_GIO
-    std::thread gdbusThread(GDBus_Thread);
-    gdbusThread.detach();
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+    mGLibMainLoop.reset(g_main_loop_new(nullptr, FALSE));
+    GThread * thread = g_thread_new("gmain-matter", GLibMainLoopThread, mGLibMainLoop.get());
+    g_thread_unref(thread); // detach the thread
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -196,6 +192,11 @@ void PlatformManagerImpl::_Shutdown()
     }
 
     Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
+
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+    g_main_loop_quit(mGLibMainLoop.get());
+    mGLibMainLoop.reset();
+#endif
 }
 
 } // namespace DeviceLayer

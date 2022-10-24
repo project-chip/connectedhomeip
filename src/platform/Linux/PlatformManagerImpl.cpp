@@ -24,6 +24,18 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <arpa/inet.h>
+#include <dirent.h>
+#include <errno.h>
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
+#include <net/if.h>
+#include <netinet/in.h>
+#include <unistd.h>
+
+#include <condition_variable>
+#include <thread>
+
 #include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Events.h>
 #include <lib/support/CHIPMem.h>
@@ -35,17 +47,6 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
 
-#include <thread>
-
-#include <arpa/inet.h>
-#include <dirent.h>
-#include <errno.h>
-#include <linux/netlink.h>
-#include <linux/rtnetlink.h>
-#include <net/if.h>
-#include <netinet/in.h>
-#include <unistd.h>
-
 using namespace ::chip::app::Clusters;
 
 namespace chip {
@@ -55,15 +56,49 @@ PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 namespace {
 
-#if CHIP_WITH_GIO
-void GDBus_Thread()
-{
-    GMainLoop * loop = g_main_loop_new(nullptr, false);
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 
-    g_main_loop_run(loop);
-    g_main_loop_unref(loop);
+class CallbackIndirection
+{
+public:
+    CallbackIndirection(GSourceFunc callback, void * userData) : mCallback(callback), mUserData(userData) {}
+
+    void Wait()
+    {
+        g_mutex_lock(&mDoneMtx);
+        while (!mDone)
+            g_cond_wait(&mDoneCond, &mDoneMtx);
+        g_mutex_unlock(&mDoneMtx);
+    }
+
+    static gboolean Callback(CallbackIndirection * self)
+    {
+        auto result = self->mCallback(self->mUserData);
+
+        g_mutex_lock(&self->mDoneMtx);
+        self->mDone = true;
+        g_mutex_unlock(&self->mDoneMtx);
+
+        g_cond_signal(&self->mDoneCond);
+        return result;
+    }
+
+private:
+    GMutex mDoneMtx{};
+    GCond mDoneCond{};
+    bool mDone = false;
+    GSourceFunc mCallback;
+    void * mUserData;
+};
+
+void * GLibMainLoopThread(void * loop)
+{
+    g_main_loop_run(static_cast<GMainLoop *>(loop));
+    return nullptr;
 }
-#endif
+
+#endif // CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -154,9 +189,16 @@ void PlatformManagerImpl::WiFiIPChangeListener()
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
-#if CHIP_WITH_GIO
-    std::thread gdbusThread(GDBus_Thread);
-    gdbusThread.detach();
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+
+    mGLibMainLoop.reset(g_main_loop_new(nullptr, FALSE));
+    GThread * thread = g_thread_new("gmain-matter", GLibMainLoopThread, mGLibMainLoop.get());
+    g_thread_unref(thread); // detach the thread
+
+    CallbackIndirection startedInd([](void *) { return G_SOURCE_REMOVE; }, nullptr);
+    g_idle_add(G_SOURCE_FUNC(&CallbackIndirection::Callback), &startedInd);
+    startedInd.Wait();
+
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -203,7 +245,33 @@ void PlatformManagerImpl::_Shutdown()
     }
 
     Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
+
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+    g_main_loop_quit(mGLibMainLoop.get());
+    mGLibMainLoop.reset();
+#endif
 }
+
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+CHIP_ERROR PlatformManagerImpl::RunOnGLibMainLoopThread(GSourceFunc callback, void * userData, bool wait)
+{
+
+    GMainContext * context = g_main_loop_get_context(mGLibMainLoop.get());
+    VerifyOrReturnError(context != nullptr,
+                        (ChipLogDetail(DeviceLayer, "Failed to get GLib main loop context"), CHIP_ERROR_INTERNAL));
+
+    if (wait)
+    {
+        CallbackIndirection indirection(callback, userData);
+        g_main_context_invoke(context, G_SOURCE_FUNC(&CallbackIndirection::Callback), &indirection);
+        indirection.Wait();
+        return CHIP_NO_ERROR;
+    }
+
+    g_main_context_invoke(context, callback, userData);
+    return CHIP_NO_ERROR;
+}
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip
