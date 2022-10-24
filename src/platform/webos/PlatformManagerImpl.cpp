@@ -46,11 +46,6 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
-#if __GLIBC__ == 2 && __GLIBC_MINOR__ < 30
-#include <sys/syscall.h>
-#define gettid() syscall(SYS_gettid)
-#endif
-
 using namespace ::chip::app::Clusters;
 
 namespace chip {
@@ -202,13 +197,6 @@ void PlatformManagerImpl::_Shutdown()
 
     Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
 }
-
-#if CHIP_WITH_GIO
-GDBusConnection * PlatformManagerImpl::GetGDBusConnection()
-{
-    return this->mpGDBusConnection.get();
-}
-#endif
 
 } // namespace DeviceLayer
 } // namespace chip

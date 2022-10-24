@@ -50,9 +50,6 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
-#if CHIP_WITH_GIO
-    GDBusConnection * GetGDBusConnection();
-#endif
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
