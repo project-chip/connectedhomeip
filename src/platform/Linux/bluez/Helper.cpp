@@ -1191,7 +1191,11 @@ void EndpointCleanup(BluezEndpoint * apEndpoint)
             g_free(apEndpoint->mpPeerDevicePath);
             apEndpoint->mpPeerDevicePath = nullptr;
         }
-        g_free(apEndpoint->mpConnectCancellable);
+        if (apEndpoint->mpConnectCancellable != nullptr)
+        {
+            g_object_unref(apEndpoint->mpConnectCancellable);
+            apEndpoint->mpConnectCancellable = nullptr;
+        }
         g_free(apEndpoint);
     }
 }
