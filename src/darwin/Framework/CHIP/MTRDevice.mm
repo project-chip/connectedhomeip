@@ -435,7 +435,7 @@ private:
     if (timeout) {
         timeout = MTRClampedNumber(timeout, @(1), @(UINT16_MAX));
     }
-    expectedValueInterval = MTRClampedNumber(expectedValueInterval, @(1), timeout ?: @(UINT16_MAX));
+    expectedValueInterval = MTRClampedNumber(expectedValueInterval, @(1), @(UINT32_MAX));
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:_queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [self newBaseDevice];
@@ -482,7 +482,7 @@ private:
         if ([expectedValueInterval compare:@(0)] == NSOrderedAscending) {
             expectedValues = nil;
         } else {
-            expectedValueInterval = MTRClampedNumber(expectedValueInterval, @(1), timeout ?: @(UINT16_MAX));
+            expectedValueInterval = MTRClampedNumber(expectedValueInterval, @(1), @(UINT32_MAX));
         }
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:_queue];
