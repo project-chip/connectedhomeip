@@ -87,4 +87,3 @@ NS_INLINE NS_FORMAT_FUNCTION(2,3) void mtr_log(MTRLogLevel level, NSString *form
     ({ MTR_LOG_DEBUG("[<%@: %p> %@]", NSStringFromClass([self class]), self, NSStringFromSelector(_cmd)); })
 
 NS_ASSUME_NONNULL_END
-

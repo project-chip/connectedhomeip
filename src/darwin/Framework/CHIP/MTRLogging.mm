@@ -208,4 +208,3 @@ static ENFORCE_FORMAT(3, 0) void cpp_log_redirect_callback(const char * module, 
 }
 
 @end
-

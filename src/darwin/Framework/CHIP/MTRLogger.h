@@ -79,10 +79,10 @@ typedef NS_ENUM(NSUInteger, MTRLogLevel) {
 
 /**
  * Gets the `MTRLogger` that will be used to log messages from the Matter SDK.
- * 
+ *
  * If no logger has been [set](@ref setLogger), all messages at all log levels will be logged
  * to the `os_log`.
- * 
+ *
  * @returns The `MTRLogger` that will be used to log messages from the Matter SDK.
  */
 + (id<MTRLogger>)getLogger;
