@@ -7,12 +7,11 @@ This example is powered by BL706 and functions as a Thread light bulb device
 type, with on/off, level and color capabilities. The steps were verified with
 following boards:
 
-    -   BL706-IoT-DVK
-    -   BL706-NIGHT-LIGHT
+-   `XT-ZB6-DevKit`
+-   `BL706-IoT-DVK`
+-   `BL706-NIGHT-LIGHT`
 
-## Build
-
-### Prerequisite
+## Prerequisite
 
 -   Clone connectedhomeip github repo and update all submodule;
 -   Install all tools (likely already present for CHIP developers).
@@ -24,143 +23,106 @@ following boards:
         ```shell
         source scripts/bootstrap.sh
         ```
-        > Note, `scripts/bootstrap.sh` only installs `bflb-iot-tool` under
-        > connectedhomeip build context.
+        > Note, `bflb-iot-tool` is only installed under connectedhomeip build
+        > context by matter environment setup `scripts/bootstrap.sh`.
     -   Others, please execute the following script before any build commands
-        executed; and `bflb-iot-tool` will import under this environment.
+        executed; and `bflb-iot-tool` imports under this environment.
         ```shell
         source scripts/activate.sh
         ```
 
 ## Build CHIP BL702 Lighting App example
 
--   Build with script `gn_bouffalolab_example.sh` under root folder of
-    connectedhomeip repo
+-   Build for `XT-ZB6-DevKit` and BL706-NIGHT-LIGHT as following commands.
 
-    -   Command format:
+    ```shell
+    ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light build
+    ./scripts/build/build_examples.py --target bouffalolab-bl706-night-light-light build
+    ```
+
+-   Build target name with `-115200` appended for UART baudrate 115200 command
+    enabled as following commands.
+
+    ```shell
+    ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-rpc build
+    ```
+
+    > UART baudrate is 2000000 by default.
+
+-   Build target name with `-shell` appended for UART shell command enabled as
+    following commands.
+
+    ```shell
+    ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-shell build
+    ```
+
+-   Build target name with `-rpc` appended for rpc enabled as following
+    commands.
+    `shell ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-rpc build`
+    > For multiple build options, such as UART baudrate 115200 + rpc, please try
+    > build command as
+    > `./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-rpc-115200 build`
+
+## Download image
+
+-   Using script `chip-bl702-lighting-example.flash.py`.
+
+    After building gets done, a python `chip-bl702-lighting-example.flash.py`
+    will generated under build output folder. Such as
+    chip-bl702-lighting-example.flash.py for lighting-app example. Please check
+    `--help` option of script for more detail.
+
+    -   Hold BOOT pin and reset chip, let it be in download mode.
+    -   Enter build out folder, download image as following execution under
+        build output folder:
 
         ```shell
-        ./scripts/examples/gn_bouffalolab_example.sh <Example folder> <Output folder> <Bouffalolab_board_name> [<Build options>]
+        ./chip-bl702-lighting-example.flash.py --port /dev/tty.usbserial-3
         ```
 
-        -   Build lighting-app for board BL706-IoT-DVK.
+        > Note, where `/dev/tty.usbserial-3` is UART port of device.
 
-            ```shell
-            ./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL706-IoT-DVK
-            ```
-
-        -   Build lighting-app for board BL706-NIGHT-LIGHT
-
-            ```shell
-            ./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL706-NIGHT-LIGHT
-            ```
-
-    -   With UART shell command enabled:
-
+    -   Build Bouffalolab OTA image as following execution under build output
+        folder:
         ```shell
-        ./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL706-IoT-DVK chip_build_libshell=true
+        ./chip-bl702-lighting-example.flash.py --build
         ```
+        After script executed, a folder `ota_images` and an image
+        `FW_OTA.bin.xz.hash` will be generated. `FW_OTA.bin.xz.hash` is
+        compressed with hash verification for `chip-bl702-lighting-example.bin`.
 
-    -   With pigweed RPC enabled:
-        ```shell
-        ./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL706-IoT-DVK 'import("//with_pw_rpc.gni")'
-        ```
-        > Note, UART shell command and pigweed RPC can not build together.
+    > Note, `chip-bl702-lighting-example.flash.py` uses Python module
+    > `bflb-iot-tool` to flash device. Please make sure current terminal is
+    > under matter build environment; otherwise, Python module `bflb-iot-tool`
+    > should be installed under default Python environment using command
+    > `pip install bflb-iot-tool`.
 
--   Build with `build_examples.py`
+-   Using `Bouffalo Lab` flash tool`BLDevCube`
+    -   Hold BOOT pin and reset chip, let it be in download mode.
+    -   Select `DTS` file;
+    -   Select Partition Table
+        `<connectedhomeip_repo_path>/examples/platform/bouffalolab/bl702/flash_config/partition_cfg_2M.toml`;
+    -   Select Firmware Bin chip-bl702-lighting-example.bin;
+    -   Select Chip Erase if need;
+    -   Choose Target COM port.
+    -   Then click Create & Download.
+        > Where `connectedhomeip_repo_path` is the root path of repo
+        > connectedhomeip.
 
-    -   Build for BL706-IoT-DVK and BL706-NIGHT-LIGHT as following commands.
+## Firmware Behavior
 
-        ```shell
-        ./scripts/build/build_examples.py --target bouffalolab-BL706-IoT-DVK-BL706C-22-light build
-        ./scripts/build/build_examples.py --target bouffalolab-BL706-NIGHT-LIGHT-light build
-        ```
+-   `XT-ZB6-DevKit` board
 
-    -   Build with pigweed RPC enabled as following commands.
-        ```shell
-        ./scripts/build/build_examples.py --target bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc build
-        ```
+    -   Lighting LED, controlled by on/off command, level command and identify
+        command.
+    -   Factory Reset: Press down boot pin over 4 seconds, and release boot pin
 
--   Build options
-
-    -   Build options list There are some build options for function and debug
-        purpose as below.
-        -   `chip_build_libshell`, whether to enable shell command line. It is
-            set to false by default.
-        -   `baudrate`, UART baudrate for log output or shell command line.
-        -   `enable_psram`, whether to enable `PSRAM`. It is set to true by
-            default.
-    -   How to use Before using these build options, please check whether they
-        are available to configure in BUILD.gn file under example application
-        folder.
-        -   build with `build_examples.py` Modify value of build options in
-            BUILD.gn file under example application folder.
-        -   build with gn_bouffalolab_example.sh Input build options, such as
-            ```
-            ./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL706-IoT-DVK chip_build_libshell=true
-            ```
-
--   Download image
-
-    -   Using script `chip-bl702-lighting-example.flash.py`.
-
-        After building gets done, a python
-        `chip-bl702-lighting-example.flash.py` will generated under build output
-        folder. Such as chip-bl702-lighting-example.flash.py for lighting-app
-        example. Please check `help` option of script for more detail.
-
-        -   Hold BOOT pin and reset chip, let it be in download mode.
-        -   Download image as following execution under build output folder:
-
-            ```shell
-            ./chip-bl702-lighting-example.flash.py --port /dev/tty.usbserial-3
-            ```
-
-            > Note, where `/dev/tty.usbserial-3` is UART port of device.
-
-        -   Build Bouffalolab OTA image as following execution under build
-            output folder:
-            ```shell
-            ./chip-bl702-lighting-example.flash.py --build
-            ```
-            After script executed, a folder `ota_images` and image
-            `FW_OTA.bin.xz.hash` will generated. `FW_OTA.bin.xz.hash` is
-            compressed with hash verification with
-            `chip-bl702-lighting-example.bin`.
-
-        > Note, `chip-bl702-lighting-example.flash.py` uses Python module
-        > `bflb-iot-tool` to flash device. Please make sure current terminal is
-        > under matter build environment, otherwise, Python module
-        > `bflb-iot-tool` should be installed with default Python.
-
-    -   Using `Bouffalo Lab` flash tool`BLDevCube`
-        -   Hold BOOT pin and reset chip, let it be in download mode.
-        -   Select `DTS` file
-            `<connectedhomeip_repo_path>/examples/platform/bouffalolab/bl702/flash_config/bl_factory_params_IoTKitA_32M.dts`;
-        -   Select Partition Table
-            `<connectedhomeip_repo_path>/examples/platform/bouffalolab/bl702/flash_config/partition_cfg_2M.toml`;
-        -   Select Firmware Bin chip-bl702-lighting-example.bin;
-        -   Select Chip Erase if need;
-        -   Choose Target COM port.
-        -   Then click Create & Download.
-            > Where `connectedhomeip_repo_path` is the root path of repo
-            > connectedhomeip.
-
--   Firmware Behavior
-
-    -   IOT Dev board Status LED: TX0<br> Lighting LED: RX1<br> Factory Reset:
-        Short `IO11` to `GND` over 3 seconds<br>
-
-    -   Night Light Unprovisioned state: light shows yellow. Provisioned state:
-        light show white. Factory Reset: Power cycle 3 times before light is on;
-        at 3rd time, light shows green and does factory reset after 3 seconds
-        later. And factory reset can be cancelled during 3 seconds wait time.
-
--   UART baudrate for log and shell command
-    -   By default, UART baudrate is 2000000
-    -   To change UART baudrate, please run script `gn_bouffalolab_example.sh`
-        with `baudrate=[uart baudrate]` followed, such as
-        `./scripts/examples/gn_bouffalolab_example.sh lighting-app out/debug BL706-NIGHT-LIGHT module_type="BL702" baudrate=115200`
+-   `Night Light` board
+    -   Unprovisioned state: light shows yellow.
+    -   Provisioned state: light show white.
+    -   Factory Reset: Power cycle 3 times before light is on; at 3rd time,
+        light shows green and does factory reset after 3 seconds later. And
+        factory reset can be cancelled during 3 seconds wait time.
 
 ## Test with chip-tool
 
@@ -204,7 +166,7 @@ which `<identify_duration>` is how many seconds to execute identify command.
 -   Under connectedhomeip repo path
 
     ```shell
-    $ ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 1 -vs "1.0" -da sha256 <FW_OTA.bin.xz.hash> lighting-app.ota
+    $ ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 10 -vs "1.0" -da sha256 <FW_OTA.bin.xz.hash> lighting-app.ota
 
     ```
 

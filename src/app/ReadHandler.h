@@ -263,6 +263,9 @@ private:
     bool IsIdle() const { return mState == HandlerState::Idle; }
     bool IsReportable() const
     {
+        // Important: Anything that changes the state IsReportable depends on in
+        // a way that causes IsReportable to become true must call ScheduleRun
+        // on the reporting engine.
         return mState == HandlerState::GeneratingReports && !mFlags.Has(ReadHandlerFlags::HoldReport) &&
             (IsDirty() || !mFlags.Has(ReadHandlerFlags::HoldSync));
     }
@@ -299,7 +302,7 @@ private:
     {
         return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::ForceDirty);
     }
-    void ClearForceDirtyFlag() { mFlags.Clear(ReadHandlerFlags::ForceDirty); }
+    void ClearForceDirtyFlag() { ClearStateFlag(ReadHandlerFlags::ForceDirty); }
     NodeId GetInitiatorNodeId() const
     {
         auto session = GetSession();
@@ -317,7 +320,7 @@ private:
 
     auto GetTransactionStartGeneration() const { return mTransactionStartGeneration; }
 
-    void UnblockUrgentEventDelivery() { mFlags.Set(ReadHandlerFlags::ForceDirty); }
+    void UnblockUrgentEventDelivery();
 
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
     void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
@@ -373,6 +376,10 @@ private:
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;
+
+    // Helpers for managing our state flags properly.
+    void SetStateFlag(ReadHandlerFlags aFlag, bool aValue = true);
+    void ClearStateFlag(ReadHandlerFlags aFlag);
 
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
 

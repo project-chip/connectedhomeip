@@ -17,11 +17,26 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-id.h>
+
 #include "DynamicDevice.h"
 
 #define DEVICE_TYPE_BRIDGED_NODE 0x0013
 // Device Version for dynamic endpoints:
 #define DEVICE_VERSION_DEFAULT 1
+
+namespace {
+static const int kDescriptorAttributeArraySize = 254;
+
+DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(descriptorAttrs)
+DECLARE_DYNAMIC_ATTRIBUTE(ZCL_DEVICE_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0),     /* device list */
+    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_SERVER_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0), /* server list */
+    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_CLIENT_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0), /* client list */
+    DECLARE_DYNAMIC_ATTRIBUTE(ZCL_PARTS_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAttributeArraySize, 0),  /* parts list */
+    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+} // namespace
 
 DynamicDevice::DynamicDevice() {}
 
@@ -34,9 +49,13 @@ Device DynamicDevice::CreateDevice()
 {
     // All nodes are bridged devices.
     mDeviceTypes.push_back(EmberAfDeviceType{ DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT });
-    mVersions.resize(mClusterRawPtrs.size());
+    mVersions.resize(mClusterRawPtrs.size() + 1); // +1 for the descriptor cluster
     for (auto * c : mClusterRawPtrs)
         mClusterBaseRawPtrs.push_back(c);
+
+    // Force a default descriptor cluster to be present.
+    mClusterDecls.emplace_back(
+        EmberAfCluster DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nullptr));
 
     return Device(chip::Span<chip::DataVersion>(mVersions.data(), mVersions.size()),
                   chip::Span<EmberAfCluster>(mClusterDecls.data(), mClusterDecls.size()),

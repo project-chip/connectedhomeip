@@ -22,6 +22,7 @@
 #include <crypto/RandUtils.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/dnssd/IPAddressSorter.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/TxtFields.h>
 #include <lib/dnssd/platform/Dnssd.h>
@@ -52,6 +53,8 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
     Platform::CopyString(nodeData.commissionData.instanceName, result->mName);
 
     nodeData.resolutionData.interfaceId = result->mInterface;
+
+    IPAddressSorter::Sort(addresses, result->mInterface);
 
     size_t addressesFound = 0;
     for (auto & ip : addresses)

@@ -133,9 +133,9 @@ void PacketBufferHandle::InternalRightSize()
     }
 
     // Reallocate only if enough space will be saved.
-    uint8_t * const start   = reinterpret_cast<uint8_t *>(mBuffer) + PacketBuffer::kStructureSize;
-    uint8_t * const payload = reinterpret_cast<uint8_t *>(mBuffer->payload);
-    const uint16_t usedSize = static_cast<uint16_t>(payload - start + mBuffer->len);
+    const uint8_t * const start   = mBuffer->ReserveStart();
+    const uint8_t * const payload = mBuffer->Start();
+    const uint16_t usedSize       = static_cast<uint16_t>(payload - start + mBuffer->len);
     if (usedSize + kRightSizingThreshold > mBuffer->alloc_size)
     {
         return;
@@ -149,14 +149,14 @@ void PacketBufferHandle::InternalRightSize()
         return;
     }
 
-    uint8_t * const newStart = reinterpret_cast<uint8_t *>(newBuffer) + PacketBuffer::kStructureSize;
+    uint8_t * const newStart = newBuffer->ReserveStart();
     newBuffer->next          = nullptr;
     newBuffer->payload       = newStart + (payload - start);
     newBuffer->tot_len       = mBuffer->tot_len;
     newBuffer->len           = mBuffer->len;
     newBuffer->ref           = 1;
     newBuffer->alloc_size    = static_cast<uint16_t>(usedSize);
-    memcpy(reinterpret_cast<uint8_t *>(newBuffer) + PacketBuffer::kStructureSize, start, usedSize);
+    memcpy(newStart, start, usedSize);
 
     PacketBuffer::Free(mBuffer);
     mBuffer = newBuffer;
@@ -193,7 +193,7 @@ void PacketBufferHandle::InternalRightSize()
 
 void PacketBuffer::SetStart(uint8_t * aNewStart)
 {
-    uint8_t * const kStart = reinterpret_cast<uint8_t *>(this) + kStructureSize;
+    uint8_t * const kStart = ReserveStart();
     uint8_t * const kEnd   = kStart + this->AllocSize();
 
     if (aNewStart < kStart)
@@ -236,9 +236,7 @@ void PacketBuffer::SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead)
 
 uint16_t PacketBuffer::MaxDataLength() const
 {
-    const uint8_t * const kStart = reinterpret_cast<const uint8_t *>(this) + kStructureSize;
-    const ptrdiff_t kDelta       = static_cast<uint8_t *>(this->payload) - kStart;
-    return static_cast<uint16_t>(this->AllocSize() - kDelta);
+    return static_cast<uint16_t>(AllocSize() - ReservedSize());
 }
 
 uint16_t PacketBuffer::AvailableDataLength() const
@@ -248,10 +246,19 @@ uint16_t PacketBuffer::AvailableDataLength() const
 
 uint16_t PacketBuffer::ReservedSize() const
 {
-    // Cast to size_t is safe because this->payload always points to "after"
-    // this.
-    const size_t kDelta = static_cast<size_t>(static_cast<uint8_t *>(this->payload) - reinterpret_cast<const uint8_t *>(this));
-    return static_cast<uint16_t>(kDelta - kStructureSize);
+    // Cast to uint16_t is safe because Start() always points to "after"
+    // ReserveStart().  At least when the payload is stored inline.
+    return static_cast<uint16_t>(Start() - ReserveStart());
+}
+
+uint8_t * PacketBuffer::ReserveStart()
+{
+    return reinterpret_cast<uint8_t *>(this) + kStructureSize;
+}
+
+const uint8_t * PacketBuffer::ReserveStart() const
+{
+    return reinterpret_cast<const uint8_t *>(this) + kStructureSize;
 }
 
 void PacketBuffer::AddToEnd(PacketBufferHandle && aPacketHandle)
@@ -282,7 +289,7 @@ void PacketBuffer::AddToEnd(PacketBufferHandle && aPacketHandle)
 
 void PacketBuffer::CompactHead()
 {
-    uint8_t * const kStart = reinterpret_cast<uint8_t *>(this) + kStructureSize;
+    uint8_t * const kStart = ReserveStart();
 
     if (this->payload != kStart)
     {
@@ -505,7 +512,7 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
         return PacketBufferHandle();
     }
 
-    lPacket->payload = reinterpret_cast<uint8_t *>(lPacket) + PacketBuffer::kStructureSize + aReservedSize;
+    lPacket->payload = lPacket->ReserveStart() + aReservedSize;
     lPacket->len = lPacket->tot_len = 0;
     lPacket->next                   = nullptr;
     lPacket->ref                    = 1;
@@ -669,8 +676,7 @@ PacketBufferHandle PacketBufferHandle::CloneData() const
             return PacketBufferHandle();
         }
         clone.mBuffer->tot_len = clone.mBuffer->len = original->len;
-        memcpy(reinterpret_cast<uint8_t *>(clone.mBuffer) + PacketBuffer::kStructureSize,
-               reinterpret_cast<uint8_t *>(original) + PacketBuffer::kStructureSize, originalDataSize + originalReservedSize);
+        memcpy(clone->ReserveStart(), original->ReserveStart(), originalDataSize + originalReservedSize);
 
         if (cloneHead.IsNull())
         {

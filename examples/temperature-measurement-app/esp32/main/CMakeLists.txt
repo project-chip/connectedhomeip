@@ -15,7 +15,9 @@
 #    limitations under the License.
 #
 #
-# (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
+
+get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
+
 set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/temperature-measurement-app/"
                       "${CMAKE_CURRENT_LIST_DIR}/include"
@@ -78,6 +80,9 @@ idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
                        SRC_DIRS ${SRC_DIRS_LIST}
                        PRIV_REQUIRES ${PRIV_REQUIRES_LIST})
 
+include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
+chip_app_component_codegen("${CHIP_ROOT}/examples/temperature-measurement-app/esp32/main/temperature-measurement.matter")
+
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
@@ -85,8 +90,6 @@ target_compile_options(${COMPONENT_LIB} PUBLIC
 )
 
 if (CONFIG_ENABLE_PW_RPC)
-
-get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)

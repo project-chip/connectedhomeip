@@ -27,7 +27,6 @@
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/callbacks/PluginCallbacks.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 
 using namespace chip;
@@ -106,6 +105,9 @@ static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterI
 void emberAfEndpointConfigure(void)
 {
     uint16_t ep;
+
+    static_assert(FIXED_ENDPOINT_COUNT <= std::numeric_limits<decltype(ep)>::max(),
+                  "FIXED_ENDPOINT_COUNT must not exceed the size of the endpoint data type");
 
 #if !defined(EMBER_SCRIPTED_TEST)
     uint16_t fixedEndpoints[]             = FIXED_ENDPOINT_ARRAY;
@@ -291,42 +293,6 @@ bool emberAfIsLongStringAttributeType(EmberAfAttributeType attributeType)
 bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType)
 {
     return dataType == ZCL_ARRAY_ATTRIBUTE_TYPE;
-}
-
-// This function is used to call the per-cluster default response callback
-void emberAfClusterDefaultResponseCallback(EndpointId endpoint, ClusterId clusterId, CommandId commandId, EmberAfStatus status,
-                                           uint8_t clientServerMask)
-{
-    const EmberAfCluster * cluster = emberAfFindCluster(endpoint, clusterId, clientServerMask);
-    if (cluster != nullptr)
-    {
-        EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_DEFAULT_RESPONSE_FUNCTION);
-        if (f != nullptr)
-        {
-            ((EmberAfDefaultResponseFunction) f)(endpoint, commandId, status);
-        }
-    }
-}
-
-// This function is used to call the per-cluster message sent callback
-void emberAfClusterMessageSentCallback(const MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen,
-                                       uint8_t * message, EmberStatus status)
-{
-    if (apsFrame != nullptr && message != nullptr && msgLen != 0)
-    {
-        const EmberAfCluster * cluster = emberAfFindCluster(
-            apsFrame->sourceEndpoint, apsFrame->clusterId,
-            (((message[0] & ZCL_FRAME_CONTROL_DIRECTION_MASK) == ZCL_FRAME_CONTROL_SERVER_TO_CLIENT) ? CLUSTER_MASK_SERVER
-                                                                                                     : CLUSTER_MASK_CLIENT));
-        if (cluster != nullptr)
-        {
-            EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_MESSAGE_SENT_FUNCTION);
-            if (f != nullptr)
-            {
-                ((EmberAfMessageSentFunction) f)(destination, apsFrame, msgLen, message, status);
-            }
-        }
-    }
 }
 
 // This function is used to call the per-cluster attribute changed callback
@@ -697,23 +663,10 @@ uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClu
     return 0xFF;
 }
 
-// Returns whether the given endpoint has the client or server of the given
-// cluster on it.
-bool emberAfContainsCluster(EndpointId endpoint, ClusterId clusterId)
-{
-    return (emberAfFindCluster(endpoint, clusterId, 0) != nullptr);
-}
-
 // Returns whether the given endpoint has the server of the given cluster on it.
 bool emberAfContainsServer(EndpointId endpoint, ClusterId clusterId)
 {
     return (emberAfFindCluster(endpoint, clusterId, CLUSTER_MASK_SERVER) != nullptr);
-}
-
-// Returns whether the given endpoint has the client of the given cluster on it.
-bool emberAfContainsClient(EndpointId endpoint, ClusterId clusterId)
-{
-    return (emberAfFindCluster(endpoint, clusterId, CLUSTER_MASK_CLIENT) != nullptr);
 }
 
 // This will find the first server that has the clusterId given from the index of endpoint.
@@ -788,12 +741,6 @@ const EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(EndpointId e
 uint16_t emberAfFindClusterServerEndpointIndex(EndpointId endpoint, ClusterId clusterId)
 {
     return findClusterEndpointIndex(endpoint, clusterId, CLUSTER_MASK_SERVER);
-}
-
-// Client wrapper for findClusterEndpointIndex
-uint16_t emberAfFindClusterClientEndpointIndex(EndpointId endpoint, ClusterId clusterId)
-{
-    return findClusterEndpointIndex(endpoint, clusterId, CLUSTER_MASK_CLIENT);
 }
 
 // Returns the endpoint index within a given cluster

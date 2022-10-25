@@ -92,7 +92,8 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         char * eptr;
         chip::NodeId nodeId           = (chip::NodeId) strtoull(argv[1], &eptr, 10);
         chip::FabricIndex fabricIndex = (chip::FabricIndex) strtol(argv[2], &eptr, 10);
-        return CastingServer::GetInstance()->TargetVideoPlayerInfoInit(nodeId, fabricIndex);
+        return CastingServer::GetInstance()->TargetVideoPlayerInfoInit(nodeId, fabricIndex, OnConnectionSuccess,
+                                                                       OnConnectionFailure, OnNewOrUpdatedEndpoint);
     }
     if (strcmp(argv[0], "discover") == 0)
     {
@@ -120,7 +121,8 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         }
         char * url     = argv[1];
         char * display = argv[2];
-        return CastingServer::GetInstance()->ContentLauncherLaunchURL(url, display, LaunchURLResponseCallback);
+        return CastingServer::GetInstance()->ContentLauncherLaunchURL(
+            CastingServer::GetInstance()->GetActiveTargetVideoPlayer()->GetEndpoint(4), url, display, LaunchURLResponseCallback);
     }
     if (strcmp(argv[0], "access") == 0)
     {
@@ -173,7 +175,8 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
             streamer_printf(streamer_get(), "ERROR - invalid fabric or video player nodeId not found\r\n");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        return CastingServer::GetInstance()->TargetVideoPlayerInfoInit(nodeId, fabricIndex);
+        return CastingServer::GetInstance()->TargetVideoPlayerInfoInit(nodeId, fabricIndex, OnConnectionSuccess,
+                                                                       OnConnectionFailure, OnNewOrUpdatedEndpoint);
     }
     if (strcmp(argv[0], "cluster") == 0)
     {

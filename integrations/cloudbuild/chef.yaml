@@ -1,5 +1,5 @@
 steps:
-    - name: "connectedhomeip/chip-build-vscode:0.6.02"
+    - name: "connectedhomeip/chip-build-vscode:0.6.03"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -12,7 +12,7 @@ steps:
             path: /pwenv
       timeout: 2700s
 
-    - name: "connectedhomeip/chip-build-vscode:0.6.02"
+    - name: "connectedhomeip/chip-build-vscode:0.6.03"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -26,7 +26,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.6.02"
+    - name: "connectedhomeip/chip-build-vscode:0.6.03"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -40,6 +40,20 @@ steps:
           - name: pwenv
             path: /pwenv
 
+    - name: "gcr.io/cloud-builders/docker"
+      args:
+          - "-c"
+          - COMMIT_SHA=$COMMIT_SHA SHORT_SHA=$SHORT_SHA REVISION_ID=$REVISION_ID
+            BUILD_ID=$BUILD_ID IMAGE_NAME=$_DOCKER_IMAGE_NAME
+            DEVICE_NAME=$_DOCKER_DEVICE_NAME
+            WORKING_DIR=/workspace/examples/chef
+            TAR_PATH=/workspace/artifacts/linux_x86-$_DOCKER_DEVICE_NAME.tar.gz
+            ./examples/chef/create_docker.sh
+      id: DockerAll
+      entrypoint: /usr/bin/bash
+      waitFor:
+          - CompileNoip
+
 logsBucket: matter-build-automation-build-logs
 
 # Global timeout for all steps
@@ -50,6 +64,8 @@ artifacts:
     objects:
         location: "gs://matter-build-automation-artifacts/$PROJECT_ID/$COMMIT_SHA/"
         paths: ["/workspace/artifacts/*.tar.gz"]
+images:
+    - $_DOCKER_IMAGE_NAME
 # Using higher CPU machines generally speeds up builds, except bootstrap is always
 # slow.
 options:

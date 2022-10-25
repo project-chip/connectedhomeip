@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-ti:0.6.02
+            image: connectedhomeip/chip-build-ti:0.6.03
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -68,7 +68,15 @@ jobs:
               timeout-minutes: 60
               run: |
                   scripts/run_in_build_env.sh "\
-                      ./scripts/build/build_examples.py --target-glob cc13x2x7_26x2x7* build \
+                      ./scripts/build/build_examples.py \
+                      --target cc13x2x7_26x2x7-all-clusters-mtd \
+                      --target cc13x2x7_26x2x7-all-clusters-minimal \
+                      --target cc13x2x7_26x2x7-lock-ftd \
+                      --target cc13x2x7_26x2x7-lock-mtd \
+                      --target cc13x2x7_26x2x7-pump \
+                      --target cc13x2x7_26x2x7-pump-controller \
+                      --target cc13x2x7_26x2x7-shell \
+                      build \
                       --copy-artifacts-to out/artifacts \
                   "
             - name: Get lock FTD size stats
@@ -104,7 +112,7 @@ jobs:
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc13x2_26x2 LP_CC2652R7 all-clusters-app \
-                    out/artifacts/cc13x2x7_26x2x7-all-clusters/chip-LP_CC2652R7-all-clusters-example.out \
+                    out/artifacts/cc13x2x7_26x2x7-all-clusters-mtd/chip-LP_CC2652R7-all-clusters-example.out \
                     /tmp/bloat_reports/
             - name: Get All Clusters Minimal App size stats
               timeout-minutes: 5

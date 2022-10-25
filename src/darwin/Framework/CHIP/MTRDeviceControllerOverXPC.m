@@ -37,13 +37,13 @@ static void SetupXPCQueue(void)
 
 @implementation MTRDeviceControllerOverXPC
 
-+ (MTRDeviceControllerOverXPC *)sharedControllerWithID:(id<NSCopying> _Nullable)controllerID
-                                       xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock
++ (MTRDeviceControllerOverXPC *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerId
+                                       xpcConnectBlock:(NSXPCConnection * (^)(void) )connectBlock
 {
     SetupXPCQueue();
-    return [[MTRDeviceControllerOverXPC alloc] initWithControllerID:controllerID
+    return [[MTRDeviceControllerOverXPC alloc] initWithControllerId:controllerId
                                                           workQueue:globalWorkQueue
-                                                       connectBlock:xpcConnectBlock];
+                                                       connectBlock:connectBlock];
 }
 
 - (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
@@ -57,55 +57,77 @@ static void SetupXPCQueue(void)
     return NO;
 }
 
-- (BOOL)commissionNodeWithID:(NSNumber *)nodeID
-         commissioningParams:(MTRCommissioningParameters *)commissioningParams
-                       error:(NSError * __autoreleasing *)error;
+- (BOOL)pairDevice:(uint64_t)deviceID
+     discriminator:(uint16_t)discriminator
+      setupPINCode:(uint32_t)setupPINCode
+             error:(NSError * __autoreleasing *)error
 {
-    MTR_LOG_ERROR("MTRDeviceController doesn't support commissionNodeWithID over XPC");
-    if (error != nil) {
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil];
-    }
+    MTR_LOG_ERROR("MTRDevice doesn't support pairDevice over XPC");
     return NO;
 }
 
-- (BOOL)cancelCommissioningForNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
+- (BOOL)pairDevice:(uint64_t)deviceID
+           address:(NSString *)address
+              port:(uint16_t)port
+     discriminator:(uint16_t)discriminator
+      setupPINCode:(uint32_t)setupPINCode
+             error:(NSError * __autoreleasing *)error
 {
-    MTR_LOG_ERROR("MTRDeviceController doesn't support cancelCommissioningForNodeID over XPC");
-    if (error != nil) {
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil];
-    }
+    MTR_LOG_ERROR("MTRDevice doesn't support pairDevice over XPC");
     return NO;
 }
 
-- (nullable MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
+- (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error
 {
-    MTR_LOG_ERROR("MTRDeviceController doesn't support deviceBeingCommissionedWithNodeID over XPC");
-    if (error != nil) {
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil];
-    }
+    MTR_LOG_ERROR("MTRDevice doesn't support pairDevice over XPC");
+    return NO;
+}
+
+- (BOOL)commissionDevice:(uint64_t)deviceId
+     commissioningParams:(MTRCommissioningParameters *)commissioningParams
+                   error:(NSError * __autoreleasing *)error
+{
+    MTR_LOG_ERROR("MTRDevice doesn't support pairDevice over XPC");
+    return NO;
+}
+
+- (void)setListenPort:(uint16_t)port
+{
+    MTR_LOG_ERROR("MTRDevice doesn't support setListenPort over XPC");
+}
+
+- (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
+{
+    MTR_LOG_ERROR("MTRDevice doesn't support stopDevicePairing over XPC");
+    return NO;
+}
+
+- (nullable MTRBaseDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error
+{
+    MTR_LOG_ERROR("MTRDevice doesn't support getDeviceBeingCommissioned over XPC");
     return nil;
 }
 
-- (void)fetchControllerIdWithQueue:(dispatch_queue_t)queue completion:(MTRFetchControllerIDCompletion)completion
+- (BOOL)getBaseDevice:(uint64_t)deviceID
+                queue:(dispatch_queue_t)queue
+    completionHandler:(MTRDeviceConnectionCallback)completionHandler
 {
-    // Capture the proxy handle so that it won't be released prior to block call.
-    __block MTRDeviceControllerXPCProxyHandle * handleRetainer = nil;
-
     dispatch_async(_workQueue, ^{
         dispatch_group_t group = dispatch_group_create();
-        if (!self.controllerID) {
+        if (!self.controllerId) {
             dispatch_group_enter(group);
             [self.xpcConnection getProxyHandleWithCompletion:^(
-                dispatch_queue_t _Nonnull proxyQueue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
+                dispatch_queue_t _Nonnull queue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
                 if (handle) {
                     [handle.proxy getAnyDeviceControllerWithCompletion:^(id _Nullable controller, NSError * _Nullable error) {
                         if (error) {
                             MTR_LOG_ERROR("Failed to fetch any shared remote controller");
                         } else {
-                            self.controllerID = controller;
-                            handleRetainer = handle;
+                            self.controllerId = controller;
                         }
                         dispatch_group_leave(group);
+                        __auto_type handleRetainer = handle;
+                        (void) handleRetainer;
                     }];
                 } else {
                     MTR_LOG_ERROR("XPC disconnected while retrieving any shared remote controller");
@@ -114,36 +136,51 @@ static void SetupXPCQueue(void)
             }];
         }
         dispatch_group_notify(group, queue, ^{
-            if (self.controllerID) {
-                completion(self.controllerID, handleRetainer, nil);
+            if (self.controllerId) {
+                MTRDeviceOverXPC * device = [[MTRDeviceOverXPC alloc] initWithController:self.controllerId
+                                                                                deviceId:deviceID
+                                                                           xpcConnection:self.xpcConnection];
+                completionHandler(device, nil);
             } else {
-                completion(nil, nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+                completionHandler(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
             }
         });
     });
+    return YES;
 }
 
-- (MTRBaseDevice *)baseDeviceForNodeID:(NSNumber *)nodeID
+- (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error
 {
-    return [[MTRDeviceOverXPC alloc] initWithControllerOverXPC:self deviceID:nodeID xpcConnection:self.xpcConnection];
+    MTR_LOG_ERROR("MTRDevice doesn't support openPairingWindow over XPC");
+    return NO;
 }
 
-- (instancetype)initWithControllerID:(id)controllerID
+- (nullable NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
+                                       duration:(NSUInteger)duration
+                                  discriminator:(NSUInteger)discriminator
+                                       setupPIN:(NSUInteger)setupPIN
+                                          error:(NSError * __autoreleasing *)error
+{
+    MTR_LOG_ERROR("MTRDevice doesn't support openPairingWindow over XPC");
+    return nil;
+}
+
+- (instancetype)initWithControllerId:(id)controllerId
                            workQueue:(dispatch_queue_t)queue
-                       xpcConnection:(MTRDeviceControllerXPCConnection *)xpcConnection
+                       xpcConnection:(MTRDeviceControllerXPCConnection *)connection
 {
-    _controllerID = controllerID;
+    _controllerId = controllerId;
     _workQueue = queue;
-    _xpcConnection = xpcConnection;
+    _xpcConnection = connection;
     return self;
 }
 
 // This is interface for unit testing
-- (instancetype)initWithControllerID:(id)controllerID
+- (instancetype)initWithControllerId:(id)controllerId
                            workQueue:(dispatch_queue_t)queue
-                        connectBlock:(MTRXPCConnectBlock)connectBlock
+                        connectBlock:(NSXPCConnection * (^)(void) )connectBlock
 {
-    return [self initWithControllerID:controllerID
+    return [self initWithControllerId:controllerId
                             workQueue:queue
                         xpcConnection:[MTRDeviceControllerXPCConnection connectionWithWorkQueue:queue connectBlock:connectBlock]];
 }

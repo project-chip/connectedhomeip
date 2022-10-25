@@ -25,7 +25,9 @@
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/ember-compatibility-functions.h>
-#include <zap-generated/PluginApplicationCallbacks.h>
+
+// TODO: figure out a clear path for compile-time codegen
+#include <app/PluginApplicationCallbacks.h>
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 #include <app/clusters/groups-server/groups-server.h>
@@ -82,24 +84,6 @@ EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 //------------------------------------------------------------------------------
 
 // Device enabled/disabled functions
-bool emberAfIsDeviceEnabled(EndpointId endpoint)
-{
-    uint16_t index;
-#ifdef ZCL_USING_BASIC_CLUSTER_DEVICE_ENABLED_ATTRIBUTE
-    bool deviceEnabled;
-    if (emberAfReadServerAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_DEVICE_ENABLED_ATTRIBUTE_ID, (uint8_t *) &deviceEnabled,
-                                   sizeof(deviceEnabled)) == EMBER_ZCL_STATUS_SUCCESS)
-    {
-        return deviceEnabled;
-    }
-#endif
-    index = emberAfIndexFromEndpoint(endpoint);
-    if (index != 0xFFFF && index < sizeof(afDeviceEnabled))
-    {
-        return afDeviceEnabled[index];
-    }
-    return false;
-}
 
 void emberAfSetDeviceEnabled(EndpointId endpoint, bool enabled)
 {
@@ -288,16 +272,6 @@ uint16_t emberAfGetMfgCodeFromCurrentCommand(void)
     }
 
     return EMBER_AF_NULL_MANUFACTURER_CODE;
-}
-
-uint8_t emberAfNextSequence(void)
-{
-    return ((++emberAfSequenceNumber) & EMBER_AF_ZCL_SEQUENCE_MASK);
-}
-
-uint8_t emberAfGetLastSequenceNumber(void)
-{
-    return (emberAfSequenceNumber & EMBER_AF_ZCL_SEQUENCE_MASK);
 }
 
 // the caller to the library can set a flag to say do not respond to the
@@ -568,34 +542,6 @@ int8_t emberAfCompareDates(EmberAfDate* date1, EmberAfDate* date2)
 bool emberAfIsTypeSigned(EmberAfAttributeType dataType)
 {
     return (dataType >= ZCL_INT8S_ATTRIBUTE_TYPE && dataType <= ZCL_INT64S_ATTRIBUTE_TYPE);
-}
-
-EmberStatus emberAfEndpointEventControlSetInactive(EmberEventControl * controls, EndpointId endpoint)
-{
-    uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    if (index == 0xFFFF)
-    {
-        return EMBER_INVALID_ENDPOINT;
-    }
-    emberEventControlSetInactive(&controls[index]);
-    return EMBER_SUCCESS;
-}
-
-bool emberAfEndpointEventControlGetActive(EmberEventControl * controls, EndpointId endpoint)
-{
-    uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    return (index != 0xFFFF && emberEventControlGetActive(&controls[index]));
-}
-
-EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl * controls, EndpointId endpoint)
-{
-    uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    if (index == 0xFFFF)
-    {
-        return EMBER_INVALID_ENDPOINT;
-    }
-    emberEventControlSetActive(&controls[index]);
-    return EMBER_SUCCESS;
 }
 
 uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, const uint8_t * appendingChars,

@@ -45,6 +45,7 @@ ALL_PLATFORMS = set([
     'webos',
     'mw320',
     'genio',
+    'openiotsdk',
 ])
 
 Module = namedtuple('Module', 'name path platforms')

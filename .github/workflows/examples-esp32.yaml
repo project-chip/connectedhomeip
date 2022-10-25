@@ -31,7 +31,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.6.02
+            image: connectedhomeip/chip-build-esp32:0.6.03
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -70,7 +70,9 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --enable-flashbundle \
-                        --target-glob '*-m5stack-{all-clusters,all-clusters-minimal,all-clusters-rpc-ipv6only}' \
+                        --target esp32-m5stack-all-clusters \
+                        --target esp32-m5stack-all-clusters-minimal \
+                        --target esp32-m5stack-all-clusters-rpc-ipv6only \
                         build \
                         --copy-artifacts-to out/artifacts \
                      "
@@ -117,7 +119,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.6.02
+            image: connectedhomeip/chip-build-esp32:0.6.03
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 

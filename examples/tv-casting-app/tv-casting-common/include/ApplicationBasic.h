@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "MediaReadBase.h"
 #include "MediaSubscriptionBase.h"
 
 #include <zap-generated/CHIPClusters.h>
@@ -70,4 +71,55 @@ class AllowedVendorListSubscriber
 {
 public:
     AllowedVendorListSubscriber() : MediaSubscriptionBase(chip::app::Clusters::ApplicationBasic::Id) {}
+};
+
+// READER CLASSES
+
+class VendorNameReader : public MediaReadBase<chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo>
+{
+public:
+    VendorNameReader() : MediaReadBase(chip::app::Clusters::ApplicationBasic::Id) {}
+};
+
+class VendorIDReader : public MediaReadBase<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo>
+{
+public:
+    VendorIDReader() : MediaReadBase(chip::app::Clusters::ApplicationBasic::Id) {}
+};
+
+class ApplicationNameReader : public MediaReadBase<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo>
+{
+public:
+    ApplicationNameReader() : MediaReadBase(chip::app::Clusters::ApplicationBasic::Id) {}
+};
+
+class ProductIDReader : public MediaReadBase<chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo>
+{
+public:
+    ProductIDReader() : MediaReadBase(chip::app::Clusters::ApplicationBasic::Id) {}
+};
+
+class ApplicationReader : public MediaReadBase<chip::app::Clusters::ApplicationBasic::Attributes::Application::TypeInfo>
+{
+public:
+    ApplicationReader() : MediaReadBase(chip::app::Clusters::ApplicationBasic::Id) {}
+};
+
+class StatusReader : public MediaReadBase<chip::app::Clusters::ApplicationBasic::Attributes::Status::TypeInfo>
+{
+public:
+    StatusReader() : MediaReadBase(chip::app::Clusters::ApplicationBasic::Id) {}
+};
+
+class ApplicationVersionReader
+    : public MediaReadBase<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo>
+{
+public:
+    ApplicationVersionReader() : MediaReadBase(chip::app::Clusters::ApplicationBasic::Id) {}
+};
+
+class AllowedVendorListReader : public MediaReadBase<chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo>
+{
+public:
+    AllowedVendorListReader() : MediaReadBase(chip::app::Clusters::ApplicationBasic::Id) {}
 };
