@@ -55,7 +55,16 @@ struct CommissionerDiscoveryView: View {
                 Text("Select a commissioner video player...")
                 ForEach(viewModel.commissioners) { commissioner in
                     NavigationLink(
-                        destination: CommissioningView(_selectedCommissioner: commissioner),
+                        destination: {
+                            if(commissioner.isPreCommissioned())
+                            {
+                                ConnectionView(_selectedVideoPlayer: commissioner.getConnectableVideoPlayer())
+                            }
+                            else
+                            {
+                                CommissioningView(_selectedCommissioner: commissioner)
+                            }
+                        },
                         label: {
                             Text(commissioner.description)
                         }

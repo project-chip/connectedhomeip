@@ -20,6 +20,19 @@
 
 @implementation ConversionUtils
 
++ (CHIP_ERROR)convertToCppAppParamsInfoFrom:(AppParameters * _Nonnull)objCAppParameters outAppParams:(AppParams &)outAppParams
+{
+    VerifyOrReturnError(objCAppParameters != nil, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (objCAppParameters.rotatingDeviceIdUniqueId != nil) {
+        chip::ByteSpan rotatingDeviceIdUniqueId
+            = chip::ByteSpan(static_cast<const uint8_t *>(objCAppParameters.rotatingDeviceIdUniqueId.bytes),
+                objCAppParameters.rotatingDeviceIdUniqueId.length);
+        outAppParams.SetRotatingDeviceIdUniqueId(MakeOptional(rotatingDeviceIdUniqueId));
+    }
+    return CHIP_NO_ERROR;
+}
+
 + (CHIP_ERROR)convertToCppTargetEndpointInfoFrom:(ContentApp * _Nonnull)objCContentApp
                            outTargetEndpointInfo:(TargetEndpointInfo &)outTargetEndpointInfo
 {

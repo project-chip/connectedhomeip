@@ -8926,29 +8926,6 @@ bool emberAfFaultInjectionClusterFailRandomlyAtFaultCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::FaultInjection::Commands::FailRandomlyAtFault::DecodableType & commandData);
 
-/** @brief Add To Current App Tasks
- *
- * This function is only useful to sleepy end devices.  This function will note
- * the passed item as part of a set of tasks the application has outstanding
- * (e.g. message sent requiring APS acknwoledgement).  This will affect how the
- * application behaves with regard to sleeping and polling.  Until the
- * outstanding task is completed, the device may poll more frequently and sleep
- * less often.
- */
-void emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks);
-
-/** @brief Remove From Current App Tasks
- *
- * This function is only useful to sleepy end devices.  This function will
- * remove the passed item from the set of tasks the application has outstanding
- * (e.g. message sent requiring APS acknwoledgement).  This will affect how the
- * application behaves with regard to sleeping and polling.  Removing the item
- * from the list of outstanding tasks may allow the device to sleep longer and
- * poll less frequently.  If there are other outstanding tasks the system may
- * still have to stay away and poll more often.
- */
-void emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks);
-
 /** @brief Allow Network Write Attribute
  *
  * This function is called by the application framework before it writes an
@@ -9116,17 +9093,6 @@ EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, ch
 EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                     const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
 
-/** @brief Get Current Time
- *
- * This callback is called when device attempts to get current time from the
- * hardware. If this device has means to retrieve exact time, then this method
- * should implement it. If the callback can't provide the exact time it should
- * return 0 to indicate failure. Default action is to return 0, which indicates
- * that device does not have access to real time.
- *
- */
-uint32_t emberAfGetCurrentTimeCallback();
-
 /** @brief Get Endpoint Info
  *
  * This function is a callback to an application implemented endpoint that
@@ -9154,18 +9120,6 @@ bool emberAfGetEndpointInfoCallback(chip::EndpointId endpoint, uint8_t * returnN
  *
  */
 void emberAfRegistrationAbortCallback();
-
-/** @brief Interpan Send Message
- *
- * This function will send a raw MAC message with interpan frame format using
- * the passed parameters.
- *
- * @param header Interpan header info  Ver.: always
- * @param messageLength The length of the message received or to send  Ver.:
- * always
- * @param message The message data received or to send.  Ver.: always
- */
-EmberStatus emberAfInterpanSendMessageCallback(EmberAfInterpanHeader * header, uint16_t messageLength, uint8_t * message);
 
 /** @brief Start Move
  *

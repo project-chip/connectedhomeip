@@ -16,10 +16,13 @@
  */
 #pragma once
 
+#include "AppParams.h"
 #include "TargetEndpointInfo.h"
 #include "TargetVideoPlayerInfo.h"
 
 #include <lib/dnssd/Resolver.h>
+
+CHIP_ERROR convertJAppParametersToCppAppParams(jobject appParameters, AppParams & outAppParams);
 
 CHIP_ERROR convertJContentAppToTargetEndpointInfo(jobject contentApp, TargetEndpointInfo & outTargetEndpointInfo);
 

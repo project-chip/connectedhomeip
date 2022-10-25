@@ -67,14 +67,6 @@ EmberAfStatus emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attr
                               false); // just test?
 }
 
-EmberAfStatus emberAfVerifyAttributeWrite(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
-                                          EmberAfAttributeType dataType)
-{
-    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType,
-                              false, // override read-only?
-                              true); // just test?
-}
-
 EmberAfStatus emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
                                    uint16_t readLength)
 {

@@ -178,7 +178,7 @@ jobject OnConnectionSuccessHandlerJNI::ConvertToJObject(TargetVideoPlayerInfo * 
     {
         ChipLogError(AppServer, "OnConnectionSuccessHandlerJNI::ConvertToJObject failed with %" CHIP_ERROR_FORMAT, err.Format());
     }
-    return nullptr;
+    return videoPlayer;
 }
 
 jobject OnNewOrUpdatedEndpointHandlerJNI::ConvertToJObject(TargetEndpointInfo * targetEndpointInfo)
@@ -383,7 +383,7 @@ jobject VendorIDSuccessHandlerJNI::ConvertToJObject(
     chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType responseData)
 {
     ChipLogProgress(AppServer, "VendorIDSuccessHandlerJNI::ConvertToJObject called");
-    return ConvertToShortJObject(responseData);
+    return ConvertToIntegerJObject(responseData);
 }
 
 jobject ApplicationNameSuccessHandlerJNI::ConvertToJObject(
@@ -397,7 +397,7 @@ jobject ProductIDSuccessHandlerJNI::ConvertToJObject(
     chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType responseData)
 {
     ChipLogProgress(AppServer, "ProductIDSuccessHandlerJNI::ConvertToJObject called");
-    return ConvertToShortJObject(responseData);
+    return ConvertToIntegerJObject(responseData);
 }
 
 jobject ApplicationVersionSuccessHandlerJNI::ConvertToJObject(

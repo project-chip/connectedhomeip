@@ -24,12 +24,16 @@
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 #include <lib/support/logging/CHIPLogging.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/PASESession.h>
 
 namespace chip {
 
 // The largest supported value for Rendezvous discriminators
 const uint16_t kMaxRendezvousDiscriminatorValue = 0xFFF;
+
+// The largest supported value for sleepy idle interval and sleepy active interval
+constexpr uint32_t kMaxSleepyInterval = 3600000;
 
 class RendezvousParameters
 {
@@ -93,6 +97,28 @@ public:
     bool HasConnectionObject() const { return false; }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
+    bool HasMRPConfig() const { return mMRPConfig.HasValue(); }
+    ReliableMessageProtocolConfig GetMRPConfig() const { return mMRPConfig.ValueOr(GetDefaultMRPConfig()); }
+    RendezvousParameters & SetIdleInterval(System::Clock::Milliseconds32 interval)
+    {
+        if (!mMRPConfig.HasValue())
+        {
+            mMRPConfig.Emplace(GetDefaultMRPConfig());
+        }
+        mMRPConfig.Value().mIdleRetransTimeout = interval;
+        return *this;
+    }
+
+    RendezvousParameters & SetActiveInterval(System::Clock::Milliseconds32 interval)
+    {
+        if (!mMRPConfig.HasValue())
+        {
+            mMRPConfig.Emplace(GetDefaultMRPConfig());
+        }
+        mMRPConfig.Value().mActiveRetransTimeout = interval;
+        return *this;
+    }
+
 private:
     Transport::PeerAddress mPeerAddress;  ///< the peer node address
     uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
@@ -100,6 +126,8 @@ private:
 
     Spake2pVerifier mPASEVerifier;
     bool mHasPASEVerifier = false;
+
+    Optional<ReliableMessageProtocolConfig> mMRPConfig;
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer               = nullptr;

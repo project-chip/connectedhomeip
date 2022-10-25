@@ -305,18 +305,18 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::LightActionEventHandler(AppEvent * event)
 {
-    bool initiated = false;
     LightingManager::Action_t action;
-    int32_t actor  = 0;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    int32_t actor;
 
-    if (event->Type == AppEvent::kEventType_Light)
+    switch (event->Type)
     {
+    case AppEvent::kEventType_Light: {
         action = static_cast<LightingManager::Action_t>(event->LightEvent.Action);
         actor  = event->LightEvent.Actor;
+        break;
     }
-    else if (event->Type == AppEvent::kEventType_Button)
-    {
+
+    case AppEvent::kEventType_Button: {
         if (LightMgr().IsLightOn())
         {
             action = LightingManager::OFF_ACTION;
@@ -325,21 +325,18 @@ void AppTask::LightActionEventHandler(AppEvent * event)
         {
             action = LightingManager::ON_ACTION;
         }
+
         actor = AppEvent::kEventType_Button;
-    }
-    else
-    {
-        err = APP_ERROR_UNHANDLED_EVENT;
+        break;
     }
 
-    if (err == CHIP_NO_ERROR)
-    {
-        initiated = LightMgr().InitiateAction(actor, action);
+    default:
+        return;
+    }
 
-        if (!initiated)
-        {
-            P6_LOG("Action is already in progress or active.");
-        }
+    if (!LightMgr().InitiateAction(actor, action))
+    {
+        P6_LOG("Action is already in progress or active.");
     }
 }
 
