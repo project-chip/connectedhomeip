@@ -47,7 +47,15 @@ public class SetupPayload {
       Set<DiscoveryCapability> discoveryCapabilities,
       int discriminator,
       long setupPinCode) {
-    this(version, vendorId, productId, commissioningFlow, discoveryCapabilities, discriminator, false, setupPinCode);
+    this(
+        version,
+        vendorId,
+        productId,
+        commissioningFlow,
+        discoveryCapabilities,
+        discriminator,
+        false,
+        setupPinCode);
   }
 
   public SetupPayload(
