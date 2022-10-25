@@ -151,7 +151,6 @@ CHIP_ERROR ESP32FactoryDataProvider::GetDeviceAttestationCert(MutableByteSpan & 
 CHIP_ERROR ESP32FactoryDataProvider::GetProductAttestationIntermediateCert(MutableByteSpan & outBuffer)
 {
     size_t certSize = outBuffer.size();
-    ;
     ScopedNvsHandle handle;
     ReturnErrorOnFailure(handle.Open("dev-att", NVS_READONLY, CHIP_DEVICE_CONFIG_CHIP_DEVICE_ATTESTATION_PARTITION));
     esp_err_t err = nvs_get_blob(handle, "pai-cert", outBuffer.data(), &certSize);

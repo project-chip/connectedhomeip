@@ -111,7 +111,9 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
                      CHIP_DEVICE_CONFIG_CHIP_COUNTERS_NAMESPACE_PARTITION, esp_err);
         SuccessOrExit(MapConfigError(esp_err));
     }
-
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+    // The CHIP_DEVICE_CONFIG_CHIP_DAC_PRIV_KEY_PARTITION is not initialized since it is not a nvs partition.
+    // It is an encrypted data partition.
     esp_err = nvs_flash_secure_init_partition(CHIP_DEVICE_CONFIG_CHIP_DEVICE_ATTESTATION_PARTITION, &cfg);
     if (esp_err == ESP_ERR_NVS_NO_FREE_PAGES || esp_err == ESP_ERR_NVS_NEW_VERSION_FOUND)
     {
@@ -127,6 +129,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
                      CHIP_DEVICE_CONFIG_CHIP_CERTIFICATION_DECLARATION_PARTITION, esp_err);
         SuccessOrExit(MapConfigError(esp_err));
     }
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
 #else
     // Initialize the nvs partitions,
@@ -139,10 +142,12 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     SuccessOrExit(MapConfigError(esp_err));
     esp_err = nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_KVS_NAMESPACE_PARTITION);
     SuccessOrExit(MapConfigError(esp_err));
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
     esp_err = nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_DEVICE_ATTESTATION_PARTITION);
     SuccessOrExit(MapConfigError(esp_err));
     esp_err = nvs_flash_init_partition(CHIP_DEVICE_CONFIG_CHIP_CERTIFICATION_DECLARATION_PARTITION);
     SuccessOrExit(MapConfigError(esp_err));
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 #endif
 
     // Force initialization of NVS namespaces if they doesn't already exist.
