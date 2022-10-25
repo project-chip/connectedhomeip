@@ -23,10 +23,16 @@
 # Usage example when the script is run from the CHIP SDK root directory:
 #     python ./credentials/development/fetch-development-paa-certs-from-dcl.py /path/to/dcld
 #
+# Usage example when the script is run from the CHIP SDK root directory for fetching production PAAs:
+#     python ./credentials/development/fetch-development-paa-certs-from-dcl.py /path/to/dcld production
+#
 # The result will be stored in:
 #     credentials/development/paa-root-certs
+# In case of production - 2nd usage example above - the result will be stored in:
+#     credentials/production/paa-root-certs
 #
 
+from contextlib import nullcontext
 import os
 import sys
 import subprocess
@@ -34,6 +40,8 @@ import copy
 import re
 from cryptography.hazmat.primitives import serialization
 from cryptography import x509
+
+PRODUCTION_NODE_URL = 'https://on.dcl.csa-iot.org:26657'
 
 
 def parse_paa_root_certs(cmdpipe, paa_list):
@@ -77,11 +85,11 @@ def parse_paa_root_certs(cmdpipe, paa_list):
                     paa_list.append(copy.deepcopy(result))
 
 
-def write_paa_root_cert(cmdpipe, subject):
+def write_paa_root_cert(cmdpipe, subject, prefix):
     pem_read = False
     subject_as_text_read = False
 
-    filename = 'paa-root-certs/dcld_mirror_' + \
+    filename = prefix + 'paa-root-certs/dcld_mirror_' + \
         re.sub('[^a-zA-Z0-9_-]', '', re.sub('[=, ]', '_', subject))
     with open(filename + '.pem', 'wb+') as outfile:
         while True:
@@ -98,7 +106,7 @@ def write_paa_root_cert(cmdpipe, subject):
                             break
                 if b'subjectAsText:' in line:
                     new_subject = line.split(b': ')[1].strip().decode("utf-8")
-                    new_filename = 'paa-root-certs/dcld_mirror_' + \
+                    new_filename = prefix + 'paa-root-certs/dcld_mirror_' + \
                         re.sub('[=,\\\\ ]', '_', new_subject)
                     subject_as_text_read = True
                     break
@@ -116,11 +124,16 @@ def write_paa_root_cert(cmdpipe, subject):
 
 
 def main():
-    if len(sys.argv) == 2:
+    if len(sys.argv) >= 2:
         dcld = sys.argv[1]
     else:
         sys.exit(
             "Error: Please specify exactly one input argument; the path to the dcld tool binary")
+
+    production = False
+    if len(sys.argv) >= 3:
+        if sys.argv[2] == "production":
+            production = True
 
     previous_dir = os.getcwd()
     abspath = os.path.dirname(sys.argv[0])
@@ -128,7 +141,10 @@ def main():
 
     os.makedirs('paa-root-certs', exist_ok=True)
 
-    cmdpipe = subprocess.Popen([dcld, 'query', 'pki', 'all-x509-root-certs'],
+    cmdlist = ['query', 'pki', 'all-x509-root-certs']
+    production_node_cmdlist = ['--node', PRODUCTION_NODE_URL]
+
+    cmdpipe = subprocess.Popen([dcld] + cmdlist + production_node_cmdlist if production else [],
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     paa_list = []
@@ -136,11 +152,14 @@ def main():
     parse_paa_root_certs(cmdpipe, paa_list)
 
     for paa in paa_list:
+
+        cmdlist = ['query', 'pki', 'x509-cert', '-u',
+                   paa[b'subject'].decode("utf-8"), '-k', paa[b'subjectKeyId'].decode("utf-8")]
+
         cmdpipe = subprocess.Popen(
-            [dcld, 'query', 'pki', 'x509-cert', '-u',
-                paa[b'subject'].decode("utf-8"), '-k', paa[b'subjectKeyId'].decode("utf-8")],
+            [dcld] + cmdlist + production_node_cmdlist if production else [],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        write_paa_root_cert(cmdpipe, paa[b'subject'].decode("utf-8"))
+        write_paa_root_cert(cmdpipe, paa[b'subject'].decode("utf-8"), "production/" if production else "development/")
 
     os.chdir(previous_dir)
 
