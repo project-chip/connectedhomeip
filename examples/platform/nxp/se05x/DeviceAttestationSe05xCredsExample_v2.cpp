@@ -208,7 +208,7 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
         }
         SuccessOrExit(tlverr);
 
-        // Transisnet binary object ids starting from location 0x7D300005 (TAG1_ID) to 0x7D30000D (TAG3_VALUE_ID)
+        // Transient binary object ids starting from location 0x7D300005 (TAG1_ID) to 0x7D30000D (TAG3_VALUE_ID)
         // are used to store the TLV contents.
         // Binary object id are calculated using the loop iterator in the below code.
 
