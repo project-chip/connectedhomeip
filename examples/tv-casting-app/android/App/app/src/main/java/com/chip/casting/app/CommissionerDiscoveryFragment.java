@@ -133,7 +133,9 @@ public class CommissionerDiscoveryFragment extends Fragment {
             ? (aux.isEmpty() ? "" : " from ") + "Vendor ID: " + commissioner.getVendorId()
             : "";
     aux = aux.isEmpty() ? aux : "\n[" + aux + "]";
-    return main + aux;
+
+    String preCommissioned = commissioner.isPreCommissioned() ? " (Pre-commissioned)" : "";
+    return main + aux + preCommissioned;
   }
 
   /** Interface for notifying the host. */

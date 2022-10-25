@@ -45,6 +45,8 @@ public:
         return mMediaCommandResponseHandler[name];
     }
 
+    FailureHandlerJNI & getReadFailureHandler(enum MediaAttributeName name) { return mReadFailureHandler[name]; }
+
     FailureHandlerJNI & getSubscriptionReadFailureHandler(enum MediaAttributeName name)
     {
         return mSubscriptionReadFailureHandler[name];
@@ -80,6 +82,15 @@ public:
     ProductIDSuccessHandlerJNI & getProductIDSuccessHandler() { return mProductIDSuccessHandlerJNI; }
     ApplicationVersionSuccessHandlerJNI & getApplicationVersionSuccessHandler() { return mApplicationVersionSuccessHandlerJNI; }
 
+    VendorNameSuccessHandlerJNI & getReadVendorNameSuccessHandler() { return mReadVendorNameSuccessHandlerJNI; }
+    VendorIDSuccessHandlerJNI & getReadVendorIDSuccessHandler() { return mReadVendorIDSuccessHandlerJNI; }
+    ApplicationNameSuccessHandlerJNI & getReadApplicationNameSuccessHandler() { return mReadApplicationNameSuccessHandlerJNI; }
+    ProductIDSuccessHandlerJNI & getReadProductIDSuccessHandler() { return mReadProductIDSuccessHandlerJNI; }
+    ApplicationVersionSuccessHandlerJNI & getReadApplicationVersionSuccessHandler()
+    {
+        return mReadApplicationVersionSuccessHandlerJNI;
+    }
+
 private:
     friend TvCastingAppJNI & TvCastingAppJNIMgr();
 
@@ -97,6 +108,7 @@ private:
     MatterCallbackHandlerJNI mMediaCommandResponseHandler[MEDIA_COMMAND_COUNT];
     FailureHandlerJNI mSubscriptionReadFailureHandler[MEDIA_ATTRIBUTE_COUNT];
     SubscriptionEstablishedHandlerJNI mSubscriptionEstablishedHandler[MEDIA_ATTRIBUTE_COUNT];
+    FailureHandlerJNI mReadFailureHandler[MEDIA_ATTRIBUTE_COUNT];
 
     CurrentStateSuccessHandlerJNI mCurrentStateSuccessHandlerJNI;
     DurationSuccessHandlerJNI mDurationSuccessHandlerJNI;
@@ -119,6 +131,12 @@ private:
     ApplicationNameSuccessHandlerJNI mApplicationNameSuccessHandlerJNI;
     ProductIDSuccessHandlerJNI mProductIDSuccessHandlerJNI;
     ApplicationVersionSuccessHandlerJNI mApplicationVersionSuccessHandlerJNI;
+
+    VendorNameSuccessHandlerJNI mReadVendorNameSuccessHandlerJNI;
+    VendorIDSuccessHandlerJNI mReadVendorIDSuccessHandlerJNI;
+    ApplicationNameSuccessHandlerJNI mReadApplicationNameSuccessHandlerJNI;
+    ProductIDSuccessHandlerJNI mReadProductIDSuccessHandlerJNI;
+    ApplicationVersionSuccessHandlerJNI mReadApplicationVersionSuccessHandlerJNI;
 };
 
 inline class TvCastingAppJNI & TvCastingAppJNIMgr()

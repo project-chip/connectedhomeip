@@ -17,10 +17,15 @@
  */
 package com.chip.casting;
 
+import java.net.InetAddress;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class VideoPlayer {
+  private static final String TAG = VideoPlayer.class.getSimpleName();
+
   private long nodeId;
   private byte fabricIndex;
   private String deviceName;
@@ -29,6 +34,9 @@ public class VideoPlayer {
   private int deviceType;
   private List<ContentApp> contentApps;
   private boolean isConnected = false;
+
+  private int numIPs;
+  private List<InetAddress> ipAddresses;
 
   private boolean isInitialized = false;
 
@@ -40,6 +48,8 @@ public class VideoPlayer {
       int productId,
       int deviceType,
       List<ContentApp> contentApps,
+      int numIPs,
+      List<InetAddress> ipAddresses,
       boolean isConnected) {
     this.nodeId = nodeId;
     this.fabricIndex = fabricIndex;
@@ -49,7 +59,41 @@ public class VideoPlayer {
     this.deviceType = deviceType;
     this.contentApps = contentApps;
     this.isConnected = isConnected;
+    this.numIPs = numIPs;
+    this.ipAddresses = ipAddresses;
     this.isInitialized = true;
+  }
+
+  public boolean isSameAs(DiscoveredNodeData discoveredNodeData) {
+    // return false because 'this' VideoPlayer is not null
+    if (discoveredNodeData == null) {
+      return false;
+    }
+
+    // return false because deviceNames are different
+    if (Objects.equals(deviceName, discoveredNodeData.getDeviceName()) == false) {
+      return false;
+    }
+
+    // return false because not even a single IP Address matches
+    if (ipAddresses != null) {
+      boolean matchFound = false;
+      Set<InetAddress> discoveredNodeDataIpAddressSet =
+          new HashSet<InetAddress>(discoveredNodeData.getIpAddresses());
+      for (InetAddress videoPlayerIpAddress : ipAddresses) {
+        if (discoveredNodeDataIpAddressSet.contains(videoPlayerIpAddress)) {
+          matchFound = true;
+          break;
+        }
+      }
+
+      if (!matchFound) {
+        return false;
+      }
+    }
+
+    // otherwise, return true
+    return true;
   }
 
   public boolean equals(Object object) {
@@ -78,8 +122,18 @@ public class VideoPlayer {
         + vendorId
         + ", productId="
         + productId
+        + ", deviceType="
+        + deviceType
+        + ", contentApps="
+        + contentApps
         + ", isConnected="
         + isConnected
+        + ", numIPs="
+        + numIPs
+        + ", ipAddresses="
+        + ipAddresses
+        + ", isInitialized="
+        + isInitialized
         + '}';
   }
 

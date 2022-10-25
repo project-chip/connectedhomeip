@@ -288,3 +288,13 @@
 	url = https://github.com/matter-mtk/genio-matter-lwip.git
 	branch = main
 	platforms = genio
+[submodule "open-iot-sdk"]
+	path = third_party/open-iot-sdk/sdk
+	url = https://git.gitlab.arm.com/iot/open-iot-sdk/sdk.git
+	branch = main
+	platforms = openiotsdk
+[submodule "open-iot-sdk-storage"]
+	path = third_party/open-iot-sdk/storage
+	url = https://git.gitlab.arm.com/iot/open-iot-sdk/storage.git
+	branch = main
+    platforms = openiotsdk

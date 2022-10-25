@@ -212,6 +212,10 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
     mRole = CryptoContext::SessionRole::kInitiator;
 
     mExchangeCtxt = exchangeCtxt;
+
+    // When commissioning starts, the peer is assumed to be active.
+    mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->MarkActiveRx();
+
     mExchangeCtxt->SetResponseTimeout(kSpake2p_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
 
     mLocalMRPConfig = mrpLocalConfig;

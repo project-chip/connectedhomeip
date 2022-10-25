@@ -17,10 +17,12 @@
 
 #import <Foundation/Foundation.h>
 
+#import "AppParameters.h"
 #import "ContentApp.h"
 #import "DiscoveredNodeData.h"
 #import "VideoPlayer.h"
 
+#import <AppParams.h>
 #import <TargetEndpointInfo.h>
 #import <TargetVideoPlayerInfo.h>
 #include <lib/dnssd/Resolver.h>
@@ -32,6 +34,8 @@
 /**
  * @brief Objective C to C++ converters
  */
++ (CHIP_ERROR)convertToCppAppParamsInfoFrom:(AppParameters * _Nonnull)objCAppParameters outAppParams:(AppParams &)outAppParams;
+
 + (CHIP_ERROR)convertToCppTargetEndpointInfoFrom:(ContentApp * _Nonnull)objCContentApp
                            outTargetEndpointInfo:(TargetEndpointInfo &)outTargetEndpointInfo;
 
