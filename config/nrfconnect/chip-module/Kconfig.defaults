@@ -281,11 +281,11 @@ config MBEDTLS_PK_WRITE_C
 
 config MBEDTLS_X509_CREATE_C
     bool
-    default y
+    default y if !CHIP_CRYPTO_PSA
 
 config MBEDTLS_X509_CSR_WRITE_C
     bool
-    default y
+    default y if !CHIP_CRYPTO_PSA
 
 # Disable unneeded crypto operations
 
@@ -294,10 +294,6 @@ config MBEDTLS_SHA384_C
     default n
 
 config MBEDTLS_SHA512_C
-    bool
-    default n
-
-config PSA_WANT_ALG_SHA_512
     bool
     default n
 
@@ -322,6 +318,54 @@ config MBEDTLS_GCM_C
     default n
 
 config MBEDTLS_RSA_C
+    bool
+    default n
+
+config PSA_WANT_KEY_TYPE_ARIA
+    bool
+    default n
+
+config PSA_WANT_KEY_TYPE_CHACHA20
+    bool
+    default n
+
+config PSA_WANT_ALG_GCM
+    bool
+    default n
+
+config PSA_WANT_ALG_CHACHA20_POLY1305
+    bool
+    default n
+
+config PSA_WANT_ALG_SHA_1
+    bool
+    default n
+
+config PSA_WANT_ALG_SHA_224
+    bool
+    default n
+
+config PSA_WANT_ALG_SHA_384
+    bool
+    default n
+
+config PSA_WANT_ALG_SHA_512
+    bool
+    default n
+
+config PSA_WANT_ALG_RIPEMD160
+    bool
+    default n
+
+config PSA_WANT_ALG_MD5
+    bool
+    default n
+
+config PSA_WANT_ALG_CFB
+    bool
+    default n
+
+config PSA_WANT_ALG_OFB
     bool
     default n
 
