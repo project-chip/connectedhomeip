@@ -37,19 +37,20 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
 ## Introduction
 
 The EFR32 Thermostat example provides a baseline demonstration of a thermostat
-device, built using CHIP and the Silicon Labs gecko SDK. It can be controlled by
-a Chip controller over an Openthread or Wifi network.
+device, built using Matter and the Silicon Labs gecko SDK. It can be controlled
+by a Chip controller over an Openthread or Wifi network.
 
 The EFR32 device can be commissioned over Bluetooth Low Energy where the device
 and the Chip controller will exchange security information with the Rendez-vous
-procedure. Thread Network credentials are then provided to the EFR32 device
-which will then join the network.
+procedure. If using Thread, Thread Network credentials are then provided to the
+EFR32 device which will then join the Thread network.
 
-The LCD on the Silabs WSTK shows a QR Code containing the needed commissioning
-information for the BLE connection and starting the Rendez-vous procedure.
+If the LCD is enabled, the LCD on the Silabs WSTK shows a QR Code containing the
+needed commissioning information for the BLE connection and starting the
+Rendez-vous procedure.
 
 The light switch example is intended to serve both as a means to explore the
-workings of CHIP as well as a template for creating real products based on the
+workings of Matter as well as a template for creating real products based on the
 Silicon Labs platform.
 
 <a name="building"></a>
@@ -76,6 +77,35 @@ Silicon Labs platform.
     $ brew install ninja
 
 -   Supported hardware:
+
+    -   > For the latest supported hardware please refer to the
+        > [Hardware Requirements](https://github.com/SiliconLabs/matter/blob/latest/docs/silabs/general/HARDWARE_REQUIREMENTS.md)
+        > in the Silicon Labs Matter Github Repo
+
+    MG12 boards:
+
+    -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
+    -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4163A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm,
+        868MHz@19dBm
+    -   BRD4164A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
+    -   BRD4166A / SLTB004A / Thunderboard Sense 2 / 2.4GHz@10dBm
+    -   BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm,
+        915MHz@19dBm
+    -   BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
+
+    MG21 boards: Currently not supported due to RAM limitation.
+
+    -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+
+    MG24 boards :
+
+    -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
     MG12 boards:
 
