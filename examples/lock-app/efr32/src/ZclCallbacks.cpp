@@ -27,7 +27,6 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/util/af-event.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip::app::Clusters;
@@ -152,8 +151,6 @@ DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t h
 
 void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId)
 {
-    emberAfDoorLockClusterPrintln("Door Auto relock timer expired. Locking...");
-    emberEventControlSetInactive(&DoorLockServer::Instance().AutolockEvent);
-    DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kLocked);
+    // Apply the relock state in the application control
     LockMgr().InitiateAction(AppEvent::kEventType_Lock, LockManager::LOCK_ACTION);
 }
