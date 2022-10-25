@@ -230,8 +230,7 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
         if (taglen > 0)
         {
             SuccessOrExit(tagReader.Get(tagvalue));
-            SuccessOrExit(
-                se05xSetCertificate(TAG1_VALUE_ID + (3 * (i - 1)), tagvalue.data(), taglen));
+            SuccessOrExit(se05xSetCertificate(TAG1_VALUE_ID + (3 * (i - 1)), tagvalue.data(), taglen));
         }
     }
 
