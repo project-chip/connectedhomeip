@@ -388,18 +388,18 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::LockActionEventHandler(AppEvent * event)
 {
-    bool initiated = false;
     LockManager::Action_t action;
     int32_t actor;
-    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (event->Type == AppEvent::kEventType_Lock)
+    switch (event->Type)
     {
+    case AppEvent::kEventType_Lock: {
         action = static_cast<LockManager::Action_t>(event->LockEvent.Action);
         actor  = event->LockEvent.Actor;
+        break;
     }
-    else if (event->Type == AppEvent::kEventType_Button)
-    {
+
+    case AppEvent::kEventType_Button: {
         if (LockMgr().NextState() == true)
         {
             action = LockManager::LOCK_ACTION;
@@ -408,21 +408,18 @@ void AppTask::LockActionEventHandler(AppEvent * event)
         {
             action = LockManager::UNLOCK_ACTION;
         }
+
         actor = AppEvent::kEventType_Button;
-    }
-    else
-    {
-        err = APP_ERROR_UNHANDLED_EVENT;
+        break;
     }
 
-    if (err == CHIP_NO_ERROR)
-    {
-        initiated = LockMgr().InitiateAction(actor, action);
+    default:
+        return;
+    }
 
-        if (!initiated)
-        {
-            P6_LOG("Action is already in progress or active.");
-        }
+    if (!LockMgr().InitiateAction(actor, action))
+    {
+        P6_LOG("Action is already in progress or active.");
     }
 }
 

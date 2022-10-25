@@ -542,10 +542,10 @@ nlTestSuite sSuite =
 
 } // namespace
 
-int TestReadChunkingTests()
+int TestEventChunkingTests()
 {
     gSuite = &sSuite;
     return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestReadChunkingTests)
+CHIP_REGISTER_TEST_SUITE(TestEventChunkingTests)

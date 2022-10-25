@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,12 +27,14 @@
 
 void LEDWidget::Init()
 {
+#ifdef LED1_PIN
     mPin = LED1_PIN;
 
     hosal_gpio_dev_t gpio_led = { .config = OUTPUT_OPEN_DRAIN_NO_PULL, .priv = NULL };
     gpio_led.port             = mPin;
 
     hosal_gpio_init(&gpio_led);
+#endif
     SetOnoff(false);
 }
 
@@ -44,6 +45,7 @@ void LEDWidget::Toggle(void)
 
 void LEDWidget::SetOnoff(bool state)
 {
+#ifdef LED1_PIN
     hosal_gpio_dev_t gpio_led = { .port = mPin, .config = OUTPUT_OPEN_DRAIN_NO_PULL, .priv = NULL };
 
     mOnoff = state;
@@ -56,6 +58,7 @@ void LEDWidget::SetOnoff(bool state)
     {
         hosal_gpio_output_set(&gpio_led, 0);
     }
+#endif
 }
 
 bool LEDWidget::GetOnoff(void)
@@ -67,8 +70,10 @@ void DimmableLEDWidget::Init()
 {
     mOnoff = light_v = 0;
 
+#ifdef MAX_PWM_CHANNEL
     demo_hosal_pwm_init();
     demo_hosal_pwm_start();
+#endif
 }
 
 void DimmableLEDWidget::Toggle(void)
@@ -79,6 +84,7 @@ void DimmableLEDWidget::Toggle(void)
 void DimmableLEDWidget::SetOnoff(bool state)
 {
     mOnoff = state;
+#ifdef MAX_PWM_CHANNEL
     if (mOnoff)
     {
         if (light_v)
@@ -94,11 +100,14 @@ void DimmableLEDWidget::SetOnoff(bool state)
     {
         set_level(0);
     }
+#endif
 }
 
 void DimmableLEDWidget::SetLevel(uint8_t level)
 {
+#ifdef MAX_PWM_CHANNEL
     set_level(level);
+#endif
     light_v = level;
     mOnoff  = light_v > 0;
 }
@@ -106,9 +115,10 @@ void DimmableLEDWidget::SetLevel(uint8_t level)
 void ColorLEDWidget::Init()
 {
     mOnoff = light_v = light_s = light_h = 0;
-
+#ifdef MAX_PWM_CHANNEL
     demo_hosal_pwm_init();
     demo_hosal_pwm_start();
+#endif
 }
 
 void ColorLEDWidget::Toggle(void)
@@ -118,6 +128,7 @@ void ColorLEDWidget::Toggle(void)
 
 void ColorLEDWidget::SetOnoff(bool state)
 {
+#ifdef MAX_PWM_CHANNEL
     mOnoff = state;
     if (mOnoff)
     {
@@ -134,6 +145,7 @@ void ColorLEDWidget::SetOnoff(bool state)
     {
         set_color(0, light_h, light_s);
     }
+#endif
 }
 
 void ColorLEDWidget::SetLevel(uint8_t level)
@@ -143,7 +155,9 @@ void ColorLEDWidget::SetLevel(uint8_t level)
 
 void ColorLEDWidget::SetColor(uint8_t level, uint8_t hue, uint8_t sat)
 {
+#ifdef MAX_PWM_CHANNEL
     set_color(level, hue, sat);
+#endif
     light_v = level;
     light_h = hue;
     light_s = sat;

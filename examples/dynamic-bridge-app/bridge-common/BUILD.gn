@@ -22,6 +22,7 @@ chip_data_model("dynamic-bridge-common") {
 
   zap_pregenerated_dir =
       "${chip_root}/zzz_generated/dynamic-bridge-app/zap-generated"
+
   is_server = true
 
   # TODO: the definition of DYNAMIC_ENDPOINT_COUNT needs find a common home!
@@ -30,7 +31,7 @@ chip_data_model("dynamic-bridge-common") {
 
 if (chip_enable_pw_rpc) {
   import("//build_overrides/pigweed.gni")
-  import("$dir_pw_protobuf_compiler/proto.gni")
+  IMPORT("$dir_pw_protobuf_compiler/proto.gni")
 
   pw_proto_library("bridge_service") {
     sources = [ "protos/bridge_service.proto" ]

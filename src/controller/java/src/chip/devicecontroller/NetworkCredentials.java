@@ -19,7 +19,7 @@ package chip.devicecontroller;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import androidx.annotation.Nullable;
+import javax.annotation.Nullable;
 
 /** Class for holding WiFi or Thread credentials, but not both. */
 public class NetworkCredentials implements Parcelable {

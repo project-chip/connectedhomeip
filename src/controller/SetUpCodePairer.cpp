@@ -344,6 +344,19 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::Discover
         Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[0], nodeData.resolutionData.port, interfaceId);
     mDiscoveredParameters.emplace();
     mDiscoveredParameters.back().SetPeerAddress(peerAddress);
+
+    if (nodeData.resolutionData.mrpRetryIntervalIdle.HasValue())
+    {
+        auto interval = nodeData.resolutionData.mrpRetryIntervalIdle.Value();
+        mDiscoveredParameters.back().SetIdleInterval(interval);
+    }
+
+    if (nodeData.resolutionData.mrpRetryIntervalActive.HasValue())
+    {
+        auto interval = nodeData.resolutionData.mrpRetryIntervalActive.Value();
+        mDiscoveredParameters.back().SetActiveInterval(interval);
+    }
+
     ConnectToDiscoveredDevice();
 }
 

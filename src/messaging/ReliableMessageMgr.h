@@ -192,6 +192,15 @@ public:
 #if CHIP_CONFIG_TEST
     // Functions for testing
     int TestGetCountRetransTable();
+
+    // Enumerate the retransmission table.  Clearing an entry while enumerating
+    // that entry is allowed.  F must take a RetransTableEntry as an argument
+    // and return Loop::Continue or Loop::Break.
+    template <typename F>
+    void EnumerateRetransTable(F && functor)
+    {
+        mRetransTable.ForEachActiveObject(std::forward<F>(functor));
+    }
 #endif // CHIP_CONFIG_TEST
 
 private:

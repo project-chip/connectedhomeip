@@ -44,16 +44,20 @@ private:
         kEndpointIdTag,
         kClusterIdsContainerTag,
         kClusterIdTag,
-        kCastingDataVersionTag,
+        kCurrentCastingDataVersionTag,
         kVideoPlayerVendorIdTag,
         kVideoPlayerProductIdTag,
         kVideoPlayerDeviceTypeIdTag,
         kVideoPlayerDeviceNameTag,
+        kVideoPlayerNumIPsTag,
+        kVideoPlayerIPAddressTag,
+        kIpAddressesContainerTag,
 
         kContextTagMaxNum = UINT8_MAX
     };
 
-    constexpr static size_t kCastingDataMaxBytes  = 1024 * 100; // 100 KBs
-    constexpr static char * kCastingDataKey       = (char *) "com.matter.casting";
-    constexpr static uint32_t kCastingDataVersion = 1;
+    constexpr static size_t kCastingDataMaxBytes               = 1024 * 100; // 100 KBs
+    constexpr static char * kCastingDataKey                    = (char *) "com.matter.casting";
+    constexpr static uint32_t kCurrentCastingDataVersion       = 1;
+    constexpr static uint32_t kSupportedCastingDataVersions[1] = { 1 };
 };

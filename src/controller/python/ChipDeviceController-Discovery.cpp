@@ -24,6 +24,7 @@
  */
 
 #include <controller/CHIPDeviceController.h>
+#include <controller/python/chip/native/PyChipError.h>
 #include <json/json.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPTLV.h>
@@ -49,8 +50,8 @@ bool pychip_DeviceController_HasDiscoveredCommissionableNode(Controller::DeviceC
     return false;
 }
 
-ChipError::StorageType pychip_DeviceController_DiscoverCommissionableNodes(Controller::DeviceCommissioner * devCtrl,
-                                                                           const uint8_t filterType, const char * filterParam)
+PyChipError pychip_DeviceController_DiscoverCommissionableNodes(Controller::DeviceCommissioner * devCtrl, const uint8_t filterType,
+                                                                const char * filterParam)
 {
     Dnssd::DiscoveryFilter filter(static_cast<Dnssd::DiscoveryFilterType>(filterType));
     switch (static_cast<Dnssd::DiscoveryFilterType>(filterType))
@@ -67,7 +68,7 @@ ChipError::StorageType pychip_DeviceController_DiscoverCommissionableNodes(Contr
         unsigned long long int numericalArg = strtoull(filterParam, nullptr, 0);
         if ((numericalArg == ULLONG_MAX) && (errno == ERANGE))
         {
-            return CHIP_ERROR_INVALID_ARGUMENT.AsInteger();
+            return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
         }
         filter.code = static_cast<uint64_t>(numericalArg);
         break;
@@ -82,10 +83,10 @@ ChipError::StorageType pychip_DeviceController_DiscoverCommissionableNodes(Contr
         filter.instanceName = filterParam;
         break;
     default:
-        return CHIP_ERROR_INVALID_ARGUMENT.AsInteger();
+        return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    return devCtrl->DiscoverCommissionableNodes(filter).AsInteger();
+    return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
 }
 
 void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::DeviceCommissioner * devCtrl,

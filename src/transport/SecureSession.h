@@ -220,9 +220,12 @@ public:
         }
     }
 
-    bool IsPeerActive() { return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < kMinActiveTime); }
+    bool IsPeerActive() const
+    {
+        return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < kMinActiveTime);
+    }
 
-    System::Clock::Timestamp GetMRPBaseTimeout() override
+    System::Clock::Timestamp GetMRPBaseTimeout() const override
     {
         return IsPeerActive() ? GetRemoteMRPConfig().mActiveRetransTimeout : GetRemoteMRPConfig().mIdleRetransTimeout;
     }
