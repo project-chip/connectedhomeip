@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity
 
   @Override
   public void handleCommissioningComplete() {
-    showFragment(SelectClusterFragment.newInstance());
+    showFragment(SelectClusterFragment.newInstance(tvCastingApp));
   }
 
   @Override
@@ -64,6 +64,11 @@ public class MainActivity extends AppCompatActivity
   @Override
   public void handleMediaPlaybackSelected() {
     showFragment(MediaPlaybackFragment.newInstance(tvCastingApp));
+  }
+
+  @Override
+  public void handleDisconnect() {
+    showFragment(CommissionerDiscoveryFragment.newInstance(tvCastingApp));
   }
 
   /**
