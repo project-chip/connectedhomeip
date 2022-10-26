@@ -1,12 +1,24 @@
-
 #include "device_creds.h"
-#include <zigbee_app_framework_common.h>
-#include <stack/include/ember.h>
-#include <app/util/ezsp/ezsp-protocol.h>
-#include <hal/hal.h>
-#include <psa/crypto.h>
+#include "em_chip.h"
+#include "sl_iostream.h"
+#include "sl_iostream_handles.h"
+#include "sl_iostream_init_instances.h"
+
 #include <em_msc.h>
+#include <mbedtls/x509_crt.h>
+#include <mbedtls/x509_csr.h>
+#include <psa/crypto.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <string.h>
+
+#define REQ_BUFFER_MAX 200
+#ifndef RES_BUFFER_MAX
+#define RES_BUFFER_MAX 1024
+#endif
+#define CREDS_REQ_HEADER_SIZE 5
+#define CREDS_RES_HEADER_SIZE 4
 
 //------------------------------------------------------------------------------
 // Private
@@ -14,24 +26,129 @@
 
 typedef enum
 {
-    CREDS_STATE_START = 0x00,
-    CREDS_STATE_CSR_GENERATE = 0x01,
-    CREDS_STATE_CSR_READY = 0x02,
-    CREDS_STATE_CSR_SENT = 0x03,
+    CREDS_STATE_READ_HEADER = 0x00,
+    CREDS_STATE_READ_PAYLOAD = 0x01,
+    CREDS_STATE_CSR_GENERATE = 0x02,
+    CREDS_STATE_CSR_READY = 0x03,
     CREDS_STATE_FAILURE = 0xff,
 
 } creds_state_t;
 
-static uint8_t _csr_buff[CREDS_CSR_LENGTH_MAX] = {0};
-static creds_file_t _csr;
-
-static sl_zigbee_event_t _creds_event;
-static uint32_t _event_period = MILLISECOND_TICKS_PER_SECOND;
-static creds_state_t _state = CREDS_STATE_START;
-
-static void credsEventHandler(sl_zigbee_event_t *event)
+static int key_destroy(psa_key_id_t key_id)
 {
-    sl_zigbee_event_set_delay_ms(&_creds_event, _event_period);
+    psa_key_handle_t key_handle;
+
+    int err = psa_open_key(key_id, &key_handle);
+    if (err)
+    {
+        psa_close_key(key_id);
+    }
+    else
+    {
+        err = psa_destroy_key(key_id);
+    }
+    return err;
+}
+
+int key_generate(psa_key_id_t key_id)
+{
+    psa_key_attributes_t key_attr = psa_key_attributes_init();
+
+    psa_set_key_id(&key_attr, key_id);
+    psa_set_key_type(&key_attr, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
+    psa_set_key_bits(&key_attr, 256);
+    psa_set_key_algorithm(&key_attr, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
+    psa_set_key_usage_flags(
+        &key_attr, PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_VERIFY_HASH | PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_VERIFY_MESSAGE);
+    psa_set_key_lifetime(
+        &key_attr, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_PERSISTENT, PSA_KEY_LOCATION_LOCAL_STORAGE));
+
+    int err = psa_generate_key(&key_attr, &key_id);
+    ASSERT(!err, return err, "psa_generate_key error %d", err);
+
+    return 0;
+}
+
+int key_import(psa_key_id_t key_id, const uint8_t * key_value, size_t key_size)
+{
+    psa_key_attributes_t key_attr = psa_key_attributes_init();
+
+    psa_set_key_id(&key_attr, key_id);
+    psa_set_key_type(&key_attr, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
+    psa_set_key_bits(&key_attr, 256);
+    psa_set_key_algorithm(&key_attr, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
+    psa_set_key_usage_flags(
+        &key_attr, PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_VERIFY_HASH | PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_VERIFY_MESSAGE);
+    psa_set_key_lifetime(
+        &key_attr, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_PERSISTENT, PSA_KEY_LOCATION_LOCAL_STORAGE));
+
+    int err = psa_import_key(&key_attr, key_value, key_size, &key_id);
+    psa_reset_key_attributes(&key_attr);
+    return err;
+}
+
+static int csr_generate(const char *common_name, unsigned vendor_id, unsigned product_id, char * buffer, size_t * size)
+{
+    psa_key_id_t key_id = EFR32_CREDENTIALS_DAC_KEY_ID;
+    mbedtls_pk_context key_ctx;
+    size_t max_size = 0;
+
+    ASSERT(buffer, return -1, "creds_csr_generate, invalid buffer pointer");
+    ASSERT(size, return -2, "creds_csr_generate, invalid size pointer");
+    ASSERT(*size >= 512, return -2, "creds_csr_generate, buffer too small");
+    max_size = *size;
+    *size    = 0;
+
+    //
+    // Key
+    //
+
+    key_destroy(key_id);
+
+    // int err = key_import(key_id, _examples_dac_priv_raw, sizeof(_examples_dac_priv_raw));
+    // ASSERT(!err, return err, "Key generation error %d", err);
+
+    int err = key_generate(key_id);
+    ASSERT(!err, return err, "Key generation error %d", err);
+
+    //
+    // CSR
+    //
+
+    static mbedtls_x509write_csr csr_ctx;
+
+    mbedtls_x509write_csr_init(&csr_ctx);
+
+    // Subject name
+
+    char subject_name[512];
+#if MATTER_X509_EXTENSIONS
+    snprintf(subject_name, sizeof(subject_name), "CN=%s,VID=%04X,PID=%04X", common_name, vendor_id,
+             product_id);
+#else
+    snprintf(subject_name, sizeof(subject_name), "CN=%s", common_name);
+#endif
+
+    mbedtls_x509write_csr_set_md_alg(&csr_ctx, MBEDTLS_MD_SHA256);
+    err = mbedtls_x509write_csr_set_subject_name(&csr_ctx, subject_name);
+    ASSERT(!err, return err, "mbedtls_x509write_csr_set_subject_name() error %d", err);
+
+    mbedtls_pk_init(&key_ctx);
+    err = mbedtls_pk_setup_opaque(&key_ctx, key_id);
+    ASSERT(!err, return err, "mbedtls_pk_setup_opaque() error %d", err);
+
+    // Signing key
+
+    mbedtls_x509write_csr_set_key(&csr_ctx, &key_ctx);
+
+    // Generate
+
+    err = mbedtls_x509write_csr_pem(&csr_ctx, (uint8_t *) buffer, max_size, NULL, NULL);
+    ASSERT(!err, return err, "mbedtls_x509write_csr_pem() error %d", err);
+    *size = strlen(buffer);
+
+    mbedtls_x509write_csr_free(&csr_ctx);
+    return err;
 }
 
 //------------------------------------------------------------------------------
@@ -40,114 +157,77 @@ static void credsEventHandler(sl_zigbee_event_t *event)
 
 int device_creds_init()
 {
+    /* Prevent buffering of output/input.*/
+#if !defined(__CROSSWORKS_ARM) && defined(__GNUC__)
+    setvbuf(stdout, NULL, _IONBF, 0); /*Set unbuffered mode for stdout (newlib)*/
+    setvbuf(stdin, NULL, _IONBF, 0);  /*Set unbuffered mode for stdin (newlib)*/
+#endif
+
     // Initialize PSA Crypto
     int err = psa_crypto_init();
     ASSERT(!err, return err, "psa_crypto_init() error %d", err);
 
-    // Initialize CSR buffer
-    creds_file_init(&_csr, _csr_buff, sizeof(_csr_buff));
 
     return 0;
 }
 
-int device_creds_action()
+static unsigned _state = CREDS_STATE_READ_HEADER;
+static uint8_t _in_buffer[REQ_BUFFER_MAX];
+static size_t _in_size = 0;
+static uint32_t _vendor_id = 0;
+static uint32_t _product_id = 0;
+static uint8_t _cn_size = 0;
+static uint8_t _out_buffer[RES_BUFFER_MAX];
+static size_t _out_size = 0;
+
+void device_creds_action()
 {
-    return 0;
-}
-
-/** @brief Main Init
- *
- * This function is called when the application starts and can be used to
- * perform any additional initialization required at system startup.
- */
-void emberAfMainInitCallback(void)
-{
-    device_creds_init();
-
-    sl_zigbee_event_init(&_creds_event, credsEventHandler);
-    sl_zigbee_event_set_active(&_creds_event);
-}
-
-/** @brief Incoming Custom EZSP Message Callback
- *
- * This function is called when the NCP receives a custom EZSP message from the
- * HOST.  The message length and payload is passed to the callback in the first
- * two arguments.  The implementation can then fill in the reply and set
- * the replayPayloadLength to the number of bytes in the reply.
- * See documentation for the function ezspCustomFrame on sending these messages
- * from the HOST.
- *
- * @param payload_size The length of the payload.
- * @param payload The custom message that was sent from the HOST.
- * Ver.: always
- * @param replay_size The length of the reply.  This needs to be
- * set by the implementation in order for a properly formed respose to be sent
- * back to the HOST. Ver.: always
- * @param reply The custom message to send back to the HOST in respose
- * to the custom message. Ver.: always
- *
- * @return An ::EmberStatus indicating the result of the custom message
- * handling.  This returned status is always the first byte of the EZSP
- * response.
- */
-EmberStatus emberAfPluginXncpIncomingCustomFrameCallback(uint8_t payload_size,
-                                                         uint8_t *payload,
-                                                         uint8_t *replay_size,
-                                                         uint8_t *reply)
-{
-    EmberStatus status = EMBER_INVALID_CALL;
-    int err = 0;
-
-    if (CREDS_STATE_FAILURE == _state)
-    {
-        _state = CREDS_STATE_START;
-        return EMBER_ERR_FATAL;
+    if(CREDS_STATE_READ_HEADER == _state) {
+        size_t bytes_read = 0;
+        sl_iostream_read(SL_IOSTREAM_STDIN, &_in_buffer[_in_size], sizeof(_in_buffer) - _in_size, &bytes_read);
+        _in_size += bytes_read;
+        if(_in_size >= CREDS_REQ_HEADER_SIZE)
+        {
+            // Decode header: vendor_id, product_id, cn_size
+            _vendor_id = (_in_buffer[0] << 8) | _in_buffer[1];
+            _product_id = (_in_buffer[2] << 8) | _in_buffer[3];
+            _cn_size = _in_buffer[4];
+            _state = CREDS_STATE_READ_PAYLOAD;
+        }
     }
+    if(CREDS_STATE_READ_PAYLOAD == _state) {
+        size_t bytes_read = 0;
+        sl_iostream_read(SL_IOSTREAM_STDIN, &_in_buffer[_in_size], sizeof(_in_buffer) - _in_size, &bytes_read);
+        _in_size += bytes_read;
+        if(_in_size >= ((size_t)CREDS_REQ_HEADER_SIZE + _cn_size))
+        {
+            // Common name received
+            _in_buffer[CREDS_REQ_HEADER_SIZE + _cn_size] = 0;
+            _state = CREDS_STATE_CSR_GENERATE;
+        }
+    }
+    else if(CREDS_STATE_CSR_GENERATE == _state) {
 
-    // First byte is the command ID.
-    creds_command_t command_id = payload[0];
+        // Generate CSR
+        // size_t offset = CREDS_HEADER_SIZE;
+        size_t csr_size = sizeof(_out_buffer) - CREDS_REQ_HEADER_SIZE - _cn_size - 1; // -1 (zero ending)
+        char *name = (char *)&_in_buffer[CREDS_REQ_HEADER_SIZE];
+        char *csr = (char *)&_out_buffer[CREDS_RES_HEADER_SIZE];
+        int32_t err = csr_generate(name, _vendor_id, _product_id, csr, &csr_size);
 
-    switch (command_id)
-    {
-    case CREDS_COMMAND_CSR_GENERATE:
-        ASSERT(CREDS_STATE_START == _state || CREDS_STATE_CSR_SENT == _state, return EMBER_INVALID_CALL, "Invalid command %d for state $d\n", command_id, _state);
-
-        err = device_csr_generate(&_csr);
-        ASSERT(!err, return EMBER_ERR_FATAL, "CSR generate error %d\n", err);
-
-        // File size in big endian format
-        reply[0] = (_csr.size >> 8) & 0xff;
-        reply[1] = (_csr.size & 0xff);
-        *replay_size = 2;
-        status = EMBER_SUCCESS;
+        // Encode header: error(2), size(2)
+        _out_buffer[0] = (err >> 8) & 0xff;
+        _out_buffer[1] = (err & 0xff);
+        _out_buffer[2] = (csr_size >> 8) & 0xff;
+        _out_buffer[3] = (csr_size & 0xff);
+        // Zero-terminate
+        _out_buffer[CREDS_RES_HEADER_SIZE + csr_size] = 0;
+        _out_size = CREDS_RES_HEADER_SIZE + csr_size + 1;
         _state = CREDS_STATE_CSR_READY;
-        break;
-
-    case CREDS_COMMAND_CSR_READ:
-        ASSERT(CREDS_STATE_CSR_READY == _state, return EMBER_INVALID_CALL, "Invalid command %d for state $d\n", command_id, _state);
-
-        if (_csr.offset < _csr.size)
-        {
-            size_t segment_size = CREDS_FRAME_LENGTH_MAX;
-            if (_csr.offset + segment_size > _csr.size)
-            {
-                // Partial segment
-                segment_size = _csr.size - _csr.offset;
-            }
-            memcpy(reply, &_csr.data[_csr.offset], segment_size);
-            _csr.offset += segment_size;
-            *replay_size = segment_size;
-        }
-        if (_csr.offset >= _csr.size)
-        {
-            _state = CREDS_STATE_CSR_SENT;
-        }
-        status = EMBER_SUCCESS;
-        break;
-
-    default:
-        break;
     }
-
-    return status;
+    else if(CREDS_STATE_CSR_READY == _state) {
+        sl_iostream_write(SL_IOSTREAM_STDOUT, _out_buffer, _out_size);
+        _in_size = 0;
+        _state = CREDS_STATE_READ_HEADER;
+    }
 }

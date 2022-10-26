@@ -1,18 +1,9 @@
 #ifndef MATTER_HOST_CREDS_H
 #define MATTER_HOST_CREDS_H
 
-#include <creds.h>
+#include <stddef.h>
+#include <stdint.h>
 
-typedef enum host_option_
-{
-    APP_OPTION_CSR_FILENAME = 0x01,
-
-} host_option_t;
-
-#define APP_OPTION_COUNT 6
-
-const char *host_option_get(host_option_t option);
-
-int host_creds_csr();
+int host_creds_csr(const char * port, const char *common_name, uint32_t vendor_id, uint32_t product_id, const char * filename);
 
 #endif // MATTER_HOST_CREDS_H

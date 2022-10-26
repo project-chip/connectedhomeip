@@ -4,11 +4,7 @@
 
 const sl_iostream_instance_info_t *sl_iostream_instances_info[] = {
 
-    &sl_iostream_instance_debug_info,
-  
     &sl_iostream_instance_vcom_info,
-  
-    &sl_iostream_instance_vuart_info,
   
 };
 

@@ -12,8 +12,15 @@ _header_filename =  _temp_dir + 'efr32_creds.h'
 _header_template = 'efr32_creds.tmpl'
 
 
+class PageInfo:
+    def __init__(self, address, size):
+        self.address = address
+        self.size = size
+
+
 def printUsage():
-    print('\nUSAGE:\n\tcert.py -p <serial port> -S <serial num> -T <mg12 | mg24> -D <CD file> -C <PAI cert> -K <PAI key> [-R <CSR file>]')
+    print('Usage:')
+    print('\tpython3 ./creds.py -p <serial_port> -S <serial_number> -B <board_num> -N <common_name> -V <vendor_id> -P <product_id> -C <pai_cert_pem> -K <pai_key_pem> -D <cert_declaration>')
 
 
 def roundNearest(n, multiple):
@@ -22,12 +29,22 @@ def roundNearest(n, multiple):
     return n
 
 
-def baseAddress(board):
-    if 'brd4164a' == board or'brd4166a' == board:
-        return 0x000FF800
-    if 'brd4186a' == board or 'brd4186c' == board:
-        return 0x0817E000
+def pageInfo(board):
+    # MG12    
+    if (('brd4161a' == board) or ('brd4162a' == board) or ('brd4163a' == board) or
+        ('brd4164a' == board) or ('brd4166a' == board) or ('brd4170a' == board) or
+        ('brd4304a' == board)):
+        return PageInfo(0x000FF800, 0x800)
+    # MG24
+    if (('brd2601b' == board) or ('brd2703a' == board) or ('brd4186a' == board) or
+        ('brd4186c' == board) or ('brd4187a' == board) or ('brd4187c' == board) or
+        ('brd4304a' == board)):
+        return PageInfo(0x0817E000, 0x2000)
+    # MGM24
+    if ('brd4316a' == board) or ('brd4317a' == board) or ('brd4319a' == board):
+        return PageInfo(0x0817E000, 0x2000)
     return None
+
 
 def execute(desc, args):
     print("\n{}\n  {}\n".format(desc, ' '.join(args)))
@@ -55,13 +72,13 @@ def prepareApps(board, serial_num):
     execute('Building host app', ["make", "-C", "host/app/", "-f", "host-creds.Makefile" ])
 
 
-def generateFiles(port, serial_num, pai_pem, pai_key):
+def generateFiles(port, serial_num, common_name, vendor_id, product_id, pai_pem, pai_key):
 
     # Create temporary dir
     execute('Creating temp dir', ["mkdir", "-p", _temp_dir ])
 
     # Generate CSR
-    execute('Requesting CSR', ["./host/app/build/debug/host-creds", "-p", port, "-R", _csr_pem ])
+    execute('Requesting CSR', ["./host/app/build/debug/host-creds", "-p", port, "-f", _csr_pem, "-N", common_name, "-V", vendor_id, "-P", product_id ])
     subprocess.run([ "cat", _csr_pem])
 
     # Generate DAC
@@ -79,7 +96,7 @@ def generateFiles(port, serial_num, pai_pem, pai_key):
     execute('Parsing PAI', ["openssl", "x509", "-outform", "der", "-in", pai_pem, "-out", _pai_der])
 
 
-def writeCredentials(serial_num, base_addr, cd_file):
+def writeCredentials(serial_num, page, cd_file):
 
     # Calculate offsets
     
@@ -88,8 +105,8 @@ def writeCredentials(serial_num, base_addr, cd_file):
     cd_stats = os.stat(cd_file)
 
     pai_offset = 0
-    dac_offset = roundNearest(pai_offset + pai_stats.st_size, 32)
-    cd_offset = roundNearest(dac_offset + dac_stats.st_size, 32)
+    dac_offset = roundNearest(pai_offset + pai_stats.st_size, 64)
+    cd_offset = roundNearest(dac_offset + dac_stats.st_size, 64)
     end_offset = roundNearest(cd_offset + cd_stats.st_size, 1024)
 
     # Generate header
@@ -108,19 +125,21 @@ def writeCredentials(serial_num, base_addr, cd_file):
 
     # Flash
 
-    cd_address = base_addr + cd_offset
-    pai_address = base_addr + pai_offset
-    dac_address = base_addr + dac_offset
-    print("PAI:\t{} + {}\t\t= {} ({})".format(hex(base_addr), hex(pai_offset), hex(pai_address), pai_stats.st_size))
-    print("DAC:\t{} + {}\t= {} ({})".format(hex(base_addr), hex(dac_offset), hex(dac_address), dac_stats.st_size))
-    print("DC:\t{} + {}\t= {} ({})".format(hex(base_addr), hex(cd_offset), hex(cd_address), cd_stats.st_size))
+    cd_address = page.address + cd_offset
+    pai_address = page.address + pai_offset
+    dac_address = page.address + dac_offset
+    print("PAI:\t{} + {}\t\t= {} ({})".format(hex(page.address), hex(pai_offset), hex(pai_address), pai_stats.st_size))
+    print("DAC:\t{} + {}\t= {} ({})".format(hex(page.address), hex(dac_offset), hex(dac_address), dac_stats.st_size))
+    print("DC:\t{} + {}\t= {} ({})".format(hex(page.address), hex(cd_offset), hex(cd_address), cd_stats.st_size))
 
-    execute('Flashing PAI', ["commander", "flash", _pai_der, "--binary", "--address", hex(base_addr + pai_offset), "--serialno", serial_num])
-    execute('Flashing DAC', ["commander", "flash", _dac_der, "--binary", "--address", hex(base_addr + dac_offset), "--serialno", serial_num])
-    execute('Flashing CD', ["commander", "flash", cd_file, "--binary", "--address", hex(base_addr + cd_offset), "--serialno", serial_num])
+    
+    execute('Erasing Page', ["commander", "device", "pageerase", "--range", "{}:+{}".format(hex(page.address), page.size), "--serialno", serial_num])
+    execute('Flashing PAI', ["commander", "flash", _pai_der, "--binary", "--address", hex(page.address + pai_offset), "--serialno", serial_num])
+    execute('Flashing DAC', ["commander", "flash", _dac_der, "--binary", "--address", hex(page.address + dac_offset), "--serialno", serial_num])
+    execute('Flashing CD', ["commander", "flash", cd_file, "--binary", "--address", hex(page.address + cd_offset), "--serialno", serial_num])
 
     # Print
-    subprocess.run(["commander", "readmem", "--range", "{}:+{}".format(hex(base_addr), end_offset), "--serialno", serial_num])
+    subprocess.run(["commander", "readmem", "--range", "{}:+{}".format(hex(page.address), end_offset), "--serialno", serial_num])
 
 
 def main(argv):
@@ -129,12 +148,15 @@ def main(argv):
     board = None
     cert_file = None
     key_file = None
+    common_name = None
+    vendor_id = None
+    product_id = None
     cd_file = None
     
     # Parse arguments
 
     try:
-        opts, args = getopt.getopt(argv,"p:S:B:C:K:D:", ["port=", "serial_num=", "board=", "pai_cert=", "pai_key=", "dc="])
+        opts, args = getopt.getopt(argv,"p:S:B:N:V:P:C:K:D:", ["port=", "serial_num=", "board=", "name=", "vendor=", "product=", "pai_cert=", "pai_key=", "cd="])
     except getopt.GetoptError:
         printUsage();
         sys.exit(2)
@@ -153,6 +175,15 @@ def main(argv):
         elif opt in ("-B", "--board"):
             board = arg
 
+        elif opt in ("-N", "--name"):
+            common_name = arg
+
+        elif opt in ("-V", "--vendor"):
+            vendor_id = arg
+
+        elif opt in ("-P", "--product"):
+            product_id = arg
+
         elif opt in ("-C", "--pai_cert"):
             cert_file = arg
 
@@ -164,7 +195,7 @@ def main(argv):
 
     # Validate arguments
 
-    if (board is None) or (port is None) or (serial_num is None) or (cert_file is None) or (key_file is None) or (cd_file is None):
+    if (board is None) or (port is None) or (serial_num is None) or (common_name is None) or (vendor_id is None) or (product_id is None) or (cert_file is None) or (key_file is None) or (cd_file is None):
         printUsage();
         sys.exit(2)
 
@@ -180,8 +211,8 @@ def main(argv):
 
     # Get flash base address
 
-    base_addr = baseAddress(board)
-    if base_addr is None:
+    page_info = pageInfo(board)
+    if page_info is None:
         print("ERROR: Board not supported: '{}'".format(board))
         exit(1)
 
@@ -200,10 +231,10 @@ def main(argv):
     prepareApps(board, serial_num)
 
     # Generate files
-    generateFiles(port, serial_num, cert_file, key_file)
+    generateFiles(port, serial_num, common_name, vendor_id, product_id, cert_file, key_file)
 
     # Write files
-    writeCredentials(serial_num, base_addr, cd_file)
+    writeCredentials(serial_num, page_info, cd_file)
 
 
 main(sys.argv[1:])

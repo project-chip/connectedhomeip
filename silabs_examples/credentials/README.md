@@ -81,7 +81,7 @@ Simplicity Commander.
 
 2. Set the environment:
 
-> `export BASE_SDK_PATH=<Gecko SDK path>`<br> 
+> `export BASE_SDK_PATH=../../third_party/silabs/gecko_sdk`<br> 
 > `export ARM_GCC_DIR=<ARM GNU toolchain path>`<br>
 
 Example:
@@ -90,7 +90,12 @@ Example:
 
 3. Execute the setup script
 
-> `python3 ./creds.py -p /dev/tty.usbmodem0004402663301 -S 440266330 -B brd4186c -C pai_cert.pem -K pai_priv.pem -D cd.bin`
+On Linux, the serial port should have the form `/dev/tty*`, for instance:
+> `python3 ./creds.py -p /dev/ttyACM0 -S 440266330 -B brd4186c -C pai_cert.pem -K pai_priv.pem -D cd.bin`
+
+On macOS, use `/dev/cu.*` instead of `/dev/tty.*`, for instance:
+> `python3 ./creds.py -p /dev/cu.usbmodem0004402663301 -S 440266330 -B brd4186c -C pai_cert.pem -K pai_priv.pem -D cd.bin`
+
 
 This script:
 
