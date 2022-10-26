@@ -410,6 +410,8 @@ private:
      */
     void ScheduleAutoRelock(chip::EndpointId endpointId, uint32_t timeoutSec);
 
+    static void DoorLockOnAutoRelockCallback(chip::EndpointId endpointId);
+
     /**
      * @brief Send generic event
      *
@@ -462,8 +464,6 @@ private:
     friend bool emberAfDoorLockClusterUnlockWithTimeoutCallback(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::DecodableType & commandData);
-
-    friend void DoorLockOnAutoRelockCallback(chip::EndpointId endpointId);
 
     friend bool emberAfDoorLockClusterSetHolidayScheduleCallback(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
