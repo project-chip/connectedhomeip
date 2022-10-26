@@ -220,10 +220,7 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list args)
     {
         redirect(moduleName, category, msg, args);
     }
-    else
-    {
-        Platform::LogV(moduleName, category, msg, args);
-    }
+    Platform::LogV(moduleName, category, msg, args);
 }
 
 #if CHIP_LOG_FILTERING

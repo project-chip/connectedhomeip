@@ -27,8 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @note We declare the public API of `MTRLogging` in the `MTRLogger.h` public header file, while the non-public
  *       module API is declared in the original `MTRLogging.h`.
  */
-@interface MTRLogging : NSObject {
-}
+@interface MTRLogging : NSObject
 
 // Disable construction
 - (instancetype)init NS_UNAVAILABLE;
@@ -70,8 +69,6 @@ NS_INLINE NS_FORMAT_FUNCTION(2, 3) void mtr_log(MTRLogLevel level, NSString * fo
     [MTRLogging logAtLevelV:level format:format args:args];
     va_end(args);
 }
-
-#define MTR_LOG_FAULT(format, ...) (mtr_log(MTRLogLevelFault, MTR_C_STRING_TO_NSSTRING(format), ##__VA_ARGS__))
 
 #define MTR_LOG_ERROR(format, ...) (mtr_log(MTRLogLevelError, MTR_C_STRING_TO_NSSTRING(format), ##__VA_ARGS__))
 

@@ -3,6 +3,7 @@
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
 #include <platform/logging/LogV.h>
+#include <platform/Darwin/Logging.h>
 
 #include <lib/core/CHIPConfig.h>
 
@@ -19,7 +20,8 @@ namespace chip {
 namespace Logging {
 namespace Platform {
 
-void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
+void ENFORCE_FORMAT(3, 0) getDarwinLogMessageFormat(const char * module, uint8_t category, const char * msg, 
+        va_list v, uint16_t size, char *formattedMsg)
 {
     timeval time;
     gettimeofday(&time, nullptr);
@@ -28,22 +30,34 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
     uint64_t ktid;
     pthread_threadid_np(nullptr, &ktid);
 
-    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-    int32_t prefixLen   = snprintf(formattedMsg, sizeof(formattedMsg), "[%ld] [%lld:%lld] CHIP: [%s] ", ms, (long long) getpid(),
+    int32_t prefixLen = snprintf(formattedMsg, size, "[%ld] [%lld:%lld] CHIP: [%s] ", ms, (long long) getpid(),
                                  (long long) ktid, module);
-    static os_log_t log = os_log_create("com.csa.matter", "all");
     if (prefixLen < 0)
     {
-        // This should not happen
+        // In the event that we could not format the message, simply copy over the
+        // unformatted message. It won't contain all the information that we need, but
+        // it's better than dropping a log on the floor.
+        strncpy(formattedMsg, msg, size);
         return;
     }
 
-    if (static_cast<size_t>(prefixLen) >= sizeof(formattedMsg))
+    if (static_cast<size_t>(prefixLen) >= size)
     {
-        prefixLen = sizeof(formattedMsg) - 1;
+        prefixLen = size - 1;
     }
 
-    vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - static_cast<size_t>(prefixLen), msg, v);
+    vsnprintf(formattedMsg + prefixLen, size - static_cast<size_t>(prefixLen), msg, v);
+
+    // Explicitly NULL-terminate the formatted string for safety.
+    formattedMsg[size - 1] = '\0';
+}
+
+void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
+{
+    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    getDarwinLogMessageFormat(module, category, msg, v, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE, formattedMsg);
+
+    static os_log_t log = os_log_create("com.csa.matter", "all");
 
     switch (category)
     {
