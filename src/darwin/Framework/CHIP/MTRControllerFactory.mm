@@ -39,6 +39,7 @@
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#include <lib/support/Pool.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <platform/PlatformManager.h>
 
@@ -308,6 +309,11 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
             MTR_LOG_ERROR("Error: %@", kErrorControllerFactoryInit);
             return;
         }
+
+        // This needs to happen after DeviceControllerFactory::Init,
+        // because that creates (lazily, by calling functions with
+        // static variables in them) some static-lifetime objects.
+        chip::HeapObjectPoolExitHandling::IgnoreLeaksOnExit();
 
         // Make sure we don't leave a system state running while we have no
         // controllers started.  This is working around the fact that a system
