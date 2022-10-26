@@ -34,7 +34,7 @@ CHIP_ERROR CallbackBaseJNI::SetUp(JNIEnv * env, jobject inHandler)
     mMethod = env->GetMethodID(mClazz, "handle", mMethodSignature);
     if (mMethod == nullptr)
     {
-        ChipLogError(AppServer, "Failed to access 'handle' method");
+        ChipLogError(AppServer, "Failed to access 'handle' method with signature %s", mMethodSignature);
         env->ExceptionClear();
     }
 
@@ -50,7 +50,7 @@ exit:
 
 void FailureHandlerJNI::Handle(CHIP_ERROR callbackErr)
 {
-    ChipLogProgress(AppServer, "FailureHandlerJNI::Handle called");
+    ChipLogProgress(AppServer, "Handle(CHIP_ERROR) called");
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     UtfString jniCallbackErrString(env, callbackErr.AsString());
@@ -63,7 +63,7 @@ void FailureHandlerJNI::Handle(CHIP_ERROR callbackErr)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "FailureHandlerJNI::Handle status error: %s", err.AsString());
+        ChipLogError(AppServer, "Handle(CHIP_ERROR) status error: %s", err.AsString());
     }
 }
 
@@ -332,9 +332,10 @@ jobject TargetListSuccessHandlerJNI::ConvertToJObject(
             return nullptr;
         }
 
-        jmethodID constructor = env->GetMethodID(responseTypeClass, "<init>", "(Ljava/lang/Integer;java/lang/String;)V");
+        jmethodID constructor = env->GetMethodID(responseTypeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
         chip::UtfString targetInfoName(env, targetInfo.name);
-        jobject jTargetInfo = env->NewObject(responseTypeClass, constructor, targetInfo.identifier, targetInfoName.jniValue());
+        jobject jTargetInfo = env->NewObject(responseTypeClass, constructor, ConvertToIntegerJObject(targetInfo.identifier),
+                                             targetInfoName.jniValue());
 
         chip::JniReferences::GetInstance().AddToList(jArrayList, jTargetInfo);
     }

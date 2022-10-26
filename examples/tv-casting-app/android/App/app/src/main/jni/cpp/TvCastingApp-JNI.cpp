@@ -204,6 +204,21 @@ exit:
     return true;
 }
 
+JNI_METHOD(void, shutdownAllSubscriptions)(JNIEnv * env, jobject)
+{
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "JNI_METHOD shutdownAllSubscriptions called");
+
+    CastingServer::GetInstance()->ShutdownAllSubscriptions();
+}
+
+JNI_METHOD(void, disconnect)(JNIEnv * env, jobject)
+{
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "JNI_METHOD disconnect called");
+    CastingServer::GetInstance()->Disconnect();
+}
+
 JNI_METHOD(jobject, getActiveTargetVideoPlayers)(JNIEnv * env, jobject)
 {
     chip::DeviceLayer::StackLock lock;

@@ -424,6 +424,28 @@ void CastingServer::SetDefaultFabricIndex(std::function<void(TargetVideoPlayerIn
     ChipLogError(AppServer, " -- No initialized fabrics with video players");
 }
 
+void CastingServer::ShutdownAllSubscriptions()
+{
+    ChipLogProgress(AppServer, "Shutting down ALL Subscriptions");
+    app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptions();
+}
+
+void CastingServer::Disconnect()
+{
+    TargetVideoPlayerInfo * currentVideoPlayer = GetActiveTargetVideoPlayer();
+
+    if (currentVideoPlayer != nullptr && currentVideoPlayer->IsInitialized())
+    {
+        chip::OperationalDeviceProxy * operationalDeviceProxy = currentVideoPlayer->GetOperationalDeviceProxy();
+        if (operationalDeviceProxy != nullptr)
+        {
+            ChipLogProgress(AppServer, "Disconnecting from VideoPlayer with nodeId=0x" ChipLogFormatX64 " fabricIndex=%d",
+                            ChipLogValueX64(currentVideoPlayer->GetNodeId()), currentVideoPlayer->GetFabricIndex());
+            operationalDeviceProxy->Disconnect();
+        }
+    }
+}
+
 /**
  * @brief Content Launcher cluster
  */
