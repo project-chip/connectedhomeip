@@ -537,7 +537,7 @@ bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
     {
         if (attr == aPath.mAttributeId)
         {
-            return (emberAfFindCluster(aPath.mEndpointId, aPath.mClusterId, CLUSTER_MASK_SERVER) != nullptr);
+            return (emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId) != nullptr);
         }
     }
     return (emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId) != nullptr);
@@ -563,7 +563,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         if (attr == aPath.mAttributeId)
         {
             isGlobalAttributeNotInMetadata = true;
-            attributeCluster               = emberAfFindCluster(aPath.mEndpointId, aPath.mClusterId, CLUSTER_MASK_SERVER);
+            attributeCluster               = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);
             break;
         }
     }
