@@ -76,12 +76,8 @@ private:
 #endif
 
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
-    struct GLibMainLoopDeleter
-    {
-        void operator()(GMainLoop * loop) { g_main_loop_unref(loop); }
-    };
-    using UniqueGLibMainLoop = std::unique_ptr<GMainLoop, GLibMainLoopDeleter>;
-    UniqueGLibMainLoop mGLibMainLoop;
+    GMainLoop * mGLibMainLoop;
+    GThread * mGLibMainLoopThread;
 #endif
 };
 

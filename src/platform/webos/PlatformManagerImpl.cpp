@@ -143,9 +143,8 @@ void PlatformManagerImpl::WiFiIPChangeListener()
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
-    mGLibMainLoop.reset(g_main_loop_new(nullptr, FALSE));
-    GThread * thread = g_thread_new("gmain-matter", GLibMainLoopThread, mGLibMainLoop.get());
-    g_thread_unref(thread); // detach the thread
+    mGLibMainLoop       = g_main_loop_new(nullptr, FALSE);
+    mGLibMainLoopThread = g_thread_new("gmain-matter", GLibMainLoopThread, mGLibMainLoop);
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -194,8 +193,9 @@ void PlatformManagerImpl::_Shutdown()
     Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
 
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
-    g_main_loop_quit(mGLibMainLoop.get());
-    mGLibMainLoop.reset();
+    g_main_loop_quit(mGLibMainLoop);
+    g_main_loop_unref(mGLibMainLoop);
+    g_thread_join(mGLibMainLoopThread);
 #endif
 }
 
