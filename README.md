@@ -33,7 +33,7 @@ The standard was built around a shared belief that smart home devices should be 
 
 The Matter specification details everything necessary to implement a Matter application and transport layer stack. It is intended to be used by implementers as a complete specification. 
 
-The Alliance officially opened the Matter Working Group on January 17, 2020, and the specification is available for adoption now.
+The Alliance officially opened the Matter Working Group on January 17, 2020, and the specification is [available](https://csa-iot.org/developer-resource/specifications-download-request/) for adoption now.
 
 Visit [buildwithmatter.com](https://buildwithmatter.com) to learn more and read the latest news and updates about the project.
 
