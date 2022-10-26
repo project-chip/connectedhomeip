@@ -43,8 +43,8 @@ All device types available (.zap files) are found inside the `devices` folder.
 ```
 
 4. Run `$ chef.py -u` to update zap and the toolchain (on selected platforms).
-5. Run `$ chef.py -gzbf -t <platform> -d lighting`. This command will run the
-   ZAP GUI opening the `devices/lighting.zap` file and will allow editing. It
+5. Run `$ chef.py -gzbf -t <platform> -d rootnode_onofflight_bbs1b7IaOV`. This command will run the
+   ZAP GUI opening the `devices/rootnode_onofflight_bbs1b7IaOV.zap` file and will allow editing. It
    will then generate the zap artifacts, place them on the `zap-generated`
    folder, run a build and flash the binary in your target.
 6. Run `chef.py -h` to see all available commands.
