@@ -132,6 +132,11 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 void GetMdnsTimeout(timeval & timeout) {}
 void HandleMdnsTimeout() {}
 
