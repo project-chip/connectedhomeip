@@ -125,7 +125,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * readAttribute will get these values
  *
  * @param expectedValueInterval  maximum interval in milliseconds during which reads of the attribute will return the value being
- * written. This value must be within [1, UINT32_MAX], and will be clamped to this range.
+ * written. If the value is less than 1, both this value and expectedValues will be ignored.
+            If this value is greater than UINT32_MAX, it will be clamped to UINT32_MAX.
  *
  * @param timeout   timeout in milliseconds for timed invoke, or nil. This value must be within [1, UINT16_MAX], and will be clamped
  * to this range.
