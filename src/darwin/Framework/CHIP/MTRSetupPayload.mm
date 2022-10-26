@@ -198,11 +198,36 @@
     return @(chip::kSetupPINCodeUndefinedValue);
 }
 
++ (bool)isQRCode:(NSString *)onboardingPayload
+{
+    return [onboardingPayload hasPrefix:@"MT:"];
+}
+
 + (MTRSetupPayload * _Nullable)setupPayloadWithOnboardingPayload:(NSString *)onboardingPayload
                                                            error:(NSError * __autoreleasing *)error
 {
     // TODO: Do we actually need the MTROnboardingPayloadParser abstraction?
-    return [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:onboardingPayload error:error];
+    MTRSetupPayload * payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:onboardingPayload error:error];
+    if (payload == nil) {
+        return nil;
+    }
+
+    bool isQRCode = [MTRSetupPayload isQRCode:onboardingPayload];
+    bool validPayload;
+    if (isQRCode) {
+        validPayload = payload->_chipSetupPayload.isValidQRCodePayload();
+    } else {
+        validPayload = payload->_chipSetupPayload.isValidManualCode();
+    }
+
+    if (!validPayload) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
+        }
+        return nil;
+    }
+
+    return payload;
 }
 
 #pragma mark - NSSecureCoding
