@@ -118,7 +118,7 @@ jobs:
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true
             - name: Run Framework Tests
-              timeout-minutes: 15
+              timeout-minutes: 20
               # For now disable unguarded-availability-new warnings because we
               # internally use APIs that we are annotating as only available on
               # new enough versions.  Maybe we should change out deployment
