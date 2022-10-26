@@ -34,7 +34,7 @@ public:
     virtual void StartEvent(const std::string & label)                       = 0;
     virtual void AddField(const std::string & tag, const std::string & data) = 0;
     virtual void FinishEvent()                                               = 0;
-    virtual void CleanJsonBuf(void)                                          = 0;
+    virtual void CleanJsonBuf()                                          = 0;
 };
 
 class TraceStreamLog : public TraceStream
@@ -54,7 +54,7 @@ public:
 
     void FinishEvent() override { ChipLogAutomation("TraceStream:%s", mStreamLine.c_str()); }
 
-    void CleanJsonBuf(void) override {}
+    void CleanJsonBuf() override {}
 
 protected:
     std::string mStreamLine;
@@ -89,14 +89,14 @@ public:
 
     void FinishEvent() override {}
 
-    void CleanJsonBuf(void) override {}
+    void CleanJsonBuf() override {}
 
 private:
     std::ofstream mFile;
 };
 
 void AddTraceStream(TraceStream * stream);
-void ResetTraceStream(void);
+void ResetTraceStream();
 void InitTrace();
 void DeInitTrace();
 

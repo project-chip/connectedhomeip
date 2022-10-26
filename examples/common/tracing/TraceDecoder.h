@@ -44,7 +44,8 @@ public:
         snprintf(buffer, sizeof(buffer), "    %s\t %s", tag.c_str(), data.c_str());
         ReadString(buffer);
     }
-    void CleanJsonBuf(void) override
+
+    void CleanJsonBuf() override
     {
         for (const auto & key : mJsonBuffer.getMemberNames())
         {
