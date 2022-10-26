@@ -196,6 +196,12 @@ config CHIP_OPERATIONAL_TIME_SAVE_INTERVAL
 	  precisely operation time in case of device reboot and maximizing flash memory
 	  lifetime.
 
+config CHIP_CRYPTO_PSA
+	bool "Use PSA crypto API for cryptographic operations"
+	help
+	  Use the backend for the Matter crypto layer that is based on PSA crypto
+	  API instead of the default, based on legacy mbedTLS APIs.
+
 config CHIP_MALLOC_SYS_HEAP
 	bool "Memory allocator based on Zephyr sys_heap"
 	imply SYS_HEAP_RUNTIME_STATS
