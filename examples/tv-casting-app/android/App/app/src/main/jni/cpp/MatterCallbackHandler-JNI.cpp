@@ -334,7 +334,8 @@ jobject TargetListSuccessHandlerJNI::ConvertToJObject(
 
         jmethodID constructor = env->GetMethodID(responseTypeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
         chip::UtfString targetInfoName(env, targetInfo.name);
-        jobject jTargetInfo = env->NewObject(responseTypeClass, constructor, ConvertToIntegerJObject(targetInfo.identifier), targetInfoName.jniValue());
+        jobject jTargetInfo = env->NewObject(responseTypeClass, constructor, ConvertToIntegerJObject(targetInfo.identifier),
+                                             targetInfoName.jniValue());
 
         chip::JniReferences::GetInstance().AddToList(jArrayList, jTargetInfo);
     }
