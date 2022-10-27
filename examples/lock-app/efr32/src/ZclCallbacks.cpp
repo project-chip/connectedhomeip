@@ -41,7 +41,9 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
     if (clusterId == DoorLock::Id && attributeId == DoorLock::Attributes::LockState::Id)
     {
-        ChipLogProgress(Zcl, "Door lock cluster: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
+        DoorLock::DlLockState lockState = *(reinterpret_cast<DoorLock::DlLockState *>(value));
+        ChipLogProgress(Zcl, "Door lock cluster: " ChipLogFormatMEI " state %d", ChipLogValueMEI(clusterId),
+                        to_underlying(lockState));
     }
 }
 
@@ -145,4 +147,10 @@ DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t h
                                           uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode)
 {
     return LockMgr().SetHolidaySchedule(endpointId, holidayIndex, status, localStartTime, localEndTime, operatingMode);
+}
+
+void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId)
+{
+    // Apply the relock state in the application control
+    LockMgr().InitiateAction(AppEvent::kEventType_Lock, LockManager::LOCK_ACTION);
 }

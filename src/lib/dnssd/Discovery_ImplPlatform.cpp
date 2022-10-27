@@ -641,6 +641,12 @@ CHIP_ERROR DiscoveryImplPlatform::StopDiscovery()
     return mResolverProxy.StopDiscovery();
 }
 
+CHIP_ERROR DiscoveryImplPlatform::ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId)
+{
+    ReturnErrorOnFailure(InitImpl());
+    return mResolverProxy.ReconfirmRecord(hostname, address, interfaceId);
+}
+
 DiscoveryImplPlatform & DiscoveryImplPlatform::GetInstance()
 {
     return sManager;
@@ -748,6 +754,11 @@ CHIP_ERROR ResolverProxy::StopDiscovery()
     CHIP_ERROR err = ChipDnssdStopBrowse(mDiscoveryContext.Value());
     mDiscoveryContext.ClearValue();
     return err;
+}
+
+CHIP_ERROR ResolverProxy::ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId)
+{
+    return ChipDnssdReconfirmRecord(hostname, address, interfaceId);
 }
 
 } // namespace Dnssd

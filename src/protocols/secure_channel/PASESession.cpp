@@ -57,10 +57,15 @@ const char * kSpake2pContext        = "CHIP PAKE V1 Commissioning";
 const char * kSpake2pI2RSessionInfo = "Commissioning I2R Key";
 const char * kSpake2pR2ISessionInfo = "Commissioning R2I Key";
 
-// Wait at most 30 seconds for the response from the peer.
-// This timeout value assumes the underlying transport is reliable.
-// The session establishment fails if the response is not received with in timeout window.
-static constexpr ExchangeContext::Timeout kSpake2p_Response_Timeout = System::Clock::Seconds16(30);
+// Amounts of time to allow for server-side processing of messages.
+//
+// These timeout values only allow for the server-side processing and assume that any transport-specific
+// latency will be added to them.
+//
+// The session establishment fails if the response is not received within the resulting timeout window,
+// which accounts for both transport latency and the server-side latency.
+static constexpr ExchangeContext::Timeout kExpectedLowProcessingTime  = System::Clock::Seconds16(2);
+static constexpr ExchangeContext::Timeout kExpectedHighProcessingTime = System::Clock::Seconds16(30);
 
 PASESession::~PASESession()
 {
@@ -216,7 +221,7 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
     // When commissioning starts, the peer is assumed to be active.
     mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->MarkActiveRx();
 
-    mExchangeCtxt->SetResponseTimeout(kSpake2p_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
+    mExchangeCtxt->UseSuggestedResponseTimeout(kExpectedLowProcessingTime);
 
     mLocalMRPConfig = mrpLocalConfig;
 
@@ -787,8 +792,8 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, cons
     else
     {
         mExchangeCtxt = exchange;
-        mExchangeCtxt->SetResponseTimeout(kSpake2p_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
     }
+    mExchangeCtxt->UseSuggestedResponseTimeout(kExpectedHighProcessingTime);
 
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((mNextExpectedMsg.HasValue() && payloadHeader.HasMessageType(mNextExpectedMsg.Value())) ||

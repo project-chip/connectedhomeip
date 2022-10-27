@@ -17,14 +17,14 @@
  */
 package chip.devicecontroller;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import javax.annotation.Nullable;
 
 /** Class for holding WiFi or Thread credentials, but not both. */
-public class NetworkCredentials implements Parcelable {
+public class NetworkCredentials {
   @Nullable private WiFiCredentials wifiCredentials;
   @Nullable private ThreadCredentials threadCredentials;
+
+  public NetworkCredentials() {}
 
   private NetworkCredentials(
       @Nullable WiFiCredentials wifiCredentials, @Nullable ThreadCredentials threadCredentials) {
@@ -54,38 +54,23 @@ public class NetworkCredentials implements Parcelable {
     return threadCredentials;
   }
 
-  // Begin Parcelable implementation
-
-  private NetworkCredentials(Parcel in) {
-    wifiCredentials = in.readParcelable(WiFiCredentials.class.getClassLoader());
-    threadCredentials = in.readParcelable(ThreadCredentials.class.getClassLoader());
+  public void setWiFiCredentials(String ssid, String password) {
+    wifiCredentials.set(ssid, password);
   }
 
-  public int describeContents() {
-    return 0;
+  public void setThreadCredentials(byte[] operationalDataset) {
+    threadCredentials.set(operationalDataset);
   }
 
-  public void writeToParcel(Parcel out, int flags) {
-    out.writeParcelable(wifiCredentials, 0);
-    out.writeParcelable(threadCredentials, 0);
-  }
-
-  public static final Parcelable.Creator<NetworkCredentials> CREATOR =
-      new Parcelable.Creator<NetworkCredentials>() {
-        public NetworkCredentials createFromParcel(Parcel in) {
-          return new NetworkCredentials(in);
-        }
-
-        public NetworkCredentials[] newArray(int size) {
-          return new NetworkCredentials[size];
-        }
-      };
-
-  public static class WiFiCredentials implements Parcelable {
-    private final String ssid;
-    private final String password;
+  public static class WiFiCredentials {
+    private String ssid;
+    private String password;
 
     public WiFiCredentials(String ssid, String password) {
+      set(ssid, password);
+    }
+
+    public void set(String ssid, String password) {
       this.ssid = ssid;
       this.password = password;
     }
@@ -97,71 +82,21 @@ public class NetworkCredentials implements Parcelable {
     public String getPassword() {
       return password;
     }
-
-    // Begin Parcelable implementation
-
-    private WiFiCredentials(Parcel in) {
-      ssid = in.readString();
-      password = in.readString();
-    }
-
-    public int describeContents() {
-      return 0;
-    }
-
-    public void writeToParcel(Parcel out, int flags) {
-      out.writeString(ssid);
-      out.writeString(password);
-    }
-
-    public static final Parcelable.Creator<WiFiCredentials> CREATOR =
-        new Parcelable.Creator<WiFiCredentials>() {
-          public WiFiCredentials createFromParcel(Parcel in) {
-            return new WiFiCredentials(in);
-          }
-
-          public WiFiCredentials[] newArray(int size) {
-            return new WiFiCredentials[size];
-          }
-        };
   }
 
-  public static class ThreadCredentials implements Parcelable {
-    private final byte[] operationalDataset;
+  public static class ThreadCredentials {
+    private byte[] operationalDataset;
 
     public ThreadCredentials(byte[] operationalDataset) {
+      set(operationalDataset);
+    }
+
+    public void set(byte[] operationalDataset) {
       this.operationalDataset = operationalDataset;
     }
 
     public byte[] getOperationalDataset() {
       return operationalDataset;
     }
-
-    // Begin Parcelable implementation
-
-    private ThreadCredentials(Parcel in) {
-      operationalDataset = new byte[in.readInt()];
-      in.readByteArray(operationalDataset);
-    }
-
-    public int describeContents() {
-      return 0;
-    }
-
-    public void writeToParcel(Parcel out, int flags) {
-      out.writeInt(operationalDataset.length);
-      out.writeByteArray(operationalDataset);
-    }
-
-    public static final Parcelable.Creator<ThreadCredentials> CREATOR =
-        new Parcelable.Creator<ThreadCredentials>() {
-          public ThreadCredentials createFromParcel(Parcel in) {
-            return new ThreadCredentials(in);
-          }
-
-          public ThreadCredentials[] newArray(int size) {
-            return new ThreadCredentials[size];
-          }
-        };
   }
 }

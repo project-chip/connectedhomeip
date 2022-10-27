@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#if LWIP_IPV4 && LWIP_DHCP
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -143,3 +145,5 @@ uint8_t dhcpclient_poll(void * arg)
     }
     return dhcp_state;
 }
+
+#endif /* LWIP_IPV4 && LWIP_DHCP */

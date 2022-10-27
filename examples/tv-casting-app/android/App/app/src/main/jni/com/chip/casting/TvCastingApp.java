@@ -95,6 +95,10 @@ public class TvCastingApp {
       FailureCallback onConnectionFailure,
       SuccessCallback<ContentApp> onNewOrUpdatedEndpointCallback);
 
+  public native void shutdownAllSubscriptions();
+
+  public native void disconnect();
+
   public native List<VideoPlayer> getActiveTargetVideoPlayers();
 
   /*
@@ -328,7 +332,7 @@ public class TvCastingApp {
 
   public native boolean applicationBasic_readVendorID(
       ContentApp contentApp,
-      SuccessCallback<Short> readSuccessHandler,
+      SuccessCallback<Integer> readSuccessHandler,
       FailureCallback readFailureHandler);
 
   public native boolean applicationBasic_readApplicationName(
@@ -338,7 +342,7 @@ public class TvCastingApp {
 
   public native boolean applicationBasic_readProductID(
       ContentApp contentApp,
-      SuccessCallback<Short> readSuccessHandler,
+      SuccessCallback<Integer> readSuccessHandler,
       FailureCallback readFailureHandler);
 
   public native boolean applicationBasic_readApplicationVersion(

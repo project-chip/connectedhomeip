@@ -19,6 +19,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import "MTRAsyncCallbackWorkQueue.h"
 #import "MTRAttributeCacheContainer_Internal.h"
 #import "MTRBaseDevice_internal.h"
 #import "MTRCallbackBridge_internal.h"
@@ -63,30 +64,47 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Identify::Commands::Identify::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Identify::Commands::Identify::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.identifyTime = params.identifyTime.unsignedShortValue;
+                request.identifyTime = params.identifyTime.unsignedShortValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::IdentifyCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::IdentifyCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)triggerEffectWithParams:(MTRIdentifyClusterTriggerEffectParams *)params
@@ -96,33 +114,50 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Identify::Commands::TriggerEffect::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Identify::Commands::TriggerEffect::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.effectIdentifier = static_cast<std::remove_reference_t<decltype(request.effectIdentifier)>>(
-                params.effectIdentifier.unsignedCharValue);
-            request.effectVariant
-                = static_cast<std::remove_reference_t<decltype(request.effectVariant)>>(params.effectVariant.unsignedCharValue);
+                request.effectIdentifier = static_cast<std::remove_reference_t<decltype(request.effectIdentifier)>>(
+                    params.effectIdentifier.unsignedCharValue);
+                request.effectVariant
+                    = static_cast<std::remove_reference_t<decltype(request.effectVariant)>>(params.effectVariant.unsignedCharValue);
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::IdentifyCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::IdentifyCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeIdentifyTimeWithParams:(MTRReadParams * _Nullable)params
@@ -225,27 +260,43 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRGroupsClusterAddGroupResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Groups::Commands::AddGroup::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRGroupsClusterAddGroupResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Groups::Commands::AddGroup::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.groupId = params.groupId.unsignedShortValue;
-            request.groupName = [self asCharSpan:params.groupName];
+                request.groupId = params.groupId.unsignedShortValue;
+                request.groupName = [self asCharSpan:params.groupName];
 
-            auto successFn = Callback<GroupsClusterAddGroupResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<GroupsClusterAddGroupResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)viewGroupWithParams:(MTRGroupsClusterViewGroupParams *)params
@@ -256,26 +307,42 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRGroupsClusterViewGroupResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Groups::Commands::ViewGroup::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRGroupsClusterViewGroupResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Groups::Commands::ViewGroup::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.groupId = params.groupId.unsignedShortValue;
+                request.groupId = params.groupId.unsignedShortValue;
 
-            auto successFn = Callback<GroupsClusterViewGroupResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<GroupsClusterViewGroupResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)getGroupMembershipWithParams:(MTRGroupsClusterGetGroupMembershipParams *)params
@@ -286,47 +353,63 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRGroupsClusterGetGroupMembershipResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Groups::Commands::GetGroupMembership::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRGroupsClusterGetGroupMembershipResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Groups::Commands::GetGroupMembership::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            {
-                using ListType_0 = std::remove_reference_t<decltype(request.groupList)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (params.groupList.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.groupList.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < params.groupList.count; ++i_0) {
-                        if (![params.groupList[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
+                {
+                    using ListType_0 = std::remove_reference_t<decltype(request.groupList)>;
+                    using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                    if (params.groupList.count != 0) {
+                        auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.groupList.count);
+                        if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (NSNumber *) params.groupList[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedShortValue;
+                        listFreer.add(listHolder_0);
+                        for (size_t i_0 = 0; i_0 < params.groupList.count; ++i_0) {
+                            if (![params.groupList[i_0] isKindOfClass:[NSNumber class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_0 = (NSNumber *) params.groupList[i_0];
+                            listHolder_0->mList[i_0] = element_0.unsignedShortValue;
+                        }
+                        request.groupList = ListType_0(listHolder_0->mList, params.groupList.count);
+                    } else {
+                        request.groupList = ListType_0();
                     }
-                    request.groupList = ListType_0(listHolder_0->mList, params.groupList.count);
-                } else {
-                    request.groupList = ListType_0();
                 }
-            }
 
-            auto successFn = Callback<GroupsClusterGetGroupMembershipResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<GroupsClusterGetGroupMembershipResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)removeGroupWithParams:(MTRGroupsClusterRemoveGroupParams *)params
@@ -337,26 +420,42 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRGroupsClusterRemoveGroupResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Groups::Commands::RemoveGroup::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRGroupsClusterRemoveGroupResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Groups::Commands::RemoveGroup::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.groupId = params.groupId.unsignedShortValue;
+                request.groupId = params.groupId.unsignedShortValue;
 
-            auto successFn = Callback<GroupsClusterRemoveGroupResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<GroupsClusterRemoveGroupResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)removeAllGroupsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -375,29 +474,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Groups::Commands::RemoveAllGroups::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Groups::Commands::RemoveAllGroups::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)addGroupIfIdentifyingWithParams:(MTRGroupsClusterAddGroupIfIdentifyingParams *)params
@@ -407,31 +523,48 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Groups::Commands::AddGroupIfIdentifying::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Groups::Commands::AddGroupIfIdentifying::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.groupId = params.groupId.unsignedShortValue;
-            request.groupName = [self asCharSpan:params.groupName];
+                request.groupId = params.groupId.unsignedShortValue;
+                request.groupName = [self asCharSpan:params.groupName];
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNameSupportWithParams:(MTRReadParams * _Nullable)params
@@ -507,102 +640,119 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRScenesClusterAddSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Scenes::Commands::AddScene::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRScenesClusterAddSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Scenes::Commands::AddScene::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.groupId = params.groupId.unsignedShortValue;
-            request.sceneId = params.sceneId.unsignedCharValue;
-            request.transitionTime = params.transitionTime.unsignedShortValue;
-            request.sceneName = [self asCharSpan:params.sceneName];
-            {
-                using ListType_0 = std::remove_reference_t<decltype(request.extensionFieldSets)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (params.extensionFieldSets.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.extensionFieldSets.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < params.extensionFieldSets.count; ++i_0) {
-                        if (![params.extensionFieldSets[i_0] isKindOfClass:[MTRScenesClusterExtensionFieldSet class]]) {
-                            // Wrong kind of value.
+                request.groupId = params.groupId.unsignedShortValue;
+                request.sceneId = params.sceneId.unsignedCharValue;
+                request.transitionTime = params.transitionTime.unsignedShortValue;
+                request.sceneName = [self asCharSpan:params.sceneName];
+                {
+                    using ListType_0 = std::remove_reference_t<decltype(request.extensionFieldSets)>;
+                    using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                    if (params.extensionFieldSets.count != 0) {
+                        auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.extensionFieldSets.count);
+                        if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (MTRScenesClusterExtensionFieldSet *) params.extensionFieldSets[i_0];
-                        listHolder_0->mList[i_0].clusterId = element_0.clusterId.unsignedIntValue;
-                        {
-                            using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].attributeValueList)>;
-                            using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                            if (element_0.attributeValueList.count != 0) {
-                                auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.attributeValueList.count);
-                                if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
-                                    return CHIP_ERROR_INVALID_ARGUMENT;
-                                }
-                                listFreer.add(listHolder_2);
-                                for (size_t i_2 = 0; i_2 < element_0.attributeValueList.count; ++i_2) {
-                                    if (![element_0.attributeValueList[i_2]
-                                            isKindOfClass:[MTRScenesClusterAttributeValuePair class]]) {
-                                        // Wrong kind of value.
+                        listFreer.add(listHolder_0);
+                        for (size_t i_0 = 0; i_0 < params.extensionFieldSets.count; ++i_0) {
+                            if (![params.extensionFieldSets[i_0] isKindOfClass:[MTRScenesClusterExtensionFieldSet class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_0 = (MTRScenesClusterExtensionFieldSet *) params.extensionFieldSets[i_0];
+                            listHolder_0->mList[i_0].clusterId = element_0.clusterId.unsignedIntValue;
+                            {
+                                using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].attributeValueList)>;
+                                using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                                if (element_0.attributeValueList.count != 0) {
+                                    auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.attributeValueList.count);
+                                    if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
                                         return CHIP_ERROR_INVALID_ARGUMENT;
                                     }
-                                    auto element_2 = (MTRScenesClusterAttributeValuePair *) element_0.attributeValueList[i_2];
-                                    if (element_2.attributeId != nil) {
-                                        auto & definedValue_4 = listHolder_2->mList[i_2].attributeId.Emplace();
-                                        definedValue_4 = element_2.attributeId.unsignedIntValue;
-                                    }
-                                    {
-                                        using ListType_4
-                                            = std::remove_reference_t<decltype(listHolder_2->mList[i_2].attributeValue)>;
-                                        using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
-                                        if (element_2.attributeValue.count != 0) {
-                                            auto * listHolder_4 = new ListHolder<ListMemberType_4>(element_2.attributeValue.count);
-                                            if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
-                                                return CHIP_ERROR_INVALID_ARGUMENT;
-                                            }
-                                            listFreer.add(listHolder_4);
-                                            for (size_t i_4 = 0; i_4 < element_2.attributeValue.count; ++i_4) {
-                                                if (![element_2.attributeValue[i_4] isKindOfClass:[NSNumber class]]) {
-                                                    // Wrong kind of value.
+                                    listFreer.add(listHolder_2);
+                                    for (size_t i_2 = 0; i_2 < element_0.attributeValueList.count; ++i_2) {
+                                        if (![element_0.attributeValueList[i_2]
+                                                isKindOfClass:[MTRScenesClusterAttributeValuePair class]]) {
+                                            // Wrong kind of value.
+                                            return CHIP_ERROR_INVALID_ARGUMENT;
+                                        }
+                                        auto element_2 = (MTRScenesClusterAttributeValuePair *) element_0.attributeValueList[i_2];
+                                        if (element_2.attributeId != nil) {
+                                            auto & definedValue_4 = listHolder_2->mList[i_2].attributeId.Emplace();
+                                            definedValue_4 = element_2.attributeId.unsignedIntValue;
+                                        }
+                                        {
+                                            using ListType_4
+                                                = std::remove_reference_t<decltype(listHolder_2->mList[i_2].attributeValue)>;
+                                            using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
+                                            if (element_2.attributeValue.count != 0) {
+                                                auto * listHolder_4
+                                                    = new ListHolder<ListMemberType_4>(element_2.attributeValue.count);
+                                                if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
                                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                                 }
-                                                auto element_4 = (NSNumber *) element_2.attributeValue[i_4];
-                                                listHolder_4->mList[i_4] = element_4.unsignedCharValue;
+                                                listFreer.add(listHolder_4);
+                                                for (size_t i_4 = 0; i_4 < element_2.attributeValue.count; ++i_4) {
+                                                    if (![element_2.attributeValue[i_4] isKindOfClass:[NSNumber class]]) {
+                                                        // Wrong kind of value.
+                                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                                    }
+                                                    auto element_4 = (NSNumber *) element_2.attributeValue[i_4];
+                                                    listHolder_4->mList[i_4] = element_4.unsignedCharValue;
+                                                }
+                                                listHolder_2->mList[i_2].attributeValue
+                                                    = ListType_4(listHolder_4->mList, element_2.attributeValue.count);
+                                            } else {
+                                                listHolder_2->mList[i_2].attributeValue = ListType_4();
                                             }
-                                            listHolder_2->mList[i_2].attributeValue
-                                                = ListType_4(listHolder_4->mList, element_2.attributeValue.count);
-                                        } else {
-                                            listHolder_2->mList[i_2].attributeValue = ListType_4();
                                         }
                                     }
+                                    listHolder_0->mList[i_0].attributeValueList
+                                        = ListType_2(listHolder_2->mList, element_0.attributeValueList.count);
+                                } else {
+                                    listHolder_0->mList[i_0].attributeValueList = ListType_2();
                                 }
-                                listHolder_0->mList[i_0].attributeValueList
-                                    = ListType_2(listHolder_2->mList, element_0.attributeValueList.count);
-                            } else {
-                                listHolder_0->mList[i_0].attributeValueList = ListType_2();
                             }
                         }
+                        request.extensionFieldSets = ListType_0(listHolder_0->mList, params.extensionFieldSets.count);
+                    } else {
+                        request.extensionFieldSets = ListType_0();
                     }
-                    request.extensionFieldSets = ListType_0(listHolder_0->mList, params.extensionFieldSets.count);
-                } else {
-                    request.extensionFieldSets = ListType_0();
                 }
-            }
 
-            auto successFn = Callback<ScenesClusterAddSceneResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<ScenesClusterAddSceneResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)viewSceneWithParams:(MTRScenesClusterViewSceneParams *)params
@@ -613,27 +763,43 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRScenesClusterViewSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Scenes::Commands::ViewScene::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRScenesClusterViewSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Scenes::Commands::ViewScene::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.groupId = params.groupId.unsignedShortValue;
-            request.sceneId = params.sceneId.unsignedCharValue;
+                request.groupId = params.groupId.unsignedShortValue;
+                request.sceneId = params.sceneId.unsignedCharValue;
 
-            auto successFn = Callback<ScenesClusterViewSceneResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<ScenesClusterViewSceneResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)removeSceneWithParams:(MTRScenesClusterRemoveSceneParams *)params
@@ -644,27 +810,43 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRScenesClusterRemoveSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Scenes::Commands::RemoveScene::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRScenesClusterRemoveSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Scenes::Commands::RemoveScene::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.groupId = params.groupId.unsignedShortValue;
-            request.sceneId = params.sceneId.unsignedCharValue;
+                request.groupId = params.groupId.unsignedShortValue;
+                request.sceneId = params.sceneId.unsignedCharValue;
 
-            auto successFn = Callback<ScenesClusterRemoveSceneResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<ScenesClusterRemoveSceneResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)removeAllScenesWithParams:(MTRScenesClusterRemoveAllScenesParams *)params
@@ -675,26 +857,42 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRScenesClusterRemoveAllScenesResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Scenes::Commands::RemoveAllScenes::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRScenesClusterRemoveAllScenesResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Scenes::Commands::RemoveAllScenes::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.groupId = params.groupId.unsignedShortValue;
+                request.groupId = params.groupId.unsignedShortValue;
 
-            auto successFn = Callback<ScenesClusterRemoveAllScenesResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<ScenesClusterRemoveAllScenesResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)storeSceneWithParams:(MTRScenesClusterStoreSceneParams *)params
@@ -705,27 +903,43 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRScenesClusterStoreSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Scenes::Commands::StoreScene::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRScenesClusterStoreSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Scenes::Commands::StoreScene::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.groupId = params.groupId.unsignedShortValue;
-            request.sceneId = params.sceneId.unsignedCharValue;
+                request.groupId = params.groupId.unsignedShortValue;
+                request.sceneId = params.sceneId.unsignedCharValue;
 
-            auto successFn = Callback<ScenesClusterStoreSceneResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<ScenesClusterStoreSceneResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)recallSceneWithParams:(MTRScenesClusterRecallSceneParams *)params
@@ -735,40 +949,57 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Scenes::Commands::RecallScene::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Scenes::Commands::RecallScene::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.groupId = params.groupId.unsignedShortValue;
-            request.sceneId = params.sceneId.unsignedCharValue;
-            if (params.transitionTime != nil) {
-                auto & definedValue_0 = request.transitionTime.Emplace();
-                if (params.transitionTime == nil) {
-                    definedValue_0.SetNull();
-                } else {
-                    auto & nonNullValue_1 = definedValue_0.SetNonNull();
-                    nonNullValue_1 = params.transitionTime.unsignedShortValue;
+                request.groupId = params.groupId.unsignedShortValue;
+                request.sceneId = params.sceneId.unsignedCharValue;
+                if (params.transitionTime != nil) {
+                    auto & definedValue_0 = request.transitionTime.Emplace();
+                    if (params.transitionTime == nil) {
+                        definedValue_0.SetNull();
+                    } else {
+                        auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                        nonNullValue_1 = params.transitionTime.unsignedShortValue;
+                    }
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)getSceneMembershipWithParams:(MTRScenesClusterGetSceneMembershipParams *)params
@@ -779,26 +1010,42 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRScenesClusterGetSceneMembershipResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Scenes::Commands::GetSceneMembership::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRScenesClusterGetSceneMembershipResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Scenes::Commands::GetSceneMembership::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.groupId = params.groupId.unsignedShortValue;
+                request.groupId = params.groupId.unsignedShortValue;
 
-            auto successFn = Callback<ScenesClusterGetSceneMembershipResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<ScenesClusterGetSceneMembershipResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)enhancedAddSceneWithParams:(MTRScenesClusterEnhancedAddSceneParams *)params
@@ -809,102 +1056,119 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRScenesClusterEnhancedAddSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Scenes::Commands::EnhancedAddScene::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRScenesClusterEnhancedAddSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Scenes::Commands::EnhancedAddScene::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.groupId = params.groupId.unsignedShortValue;
-            request.sceneId = params.sceneId.unsignedCharValue;
-            request.transitionTime = params.transitionTime.unsignedShortValue;
-            request.sceneName = [self asCharSpan:params.sceneName];
-            {
-                using ListType_0 = std::remove_reference_t<decltype(request.extensionFieldSets)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (params.extensionFieldSets.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.extensionFieldSets.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < params.extensionFieldSets.count; ++i_0) {
-                        if (![params.extensionFieldSets[i_0] isKindOfClass:[MTRScenesClusterExtensionFieldSet class]]) {
-                            // Wrong kind of value.
+                request.groupId = params.groupId.unsignedShortValue;
+                request.sceneId = params.sceneId.unsignedCharValue;
+                request.transitionTime = params.transitionTime.unsignedShortValue;
+                request.sceneName = [self asCharSpan:params.sceneName];
+                {
+                    using ListType_0 = std::remove_reference_t<decltype(request.extensionFieldSets)>;
+                    using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                    if (params.extensionFieldSets.count != 0) {
+                        auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.extensionFieldSets.count);
+                        if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (MTRScenesClusterExtensionFieldSet *) params.extensionFieldSets[i_0];
-                        listHolder_0->mList[i_0].clusterId = element_0.clusterId.unsignedIntValue;
-                        {
-                            using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].attributeValueList)>;
-                            using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                            if (element_0.attributeValueList.count != 0) {
-                                auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.attributeValueList.count);
-                                if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
-                                    return CHIP_ERROR_INVALID_ARGUMENT;
-                                }
-                                listFreer.add(listHolder_2);
-                                for (size_t i_2 = 0; i_2 < element_0.attributeValueList.count; ++i_2) {
-                                    if (![element_0.attributeValueList[i_2]
-                                            isKindOfClass:[MTRScenesClusterAttributeValuePair class]]) {
-                                        // Wrong kind of value.
+                        listFreer.add(listHolder_0);
+                        for (size_t i_0 = 0; i_0 < params.extensionFieldSets.count; ++i_0) {
+                            if (![params.extensionFieldSets[i_0] isKindOfClass:[MTRScenesClusterExtensionFieldSet class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_0 = (MTRScenesClusterExtensionFieldSet *) params.extensionFieldSets[i_0];
+                            listHolder_0->mList[i_0].clusterId = element_0.clusterId.unsignedIntValue;
+                            {
+                                using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].attributeValueList)>;
+                                using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                                if (element_0.attributeValueList.count != 0) {
+                                    auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.attributeValueList.count);
+                                    if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
                                         return CHIP_ERROR_INVALID_ARGUMENT;
                                     }
-                                    auto element_2 = (MTRScenesClusterAttributeValuePair *) element_0.attributeValueList[i_2];
-                                    if (element_2.attributeId != nil) {
-                                        auto & definedValue_4 = listHolder_2->mList[i_2].attributeId.Emplace();
-                                        definedValue_4 = element_2.attributeId.unsignedIntValue;
-                                    }
-                                    {
-                                        using ListType_4
-                                            = std::remove_reference_t<decltype(listHolder_2->mList[i_2].attributeValue)>;
-                                        using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
-                                        if (element_2.attributeValue.count != 0) {
-                                            auto * listHolder_4 = new ListHolder<ListMemberType_4>(element_2.attributeValue.count);
-                                            if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
-                                                return CHIP_ERROR_INVALID_ARGUMENT;
-                                            }
-                                            listFreer.add(listHolder_4);
-                                            for (size_t i_4 = 0; i_4 < element_2.attributeValue.count; ++i_4) {
-                                                if (![element_2.attributeValue[i_4] isKindOfClass:[NSNumber class]]) {
-                                                    // Wrong kind of value.
+                                    listFreer.add(listHolder_2);
+                                    for (size_t i_2 = 0; i_2 < element_0.attributeValueList.count; ++i_2) {
+                                        if (![element_0.attributeValueList[i_2]
+                                                isKindOfClass:[MTRScenesClusterAttributeValuePair class]]) {
+                                            // Wrong kind of value.
+                                            return CHIP_ERROR_INVALID_ARGUMENT;
+                                        }
+                                        auto element_2 = (MTRScenesClusterAttributeValuePair *) element_0.attributeValueList[i_2];
+                                        if (element_2.attributeId != nil) {
+                                            auto & definedValue_4 = listHolder_2->mList[i_2].attributeId.Emplace();
+                                            definedValue_4 = element_2.attributeId.unsignedIntValue;
+                                        }
+                                        {
+                                            using ListType_4
+                                                = std::remove_reference_t<decltype(listHolder_2->mList[i_2].attributeValue)>;
+                                            using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
+                                            if (element_2.attributeValue.count != 0) {
+                                                auto * listHolder_4
+                                                    = new ListHolder<ListMemberType_4>(element_2.attributeValue.count);
+                                                if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
                                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                                 }
-                                                auto element_4 = (NSNumber *) element_2.attributeValue[i_4];
-                                                listHolder_4->mList[i_4] = element_4.unsignedCharValue;
+                                                listFreer.add(listHolder_4);
+                                                for (size_t i_4 = 0; i_4 < element_2.attributeValue.count; ++i_4) {
+                                                    if (![element_2.attributeValue[i_4] isKindOfClass:[NSNumber class]]) {
+                                                        // Wrong kind of value.
+                                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                                    }
+                                                    auto element_4 = (NSNumber *) element_2.attributeValue[i_4];
+                                                    listHolder_4->mList[i_4] = element_4.unsignedCharValue;
+                                                }
+                                                listHolder_2->mList[i_2].attributeValue
+                                                    = ListType_4(listHolder_4->mList, element_2.attributeValue.count);
+                                            } else {
+                                                listHolder_2->mList[i_2].attributeValue = ListType_4();
                                             }
-                                            listHolder_2->mList[i_2].attributeValue
-                                                = ListType_4(listHolder_4->mList, element_2.attributeValue.count);
-                                        } else {
-                                            listHolder_2->mList[i_2].attributeValue = ListType_4();
                                         }
                                     }
+                                    listHolder_0->mList[i_0].attributeValueList
+                                        = ListType_2(listHolder_2->mList, element_0.attributeValueList.count);
+                                } else {
+                                    listHolder_0->mList[i_0].attributeValueList = ListType_2();
                                 }
-                                listHolder_0->mList[i_0].attributeValueList
-                                    = ListType_2(listHolder_2->mList, element_0.attributeValueList.count);
-                            } else {
-                                listHolder_0->mList[i_0].attributeValueList = ListType_2();
                             }
                         }
+                        request.extensionFieldSets = ListType_0(listHolder_0->mList, params.extensionFieldSets.count);
+                    } else {
+                        request.extensionFieldSets = ListType_0();
                     }
-                    request.extensionFieldSets = ListType_0(listHolder_0->mList, params.extensionFieldSets.count);
-                } else {
-                    request.extensionFieldSets = ListType_0();
                 }
-            }
 
-            auto successFn = Callback<ScenesClusterEnhancedAddSceneResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<ScenesClusterEnhancedAddSceneResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)enhancedViewSceneWithParams:(MTRScenesClusterEnhancedViewSceneParams *)params
@@ -915,27 +1179,43 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRScenesClusterEnhancedViewSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Scenes::Commands::EnhancedViewScene::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRScenesClusterEnhancedViewSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Scenes::Commands::EnhancedViewScene::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.groupId = params.groupId.unsignedShortValue;
-            request.sceneId = params.sceneId.unsignedCharValue;
+                request.groupId = params.groupId.unsignedShortValue;
+                request.sceneId = params.sceneId.unsignedCharValue;
 
-            auto successFn = Callback<ScenesClusterEnhancedViewSceneResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<ScenesClusterEnhancedViewSceneResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)copySceneWithParams:(MTRScenesClusterCopySceneParams *)params
@@ -946,30 +1226,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRScenesClusterCopySceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Scenes::Commands::CopyScene::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRScenesClusterCopySceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Scenes::Commands::CopyScene::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.mode = static_cast<std::remove_reference_t<decltype(request.mode)>>(params.mode.unsignedCharValue);
-            request.groupIdFrom = params.groupIdFrom.unsignedShortValue;
-            request.sceneIdFrom = params.sceneIdFrom.unsignedCharValue;
-            request.groupIdTo = params.groupIdTo.unsignedShortValue;
-            request.sceneIdTo = params.sceneIdTo.unsignedCharValue;
+                request.mode = static_cast<std::remove_reference_t<decltype(request.mode)>>(params.mode.unsignedCharValue);
+                request.groupIdFrom = params.groupIdFrom.unsignedShortValue;
+                request.sceneIdFrom = params.sceneIdFrom.unsignedCharValue;
+                request.groupIdTo = params.groupIdTo.unsignedShortValue;
+                request.sceneIdTo = params.sceneIdTo.unsignedCharValue;
 
-            auto successFn = Callback<ScenesClusterCopySceneResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<ScenesClusterCopySceneResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSceneCountWithParams:(MTRReadParams * _Nullable)params
@@ -1093,29 +1389,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            OnOff::Commands::Off::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                OnOff::Commands::Off::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::OnOffCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::OnOffCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)onWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -1134,29 +1447,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            OnOff::Commands::On::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                OnOff::Commands::On::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::OnOffCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::OnOffCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)toggleWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -1175,29 +1505,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            OnOff::Commands::Toggle::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                OnOff::Commands::Toggle::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::OnOffCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::OnOffCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)offWithEffectWithParams:(MTROnOffClusterOffWithEffectParams *)params
@@ -1207,32 +1554,50 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            OnOff::Commands::OffWithEffect::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                OnOff::Commands::OffWithEffect::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.effectId = static_cast<std::remove_reference_t<decltype(request.effectId)>>(params.effectId.unsignedCharValue);
-            request.effectVariant
-                = static_cast<std::remove_reference_t<decltype(request.effectVariant)>>(params.effectVariant.unsignedCharValue);
+                request.effectId
+                    = static_cast<std::remove_reference_t<decltype(request.effectId)>>(params.effectId.unsignedCharValue);
+                request.effectVariant
+                    = static_cast<std::remove_reference_t<decltype(request.effectVariant)>>(params.effectVariant.unsignedCharValue);
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::OnOffCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::OnOffCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)onWithRecallGlobalSceneWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -1251,29 +1616,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            OnOff::Commands::OnWithRecallGlobalScene::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                OnOff::Commands::OnWithRecallGlobalScene::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::OnOffCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::OnOffCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)onWithTimedOffWithParams:(MTROnOffClusterOnWithTimedOffParams *)params
@@ -1283,33 +1665,50 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            OnOff::Commands::OnWithTimedOff::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                OnOff::Commands::OnWithTimedOff::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.onOffControl
-                = static_cast<std::remove_reference_t<decltype(request.onOffControl)>>(params.onOffControl.unsignedCharValue);
-            request.onTime = params.onTime.unsignedShortValue;
-            request.offWaitTime = params.offWaitTime.unsignedShortValue;
+                request.onOffControl
+                    = static_cast<std::remove_reference_t<decltype(request.onOffControl)>>(params.onOffControl.unsignedCharValue);
+                request.onTime = params.onTime.unsignedShortValue;
+                request.offWaitTime = params.offWaitTime.unsignedShortValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::OnOffCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::OnOffCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOnOffWithParams:(MTRReadParams * _Nullable)params
@@ -1565,38 +1964,55 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            LevelControl::Commands::MoveToLevel::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                LevelControl::Commands::MoveToLevel::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.level = params.level.unsignedCharValue;
-            if (params.transitionTime == nil) {
-                request.transitionTime.SetNull();
-            } else {
-                auto & nonNullValue_0 = request.transitionTime.SetNonNull();
-                nonNullValue_0 = params.transitionTime.unsignedShortValue;
-            }
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.level = params.level.unsignedCharValue;
+                if (params.transitionTime == nil) {
+                    request.transitionTime.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.transitionTime.SetNonNull();
+                    nonNullValue_0 = params.transitionTime.unsignedShortValue;
+                }
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveWithParams:(MTRLevelControlClusterMoveParams *)params
@@ -1606,38 +2022,56 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            LevelControl::Commands::Move::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                LevelControl::Commands::Move::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
-            if (params.rate == nil) {
-                request.rate.SetNull();
-            } else {
-                auto & nonNullValue_0 = request.rate.SetNonNull();
-                nonNullValue_0 = params.rate.unsignedCharValue;
-            }
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.moveMode
+                    = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
+                if (params.rate == nil) {
+                    request.rate.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.rate.SetNonNull();
+                    nonNullValue_0 = params.rate.unsignedCharValue;
+                }
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stepWithParams:(MTRLevelControlClusterStepParams *)params
@@ -1647,39 +2081,57 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            LevelControl::Commands::Step::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                LevelControl::Commands::Step::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
-            request.stepSize = params.stepSize.unsignedCharValue;
-            if (params.transitionTime == nil) {
-                request.transitionTime.SetNull();
-            } else {
-                auto & nonNullValue_0 = request.transitionTime.SetNonNull();
-                nonNullValue_0 = params.transitionTime.unsignedShortValue;
-            }
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.stepMode
+                    = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
+                request.stepSize = params.stepSize.unsignedCharValue;
+                if (params.transitionTime == nil) {
+                    request.transitionTime.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.transitionTime.SetNonNull();
+                    nonNullValue_0 = params.transitionTime.unsignedShortValue;
+                }
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stopWithParams:(MTRLevelControlClusterStopParams *)params
@@ -1689,31 +2141,48 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            LevelControl::Commands::Stop::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                LevelControl::Commands::Stop::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveToLevelWithOnOffWithParams:(MTRLevelControlClusterMoveToLevelWithOnOffParams *)params
@@ -1723,38 +2192,55 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            LevelControl::Commands::MoveToLevelWithOnOff::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                LevelControl::Commands::MoveToLevelWithOnOff::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.level = params.level.unsignedCharValue;
-            if (params.transitionTime == nil) {
-                request.transitionTime.SetNull();
-            } else {
-                auto & nonNullValue_0 = request.transitionTime.SetNonNull();
-                nonNullValue_0 = params.transitionTime.unsignedShortValue;
-            }
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.level = params.level.unsignedCharValue;
+                if (params.transitionTime == nil) {
+                    request.transitionTime.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.transitionTime.SetNonNull();
+                    nonNullValue_0 = params.transitionTime.unsignedShortValue;
+                }
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveWithOnOffWithParams:(MTRLevelControlClusterMoveWithOnOffParams *)params
@@ -1764,38 +2250,56 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            LevelControl::Commands::MoveWithOnOff::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                LevelControl::Commands::MoveWithOnOff::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
-            if (params.rate == nil) {
-                request.rate.SetNull();
-            } else {
-                auto & nonNullValue_0 = request.rate.SetNonNull();
-                nonNullValue_0 = params.rate.unsignedCharValue;
-            }
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.moveMode
+                    = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
+                if (params.rate == nil) {
+                    request.rate.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.rate.SetNonNull();
+                    nonNullValue_0 = params.rate.unsignedCharValue;
+                }
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stepWithOnOffWithParams:(MTRLevelControlClusterStepWithOnOffParams *)params
@@ -1805,39 +2309,57 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            LevelControl::Commands::StepWithOnOff::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                LevelControl::Commands::StepWithOnOff::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
-            request.stepSize = params.stepSize.unsignedCharValue;
-            if (params.transitionTime == nil) {
-                request.transitionTime.SetNull();
-            } else {
-                auto & nonNullValue_0 = request.transitionTime.SetNonNull();
-                nonNullValue_0 = params.transitionTime.unsignedShortValue;
-            }
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.stepMode
+                    = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
+                request.stepSize = params.stepSize.unsignedCharValue;
+                if (params.transitionTime == nil) {
+                    request.transitionTime.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.transitionTime.SetNonNull();
+                    nonNullValue_0 = params.transitionTime.unsignedShortValue;
+                }
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stopWithOnOffWithParams:(MTRLevelControlClusterStopWithOnOffParams *)params
@@ -1847,31 +2369,48 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            LevelControl::Commands::StopWithOnOff::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                LevelControl::Commands::StopWithOnOff::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveToClosestFrequencyWithParams:(MTRLevelControlClusterMoveToClosestFrequencyParams *)params
@@ -1881,30 +2420,47 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            LevelControl::Commands::MoveToClosestFrequency::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                LevelControl::Commands::MoveToClosestFrequency::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.frequency = params.frequency.unsignedShortValue;
+                request.frequency = params.frequency.unsignedShortValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentLevelWithParams:(MTRReadParams * _Nullable)params
@@ -2767,34 +3323,51 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Actions::Commands::InstantAction::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Actions::Commands::InstantAction::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.actionID = params.actionID.unsignedShortValue;
-            if (params.invokeID != nil) {
-                auto & definedValue_0 = request.invokeID.Emplace();
-                definedValue_0 = params.invokeID.unsignedIntValue;
-            }
+                request.actionID = params.actionID.unsignedShortValue;
+                if (params.invokeID != nil) {
+                    auto & definedValue_0 = request.invokeID.Emplace();
+                    definedValue_0 = params.invokeID.unsignedIntValue;
+                }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)instantActionWithTransitionWithParams:(MTRActionsClusterInstantActionWithTransitionParams *)params
@@ -2804,35 +3377,52 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Actions::Commands::InstantActionWithTransition::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Actions::Commands::InstantActionWithTransition::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.actionID = params.actionID.unsignedShortValue;
-            if (params.invokeID != nil) {
-                auto & definedValue_0 = request.invokeID.Emplace();
-                definedValue_0 = params.invokeID.unsignedIntValue;
-            }
-            request.transitionTime = params.transitionTime.unsignedShortValue;
+                request.actionID = params.actionID.unsignedShortValue;
+                if (params.invokeID != nil) {
+                    auto & definedValue_0 = request.invokeID.Emplace();
+                    definedValue_0 = params.invokeID.unsignedIntValue;
+                }
+                request.transitionTime = params.transitionTime.unsignedShortValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)startActionWithParams:(MTRActionsClusterStartActionParams *)params
@@ -2842,34 +3432,51 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Actions::Commands::StartAction::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Actions::Commands::StartAction::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.actionID = params.actionID.unsignedShortValue;
-            if (params.invokeID != nil) {
-                auto & definedValue_0 = request.invokeID.Emplace();
-                definedValue_0 = params.invokeID.unsignedIntValue;
-            }
+                request.actionID = params.actionID.unsignedShortValue;
+                if (params.invokeID != nil) {
+                    auto & definedValue_0 = request.invokeID.Emplace();
+                    definedValue_0 = params.invokeID.unsignedIntValue;
+                }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)startActionWithDurationWithParams:(MTRActionsClusterStartActionWithDurationParams *)params
@@ -2879,35 +3486,52 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Actions::Commands::StartActionWithDuration::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Actions::Commands::StartActionWithDuration::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.actionID = params.actionID.unsignedShortValue;
-            if (params.invokeID != nil) {
-                auto & definedValue_0 = request.invokeID.Emplace();
-                definedValue_0 = params.invokeID.unsignedIntValue;
-            }
-            request.duration = params.duration.unsignedIntValue;
+                request.actionID = params.actionID.unsignedShortValue;
+                if (params.invokeID != nil) {
+                    auto & definedValue_0 = request.invokeID.Emplace();
+                    definedValue_0 = params.invokeID.unsignedIntValue;
+                }
+                request.duration = params.duration.unsignedIntValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stopActionWithParams:(MTRActionsClusterStopActionParams *)params
@@ -2917,34 +3541,51 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Actions::Commands::StopAction::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Actions::Commands::StopAction::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.actionID = params.actionID.unsignedShortValue;
-            if (params.invokeID != nil) {
-                auto & definedValue_0 = request.invokeID.Emplace();
-                definedValue_0 = params.invokeID.unsignedIntValue;
-            }
+                request.actionID = params.actionID.unsignedShortValue;
+                if (params.invokeID != nil) {
+                    auto & definedValue_0 = request.invokeID.Emplace();
+                    definedValue_0 = params.invokeID.unsignedIntValue;
+                }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)pauseActionWithParams:(MTRActionsClusterPauseActionParams *)params
@@ -2954,34 +3595,51 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Actions::Commands::PauseAction::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Actions::Commands::PauseAction::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.actionID = params.actionID.unsignedShortValue;
-            if (params.invokeID != nil) {
-                auto & definedValue_0 = request.invokeID.Emplace();
-                definedValue_0 = params.invokeID.unsignedIntValue;
-            }
+                request.actionID = params.actionID.unsignedShortValue;
+                if (params.invokeID != nil) {
+                    auto & definedValue_0 = request.invokeID.Emplace();
+                    definedValue_0 = params.invokeID.unsignedIntValue;
+                }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)pauseActionWithDurationWithParams:(MTRActionsClusterPauseActionWithDurationParams *)params
@@ -2991,35 +3649,52 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Actions::Commands::PauseActionWithDuration::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Actions::Commands::PauseActionWithDuration::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.actionID = params.actionID.unsignedShortValue;
-            if (params.invokeID != nil) {
-                auto & definedValue_0 = request.invokeID.Emplace();
-                definedValue_0 = params.invokeID.unsignedIntValue;
-            }
-            request.duration = params.duration.unsignedIntValue;
+                request.actionID = params.actionID.unsignedShortValue;
+                if (params.invokeID != nil) {
+                    auto & definedValue_0 = request.invokeID.Emplace();
+                    definedValue_0 = params.invokeID.unsignedIntValue;
+                }
+                request.duration = params.duration.unsignedIntValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)resumeActionWithParams:(MTRActionsClusterResumeActionParams *)params
@@ -3029,34 +3704,51 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Actions::Commands::ResumeAction::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Actions::Commands::ResumeAction::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.actionID = params.actionID.unsignedShortValue;
-            if (params.invokeID != nil) {
-                auto & definedValue_0 = request.invokeID.Emplace();
-                definedValue_0 = params.invokeID.unsignedIntValue;
-            }
+                request.actionID = params.actionID.unsignedShortValue;
+                if (params.invokeID != nil) {
+                    auto & definedValue_0 = request.invokeID.Emplace();
+                    definedValue_0 = params.invokeID.unsignedIntValue;
+                }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)enableActionWithParams:(MTRActionsClusterEnableActionParams *)params
@@ -3066,34 +3758,51 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Actions::Commands::EnableAction::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Actions::Commands::EnableAction::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.actionID = params.actionID.unsignedShortValue;
-            if (params.invokeID != nil) {
-                auto & definedValue_0 = request.invokeID.Emplace();
-                definedValue_0 = params.invokeID.unsignedIntValue;
-            }
+                request.actionID = params.actionID.unsignedShortValue;
+                if (params.invokeID != nil) {
+                    auto & definedValue_0 = request.invokeID.Emplace();
+                    definedValue_0 = params.invokeID.unsignedIntValue;
+                }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)enableActionWithDurationWithParams:(MTRActionsClusterEnableActionWithDurationParams *)params
@@ -3103,35 +3812,52 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Actions::Commands::EnableActionWithDuration::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Actions::Commands::EnableActionWithDuration::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.actionID = params.actionID.unsignedShortValue;
-            if (params.invokeID != nil) {
-                auto & definedValue_0 = request.invokeID.Emplace();
-                definedValue_0 = params.invokeID.unsignedIntValue;
-            }
-            request.duration = params.duration.unsignedIntValue;
+                request.actionID = params.actionID.unsignedShortValue;
+                if (params.invokeID != nil) {
+                    auto & definedValue_0 = request.invokeID.Emplace();
+                    definedValue_0 = params.invokeID.unsignedIntValue;
+                }
+                request.duration = params.duration.unsignedIntValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)disableActionWithParams:(MTRActionsClusterDisableActionParams *)params
@@ -3141,34 +3867,51 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Actions::Commands::DisableAction::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Actions::Commands::DisableAction::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.actionID = params.actionID.unsignedShortValue;
-            if (params.invokeID != nil) {
-                auto & definedValue_0 = request.invokeID.Emplace();
-                definedValue_0 = params.invokeID.unsignedIntValue;
-            }
+                request.actionID = params.actionID.unsignedShortValue;
+                if (params.invokeID != nil) {
+                    auto & definedValue_0 = request.invokeID.Emplace();
+                    definedValue_0 = params.invokeID.unsignedIntValue;
+                }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)disableActionWithDurationWithParams:(MTRActionsClusterDisableActionWithDurationParams *)params
@@ -3178,35 +3921,52 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Actions::Commands::DisableActionWithDuration::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Actions::Commands::DisableActionWithDuration::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.actionID = params.actionID.unsignedShortValue;
-            if (params.invokeID != nil) {
-                auto & definedValue_0 = request.invokeID.Emplace();
-                definedValue_0 = params.invokeID.unsignedIntValue;
-            }
-            request.duration = params.duration.unsignedIntValue;
+                request.actionID = params.actionID.unsignedShortValue;
+                if (params.invokeID != nil) {
+                    auto & definedValue_0 = request.invokeID.Emplace();
+                    definedValue_0 = params.invokeID.unsignedIntValue;
+                }
+                request.duration = params.duration.unsignedIntValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActionListWithParams:(MTRReadParams * _Nullable)params
@@ -3306,29 +4066,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Basic::Commands::MfgSpecificPing::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Basic::Commands::MfgSpecificPing::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::BasicCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::BasicCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDataModelRevisionWithParams:(MTRReadParams * _Nullable)params
@@ -3613,67 +4390,84 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            OtaSoftwareUpdateProvider::Commands::QueryImage::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                OtaSoftwareUpdateProvider::Commands::QueryImage::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.vendorId = static_cast<std::remove_reference_t<decltype(request.vendorId)>>(params.vendorId.unsignedShortValue);
-            request.productId = params.productId.unsignedShortValue;
-            request.softwareVersion = params.softwareVersion.unsignedIntValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(request.protocolsSupported)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (params.protocolsSupported.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.protocolsSupported.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < params.protocolsSupported.count; ++i_0) {
-                        if (![params.protocolsSupported[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
+                request.vendorId
+                    = static_cast<std::remove_reference_t<decltype(request.vendorId)>>(params.vendorId.unsignedShortValue);
+                request.productId = params.productId.unsignedShortValue;
+                request.softwareVersion = params.softwareVersion.unsignedIntValue;
+                {
+                    using ListType_0 = std::remove_reference_t<decltype(request.protocolsSupported)>;
+                    using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                    if (params.protocolsSupported.count != 0) {
+                        auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.protocolsSupported.count);
+                        if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (NSNumber *) params.protocolsSupported[i_0];
-                        listHolder_0->mList[i_0]
-                            = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0])>>(element_0.unsignedCharValue);
+                        listFreer.add(listHolder_0);
+                        for (size_t i_0 = 0; i_0 < params.protocolsSupported.count; ++i_0) {
+                            if (![params.protocolsSupported[i_0] isKindOfClass:[NSNumber class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_0 = (NSNumber *) params.protocolsSupported[i_0];
+                            listHolder_0->mList[i_0] = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0])>>(
+                                element_0.unsignedCharValue);
+                        }
+                        request.protocolsSupported = ListType_0(listHolder_0->mList, params.protocolsSupported.count);
+                    } else {
+                        request.protocolsSupported = ListType_0();
                     }
-                    request.protocolsSupported = ListType_0(listHolder_0->mList, params.protocolsSupported.count);
-                } else {
-                    request.protocolsSupported = ListType_0();
                 }
-            }
-            if (params.hardwareVersion != nil) {
-                auto & definedValue_0 = request.hardwareVersion.Emplace();
-                definedValue_0 = params.hardwareVersion.unsignedShortValue;
-            }
-            if (params.location != nil) {
-                auto & definedValue_0 = request.location.Emplace();
-                definedValue_0 = [self asCharSpan:params.location];
-            }
-            if (params.requestorCanConsent != nil) {
-                auto & definedValue_0 = request.requestorCanConsent.Emplace();
-                definedValue_0 = params.requestorCanConsent.boolValue;
-            }
-            if (params.metadataForProvider != nil) {
-                auto & definedValue_0 = request.metadataForProvider.Emplace();
-                definedValue_0 = [self asByteSpan:params.metadataForProvider];
-            }
+                if (params.hardwareVersion != nil) {
+                    auto & definedValue_0 = request.hardwareVersion.Emplace();
+                    definedValue_0 = params.hardwareVersion.unsignedShortValue;
+                }
+                if (params.location != nil) {
+                    auto & definedValue_0 = request.location.Emplace();
+                    definedValue_0 = [self asCharSpan:params.location];
+                }
+                if (params.requestorCanConsent != nil) {
+                    auto & definedValue_0 = request.requestorCanConsent.Emplace();
+                    definedValue_0 = params.requestorCanConsent.boolValue;
+                }
+                if (params.metadataForProvider != nil) {
+                    auto & definedValue_0 = request.metadataForProvider.Emplace();
+                    definedValue_0 = [self asByteSpan:params.metadataForProvider];
+                }
 
-            auto successFn = Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::OtaSoftwareUpdateProviderCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::OtaSoftwareUpdateProviderCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)applyUpdateRequestWithParams:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
@@ -3684,27 +4478,43 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.updateToken = [self asByteSpan:params.updateToken];
-            request.newVersion = params.newVersion.unsignedIntValue;
+                request.updateToken = [self asByteSpan:params.updateToken];
+                request.newVersion = params.newVersion.unsignedIntValue;
 
-            auto successFn = Callback<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::OtaSoftwareUpdateProviderCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::OtaSoftwareUpdateProviderCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)notifyUpdateAppliedWithParams:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
@@ -3714,31 +4524,48 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.updateToken = [self asByteSpan:params.updateToken];
-            request.softwareVersion = params.softwareVersion.unsignedIntValue;
+                request.updateToken = [self asByteSpan:params.updateToken];
+                request.softwareVersion = params.softwareVersion.unsignedIntValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::OtaSoftwareUpdateProviderCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::OtaSoftwareUpdateProviderCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -3805,38 +4632,56 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.providerNodeId = params.providerNodeId.unsignedLongLongValue;
-            request.vendorId = static_cast<std::remove_reference_t<decltype(request.vendorId)>>(params.vendorId.unsignedShortValue);
-            request.announcementReason = static_cast<std::remove_reference_t<decltype(request.announcementReason)>>(
-                params.announcementReason.unsignedCharValue);
-            if (params.metadataForNode != nil) {
-                auto & definedValue_0 = request.metadataForNode.Emplace();
-                definedValue_0 = [self asByteSpan:params.metadataForNode];
-            }
-            request.endpoint = params.endpoint.unsignedShortValue;
+                request.providerNodeId = params.providerNodeId.unsignedLongLongValue;
+                request.vendorId
+                    = static_cast<std::remove_reference_t<decltype(request.vendorId)>>(params.vendorId.unsignedShortValue);
+                request.announcementReason = static_cast<std::remove_reference_t<decltype(request.announcementReason)>>(
+                    params.announcementReason.unsignedCharValue);
+                if (params.metadataForNode != nil) {
+                    auto & definedValue_0 = request.metadataForNode.Emplace();
+                    definedValue_0 = [self asByteSpan:params.metadataForNode];
+                }
+                request.endpoint = params.endpoint.unsignedShortValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::OtaSoftwareUpdateRequestorCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::OtaSoftwareUpdateRequestorCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDefaultOtaProvidersWithParams:(MTRReadParams * _Nullable)params
@@ -4620,27 +5465,43 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            GeneralCommissioning::Commands::ArmFailSafe::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                GeneralCommissioning::Commands::ArmFailSafe::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.expiryLengthSeconds = params.expiryLengthSeconds.unsignedShortValue;
-            request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
+                request.expiryLengthSeconds = params.expiryLengthSeconds.unsignedShortValue;
+                request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
 
-            auto successFn = Callback<GeneralCommissioningClusterArmFailSafeResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::GeneralCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<GeneralCommissioningClusterArmFailSafeResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::GeneralCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)setRegulatoryConfigWithParams:(MTRGeneralCommissioningClusterSetRegulatoryConfigParams *)params
@@ -4651,29 +5512,47 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            GeneralCommissioning::Commands::SetRegulatoryConfig::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(self.callbackQueue, baseDevice,
+            completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                GeneralCommissioning::Commands::SetRegulatoryConfig::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.newRegulatoryConfig = static_cast<std::remove_reference_t<decltype(request.newRegulatoryConfig)>>(
-                params.newRegulatoryConfig.unsignedCharValue);
-            request.countryCode = [self asCharSpan:params.countryCode];
-            request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
+                request.newRegulatoryConfig = static_cast<std::remove_reference_t<decltype(request.newRegulatoryConfig)>>(
+                    params.newRegulatoryConfig.unsignedCharValue);
+                request.countryCode = [self asCharSpan:params.countryCode];
+                request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
 
-            auto successFn = Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::GeneralCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn
+                    = Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::GeneralCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)commissioningCompleteWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -4696,26 +5575,43 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            GeneralCommissioning::Commands::CommissioningComplete::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(self.callbackQueue, baseDevice,
+            completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                GeneralCommissioning::Commands::CommissioningComplete::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn
-                = Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::GeneralCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn
+                    = Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::GeneralCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBreadcrumbWithParams:(MTRReadParams * _Nullable)params
@@ -4842,40 +5738,56 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            NetworkCommissioning::Commands::ScanNetworks::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                NetworkCommissioning::Commands::ScanNetworks::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            if (params != nil) {
-                if (params.ssid != nil) {
-                    auto & definedValue_0 = request.ssid.Emplace();
-                    if (params.ssid == nil) {
-                        definedValue_0.SetNull();
-                    } else {
-                        auto & nonNullValue_1 = definedValue_0.SetNonNull();
-                        nonNullValue_1 = [self asByteSpan:params.ssid];
+                if (params != nil) {
+                    if (params.ssid != nil) {
+                        auto & definedValue_0 = request.ssid.Emplace();
+                        if (params.ssid == nil) {
+                            definedValue_0.SetNull();
+                        } else {
+                            auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                            nonNullValue_1 = [self asByteSpan:params.ssid];
+                        }
+                    }
+                    if (params.breadcrumb != nil) {
+                        auto & definedValue_0 = request.breadcrumb.Emplace();
+                        definedValue_0 = params.breadcrumb.unsignedLongLongValue;
                     }
                 }
-                if (params.breadcrumb != nil) {
-                    auto & definedValue_0 = request.breadcrumb.Emplace();
-                    definedValue_0 = params.breadcrumb.unsignedLongLongValue;
-                }
-            }
 
-            auto successFn = Callback<NetworkCommissioningClusterScanNetworksResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::NetworkCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<NetworkCommissioningClusterScanNetworksResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::NetworkCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)addOrUpdateWiFiNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams *)params
@@ -4886,31 +5798,47 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.ssid = [self asByteSpan:params.ssid];
-            request.credentials = [self asByteSpan:params.credentials];
-            if (params.breadcrumb != nil) {
-                auto & definedValue_0 = request.breadcrumb.Emplace();
-                definedValue_0 = params.breadcrumb.unsignedLongLongValue;
-            }
+                request.ssid = [self asByteSpan:params.ssid];
+                request.credentials = [self asByteSpan:params.credentials];
+                if (params.breadcrumb != nil) {
+                    auto & definedValue_0 = request.breadcrumb.Emplace();
+                    definedValue_0 = params.breadcrumb.unsignedLongLongValue;
+                }
 
-            auto successFn = Callback<NetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::NetworkCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<NetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::NetworkCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)addOrUpdateThreadNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams *)params
@@ -4921,30 +5849,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.operationalDataset = [self asByteSpan:params.operationalDataset];
-            if (params.breadcrumb != nil) {
-                auto & definedValue_0 = request.breadcrumb.Emplace();
-                definedValue_0 = params.breadcrumb.unsignedLongLongValue;
-            }
+                request.operationalDataset = [self asByteSpan:params.operationalDataset];
+                if (params.breadcrumb != nil) {
+                    auto & definedValue_0 = request.breadcrumb.Emplace();
+                    definedValue_0 = params.breadcrumb.unsignedLongLongValue;
+                }
 
-            auto successFn = Callback<NetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::NetworkCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<NetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::NetworkCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)removeNetworkWithParams:(MTRNetworkCommissioningClusterRemoveNetworkParams *)params
@@ -4955,30 +5899,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            NetworkCommissioning::Commands::RemoveNetwork::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                NetworkCommissioning::Commands::RemoveNetwork::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.networkID = [self asByteSpan:params.networkID];
-            if (params.breadcrumb != nil) {
-                auto & definedValue_0 = request.breadcrumb.Emplace();
-                definedValue_0 = params.breadcrumb.unsignedLongLongValue;
-            }
+                request.networkID = [self asByteSpan:params.networkID];
+                if (params.breadcrumb != nil) {
+                    auto & definedValue_0 = request.breadcrumb.Emplace();
+                    definedValue_0 = params.breadcrumb.unsignedLongLongValue;
+                }
 
-            auto successFn = Callback<NetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::NetworkCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<NetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::NetworkCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)connectNetworkWithParams:(MTRNetworkCommissioningClusterConnectNetworkParams *)params
@@ -4989,30 +5949,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            NetworkCommissioning::Commands::ConnectNetwork::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                NetworkCommissioning::Commands::ConnectNetwork::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.networkID = [self asByteSpan:params.networkID];
-            if (params.breadcrumb != nil) {
-                auto & definedValue_0 = request.breadcrumb.Emplace();
-                definedValue_0 = params.breadcrumb.unsignedLongLongValue;
-            }
+                request.networkID = [self asByteSpan:params.networkID];
+                if (params.breadcrumb != nil) {
+                    auto & definedValue_0 = request.breadcrumb.Emplace();
+                    definedValue_0 = params.breadcrumb.unsignedLongLongValue;
+                }
 
-            auto successFn = Callback<NetworkCommissioningClusterConnectNetworkResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::NetworkCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<NetworkCommissioningClusterConnectNetworkResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::NetworkCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)reorderNetworkWithParams:(MTRNetworkCommissioningClusterReorderNetworkParams *)params
@@ -5023,31 +5999,47 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            NetworkCommissioning::Commands::ReorderNetwork::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                NetworkCommissioning::Commands::ReorderNetwork::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.networkID = [self asByteSpan:params.networkID];
-            request.networkIndex = params.networkIndex.unsignedCharValue;
-            if (params.breadcrumb != nil) {
-                auto & definedValue_0 = request.breadcrumb.Emplace();
-                definedValue_0 = params.breadcrumb.unsignedLongLongValue;
-            }
+                request.networkID = [self asByteSpan:params.networkID];
+                request.networkIndex = params.networkIndex.unsignedCharValue;
+                if (params.breadcrumb != nil) {
+                    auto & definedValue_0 = request.breadcrumb.Emplace();
+                    definedValue_0 = params.breadcrumb.unsignedLongLongValue;
+                }
 
-            auto successFn = Callback<NetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::NetworkCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<NetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::NetworkCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxNetworksWithParams:(MTRReadParams * _Nullable)params
@@ -5198,29 +6190,45 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            DiagnosticLogs::Commands::RetrieveLogsRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                DiagnosticLogs::Commands::RetrieveLogsRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.intent = static_cast<std::remove_reference_t<decltype(request.intent)>>(params.intent.unsignedCharValue);
-            request.requestedProtocol = static_cast<std::remove_reference_t<decltype(request.requestedProtocol)>>(
-                params.requestedProtocol.unsignedCharValue);
-            request.transferFileDesignator = [self asByteSpan:params.transferFileDesignator];
+                request.intent = static_cast<std::remove_reference_t<decltype(request.intent)>>(params.intent.unsignedCharValue);
+                request.requestedProtocol = static_cast<std::remove_reference_t<decltype(request.requestedProtocol)>>(
+                    params.requestedProtocol.unsignedCharValue);
+                request.transferFileDesignator = [self asByteSpan:params.transferFileDesignator];
 
-            auto successFn = Callback<DiagnosticLogsClusterRetrieveLogsResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::DiagnosticLogsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<DiagnosticLogsClusterRetrieveLogsResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::DiagnosticLogsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -5287,31 +6295,48 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            GeneralDiagnostics::Commands::TestEventTrigger::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                GeneralDiagnostics::Commands::TestEventTrigger::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.enableKey = [self asByteSpan:params.enableKey];
-            request.eventTrigger = params.eventTrigger.unsignedLongLongValue;
+                request.enableKey = [self asByteSpan:params.enableKey];
+                request.eventTrigger = params.eventTrigger.unsignedLongLongValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::GeneralDiagnosticsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::GeneralDiagnosticsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNetworkInterfacesWithParams:(MTRReadParams * _Nullable)params
@@ -5459,29 +6484,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            SoftwareDiagnostics::Commands::ResetWatermarks::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                SoftwareDiagnostics::Commands::ResetWatermarks::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::SoftwareDiagnosticsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::SoftwareDiagnosticsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeThreadMetricsWithParams:(MTRReadParams * _Nullable)params
@@ -5589,29 +6631,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ThreadNetworkDiagnostics::Commands::ResetCounts::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ThreadNetworkDiagnostics::Commands::ResetCounts::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ThreadNetworkDiagnosticsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ThreadNetworkDiagnosticsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeChannelWithParams:(MTRReadParams * _Nullable)params
@@ -6192,29 +7251,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            WiFiNetworkDiagnostics::Commands::ResetCounts::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                WiFiNetworkDiagnostics::Commands::ResetCounts::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::WiFiNetworkDiagnosticsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::WiFiNetworkDiagnosticsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBssidWithParams:(MTRReadParams * _Nullable)params
@@ -6394,29 +7470,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            EthernetNetworkDiagnostics::Commands::ResetCounts::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                EthernetNetworkDiagnostics::Commands::ResetCounts::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::EthernetNetworkDiagnosticsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::EthernetNetworkDiagnosticsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePHYRateWithParams:(MTRReadParams * _Nullable)params
@@ -6832,37 +7925,54 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            if (!timedInvokeTimeoutMs.HasValue()) {
-                timedInvokeTimeoutMs.SetValue(10000);
-            }
-            request.commissioningTimeout = params.commissioningTimeout.unsignedShortValue;
-            request.PAKEVerifier = [self asByteSpan:params.pakeVerifier];
-            request.discriminator = params.discriminator.unsignedShortValue;
-            request.iterations = params.iterations.unsignedIntValue;
-            request.salt = [self asByteSpan:params.salt];
+                if (!timedInvokeTimeoutMs.HasValue()) {
+                    timedInvokeTimeoutMs.SetValue(10000);
+                }
+                request.commissioningTimeout = params.commissioningTimeout.unsignedShortValue;
+                request.PAKEVerifier = [self asByteSpan:params.pakeVerifier];
+                request.discriminator = params.discriminator.unsignedShortValue;
+                request.iterations = params.iterations.unsignedIntValue;
+                request.salt = [self asByteSpan:params.salt];
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::AdministratorCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::AdministratorCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)openBasicCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams *)params
@@ -6872,33 +7982,50 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            if (!timedInvokeTimeoutMs.HasValue()) {
-                timedInvokeTimeoutMs.SetValue(10000);
-            }
-            request.commissioningTimeout = params.commissioningTimeout.unsignedShortValue;
+                if (!timedInvokeTimeoutMs.HasValue()) {
+                    timedInvokeTimeoutMs.SetValue(10000);
+                }
+                request.commissioningTimeout = params.commissioningTimeout.unsignedShortValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::AdministratorCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::AdministratorCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)revokeCommissioningWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -6917,32 +8044,49 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            AdministratorCommissioning::Commands::RevokeCommissioning::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                AdministratorCommissioning::Commands::RevokeCommissioning::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            if (!timedInvokeTimeoutMs.HasValue()) {
-                timedInvokeTimeoutMs.SetValue(10000);
-            }
+                if (!timedInvokeTimeoutMs.HasValue()) {
+                    timedInvokeTimeoutMs.SetValue(10000);
+                }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::AdministratorCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::AdministratorCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeWindowStatusWithParams:(MTRReadParams * _Nullable)params
@@ -7034,26 +8178,42 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTROperationalCredentialsClusterAttestationResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            OperationalCredentials::Commands::AttestationRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTROperationalCredentialsClusterAttestationResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                OperationalCredentials::Commands::AttestationRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.attestationNonce = [self asByteSpan:params.attestationNonce];
+                request.attestationNonce = [self asByteSpan:params.attestationNonce];
 
-            auto successFn = Callback<OperationalCredentialsClusterAttestationResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<OperationalCredentialsClusterAttestationResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)certificateChainRequestWithParams:(MTROperationalCredentialsClusterCertificateChainRequestParams *)params
@@ -7064,26 +8224,44 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            OperationalCredentials::Commands::CertificateChainRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge(self.callbackQueue, baseDevice,
+            completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                OperationalCredentials::Commands::CertificateChainRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.certificateType = params.certificateType.unsignedCharValue;
+                request.certificateType = params.certificateType.unsignedCharValue;
 
-            auto successFn = Callback<OperationalCredentialsClusterCertificateChainResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn
+                    = Callback<OperationalCredentialsClusterCertificateChainResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)CSRRequestWithParams:(MTROperationalCredentialsClusterCSRRequestParams *)params
@@ -7094,30 +8272,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTROperationalCredentialsClusterCSRResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            OperationalCredentials::Commands::CSRRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTROperationalCredentialsClusterCSRResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                OperationalCredentials::Commands::CSRRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.CSRNonce = [self asByteSpan:params.csrNonce];
-            if (params.isForUpdateNOC != nil) {
-                auto & definedValue_0 = request.isForUpdateNOC.Emplace();
-                definedValue_0 = params.isForUpdateNOC.boolValue;
-            }
+                request.CSRNonce = [self asByteSpan:params.csrNonce];
+                if (params.isForUpdateNOC != nil) {
+                    auto & definedValue_0 = request.isForUpdateNOC.Emplace();
+                    definedValue_0 = params.isForUpdateNOC.boolValue;
+                }
 
-            auto successFn = Callback<OperationalCredentialsClusterCSRResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<OperationalCredentialsClusterCSRResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)addNOCWithParams:(MTROperationalCredentialsClusterAddNOCParams *)params
@@ -7128,34 +8322,50 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            OperationalCredentials::Commands::AddNOC::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                OperationalCredentials::Commands::AddNOC::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.NOCValue = [self asByteSpan:params.nocValue];
-            if (params.icacValue != nil) {
-                auto & definedValue_0 = request.ICACValue.Emplace();
-                definedValue_0 = [self asByteSpan:params.icacValue];
-            }
-            request.IPKValue = [self asByteSpan:params.ipkValue];
-            request.caseAdminSubject = params.caseAdminSubject.unsignedLongLongValue;
-            request.adminVendorId
-                = static_cast<std::remove_reference_t<decltype(request.adminVendorId)>>(params.adminVendorId.unsignedShortValue);
+                request.NOCValue = [self asByteSpan:params.nocValue];
+                if (params.icacValue != nil) {
+                    auto & definedValue_0 = request.ICACValue.Emplace();
+                    definedValue_0 = [self asByteSpan:params.icacValue];
+                }
+                request.IPKValue = [self asByteSpan:params.ipkValue];
+                request.caseAdminSubject = params.caseAdminSubject.unsignedLongLongValue;
+                request.adminVendorId = static_cast<std::remove_reference_t<decltype(request.adminVendorId)>>(
+                    params.adminVendorId.unsignedShortValue);
 
-            auto successFn = Callback<OperationalCredentialsClusterNOCResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<OperationalCredentialsClusterNOCResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)updateNOCWithParams:(MTROperationalCredentialsClusterUpdateNOCParams *)params
@@ -7166,30 +8376,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            OperationalCredentials::Commands::UpdateNOC::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                OperationalCredentials::Commands::UpdateNOC::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.NOCValue = [self asByteSpan:params.nocValue];
-            if (params.icacValue != nil) {
-                auto & definedValue_0 = request.ICACValue.Emplace();
-                definedValue_0 = [self asByteSpan:params.icacValue];
-            }
+                request.NOCValue = [self asByteSpan:params.nocValue];
+                if (params.icacValue != nil) {
+                    auto & definedValue_0 = request.ICACValue.Emplace();
+                    definedValue_0 = [self asByteSpan:params.icacValue];
+                }
 
-            auto successFn = Callback<OperationalCredentialsClusterNOCResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<OperationalCredentialsClusterNOCResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)updateFabricLabelWithParams:(MTROperationalCredentialsClusterUpdateFabricLabelParams *)params
@@ -7200,26 +8426,42 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            OperationalCredentials::Commands::UpdateFabricLabel::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                OperationalCredentials::Commands::UpdateFabricLabel::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.label = [self asCharSpan:params.label];
+                request.label = [self asCharSpan:params.label];
 
-            auto successFn = Callback<OperationalCredentialsClusterNOCResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<OperationalCredentialsClusterNOCResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)removeFabricWithParams:(MTROperationalCredentialsClusterRemoveFabricParams *)params
@@ -7230,26 +8472,42 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            OperationalCredentials::Commands::RemoveFabric::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                OperationalCredentials::Commands::RemoveFabric::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.fabricIndex = params.fabricIndex.unsignedCharValue;
+                request.fabricIndex = params.fabricIndex.unsignedCharValue;
 
-            auto successFn = Callback<OperationalCredentialsClusterNOCResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<OperationalCredentialsClusterNOCResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)addTrustedRootCertificateWithParams:(MTROperationalCredentialsClusterAddTrustedRootCertificateParams *)params
@@ -7259,30 +8517,47 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            OperationalCredentials::Commands::AddTrustedRootCertificate::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                OperationalCredentials::Commands::AddTrustedRootCertificate::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.rootCertificate = [self asByteSpan:params.rootCertificate];
+                request.rootCertificate = [self asByteSpan:params.rootCertificate];
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNOCsWithParams:(MTRReadParams * _Nullable)params
@@ -7397,69 +8672,86 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            GroupKeyManagement::Commands::KeySetWrite::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                GroupKeyManagement::Commands::KeySetWrite::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.groupKeySet.groupKeySetID = params.groupKeySet.groupKeySetID.unsignedShortValue;
-            request.groupKeySet.groupKeySecurityPolicy
-                = static_cast<std::remove_reference_t<decltype(request.groupKeySet.groupKeySecurityPolicy)>>(
-                    params.groupKeySet.groupKeySecurityPolicy.unsignedCharValue);
-            if (params.groupKeySet.epochKey0 == nil) {
-                request.groupKeySet.epochKey0.SetNull();
-            } else {
-                auto & nonNullValue_1 = request.groupKeySet.epochKey0.SetNonNull();
-                nonNullValue_1 = [self asByteSpan:params.groupKeySet.epochKey0];
-            }
-            if (params.groupKeySet.epochStartTime0 == nil) {
-                request.groupKeySet.epochStartTime0.SetNull();
-            } else {
-                auto & nonNullValue_1 = request.groupKeySet.epochStartTime0.SetNonNull();
-                nonNullValue_1 = params.groupKeySet.epochStartTime0.unsignedLongLongValue;
-            }
-            if (params.groupKeySet.epochKey1 == nil) {
-                request.groupKeySet.epochKey1.SetNull();
-            } else {
-                auto & nonNullValue_1 = request.groupKeySet.epochKey1.SetNonNull();
-                nonNullValue_1 = [self asByteSpan:params.groupKeySet.epochKey1];
-            }
-            if (params.groupKeySet.epochStartTime1 == nil) {
-                request.groupKeySet.epochStartTime1.SetNull();
-            } else {
-                auto & nonNullValue_1 = request.groupKeySet.epochStartTime1.SetNonNull();
-                nonNullValue_1 = params.groupKeySet.epochStartTime1.unsignedLongLongValue;
-            }
-            if (params.groupKeySet.epochKey2 == nil) {
-                request.groupKeySet.epochKey2.SetNull();
-            } else {
-                auto & nonNullValue_1 = request.groupKeySet.epochKey2.SetNonNull();
-                nonNullValue_1 = [self asByteSpan:params.groupKeySet.epochKey2];
-            }
-            if (params.groupKeySet.epochStartTime2 == nil) {
-                request.groupKeySet.epochStartTime2.SetNull();
-            } else {
-                auto & nonNullValue_1 = request.groupKeySet.epochStartTime2.SetNonNull();
-                nonNullValue_1 = params.groupKeySet.epochStartTime2.unsignedLongLongValue;
-            }
+                request.groupKeySet.groupKeySetID = params.groupKeySet.groupKeySetID.unsignedShortValue;
+                request.groupKeySet.groupKeySecurityPolicy
+                    = static_cast<std::remove_reference_t<decltype(request.groupKeySet.groupKeySecurityPolicy)>>(
+                        params.groupKeySet.groupKeySecurityPolicy.unsignedCharValue);
+                if (params.groupKeySet.epochKey0 == nil) {
+                    request.groupKeySet.epochKey0.SetNull();
+                } else {
+                    auto & nonNullValue_1 = request.groupKeySet.epochKey0.SetNonNull();
+                    nonNullValue_1 = [self asByteSpan:params.groupKeySet.epochKey0];
+                }
+                if (params.groupKeySet.epochStartTime0 == nil) {
+                    request.groupKeySet.epochStartTime0.SetNull();
+                } else {
+                    auto & nonNullValue_1 = request.groupKeySet.epochStartTime0.SetNonNull();
+                    nonNullValue_1 = params.groupKeySet.epochStartTime0.unsignedLongLongValue;
+                }
+                if (params.groupKeySet.epochKey1 == nil) {
+                    request.groupKeySet.epochKey1.SetNull();
+                } else {
+                    auto & nonNullValue_1 = request.groupKeySet.epochKey1.SetNonNull();
+                    nonNullValue_1 = [self asByteSpan:params.groupKeySet.epochKey1];
+                }
+                if (params.groupKeySet.epochStartTime1 == nil) {
+                    request.groupKeySet.epochStartTime1.SetNull();
+                } else {
+                    auto & nonNullValue_1 = request.groupKeySet.epochStartTime1.SetNonNull();
+                    nonNullValue_1 = params.groupKeySet.epochStartTime1.unsignedLongLongValue;
+                }
+                if (params.groupKeySet.epochKey2 == nil) {
+                    request.groupKeySet.epochKey2.SetNull();
+                } else {
+                    auto & nonNullValue_1 = request.groupKeySet.epochKey2.SetNonNull();
+                    nonNullValue_1 = [self asByteSpan:params.groupKeySet.epochKey2];
+                }
+                if (params.groupKeySet.epochStartTime2 == nil) {
+                    request.groupKeySet.epochStartTime2.SetNull();
+                } else {
+                    auto & nonNullValue_1 = request.groupKeySet.epochStartTime2.SetNonNull();
+                    nonNullValue_1 = params.groupKeySet.epochStartTime2.unsignedLongLongValue;
+                }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::GroupKeyManagementCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::GroupKeyManagementCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)keySetReadWithParams:(MTRGroupKeyManagementClusterKeySetReadParams *)params
@@ -7470,26 +8762,42 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            GroupKeyManagement::Commands::KeySetRead::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                GroupKeyManagement::Commands::KeySetRead::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.groupKeySetID = params.groupKeySetID.unsignedShortValue;
+                request.groupKeySetID = params.groupKeySetID.unsignedShortValue;
 
-            auto successFn = Callback<GroupKeyManagementClusterKeySetReadResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::GroupKeyManagementCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<GroupKeyManagementClusterKeySetReadResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::GroupKeyManagementCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)keySetRemoveWithParams:(MTRGroupKeyManagementClusterKeySetRemoveParams *)params
@@ -7499,30 +8807,47 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            GroupKeyManagement::Commands::KeySetRemove::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                GroupKeyManagement::Commands::KeySetRemove::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.groupKeySetID = params.groupKeySetID.unsignedShortValue;
+                request.groupKeySetID = params.groupKeySetID.unsignedShortValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::GroupKeyManagementCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::GroupKeyManagementCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)keySetReadAllIndicesWithParams:(MTRGroupKeyManagementClusterKeySetReadAllIndicesParams *)params
@@ -7533,47 +8858,65 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            GroupKeyManagement::Commands::KeySetReadAllIndices::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge(self.callbackQueue, baseDevice,
+            completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                GroupKeyManagement::Commands::KeySetReadAllIndices::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            {
-                using ListType_0 = std::remove_reference_t<decltype(request.groupKeySetIDs)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (params.groupKeySetIDs.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.groupKeySetIDs.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < params.groupKeySetIDs.count; ++i_0) {
-                        if (![params.groupKeySetIDs[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
+                {
+                    using ListType_0 = std::remove_reference_t<decltype(request.groupKeySetIDs)>;
+                    using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                    if (params.groupKeySetIDs.count != 0) {
+                        auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.groupKeySetIDs.count);
+                        if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (NSNumber *) params.groupKeySetIDs[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedShortValue;
+                        listFreer.add(listHolder_0);
+                        for (size_t i_0 = 0; i_0 < params.groupKeySetIDs.count; ++i_0) {
+                            if (![params.groupKeySetIDs[i_0] isKindOfClass:[NSNumber class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_0 = (NSNumber *) params.groupKeySetIDs[i_0];
+                            listHolder_0->mList[i_0] = element_0.unsignedShortValue;
+                        }
+                        request.groupKeySetIDs = ListType_0(listHolder_0->mList, params.groupKeySetIDs.count);
+                    } else {
+                        request.groupKeySetIDs = ListType_0();
                     }
-                    request.groupKeySetIDs = ListType_0(listHolder_0->mList, params.groupKeySetIDs.count);
-                } else {
-                    request.groupKeySetIDs = ListType_0();
                 }
-            }
 
-            auto successFn = Callback<GroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::GroupKeyManagementCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn
+                    = Callback<GroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::GroupKeyManagementCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGroupKeyMapWithParams:(MTRReadParams * _Nullable)params
@@ -7905,30 +9248,47 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ModeSelect::Commands::ChangeToMode::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ModeSelect::Commands::ChangeToMode::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.newMode = params.newMode.unsignedCharValue;
+                request.newMode = params.newMode.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ModeSelectCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ModeSelectCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params
@@ -8081,38 +9441,55 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            DoorLock::Commands::LockDoor::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                DoorLock::Commands::LockDoor::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            if (!timedInvokeTimeoutMs.HasValue()) {
-                timedInvokeTimeoutMs.SetValue(10000);
-            }
-            if (params != nil) {
-                if (params.pinCode != nil) {
-                    auto & definedValue_0 = request.pinCode.Emplace();
-                    definedValue_0 = [self asByteSpan:params.pinCode];
+                if (!timedInvokeTimeoutMs.HasValue()) {
+                    timedInvokeTimeoutMs.SetValue(10000);
                 }
-            }
+                if (params != nil) {
+                    if (params.pinCode != nil) {
+                        auto & definedValue_0 = request.pinCode.Emplace();
+                        definedValue_0 = [self asByteSpan:params.pinCode];
+                    }
+                }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)unlockDoorWithParams:(MTRDoorLockClusterUnlockDoorParams * _Nullable)params
@@ -8122,38 +9499,55 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            DoorLock::Commands::UnlockDoor::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                DoorLock::Commands::UnlockDoor::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            if (!timedInvokeTimeoutMs.HasValue()) {
-                timedInvokeTimeoutMs.SetValue(10000);
-            }
-            if (params != nil) {
-                if (params.pinCode != nil) {
-                    auto & definedValue_0 = request.pinCode.Emplace();
-                    definedValue_0 = [self asByteSpan:params.pinCode];
+                if (!timedInvokeTimeoutMs.HasValue()) {
+                    timedInvokeTimeoutMs.SetValue(10000);
                 }
-            }
+                if (params != nil) {
+                    if (params.pinCode != nil) {
+                        auto & definedValue_0 = request.pinCode.Emplace();
+                        definedValue_0 = [self asByteSpan:params.pinCode];
+                    }
+                }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)unlockWithTimeoutWithParams:(MTRDoorLockClusterUnlockWithTimeoutParams *)params
@@ -8163,37 +9557,54 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            DoorLock::Commands::UnlockWithTimeout::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                DoorLock::Commands::UnlockWithTimeout::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            if (!timedInvokeTimeoutMs.HasValue()) {
-                timedInvokeTimeoutMs.SetValue(10000);
-            }
-            request.timeout = params.timeout.unsignedShortValue;
-            if (params.pinCode != nil) {
-                auto & definedValue_0 = request.pinCode.Emplace();
-                definedValue_0 = [self asByteSpan:params.pinCode];
-            }
+                if (!timedInvokeTimeoutMs.HasValue()) {
+                    timedInvokeTimeoutMs.SetValue(10000);
+                }
+                request.timeout = params.timeout.unsignedShortValue;
+                if (params.pinCode != nil) {
+                    auto & definedValue_0 = request.pinCode.Emplace();
+                    definedValue_0 = [self asByteSpan:params.pinCode];
+                }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)setWeekDayScheduleWithParams:(MTRDoorLockClusterSetWeekDayScheduleParams *)params
@@ -8203,36 +9614,54 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            DoorLock::Commands::SetWeekDaySchedule::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                DoorLock::Commands::SetWeekDaySchedule::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
-            request.userIndex = params.userIndex.unsignedShortValue;
-            request.daysMask = static_cast<std::remove_reference_t<decltype(request.daysMask)>>(params.daysMask.unsignedCharValue);
-            request.startHour = params.startHour.unsignedCharValue;
-            request.startMinute = params.startMinute.unsignedCharValue;
-            request.endHour = params.endHour.unsignedCharValue;
-            request.endMinute = params.endMinute.unsignedCharValue;
+                request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
+                request.userIndex = params.userIndex.unsignedShortValue;
+                request.daysMask
+                    = static_cast<std::remove_reference_t<decltype(request.daysMask)>>(params.daysMask.unsignedCharValue);
+                request.startHour = params.startHour.unsignedCharValue;
+                request.startMinute = params.startMinute.unsignedCharValue;
+                request.endHour = params.endHour.unsignedCharValue;
+                request.endMinute = params.endMinute.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)getWeekDayScheduleWithParams:(MTRDoorLockClusterGetWeekDayScheduleParams *)params
@@ -8243,27 +9672,43 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            DoorLock::Commands::GetWeekDaySchedule::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                DoorLock::Commands::GetWeekDaySchedule::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
-            request.userIndex = params.userIndex.unsignedShortValue;
+                request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
+                request.userIndex = params.userIndex.unsignedShortValue;
 
-            auto successFn = Callback<DoorLockClusterGetWeekDayScheduleResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<DoorLockClusterGetWeekDayScheduleResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)clearWeekDayScheduleWithParams:(MTRDoorLockClusterClearWeekDayScheduleParams *)params
@@ -8273,31 +9718,48 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            DoorLock::Commands::ClearWeekDaySchedule::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                DoorLock::Commands::ClearWeekDaySchedule::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
-            request.userIndex = params.userIndex.unsignedShortValue;
+                request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
+                request.userIndex = params.userIndex.unsignedShortValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)setYearDayScheduleWithParams:(MTRDoorLockClusterSetYearDayScheduleParams *)params
@@ -8307,33 +9769,50 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            DoorLock::Commands::SetYearDaySchedule::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                DoorLock::Commands::SetYearDaySchedule::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
-            request.userIndex = params.userIndex.unsignedShortValue;
-            request.localStartTime = params.localStartTime.unsignedIntValue;
-            request.localEndTime = params.localEndTime.unsignedIntValue;
+                request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
+                request.userIndex = params.userIndex.unsignedShortValue;
+                request.localStartTime = params.localStartTime.unsignedIntValue;
+                request.localEndTime = params.localEndTime.unsignedIntValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)getYearDayScheduleWithParams:(MTRDoorLockClusterGetYearDayScheduleParams *)params
@@ -8344,27 +9823,43 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            DoorLock::Commands::GetYearDaySchedule::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                DoorLock::Commands::GetYearDaySchedule::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
-            request.userIndex = params.userIndex.unsignedShortValue;
+                request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
+                request.userIndex = params.userIndex.unsignedShortValue;
 
-            auto successFn = Callback<DoorLockClusterGetYearDayScheduleResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<DoorLockClusterGetYearDayScheduleResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)clearYearDayScheduleWithParams:(MTRDoorLockClusterClearYearDayScheduleParams *)params
@@ -8374,31 +9869,48 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            DoorLock::Commands::ClearYearDaySchedule::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                DoorLock::Commands::ClearYearDaySchedule::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
-            request.userIndex = params.userIndex.unsignedShortValue;
+                request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
+                request.userIndex = params.userIndex.unsignedShortValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)setHolidayScheduleWithParams:(MTRDoorLockClusterSetHolidayScheduleParams *)params
@@ -8408,34 +9920,51 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            DoorLock::Commands::SetHolidaySchedule::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                DoorLock::Commands::SetHolidaySchedule::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.holidayIndex = params.holidayIndex.unsignedCharValue;
-            request.localStartTime = params.localStartTime.unsignedIntValue;
-            request.localEndTime = params.localEndTime.unsignedIntValue;
-            request.operatingMode
-                = static_cast<std::remove_reference_t<decltype(request.operatingMode)>>(params.operatingMode.unsignedCharValue);
+                request.holidayIndex = params.holidayIndex.unsignedCharValue;
+                request.localStartTime = params.localStartTime.unsignedIntValue;
+                request.localEndTime = params.localEndTime.unsignedIntValue;
+                request.operatingMode
+                    = static_cast<std::remove_reference_t<decltype(request.operatingMode)>>(params.operatingMode.unsignedCharValue);
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)getHolidayScheduleWithParams:(MTRDoorLockClusterGetHolidayScheduleParams *)params
@@ -8446,26 +9975,42 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            DoorLock::Commands::GetHolidaySchedule::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                DoorLock::Commands::GetHolidaySchedule::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.holidayIndex = params.holidayIndex.unsignedCharValue;
+                request.holidayIndex = params.holidayIndex.unsignedCharValue;
 
-            auto successFn = Callback<DoorLockClusterGetHolidayScheduleResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<DoorLockClusterGetHolidayScheduleResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)clearHolidayScheduleWithParams:(MTRDoorLockClusterClearHolidayScheduleParams *)params
@@ -8475,30 +10020,47 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            DoorLock::Commands::ClearHolidaySchedule::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                DoorLock::Commands::ClearHolidaySchedule::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.holidayIndex = params.holidayIndex.unsignedCharValue;
+                request.holidayIndex = params.holidayIndex.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)setUserWithParams:(MTRDoorLockClusterSetUserParams *)params
@@ -8508,67 +10070,85 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            DoorLock::Commands::SetUser::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                DoorLock::Commands::SetUser::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            if (!timedInvokeTimeoutMs.HasValue()) {
-                timedInvokeTimeoutMs.SetValue(10000);
-            }
-            request.operationType
-                = static_cast<std::remove_reference_t<decltype(request.operationType)>>(params.operationType.unsignedCharValue);
-            request.userIndex = params.userIndex.unsignedShortValue;
-            if (params.userName == nil) {
-                request.userName.SetNull();
-            } else {
-                auto & nonNullValue_0 = request.userName.SetNonNull();
-                nonNullValue_0 = [self asCharSpan:params.userName];
-            }
-            if (params.userUniqueId == nil) {
-                request.userUniqueId.SetNull();
-            } else {
-                auto & nonNullValue_0 = request.userUniqueId.SetNonNull();
-                nonNullValue_0 = params.userUniqueId.unsignedIntValue;
-            }
-            if (params.userStatus == nil) {
-                request.userStatus.SetNull();
-            } else {
-                auto & nonNullValue_0 = request.userStatus.SetNonNull();
-                nonNullValue_0
-                    = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(params.userStatus.unsignedCharValue);
-            }
-            if (params.userType == nil) {
-                request.userType.SetNull();
-            } else {
-                auto & nonNullValue_0 = request.userType.SetNonNull();
-                nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(params.userType.unsignedCharValue);
-            }
-            if (params.credentialRule == nil) {
-                request.credentialRule.SetNull();
-            } else {
-                auto & nonNullValue_0 = request.credentialRule.SetNonNull();
-                nonNullValue_0
-                    = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(params.credentialRule.unsignedCharValue);
-            }
+                if (!timedInvokeTimeoutMs.HasValue()) {
+                    timedInvokeTimeoutMs.SetValue(10000);
+                }
+                request.operationType
+                    = static_cast<std::remove_reference_t<decltype(request.operationType)>>(params.operationType.unsignedCharValue);
+                request.userIndex = params.userIndex.unsignedShortValue;
+                if (params.userName == nil) {
+                    request.userName.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.userName.SetNonNull();
+                    nonNullValue_0 = [self asCharSpan:params.userName];
+                }
+                if (params.userUniqueId == nil) {
+                    request.userUniqueId.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.userUniqueId.SetNonNull();
+                    nonNullValue_0 = params.userUniqueId.unsignedIntValue;
+                }
+                if (params.userStatus == nil) {
+                    request.userStatus.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.userStatus.SetNonNull();
+                    nonNullValue_0
+                        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(params.userStatus.unsignedCharValue);
+                }
+                if (params.userType == nil) {
+                    request.userType.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.userType.SetNonNull();
+                    nonNullValue_0
+                        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(params.userType.unsignedCharValue);
+                }
+                if (params.credentialRule == nil) {
+                    request.credentialRule.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.credentialRule.SetNonNull();
+                    nonNullValue_0
+                        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(params.credentialRule.unsignedCharValue);
+                }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)getUserWithParams:(MTRDoorLockClusterGetUserParams *)params
@@ -8579,26 +10159,42 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRDoorLockClusterGetUserResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            DoorLock::Commands::GetUser::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRDoorLockClusterGetUserResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                DoorLock::Commands::GetUser::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.userIndex = params.userIndex.unsignedShortValue;
+                request.userIndex = params.userIndex.unsignedShortValue;
 
-            auto successFn = Callback<DoorLockClusterGetUserResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<DoorLockClusterGetUserResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)clearUserWithParams:(MTRDoorLockClusterClearUserParams *)params
@@ -8608,33 +10204,50 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            DoorLock::Commands::ClearUser::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                DoorLock::Commands::ClearUser::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            if (!timedInvokeTimeoutMs.HasValue()) {
-                timedInvokeTimeoutMs.SetValue(10000);
-            }
-            request.userIndex = params.userIndex.unsignedShortValue;
+                if (!timedInvokeTimeoutMs.HasValue()) {
+                    timedInvokeTimeoutMs.SetValue(10000);
+                }
+                request.userIndex = params.userIndex.unsignedShortValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)setCredentialWithParams:(MTRDoorLockClusterSetCredentialParams *)params
@@ -8645,53 +10258,71 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRDoorLockClusterSetCredentialResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            DoorLock::Commands::SetCredential::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRDoorLockClusterSetCredentialResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                DoorLock::Commands::SetCredential::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            if (!timedInvokeTimeoutMs.HasValue()) {
-                timedInvokeTimeoutMs.SetValue(10000);
-            }
-            request.operationType
-                = static_cast<std::remove_reference_t<decltype(request.operationType)>>(params.operationType.unsignedCharValue);
-            request.credential.credentialType = static_cast<std::remove_reference_t<decltype(request.credential.credentialType)>>(
-                params.credential.credentialType.unsignedCharValue);
-            request.credential.credentialIndex = params.credential.credentialIndex.unsignedShortValue;
-            request.credentialData = [self asByteSpan:params.credentialData];
-            if (params.userIndex == nil) {
-                request.userIndex.SetNull();
-            } else {
-                auto & nonNullValue_0 = request.userIndex.SetNonNull();
-                nonNullValue_0 = params.userIndex.unsignedShortValue;
-            }
-            if (params.userStatus == nil) {
-                request.userStatus.SetNull();
-            } else {
-                auto & nonNullValue_0 = request.userStatus.SetNonNull();
-                nonNullValue_0
-                    = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(params.userStatus.unsignedCharValue);
-            }
-            if (params.userType == nil) {
-                request.userType.SetNull();
-            } else {
-                auto & nonNullValue_0 = request.userType.SetNonNull();
-                nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(params.userType.unsignedCharValue);
-            }
+                if (!timedInvokeTimeoutMs.HasValue()) {
+                    timedInvokeTimeoutMs.SetValue(10000);
+                }
+                request.operationType
+                    = static_cast<std::remove_reference_t<decltype(request.operationType)>>(params.operationType.unsignedCharValue);
+                request.credential.credentialType
+                    = static_cast<std::remove_reference_t<decltype(request.credential.credentialType)>>(
+                        params.credential.credentialType.unsignedCharValue);
+                request.credential.credentialIndex = params.credential.credentialIndex.unsignedShortValue;
+                request.credentialData = [self asByteSpan:params.credentialData];
+                if (params.userIndex == nil) {
+                    request.userIndex.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.userIndex.SetNonNull();
+                    nonNullValue_0 = params.userIndex.unsignedShortValue;
+                }
+                if (params.userStatus == nil) {
+                    request.userStatus.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.userStatus.SetNonNull();
+                    nonNullValue_0
+                        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(params.userStatus.unsignedCharValue);
+                }
+                if (params.userType == nil) {
+                    request.userType.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.userType.SetNonNull();
+                    nonNullValue_0
+                        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(params.userType.unsignedCharValue);
+                }
 
-            auto successFn = Callback<DoorLockClusterSetCredentialResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<DoorLockClusterSetCredentialResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)getCredentialStatusWithParams:(MTRDoorLockClusterGetCredentialStatusParams *)params
@@ -8702,28 +10333,45 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            DoorLock::Commands::GetCredentialStatus::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                DoorLock::Commands::GetCredentialStatus::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.credential.credentialType = static_cast<std::remove_reference_t<decltype(request.credential.credentialType)>>(
-                params.credential.credentialType.unsignedCharValue);
-            request.credential.credentialIndex = params.credential.credentialIndex.unsignedShortValue;
+                request.credential.credentialType
+                    = static_cast<std::remove_reference_t<decltype(request.credential.credentialType)>>(
+                        params.credential.credentialType.unsignedCharValue);
+                request.credential.credentialIndex = params.credential.credentialIndex.unsignedShortValue;
 
-            auto successFn = Callback<DoorLockClusterGetCredentialStatusResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<DoorLockClusterGetCredentialStatusResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)clearCredentialWithParams:(MTRDoorLockClusterClearCredentialParams *)params
@@ -8733,40 +10381,57 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            DoorLock::Commands::ClearCredential::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                DoorLock::Commands::ClearCredential::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            if (!timedInvokeTimeoutMs.HasValue()) {
-                timedInvokeTimeoutMs.SetValue(10000);
-            }
-            if (params.credential == nil) {
-                request.credential.SetNull();
-            } else {
-                auto & nonNullValue_0 = request.credential.SetNonNull();
-                nonNullValue_0.credentialType = static_cast<std::remove_reference_t<decltype(nonNullValue_0.credentialType)>>(
-                    params.credential.credentialType.unsignedCharValue);
-                nonNullValue_0.credentialIndex = params.credential.credentialIndex.unsignedShortValue;
-            }
+                if (!timedInvokeTimeoutMs.HasValue()) {
+                    timedInvokeTimeoutMs.SetValue(10000);
+                }
+                if (params.credential == nil) {
+                    request.credential.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.credential.SetNonNull();
+                    nonNullValue_0.credentialType = static_cast<std::remove_reference_t<decltype(nonNullValue_0.credentialType)>>(
+                        params.credential.credentialType.unsignedCharValue);
+                    nonNullValue_0.credentialIndex = params.credential.credentialIndex.unsignedShortValue;
+                }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLockStateWithParams:(MTRReadParams * _Nullable)params
@@ -9486,29 +11151,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            WindowCovering::Commands::UpOrOpen::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                WindowCovering::Commands::UpOrOpen::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)downOrCloseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -9527,29 +11209,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            WindowCovering::Commands::DownOrClose::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                WindowCovering::Commands::DownOrClose::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stopMotionWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -9568,29 +11267,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            WindowCovering::Commands::StopMotion::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                WindowCovering::Commands::StopMotion::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)goToLiftValueWithParams:(MTRWindowCoveringClusterGoToLiftValueParams *)params
@@ -9600,30 +11316,47 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            WindowCovering::Commands::GoToLiftValue::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                WindowCovering::Commands::GoToLiftValue::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.liftValue = params.liftValue.unsignedShortValue;
+                request.liftValue = params.liftValue.unsignedShortValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)goToLiftPercentageWithParams:(MTRWindowCoveringClusterGoToLiftPercentageParams *)params
@@ -9633,30 +11366,47 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            WindowCovering::Commands::GoToLiftPercentage::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                WindowCovering::Commands::GoToLiftPercentage::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.liftPercent100thsValue = params.liftPercent100thsValue.unsignedShortValue;
+                request.liftPercent100thsValue = params.liftPercent100thsValue.unsignedShortValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)goToTiltValueWithParams:(MTRWindowCoveringClusterGoToTiltValueParams *)params
@@ -9666,30 +11416,47 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            WindowCovering::Commands::GoToTiltValue::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                WindowCovering::Commands::GoToTiltValue::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.tiltValue = params.tiltValue.unsignedShortValue;
+                request.tiltValue = params.tiltValue.unsignedShortValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)goToTiltPercentageWithParams:(MTRWindowCoveringClusterGoToTiltPercentageParams *)params
@@ -9699,30 +11466,47 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            WindowCovering::Commands::GoToTiltPercentage::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                WindowCovering::Commands::GoToTiltPercentage::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.tiltPercent100thsValue = params.tiltPercent100thsValue.unsignedShortValue;
+                request.tiltPercent100thsValue = params.tiltPercent100thsValue.unsignedShortValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTypeWithParams:(MTRReadParams * _Nullable)params
@@ -9984,30 +11768,47 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            BarrierControl::Commands::BarrierControlGoToPercent::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                BarrierControl::Commands::BarrierControlGoToPercent::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.percentOpen = params.percentOpen.unsignedCharValue;
+                request.percentOpen = params.percentOpen.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::BarrierControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::BarrierControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)barrierControlStopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -10026,29 +11827,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            BarrierControl::Commands::BarrierControlStop::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                BarrierControl::Commands::BarrierControlStop::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::BarrierControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::BarrierControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBarrierMovingStateWithParams:(MTRReadParams * _Nullable)params
@@ -10632,31 +12450,48 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Thermostat::Commands::SetpointRaiseLower::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Thermostat::Commands::SetpointRaiseLower::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.mode = static_cast<std::remove_reference_t<decltype(request.mode)>>(params.mode.unsignedCharValue);
-            request.amount = params.amount.charValue;
+                request.mode = static_cast<std::remove_reference_t<decltype(request.mode)>>(params.mode.unsignedCharValue);
+                request.amount = params.amount.charValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ThermostatCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ThermostatCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)setWeeklyScheduleWithParams:(MTRThermostatClusterSetWeeklyScheduleParams *)params
@@ -10666,68 +12501,85 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Thermostat::Commands::SetWeeklySchedule::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Thermostat::Commands::SetWeeklySchedule::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.numberOfTransitionsForSequence = params.numberOfTransitionsForSequence.unsignedCharValue;
-            request.dayOfWeekForSequence = static_cast<std::remove_reference_t<decltype(request.dayOfWeekForSequence)>>(
-                params.dayOfWeekForSequence.unsignedCharValue);
-            request.modeForSequence
-                = static_cast<std::remove_reference_t<decltype(request.modeForSequence)>>(params.modeForSequence.unsignedCharValue);
-            {
-                using ListType_0 = std::remove_reference_t<decltype(request.transitions)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (params.transitions.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.transitions.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < params.transitions.count; ++i_0) {
-                        if (![params.transitions[i_0] isKindOfClass:[MTRThermostatClusterThermostatScheduleTransition class]]) {
-                            // Wrong kind of value.
+                request.numberOfTransitionsForSequence = params.numberOfTransitionsForSequence.unsignedCharValue;
+                request.dayOfWeekForSequence = static_cast<std::remove_reference_t<decltype(request.dayOfWeekForSequence)>>(
+                    params.dayOfWeekForSequence.unsignedCharValue);
+                request.modeForSequence = static_cast<std::remove_reference_t<decltype(request.modeForSequence)>>(
+                    params.modeForSequence.unsignedCharValue);
+                {
+                    using ListType_0 = std::remove_reference_t<decltype(request.transitions)>;
+                    using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                    if (params.transitions.count != 0) {
+                        auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.transitions.count);
+                        if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (MTRThermostatClusterThermostatScheduleTransition *) params.transitions[i_0];
-                        listHolder_0->mList[i_0].transitionTime = element_0.transitionTime.unsignedShortValue;
-                        if (element_0.heatSetpoint == nil) {
-                            listHolder_0->mList[i_0].heatSetpoint.SetNull();
-                        } else {
-                            auto & nonNullValue_2 = listHolder_0->mList[i_0].heatSetpoint.SetNonNull();
-                            nonNullValue_2 = element_0.heatSetpoint.shortValue;
+                        listFreer.add(listHolder_0);
+                        for (size_t i_0 = 0; i_0 < params.transitions.count; ++i_0) {
+                            if (![params.transitions[i_0] isKindOfClass:[MTRThermostatClusterThermostatScheduleTransition class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_0 = (MTRThermostatClusterThermostatScheduleTransition *) params.transitions[i_0];
+                            listHolder_0->mList[i_0].transitionTime = element_0.transitionTime.unsignedShortValue;
+                            if (element_0.heatSetpoint == nil) {
+                                listHolder_0->mList[i_0].heatSetpoint.SetNull();
+                            } else {
+                                auto & nonNullValue_2 = listHolder_0->mList[i_0].heatSetpoint.SetNonNull();
+                                nonNullValue_2 = element_0.heatSetpoint.shortValue;
+                            }
+                            if (element_0.coolSetpoint == nil) {
+                                listHolder_0->mList[i_0].coolSetpoint.SetNull();
+                            } else {
+                                auto & nonNullValue_2 = listHolder_0->mList[i_0].coolSetpoint.SetNonNull();
+                                nonNullValue_2 = element_0.coolSetpoint.shortValue;
+                            }
                         }
-                        if (element_0.coolSetpoint == nil) {
-                            listHolder_0->mList[i_0].coolSetpoint.SetNull();
-                        } else {
-                            auto & nonNullValue_2 = listHolder_0->mList[i_0].coolSetpoint.SetNonNull();
-                            nonNullValue_2 = element_0.coolSetpoint.shortValue;
-                        }
+                        request.transitions = ListType_0(listHolder_0->mList, params.transitions.count);
+                    } else {
+                        request.transitions = ListType_0();
                     }
-                    request.transitions = ListType_0(listHolder_0->mList, params.transitions.count);
-                } else {
-                    request.transitions = ListType_0();
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ThermostatCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ThermostatCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)getWeeklyScheduleWithParams:(MTRThermostatClusterGetWeeklyScheduleParams *)params
@@ -10738,29 +12590,45 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Thermostat::Commands::GetWeeklySchedule::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Thermostat::Commands::GetWeeklySchedule::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.daysToReturn
-                = static_cast<std::remove_reference_t<decltype(request.daysToReturn)>>(params.daysToReturn.unsignedCharValue);
-            request.modeToReturn
-                = static_cast<std::remove_reference_t<decltype(request.modeToReturn)>>(params.modeToReturn.unsignedCharValue);
+                request.daysToReturn
+                    = static_cast<std::remove_reference_t<decltype(request.daysToReturn)>>(params.daysToReturn.unsignedCharValue);
+                request.modeToReturn
+                    = static_cast<std::remove_reference_t<decltype(request.modeToReturn)>>(params.modeToReturn.unsignedCharValue);
 
-            auto successFn = Callback<ThermostatClusterGetWeeklyScheduleResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ThermostatCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<ThermostatClusterGetWeeklyScheduleResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ThermostatCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)clearWeeklyScheduleWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -10779,29 +12647,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Thermostat::Commands::ClearWeeklySchedule::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Thermostat::Commands::ClearWeeklySchedule::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ThermostatCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ThermostatCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLocalTemperatureWithParams:(MTRReadParams * _Nullable)params
@@ -12197,35 +14082,52 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ColorControl::Commands::MoveToHue::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ColorControl::Commands::MoveToHue::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.hue = params.hue.unsignedCharValue;
-            request.direction
-                = static_cast<std::remove_reference_t<decltype(request.direction)>>(params.direction.unsignedCharValue);
-            request.transitionTime = params.transitionTime.unsignedShortValue;
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.hue = params.hue.unsignedCharValue;
+                request.direction
+                    = static_cast<std::remove_reference_t<decltype(request.direction)>>(params.direction.unsignedCharValue);
+                request.transitionTime = params.transitionTime.unsignedShortValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveHueWithParams:(MTRColorControlClusterMoveHueParams *)params
@@ -12235,33 +14137,51 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ColorControl::Commands::MoveHue::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ColorControl::Commands::MoveHue::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
-            request.rate = params.rate.unsignedCharValue;
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.moveMode
+                    = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
+                request.rate = params.rate.unsignedCharValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stepHueWithParams:(MTRColorControlClusterStepHueParams *)params
@@ -12271,34 +14191,52 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ColorControl::Commands::StepHue::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ColorControl::Commands::StepHue::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
-            request.stepSize = params.stepSize.unsignedCharValue;
-            request.transitionTime = params.transitionTime.unsignedCharValue;
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.stepMode
+                    = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
+                request.stepSize = params.stepSize.unsignedCharValue;
+                request.transitionTime = params.transitionTime.unsignedCharValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveToSaturationWithParams:(MTRColorControlClusterMoveToSaturationParams *)params
@@ -12308,33 +14246,50 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ColorControl::Commands::MoveToSaturation::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ColorControl::Commands::MoveToSaturation::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.saturation = params.saturation.unsignedCharValue;
-            request.transitionTime = params.transitionTime.unsignedShortValue;
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.saturation = params.saturation.unsignedCharValue;
+                request.transitionTime = params.transitionTime.unsignedShortValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveSaturationWithParams:(MTRColorControlClusterMoveSaturationParams *)params
@@ -12344,33 +14299,51 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ColorControl::Commands::MoveSaturation::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ColorControl::Commands::MoveSaturation::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
-            request.rate = params.rate.unsignedCharValue;
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.moveMode
+                    = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
+                request.rate = params.rate.unsignedCharValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stepSaturationWithParams:(MTRColorControlClusterStepSaturationParams *)params
@@ -12380,34 +14353,52 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ColorControl::Commands::StepSaturation::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ColorControl::Commands::StepSaturation::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
-            request.stepSize = params.stepSize.unsignedCharValue;
-            request.transitionTime = params.transitionTime.unsignedCharValue;
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.stepMode
+                    = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
+                request.stepSize = params.stepSize.unsignedCharValue;
+                request.transitionTime = params.transitionTime.unsignedCharValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveToHueAndSaturationWithParams:(MTRColorControlClusterMoveToHueAndSaturationParams *)params
@@ -12417,34 +14408,51 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ColorControl::Commands::MoveToHueAndSaturation::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ColorControl::Commands::MoveToHueAndSaturation::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.hue = params.hue.unsignedCharValue;
-            request.saturation = params.saturation.unsignedCharValue;
-            request.transitionTime = params.transitionTime.unsignedShortValue;
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.hue = params.hue.unsignedCharValue;
+                request.saturation = params.saturation.unsignedCharValue;
+                request.transitionTime = params.transitionTime.unsignedShortValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveToColorWithParams:(MTRColorControlClusterMoveToColorParams *)params
@@ -12454,34 +14462,51 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ColorControl::Commands::MoveToColor::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ColorControl::Commands::MoveToColor::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.colorX = params.colorX.unsignedShortValue;
-            request.colorY = params.colorY.unsignedShortValue;
-            request.transitionTime = params.transitionTime.unsignedShortValue;
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.colorX = params.colorX.unsignedShortValue;
+                request.colorY = params.colorY.unsignedShortValue;
+                request.transitionTime = params.transitionTime.unsignedShortValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveColorWithParams:(MTRColorControlClusterMoveColorParams *)params
@@ -12491,33 +14516,50 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ColorControl::Commands::MoveColor::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ColorControl::Commands::MoveColor::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.rateX = params.rateX.shortValue;
-            request.rateY = params.rateY.shortValue;
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.rateX = params.rateX.shortValue;
+                request.rateY = params.rateY.shortValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stepColorWithParams:(MTRColorControlClusterStepColorParams *)params
@@ -12527,34 +14569,51 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ColorControl::Commands::StepColor::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ColorControl::Commands::StepColor::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.stepX = params.stepX.shortValue;
-            request.stepY = params.stepY.shortValue;
-            request.transitionTime = params.transitionTime.unsignedShortValue;
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.stepX = params.stepX.shortValue;
+                request.stepY = params.stepY.shortValue;
+                request.transitionTime = params.transitionTime.unsignedShortValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveToColorTemperatureWithParams:(MTRColorControlClusterMoveToColorTemperatureParams *)params
@@ -12564,33 +14623,50 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ColorControl::Commands::MoveToColorTemperature::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ColorControl::Commands::MoveToColorTemperature::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.colorTemperature = params.colorTemperature.unsignedShortValue;
-            request.transitionTime = params.transitionTime.unsignedShortValue;
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.colorTemperature = params.colorTemperature.unsignedShortValue;
+                request.transitionTime = params.transitionTime.unsignedShortValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)enhancedMoveToHueWithParams:(MTRColorControlClusterEnhancedMoveToHueParams *)params
@@ -12600,35 +14676,52 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ColorControl::Commands::EnhancedMoveToHue::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ColorControl::Commands::EnhancedMoveToHue::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.enhancedHue = params.enhancedHue.unsignedShortValue;
-            request.direction
-                = static_cast<std::remove_reference_t<decltype(request.direction)>>(params.direction.unsignedCharValue);
-            request.transitionTime = params.transitionTime.unsignedShortValue;
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.enhancedHue = params.enhancedHue.unsignedShortValue;
+                request.direction
+                    = static_cast<std::remove_reference_t<decltype(request.direction)>>(params.direction.unsignedCharValue);
+                request.transitionTime = params.transitionTime.unsignedShortValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)enhancedMoveHueWithParams:(MTRColorControlClusterEnhancedMoveHueParams *)params
@@ -12638,33 +14731,51 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ColorControl::Commands::EnhancedMoveHue::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ColorControl::Commands::EnhancedMoveHue::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
-            request.rate = params.rate.unsignedShortValue;
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.moveMode
+                    = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
+                request.rate = params.rate.unsignedShortValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)enhancedStepHueWithParams:(MTRColorControlClusterEnhancedStepHueParams *)params
@@ -12674,34 +14785,52 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ColorControl::Commands::EnhancedStepHue::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ColorControl::Commands::EnhancedStepHue::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
-            request.stepSize = params.stepSize.unsignedShortValue;
-            request.transitionTime = params.transitionTime.unsignedShortValue;
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.stepMode
+                    = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
+                request.stepSize = params.stepSize.unsignedShortValue;
+                request.transitionTime = params.transitionTime.unsignedShortValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)enhancedMoveToHueAndSaturationWithParams:(MTRColorControlClusterEnhancedMoveToHueAndSaturationParams *)params
@@ -12711,34 +14840,51 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.enhancedHue = params.enhancedHue.unsignedShortValue;
-            request.saturation = params.saturation.unsignedCharValue;
-            request.transitionTime = params.transitionTime.unsignedShortValue;
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.enhancedHue = params.enhancedHue.unsignedShortValue;
+                request.saturation = params.saturation.unsignedCharValue;
+                request.transitionTime = params.transitionTime.unsignedShortValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)colorLoopSetWithParams:(MTRColorControlClusterColorLoopSetParams *)params
@@ -12748,38 +14894,55 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ColorControl::Commands::ColorLoopSet::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ColorControl::Commands::ColorLoopSet::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.updateFlags
-                = static_cast<std::remove_reference_t<decltype(request.updateFlags)>>(params.updateFlags.unsignedCharValue);
-            request.action = static_cast<std::remove_reference_t<decltype(request.action)>>(params.action.unsignedCharValue);
-            request.direction
-                = static_cast<std::remove_reference_t<decltype(request.direction)>>(params.direction.unsignedCharValue);
-            request.time = params.time.unsignedShortValue;
-            request.startHue = params.startHue.unsignedShortValue;
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.updateFlags
+                    = static_cast<std::remove_reference_t<decltype(request.updateFlags)>>(params.updateFlags.unsignedCharValue);
+                request.action = static_cast<std::remove_reference_t<decltype(request.action)>>(params.action.unsignedCharValue);
+                request.direction
+                    = static_cast<std::remove_reference_t<decltype(request.direction)>>(params.direction.unsignedCharValue);
+                request.time = params.time.unsignedShortValue;
+                request.startHue = params.startHue.unsignedShortValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stopMoveStepWithParams:(MTRColorControlClusterStopMoveStepParams *)params
@@ -12789,31 +14952,48 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ColorControl::Commands::StopMoveStep::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ColorControl::Commands::StopMoveStep::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)moveColorTemperatureWithParams:(MTRColorControlClusterMoveColorTemperatureParams *)params
@@ -12823,35 +15003,53 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ColorControl::Commands::MoveColorTemperature::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ColorControl::Commands::MoveColorTemperature::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
-            request.rate = params.rate.unsignedShortValue;
-            request.colorTemperatureMinimumMireds = params.colorTemperatureMinimumMireds.unsignedShortValue;
-            request.colorTemperatureMaximumMireds = params.colorTemperatureMaximumMireds.unsignedShortValue;
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.moveMode
+                    = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(params.moveMode.unsignedCharValue);
+                request.rate = params.rate.unsignedShortValue;
+                request.colorTemperatureMinimumMireds = params.colorTemperatureMinimumMireds.unsignedShortValue;
+                request.colorTemperatureMaximumMireds = params.colorTemperatureMaximumMireds.unsignedShortValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stepColorTemperatureWithParams:(MTRColorControlClusterStepColorTemperatureParams *)params
@@ -12861,36 +15059,54 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ColorControl::Commands::StepColorTemperature::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ColorControl::Commands::StepColorTemperature::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
-            request.stepSize = params.stepSize.unsignedShortValue;
-            request.transitionTime = params.transitionTime.unsignedShortValue;
-            request.colorTemperatureMinimumMireds = params.colorTemperatureMinimumMireds.unsignedShortValue;
-            request.colorTemperatureMaximumMireds = params.colorTemperatureMaximumMireds.unsignedShortValue;
-            request.optionsMask = params.optionsMask.unsignedCharValue;
-            request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.stepMode
+                    = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(params.stepMode.unsignedCharValue);
+                request.stepSize = params.stepSize.unsignedShortValue;
+                request.transitionTime = params.transitionTime.unsignedShortValue;
+                request.colorTemperatureMinimumMireds = params.colorTemperatureMinimumMireds.unsignedShortValue;
+                request.colorTemperatureMaximumMireds = params.colorTemperatureMaximumMireds.unsignedShortValue;
+                request.optionsMask = params.optionsMask.unsignedCharValue;
+                request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentHueWithParams:(MTRReadParams * _Nullable)params
@@ -14890,26 +17106,42 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRChannelClusterChangeChannelResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Channel::Commands::ChangeChannel::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRChannelClusterChangeChannelResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Channel::Commands::ChangeChannel::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.match = [self asCharSpan:params.match];
+                request.match = [self asCharSpan:params.match];
 
-            auto successFn = Callback<ChannelClusterChangeChannelResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ChannelCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<ChannelClusterChangeChannelResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ChannelCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)changeChannelByNumberWithParams:(MTRChannelClusterChangeChannelByNumberParams *)params
@@ -14919,31 +17151,48 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Channel::Commands::ChangeChannelByNumber::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Channel::Commands::ChangeChannelByNumber::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.majorNumber = params.majorNumber.unsignedShortValue;
-            request.minorNumber = params.minorNumber.unsignedShortValue;
+                request.majorNumber = params.majorNumber.unsignedShortValue;
+                request.minorNumber = params.minorNumber.unsignedShortValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ChannelCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ChannelCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)skipChannelWithParams:(MTRChannelClusterSkipChannelParams *)params
@@ -14953,30 +17202,47 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            Channel::Commands::SkipChannel::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                Channel::Commands::SkipChannel::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.count = params.count.unsignedShortValue;
+                request.count = params.count.unsignedShortValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ChannelCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ChannelCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeChannelListWithParams:(MTRReadParams * _Nullable)params
@@ -15068,30 +17334,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TargetNavigator::Commands::NavigateTarget::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TargetNavigator::Commands::NavigateTarget::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.target = params.target.unsignedCharValue;
-            if (params.data != nil) {
-                auto & definedValue_0 = request.data.Emplace();
-                definedValue_0 = [self asCharSpan:params.data];
-            }
+                request.target = params.target.unsignedCharValue;
+                if (params.data != nil) {
+                    auto & definedValue_0 = request.data.Emplace();
+                    definedValue_0 = [self asCharSpan:params.data];
+                }
 
-            auto successFn = Callback<TargetNavigatorClusterNavigateTargetResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TargetNavigatorCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<TargetNavigatorClusterNavigateTargetResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TargetNavigatorCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTargetListWithParams:(MTRReadParams * _Nullable)params
@@ -15185,25 +17467,41 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            MediaPlayback::Commands::Play::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                MediaPlayback::Commands::Play::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)pauseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -15224,25 +17522,41 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            MediaPlayback::Commands::Pause::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                MediaPlayback::Commands::Pause::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stopPlaybackWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -15263,25 +17577,41 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            MediaPlayback::Commands::StopPlayback::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                MediaPlayback::Commands::StopPlayback::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)startOverWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -15302,25 +17632,41 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            MediaPlayback::Commands::StartOver::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                MediaPlayback::Commands::StartOver::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)previousWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -15341,25 +17687,41 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            MediaPlayback::Commands::Previous::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                MediaPlayback::Commands::Previous::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)nextWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -15380,25 +17742,41 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            MediaPlayback::Commands::Next::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                MediaPlayback::Commands::Next::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)rewindWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -15419,25 +17797,41 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            MediaPlayback::Commands::Rewind::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                MediaPlayback::Commands::Rewind::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)fastForwardWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -15458,25 +17852,41 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            MediaPlayback::Commands::FastForward::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                MediaPlayback::Commands::FastForward::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)skipForwardWithParams:(MTRMediaPlaybackClusterSkipForwardParams *)params
@@ -15487,26 +17897,42 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            MediaPlayback::Commands::SkipForward::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                MediaPlayback::Commands::SkipForward::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.deltaPositionMilliseconds = params.deltaPositionMilliseconds.unsignedLongLongValue;
+                request.deltaPositionMilliseconds = params.deltaPositionMilliseconds.unsignedLongLongValue;
 
-            auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)skipBackwardWithParams:(MTRMediaPlaybackClusterSkipBackwardParams *)params
@@ -15517,26 +17943,42 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            MediaPlayback::Commands::SkipBackward::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                MediaPlayback::Commands::SkipBackward::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.deltaPositionMilliseconds = params.deltaPositionMilliseconds.unsignedLongLongValue;
+                request.deltaPositionMilliseconds = params.deltaPositionMilliseconds.unsignedLongLongValue;
 
-            auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)seekWithParams:(MTRMediaPlaybackClusterSeekParams *)params
@@ -15547,26 +17989,42 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            MediaPlayback::Commands::Seek::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                MediaPlayback::Commands::Seek::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.position = params.position.unsignedLongLongValue;
+                request.position = params.position.unsignedLongLongValue;
 
-            auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentStateWithParams:(MTRReadParams * _Nullable)params
@@ -15689,30 +18147,47 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            MediaInput::Commands::SelectInput::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                MediaInput::Commands::SelectInput::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.index = params.index.unsignedCharValue;
+                request.index = params.index.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::MediaInputCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::MediaInputCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)showInputStatusWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -15731,29 +18206,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            MediaInput::Commands::ShowInputStatus::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                MediaInput::Commands::ShowInputStatus::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::MediaInputCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::MediaInputCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)hideInputStatusWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -15772,29 +18264,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            MediaInput::Commands::HideInputStatus::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                MediaInput::Commands::HideInputStatus::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::MediaInputCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::MediaInputCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)renameInputWithParams:(MTRMediaInputClusterRenameInputParams *)params
@@ -15804,31 +18313,48 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            MediaInput::Commands::RenameInput::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                MediaInput::Commands::RenameInput::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.index = params.index.unsignedCharValue;
-            request.name = [self asCharSpan:params.name];
+                request.index = params.index.unsignedCharValue;
+                request.name = [self asCharSpan:params.name];
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::MediaInputCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::MediaInputCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeInputListWithParams:(MTRReadParams * _Nullable)params
@@ -15920,29 +18446,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            LowPower::Commands::Sleep::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                LowPower::Commands::Sleep::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::LowPowerCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::LowPowerCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -16010,26 +18553,42 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRKeypadInputClusterSendKeyResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            KeypadInput::Commands::SendKey::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRKeypadInputClusterSendKeyResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                KeypadInput::Commands::SendKey::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.keyCode = static_cast<std::remove_reference_t<decltype(request.keyCode)>>(params.keyCode.unsignedCharValue);
+                request.keyCode = static_cast<std::remove_reference_t<decltype(request.keyCode)>>(params.keyCode.unsignedCharValue);
 
-            auto successFn = Callback<KeypadInputClusterSendKeyResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::KeypadInputCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<KeypadInputClusterSendKeyResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::KeypadInputCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -16097,82 +18656,99 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRContentLauncherClusterLaunchResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ContentLauncher::Commands::LaunchContent::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRContentLauncherClusterLaunchResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ContentLauncher::Commands::LaunchContent::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            {
-                using ListType_1 = std::remove_reference_t<decltype(request.search.parameterList)>;
-                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
-                if (params.search.parameterList.count != 0) {
-                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(params.search.parameterList.count);
-                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_1);
-                    for (size_t i_1 = 0; i_1 < params.search.parameterList.count; ++i_1) {
-                        if (![params.search.parameterList[i_1] isKindOfClass:[MTRContentLauncherClusterParameter class]]) {
-                            // Wrong kind of value.
+                {
+                    using ListType_1 = std::remove_reference_t<decltype(request.search.parameterList)>;
+                    using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                    if (params.search.parameterList.count != 0) {
+                        auto * listHolder_1 = new ListHolder<ListMemberType_1>(params.search.parameterList.count);
+                        if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_1 = (MTRContentLauncherClusterParameter *) params.search.parameterList[i_1];
-                        listHolder_1->mList[i_1].type
-                            = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].type)>>(
-                                element_1.type.unsignedCharValue);
-                        listHolder_1->mList[i_1].value = [self asCharSpan:element_1.value];
-                        if (element_1.externalIDList != nil) {
-                            auto & definedValue_3 = listHolder_1->mList[i_1].externalIDList.Emplace();
-                            {
-                                using ListType_4 = std::remove_reference_t<decltype(definedValue_3)>;
-                                using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
-                                if (element_1.externalIDList.count != 0) {
-                                    auto * listHolder_4 = new ListHolder<ListMemberType_4>(element_1.externalIDList.count);
-                                    if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
-                                        return CHIP_ERROR_INVALID_ARGUMENT;
-                                    }
-                                    listFreer.add(listHolder_4);
-                                    for (size_t i_4 = 0; i_4 < element_1.externalIDList.count; ++i_4) {
-                                        if (![element_1.externalIDList[i_4]
-                                                isKindOfClass:[MTRContentLauncherClusterAdditionalInfo class]]) {
-                                            // Wrong kind of value.
+                        listFreer.add(listHolder_1);
+                        for (size_t i_1 = 0; i_1 < params.search.parameterList.count; ++i_1) {
+                            if (![params.search.parameterList[i_1] isKindOfClass:[MTRContentLauncherClusterParameter class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_1 = (MTRContentLauncherClusterParameter *) params.search.parameterList[i_1];
+                            listHolder_1->mList[i_1].type
+                                = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].type)>>(
+                                    element_1.type.unsignedCharValue);
+                            listHolder_1->mList[i_1].value = [self asCharSpan:element_1.value];
+                            if (element_1.externalIDList != nil) {
+                                auto & definedValue_3 = listHolder_1->mList[i_1].externalIDList.Emplace();
+                                {
+                                    using ListType_4 = std::remove_reference_t<decltype(definedValue_3)>;
+                                    using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
+                                    if (element_1.externalIDList.count != 0) {
+                                        auto * listHolder_4 = new ListHolder<ListMemberType_4>(element_1.externalIDList.count);
+                                        if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
                                             return CHIP_ERROR_INVALID_ARGUMENT;
                                         }
-                                        auto element_4 = (MTRContentLauncherClusterAdditionalInfo *) element_1.externalIDList[i_4];
-                                        listHolder_4->mList[i_4].name = [self asCharSpan:element_4.name];
-                                        listHolder_4->mList[i_4].value = [self asCharSpan:element_4.value];
+                                        listFreer.add(listHolder_4);
+                                        for (size_t i_4 = 0; i_4 < element_1.externalIDList.count; ++i_4) {
+                                            if (![element_1.externalIDList[i_4]
+                                                    isKindOfClass:[MTRContentLauncherClusterAdditionalInfo class]]) {
+                                                // Wrong kind of value.
+                                                return CHIP_ERROR_INVALID_ARGUMENT;
+                                            }
+                                            auto element_4
+                                                = (MTRContentLauncherClusterAdditionalInfo *) element_1.externalIDList[i_4];
+                                            listHolder_4->mList[i_4].name = [self asCharSpan:element_4.name];
+                                            listHolder_4->mList[i_4].value = [self asCharSpan:element_4.value];
+                                        }
+                                        definedValue_3 = ListType_4(listHolder_4->mList, element_1.externalIDList.count);
+                                    } else {
+                                        definedValue_3 = ListType_4();
                                     }
-                                    definedValue_3 = ListType_4(listHolder_4->mList, element_1.externalIDList.count);
-                                } else {
-                                    definedValue_3 = ListType_4();
                                 }
                             }
                         }
+                        request.search.parameterList = ListType_1(listHolder_1->mList, params.search.parameterList.count);
+                    } else {
+                        request.search.parameterList = ListType_1();
                     }
-                    request.search.parameterList = ListType_1(listHolder_1->mList, params.search.parameterList.count);
-                } else {
-                    request.search.parameterList = ListType_1();
                 }
-            }
-            request.autoPlay = params.autoPlay.boolValue;
-            if (params.data != nil) {
-                auto & definedValue_0 = request.data.Emplace();
-                definedValue_0 = [self asCharSpan:params.data];
-            }
+                request.autoPlay = params.autoPlay.boolValue;
+                if (params.data != nil) {
+                    auto & definedValue_0 = request.data.Emplace();
+                    definedValue_0 = [self asCharSpan:params.data];
+                }
 
-            auto successFn = Callback<ContentLauncherClusterLaunchResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ContentLauncherCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<ContentLauncherClusterLaunchResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ContentLauncherCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)launchURLWithParams:(MTRContentLauncherClusterLaunchURLParams *)params
@@ -16183,124 +18759,140 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRContentLauncherClusterLaunchResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ContentLauncher::Commands::LaunchURL::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRContentLauncherClusterLaunchResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ContentLauncher::Commands::LaunchURL::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.contentURL = [self asCharSpan:params.contentURL];
-            if (params.displayString != nil) {
-                auto & definedValue_0 = request.displayString.Emplace();
-                definedValue_0 = [self asCharSpan:params.displayString];
-            }
-            if (params.brandingInformation != nil) {
-                auto & definedValue_0 = request.brandingInformation.Emplace();
-                definedValue_0.providerName = [self asCharSpan:params.brandingInformation.providerName];
-                if (params.brandingInformation.background != nil) {
-                    auto & definedValue_2 = definedValue_0.background.Emplace();
-                    if (params.brandingInformation.background.imageUrl != nil) {
-                        auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
-                        definedValue_4 = [self asCharSpan:params.brandingInformation.background.imageUrl];
+                request.contentURL = [self asCharSpan:params.contentURL];
+                if (params.displayString != nil) {
+                    auto & definedValue_0 = request.displayString.Emplace();
+                    definedValue_0 = [self asCharSpan:params.displayString];
+                }
+                if (params.brandingInformation != nil) {
+                    auto & definedValue_0 = request.brandingInformation.Emplace();
+                    definedValue_0.providerName = [self asCharSpan:params.brandingInformation.providerName];
+                    if (params.brandingInformation.background != nil) {
+                        auto & definedValue_2 = definedValue_0.background.Emplace();
+                        if (params.brandingInformation.background.imageUrl != nil) {
+                            auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
+                            definedValue_4 = [self asCharSpan:params.brandingInformation.background.imageUrl];
+                        }
+                        if (params.brandingInformation.background.color != nil) {
+                            auto & definedValue_4 = definedValue_2.color.Emplace();
+                            definedValue_4 = [self asCharSpan:params.brandingInformation.background.color];
+                        }
+                        if (params.brandingInformation.background.size != nil) {
+                            auto & definedValue_4 = definedValue_2.size.Emplace();
+                            definedValue_4.width = params.brandingInformation.background.size.width.doubleValue;
+                            definedValue_4.height = params.brandingInformation.background.size.height.doubleValue;
+                            definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
+                                params.brandingInformation.background.size.metric.unsignedCharValue);
+                        }
                     }
-                    if (params.brandingInformation.background.color != nil) {
-                        auto & definedValue_4 = definedValue_2.color.Emplace();
-                        definedValue_4 = [self asCharSpan:params.brandingInformation.background.color];
+                    if (params.brandingInformation.logo != nil) {
+                        auto & definedValue_2 = definedValue_0.logo.Emplace();
+                        if (params.brandingInformation.logo.imageUrl != nil) {
+                            auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
+                            definedValue_4 = [self asCharSpan:params.brandingInformation.logo.imageUrl];
+                        }
+                        if (params.brandingInformation.logo.color != nil) {
+                            auto & definedValue_4 = definedValue_2.color.Emplace();
+                            definedValue_4 = [self asCharSpan:params.brandingInformation.logo.color];
+                        }
+                        if (params.brandingInformation.logo.size != nil) {
+                            auto & definedValue_4 = definedValue_2.size.Emplace();
+                            definedValue_4.width = params.brandingInformation.logo.size.width.doubleValue;
+                            definedValue_4.height = params.brandingInformation.logo.size.height.doubleValue;
+                            definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
+                                params.brandingInformation.logo.size.metric.unsignedCharValue);
+                        }
                     }
-                    if (params.brandingInformation.background.size != nil) {
-                        auto & definedValue_4 = definedValue_2.size.Emplace();
-                        definedValue_4.width = params.brandingInformation.background.size.width.doubleValue;
-                        definedValue_4.height = params.brandingInformation.background.size.height.doubleValue;
-                        definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
-                            params.brandingInformation.background.size.metric.unsignedCharValue);
+                    if (params.brandingInformation.progressBar != nil) {
+                        auto & definedValue_2 = definedValue_0.progressBar.Emplace();
+                        if (params.brandingInformation.progressBar.imageUrl != nil) {
+                            auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
+                            definedValue_4 = [self asCharSpan:params.brandingInformation.progressBar.imageUrl];
+                        }
+                        if (params.brandingInformation.progressBar.color != nil) {
+                            auto & definedValue_4 = definedValue_2.color.Emplace();
+                            definedValue_4 = [self asCharSpan:params.brandingInformation.progressBar.color];
+                        }
+                        if (params.brandingInformation.progressBar.size != nil) {
+                            auto & definedValue_4 = definedValue_2.size.Emplace();
+                            definedValue_4.width = params.brandingInformation.progressBar.size.width.doubleValue;
+                            definedValue_4.height = params.brandingInformation.progressBar.size.height.doubleValue;
+                            definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
+                                params.brandingInformation.progressBar.size.metric.unsignedCharValue);
+                        }
+                    }
+                    if (params.brandingInformation.splash != nil) {
+                        auto & definedValue_2 = definedValue_0.splash.Emplace();
+                        if (params.brandingInformation.splash.imageUrl != nil) {
+                            auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
+                            definedValue_4 = [self asCharSpan:params.brandingInformation.splash.imageUrl];
+                        }
+                        if (params.brandingInformation.splash.color != nil) {
+                            auto & definedValue_4 = definedValue_2.color.Emplace();
+                            definedValue_4 = [self asCharSpan:params.brandingInformation.splash.color];
+                        }
+                        if (params.brandingInformation.splash.size != nil) {
+                            auto & definedValue_4 = definedValue_2.size.Emplace();
+                            definedValue_4.width = params.brandingInformation.splash.size.width.doubleValue;
+                            definedValue_4.height = params.brandingInformation.splash.size.height.doubleValue;
+                            definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
+                                params.brandingInformation.splash.size.metric.unsignedCharValue);
+                        }
+                    }
+                    if (params.brandingInformation.waterMark != nil) {
+                        auto & definedValue_2 = definedValue_0.waterMark.Emplace();
+                        if (params.brandingInformation.waterMark.imageUrl != nil) {
+                            auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
+                            definedValue_4 = [self asCharSpan:params.brandingInformation.waterMark.imageUrl];
+                        }
+                        if (params.brandingInformation.waterMark.color != nil) {
+                            auto & definedValue_4 = definedValue_2.color.Emplace();
+                            definedValue_4 = [self asCharSpan:params.brandingInformation.waterMark.color];
+                        }
+                        if (params.brandingInformation.waterMark.size != nil) {
+                            auto & definedValue_4 = definedValue_2.size.Emplace();
+                            definedValue_4.width = params.brandingInformation.waterMark.size.width.doubleValue;
+                            definedValue_4.height = params.brandingInformation.waterMark.size.height.doubleValue;
+                            definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
+                                params.brandingInformation.waterMark.size.metric.unsignedCharValue);
+                        }
                     }
                 }
-                if (params.brandingInformation.logo != nil) {
-                    auto & definedValue_2 = definedValue_0.logo.Emplace();
-                    if (params.brandingInformation.logo.imageUrl != nil) {
-                        auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
-                        definedValue_4 = [self asCharSpan:params.brandingInformation.logo.imageUrl];
-                    }
-                    if (params.brandingInformation.logo.color != nil) {
-                        auto & definedValue_4 = definedValue_2.color.Emplace();
-                        definedValue_4 = [self asCharSpan:params.brandingInformation.logo.color];
-                    }
-                    if (params.brandingInformation.logo.size != nil) {
-                        auto & definedValue_4 = definedValue_2.size.Emplace();
-                        definedValue_4.width = params.brandingInformation.logo.size.width.doubleValue;
-                        definedValue_4.height = params.brandingInformation.logo.size.height.doubleValue;
-                        definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
-                            params.brandingInformation.logo.size.metric.unsignedCharValue);
-                    }
-                }
-                if (params.brandingInformation.progressBar != nil) {
-                    auto & definedValue_2 = definedValue_0.progressBar.Emplace();
-                    if (params.brandingInformation.progressBar.imageUrl != nil) {
-                        auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
-                        definedValue_4 = [self asCharSpan:params.brandingInformation.progressBar.imageUrl];
-                    }
-                    if (params.brandingInformation.progressBar.color != nil) {
-                        auto & definedValue_4 = definedValue_2.color.Emplace();
-                        definedValue_4 = [self asCharSpan:params.brandingInformation.progressBar.color];
-                    }
-                    if (params.brandingInformation.progressBar.size != nil) {
-                        auto & definedValue_4 = definedValue_2.size.Emplace();
-                        definedValue_4.width = params.brandingInformation.progressBar.size.width.doubleValue;
-                        definedValue_4.height = params.brandingInformation.progressBar.size.height.doubleValue;
-                        definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
-                            params.brandingInformation.progressBar.size.metric.unsignedCharValue);
-                    }
-                }
-                if (params.brandingInformation.splash != nil) {
-                    auto & definedValue_2 = definedValue_0.splash.Emplace();
-                    if (params.brandingInformation.splash.imageUrl != nil) {
-                        auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
-                        definedValue_4 = [self asCharSpan:params.brandingInformation.splash.imageUrl];
-                    }
-                    if (params.brandingInformation.splash.color != nil) {
-                        auto & definedValue_4 = definedValue_2.color.Emplace();
-                        definedValue_4 = [self asCharSpan:params.brandingInformation.splash.color];
-                    }
-                    if (params.brandingInformation.splash.size != nil) {
-                        auto & definedValue_4 = definedValue_2.size.Emplace();
-                        definedValue_4.width = params.brandingInformation.splash.size.width.doubleValue;
-                        definedValue_4.height = params.brandingInformation.splash.size.height.doubleValue;
-                        definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
-                            params.brandingInformation.splash.size.metric.unsignedCharValue);
-                    }
-                }
-                if (params.brandingInformation.waterMark != nil) {
-                    auto & definedValue_2 = definedValue_0.waterMark.Emplace();
-                    if (params.brandingInformation.waterMark.imageUrl != nil) {
-                        auto & definedValue_4 = definedValue_2.imageUrl.Emplace();
-                        definedValue_4 = [self asCharSpan:params.brandingInformation.waterMark.imageUrl];
-                    }
-                    if (params.brandingInformation.waterMark.color != nil) {
-                        auto & definedValue_4 = definedValue_2.color.Emplace();
-                        definedValue_4 = [self asCharSpan:params.brandingInformation.waterMark.color];
-                    }
-                    if (params.brandingInformation.waterMark.size != nil) {
-                        auto & definedValue_4 = definedValue_2.size.Emplace();
-                        definedValue_4.width = params.brandingInformation.waterMark.size.width.doubleValue;
-                        definedValue_4.height = params.brandingInformation.waterMark.size.height.doubleValue;
-                        definedValue_4.metric = static_cast<std::remove_reference_t<decltype(definedValue_4.metric)>>(
-                            params.brandingInformation.waterMark.size.metric.unsignedCharValue);
-                    }
-                }
-            }
 
-            auto successFn = Callback<ContentLauncherClusterLaunchResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ContentLauncherCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<ContentLauncherClusterLaunchResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ContentLauncherCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptHeaderWithParams:(MTRReadParams * _Nullable)params
@@ -16404,30 +18996,47 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            AudioOutput::Commands::SelectOutput::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                AudioOutput::Commands::SelectOutput::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.index = params.index.unsignedCharValue;
+                request.index = params.index.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::AudioOutputCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::AudioOutputCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)renameOutputWithParams:(MTRAudioOutputClusterRenameOutputParams *)params
@@ -16437,31 +19046,48 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            AudioOutput::Commands::RenameOutput::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                AudioOutput::Commands::RenameOutput::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.index = params.index.unsignedCharValue;
-            request.name = [self asCharSpan:params.name];
+                request.index = params.index.unsignedCharValue;
+                request.name = [self asCharSpan:params.name];
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::AudioOutputCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::AudioOutputCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOutputListWithParams:(MTRReadParams * _Nullable)params
@@ -16545,31 +19171,47 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ApplicationLauncher::Commands::LaunchApp::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ApplicationLauncher::Commands::LaunchApp::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
-            request.application.applicationId = [self asCharSpan:params.application.applicationId];
-            if (params.data != nil) {
-                auto & definedValue_0 = request.data.Emplace();
-                definedValue_0 = [self asByteSpan:params.data];
-            }
+                request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
+                request.application.applicationId = [self asCharSpan:params.application.applicationId];
+                if (params.data != nil) {
+                    auto & definedValue_0 = request.data.Emplace();
+                    definedValue_0 = [self asByteSpan:params.data];
+                }
 
-            auto successFn = Callback<ApplicationLauncherClusterLauncherResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ApplicationLauncherCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<ApplicationLauncherClusterLauncherResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ApplicationLauncherCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams *)params
@@ -16580,27 +19222,43 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ApplicationLauncher::Commands::StopApp::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ApplicationLauncher::Commands::StopApp::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
-            request.application.applicationId = [self asCharSpan:params.application.applicationId];
+                request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
+                request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
-            auto successFn = Callback<ApplicationLauncherClusterLauncherResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ApplicationLauncherCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<ApplicationLauncherClusterLauncherResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ApplicationLauncherCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams *)params
@@ -16611,27 +19269,43 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ApplicationLauncher::Commands::HideApp::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ApplicationLauncher::Commands::HideApp::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
-            request.application.applicationId = [self asCharSpan:params.application.applicationId];
+                request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
+                request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
-            auto successFn = Callback<ApplicationLauncherClusterLauncherResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ApplicationLauncherCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<ApplicationLauncherClusterLauncherResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ApplicationLauncherCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCatalogListWithParams:(MTRReadParams * _Nullable)params
@@ -16855,29 +19529,45 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRAccountLoginClusterGetSetupPINResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            AccountLogin::Commands::GetSetupPIN::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRAccountLoginClusterGetSetupPINResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                AccountLogin::Commands::GetSetupPIN::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            if (!timedInvokeTimeoutMs.HasValue()) {
-                timedInvokeTimeoutMs.SetValue(10000);
-            }
-            request.tempAccountIdentifier = [self asCharSpan:params.tempAccountIdentifier];
+                if (!timedInvokeTimeoutMs.HasValue()) {
+                    timedInvokeTimeoutMs.SetValue(10000);
+                }
+                request.tempAccountIdentifier = [self asCharSpan:params.tempAccountIdentifier];
 
-            auto successFn = Callback<AccountLoginClusterGetSetupPINResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::AccountLoginCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<AccountLoginClusterGetSetupPINResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::AccountLoginCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)loginWithParams:(MTRAccountLoginClusterLoginParams *)params
@@ -16887,34 +19577,51 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            AccountLogin::Commands::Login::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                AccountLogin::Commands::Login::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            if (!timedInvokeTimeoutMs.HasValue()) {
-                timedInvokeTimeoutMs.SetValue(10000);
-            }
-            request.tempAccountIdentifier = [self asCharSpan:params.tempAccountIdentifier];
-            request.setupPIN = [self asCharSpan:params.setupPIN];
+                if (!timedInvokeTimeoutMs.HasValue()) {
+                    timedInvokeTimeoutMs.SetValue(10000);
+                }
+                request.tempAccountIdentifier = [self asCharSpan:params.tempAccountIdentifier];
+                request.setupPIN = [self asCharSpan:params.setupPIN];
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::AccountLoginCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::AccountLoginCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)logoutWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -16933,32 +19640,49 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            AccountLogin::Commands::Logout::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                AccountLogin::Commands::Logout::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            if (!timedInvokeTimeoutMs.HasValue()) {
-                timedInvokeTimeoutMs.SetValue(10000);
-            }
+                if (!timedInvokeTimeoutMs.HasValue()) {
+                    timedInvokeTimeoutMs.SetValue(10000);
+                }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::AccountLoginCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::AccountLoginCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -17034,29 +19758,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ElectricalMeasurement::Commands::GetProfileInfoCommand::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ElectricalMeasurement::Commands::GetProfileInfoCommand::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ElectricalMeasurementCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ElectricalMeasurementCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)getMeasurementProfileCommandWithParams:(MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams *)params
@@ -17066,32 +19807,49 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            ElectricalMeasurement::Commands::GetMeasurementProfileCommand::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ElectricalMeasurement::Commands::GetMeasurementProfileCommand::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.attributeId = params.attributeId.unsignedShortValue;
-            request.startTime = params.startTime.unsignedIntValue;
-            request.numberOfIntervals = params.numberOfIntervals.unsignedCharValue;
+                request.attributeId = params.attributeId.unsignedShortValue;
+                request.startTime = params.startTime.unsignedIntValue;
+                request.numberOfIntervals = params.numberOfIntervals.unsignedCharValue;
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::ElectricalMeasurementCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::ElectricalMeasurementCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementTypeWithParams:(MTRReadParams * _Nullable)params
@@ -18355,29 +21113,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::Test::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::Test::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testNotHandledWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -18396,29 +21171,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TestNotHandled::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TestNotHandled::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testSpecificWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -18439,25 +21231,41 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRTestClusterClusterTestSpecificResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TestSpecific::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRTestClusterClusterTestSpecificResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TestSpecific::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<TestClusterClusterTestSpecificResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<TestClusterClusterTestSpecificResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testUnknownCommandWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -18476,29 +21284,46 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TestUnknownCommand::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TestUnknownCommand::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testAddArgumentsWithParams:(MTRTestClusterClusterTestAddArgumentsParams *)params
@@ -18509,27 +21334,43 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRTestClusterClusterTestAddArgumentsResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TestAddArguments::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRTestClusterClusterTestAddArgumentsResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TestAddArguments::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.arg1 = params.arg1.unsignedCharValue;
-            request.arg2 = params.arg2.unsignedCharValue;
+                request.arg1 = params.arg1.unsignedCharValue;
+                request.arg2 = params.arg2.unsignedCharValue;
 
-            auto successFn = Callback<TestClusterClusterTestAddArgumentsResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<TestClusterClusterTestAddArgumentsResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testSimpleArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleArgumentRequestParams *)params
@@ -18540,26 +21381,42 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRTestClusterClusterTestSimpleArgumentResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TestSimpleArgumentRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRTestClusterClusterTestSimpleArgumentResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TestSimpleArgumentRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.arg1 = params.arg1.boolValue;
+                request.arg1 = params.arg1.boolValue;
 
-            auto successFn = Callback<TestClusterClusterTestSimpleArgumentResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<TestClusterClusterTestSimpleArgumentResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testStructArrayArgumentRequestWithParams:(MTRTestClusterClusterTestStructArrayArgumentRequestParams *)params
@@ -18571,235 +21428,253 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRTestClusterClusterTestStructArrayArgumentResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TestStructArrayArgumentRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRTestClusterClusterTestStructArrayArgumentResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TestStructArrayArgumentRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            {
-                using ListType_0 = std::remove_reference_t<decltype(request.arg1)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (params.arg1.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.arg1.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < params.arg1.count; ++i_0) {
-                        if (![params.arg1[i_0] isKindOfClass:[MTRTestClusterClusterNestedStructList class]]) {
-                            // Wrong kind of value.
+                {
+                    using ListType_0 = std::remove_reference_t<decltype(request.arg1)>;
+                    using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                    if (params.arg1.count != 0) {
+                        auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.arg1.count);
+                        if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (MTRTestClusterClusterNestedStructList *) params.arg1[i_0];
-                        listHolder_0->mList[i_0].a = element_0.a.unsignedCharValue;
-                        listHolder_0->mList[i_0].b = element_0.b.boolValue;
-                        listHolder_0->mList[i_0].c.a = element_0.c.a.unsignedCharValue;
-                        listHolder_0->mList[i_0].c.b = element_0.c.b.boolValue;
-                        listHolder_0->mList[i_0].c.c = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c.c)>>(
-                            element_0.c.c.unsignedCharValue);
-                        listHolder_0->mList[i_0].c.d = [self asByteSpan:element_0.c.d];
-                        listHolder_0->mList[i_0].c.e = [self asCharSpan:element_0.c.e];
-                        listHolder_0->mList[i_0].c.f = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c.f)>>(
-                            element_0.c.f.unsignedCharValue);
-                        listHolder_0->mList[i_0].c.g = element_0.c.g.floatValue;
-                        listHolder_0->mList[i_0].c.h = element_0.c.h.doubleValue;
-                        {
-                            using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].d)>;
-                            using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                            if (element_0.d.count != 0) {
-                                auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.d.count);
-                                if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
-                                    return CHIP_ERROR_INVALID_ARGUMENT;
-                                }
-                                listFreer.add(listHolder_2);
-                                for (size_t i_2 = 0; i_2 < element_0.d.count; ++i_2) {
-                                    if (![element_0.d[i_2] isKindOfClass:[MTRTestClusterClusterSimpleStruct class]]) {
-                                        // Wrong kind of value.
+                        listFreer.add(listHolder_0);
+                        for (size_t i_0 = 0; i_0 < params.arg1.count; ++i_0) {
+                            if (![params.arg1[i_0] isKindOfClass:[MTRTestClusterClusterNestedStructList class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_0 = (MTRTestClusterClusterNestedStructList *) params.arg1[i_0];
+                            listHolder_0->mList[i_0].a = element_0.a.unsignedCharValue;
+                            listHolder_0->mList[i_0].b = element_0.b.boolValue;
+                            listHolder_0->mList[i_0].c.a = element_0.c.a.unsignedCharValue;
+                            listHolder_0->mList[i_0].c.b = element_0.c.b.boolValue;
+                            listHolder_0->mList[i_0].c.c
+                                = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c.c)>>(
+                                    element_0.c.c.unsignedCharValue);
+                            listHolder_0->mList[i_0].c.d = [self asByteSpan:element_0.c.d];
+                            listHolder_0->mList[i_0].c.e = [self asCharSpan:element_0.c.e];
+                            listHolder_0->mList[i_0].c.f
+                                = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c.f)>>(
+                                    element_0.c.f.unsignedCharValue);
+                            listHolder_0->mList[i_0].c.g = element_0.c.g.floatValue;
+                            listHolder_0->mList[i_0].c.h = element_0.c.h.doubleValue;
+                            {
+                                using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].d)>;
+                                using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                                if (element_0.d.count != 0) {
+                                    auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.d.count);
+                                    if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
                                         return CHIP_ERROR_INVALID_ARGUMENT;
                                     }
-                                    auto element_2 = (MTRTestClusterClusterSimpleStruct *) element_0.d[i_2];
-                                    listHolder_2->mList[i_2].a = element_2.a.unsignedCharValue;
-                                    listHolder_2->mList[i_2].b = element_2.b.boolValue;
-                                    listHolder_2->mList[i_2].c
-                                        = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].c)>>(
-                                            element_2.c.unsignedCharValue);
-                                    listHolder_2->mList[i_2].d = [self asByteSpan:element_2.d];
-                                    listHolder_2->mList[i_2].e = [self asCharSpan:element_2.e];
-                                    listHolder_2->mList[i_2].f
-                                        = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].f)>>(
-                                            element_2.f.unsignedCharValue);
-                                    listHolder_2->mList[i_2].g = element_2.g.floatValue;
-                                    listHolder_2->mList[i_2].h = element_2.h.doubleValue;
+                                    listFreer.add(listHolder_2);
+                                    for (size_t i_2 = 0; i_2 < element_0.d.count; ++i_2) {
+                                        if (![element_0.d[i_2] isKindOfClass:[MTRTestClusterClusterSimpleStruct class]]) {
+                                            // Wrong kind of value.
+                                            return CHIP_ERROR_INVALID_ARGUMENT;
+                                        }
+                                        auto element_2 = (MTRTestClusterClusterSimpleStruct *) element_0.d[i_2];
+                                        listHolder_2->mList[i_2].a = element_2.a.unsignedCharValue;
+                                        listHolder_2->mList[i_2].b = element_2.b.boolValue;
+                                        listHolder_2->mList[i_2].c
+                                            = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].c)>>(
+                                                element_2.c.unsignedCharValue);
+                                        listHolder_2->mList[i_2].d = [self asByteSpan:element_2.d];
+                                        listHolder_2->mList[i_2].e = [self asCharSpan:element_2.e];
+                                        listHolder_2->mList[i_2].f
+                                            = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].f)>>(
+                                                element_2.f.unsignedCharValue);
+                                        listHolder_2->mList[i_2].g = element_2.g.floatValue;
+                                        listHolder_2->mList[i_2].h = element_2.h.doubleValue;
+                                    }
+                                    listHolder_0->mList[i_0].d = ListType_2(listHolder_2->mList, element_0.d.count);
+                                } else {
+                                    listHolder_0->mList[i_0].d = ListType_2();
                                 }
-                                listHolder_0->mList[i_0].d = ListType_2(listHolder_2->mList, element_0.d.count);
-                            } else {
-                                listHolder_0->mList[i_0].d = ListType_2();
                             }
-                        }
-                        {
-                            using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].e)>;
-                            using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                            if (element_0.e.count != 0) {
-                                auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.e.count);
-                                if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
-                                    return CHIP_ERROR_INVALID_ARGUMENT;
-                                }
-                                listFreer.add(listHolder_2);
-                                for (size_t i_2 = 0; i_2 < element_0.e.count; ++i_2) {
-                                    if (![element_0.e[i_2] isKindOfClass:[NSNumber class]]) {
-                                        // Wrong kind of value.
+                            {
+                                using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].e)>;
+                                using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                                if (element_0.e.count != 0) {
+                                    auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.e.count);
+                                    if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
                                         return CHIP_ERROR_INVALID_ARGUMENT;
                                     }
-                                    auto element_2 = (NSNumber *) element_0.e[i_2];
-                                    listHolder_2->mList[i_2] = element_2.unsignedIntValue;
+                                    listFreer.add(listHolder_2);
+                                    for (size_t i_2 = 0; i_2 < element_0.e.count; ++i_2) {
+                                        if (![element_0.e[i_2] isKindOfClass:[NSNumber class]]) {
+                                            // Wrong kind of value.
+                                            return CHIP_ERROR_INVALID_ARGUMENT;
+                                        }
+                                        auto element_2 = (NSNumber *) element_0.e[i_2];
+                                        listHolder_2->mList[i_2] = element_2.unsignedIntValue;
+                                    }
+                                    listHolder_0->mList[i_0].e = ListType_2(listHolder_2->mList, element_0.e.count);
+                                } else {
+                                    listHolder_0->mList[i_0].e = ListType_2();
                                 }
-                                listHolder_0->mList[i_0].e = ListType_2(listHolder_2->mList, element_0.e.count);
-                            } else {
-                                listHolder_0->mList[i_0].e = ListType_2();
                             }
-                        }
-                        {
-                            using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].f)>;
-                            using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                            if (element_0.f.count != 0) {
-                                auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.f.count);
-                                if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
-                                    return CHIP_ERROR_INVALID_ARGUMENT;
-                                }
-                                listFreer.add(listHolder_2);
-                                for (size_t i_2 = 0; i_2 < element_0.f.count; ++i_2) {
-                                    if (![element_0.f[i_2] isKindOfClass:[NSData class]]) {
-                                        // Wrong kind of value.
+                            {
+                                using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].f)>;
+                                using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                                if (element_0.f.count != 0) {
+                                    auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.f.count);
+                                    if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
                                         return CHIP_ERROR_INVALID_ARGUMENT;
                                     }
-                                    auto element_2 = (NSData *) element_0.f[i_2];
-                                    listHolder_2->mList[i_2] = [self asByteSpan:element_2];
+                                    listFreer.add(listHolder_2);
+                                    for (size_t i_2 = 0; i_2 < element_0.f.count; ++i_2) {
+                                        if (![element_0.f[i_2] isKindOfClass:[NSData class]]) {
+                                            // Wrong kind of value.
+                                            return CHIP_ERROR_INVALID_ARGUMENT;
+                                        }
+                                        auto element_2 = (NSData *) element_0.f[i_2];
+                                        listHolder_2->mList[i_2] = [self asByteSpan:element_2];
+                                    }
+                                    listHolder_0->mList[i_0].f = ListType_2(listHolder_2->mList, element_0.f.count);
+                                } else {
+                                    listHolder_0->mList[i_0].f = ListType_2();
                                 }
-                                listHolder_0->mList[i_0].f = ListType_2(listHolder_2->mList, element_0.f.count);
-                            } else {
-                                listHolder_0->mList[i_0].f = ListType_2();
                             }
-                        }
-                        {
-                            using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].g)>;
-                            using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                            if (element_0.g.count != 0) {
-                                auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.g.count);
-                                if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
-                                    return CHIP_ERROR_INVALID_ARGUMENT;
-                                }
-                                listFreer.add(listHolder_2);
-                                for (size_t i_2 = 0; i_2 < element_0.g.count; ++i_2) {
-                                    if (![element_0.g[i_2] isKindOfClass:[NSNumber class]]) {
-                                        // Wrong kind of value.
+                            {
+                                using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].g)>;
+                                using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                                if (element_0.g.count != 0) {
+                                    auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.g.count);
+                                    if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
                                         return CHIP_ERROR_INVALID_ARGUMENT;
                                     }
-                                    auto element_2 = (NSNumber *) element_0.g[i_2];
-                                    listHolder_2->mList[i_2] = element_2.unsignedCharValue;
+                                    listFreer.add(listHolder_2);
+                                    for (size_t i_2 = 0; i_2 < element_0.g.count; ++i_2) {
+                                        if (![element_0.g[i_2] isKindOfClass:[NSNumber class]]) {
+                                            // Wrong kind of value.
+                                            return CHIP_ERROR_INVALID_ARGUMENT;
+                                        }
+                                        auto element_2 = (NSNumber *) element_0.g[i_2];
+                                        listHolder_2->mList[i_2] = element_2.unsignedCharValue;
+                                    }
+                                    listHolder_0->mList[i_0].g = ListType_2(listHolder_2->mList, element_0.g.count);
+                                } else {
+                                    listHolder_0->mList[i_0].g = ListType_2();
                                 }
-                                listHolder_0->mList[i_0].g = ListType_2(listHolder_2->mList, element_0.g.count);
-                            } else {
-                                listHolder_0->mList[i_0].g = ListType_2();
                             }
                         }
+                        request.arg1 = ListType_0(listHolder_0->mList, params.arg1.count);
+                    } else {
+                        request.arg1 = ListType_0();
                     }
-                    request.arg1 = ListType_0(listHolder_0->mList, params.arg1.count);
-                } else {
-                    request.arg1 = ListType_0();
                 }
-            }
-            {
-                using ListType_0 = std::remove_reference_t<decltype(request.arg2)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (params.arg2.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.arg2.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < params.arg2.count; ++i_0) {
-                        if (![params.arg2[i_0] isKindOfClass:[MTRTestClusterClusterSimpleStruct class]]) {
-                            // Wrong kind of value.
+                {
+                    using ListType_0 = std::remove_reference_t<decltype(request.arg2)>;
+                    using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                    if (params.arg2.count != 0) {
+                        auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.arg2.count);
+                        if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (MTRTestClusterClusterSimpleStruct *) params.arg2[i_0];
-                        listHolder_0->mList[i_0].a = element_0.a.unsignedCharValue;
-                        listHolder_0->mList[i_0].b = element_0.b.boolValue;
-                        listHolder_0->mList[i_0].c = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c)>>(
-                            element_0.c.unsignedCharValue);
-                        listHolder_0->mList[i_0].d = [self asByteSpan:element_0.d];
-                        listHolder_0->mList[i_0].e = [self asCharSpan:element_0.e];
-                        listHolder_0->mList[i_0].f = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].f)>>(
-                            element_0.f.unsignedCharValue);
-                        listHolder_0->mList[i_0].g = element_0.g.floatValue;
-                        listHolder_0->mList[i_0].h = element_0.h.doubleValue;
+                        listFreer.add(listHolder_0);
+                        for (size_t i_0 = 0; i_0 < params.arg2.count; ++i_0) {
+                            if (![params.arg2[i_0] isKindOfClass:[MTRTestClusterClusterSimpleStruct class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_0 = (MTRTestClusterClusterSimpleStruct *) params.arg2[i_0];
+                            listHolder_0->mList[i_0].a = element_0.a.unsignedCharValue;
+                            listHolder_0->mList[i_0].b = element_0.b.boolValue;
+                            listHolder_0->mList[i_0].c = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c)>>(
+                                element_0.c.unsignedCharValue);
+                            listHolder_0->mList[i_0].d = [self asByteSpan:element_0.d];
+                            listHolder_0->mList[i_0].e = [self asCharSpan:element_0.e];
+                            listHolder_0->mList[i_0].f = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].f)>>(
+                                element_0.f.unsignedCharValue);
+                            listHolder_0->mList[i_0].g = element_0.g.floatValue;
+                            listHolder_0->mList[i_0].h = element_0.h.doubleValue;
+                        }
+                        request.arg2 = ListType_0(listHolder_0->mList, params.arg2.count);
+                    } else {
+                        request.arg2 = ListType_0();
                     }
-                    request.arg2 = ListType_0(listHolder_0->mList, params.arg2.count);
-                } else {
-                    request.arg2 = ListType_0();
                 }
-            }
-            {
-                using ListType_0 = std::remove_reference_t<decltype(request.arg3)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (params.arg3.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.arg3.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < params.arg3.count; ++i_0) {
-                        if (![params.arg3[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
+                {
+                    using ListType_0 = std::remove_reference_t<decltype(request.arg3)>;
+                    using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                    if (params.arg3.count != 0) {
+                        auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.arg3.count);
+                        if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (NSNumber *) params.arg3[i_0];
-                        listHolder_0->mList[i_0]
-                            = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0])>>(element_0.unsignedCharValue);
+                        listFreer.add(listHolder_0);
+                        for (size_t i_0 = 0; i_0 < params.arg3.count; ++i_0) {
+                            if (![params.arg3[i_0] isKindOfClass:[NSNumber class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_0 = (NSNumber *) params.arg3[i_0];
+                            listHolder_0->mList[i_0] = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0])>>(
+                                element_0.unsignedCharValue);
+                        }
+                        request.arg3 = ListType_0(listHolder_0->mList, params.arg3.count);
+                    } else {
+                        request.arg3 = ListType_0();
                     }
-                    request.arg3 = ListType_0(listHolder_0->mList, params.arg3.count);
-                } else {
-                    request.arg3 = ListType_0();
                 }
-            }
-            {
-                using ListType_0 = std::remove_reference_t<decltype(request.arg4)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (params.arg4.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.arg4.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < params.arg4.count; ++i_0) {
-                        if (![params.arg4[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
+                {
+                    using ListType_0 = std::remove_reference_t<decltype(request.arg4)>;
+                    using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                    if (params.arg4.count != 0) {
+                        auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.arg4.count);
+                        if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (NSNumber *) params.arg4[i_0];
-                        listHolder_0->mList[i_0] = element_0.boolValue;
+                        listFreer.add(listHolder_0);
+                        for (size_t i_0 = 0; i_0 < params.arg4.count; ++i_0) {
+                            if (![params.arg4[i_0] isKindOfClass:[NSNumber class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_0 = (NSNumber *) params.arg4[i_0];
+                            listHolder_0->mList[i_0] = element_0.boolValue;
+                        }
+                        request.arg4 = ListType_0(listHolder_0->mList, params.arg4.count);
+                    } else {
+                        request.arg4 = ListType_0();
                     }
-                    request.arg4 = ListType_0(listHolder_0->mList, params.arg4.count);
-                } else {
-                    request.arg4 = ListType_0();
                 }
-            }
-            request.arg5 = static_cast<std::remove_reference_t<decltype(request.arg5)>>(params.arg5.unsignedCharValue);
-            request.arg6 = params.arg6.boolValue;
+                request.arg5 = static_cast<std::remove_reference_t<decltype(request.arg5)>>(params.arg5.unsignedCharValue);
+                request.arg6 = params.arg6.boolValue;
 
-            auto successFn = Callback<TestClusterClusterTestStructArrayArgumentResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<TestClusterClusterTestStructArrayArgumentResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testStructArgumentRequestWithParams:(MTRTestClusterClusterTestStructArgumentRequestParams *)params
@@ -18810,33 +21685,49 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TestStructArgumentRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TestStructArgumentRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.arg1.a = params.arg1.a.unsignedCharValue;
-            request.arg1.b = params.arg1.b.boolValue;
-            request.arg1.c = static_cast<std::remove_reference_t<decltype(request.arg1.c)>>(params.arg1.c.unsignedCharValue);
-            request.arg1.d = [self asByteSpan:params.arg1.d];
-            request.arg1.e = [self asCharSpan:params.arg1.e];
-            request.arg1.f = static_cast<std::remove_reference_t<decltype(request.arg1.f)>>(params.arg1.f.unsignedCharValue);
-            request.arg1.g = params.arg1.g.floatValue;
-            request.arg1.h = params.arg1.h.doubleValue;
+                request.arg1.a = params.arg1.a.unsignedCharValue;
+                request.arg1.b = params.arg1.b.boolValue;
+                request.arg1.c = static_cast<std::remove_reference_t<decltype(request.arg1.c)>>(params.arg1.c.unsignedCharValue);
+                request.arg1.d = [self asByteSpan:params.arg1.d];
+                request.arg1.e = [self asCharSpan:params.arg1.e];
+                request.arg1.f = static_cast<std::remove_reference_t<decltype(request.arg1.f)>>(params.arg1.f.unsignedCharValue);
+                request.arg1.g = params.arg1.g.floatValue;
+                request.arg1.h = params.arg1.h.doubleValue;
 
-            auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testNestedStructArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructArgumentRequestParams *)params
@@ -18847,35 +21738,53 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TestNestedStructArgumentRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TestNestedStructArgumentRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.arg1.a = params.arg1.a.unsignedCharValue;
-            request.arg1.b = params.arg1.b.boolValue;
-            request.arg1.c.a = params.arg1.c.a.unsignedCharValue;
-            request.arg1.c.b = params.arg1.c.b.boolValue;
-            request.arg1.c.c = static_cast<std::remove_reference_t<decltype(request.arg1.c.c)>>(params.arg1.c.c.unsignedCharValue);
-            request.arg1.c.d = [self asByteSpan:params.arg1.c.d];
-            request.arg1.c.e = [self asCharSpan:params.arg1.c.e];
-            request.arg1.c.f = static_cast<std::remove_reference_t<decltype(request.arg1.c.f)>>(params.arg1.c.f.unsignedCharValue);
-            request.arg1.c.g = params.arg1.c.g.floatValue;
-            request.arg1.c.h = params.arg1.c.h.doubleValue;
+                request.arg1.a = params.arg1.a.unsignedCharValue;
+                request.arg1.b = params.arg1.b.boolValue;
+                request.arg1.c.a = params.arg1.c.a.unsignedCharValue;
+                request.arg1.c.b = params.arg1.c.b.boolValue;
+                request.arg1.c.c
+                    = static_cast<std::remove_reference_t<decltype(request.arg1.c.c)>>(params.arg1.c.c.unsignedCharValue);
+                request.arg1.c.d = [self asByteSpan:params.arg1.c.d];
+                request.arg1.c.e = [self asCharSpan:params.arg1.c.e];
+                request.arg1.c.f
+                    = static_cast<std::remove_reference_t<decltype(request.arg1.c.f)>>(params.arg1.c.f.unsignedCharValue);
+                request.arg1.c.g = params.arg1.c.g.floatValue;
+                request.arg1.c.h = params.arg1.c.h.doubleValue;
 
-            auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testListStructArgumentRequestWithParams:(MTRTestClusterClusterTestListStructArgumentRequestParams *)params
@@ -18886,56 +21795,72 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TestListStructArgumentRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TestListStructArgumentRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            {
-                using ListType_0 = std::remove_reference_t<decltype(request.arg1)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (params.arg1.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.arg1.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < params.arg1.count; ++i_0) {
-                        if (![params.arg1[i_0] isKindOfClass:[MTRTestClusterClusterSimpleStruct class]]) {
-                            // Wrong kind of value.
+                {
+                    using ListType_0 = std::remove_reference_t<decltype(request.arg1)>;
+                    using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                    if (params.arg1.count != 0) {
+                        auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.arg1.count);
+                        if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (MTRTestClusterClusterSimpleStruct *) params.arg1[i_0];
-                        listHolder_0->mList[i_0].a = element_0.a.unsignedCharValue;
-                        listHolder_0->mList[i_0].b = element_0.b.boolValue;
-                        listHolder_0->mList[i_0].c = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c)>>(
-                            element_0.c.unsignedCharValue);
-                        listHolder_0->mList[i_0].d = [self asByteSpan:element_0.d];
-                        listHolder_0->mList[i_0].e = [self asCharSpan:element_0.e];
-                        listHolder_0->mList[i_0].f = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].f)>>(
-                            element_0.f.unsignedCharValue);
-                        listHolder_0->mList[i_0].g = element_0.g.floatValue;
-                        listHolder_0->mList[i_0].h = element_0.h.doubleValue;
+                        listFreer.add(listHolder_0);
+                        for (size_t i_0 = 0; i_0 < params.arg1.count; ++i_0) {
+                            if (![params.arg1[i_0] isKindOfClass:[MTRTestClusterClusterSimpleStruct class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_0 = (MTRTestClusterClusterSimpleStruct *) params.arg1[i_0];
+                            listHolder_0->mList[i_0].a = element_0.a.unsignedCharValue;
+                            listHolder_0->mList[i_0].b = element_0.b.boolValue;
+                            listHolder_0->mList[i_0].c = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c)>>(
+                                element_0.c.unsignedCharValue);
+                            listHolder_0->mList[i_0].d = [self asByteSpan:element_0.d];
+                            listHolder_0->mList[i_0].e = [self asCharSpan:element_0.e];
+                            listHolder_0->mList[i_0].f = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].f)>>(
+                                element_0.f.unsignedCharValue);
+                            listHolder_0->mList[i_0].g = element_0.g.floatValue;
+                            listHolder_0->mList[i_0].h = element_0.h.doubleValue;
+                        }
+                        request.arg1 = ListType_0(listHolder_0->mList, params.arg1.count);
+                    } else {
+                        request.arg1 = ListType_0();
                     }
-                    request.arg1 = ListType_0(listHolder_0->mList, params.arg1.count);
-                } else {
-                    request.arg1 = ListType_0();
                 }
-            }
 
-            auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testListInt8UArgumentRequestWithParams:(MTRTestClusterClusterTestListInt8UArgumentRequestParams *)params
@@ -18946,47 +21871,63 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TestListInt8UArgumentRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TestListInt8UArgumentRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            {
-                using ListType_0 = std::remove_reference_t<decltype(request.arg1)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (params.arg1.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.arg1.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < params.arg1.count; ++i_0) {
-                        if (![params.arg1[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
+                {
+                    using ListType_0 = std::remove_reference_t<decltype(request.arg1)>;
+                    using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                    if (params.arg1.count != 0) {
+                        auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.arg1.count);
+                        if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (NSNumber *) params.arg1[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedCharValue;
+                        listFreer.add(listHolder_0);
+                        for (size_t i_0 = 0; i_0 < params.arg1.count; ++i_0) {
+                            if (![params.arg1[i_0] isKindOfClass:[NSNumber class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_0 = (NSNumber *) params.arg1[i_0];
+                            listHolder_0->mList[i_0] = element_0.unsignedCharValue;
+                        }
+                        request.arg1 = ListType_0(listHolder_0->mList, params.arg1.count);
+                    } else {
+                        request.arg1 = ListType_0();
                     }
-                    request.arg1 = ListType_0(listHolder_0->mList, params.arg1.count);
-                } else {
-                    request.arg1 = ListType_0();
                 }
-            }
 
-            auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testNestedStructListArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructListArgumentRequestParams *)params
@@ -18997,132 +21938,150 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TestNestedStructListArgumentRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TestNestedStructListArgumentRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.arg1.a = params.arg1.a.unsignedCharValue;
-            request.arg1.b = params.arg1.b.boolValue;
-            request.arg1.c.a = params.arg1.c.a.unsignedCharValue;
-            request.arg1.c.b = params.arg1.c.b.boolValue;
-            request.arg1.c.c = static_cast<std::remove_reference_t<decltype(request.arg1.c.c)>>(params.arg1.c.c.unsignedCharValue);
-            request.arg1.c.d = [self asByteSpan:params.arg1.c.d];
-            request.arg1.c.e = [self asCharSpan:params.arg1.c.e];
-            request.arg1.c.f = static_cast<std::remove_reference_t<decltype(request.arg1.c.f)>>(params.arg1.c.f.unsignedCharValue);
-            request.arg1.c.g = params.arg1.c.g.floatValue;
-            request.arg1.c.h = params.arg1.c.h.doubleValue;
-            {
-                using ListType_1 = std::remove_reference_t<decltype(request.arg1.d)>;
-                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
-                if (params.arg1.d.count != 0) {
-                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(params.arg1.d.count);
-                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_1);
-                    for (size_t i_1 = 0; i_1 < params.arg1.d.count; ++i_1) {
-                        if (![params.arg1.d[i_1] isKindOfClass:[MTRTestClusterClusterSimpleStruct class]]) {
-                            // Wrong kind of value.
+                request.arg1.a = params.arg1.a.unsignedCharValue;
+                request.arg1.b = params.arg1.b.boolValue;
+                request.arg1.c.a = params.arg1.c.a.unsignedCharValue;
+                request.arg1.c.b = params.arg1.c.b.boolValue;
+                request.arg1.c.c
+                    = static_cast<std::remove_reference_t<decltype(request.arg1.c.c)>>(params.arg1.c.c.unsignedCharValue);
+                request.arg1.c.d = [self asByteSpan:params.arg1.c.d];
+                request.arg1.c.e = [self asCharSpan:params.arg1.c.e];
+                request.arg1.c.f
+                    = static_cast<std::remove_reference_t<decltype(request.arg1.c.f)>>(params.arg1.c.f.unsignedCharValue);
+                request.arg1.c.g = params.arg1.c.g.floatValue;
+                request.arg1.c.h = params.arg1.c.h.doubleValue;
+                {
+                    using ListType_1 = std::remove_reference_t<decltype(request.arg1.d)>;
+                    using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                    if (params.arg1.d.count != 0) {
+                        auto * listHolder_1 = new ListHolder<ListMemberType_1>(params.arg1.d.count);
+                        if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_1 = (MTRTestClusterClusterSimpleStruct *) params.arg1.d[i_1];
-                        listHolder_1->mList[i_1].a = element_1.a.unsignedCharValue;
-                        listHolder_1->mList[i_1].b = element_1.b.boolValue;
-                        listHolder_1->mList[i_1].c = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].c)>>(
-                            element_1.c.unsignedCharValue);
-                        listHolder_1->mList[i_1].d = [self asByteSpan:element_1.d];
-                        listHolder_1->mList[i_1].e = [self asCharSpan:element_1.e];
-                        listHolder_1->mList[i_1].f = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].f)>>(
-                            element_1.f.unsignedCharValue);
-                        listHolder_1->mList[i_1].g = element_1.g.floatValue;
-                        listHolder_1->mList[i_1].h = element_1.h.doubleValue;
+                        listFreer.add(listHolder_1);
+                        for (size_t i_1 = 0; i_1 < params.arg1.d.count; ++i_1) {
+                            if (![params.arg1.d[i_1] isKindOfClass:[MTRTestClusterClusterSimpleStruct class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_1 = (MTRTestClusterClusterSimpleStruct *) params.arg1.d[i_1];
+                            listHolder_1->mList[i_1].a = element_1.a.unsignedCharValue;
+                            listHolder_1->mList[i_1].b = element_1.b.boolValue;
+                            listHolder_1->mList[i_1].c = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].c)>>(
+                                element_1.c.unsignedCharValue);
+                            listHolder_1->mList[i_1].d = [self asByteSpan:element_1.d];
+                            listHolder_1->mList[i_1].e = [self asCharSpan:element_1.e];
+                            listHolder_1->mList[i_1].f = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].f)>>(
+                                element_1.f.unsignedCharValue);
+                            listHolder_1->mList[i_1].g = element_1.g.floatValue;
+                            listHolder_1->mList[i_1].h = element_1.h.doubleValue;
+                        }
+                        request.arg1.d = ListType_1(listHolder_1->mList, params.arg1.d.count);
+                    } else {
+                        request.arg1.d = ListType_1();
                     }
-                    request.arg1.d = ListType_1(listHolder_1->mList, params.arg1.d.count);
-                } else {
-                    request.arg1.d = ListType_1();
                 }
-            }
-            {
-                using ListType_1 = std::remove_reference_t<decltype(request.arg1.e)>;
-                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
-                if (params.arg1.e.count != 0) {
-                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(params.arg1.e.count);
-                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_1);
-                    for (size_t i_1 = 0; i_1 < params.arg1.e.count; ++i_1) {
-                        if (![params.arg1.e[i_1] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
+                {
+                    using ListType_1 = std::remove_reference_t<decltype(request.arg1.e)>;
+                    using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                    if (params.arg1.e.count != 0) {
+                        auto * listHolder_1 = new ListHolder<ListMemberType_1>(params.arg1.e.count);
+                        if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_1 = (NSNumber *) params.arg1.e[i_1];
-                        listHolder_1->mList[i_1] = element_1.unsignedIntValue;
+                        listFreer.add(listHolder_1);
+                        for (size_t i_1 = 0; i_1 < params.arg1.e.count; ++i_1) {
+                            if (![params.arg1.e[i_1] isKindOfClass:[NSNumber class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_1 = (NSNumber *) params.arg1.e[i_1];
+                            listHolder_1->mList[i_1] = element_1.unsignedIntValue;
+                        }
+                        request.arg1.e = ListType_1(listHolder_1->mList, params.arg1.e.count);
+                    } else {
+                        request.arg1.e = ListType_1();
                     }
-                    request.arg1.e = ListType_1(listHolder_1->mList, params.arg1.e.count);
-                } else {
-                    request.arg1.e = ListType_1();
                 }
-            }
-            {
-                using ListType_1 = std::remove_reference_t<decltype(request.arg1.f)>;
-                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
-                if (params.arg1.f.count != 0) {
-                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(params.arg1.f.count);
-                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_1);
-                    for (size_t i_1 = 0; i_1 < params.arg1.f.count; ++i_1) {
-                        if (![params.arg1.f[i_1] isKindOfClass:[NSData class]]) {
-                            // Wrong kind of value.
+                {
+                    using ListType_1 = std::remove_reference_t<decltype(request.arg1.f)>;
+                    using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                    if (params.arg1.f.count != 0) {
+                        auto * listHolder_1 = new ListHolder<ListMemberType_1>(params.arg1.f.count);
+                        if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_1 = (NSData *) params.arg1.f[i_1];
-                        listHolder_1->mList[i_1] = [self asByteSpan:element_1];
+                        listFreer.add(listHolder_1);
+                        for (size_t i_1 = 0; i_1 < params.arg1.f.count; ++i_1) {
+                            if (![params.arg1.f[i_1] isKindOfClass:[NSData class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_1 = (NSData *) params.arg1.f[i_1];
+                            listHolder_1->mList[i_1] = [self asByteSpan:element_1];
+                        }
+                        request.arg1.f = ListType_1(listHolder_1->mList, params.arg1.f.count);
+                    } else {
+                        request.arg1.f = ListType_1();
                     }
-                    request.arg1.f = ListType_1(listHolder_1->mList, params.arg1.f.count);
-                } else {
-                    request.arg1.f = ListType_1();
                 }
-            }
-            {
-                using ListType_1 = std::remove_reference_t<decltype(request.arg1.g)>;
-                using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
-                if (params.arg1.g.count != 0) {
-                    auto * listHolder_1 = new ListHolder<ListMemberType_1>(params.arg1.g.count);
-                    if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_1);
-                    for (size_t i_1 = 0; i_1 < params.arg1.g.count; ++i_1) {
-                        if (![params.arg1.g[i_1] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
+                {
+                    using ListType_1 = std::remove_reference_t<decltype(request.arg1.g)>;
+                    using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                    if (params.arg1.g.count != 0) {
+                        auto * listHolder_1 = new ListHolder<ListMemberType_1>(params.arg1.g.count);
+                        if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_1 = (NSNumber *) params.arg1.g[i_1];
-                        listHolder_1->mList[i_1] = element_1.unsignedCharValue;
+                        listFreer.add(listHolder_1);
+                        for (size_t i_1 = 0; i_1 < params.arg1.g.count; ++i_1) {
+                            if (![params.arg1.g[i_1] isKindOfClass:[NSNumber class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_1 = (NSNumber *) params.arg1.g[i_1];
+                            listHolder_1->mList[i_1] = element_1.unsignedCharValue;
+                        }
+                        request.arg1.g = ListType_1(listHolder_1->mList, params.arg1.g.count);
+                    } else {
+                        request.arg1.g = ListType_1();
                     }
-                    request.arg1.g = ListType_1(listHolder_1->mList, params.arg1.g.count);
-                } else {
-                    request.arg1.g = ListType_1();
                 }
-            }
 
-            auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testListNestedStructListArgumentRequestWithParams:
@@ -19134,157 +22093,175 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TestListNestedStructListArgumentRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TestListNestedStructListArgumentRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            {
-                using ListType_0 = std::remove_reference_t<decltype(request.arg1)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (params.arg1.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.arg1.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < params.arg1.count; ++i_0) {
-                        if (![params.arg1[i_0] isKindOfClass:[MTRTestClusterClusterNestedStructList class]]) {
-                            // Wrong kind of value.
+                {
+                    using ListType_0 = std::remove_reference_t<decltype(request.arg1)>;
+                    using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                    if (params.arg1.count != 0) {
+                        auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.arg1.count);
+                        if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (MTRTestClusterClusterNestedStructList *) params.arg1[i_0];
-                        listHolder_0->mList[i_0].a = element_0.a.unsignedCharValue;
-                        listHolder_0->mList[i_0].b = element_0.b.boolValue;
-                        listHolder_0->mList[i_0].c.a = element_0.c.a.unsignedCharValue;
-                        listHolder_0->mList[i_0].c.b = element_0.c.b.boolValue;
-                        listHolder_0->mList[i_0].c.c = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c.c)>>(
-                            element_0.c.c.unsignedCharValue);
-                        listHolder_0->mList[i_0].c.d = [self asByteSpan:element_0.c.d];
-                        listHolder_0->mList[i_0].c.e = [self asCharSpan:element_0.c.e];
-                        listHolder_0->mList[i_0].c.f = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c.f)>>(
-                            element_0.c.f.unsignedCharValue);
-                        listHolder_0->mList[i_0].c.g = element_0.c.g.floatValue;
-                        listHolder_0->mList[i_0].c.h = element_0.c.h.doubleValue;
-                        {
-                            using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].d)>;
-                            using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                            if (element_0.d.count != 0) {
-                                auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.d.count);
-                                if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
-                                    return CHIP_ERROR_INVALID_ARGUMENT;
-                                }
-                                listFreer.add(listHolder_2);
-                                for (size_t i_2 = 0; i_2 < element_0.d.count; ++i_2) {
-                                    if (![element_0.d[i_2] isKindOfClass:[MTRTestClusterClusterSimpleStruct class]]) {
-                                        // Wrong kind of value.
+                        listFreer.add(listHolder_0);
+                        for (size_t i_0 = 0; i_0 < params.arg1.count; ++i_0) {
+                            if (![params.arg1[i_0] isKindOfClass:[MTRTestClusterClusterNestedStructList class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_0 = (MTRTestClusterClusterNestedStructList *) params.arg1[i_0];
+                            listHolder_0->mList[i_0].a = element_0.a.unsignedCharValue;
+                            listHolder_0->mList[i_0].b = element_0.b.boolValue;
+                            listHolder_0->mList[i_0].c.a = element_0.c.a.unsignedCharValue;
+                            listHolder_0->mList[i_0].c.b = element_0.c.b.boolValue;
+                            listHolder_0->mList[i_0].c.c
+                                = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c.c)>>(
+                                    element_0.c.c.unsignedCharValue);
+                            listHolder_0->mList[i_0].c.d = [self asByteSpan:element_0.c.d];
+                            listHolder_0->mList[i_0].c.e = [self asCharSpan:element_0.c.e];
+                            listHolder_0->mList[i_0].c.f
+                                = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c.f)>>(
+                                    element_0.c.f.unsignedCharValue);
+                            listHolder_0->mList[i_0].c.g = element_0.c.g.floatValue;
+                            listHolder_0->mList[i_0].c.h = element_0.c.h.doubleValue;
+                            {
+                                using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].d)>;
+                                using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                                if (element_0.d.count != 0) {
+                                    auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.d.count);
+                                    if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
                                         return CHIP_ERROR_INVALID_ARGUMENT;
                                     }
-                                    auto element_2 = (MTRTestClusterClusterSimpleStruct *) element_0.d[i_2];
-                                    listHolder_2->mList[i_2].a = element_2.a.unsignedCharValue;
-                                    listHolder_2->mList[i_2].b = element_2.b.boolValue;
-                                    listHolder_2->mList[i_2].c
-                                        = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].c)>>(
-                                            element_2.c.unsignedCharValue);
-                                    listHolder_2->mList[i_2].d = [self asByteSpan:element_2.d];
-                                    listHolder_2->mList[i_2].e = [self asCharSpan:element_2.e];
-                                    listHolder_2->mList[i_2].f
-                                        = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].f)>>(
-                                            element_2.f.unsignedCharValue);
-                                    listHolder_2->mList[i_2].g = element_2.g.floatValue;
-                                    listHolder_2->mList[i_2].h = element_2.h.doubleValue;
+                                    listFreer.add(listHolder_2);
+                                    for (size_t i_2 = 0; i_2 < element_0.d.count; ++i_2) {
+                                        if (![element_0.d[i_2] isKindOfClass:[MTRTestClusterClusterSimpleStruct class]]) {
+                                            // Wrong kind of value.
+                                            return CHIP_ERROR_INVALID_ARGUMENT;
+                                        }
+                                        auto element_2 = (MTRTestClusterClusterSimpleStruct *) element_0.d[i_2];
+                                        listHolder_2->mList[i_2].a = element_2.a.unsignedCharValue;
+                                        listHolder_2->mList[i_2].b = element_2.b.boolValue;
+                                        listHolder_2->mList[i_2].c
+                                            = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].c)>>(
+                                                element_2.c.unsignedCharValue);
+                                        listHolder_2->mList[i_2].d = [self asByteSpan:element_2.d];
+                                        listHolder_2->mList[i_2].e = [self asCharSpan:element_2.e];
+                                        listHolder_2->mList[i_2].f
+                                            = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].f)>>(
+                                                element_2.f.unsignedCharValue);
+                                        listHolder_2->mList[i_2].g = element_2.g.floatValue;
+                                        listHolder_2->mList[i_2].h = element_2.h.doubleValue;
+                                    }
+                                    listHolder_0->mList[i_0].d = ListType_2(listHolder_2->mList, element_0.d.count);
+                                } else {
+                                    listHolder_0->mList[i_0].d = ListType_2();
                                 }
-                                listHolder_0->mList[i_0].d = ListType_2(listHolder_2->mList, element_0.d.count);
-                            } else {
-                                listHolder_0->mList[i_0].d = ListType_2();
                             }
-                        }
-                        {
-                            using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].e)>;
-                            using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                            if (element_0.e.count != 0) {
-                                auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.e.count);
-                                if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
-                                    return CHIP_ERROR_INVALID_ARGUMENT;
-                                }
-                                listFreer.add(listHolder_2);
-                                for (size_t i_2 = 0; i_2 < element_0.e.count; ++i_2) {
-                                    if (![element_0.e[i_2] isKindOfClass:[NSNumber class]]) {
-                                        // Wrong kind of value.
+                            {
+                                using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].e)>;
+                                using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                                if (element_0.e.count != 0) {
+                                    auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.e.count);
+                                    if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
                                         return CHIP_ERROR_INVALID_ARGUMENT;
                                     }
-                                    auto element_2 = (NSNumber *) element_0.e[i_2];
-                                    listHolder_2->mList[i_2] = element_2.unsignedIntValue;
+                                    listFreer.add(listHolder_2);
+                                    for (size_t i_2 = 0; i_2 < element_0.e.count; ++i_2) {
+                                        if (![element_0.e[i_2] isKindOfClass:[NSNumber class]]) {
+                                            // Wrong kind of value.
+                                            return CHIP_ERROR_INVALID_ARGUMENT;
+                                        }
+                                        auto element_2 = (NSNumber *) element_0.e[i_2];
+                                        listHolder_2->mList[i_2] = element_2.unsignedIntValue;
+                                    }
+                                    listHolder_0->mList[i_0].e = ListType_2(listHolder_2->mList, element_0.e.count);
+                                } else {
+                                    listHolder_0->mList[i_0].e = ListType_2();
                                 }
-                                listHolder_0->mList[i_0].e = ListType_2(listHolder_2->mList, element_0.e.count);
-                            } else {
-                                listHolder_0->mList[i_0].e = ListType_2();
                             }
-                        }
-                        {
-                            using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].f)>;
-                            using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                            if (element_0.f.count != 0) {
-                                auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.f.count);
-                                if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
-                                    return CHIP_ERROR_INVALID_ARGUMENT;
-                                }
-                                listFreer.add(listHolder_2);
-                                for (size_t i_2 = 0; i_2 < element_0.f.count; ++i_2) {
-                                    if (![element_0.f[i_2] isKindOfClass:[NSData class]]) {
-                                        // Wrong kind of value.
+                            {
+                                using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].f)>;
+                                using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                                if (element_0.f.count != 0) {
+                                    auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.f.count);
+                                    if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
                                         return CHIP_ERROR_INVALID_ARGUMENT;
                                     }
-                                    auto element_2 = (NSData *) element_0.f[i_2];
-                                    listHolder_2->mList[i_2] = [self asByteSpan:element_2];
+                                    listFreer.add(listHolder_2);
+                                    for (size_t i_2 = 0; i_2 < element_0.f.count; ++i_2) {
+                                        if (![element_0.f[i_2] isKindOfClass:[NSData class]]) {
+                                            // Wrong kind of value.
+                                            return CHIP_ERROR_INVALID_ARGUMENT;
+                                        }
+                                        auto element_2 = (NSData *) element_0.f[i_2];
+                                        listHolder_2->mList[i_2] = [self asByteSpan:element_2];
+                                    }
+                                    listHolder_0->mList[i_0].f = ListType_2(listHolder_2->mList, element_0.f.count);
+                                } else {
+                                    listHolder_0->mList[i_0].f = ListType_2();
                                 }
-                                listHolder_0->mList[i_0].f = ListType_2(listHolder_2->mList, element_0.f.count);
-                            } else {
-                                listHolder_0->mList[i_0].f = ListType_2();
                             }
-                        }
-                        {
-                            using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].g)>;
-                            using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                            if (element_0.g.count != 0) {
-                                auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.g.count);
-                                if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
-                                    return CHIP_ERROR_INVALID_ARGUMENT;
-                                }
-                                listFreer.add(listHolder_2);
-                                for (size_t i_2 = 0; i_2 < element_0.g.count; ++i_2) {
-                                    if (![element_0.g[i_2] isKindOfClass:[NSNumber class]]) {
-                                        // Wrong kind of value.
+                            {
+                                using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].g)>;
+                                using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                                if (element_0.g.count != 0) {
+                                    auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.g.count);
+                                    if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
                                         return CHIP_ERROR_INVALID_ARGUMENT;
                                     }
-                                    auto element_2 = (NSNumber *) element_0.g[i_2];
-                                    listHolder_2->mList[i_2] = element_2.unsignedCharValue;
+                                    listFreer.add(listHolder_2);
+                                    for (size_t i_2 = 0; i_2 < element_0.g.count; ++i_2) {
+                                        if (![element_0.g[i_2] isKindOfClass:[NSNumber class]]) {
+                                            // Wrong kind of value.
+                                            return CHIP_ERROR_INVALID_ARGUMENT;
+                                        }
+                                        auto element_2 = (NSNumber *) element_0.g[i_2];
+                                        listHolder_2->mList[i_2] = element_2.unsignedCharValue;
+                                    }
+                                    listHolder_0->mList[i_0].g = ListType_2(listHolder_2->mList, element_0.g.count);
+                                } else {
+                                    listHolder_0->mList[i_0].g = ListType_2();
                                 }
-                                listHolder_0->mList[i_0].g = ListType_2(listHolder_2->mList, element_0.g.count);
-                            } else {
-                                listHolder_0->mList[i_0].g = ListType_2();
                             }
                         }
+                        request.arg1 = ListType_0(listHolder_0->mList, params.arg1.count);
+                    } else {
+                        request.arg1 = ListType_0();
                     }
-                    request.arg1 = ListType_0(listHolder_0->mList, params.arg1.count);
-                } else {
-                    request.arg1 = ListType_0();
                 }
-            }
 
-            auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testListInt8UReverseRequestWithParams:(MTRTestClusterClusterTestListInt8UReverseRequestParams *)params
@@ -19295,47 +22272,63 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRTestClusterClusterTestListInt8UReverseResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TestListInt8UReverseRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRTestClusterClusterTestListInt8UReverseResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TestListInt8UReverseRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            {
-                using ListType_0 = std::remove_reference_t<decltype(request.arg1)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (params.arg1.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.arg1.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < params.arg1.count; ++i_0) {
-                        if (![params.arg1[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
+                {
+                    using ListType_0 = std::remove_reference_t<decltype(request.arg1)>;
+                    using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                    if (params.arg1.count != 0) {
+                        auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.arg1.count);
+                        if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (NSNumber *) params.arg1[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedCharValue;
+                        listFreer.add(listHolder_0);
+                        for (size_t i_0 = 0; i_0 < params.arg1.count; ++i_0) {
+                            if (![params.arg1[i_0] isKindOfClass:[NSNumber class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_0 = (NSNumber *) params.arg1[i_0];
+                            listHolder_0->mList[i_0] = element_0.unsignedCharValue;
+                        }
+                        request.arg1 = ListType_0(listHolder_0->mList, params.arg1.count);
+                    } else {
+                        request.arg1 = ListType_0();
                     }
-                    request.arg1 = ListType_0(listHolder_0->mList, params.arg1.count);
-                } else {
-                    request.arg1 = ListType_0();
                 }
-            }
 
-            auto successFn = Callback<TestClusterClusterTestListInt8UReverseResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<TestClusterClusterTestListInt8UReverseResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testEnumsRequestWithParams:(MTRTestClusterClusterTestEnumsRequestParams *)params
@@ -19346,27 +22339,43 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRTestClusterClusterTestEnumsResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TestEnumsRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRTestClusterClusterTestEnumsResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TestEnumsRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.arg1 = static_cast<std::remove_reference_t<decltype(request.arg1)>>(params.arg1.unsignedShortValue);
-            request.arg2 = static_cast<std::remove_reference_t<decltype(request.arg2)>>(params.arg2.unsignedCharValue);
+                request.arg1 = static_cast<std::remove_reference_t<decltype(request.arg1)>>(params.arg1.unsignedShortValue);
+                request.arg2 = static_cast<std::remove_reference_t<decltype(request.arg2)>>(params.arg2.unsignedCharValue);
 
-            auto successFn = Callback<TestClusterClusterTestEnumsResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<TestClusterClusterTestEnumsResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testNullableOptionalRequestWithParams:(MTRTestClusterClusterTestNullableOptionalRequestParams * _Nullable)params
@@ -19377,36 +22386,52 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRTestClusterClusterTestNullableOptionalResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TestNullableOptionalRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRTestClusterClusterTestNullableOptionalResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TestNullableOptionalRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            if (params != nil) {
-                if (params.arg1 != nil) {
-                    auto & definedValue_0 = request.arg1.Emplace();
-                    if (params.arg1 == nil) {
-                        definedValue_0.SetNull();
-                    } else {
-                        auto & nonNullValue_1 = definedValue_0.SetNonNull();
-                        nonNullValue_1 = params.arg1.unsignedCharValue;
+                if (params != nil) {
+                    if (params.arg1 != nil) {
+                        auto & definedValue_0 = request.arg1.Emplace();
+                        if (params.arg1 == nil) {
+                            definedValue_0.SetNull();
+                        } else {
+                            auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                            nonNullValue_1 = params.arg1.unsignedCharValue;
+                        }
                     }
                 }
-            }
 
-            auto successFn = Callback<TestClusterClusterTestNullableOptionalResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<TestClusterClusterTestNullableOptionalResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testComplexNullableOptionalRequestWithParams:(MTRTestClusterClusterTestComplexNullableOptionalRequestParams *)params
@@ -19418,194 +22443,213 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TestComplexNullableOptionalRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge(self.callbackQueue, baseDevice,
+            completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TestComplexNullableOptionalRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            if (params.nullableInt == nil) {
-                request.nullableInt.SetNull();
-            } else {
-                auto & nonNullValue_0 = request.nullableInt.SetNonNull();
-                nonNullValue_0 = params.nullableInt.unsignedShortValue;
-            }
-            if (params.optionalInt != nil) {
-                auto & definedValue_0 = request.optionalInt.Emplace();
-                definedValue_0 = params.optionalInt.unsignedShortValue;
-            }
-            if (params.nullableOptionalInt != nil) {
-                auto & definedValue_0 = request.nullableOptionalInt.Emplace();
-                if (params.nullableOptionalInt == nil) {
-                    definedValue_0.SetNull();
+                if (params.nullableInt == nil) {
+                    request.nullableInt.SetNull();
                 } else {
-                    auto & nonNullValue_1 = definedValue_0.SetNonNull();
-                    nonNullValue_1 = params.nullableOptionalInt.unsignedShortValue;
+                    auto & nonNullValue_0 = request.nullableInt.SetNonNull();
+                    nonNullValue_0 = params.nullableInt.unsignedShortValue;
                 }
-            }
-            if (params.nullableString == nil) {
-                request.nullableString.SetNull();
-            } else {
-                auto & nonNullValue_0 = request.nullableString.SetNonNull();
-                nonNullValue_0 = [self asCharSpan:params.nullableString];
-            }
-            if (params.optionalString != nil) {
-                auto & definedValue_0 = request.optionalString.Emplace();
-                definedValue_0 = [self asCharSpan:params.optionalString];
-            }
-            if (params.nullableOptionalString != nil) {
-                auto & definedValue_0 = request.nullableOptionalString.Emplace();
-                if (params.nullableOptionalString == nil) {
-                    definedValue_0.SetNull();
-                } else {
-                    auto & nonNullValue_1 = definedValue_0.SetNonNull();
-                    nonNullValue_1 = [self asCharSpan:params.nullableOptionalString];
+                if (params.optionalInt != nil) {
+                    auto & definedValue_0 = request.optionalInt.Emplace();
+                    definedValue_0 = params.optionalInt.unsignedShortValue;
                 }
-            }
-            if (params.nullableStruct == nil) {
-                request.nullableStruct.SetNull();
-            } else {
-                auto & nonNullValue_0 = request.nullableStruct.SetNonNull();
-                nonNullValue_0.a = params.nullableStruct.a.unsignedCharValue;
-                nonNullValue_0.b = params.nullableStruct.b.boolValue;
-                nonNullValue_0.c
-                    = static_cast<std::remove_reference_t<decltype(nonNullValue_0.c)>>(params.nullableStruct.c.unsignedCharValue);
-                nonNullValue_0.d = [self asByteSpan:params.nullableStruct.d];
-                nonNullValue_0.e = [self asCharSpan:params.nullableStruct.e];
-                nonNullValue_0.f
-                    = static_cast<std::remove_reference_t<decltype(nonNullValue_0.f)>>(params.nullableStruct.f.unsignedCharValue);
-                nonNullValue_0.g = params.nullableStruct.g.floatValue;
-                nonNullValue_0.h = params.nullableStruct.h.doubleValue;
-            }
-            if (params.optionalStruct != nil) {
-                auto & definedValue_0 = request.optionalStruct.Emplace();
-                definedValue_0.a = params.optionalStruct.a.unsignedCharValue;
-                definedValue_0.b = params.optionalStruct.b.boolValue;
-                definedValue_0.c
-                    = static_cast<std::remove_reference_t<decltype(definedValue_0.c)>>(params.optionalStruct.c.unsignedCharValue);
-                definedValue_0.d = [self asByteSpan:params.optionalStruct.d];
-                definedValue_0.e = [self asCharSpan:params.optionalStruct.e];
-                definedValue_0.f
-                    = static_cast<std::remove_reference_t<decltype(definedValue_0.f)>>(params.optionalStruct.f.unsignedCharValue);
-                definedValue_0.g = params.optionalStruct.g.floatValue;
-                definedValue_0.h = params.optionalStruct.h.doubleValue;
-            }
-            if (params.nullableOptionalStruct != nil) {
-                auto & definedValue_0 = request.nullableOptionalStruct.Emplace();
-                if (params.nullableOptionalStruct == nil) {
-                    definedValue_0.SetNull();
-                } else {
-                    auto & nonNullValue_1 = definedValue_0.SetNonNull();
-                    nonNullValue_1.a = params.nullableOptionalStruct.a.unsignedCharValue;
-                    nonNullValue_1.b = params.nullableOptionalStruct.b.boolValue;
-                    nonNullValue_1.c = static_cast<std::remove_reference_t<decltype(nonNullValue_1.c)>>(
-                        params.nullableOptionalStruct.c.unsignedCharValue);
-                    nonNullValue_1.d = [self asByteSpan:params.nullableOptionalStruct.d];
-                    nonNullValue_1.e = [self asCharSpan:params.nullableOptionalStruct.e];
-                    nonNullValue_1.f = static_cast<std::remove_reference_t<decltype(nonNullValue_1.f)>>(
-                        params.nullableOptionalStruct.f.unsignedCharValue);
-                    nonNullValue_1.g = params.nullableOptionalStruct.g.floatValue;
-                    nonNullValue_1.h = params.nullableOptionalStruct.h.doubleValue;
-                }
-            }
-            if (params.nullableList == nil) {
-                request.nullableList.SetNull();
-            } else {
-                auto & nonNullValue_0 = request.nullableList.SetNonNull();
-                {
-                    using ListType_1 = std::remove_reference_t<decltype(nonNullValue_0)>;
-                    using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
-                    if (params.nullableList.count != 0) {
-                        auto * listHolder_1 = new ListHolder<ListMemberType_1>(params.nullableList.count);
-                        if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        listFreer.add(listHolder_1);
-                        for (size_t i_1 = 0; i_1 < params.nullableList.count; ++i_1) {
-                            if (![params.nullableList[i_1] isKindOfClass:[NSNumber class]]) {
-                                // Wrong kind of value.
-                                return CHIP_ERROR_INVALID_ARGUMENT;
-                            }
-                            auto element_1 = (NSNumber *) params.nullableList[i_1];
-                            listHolder_1->mList[i_1] = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1])>>(
-                                element_1.unsignedCharValue);
-                        }
-                        nonNullValue_0 = ListType_1(listHolder_1->mList, params.nullableList.count);
+                if (params.nullableOptionalInt != nil) {
+                    auto & definedValue_0 = request.nullableOptionalInt.Emplace();
+                    if (params.nullableOptionalInt == nil) {
+                        definedValue_0.SetNull();
                     } else {
-                        nonNullValue_0 = ListType_1();
+                        auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                        nonNullValue_1 = params.nullableOptionalInt.unsignedShortValue;
                     }
                 }
-            }
-            if (params.optionalList != nil) {
-                auto & definedValue_0 = request.optionalList.Emplace();
-                {
-                    using ListType_1 = std::remove_reference_t<decltype(definedValue_0)>;
-                    using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
-                    if (params.optionalList.count != 0) {
-                        auto * listHolder_1 = new ListHolder<ListMemberType_1>(params.optionalList.count);
-                        if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        listFreer.add(listHolder_1);
-                        for (size_t i_1 = 0; i_1 < params.optionalList.count; ++i_1) {
-                            if (![params.optionalList[i_1] isKindOfClass:[NSNumber class]]) {
-                                // Wrong kind of value.
-                                return CHIP_ERROR_INVALID_ARGUMENT;
-                            }
-                            auto element_1 = (NSNumber *) params.optionalList[i_1];
-                            listHolder_1->mList[i_1] = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1])>>(
-                                element_1.unsignedCharValue);
-                        }
-                        definedValue_0 = ListType_1(listHolder_1->mList, params.optionalList.count);
+                if (params.nullableString == nil) {
+                    request.nullableString.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.nullableString.SetNonNull();
+                    nonNullValue_0 = [self asCharSpan:params.nullableString];
+                }
+                if (params.optionalString != nil) {
+                    auto & definedValue_0 = request.optionalString.Emplace();
+                    definedValue_0 = [self asCharSpan:params.optionalString];
+                }
+                if (params.nullableOptionalString != nil) {
+                    auto & definedValue_0 = request.nullableOptionalString.Emplace();
+                    if (params.nullableOptionalString == nil) {
+                        definedValue_0.SetNull();
                     } else {
-                        definedValue_0 = ListType_1();
+                        auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                        nonNullValue_1 = [self asCharSpan:params.nullableOptionalString];
                     }
                 }
-            }
-            if (params.nullableOptionalList != nil) {
-                auto & definedValue_0 = request.nullableOptionalList.Emplace();
-                if (params.nullableOptionalList == nil) {
-                    definedValue_0.SetNull();
+                if (params.nullableStruct == nil) {
+                    request.nullableStruct.SetNull();
                 } else {
-                    auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                    auto & nonNullValue_0 = request.nullableStruct.SetNonNull();
+                    nonNullValue_0.a = params.nullableStruct.a.unsignedCharValue;
+                    nonNullValue_0.b = params.nullableStruct.b.boolValue;
+                    nonNullValue_0.c = static_cast<std::remove_reference_t<decltype(nonNullValue_0.c)>>(
+                        params.nullableStruct.c.unsignedCharValue);
+                    nonNullValue_0.d = [self asByteSpan:params.nullableStruct.d];
+                    nonNullValue_0.e = [self asCharSpan:params.nullableStruct.e];
+                    nonNullValue_0.f = static_cast<std::remove_reference_t<decltype(nonNullValue_0.f)>>(
+                        params.nullableStruct.f.unsignedCharValue);
+                    nonNullValue_0.g = params.nullableStruct.g.floatValue;
+                    nonNullValue_0.h = params.nullableStruct.h.doubleValue;
+                }
+                if (params.optionalStruct != nil) {
+                    auto & definedValue_0 = request.optionalStruct.Emplace();
+                    definedValue_0.a = params.optionalStruct.a.unsignedCharValue;
+                    definedValue_0.b = params.optionalStruct.b.boolValue;
+                    definedValue_0.c = static_cast<std::remove_reference_t<decltype(definedValue_0.c)>>(
+                        params.optionalStruct.c.unsignedCharValue);
+                    definedValue_0.d = [self asByteSpan:params.optionalStruct.d];
+                    definedValue_0.e = [self asCharSpan:params.optionalStruct.e];
+                    definedValue_0.f = static_cast<std::remove_reference_t<decltype(definedValue_0.f)>>(
+                        params.optionalStruct.f.unsignedCharValue);
+                    definedValue_0.g = params.optionalStruct.g.floatValue;
+                    definedValue_0.h = params.optionalStruct.h.doubleValue;
+                }
+                if (params.nullableOptionalStruct != nil) {
+                    auto & definedValue_0 = request.nullableOptionalStruct.Emplace();
+                    if (params.nullableOptionalStruct == nil) {
+                        definedValue_0.SetNull();
+                    } else {
+                        auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                        nonNullValue_1.a = params.nullableOptionalStruct.a.unsignedCharValue;
+                        nonNullValue_1.b = params.nullableOptionalStruct.b.boolValue;
+                        nonNullValue_1.c = static_cast<std::remove_reference_t<decltype(nonNullValue_1.c)>>(
+                            params.nullableOptionalStruct.c.unsignedCharValue);
+                        nonNullValue_1.d = [self asByteSpan:params.nullableOptionalStruct.d];
+                        nonNullValue_1.e = [self asCharSpan:params.nullableOptionalStruct.e];
+                        nonNullValue_1.f = static_cast<std::remove_reference_t<decltype(nonNullValue_1.f)>>(
+                            params.nullableOptionalStruct.f.unsignedCharValue);
+                        nonNullValue_1.g = params.nullableOptionalStruct.g.floatValue;
+                        nonNullValue_1.h = params.nullableOptionalStruct.h.doubleValue;
+                    }
+                }
+                if (params.nullableList == nil) {
+                    request.nullableList.SetNull();
+                } else {
+                    auto & nonNullValue_0 = request.nullableList.SetNonNull();
                     {
-                        using ListType_2 = std::remove_reference_t<decltype(nonNullValue_1)>;
-                        using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                        if (params.nullableOptionalList.count != 0) {
-                            auto * listHolder_2 = new ListHolder<ListMemberType_2>(params.nullableOptionalList.count);
-                            if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                        using ListType_1 = std::remove_reference_t<decltype(nonNullValue_0)>;
+                        using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                        if (params.nullableList.count != 0) {
+                            auto * listHolder_1 = new ListHolder<ListMemberType_1>(params.nullableList.count);
+                            if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
                                 return CHIP_ERROR_INVALID_ARGUMENT;
                             }
-                            listFreer.add(listHolder_2);
-                            for (size_t i_2 = 0; i_2 < params.nullableOptionalList.count; ++i_2) {
-                                if (![params.nullableOptionalList[i_2] isKindOfClass:[NSNumber class]]) {
+                            listFreer.add(listHolder_1);
+                            for (size_t i_1 = 0; i_1 < params.nullableList.count; ++i_1) {
+                                if (![params.nullableList[i_1] isKindOfClass:[NSNumber class]]) {
                                     // Wrong kind of value.
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
-                                auto element_2 = (NSNumber *) params.nullableOptionalList[i_2];
-                                listHolder_2->mList[i_2] = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2])>>(
-                                    element_2.unsignedCharValue);
+                                auto element_1 = (NSNumber *) params.nullableList[i_1];
+                                listHolder_1->mList[i_1] = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1])>>(
+                                    element_1.unsignedCharValue);
                             }
-                            nonNullValue_1 = ListType_2(listHolder_2->mList, params.nullableOptionalList.count);
+                            nonNullValue_0 = ListType_1(listHolder_1->mList, params.nullableList.count);
                         } else {
-                            nonNullValue_1 = ListType_2();
+                            nonNullValue_0 = ListType_1();
                         }
                     }
                 }
-            }
+                if (params.optionalList != nil) {
+                    auto & definedValue_0 = request.optionalList.Emplace();
+                    {
+                        using ListType_1 = std::remove_reference_t<decltype(definedValue_0)>;
+                        using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+                        if (params.optionalList.count != 0) {
+                            auto * listHolder_1 = new ListHolder<ListMemberType_1>(params.optionalList.count);
+                            if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            listFreer.add(listHolder_1);
+                            for (size_t i_1 = 0; i_1 < params.optionalList.count; ++i_1) {
+                                if (![params.optionalList[i_1] isKindOfClass:[NSNumber class]]) {
+                                    // Wrong kind of value.
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                auto element_1 = (NSNumber *) params.optionalList[i_1];
+                                listHolder_1->mList[i_1] = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1])>>(
+                                    element_1.unsignedCharValue);
+                            }
+                            definedValue_0 = ListType_1(listHolder_1->mList, params.optionalList.count);
+                        } else {
+                            definedValue_0 = ListType_1();
+                        }
+                    }
+                }
+                if (params.nullableOptionalList != nil) {
+                    auto & definedValue_0 = request.nullableOptionalList.Emplace();
+                    if (params.nullableOptionalList == nil) {
+                        definedValue_0.SetNull();
+                    } else {
+                        auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                        {
+                            using ListType_2 = std::remove_reference_t<decltype(nonNullValue_1)>;
+                            using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                            if (params.nullableOptionalList.count != 0) {
+                                auto * listHolder_2 = new ListHolder<ListMemberType_2>(params.nullableOptionalList.count);
+                                if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                listFreer.add(listHolder_2);
+                                for (size_t i_2 = 0; i_2 < params.nullableOptionalList.count; ++i_2) {
+                                    if (![params.nullableOptionalList[i_2] isKindOfClass:[NSNumber class]]) {
+                                        // Wrong kind of value.
+                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                    }
+                                    auto element_2 = (NSNumber *) params.nullableOptionalList[i_2];
+                                    listHolder_2->mList[i_2]
+                                        = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2])>>(
+                                            element_2.unsignedCharValue);
+                                }
+                                nonNullValue_1 = ListType_2(listHolder_2->mList, params.nullableOptionalList.count);
+                            } else {
+                                nonNullValue_1 = ListType_2();
+                            }
+                        }
+                    }
+                }
 
-            auto successFn = Callback<TestClusterClusterTestComplexNullableOptionalResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn
+                    = Callback<TestClusterClusterTestComplexNullableOptionalResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)simpleStructEchoRequestWithParams:(MTRTestClusterClusterSimpleStructEchoRequestParams *)params
@@ -19616,33 +22660,49 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRTestClusterClusterSimpleStructResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::SimpleStructEchoRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRTestClusterClusterSimpleStructResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::SimpleStructEchoRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.arg1.a = params.arg1.a.unsignedCharValue;
-            request.arg1.b = params.arg1.b.boolValue;
-            request.arg1.c = static_cast<std::remove_reference_t<decltype(request.arg1.c)>>(params.arg1.c.unsignedCharValue);
-            request.arg1.d = [self asByteSpan:params.arg1.d];
-            request.arg1.e = [self asCharSpan:params.arg1.e];
-            request.arg1.f = static_cast<std::remove_reference_t<decltype(request.arg1.f)>>(params.arg1.f.unsignedCharValue);
-            request.arg1.g = params.arg1.g.floatValue;
-            request.arg1.h = params.arg1.h.doubleValue;
+                request.arg1.a = params.arg1.a.unsignedCharValue;
+                request.arg1.b = params.arg1.b.boolValue;
+                request.arg1.c = static_cast<std::remove_reference_t<decltype(request.arg1.c)>>(params.arg1.c.unsignedCharValue);
+                request.arg1.d = [self asByteSpan:params.arg1.d];
+                request.arg1.e = [self asCharSpan:params.arg1.e];
+                request.arg1.f = static_cast<std::remove_reference_t<decltype(request.arg1.f)>>(params.arg1.f.unsignedCharValue);
+                request.arg1.g = params.arg1.g.floatValue;
+                request.arg1.h = params.arg1.h.doubleValue;
 
-            auto successFn = Callback<TestClusterClusterSimpleStructResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<TestClusterClusterSimpleStructResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)timedInvokeRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
@@ -19661,32 +22721,49 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TimedInvokeRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TimedInvokeRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            if (!timedInvokeTimeoutMs.HasValue()) {
-                timedInvokeTimeoutMs.SetValue(10000);
-            }
+                if (!timedInvokeTimeoutMs.HasValue()) {
+                    timedInvokeTimeoutMs.SetValue(10000);
+                }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testSimpleOptionalArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
@@ -19696,35 +22773,52 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRCommandSuccessCallbackBridge(
-        self.callbackQueue, baseDevice,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue, baseDevice,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completionHandler(error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            if (params != nil) {
-                if (params.arg1 != nil) {
-                    auto & definedValue_0 = request.arg1.Emplace();
-                    definedValue_0 = params.arg1.boolValue;
+                if (params != nil) {
+                    if (params.arg1 != nil) {
+                        auto & definedValue_0 = request.arg1.Emplace();
+                        definedValue_0 = params.arg1.boolValue;
+                    }
                 }
-            }
 
-            auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testEmitTestEventRequestWithParams:(MTRTestClusterClusterTestEmitTestEventRequestParams *)params
@@ -19735,28 +22829,44 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRTestClusterClusterTestEmitTestEventResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TestEmitTestEventRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRTestClusterClusterTestEmitTestEventResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TestEmitTestEventRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.arg1 = params.arg1.unsignedCharValue;
-            request.arg2 = static_cast<std::remove_reference_t<decltype(request.arg2)>>(params.arg2.unsignedCharValue);
-            request.arg3 = params.arg3.boolValue;
+                request.arg1 = params.arg1.unsignedCharValue;
+                request.arg2 = static_cast<std::remove_reference_t<decltype(request.arg2)>>(params.arg2.unsignedCharValue);
+                request.arg3 = params.arg3.boolValue;
 
-            auto successFn = Callback<TestClusterClusterTestEmitTestEventResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn = Callback<TestClusterClusterTestEmitTestEventResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (void)testEmitTestFabricScopedEventRequestWithParams:(MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams *)params
@@ -19769,26 +22879,44 @@ using chip::SessionHandle;
 {
     // Make a copy of params before we go async.
     params = [params copy];
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-    new MTRTestClusterClusterTestEmitTestFabricScopedEventResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
-        ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
-            ListFreer listFreer;
-            TestCluster::Commands::TestEmitTestFabricScopedEventRequest::Type request;
-            if (params != nil) {
-                if (params.timedInvokeTimeoutMs != nil) {
-                    timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        new MTRTestClusterClusterTestEmitTestFabricScopedEventResponseCallbackBridge(self.callbackQueue, baseDevice,
+            completionHandler,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                TestCluster::Commands::TestEmitTestFabricScopedEventRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-            }
-            request.arg1 = params.arg1.unsignedCharValue;
+                request.arg1 = params.arg1.unsignedCharValue;
 
-            auto successFn = Callback<TestClusterClusterTestEmitTestFabricScopedEventResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-            chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-        });
+                auto successFn
+                    = Callback<TestClusterClusterTestEmitTestFabricScopedEventResponseCallbackType>::FromCancelable(success);
+                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
+                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(
+                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+            });
+    };
+    workItem.readyHandler = readyHandler;
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBooleanWithParams:(MTRReadParams * _Nullable)params
