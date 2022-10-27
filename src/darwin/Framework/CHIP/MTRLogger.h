@@ -45,7 +45,7 @@ typedef NS_ENUM(NSUInteger, MTRLogLevel) { MTRLogLevelError = 0, MTRLogLevelInfo
 - (BOOL)isLoggingEnabledAtLevel:(MTRLogLevel)level;
 
 /**
- * Logs a message at the given level. Logs will be written asynchronously using the worker dispatch queue.
+ * Logs a message at the given level. Logs will be written asynchronously using a logger dispatch queue.
  *
  * @note Messages will only be passed to this method if `isLoggingEnabledAtLevel` is `true` for the given log level.
  */

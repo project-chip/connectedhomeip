@@ -17,8 +17,8 @@
 
 #import <MTRLogging.h>
 #import <lib/support/logging/CHIPLogging.h>
-#include <platform/PlatformManager.h>
 #include <platform/Darwin/Logging.h>
+#include <dispatch/dispatch.h>
 #import <os/log.h>
 #import <pthread.h>
 
@@ -136,7 +136,7 @@ static ENFORCE_FORMAT(3, 0) void cpp_log_redirect_callback(const char * module, 
 @implementation MTRLogging
 
 // queue used to serialize all work performed by the MTRLogger
-static dispatch_queue_t chipWorkQueue;
+static dispatch_queue_t logQueue;
 
 + (void)logAtLevel:(MTRLogLevel)level format:(NSString *)format, ... NS_FORMAT_FUNCTION(2, 3)
 {
@@ -148,9 +148,9 @@ static dispatch_queue_t chipWorkQueue;
 
 + (void)logAtLevelV:(MTRLogLevel)level format:(NSString *)format args:(va_list)args NS_FORMAT_FUNCTION(2, 0)
 {
-    if (chipWorkQueue == nil)
+    if (logQueue == nil)
     {
-        chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
+        logQueue = dispatch_queue_create("com.csa.matter.framework.log.workqueue", DISPATCH_QUEUE_SERIAL);
     }
 
     // Fetch the currently-active MTRLogger
@@ -164,7 +164,7 @@ static dispatch_queue_t chipWorkQueue;
     // Format the message
     NSString * message = [[NSString alloc] initWithFormat:format arguments:args];
 
-    dispatch_async(chipWorkQueue, ^{
+    dispatch_async(logQueue, ^{
         // Log the message to the MTRLogger
         [logger logAtLevel:level message:message];
     });
