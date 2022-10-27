@@ -261,6 +261,15 @@ target_link_libraries(openiotsdk-chip INTERFACE
 )
 add_dependencies(openiotsdk-chip chip-gn)
 
+# ==============================================================================
+# Add additional Open IoT SDK port components
+# ==============================================================================
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/storage storage_build)
+
+target_link_libraries(openiotsdk-chip INTERFACE
+    openiotsdk-storage
+)
+
 target_include_directories(openiotsdk-chip INTERFACE
     ${CHIP_ROOT}/config/openiotsdk/mbedtls
 )
