@@ -251,6 +251,7 @@ target_link_libraries(openiotsdk-chip INTERFACE -Wl,--start-group ${CHIP_LIBRARI
 target_link_libraries(openiotsdk-chip INTERFACE
     $<$<TARGET_EXISTS:mcu-driver-hal>:mcu-driver-hal>
     $<$<TARGET_EXISTS:mcu-driver-bootstrap>:mcu-driver-bootstrap>
+    $<$<TARGET_EXISTS:tfm-ns-interface-cmsis-rtos>:tfm-ns-interface-cmsis-rtos>
     $<$<TARGET_EXISTS:mdh-reference-platforms-for-arm>:mdh-reference-platforms-for-arm>
     $<$<TARGET_EXISTS:mbedtls>:mbedtls>
     $<$<TARGET_EXISTS:lwipcore>:lwipcore>
@@ -270,11 +271,21 @@ target_link_libraries(openiotsdk-chip INTERFACE
     openiotsdk-storage
 )
 
+# ==============================================================================
+# Additional openiotsdk-chip target configuration
+# ==============================================================================
+if(TFM_SUPPORT)
+    add_dependencies(openiotsdk-chip trusted-firmware-m-build)
+    target_compile_definitions(openiotsdk-chip INTERFACE
+        TFM_SUPPORT
+    )
+endif()
+
 target_include_directories(openiotsdk-chip INTERFACE
     ${CHIP_ROOT}/config/openiotsdk/mbedtls
 )
 
-if (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+if (NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     target_compile_definitions(openiotsdk-chip INTERFACE
         NDEBUG
     )

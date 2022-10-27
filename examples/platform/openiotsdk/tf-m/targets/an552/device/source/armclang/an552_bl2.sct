@@ -1,0 +1,49 @@
+/*
+ * Copyright (c) 2017-2020 Arm Limited. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "region_defs.h"
+
+LR_CODE BL2_CODE_START {
+    ER_CODE BL2_CODE_START BL2_CODE_SIZE {
+        *.o (RESET +First)
+        * (+RO)
+    }
+
+    TFM_SHARED_DATA BOOT_TFM_SHARED_DATA_BASE ALIGN 32 EMPTY BOOT_TFM_SHARED_DATA_SIZE {
+    }
+
+    ER_DATA +0 {
+        * (+ZI +RW)
+    }
+
+    /* MSP */
+    ARM_LIB_STACK +0 ALIGN 32 EMPTY BL2_MSP_STACK_SIZE {
+    }
+
+    ARM_LIB_HEAP +0 ALIGN 8 EMPTY BL2_HEAP_SIZE {
+    }
+
+    /* This empty, zero long execution region is here to mark the limit address
+     * of the last execution region that is allocated in SRAM.
+     */
+    SRAM_WATERMARK +0 EMPTY 0x0 {
+    }
+
+    /* Make sure that the sections allocated in the SRAM does not exceed the
+     * size of the SRAM available.
+     */
+    ScatterAssert(ImageLimit(SRAM_WATERMARK) <= BL2_DATA_START + BL2_DATA_SIZE)
+}

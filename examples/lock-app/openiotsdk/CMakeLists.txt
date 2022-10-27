@@ -23,7 +23,10 @@ get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
 list(APPEND CMAKE_MODULE_PATH ${OPEN_IOT_SDK_CONFIG}/cmake)
 
-set(APP_TARGET chip-openiotsdk-lock-app-example)
+set(APP_TARGET chip-openiotsdk-lock-app-example_ns)
+
+set(TFM_SUPPORT YES)
+set(TFM_NS_APP_VERSION "0.0.1")
 
 # Toolchain files need to exist before first call to project
 include(toolchain)
@@ -64,7 +67,7 @@ target_include_directories(${APP_TARGET}
 
 target_sources(${APP_TARGET} 
     PRIVATE
-        main/main.cpp
+        main/main_ns.cpp
         main/ZclCallbacks.cpp
         main/LockManager.cpp
         main/LockEndpoint.cpp
@@ -83,3 +86,5 @@ chip_configure_data_model(${APP_TARGET}
 
 include(linker)
 set_target_link(${APP_TARGET})
+
+sdk_post_build(${APP_TARGET})

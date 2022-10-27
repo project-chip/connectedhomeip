@@ -113,6 +113,10 @@ function build_with_cmake() {
     PATH=$(echo "$PATH" | sed 's/:/\n/g' | grep -v "$PW_ARM_CIPD_INSTALL_DIR" | xargs | tr ' ' ':')
 
     cmake -G Ninja -S "$EXAMPLE_PATH" -B "$BUILD_PATH" --toolchain="$TOOLCHAIN_PATH" "${BUILD_OPTIONS[@]}"
+    if [ -f "$BUILD_PATH"/_deps/tf-m-src/tools/requirements.txt ]; then
+        pip3 install -r "$BUILD_PATH"/_deps/tf-m-src/tools/requirements.txt
+    fi
+
     cmake --build "$BUILD_PATH"
 }
 
@@ -230,8 +234,8 @@ function run_test() {
     fi
 }
 
-SHORT=C:,p:,d:.n:,c,s,h
-LONG=command:,path:,debug:.network:,clean,scratch,help
+SHORT=C:,p:,d:,n:,c,s,h
+LONG=command:,path:,debug:,network:,clean,scratch,help
 OPTS=$(getopt -n build --options "$SHORT" --longoptions "$LONG" -- "$@")
 
 eval set -- "$OPTS"
