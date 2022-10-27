@@ -88,6 +88,14 @@ static bool EnsureWiFiIsStarted()
 }
 #endif
 
+void CleanShutdown()
+{
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+
+    chip::Server::GetInstance().Shutdown();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
+}
+
 using PostAttributeChangeCallback = void (*)(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t type,
                                              uint16_t size, uint8_t * value);
 
@@ -175,6 +183,8 @@ void pychip_server_native_init()
     {
         ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: platform init failed: %s", chip::ErrorStr(err));
     }
+
+    atexit(CleanShutdown);
 
     return /*err*/;
 }
