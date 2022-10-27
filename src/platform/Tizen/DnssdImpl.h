@@ -17,13 +17,14 @@
 
 #pragma once
 
-#include <lib/dnssd/platform/Dnssd.h>
 #include <memory>
 #include <mutex>
 #include <set>
 #include <string>
 #include <sys/param.h>
 #include <vector>
+
+#include <lib/dnssd/platform/Dnssd.h>
 
 #include <dns-sd.h>
 #include <glib.h>

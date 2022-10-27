@@ -17,6 +17,7 @@
 #pragma once
 
 #include <lib/address_resolve/AddressResolve.h>
+#include <lib/dnssd/IPAddressSorter.h>
 #include <lib/dnssd/Resolver.h>
 #include <system/TimeSource.h>
 #include <transport/raw/PeerAddress.h>
@@ -123,7 +124,7 @@ private:
     System::Clock::Timestamp mRequestStartTime;
     NodeLookupRequest mRequest; // active request to process
     AddressResolve::ResolveResult mBestResult;
-    unsigned mBestAddressScore = 0;
+    Dnssd::IPAddressSorter::IpScore mBestAddressScore;
 };
 
 class Resolver : public ::chip::AddressResolve::Resolver, public Dnssd::OperationalResolveDelegate

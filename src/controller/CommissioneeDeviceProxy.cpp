@@ -109,7 +109,14 @@ CHIP_ERROR CommissioneeDeviceProxy::SetConnected(const SessionHandle & session)
     return CHIP_NO_ERROR;
 }
 
-CommissioneeDeviceProxy::~CommissioneeDeviceProxy() {}
+CommissioneeDeviceProxy::~CommissioneeDeviceProxy()
+{
+    auto session = GetSecureSession();
+    if (session.HasValue())
+    {
+        session.Value()->AsSecureSession()->MarkForEviction();
+    }
+}
 
 CHIP_ERROR CommissioneeDeviceProxy::SetPeerId(ByteSpan rcac, ByteSpan noc)
 {

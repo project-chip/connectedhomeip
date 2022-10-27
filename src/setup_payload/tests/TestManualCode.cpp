@@ -33,7 +33,9 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/verhoeff/Verhoeff.h>
 
+#include <algorithm>
 #include <math.h>
+#include <string>
 
 using namespace chip;
 
@@ -202,6 +204,14 @@ void TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator(nlTestSuite * in
     }
 }
 
+char ComputeCheckChar(const std::string & str)
+{
+    // Strip out dashes, if any, from the string before computing the checksum.
+    std::string copy(str);
+    copy.erase(std::remove(copy.begin(), copy.end(), '-'), copy.end());
+    return Verhoeff10::ComputeCheckChar(copy.c_str());
+}
+
 void TestPayloadParser_FullPayload(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload payload;
@@ -213,6 +223,15 @@ void TestPayloadParser_FullPayload(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SetupDiscriminator discriminator;
+    discriminator.SetShortValue(0xa);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 123456780, discriminator, 45367, 14526);
+
+    // The same thing, but with dashes separating digit groups.
+    decimalString = "6361-0875-3545-3671-4526";
+    decimalString += ComputeCheckChar(decimalString.c_str());
+    err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     discriminator.SetShortValue(0xa);
     assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 123456780, discriminator, 45367, 14526);
 
@@ -285,6 +304,16 @@ void TestPayloadParser_PartialPayload(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SetupDiscriminator discriminator;
+    discriminator.SetShortValue(0xa);
+    assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 123456780, discriminator, 0, 0);
+
+    // The same thing, but with dashes separating digit groups.
+    decimalString = "236-108753-5";
+    decimalString += ComputeCheckChar(decimalString.c_str());
+    NL_TEST_ASSERT(inSuite, decimalString.length() == 13);
+    err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     discriminator.SetShortValue(0xa);
     assertPayloadValues(inSuite, err, CHIP_NO_ERROR, payload, 123456780, discriminator, 0, 0);
 

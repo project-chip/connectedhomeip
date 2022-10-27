@@ -24,71 +24,6 @@ namespace {
 
 static constexpr System::Clock::Timeout kInvalidTimeout{ System::Clock::Timeout::max() };
 
-// IP addess "suitability"
-//   - Larger value means "more suitable"
-//   - Enum ordered ascending for easier read. Note however that order of
-//     checks MUST match in ScoreIpAddress below.
-enum class IpScore : unsigned
-{
-    kInvalid = 0, // No address available
-
-    // "Other" IPv6 include:
-    //   - invalid addresses (have seen router bugs during interop testing)
-    //   - embedded IPv4 (::/80)
-    kOtherIpv6                     = 1,
-    kIpv4                          = 2, // Not Matter SPEC, so low priority
-    kLinkLocal                     = 3, // Valid only on an interface
-    kUniqueLocal                   = 4, // ULA. Thread devices use this
-    kGlobalUnicast                 = 5, // Maybe routable, not local subnet
-    kUniqueLocalWithSharedPrefix   = 6, // Prefix seems to match a local interface
-    kGlobalUnicastWithSharedPrefix = 7, // Prefix seems to match a local interface
-};
-
-constexpr unsigned ScoreValue(IpScore score)
-{
-    return static_cast<unsigned>(score);
-}
-
-/**
- * Gives a score for an IP address, generally related to "how good" the address
- * is and how likely it is for it to be reachable.
- */
-IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId)
-{
-    if (ip.IsIPv6())
-    {
-        if (interfaceId.MatchLocalIPv6Subnet(ip))
-        {
-            if (ip.IsIPv6GlobalUnicast())
-            {
-                return IpScore::kGlobalUnicastWithSharedPrefix;
-            }
-            if (ip.IsIPv6ULA())
-            {
-                return IpScore::kUniqueLocalWithSharedPrefix;
-            }
-        }
-        if (ip.IsIPv6GlobalUnicast())
-        {
-            return IpScore::kGlobalUnicast;
-        }
-
-        if (ip.IsIPv6ULA())
-        {
-            return IpScore::kUniqueLocal;
-        }
-
-        if (ip.IsIPv6LinkLocal())
-        {
-            return IpScore::kLinkLocal;
-        }
-
-        return IpScore::kOtherIpv6;
-    }
-
-    return IpScore::kIpv4;
-}
-
 } // namespace
 
 void NodeLookupHandle::ResetForLookup(System::Clock::Timestamp now, const NodeLookupRequest & request)
@@ -96,7 +31,7 @@ void NodeLookupHandle::ResetForLookup(System::Clock::Timestamp now, const NodeLo
     mRequestStartTime = now;
     mRequest          = request;
     mBestResult       = ResolveResult();
-    mBestAddressScore = ScoreValue(IpScore::kInvalid);
+    mBestAddressScore = Dnssd::IPAddressSorter::IpScore::kInvalid;
 }
 
 void NodeLookupHandle::LookupResult(const ResolveResult & result)
@@ -106,8 +41,8 @@ void NodeLookupHandle::LookupResult(const ResolveResult & result)
     result.address.ToString(addr_string);
 #endif
 
-    unsigned newScore = ScoreValue(ScoreIpAddress(result.address.GetIPAddress(), result.address.GetInterface()));
-    if (newScore > mBestAddressScore)
+    auto newScore = Dnssd::IPAddressSorter::ScoreIpAddress(result.address.GetIPAddress(), result.address.GetInterface());
+    if (to_underlying(newScore) > to_underlying(mBestAddressScore))
     {
         mBestResult       = result;
         mBestAddressScore = newScore;
@@ -123,11 +58,11 @@ void NodeLookupHandle::LookupResult(const ResolveResult & result)
         }
 
 #if CHIP_PROGRESS_LOGGING
-        ChipLogProgress(Discovery, "%s: new best score: %u", addr_string, mBestAddressScore);
+        ChipLogProgress(Discovery, "%s: new best score: %u", addr_string, to_underlying(mBestAddressScore));
     }
     else
     {
-        ChipLogProgress(Discovery, "%s: score has not improved: %u", addr_string, newScore);
+        ChipLogProgress(Discovery, "%s: score has not improved: %u", addr_string, to_underlying(newScore));
 #endif
     }
 }
@@ -163,7 +98,7 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
     }
 
     // Minimal time to search reached. If any IP available, ready to return it.
-    if (mBestAddressScore > ScoreValue(IpScore::kInvalid))
+    if (mBestAddressScore != Dnssd::IPAddressSorter::IpScore::kInvalid)
     {
         return NodeLookupAction::Success(mBestResult);
     }

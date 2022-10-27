@@ -59,8 +59,10 @@ ALL_TESTS = ['network_commissioning', 'datamodel']
 
 def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: int, address_override: str, device_nodeid: int):
     logger.info("Testing discovery")
-    address = test.TestDiscovery(discriminator=discriminator)
-    FailIfNot(address, "Failed to discover any devices.")
+    device = test.TestDiscovery(discriminator=discriminator)
+    FailIfNot(device, "Failed to discover any devices.")
+
+    address = device.addresses[0]
 
     # FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
     #           "Failed to finish network commissioning")

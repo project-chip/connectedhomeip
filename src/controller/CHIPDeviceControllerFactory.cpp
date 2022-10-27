@@ -463,6 +463,7 @@ void DeviceControllerSystemState::Shutdown()
 
     if (mTempFabricTable != nullptr)
     {
+        mTempFabricTable->Shutdown();
         chip::Platform::Delete(mTempFabricTable);
         mTempFabricTable = nullptr;
         // if we created a temp fabric table, then mFabrics points to it.

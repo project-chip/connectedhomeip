@@ -232,7 +232,7 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read overrun-count 1 0
 
-          Verify on TH(all-clusters-app) Log
+          Verify the value of  OverrunCount is in range uint64 on TH(all-clusters-app) Log
 
           [1659971467.437214][3458:3458] CHIP:IM: Received Read request
           [1659971467.437292][3458:3458] CHIP:DMG: ReadRequestMessage =

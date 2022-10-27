@@ -39,6 +39,7 @@
 #endif
 
 #include <platform/internal/BLEManager.h>
+#include <support/CHIPMemString.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -389,8 +390,8 @@ void ConnectivityManagerImpl::DriveStationState()
 
                 memset(&sta_config, 0x0, sizeof(sta_config));
                 sta_config.security = WIFI_SECURITY_AUTO; // can't use WIFI_DEFAULT_STA_CONFIG because of C99 designator error
-                strncpy(sta_config.ssid, mWifiNetconf.ssid, mWifiNetconf.ssidLen);
-                strncpy(sta_config.password, mWifiNetconf.credentials, mWifiNetconf.credentialsLen);
+                Platform::CopyString(sta_config.ssid, mWifiNetconf.ssidLen, mWifiNetconf.ssid);
+                Platform::CopyString(sta_config.password, mWifiNetconf.credentialsLen, mWifiNetconf.credentials);
                 BK_LOG_ON_ERR(bk_wifi_sta_set_config(&sta_config));
                 BK_LOG_ON_ERR(bk_wifi_sta_start());
                 BK_LOG_ON_ERR(bk_event_register_cb(EVENT_MOD_WIFI, EVENT_ID_ALL, ConnectivityManagerImpl().wlan_event_cb, NULL));

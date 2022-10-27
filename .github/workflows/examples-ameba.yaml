@@ -32,7 +32,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-ameba:0.5.91
+            image: connectedhomeip/chip-build-ameba:0.6.03
             options: --user root
 
         steps:
@@ -47,4 +47,12 @@ jobs:
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform ameba
             - name: Build example Ameba All Clusters App
-              run: scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target-glob 'ameba-*' build"
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target ameba-amebad-all-clusters \
+                        --target ameba-amebad-all-clusters-minimal \
+                        --target ameba-amebad-light \
+                        --target ameba-amebad-pigweed \
+                        build \
+                     "

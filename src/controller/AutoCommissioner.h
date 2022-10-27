@@ -18,6 +18,7 @@
 #pragma once
 #include <controller/CommissioneeDeviceProxy.h>
 #include <controller/CommissioningDelegate.h>
+#include <credentials/DeviceAttestationConstructor.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 
 namespace chip {
@@ -35,8 +36,13 @@ public:
     void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) override;
 
     CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy) override;
+    void StopCommissioning() { mStopCommissioning = true; };
 
     CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
+
+    ByteSpan GetAttestationElements() const { return ByteSpan(mAttestationElements, mAttestationElementsLen); }
+    ByteSpan GetAttestationSignature() const { return ByteSpan(mAttestationSignature, mAttestationSignatureLen); }
+    ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce); }
 
 protected:
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
@@ -63,6 +69,8 @@ private:
     EndpointId GetEndpoint(const CommissioningStage & stage) const;
     CommissioningStage GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr);
 
+    bool mStopCommissioning = false;
+
     DeviceCommissioner * mCommissioner                               = nullptr;
     CommissioneeDeviceProxy * mCommissioneeDeviceProxy               = nullptr;
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate = nullptr;
@@ -86,6 +94,11 @@ private:
     uint8_t mCSRNonce[kCSRNonceLength];
     uint8_t mNOCertBuffer[Credentials::kMaxCHIPCertLength];
     uint8_t mICACertBuffer[Credentials::kMaxCHIPCertLength];
+
+    uint16_t mAttestationElementsLen = 0;
+    uint8_t mAttestationElements[Credentials::kMaxRspLen];
+    uint16_t mAttestationSignatureLen = 0;
+    uint8_t mAttestationSignature[Crypto::kMax_ECDSA_Signature_Length];
 };
 } // namespace Controller
 } // namespace chip

@@ -14,18 +14,6 @@
             }
         },
         {
-            "label": "Build examples (glob)",
-            "type": "shell",
-            "command": "scripts/run_in_build_env.sh",
-            "args": [
-                "./scripts/build/build_examples.py --target-glob \"${input:exampleGlob}\" build"
-            ],
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc"
-            }
-        },
-        {
             "label": "Main Build",
             "type": "shell",
             "command": "scripts/build/default.sh",
@@ -332,6 +320,11 @@
                 "android-x64-chip-tool",
                 "android-x86-chip-tool",
                 "bl602-light",
+                "bouffalolab-BL702-IoT-DVK-light",
+                "bouffalolab-BL702-IoT-DVK-light-rpc",
+                "bouffalolab-BL706-IoT-DVK-BL706C-22-light",
+                "bouffalolab-BL706-IoT-DVK-BL706C-22-light-rpc",
+                "bouffalolab-BL706-NIGHT-LIGHT",
                 "efr32-brd4161a-light",
                 "efr32-brd4163a-light",
                 "efr32-brd4164a-light",
@@ -391,9 +384,9 @@
                 "esp32-m5stack-all-clusters-ipv6only",
                 "esp32-m5stack-all-clusters-rpc",
                 "esp32-m5stack-all-clusters-rpc-ipv6only",
-                "infineon-p6-all-clusters",
-                "infineon-p6-lock",
-                "infineon-p6-light",
+                "infineon-psoc6-all-clusters",
+                "infineon-psoc6-lock",
+                "infineon-psoc6-light",
                 "linux-arm64-all-clusters",
                 "linux-arm64-all-clusters-ipv6only",
                 "linux-arm64-chip-tool",
@@ -438,6 +431,7 @@
                 "qpg-qpg6100-lock",
                 "telink-tlsr9518adk80d-light",
                 "telink-tlsr9518adk80d-light-switch",
+                "telink-tlsr9518adk80d-ota-requestor",
                 "tizen-arm-light"
             ]
         },

@@ -61,5 +61,9 @@ typedef NS_ENUM(uint8_t, UserConsentState) {
 @property (strong, nonatomic, nullable) NSNumber * nodeID;
 @property (nonatomic, readwrite) MTROtaSoftwareUpdateProviderOTAQueryStatus queryImageStatus;
 @property (nonatomic, readwrite) UserConsentState userConsentState;
+@property (nonatomic, readwrite) MTROtaSoftwareUpdateProviderOTAApplyUpdateAction action;
+@property (nonatomic, readwrite, nullable) NSNumber * delayedActionTime;
+@property (nonatomic, readwrite, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, readwrite, nullable) NSNumber * userConsentNeeded;
 
 @end

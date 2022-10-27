@@ -224,18 +224,6 @@ int mdns_responder_ops(struct netif * netif)
     mdns.slot_idx++;
     mdns_resp_announce(netif);
 
-#if 0
-    // for ota
-    slot =
-        mdns_resp_add_service(netif, "MATTER OTA", "_ota", static_cast<uint8_t>(glservice->mProtocol), 3333, 1000, ota_txt, NULL);
-    if (slot < 0)
-    {
-        mdns_resp_remove_netif(netif);
-        mdns_resp_deinit();
-        log_info("ota mdns fail.\r\n");
-    }
-#endif
-
     return slot;
 }
 
@@ -308,13 +296,24 @@ CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * /*type*/, DnssdServiceProtocol /*protocol*/, chip::Inet::IPAddressType addressType,
-                           chip::Inet::InterfaceId /*interface*/, DnssdBrowseCallback /*callback*/, void * /*context*/)
+                           chip::Inet::InterfaceId /*interface*/, DnssdBrowseCallback /*callback*/, void * /*context*/,
+                           intptr_t * /*browseIdentifier*/)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ChipDnssdStopBrowse(intptr_t /*browseIdentifier*/)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * /*service*/, chip::Inet::InterfaceId /*interface*/, DnssdResolveCallback /*callback*/,
                             void * /*context*/)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

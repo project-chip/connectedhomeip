@@ -19,6 +19,7 @@ AccessControlEntry
 accessor
 AccountLogin
 acdbc
+ack
 ACKed
 ACL
 ACLs
@@ -48,11 +49,9 @@ algs
 alloc
 Ameba
 amebad
-AmebaD
 amebaiot
 AmebaZ
 amebaz2
-AmebaZ2
 announcementReason
 AnnounceOTAProvider
 AnnounceOtaProviderRequest
@@ -84,8 +83,6 @@ args
 argv
 armeabi
 armino
-Armino
-ARMINO
 ARMmbed
 armv
 ASAN
@@ -257,6 +254,7 @@ ClusterTestGeneration
 cmake
 CMakeLists
 CMD
+CMS
 CMSIS
 CMVH
 cn
@@ -294,8 +292,8 @@ connstring
 conntype
 const
 ContentApp
-ContentApp's
 ContentAppPlatform
+ContentApp's
 ContentLaunch
 ContentLauncher
 continuousHinting
@@ -332,6 +330,7 @@ cxx
 CY
 CYW
 DAC
+DACs
 dadbdcdddedf
 DAP
 DAPLINK
@@ -449,6 +448,7 @@ dryrun
 DS
 duplicative
 DUT
+DUTS
 DV
 DVK
 dynload
@@ -596,6 +596,7 @@ GPL
 GPLv
 Gradle
 gradlew
+Groupcast
 GroupId
 GroupKeyManagement
 groupKeySecurityPolicy
@@ -830,6 +831,7 @@ mdash
 MDNS
 MediaInput
 MediaPlayback
+MediaTek
 mem
 memdf
 MemMonitoring
@@ -987,6 +989,7 @@ PAAs
 PacketBuffer
 PAI
 PairDevice
+PAIs
 PAKE
 palletsprojects
 pankore
@@ -1116,8 +1119,8 @@ REPL
 repo
 req
 Requestor
-Requestor's
 RequestorCanConsent
+Requestor's
 Requestors
 responder
 RestrictedEvent
@@ -1164,8 +1167,8 @@ SDB
 SDC
 SDHC
 SDK
-SDK's
 sdkconfig
+SDK's
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1342,6 +1345,7 @@ trackFree
 TransferSession
 transitionTime
 TransportMgrBase
+TriggerEffect
 TRNG
 TrustedRootCertificates
 tsan
@@ -1372,12 +1376,14 @@ uint
 ULA
 UNBLUR
 uncommissioned
+Unencrypted
 unfocus
 Unicast
 UniFlash
 UnitLocalization
 unpair
 unprovisioned
+Unsecure
 untrusted
 updateAvailable
 updateNotAvailable
@@ -1413,6 +1419,7 @@ ver
 Verifier
 Verifiers
 VID
+vids
 virtualenv
 visualstudio
 vlatest

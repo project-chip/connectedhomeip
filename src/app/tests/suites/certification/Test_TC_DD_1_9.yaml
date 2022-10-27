@@ -27,13 +27,23 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          Chip-tool command used below are an example to verify the DUT as commissioner test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Preconditions"
+      verification: |
+          Manual Pairing Code is printed on the device or in additional provided materials (ex: manual)
+      disabled: true
+
     - label:
           "Provide the 11-digit/21-digit Manual Pairing Code from the TH Device
           in text, speech or any format supported by DUT"
       verification: |
           1. Launch all-clusters-app on the raspi , get the Manual Pairing code from the log
 
-          ubuntu@matter-7:~/Apr18_dut/connectedhomeip/examples/all-clusters-app/linux/out/all-clusters-app$ sudo ./chip-all-clusters-app --wifi
+          $ sudo ./chip-all-clusters-app --wifi
 
           [13293:13293] CHIP:DL: Device Configuration:
           [1653306603.740569][13293:13293] CHIP:DL:   Serial Number: TEST_SN
@@ -57,9 +67,9 @@ tests:
 
 
           2. Parse 11-digit Manual Pairing code
-          ubuntu@matter-7:~/Apr18_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool payload parse-setup-payload 34970112332
+          $ ./chip-tool payload parse-setup-payload 34970112332
 
-          Verify in DUT as client side:
+          Verify in DUT as commissioner side:
           CHIP:SPL: Parsing decimalRepresentation: 34970112332
           CHIP:SPL: CommissioningFlow: 0
           CHIP:SPL: VendorID: 0
@@ -70,9 +80,9 @@ tests:
           CHIP:SPL: RendezvousInformation: 0
 
           3. Parse 21-digit Manual Pairing code
-          ubuntu@matter-7:~/Apr18_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool payload parse-setup-payload 749701123365521327694
+          $ ./chip-tool payload parse-setup-payload 749701123365521327694
 
-          Verify in DUT as client side:
+          Verify in DUT as commissoiner side:
           CHIP:SPL: Parsing decimalRepresentation: 749701123365521327694
           CHIP:SPL: CommissioningFlow: 2
           CHIP:SPL: VendorID: 65521
@@ -85,13 +95,13 @@ tests:
           4. Parse payload by commissioning the TH
           ./chip-tool pairing code 1 34970112332
 
-          Verify in DUT as client side:
+          Verify in DUT as commissioner side:
           [1653556303.582797][4071:4076] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
           [1653556303.582850][4071:4076] CHIP:CTL: Received CommissioningComplete response, errorCode=0
-          [1653556303.582891][4071:4076] CHIP:CTL: Successfully finished commissioning step "SendComplete"
-          [1653556303.582927][4071:4076] CHIP:CTL: Commissioning stage next step: "SendComplete" -> "Cleanup"
-          [1653556303.582964][4071:4076] CHIP:CTL: Performing next commissioning step "Cleanup"
-          [1653556303.583040][4071:4076] CHIP:CTL: Successfully finished commissioning step "Cleanup"
+          [1653556303.582891][4071:4076] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+          [1653556303.582927][4071:4076] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1653556303.582964][4071:4076] CHIP:CTL: Performing next commissioning step 'Cleanup'
+          [1653556303.583040][4071:4076] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
           [1653556303.583110][4071:4076] CHIP:TOO: Device commissioning completed with success
           [1653556303.583209][4071:4076] CHIP:DMG: ICR moving to [AwaitingDe]
           [1653556303.583255][4071:4076] CHIP:EM: Sending Standalone Ack for MessageCounter:9735725 on exchange 24476i

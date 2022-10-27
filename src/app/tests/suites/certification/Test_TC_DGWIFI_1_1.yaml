@@ -48,15 +48,27 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "TH reads the FeatureMap from DUT"
-      PICS: DGWIFI.S.F00 || DGWIFI.S.F01
+    - label:
+          "Given DGWIFI.S.F00(PacketCounts) ensure featuremap has the correct
+          bit set"
+      PICS: DGWIFI.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           constraints:
               type: bitmap32
-              minValue: 1
-              maxValue: 3
+              hasMasksSet: [0x1]
+
+    - label:
+          "Given DGWIFI.S.F01(ErrorCounts) ensure featuremap has the correct bit
+          set"
+      PICS: DGWIFI.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
 
     - label: "TH reads AttributeList from DUT"
       command: "readAttribute"

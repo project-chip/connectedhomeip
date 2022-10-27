@@ -24,8 +24,11 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
+
+#ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
 #include "sl_simple_led_instances.h"
+#endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"
@@ -34,6 +37,7 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
+#include "EFR32DeviceDataProvider.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
@@ -43,7 +47,6 @@
 #include <assert.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/EFR32/freertos_bluetooth.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -72,7 +75,9 @@
 #define APP_EVENT_QUEUE_SIZE 10
 #define EXAMPLE_VENDOR_ID 0xcafe
 
+#ifdef ENABLE_WSTK_LEDS
 #define SYSTEM_STATE_LED &sl_led_led0
+#endif // ENABLE_WSTK_LEDS
 
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 
@@ -91,7 +96,9 @@ TimerHandle_t sLightTimer;
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
+#ifdef ENABLE_WSTK_LEDS
 LEDWidget sStatusLED;
+#endif // ENABLE_WSTK_LEDS
 
 #ifdef SL_WIFI
 app::Clusters::NetworkCommissioning::Instance
@@ -156,7 +163,7 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
 
     if (identifyObj == nullptr)
     {
-        EFR32_LOG("funct timer create failed");
+        EFR32_LOG("Invalid Identify Object!");
         appError(CHIP_ERROR_INVALID_ARGUMENT);
     }
 
@@ -205,29 +212,31 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
 
     EFR32_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
+#ifdef ENABLE_WSTK_LEDS
     LEDWidget::InitGpio();
     sStatusLED.Init(SYSTEM_STATE_LED);
+#endif // ENABLE_WSTK_LEDS
 
     ConfigurationMgr().LogDeviceConfig();
 
-// Print setup info on LCD if available
-#ifdef QR_CODE_ENABLED
     // Create buffer for QR code that can fit max size and null terminator.
     char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     chip::MutableCharSpan QRCode(qrCodeBuffer);
 
-    if (GetQRCode(QRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
+    if (EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(QRCode) == CHIP_NO_ERROR)
     {
+        // Print setup info on LCD if available
+#ifdef QR_CODE_ENABLED
         slLCD.SetQRCode((uint8_t *) QRCode.data(), QRCode.size());
         slLCD.ShowQRCode(true, true);
+#else
+        PrintQrCodeURL(QRCode);
+#endif // QR_CODE_ENABLED
     }
     else
     {
         EFR32_LOG("Getting QR code failed!");
     }
-#else
-    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
-#endif // QR_CODE_ENABLED
 
     return err;
 }
@@ -264,10 +273,12 @@ void BaseApplication::FunctionEventHandler(AppEvent * aEvent)
 
         mFunction = kFunction_FactoryReset;
 
+#ifdef ENABLE_WSTK_LEDS
         // Turn off all LEDs before starting blink to make sure blink is
         // co-ordinated.
         sStatusLED.Set(false);
         sStatusLED.Blink(500);
+#endif // ENABLE_WSTK_LEDS
     }
     else if (mFunctionTimerActive && mFunction == kFunction_FactoryReset)
     {
@@ -323,21 +334,29 @@ void BaseApplication::LightEventHandler()
     {
         if ((gIdentifyptr != nullptr) && (gIdentifyptr->mActive))
         {
+#ifdef ENABLE_WSTK_LEDS
             sStatusLED.Blink(250, 250);
+#endif // ENABLE_WSTK_LEDS
         }
         else if (sIdentifyEffect != EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT)
         {
             if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK)
             {
+#ifdef ENABLE_WSTK_LEDS
                 sStatusLED.Blink(50, 50);
+#endif // ENABLE_WSTK_LEDS
             }
             if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE)
             {
+#ifdef ENABLE_WSTK_LEDS
                 sStatusLED.Blink(1000, 1000);
+#endif // ENABLE_WSTK_LEDS
             }
             if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY)
             {
+#ifdef ENABLE_WSTK_LEDS
                 sStatusLED.Blink(300, 700);
+#endif // ENABLE_WSTK_LEDS
             }
         }
 #if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
@@ -345,25 +364,35 @@ void BaseApplication::LightEventHandler()
         {
             if (sIsAttached)
             {
+#ifdef ENABLE_WSTK_LEDS
                 sStatusLED.Set(true);
+#endif // ENABLE_WSTK_LEDS
             }
             else
             {
+#ifdef ENABLE_WSTK_LEDS
                 sStatusLED.Blink(950, 50);
+#endif
             }
         }
         else if (sHaveBLEConnections)
         {
+#ifdef ENABLE_WSTK_LEDS
             sStatusLED.Blink(100, 100);
+#endif // ENABLE_WSTK_LEDS
         }
         else
         {
+#ifdef ENABLE_WSTK_LEDS
             sStatusLED.Blink(50, 950);
+#endif // ENABLE_WSTK_LEDS
         }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SED
     }
 
+#ifdef ENABLE_WSTK_LEDS
     sStatusLED.Animate();
+#endif // ENABLE_WSTK_LEDS
 }
 
 void BaseApplication::ButtonHandler(AppEvent * aEvent)
@@ -385,7 +414,8 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
     }
     else
     {
-        // If the button was released before factory reset got initiated, start BLE advertissement in fast mode
+        // If the button was released before factory reset got initiated, open the commissioning window and start BLE advertissement
+        // in fast mode
         if (mFunctionTimerActive && mFunction == kFunction_StartBleAdv)
         {
             CancelFunctionTimer();
@@ -402,9 +432,14 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             if (!ConnectivityMgr().IsThreadProvisioned())
 #endif /* !SL_WIFI */
             {
-                // Enable BLE advertisements
-                ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-                ConnectivityMgr().SetBLEAdvertisingMode(ConnectivityMgr().kFastAdvertising);
+                // Open Basic CommissioningWindow. Will start BLE advertisements
+                chip::DeviceLayer::PlatformMgr().LockChipStack();
+                CHIP_ERROR err = chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+                chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+                if (err != CHIP_NO_ERROR)
+                {
+                    EFR32_LOG("Failed to open the Basic Commissioning Window");
+                }
             }
             else { EFR32_LOG("Network is already provisioned, Ble advertissement not enabled"); }
         }
@@ -466,7 +501,10 @@ void BaseApplication::StartStatusLEDTimer()
 
 void BaseApplication::StopStatusLEDTimer()
 {
+#ifdef ENABLE_WSTK_LEDS
     sStatusLED.Set(false);
+#endif // ENABLE_WSTK_LEDS
+
     if (xTimerStop(sLightTimer, 100) != pdPASS)
     {
         EFR32_LOG("Light Time start failed");

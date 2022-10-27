@@ -40,15 +40,6 @@ tests:
               type: int16u
 
     - label: "Read the global attribute: FeatureMap"
-      PICS: PRS.S.F00
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          value: 1
-          constraints:
-              type: bitmap32
-
-    - label: "Read the global attribute: FeatureMap"
       PICS: " !PRS.S.F00 "
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -56,6 +47,15 @@ tests:
           value: 0
           constraints:
               type: bitmap32
+
+    - label: "Given PRS.S.F00(EXT) ensure featuremap has the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: PRS.S.F00
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
 
     - label: "Read the global mandatory attribute: AttributeList"
       command: "readAttribute"

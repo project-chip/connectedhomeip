@@ -142,7 +142,10 @@ protected:
 
         Protocols::SecureChannel::StatusReport statusReport(generalCode, Protocols::SecureChannel::Id, protocolCode);
 
-        Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(statusReport.Size()));
+        auto handle = System::PacketBufferHandle::New(statusReport.Size());
+        VerifyOrReturn(!handle.IsNull(), ChipLogError(SecureChannel, "Failed to allocate status report message"));
+        Encoding::LittleEndian::PacketBufferWriter bbuf(std::move(handle));
+
         statusReport.WriteToBuffer(bbuf);
 
         System::PacketBufferHandle msg = bbuf.Finalize();
@@ -191,6 +194,12 @@ protected:
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     void Clear();
+
+    /**
+     * Notify our delegate about a session establishment error, if we have not
+     * notified it of an error or success before.
+     */
+    void NotifySessionEstablishmentError(CHIP_ERROR error);
 
 protected:
     CryptoContext::SessionRole mRole;

@@ -31,7 +31,7 @@ tests:
 
     - label: "Commission DUT to TH"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT reads RxTotalCount attribute value from TH"

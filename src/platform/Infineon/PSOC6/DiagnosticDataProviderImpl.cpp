@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 
 #include "cyhal_system.h"
 #include <cy_lwip.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Infineon/PSOC6/DiagnosticDataProviderImpl.h>
@@ -249,7 +250,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wiFiVersion)
     whd_security_t security;
     cy_rslt_t result = CY_RSLT_SUCCESS;
 
-    if (whd_wifi_get_ap_info(whd_ifs[CY_WCM_INTERFACE_TYPE_STA], &bss_info, &security) != CY_RSLT_SUCCESS)
+    result = whd_wifi_get_ap_info(whd_ifs[CY_WCM_INTERFACE_TYPE_STA], &bss_info, &security);
+    if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "whd_wifi_get_ap_info failed: %d", (int) result);
         SuccessOrExit(CHIP_ERROR_INTERNAL);
@@ -565,8 +567,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
         {
             ThreadMetrics * thread = (ThreadMetrics *) pvPortMalloc(sizeof(ThreadMetrics));
 
-            strncpy(thread->NameBuf, taskStatusArray[x].pcTaskName, kMaxThreadNameLength - 1);
-            thread->NameBuf[kMaxThreadNameLength] = '\0';
+            Platform::CopyString(thread->NameBuf, taskStatusArray[x].pcTaskName);
             thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
             thread->id = taskStatusArray[x].xTaskNumber;
 

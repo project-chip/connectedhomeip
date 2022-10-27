@@ -184,8 +184,8 @@ typedef void (*CHIPBinaryInputBasicClusterFeatureMapAttributeCallbackType)(
 typedef void (*CHIPBinaryInputBasicClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::BinaryInputBasic::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
-typedef void (*CHIPDescriptorClusterDeviceListAttributeCallbackType)(
-    void *, const chip::app::Clusters::Descriptor::Attributes::DeviceList::TypeInfo::DecodableType &);
+typedef void (*CHIPDescriptorClusterDeviceTypeListAttributeCallbackType)(
+    void *, const chip::app::Clusters::Descriptor::Attributes::DeviceTypeList::TypeInfo::DecodableType &);
 typedef void (*CHIPDescriptorClusterServerListAttributeCallbackType)(
     void *, const chip::app::Clusters::Descriptor::Attributes::ServerList::TypeInfo::DecodableType &);
 typedef void (*CHIPDescriptorClusterClientListAttributeCallbackType)(
@@ -1282,8 +1282,8 @@ typedef void (*CHIPColorControlClusterDriftCompensationAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::DriftCompensation::TypeInfo::DecodableArgType);
 typedef void (*CHIPColorControlClusterCompensationTextAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::CompensationText::TypeInfo::DecodableArgType);
-typedef void (*CHIPColorControlClusterColorTemperatureAttributeCallbackType)(
-    void *, chip::app::Clusters::ColorControl::Attributes::ColorTemperature::TypeInfo::DecodableArgType);
+typedef void (*CHIPColorControlClusterColorTemperatureMiredsAttributeCallbackType)(
+    void *, chip::app::Clusters::ColorControl::Attributes::ColorTemperatureMireds::TypeInfo::DecodableArgType);
 typedef void (*CHIPColorControlClusterColorModeAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::ColorMode::TypeInfo::DecodableArgType);
 typedef void (*CHIPColorControlClusterOptionsAttributeCallbackType)(
@@ -1963,14 +1963,3 @@ typedef void (*CHIPTestClusterClusterFeatureMapAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
-
-typedef void (*CHIPFaultInjectionClusterGeneratedCommandListAttributeCallbackType)(
-    void *, const chip::app::Clusters::FaultInjection::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
-typedef void (*CHIPFaultInjectionClusterAcceptedCommandListAttributeCallbackType)(
-    void *, const chip::app::Clusters::FaultInjection::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
-typedef void (*CHIPFaultInjectionClusterAttributeListAttributeCallbackType)(
-    void *, const chip::app::Clusters::FaultInjection::Attributes::AttributeList::TypeInfo::DecodableType &);
-typedef void (*CHIPFaultInjectionClusterFeatureMapAttributeCallbackType)(
-    void *, chip::app::Clusters::FaultInjection::Attributes::FeatureMap::TypeInfo::DecodableArgType);
-typedef void (*CHIPFaultInjectionClusterClusterRevisionAttributeCallbackType)(
-    void *, chip::app::Clusters::FaultInjection::Attributes::ClusterRevision::TypeInfo::DecodableArgType);

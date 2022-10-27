@@ -14,10 +14,10 @@
 #import <setup_payload/SetupPayload.h>
 #endif
 
-@interface MTRSetupPayload () <NSSecureCoding>
+@interface MTRSetupPayload ()
 
 #ifdef __cplusplus
-- (id)initWithSetupPayload:(chip::SetupPayload)setupPayload;
+- (instancetype)initWithSetupPayload:(chip::SetupPayload)setupPayload;
 - (NSNumber *)convertRendezvousFlags:(const chip::Optional<chip::RendezvousInformationFlags> &)value;
 - (MTRCommissioningFlow)convertCommissioningFlow:(chip::CommissioningFlow)value;
 #endif

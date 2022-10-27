@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Identify
- *
+ *    Attributes and commands for putting a device into Identification mode (e.g. flashing a light).
  */
 @interface MTRBaseClusterIdentify : MTRCluster
 
@@ -178,7 +178,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Groups
- *
+ *    Attributes and commands for group configuration and manipulation.
  */
 @interface MTRBaseClusterGroups : MTRCluster
 
@@ -319,7 +319,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Scenes
- *
+ *    Attributes and commands for scene configuration and manipulation.
  */
 @interface MTRBaseClusterScenes : MTRCluster
 
@@ -559,7 +559,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster On/Off
- *
+ *    Attributes and commands for switching devices between 'On' and 'Off' states.
  */
 @interface MTRBaseClusterOnOff : MTRCluster
 
@@ -773,7 +773,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster On/off Switch Configuration
- *
+ *    Attributes and commands for configuring On/Off switching devices.
  */
 @interface MTRBaseClusterOnOffSwitchConfiguration : MTRCluster
 
@@ -918,7 +918,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Level Control
- *
+ *    Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.'
  */
 @interface MTRBaseClusterLevelControl : MTRCluster
 
@@ -1315,7 +1315,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Binary Input (Basic)
- *
+ *    An interface for reading the value of a binary measurement and accessing various characteristics of that measurement.
  */
 @interface MTRBaseClusterBinaryInputBasic : MTRCluster
 
@@ -1601,7 +1601,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Descriptor
- *
+ *    The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its
+ * endpoints and clusters.
  */
 @interface MTRBaseClusterDescriptor : MTRCluster
 
@@ -1771,7 +1772,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Binding
- *
+ *    The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table.
  */
 @interface MTRBaseClusterBinding : MTRCluster
 
@@ -1897,7 +1898,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Access Control
- *
+ *    The Access Control Cluster exposes a data model view of a
+      Node's Access Control List (ACL), which codifies the rules used to manage
+      and enforce Access Control for the Node's endpoints and their associated
+      cluster instances.
  */
 @interface MTRBaseClusterAccessControl : MTRCluster
 
@@ -2100,7 +2104,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Actions
- *
+ *    This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information.
  */
 @interface MTRBaseClusterActions : MTRCluster
 
@@ -2276,7 +2280,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Basic
- *
+ *    This cluster provides attributes and events for determining basic information about Nodes, which supports both
+      Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
+      which apply to the whole Node. Also allows setting user device information such as location.
  */
 @interface MTRBaseClusterBasic : MTRCluster
 
@@ -2745,7 +2751,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster OTA Software Update Provider
- *
+ *    Provides an interface for providing OTA software updates
  */
 @interface MTRBaseClusterOtaSoftwareUpdateProvider : MTRCluster
 
@@ -2860,7 +2866,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster OTA Software Update Requestor
- *
+ *    Provides an interface for downloading and applying OTA software updates
  */
 @interface MTRBaseClusterOtaSoftwareUpdateRequestor : MTRCluster
 
@@ -3047,7 +3053,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Localization Configuration
- *
+ *    Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing common languages, units of measurements, and numerical formatting
+      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
+      they can be configured to use a user’s preferred language, units, etc
  */
 @interface MTRBaseClusterLocalizationConfiguration : MTRCluster
 
@@ -3193,7 +3202,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Time Format Localization
- *
+ *    Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing preferences for how dates and times are conveyed. As such, Nodes that visually
+      or audibly convey time information need a mechanism by which they can be configured to use a
+      user’s preferred format.
  */
 @interface MTRBaseClusterTimeFormatLocalization : MTRCluster
 
@@ -3361,7 +3373,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Unit Localization
- *
+ *    Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing preferences for the units in which values are conveyed in communication to a
+      user. As such, Nodes that visually or audibly convey measurable values to the user need a
+      mechanism by which they can be configured to use a user’s preferred unit.
  */
 @interface MTRBaseClusterUnitLocalization : MTRCluster
 
@@ -3489,7 +3504,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Power Source Configuration
- *
+ *    This cluster is used to describe the configuration and capabilities of a Device's power system.
  */
 @interface MTRBaseClusterPowerSourceConfiguration : MTRCluster
 
@@ -3610,7 +3625,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Power Source
- *
+ *    This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the
+ * Node.
  */
 @interface MTRBaseClusterPowerSource : MTRCluster
 
@@ -4276,7 +4292,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster General Commissioning
- *
+ *    This cluster is used to manage global aspects of the Commissioning flow.
  */
 @interface MTRBaseClusterGeneralCommissioning : MTRCluster
 
@@ -4493,7 +4509,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Network Commissioning
- *
+ *    Functionality to configure, enable, disable network credentials and access on a Matter device.
  */
 @interface MTRBaseClusterNetworkCommissioning : MTRCluster
 
@@ -4765,7 +4781,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Diagnostic Logs
- *
+ *    The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics.
  */
 @interface MTRBaseClusterDiagnosticLogs : MTRCluster
 
@@ -4875,7 +4891,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster General Diagnostics
- *
+ *    The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics
+ * metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.
  */
 @interface MTRBaseClusterGeneralDiagnostics : MTRCluster
 
@@ -5145,7 +5162,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Software Diagnostics
- *
+ *    The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to
+ * assist a user or Administrative Node in diagnosing potential problems.
  */
 @interface MTRBaseClusterSoftwareDiagnostics : MTRCluster
 
@@ -5328,7 +5346,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Thread Network Diagnostics
- *
+ *    The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node
+ * to assist a user or Administrative Node in diagnosing potential problems
  */
 @interface MTRBaseClusterThreadNetworkDiagnostics : MTRCluster
 
@@ -6579,7 +6598,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster WiFi Network Diagnostics
- *
+ *    The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node
+ * to assist a user or Administrative Node in diagnosing potential problems.
  */
 @interface MTRBaseClusterWiFiNetworkDiagnostics : MTRCluster
 
@@ -6920,7 +6940,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Ethernet Network Diagnostics
- *
+ *    The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a
+ * Node to assist a user or Administrative Node in diagnosing potential problems.
  */
 @interface MTRBaseClusterEthernetNetworkDiagnostics : MTRCluster
 
@@ -7188,7 +7209,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Bridged Device Basic
- *
+ *    This Cluster serves two purposes towards a Node communicating with a Bridge: indicate that the functionality on
+          the Endpoint where it is placed (and its Parts) is bridged from a non-CHIP technology; and provide a centralized
+          collection of attributes that the Node MAY collect to aid in conveying information regarding the Bridged Device to a user,
+          such as the vendor name, the model name, or user-assigned name.
  */
 @interface MTRBaseClusterBridgedDeviceBasic : MTRCluster
 
@@ -7558,7 +7582,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Switch
- *
+ *    This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
+Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button),
+distinguished with their feature flags. Interactions with the switch device are exposed as attributes (for the latching switch) and
+as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the
+interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a
+light or a window shade.
  */
 @interface MTRBaseClusterSwitch : MTRCluster
 
@@ -7718,7 +7747,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster AdministratorCommissioning
- *
+ *    Commands to trigger a Node to allow a new Administrator to commission it.
  */
 @interface MTRBaseClusterAdministratorCommissioning : MTRCluster
 
@@ -7886,7 +7915,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Operational Credentials
- *
+ *    This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated
+ * Fabrics.
  */
 @interface MTRBaseClusterOperationalCredentials : MTRCluster
 
@@ -8122,7 +8152,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Group Key Management
- *
+ *    The Group Key Management Cluster is the mechanism by which group keys are managed.
  */
 @interface MTRBaseClusterGroupKeyManagement : MTRCluster
 
@@ -8313,7 +8343,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Fixed Label
- *
+ *    The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
+labels.
  */
 @interface MTRBaseClusterFixedLabel : MTRCluster
 
@@ -8435,7 +8466,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster User Label
- *
+ *    The User Label Cluster provides a feature to tag an endpoint with zero or more labels.
  */
 @interface MTRBaseClusterUserLabel : MTRCluster
 
@@ -8561,7 +8592,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Boolean State
- *
+ *    This cluster provides an interface to a boolean state called StateValue.
  */
 @interface MTRBaseClusterBooleanState : MTRCluster
 
@@ -8684,7 +8715,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Mode Select
- *
+ *    Attributes and commands for selecting a mode from a list of supported options.
  */
 @interface MTRBaseClusterModeSelect : MTRCluster
 
@@ -8903,7 +8934,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Door Lock
- *
+ *    An interface to a generic way to secure a door
  */
 @interface MTRBaseClusterDoorLock : MTRCluster
 
@@ -9787,7 +9818,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Window Covering
- *
+ *    Provides an interface for controlling and adjusting automatic window coverings.
  */
 @interface MTRBaseClusterWindowCovering : MTRCluster
 
@@ -10321,7 +10352,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Barrier Control
- *
+ *    This cluster provides control of a barrier (garage door).
  */
 @interface MTRBaseClusterBarrierControl : MTRCluster
 
@@ -10643,7 +10674,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Pump Configuration and Control
- *
+ *    An interface for configuring and controlling pumps.
  */
 @interface MTRBaseClusterPumpConfigurationAndControl : MTRCluster
 
@@ -11170,7 +11201,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Thermostat
- *
+ *    An interface for configuring and controlling the functionality of a thermostat.
  */
 @interface MTRBaseClusterThermostat : MTRCluster
 
@@ -12310,7 +12341,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Fan Control
- *
+ *    An interface for controlling a fan in a heating/cooling system.
  */
 @interface MTRBaseClusterFanControl : MTRCluster
 
@@ -12630,7 +12661,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Thermostat User Interface Configuration
- *
+ *    An interface for configuring the user interface of a thermostat (which may be remote from the thermostat).
  */
 @interface MTRBaseClusterThermostatUserInterfaceConfiguration : MTRCluster
 
@@ -12806,7 +12837,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Color Control
- *
+ *    Attributes and commands for controlling the color properties of a color-capable light.
  */
 @interface MTRBaseClusterColorControl : MTRCluster
 
@@ -12969,23 +13000,24 @@ NS_ASSUME_NONNULL_BEGIN
                                       completionHandler:
                                           (void (^)(NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeColorTemperatureWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                               NSError * _Nullable error))completionHandler;
+- (void)readAttributeColorTemperatureMiredsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * MTRSubscribeParams.
  */
-- (void)subscribeAttributeColorTemperatureWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                              maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                   params:(MTRSubscribeParams * _Nullable)params
-                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                            reportHandler:
-                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeColorTemperatureWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                               endpoint:(NSNumber *)endpoint
-                                                  queue:(dispatch_queue_t)queue
-                                      completionHandler:
-                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeColorTemperatureMiredsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                         params:(MTRSubscribeParams * _Nullable)params
+                                        subscriptionEstablished:
+                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                  reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))reportHandler;
++ (void)readAttributeColorTemperatureMiredsWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                                     endpoint:(NSNumber *)endpoint
+                                                        queue:(dispatch_queue_t)queue
+                                            completionHandler:
+                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeColorModeWithCompletionHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -13912,7 +13944,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Ballast Configuration
- *
+ *    Attributes and commands for configuring a lighting ballast.
  */
 @interface MTRBaseClusterBallastConfiguration : MTRCluster
 
@@ -14310,7 +14342,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Illuminance Measurement
- *
+ *    Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements.
  */
 @interface MTRBaseClusterIlluminanceMeasurement : MTRCluster
 
@@ -14504,7 +14536,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Temperature Measurement
- *
+ *    Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements.
  */
 @interface MTRBaseClusterTemperatureMeasurement : MTRCluster
 
@@ -14680,7 +14712,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Pressure Measurement
- *
+ *    Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements.
  */
 @interface MTRBaseClusterPressureMeasurement : MTRCluster
 
@@ -14942,7 +14974,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Flow Measurement
- *
+ *    Attributes and commands for configuring the measurement of flow, and reporting flow measurements.
  */
 @interface MTRBaseClusterFlowMeasurement : MTRCluster
 
@@ -15118,7 +15150,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Relative Humidity Measurement
- *
+ *    Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements.
  */
 @interface MTRBaseClusterRelativeHumidityMeasurement : MTRCluster
 
@@ -15294,7 +15326,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Occupancy Sensing
- *
+ *    Attributes and commands for configuring occupancy sensing, and reporting occupancy status.
  */
 @interface MTRBaseClusterOccupancySensing : MTRCluster
 
@@ -15674,7 +15706,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Wake on LAN
- *
+ *    This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol.
  */
 @interface MTRBaseClusterWakeOnLan : MTRCluster
 
@@ -15797,7 +15829,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Channel
- *
+ *    This cluster provides an interface for controlling the current Channel on a device.
  */
 @interface MTRBaseClusterChannel : MTRCluster
 
@@ -15963,7 +15995,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Target Navigator
- *
+ *    This cluster provides an interface for UX navigation within a set of targets on a device or endpoint.
  */
 @interface MTRBaseClusterTargetNavigator : MTRCluster
 
@@ -16107,7 +16139,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Media Playback
- *
+ *    This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or
+ * Speaker.
  */
 @interface MTRBaseClusterMediaPlayback : MTRCluster
 
@@ -16385,7 +16418,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Media Input
- *
+ *    This cluster provides an interface for controlling the Input Selector on a media device such as a TV.
  */
 @interface MTRBaseClusterMediaInput : MTRCluster
 
@@ -16534,7 +16567,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Low Power
- *
+ *    This cluster provides an interface for managing low power mode on a device.
  */
 @interface MTRBaseClusterLowPower : MTRCluster
 
@@ -16643,7 +16676,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Keypad Input
- *
+ *    This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT.
  */
 @interface MTRBaseClusterKeypadInput : MTRCluster
 
@@ -16753,7 +16786,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Content Launcher
- *
+ *    This cluster provides an interface for launching content on a media player device such as a TV or Speaker.
  */
 @interface MTRBaseClusterContentLauncher : MTRCluster
 
@@ -16907,7 +16940,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Audio Output
- *
+ *    This cluster provides an interface for controlling the Output on a media device such as a TV.
  */
 @interface MTRBaseClusterAudioOutput : MTRCluster
 
@@ -17052,7 +17085,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Application Launcher
- *
+ *    This cluster provides an interface for launching content on a media player device such as a TV or Speaker.
  */
 @interface MTRBaseClusterApplicationLauncher : MTRCluster
 
@@ -17208,7 +17241,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Application Basic
- *
+ *    This cluster provides information about an application running on a TV or media player device which is represented as an
+ * endpoint.
  */
 @interface MTRBaseClusterApplicationBasic : MTRCluster
 
@@ -17452,7 +17486,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Account Login
- *
+ *    This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App
+ * running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make
+ * the user account on the Content App match the user account on the Client.
  */
 @interface MTRBaseClusterAccountLogin : MTRCluster
 
@@ -17566,7 +17602,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Electrical Measurement
- *
+ *    Attributes related to the electrical properties of a device. This cluster is used by power outlets and other devices that need
+ * to provide instantaneous data as opposed to metrology data which should be retrieved from the metering cluster..
  */
 @interface MTRBaseClusterElectricalMeasurement : MTRCluster
 
@@ -20079,7 +20116,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Test Cluster
- *
+ *    The Test Cluster is meant to validate the generated code
  */
 @interface MTRBaseClusterTestCluster : MTRCluster
 
@@ -21890,116 +21927,33 @@ NS_ASSUME_NONNULL_BEGIN
                                                    completionHandler:(void (^)(NSNumber * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                   NSError * _Nullable error))completionHandler;
+- (void)readAttributeWriteOnlyInt8uWithCompletionHandler:
+    (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+- (void)writeAttributeWriteOnlyInt8uWithValue:(NSNumber * _Nonnull)value
+                            completionHandler:(StatusCompletion)completionHandler
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+- (void)writeAttributeWriteOnlyInt8uWithValue:(NSNumber * _Nonnull)value
+                                       params:(MTRWriteParams * _Nullable)params
+                            completionHandler:(StatusCompletion)completionHandler
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 /**
  * This API does not support setting autoResubscribe to NO in the
  * MTRSubscribeParams.
  */
-- (void)subscribeAttributeGeneratedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                       params:(MTRSubscribeParams * _Nullable)params
-                                      subscriptionEstablished:
-                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                reportHandler:
-                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeGeneratedCommandListWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                                   endpoint:(NSNumber *)endpoint
-                                                      queue:(dispatch_queue_t)queue
-                                          completionHandler:
-                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeAcceptedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                  NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * MTRSubscribeParams.
- */
-- (void)subscribeAttributeAcceptedCommandListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                      params:(MTRSubscribeParams * _Nullable)params
-                                     subscriptionEstablished:
-                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                               reportHandler:
-                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeAcceptedCommandListWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                                  endpoint:(NSNumber *)endpoint
-                                                     queue:(dispatch_queue_t)queue
-                                         completionHandler:
-                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
-                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * MTRSubscribeParams.
- */
-- (void)subscribeAttributeAttributeListWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                           maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                params:(MTRSubscribeParams * _Nullable)params
-                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                         reportHandler:
-                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeAttributeListWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                            endpoint:(NSNumber *)endpoint
-                                               queue:(dispatch_queue_t)queue
-                                   completionHandler:
-                                       (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
-                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * MTRSubscribeParams.
- */
-- (void)subscribeAttributeFeatureMapWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                        maxInterval:(NSNumber * _Nonnull)maxInterval
-                                             params:(MTRSubscribeParams * _Nullable)params
-                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeFeatureMapWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                         endpoint:(NSNumber *)endpoint
-                                            queue:(dispatch_queue_t)queue
-                                completionHandler:
-                                    (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                              NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * MTRSubscribeParams.
- */
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                             maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                  params:(MTRSubscribeParams * _Nullable)params
-                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                           reportHandler:
-                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeClusterRevisionWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                              endpoint:(NSNumber *)endpoint
-                                                 queue:(dispatch_queue_t)queue
-                                     completionHandler:
-                                         (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-/**
- * Cluster Fault Injection
- *
- */
-@interface MTRBaseClusterFaultInjection : MTRCluster
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
-
-- (void)failAtFaultWithParams:(MTRFaultInjectionClusterFailAtFaultParams *)params
-            completionHandler:(StatusCompletion)completionHandler;
-- (void)failRandomlyAtFaultWithParams:(MTRFaultInjectionClusterFailRandomlyAtFaultParams *)params
-                    completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeWriteOnlyInt8uWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(MTRSubscribeParams * _Nullable)params
+                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                          reportHandler:
+                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
++ (void)readAttributeWriteOnlyInt8uWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                             endpoint:(NSNumber *)endpoint
+                                                queue:(dispatch_queue_t)queue
+                                    completionHandler:
+                                        (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
@@ -22603,6 +22557,14 @@ typedef NS_ENUM(uint8_t, MTRTimeSynchronizationTimeSource) {
     MTRTimeSynchronizationTimeSourcePtp = 0x0F,
     MTRTimeSynchronizationTimeSourceGnss = 0x10,
 };
+
+typedef NS_OPTIONS(uint32_t, MTRSwitchFeature) {
+    MTRSwitchFeatureLatchingSwitch = 0x1,
+    MTRSwitchFeatureMomentarySwitch = 0x2,
+    MTRSwitchFeatureMomentarySwitchRelease = 0x4,
+    MTRSwitchFeatureMomentarySwitchLongPress = 0x8,
+    MTRSwitchFeatureMomentarySwitchMultiPress = 0x10,
+} API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 typedef NS_ENUM(uint8_t, MTRAdministratorCommissioningCommissioningWindowStatus) {
     MTRAdministratorCommissioningCommissioningWindowStatusWindowNotOpen = 0x00,
@@ -23295,6 +23257,11 @@ typedef NS_ENUM(uint8_t, MTRMediaPlaybackPlaybackState) {
     MTRMediaPlaybackPlaybackStateNotPlaying = 0x02,
     MTRMediaPlaybackPlaybackStateBuffering = 0x03,
 };
+
+typedef NS_OPTIONS(uint32_t, MTRMediaPlaybackFeature) {
+    MTRMediaPlaybackFeatureAdvancedSeek = 0x1,
+    MTRMediaPlaybackFeatureVariableSpeed = 0x2,
+} API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 typedef NS_ENUM(uint8_t, MTRMediaInputInputType) {
     MTRMediaInputInputTypeInternal = 0x00,

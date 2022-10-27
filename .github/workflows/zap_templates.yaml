@@ -25,11 +25,11 @@ concurrency:
 jobs:
     zap_templates:
         name: ZAP templates generation
-        timeout-minutes: 60
+        timeout-minutes: 90
 
         runs-on: ubuntu-20.04
         container:
-            image: connectedhomeip/chip-build-zap:0.5.91
+            image: connectedhomeip/chip-build-zap:0.6.03
         defaults:
             run:
                 shell: sh
@@ -55,7 +55,6 @@ jobs:
                   npm rebuild canvas --update-binary
                   npm run build-spa
             - name: Generate all
-              timeout-minutes: 30
               run: scripts/tools/zap_regen_all.py
             - name: Check for uncommited changes
               run: |

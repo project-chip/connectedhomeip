@@ -25,7 +25,6 @@
 
 #include "ti_drivers_config.h"
 
-#include <ti/devices/DeviceFamily.h>
 #include <ti/drivers/AESECB.h>
 #include <ti/drivers/cryptoutils/cryptokey/CryptoKeyPlaintext.h>
 

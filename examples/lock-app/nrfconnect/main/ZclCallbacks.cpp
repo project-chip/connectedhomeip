@@ -77,12 +77,28 @@ bool emberAfPluginDoorLockSetCredential(EndpointId endpointId, uint16_t credenti
 
 bool emberAfPluginDoorLockOnDoorLockCommand(EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
 {
-    return BoltLockMgr().ValidatePIN(pinCode, err);
+    bool result = BoltLockMgr().ValidatePIN(pinCode, err);
+
+    /* Handle changing attribute state on command reception */
+    if (result)
+    {
+        BoltLockMgr().Lock(BoltLockManager::OperationSource::kRemote);
+    }
+
+    return result;
 }
 
 bool emberAfPluginDoorLockOnDoorUnlockCommand(EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
 {
-    return BoltLockMgr().ValidatePIN(pinCode, err);
+    bool result = BoltLockMgr().ValidatePIN(pinCode, err);
+
+    /* Handle changing attribute state on command reception */
+    if (result)
+    {
+        BoltLockMgr().Unlock(BoltLockManager::OperationSource::kRemote);
+    }
+
+    return result;
 }
 
 void emberAfDoorLockClusterInitCallback(EndpointId endpoint)

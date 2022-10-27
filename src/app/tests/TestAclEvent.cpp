@@ -16,12 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements unit tests for CHIP Interaction Model Read Interaction
- *
- */
-
 #include "lib/support/CHIPMem.h"
 #include <access/AccessControl.h>
 #include <app/AttributeAccessInterface.h>
@@ -55,7 +49,7 @@ uint8_t gDebugEventBuffer[128];
 uint8_t gInfoEventBuffer[128];
 uint8_t gCritEventBuffer[128];
 chip::app::CircularEventBuffer gCircularEventBuffer[3];
-chip::ClusterId kTestClusterId1    = 6;
+chip::ClusterId kTestClusterId1    = 100;
 chip::ClusterId kTestClusterId2    = 7;
 chip::EndpointId kTestEndpointId   = 1;
 chip::EventId kTestEventIdDebug    = 1;

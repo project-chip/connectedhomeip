@@ -35,10 +35,13 @@ shared_library("jni") {
     "include/cluster-init.cpp",
     "include/content-launcher/AppContentLauncherManager.cpp",
     "include/content-launcher/AppContentLauncherManager.h",
+    "include/media-playback/AppMediaPlaybackManager.cpp",
+    "include/media-playback/AppMediaPlaybackManager.h",
     "include/target-navigator/TargetNavigatorManager.cpp",
     "include/target-navigator/TargetNavigatorManager.h",
     "java/AppImpl.cpp",
     "java/AppImpl.h",
+    "java/AppPlatform-JNI.cpp",
     "java/AppPlatformShellCommands-JNI.cpp",
     "java/AppPlatformShellCommands-JNI.h",
     "java/ChannelManager.cpp",
@@ -105,6 +108,7 @@ android_library("java") {
   ]
 
   sources = [
+    "java/src/com/matter/tv/server/tvapp/AppPlatform.java",
     "java/src/com/matter/tv/server/tvapp/AppPlatformShellCommands.java",
     "java/src/com/matter/tv/server/tvapp/ChannelInfo.java",
     "java/src/com/matter/tv/server/tvapp/ChannelLineupInfo.java",

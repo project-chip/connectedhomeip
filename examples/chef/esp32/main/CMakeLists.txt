@@ -16,7 +16,7 @@
 #
 # (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
 
-get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../../.. REALPATH)
+get_filename_component(CHIP_ROOT ../third_party/connectedhomeip REALPATH)
 get_filename_component(CHEF ${CMAKE_CURRENT_SOURCE_DIR}/../../ REALPATH)
 get_filename_component(GEN_DIR ${CHEF}/out/${SAMPLE_NAME}/zap-generated REALPATH)
 
@@ -107,6 +107,9 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       PRIV_REQUIRES chip nvs_flash bt console esp32_mbedtls QRCode tft screen-framework spidriver
                       SRC_DIRS ${SRC_DIRS_LIST})
 
+include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
+chip_app_component_codegen("${CHEF}/devices/${SAMPLE_NAME}.matter")
+
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
@@ -114,8 +117,6 @@ target_compile_options(${COMPONENT_LIB} PUBLIC
 )
 
 if (CONFIG_ENABLE_PW_RPC)
-
-get_filename_component(CHIP_ROOT ../third_party/connectedhomeip REALPATH)
 
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)

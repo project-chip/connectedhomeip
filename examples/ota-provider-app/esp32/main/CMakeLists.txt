@@ -16,7 +16,7 @@
 #
 #
 # (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
-idf_component_register(PRIV_INCLUDE_DIRS 
+idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_CURRENT_LIST_DIR}/include"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/ota-provider-app/"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/ota-provider-app"
@@ -58,6 +58,10 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       EXCLUDE_SRCS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/ota-provider-app/ota-provider-common/BdxOtaSender.cpp"
                       PRIV_REQUIRES chip QRCode bt console spiffs)
+
+get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
+include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
+chip_app_component_codegen("${CHIP_ROOT}/examples/ota-provider-app/ota-provider-common/ota-provider-app.matter")
 
 spiffs_create_partition_image(img_storage ${CMAKE_SOURCE_DIR}/spiffs_image FLASH_IN_PROJECT)
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 14)

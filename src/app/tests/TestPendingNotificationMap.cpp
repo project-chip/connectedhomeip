@@ -64,8 +64,11 @@ void TestAddRemove(nlTestSuite * aSuite, void * aContext)
     CreateDefaultFullBindingTable(BindingTable::GetInstance());
     for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
     {
-        pendingMap.AddPendingNotification(i, nullptr);
+        NL_TEST_ASSERT(aSuite, pendingMap.AddPendingNotification(i, nullptr) == CHIP_NO_ERROR);
     }
+    // Confirm adding in one more element fails
+    NL_TEST_ASSERT(aSuite, pendingMap.AddPendingNotification(EMBER_BINDING_TABLE_SIZE, nullptr) == CHIP_ERROR_NO_MEMORY);
+
     auto iter = pendingMap.begin();
     for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
     {
@@ -102,11 +105,11 @@ void TestLRUEntry(nlTestSuite * aSuite, void * aContext)
     PendingNotificationMap pendingMap;
     ClearBindingTable(BindingTable::GetInstance());
     CreateDefaultFullBindingTable(BindingTable::GetInstance());
-    pendingMap.AddPendingNotification(0, nullptr);
-    pendingMap.AddPendingNotification(1, nullptr);
-    pendingMap.AddPendingNotification(5, nullptr);
-    pendingMap.AddPendingNotification(7, nullptr);
-    pendingMap.AddPendingNotification(11, nullptr);
+    NL_TEST_ASSERT(aSuite, pendingMap.AddPendingNotification(0, nullptr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(aSuite, pendingMap.AddPendingNotification(1, nullptr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(aSuite, pendingMap.AddPendingNotification(5, nullptr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(aSuite, pendingMap.AddPendingNotification(7, nullptr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(aSuite, pendingMap.AddPendingNotification(11, nullptr) == CHIP_NO_ERROR);
 
     chip::ScopedNodeId node;
 

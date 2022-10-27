@@ -18,6 +18,9 @@
 # CMakeLists in this exact order for cmake to work correctly
 cmake_minimum_required(VERSION 3.5)
 
+set(PROJECT_VER "v1.0")
+set(PROJECT_VER_NUMBER 1)
+
 set(is_debug true CACHE BOOL "Optimization variable")
 if(NOT is_debug)
     set(SDKCONFIG_DEFAULTS "sdkconfig.optimize.defaults")

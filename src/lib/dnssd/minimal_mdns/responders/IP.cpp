@@ -16,43 +16,51 @@
  */
 #include "IP.h"
 
+#include <assert.h>
+
+#include <lib/dnssd/minimal_mdns/AddressPolicy.h>
 #include <lib/dnssd/minimal_mdns/records/IP.h>
 
 namespace mdns {
 namespace Minimal {
 
+using chip::Platform::UniquePtr;
+
 void IPv4Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
                                     const ResponseConfiguration & configuration)
 {
+#if INET_CONFIG_ENABLE_IPV4
     chip::Inet::IPAddress addr;
-    for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
+    UniquePtr<IpAddressIterator> ips =
+        GetAddressPolicy()->GetIpAddressesForEndpoint(source->Interface, chip::Inet::IPAddressType::kIPv4);
+    VerifyOrDie(ips);
+
+    while (ips->Next(addr))
     {
-        if ((it.GetInterfaceId() == source->Interface) && (it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv4())
-        {
-            IPResourceRecord record(GetQName(), addr);
-            configuration.Adjust(record);
-            delegate->AddResponse(record);
-        }
+        assert(addr.IsIPv4());
+
+        IPResourceRecord record(GetQName(), addr);
+        configuration.Adjust(record);
+        delegate->AddResponse(record);
     }
+#endif
 }
 
 void IPv6Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
                                     const ResponseConfiguration & configuration)
 {
-    for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
-    {
-        if (it.GetInterfaceId() != source->Interface)
-        {
-            continue;
-        }
+    chip::Inet::IPAddress addr;
+    UniquePtr<IpAddressIterator> ips =
+        GetAddressPolicy()->GetIpAddressesForEndpoint(source->Interface, chip::Inet::IPAddressType::kIPv6);
+    VerifyOrDie(ips);
 
-        chip::Inet::IPAddress addr;
-        if ((it.GetInterfaceId() == source->Interface) && (it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv6())
-        {
-            IPResourceRecord record(GetQName(), addr);
-            configuration.Adjust(record);
-            delegate->AddResponse(record);
-        }
+    while (ips->Next(addr))
+    {
+        assert(addr.IsIPv6());
+
+        IPResourceRecord record(GetQName(), addr);
+        configuration.Adjust(record);
+        delegate->AddResponse(record);
     }
 }
 

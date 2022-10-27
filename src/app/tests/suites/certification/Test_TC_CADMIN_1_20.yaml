@@ -122,7 +122,7 @@ tests:
           CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
           [1649756670.402192][10794:10799] CHIP:CTL: Device returned status 5 on receiving the NOC
           [1649756670.402221][10794:10799] CHIP:CTL: Add NOC failed with error ../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1110: CHIP Error 0x0000000B: No memory
-          [1649756670.402241][10794:10799] CHIP:CTL: Failed to perform commissioning step 12
+          [1649756670.402241][10794:10799] CHIP:CTL: Failed to perform commissioning step 13
       disabled: true
 
     - label: "TH_CR1 removes FabricIndex1"
@@ -140,9 +140,9 @@ tests:
           CHIP:TOO:    }
           CHIP:DMG: ICR moving to [AwaitingDe]
 
-          Verify CommissionedFabrics=SupportedFabrics-1 on  TH_CR1(chip-tool) log
+          Verify CommissionedFabrics=SupportedFabrics-1 on  TH_CR2(chip-tool) log
 
-          ./chip-tool operationalcredentials read commissioned-fabrics 1 0
+          ./chip-tool operationalcredentials read commissioned-fabrics 2 0 --commissioner-name beta
 
           [1660907933.677983][33780:33785] CHIP:TOO:   CommissionedFabrics: 15
       disabled: true

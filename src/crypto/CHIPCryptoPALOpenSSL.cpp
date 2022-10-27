@@ -1602,6 +1602,111 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, AttestationCertType certType)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    const uint8_t * certPtr = cert.data();
+    X509 * x509Cert         = nullptr;
+    bool extBasicPresent    = false;
+    bool extKeyUsagePresent = false;
+    bool extSKIDPresent     = false;
+    bool extAKIDPresent     = false;
+
+    VerifyOrReturnError(!cert.empty() && CanCastTo<long>(cert.size()), CHIP_ERROR_INVALID_ARGUMENT);
+
+    x509Cert = d2i_X509(nullptr, &certPtr, static_cast<long>(cert.size()));
+    VerifyOrExit(x509Cert != nullptr, err = CHIP_ERROR_INTERNAL);
+
+    VerifyOrExit(X509_get_version(x509Cert) == 2, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(X509_get_serialNumber(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(X509_get_signature_nid(x509Cert) == NID_ecdsa_with_SHA256, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(X509_get_issuer_name(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(X509_get_notBefore(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(X509_get_notAfter(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(X509_get_subject_name(x509Cert) != nullptr, err = CHIP_ERROR_INTERNAL);
+
+    // Verify public key presence and format.
+    {
+        Crypto::P256PublicKey pubkey;
+        SuccessOrExit(err = ExtractPubkeyFromX509Cert(cert, pubkey));
+    }
+
+    for (int i = 0; i < X509_get_ext_count(x509Cert); i++)
+    {
+        X509_EXTENSION * ex = X509_get_ext(x509Cert, i);
+        ASN1_OBJECT * obj   = X509_EXTENSION_get_object(ex);
+        bool isCritical     = X509_EXTENSION_get_critical(ex) == 1;
+
+        switch (OBJ_obj2nid(obj))
+        {
+        case NID_basic_constraints:
+            VerifyOrExit(isCritical && !extBasicPresent, err = CHIP_ERROR_INTERNAL);
+            extBasicPresent = true;
+            {
+                bool isCA    = X509_get_extension_flags(x509Cert) & EXFLAG_CA;
+                long pathLen = X509_get_pathlen(x509Cert);
+                if (certType == AttestationCertType::kDAC)
+                {
+                    VerifyOrExit(!isCA && pathLen == -1, err = CHIP_ERROR_INTERNAL);
+                }
+                else if (certType == AttestationCertType::kPAI)
+                {
+                    VerifyOrExit(isCA && pathLen == 0, err = CHIP_ERROR_INTERNAL);
+                }
+                else
+                {
+                    VerifyOrExit(isCA && (pathLen == -1 || pathLen == 0 || pathLen == 1), err = CHIP_ERROR_INTERNAL);
+                }
+            }
+            break;
+        case NID_key_usage:
+            VerifyOrExit(isCritical && !extKeyUsagePresent, err = CHIP_ERROR_INTERNAL);
+            extKeyUsagePresent = true;
+            {
+                uint32_t keyUsage = X509_get_key_usage(x509Cert);
+                if (certType == AttestationCertType::kDAC)
+                {
+                    // SHALL only have the digitalSignature bit set.
+                    VerifyOrExit(keyUsage == X509v3_KU_DIGITAL_SIGNATURE, err = CHIP_ERROR_INTERNAL);
+                }
+                else
+                {
+                    bool keyCertSignFlag = keyUsage & X509v3_KU_KEY_CERT_SIGN;
+                    bool crlSignFlag     = keyUsage & X509v3_KU_CRL_SIGN;
+                    bool otherFlags      = keyUsage & ~(X509v3_KU_CRL_SIGN | X509v3_KU_KEY_CERT_SIGN | X509v3_KU_DIGITAL_SIGNATURE);
+                    VerifyOrExit(keyCertSignFlag && crlSignFlag && !otherFlags, err = CHIP_ERROR_INTERNAL);
+                }
+            }
+            break;
+        case NID_subject_key_identifier:
+            VerifyOrExit(!isCritical && !extSKIDPresent, err = CHIP_ERROR_INTERNAL);
+            VerifyOrExit(X509_get0_subject_key_id(x509Cert)->length == kSubjectKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
+            extSKIDPresent = true;
+            break;
+        case NID_authority_key_identifier:
+            VerifyOrExit(!isCritical && !extAKIDPresent, err = CHIP_ERROR_INTERNAL);
+            VerifyOrExit(X509_get0_authority_key_id(x509Cert)->length == kAuthorityKeyIdentifierLength, err = CHIP_ERROR_INTERNAL);
+            extAKIDPresent = true;
+            break;
+        default:
+            break;
+        }
+    }
+    // Mandatory extensions for all certs.
+    VerifyOrExit(extBasicPresent && extKeyUsagePresent && extSKIDPresent, err = CHIP_ERROR_INTERNAL);
+
+    if (certType == AttestationCertType::kDAC || certType == AttestationCertType::kPAI)
+    {
+        // Mandatory extension for DAC and PAI certs.
+        VerifyOrExit(extAKIDPresent, err = CHIP_ERROR_INTERNAL);
+    }
+
+exit:
+    X509_free(x509Cert);
+
+    return err;
+}
+
 CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t rootCertificateLen, const uint8_t * caCertificate,
                                     size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen,
                                     CertificateChainValidationResult & result)
@@ -1619,8 +1724,6 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
 
     VerifyOrReturnError(rootCertificate != nullptr && rootCertificateLen != 0 && CanCastTo<long>(rootCertificateLen),
                         (result = CertificateChainValidationResult::kRootArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
-    VerifyOrReturnError(caCertificate != nullptr && caCertificateLen != 0 && CanCastTo<long>(caCertificateLen),
-                        (result = CertificateChainValidationResult::kICAArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
     VerifyOrReturnError(leafCertificate != nullptr && leafCertificateLen != 0 && CanCastTo<long>(leafCertificateLen),
                         (result = CertificateChainValidationResult::kLeafArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
 
@@ -1633,6 +1736,8 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     chain = sk_X509_new_null();
     VerifyOrExit(chain != nullptr, (result = CertificateChainValidationResult::kNoMemory, err = CHIP_ERROR_NO_MEMORY));
 
+    VerifyOrExit(CanCastTo<long>(rootCertificateLen),
+                 (result = CertificateChainValidationResult::kRootArgumentInvalid, err = CHIP_ERROR_INVALID_ARGUMENT));
     x509RootCertificate = d2i_X509(nullptr, &rootCertificate, static_cast<long>(rootCertificateLen));
     VerifyOrExit(x509RootCertificate != nullptr,
                  (result = CertificateChainValidationResult::kRootFormatInvalid, err = CHIP_ERROR_INTERNAL));
@@ -1640,13 +1745,20 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     status = X509_STORE_add_cert(store, x509RootCertificate);
     VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kInternalFrameworkError, err = CHIP_ERROR_INTERNAL));
 
-    x509CACertificate = d2i_X509(nullptr, &caCertificate, static_cast<long>(caCertificateLen));
-    VerifyOrExit(x509CACertificate != nullptr,
-                 (result = CertificateChainValidationResult::kICAFormatInvalid, err = CHIP_ERROR_INTERNAL));
+    if (caCertificate != nullptr && caCertificateLen > 0)
+    {
+        VerifyOrExit(CanCastTo<long>(caCertificateLen),
+                     (result = CertificateChainValidationResult::kICAArgumentInvalid, err = CHIP_ERROR_INVALID_ARGUMENT));
+        x509CACertificate = d2i_X509(nullptr, &caCertificate, static_cast<long>(caCertificateLen));
+        VerifyOrExit(x509CACertificate != nullptr,
+                     (result = CertificateChainValidationResult::kICAFormatInvalid, err = CHIP_ERROR_INTERNAL));
 
-    status = static_cast<int>(sk_X509_push(chain, x509CACertificate));
-    VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kInternalFrameworkError, err = CHIP_ERROR_INTERNAL));
+        status = static_cast<int>(sk_X509_push(chain, x509CACertificate));
+        VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kInternalFrameworkError, err = CHIP_ERROR_INTERNAL));
+    }
 
+    VerifyOrExit(CanCastTo<long>(leafCertificateLen),
+                 (result = CertificateChainValidationResult::kLeafArgumentInvalid, err = CHIP_ERROR_INVALID_ARGUMENT));
     x509LeafCertificate = d2i_X509(nullptr, &leafCertificate, static_cast<long>(leafCertificateLen));
     VerifyOrExit(x509LeafCertificate != nullptr,
                  (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
@@ -1674,6 +1786,7 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
         VerifyOrExit(CanCastTo<time_t>(unixEpoch),
                      (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
         X509_VERIFY_PARAM_set_time(param, static_cast<time_t>(unixEpoch));
+        X509_VERIFY_PARAM_set_flags(param, X509_V_FLAG_X509_STRICT);
     }
 
     status = X509_verify_cert(verifyCtx);
@@ -1779,6 +1892,7 @@ exit:
 CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey)
 {
     CHIP_ERROR err                       = CHIP_NO_ERROR;
+    EC_KEY * ec_key                      = nullptr;
     EVP_PKEY * pkey                      = nullptr;
     X509 * x509certificate               = nullptr;
     const unsigned char * pCertificate   = certificate.data();
@@ -1797,12 +1911,17 @@ CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256P
     VerifyOrExit(EVP_PKEY_base_id(pkey) == EVP_PKEY_EC, err = CHIP_ERROR_INTERNAL);
     VerifyOrExit(EVP_PKEY_bits(pkey) == 256, err = CHIP_ERROR_INTERNAL);
 
+    ec_key = EVP_PKEY_get1_EC_KEY(pkey);
+    VerifyOrExit(ec_key != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(EC_GROUP_get_curve_name(EC_KEY_get0_group(ec_key)) == NID_X9_62_prime256v1, err = CHIP_ERROR_INTERNAL);
+
     pkeyLen = i2d_PublicKey(pkey, nullptr);
     VerifyOrExit(pkeyLen == static_cast<int>(pubkey.Length()), err = CHIP_ERROR_INTERNAL);
 
     VerifyOrExit(i2d_PublicKey(pkey, ppPubkey) == pkeyLen, err = CHIP_ERROR_INTERNAL);
 
 exit:
+    EC_KEY_free(ec_key);
     EVP_PKEY_free(pkey);
     X509_free(x509certificate);
 
@@ -1825,7 +1944,7 @@ CHIP_ERROR ExtractKIDFromX509Cert(bool isSKID, const ByteSpan & certificate, Mut
     VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     kidString = isSKID ? X509_get0_subject_key_id(x509certificate) : X509_get0_authority_key_id(x509certificate);
-    VerifyOrExit(kidString != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(kidString != nullptr, err = CHIP_ERROR_NOT_FOUND);
     VerifyOrExit(CanCastTo<size_t>(kidString->length), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(kidString->length == kSubjectKeyIdentifierLength, err = CHIP_ERROR_WRONG_CERT_TYPE);
     VerifyOrExit(static_cast<size_t>(kidString->length) <= kid.size(), err = CHIP_ERROR_BUFFER_TOO_SMALL);

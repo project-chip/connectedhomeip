@@ -35,7 +35,12 @@ constexpr uint8_t kUpdateTokenLen = 32;
 {
     if (self = [super init]) {
         _selectedCandidate = [[DeviceSoftwareVersionModel alloc] init];
+        _action = MTROtaSoftwareUpdateProviderOTAApplyUpdateActionProceed;
         _userConsentState = OTAProviderUserUnknown;
+        _delayedActionTime = nil;
+        _timedInvokeTimeoutMs = nil;
+        _userConsentNeeded = nil;
+        _queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable;
     }
     return self;
 }
@@ -46,17 +51,11 @@ constexpr uint8_t kUpdateTokenLen = 32;
                 completionHandler:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
                                       NSError * _Nullable error))completionHandler
 {
-    NSError * error;
-
     auto isBDXProtocolSupported =
         [params.protocolsSupported containsObject:@(MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXSynchronous)];
     if (!isBDXProtocolSupported) {
         _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported);
-        error =
-            [[NSError alloc] initWithDomain:@"OTAProviderDomain"
-                                       code:MTRErrorCodeGeneralError
-                                   userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Protocol is not supported.", nil) }];
-        completionHandler(_selectedCandidate, error);
+        completionHandler(_selectedCandidate, nil);
         return;
     }
 
@@ -64,44 +63,19 @@ constexpr uint8_t kUpdateTokenLen = 32;
     if (!hasCandidate) {
         NSLog(@"Unable to select OTA Image.");
         _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable);
-        error = [[NSError alloc]
-            initWithDomain:@"OTAProviderDomain"
-                      code:MTRErrorCodeInvalidState
-                  userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Unable to select Candidate.", nil) }];
+        completionHandler(_selectedCandidate, nil);
         return;
     }
 
     _selectedCandidate.updateToken = [self generateUpdateToken];
-
-    if (params.requestorCanConsent.integerValue == 1) {
-        _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable);
-        _selectedCandidate.userConsentNeeded
-            = (_userConsentState == OTAProviderUserUnknown || _userConsentState == OTAProviderUserDenied) ? @(1) : @(0);
-        NSLog(@"User Consent Needed: %@", _selectedCandidate.userConsentNeeded);
-        completionHandler(_selectedCandidate, error);
-        return;
-    }
-
-    NSLog(@"Requestor cannot obtain user consent. Our State: %hhu", _userConsentState);
-    switch (_userConsentState) {
-    case OTAProviderUserGranted:
-        NSLog(@"User Consent Granted");
-        _queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable;
-        break;
-
-    case OTAProviderUserObtaining:
-        NSLog(@"User Consent Obtaining");
-        _queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusBusy;
-        break;
-
-    case OTAProviderUserDenied:
-    case OTAProviderUserUnknown:
-        NSLog(@"User Consent Denied or Uknown");
-        _queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable;
-        break;
-    }
+    NSLog(@"Query Image Status: %hhu", _queryImageStatus);
     _selectedCandidate.status = @(_queryImageStatus);
-    completionHandler(_selectedCandidate, error);
+
+    if (params.requestorCanConsent.integerValue == 1 && _userConsentNeeded) {
+        _selectedCandidate.userConsentNeeded = _userConsentNeeded;
+        NSLog(@"User Consent Needed: %@", _selectedCandidate.userConsentNeeded);
+    }
+    completionHandler(_selectedCandidate, nil);
 }
 
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber * _Nonnull)nodeID
@@ -113,7 +87,14 @@ constexpr uint8_t kUpdateTokenLen = 32;
 {
     MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * applyUpdateResponseParams =
         [[MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
-    applyUpdateResponseParams.action = @(MTROtaSoftwareUpdateProviderOTAApplyUpdateActionProceed);
+    applyUpdateResponseParams.action = @(_action);
+    if (_delayedActionTime) {
+        applyUpdateResponseParams.delayedActionTime = _delayedActionTime;
+    }
+    if (_timedInvokeTimeoutMs) {
+        applyUpdateResponseParams.timedInvokeTimeoutMs = _timedInvokeTimeoutMs;
+    }
+
     completionHandler(applyUpdateResponseParams, nil);
 }
 

@@ -64,10 +64,6 @@ source_set("libopenthread-qpg") {
   ]
   include_dirs += [ "${openthread_root}/examples/apps" ]
 
-  if (qpg_sdk_include_platform_libs) {
-    libs = [ "${qpg_sdk_root}/${qpg_sdk_lib_dir}/OpenThreadQorvoGlue_${qpg_target_ic}_mtd/libOpenThreadQorvoGlue_${qpg_target_ic}_mtd.a" ]
-  }
-
   public_deps = [
     ":openthread_core_config_qpg",
     "${openthread_root}/src/core:libopenthread_core_headers",

@@ -15,13 +15,17 @@ import chip.platform.NsdManagerServiceBrowser;
 import chip.platform.NsdManagerServiceResolver;
 import chip.platform.PreferencesConfigurationManager;
 import chip.platform.PreferencesKeyValueStoreManager;
+import com.chip.casting.AppParameters;
 import com.chip.casting.DACProviderStub;
+import com.chip.casting.DiscoveredNodeData;
 import com.chip.casting.TvCastingApp;
-import com.chip.casting.dnssd.DiscoveredNodeData;
 import com.chip.casting.util.GlobalCastingConstants;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity
-    implements CommissionerDiscoveryFragment.Callback, CommissioningFragment.Callback {
+    implements CommissionerDiscoveryFragment.Callback,
+        ConnectionFragment.Callback,
+        SelectClusterFragment.Callback {
 
   private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -35,7 +39,7 @@ public class MainActivity extends AppCompatActivity
 
     initJni();
 
-    Fragment fragment = CommissionerDiscoveryFragment.newInstance();
+    Fragment fragment = CommissionerDiscoveryFragment.newInstance(tvCastingApp);
     getSupportFragmentManager()
         .beginTransaction()
         .add(R.id.main_fragment_container, fragment, fragment.getClass().getSimpleName())
@@ -44,12 +48,27 @@ public class MainActivity extends AppCompatActivity
 
   @Override
   public void handleCommissioningButtonClicked(DiscoveredNodeData commissioner) {
-    showFragment(CommissioningFragment.newInstance(tvCastingApp, commissioner));
+    showFragment(ConnectionFragment.newInstance(tvCastingApp, commissioner));
   }
 
   @Override
   public void handleCommissioningComplete() {
+    showFragment(SelectClusterFragment.newInstance(tvCastingApp));
+  }
+
+  @Override
+  public void handleContentLauncherSelected() {
     showFragment(ContentLauncherFragment.newInstance(tvCastingApp));
+  }
+
+  @Override
+  public void handleMediaPlaybackSelected() {
+    showFragment(MediaPlaybackFragment.newInstance(tvCastingApp));
+  }
+
+  @Override
+  public void handleDisconnect() {
+    showFragment(CommissionerDiscoveryFragment.newInstance(tvCastingApp));
   }
 
   /**
@@ -78,7 +97,12 @@ public class MainActivity extends AppCompatActivity
     chipAppServer = new ChipAppServer();
     chipAppServer.startApp();
 
-    tvCastingApp.init();
+    AppParameters appParameters = new AppParameters();
+    byte[] rotatingDeviceIdUniqueId =
+        new byte[AppParameters.MIN_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH];
+    new Random().nextBytes(rotatingDeviceIdUniqueId);
+    appParameters.setRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueId);
+    tvCastingApp.init(appParameters);
   }
 
   private void showFragment(Fragment fragment, boolean showOnBack) {

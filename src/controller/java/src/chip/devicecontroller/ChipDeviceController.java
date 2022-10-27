@@ -19,13 +19,13 @@ package chip.devicecontroller;
 
 import android.bluetooth.BluetoothGatt;
 import android.util.Log;
-import androidx.annotation.Nullable;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 
 /** Controller to interact with the CHIP device. */
 public class ChipDeviceController {
@@ -50,6 +50,9 @@ public class ChipDeviceController {
    * ID
    */
   public ChipDeviceController(ControllerParams params) {
+    if (params == null) {
+      throw new NullPointerException("params cannot be null");
+    }
     deviceControllerPtr = newDeviceController(params);
   }
 
@@ -452,7 +455,7 @@ public class ChipDeviceController {
   }
 
   /** Subscribe to the given attribute path. */
-  public void subscribeToPath(
+  public void subscribeToAttributePath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ReportCallback reportCallback,
       long devicePtr,
@@ -460,61 +463,62 @@ public class ChipDeviceController {
       int minInterval,
       int maxInterval) {
     ReportCallbackJni jniCallback =
-        new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback);
-    subscribeToPath(
+        new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
+    subscribe(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
         attributePaths,
+        null,
         minInterval,
-        maxInterval);
+        maxInterval,
+        false,
+        false);
   }
 
-  /** Read the given attribute path. */
-  public void readPath(
-      ReportCallback callback, long devicePtr, List<ChipAttributePath> attributePaths) {
-    ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback);
-    readPath(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, attributePaths);
-  }
-
-  /** Subscribe to the given event path. */
+  /** Subscribe to the given event path */
   public void subscribeToEventPath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
-      ResubscriptionAttemptCallback resubscriptionAttemptCallback,
-      ReportEventCallback reportCallback,
+      ReportCallback reportCallback,
       long devicePtr,
       List<ChipEventPath> eventPaths,
       int minInterval,
       int maxInterval) {
-    subscribeToEventPath(
-        subscriptionEstablishedCallback,
-        resubscriptionAttemptCallback,
-        reportCallback,
+    ReportCallbackJni jniCallback =
+        new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
+    subscribe(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
         devicePtr,
+        null,
         eventPaths,
         minInterval,
         maxInterval,
         false,
-        true);
+        false);
   }
 
-  public void subscribeToEventPath(
+  /** Subscribe to the given attribute/event path with keepSubscriptions and isFabricFiltered. */
+  public void subscribeToPath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ResubscriptionAttemptCallback resubscriptionAttemptCallback,
-      ReportEventCallback reportCallback,
+      ReportCallback reportCallback,
       long devicePtr,
+      List<ChipAttributePath> attributePaths,
       List<ChipEventPath> eventPaths,
       int minInterval,
       int maxInterval,
       boolean keepSubscriptions,
       boolean isFabricFiltered) {
-    ReportEventCallbackJni jniCallback =
-        new ReportEventCallbackJni(
-            subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
-    subscribeToEventPath(
+    // TODO: pass resubscriptionAttemptCallback to ReportCallbackJni since jni layer is not ready
+    // for auto-resubscribe
+    ReportCallbackJni jniCallback =
+        new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
+    subscribe(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
+        attributePaths,
         eventPaths,
         minInterval,
         maxInterval,
@@ -522,11 +526,41 @@ public class ChipDeviceController {
         isFabricFiltered);
   }
 
+  /** Read the given attribute path. */
+  public void readAttributePath(
+      ReportCallback callback, long devicePtr, List<ChipAttributePath> attributePaths) {
+    ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
+    read(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        attributePaths,
+        null,
+        true);
+  }
+
   /** Read the given event path. */
   public void readEventPath(
-      ReportEventCallback callback, long devicePtr, List<ChipEventPath> eventPaths) {
-    ReportEventCallbackJni jniCallback = new ReportEventCallbackJni(null, callback, null);
-    readEventPath(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, eventPaths);
+      ReportCallback callback, long devicePtr, List<ChipEventPath> eventPaths) {
+    ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
+    read(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, null, eventPaths, true);
+  }
+
+  /** Read the given attribute/event path with isFabricFiltered flag. */
+  public void readPath(
+      ReportCallback callback,
+      long devicePtr,
+      List<ChipAttributePath> attributePaths,
+      List<ChipEventPath> eventPaths,
+      boolean isFabricFiltered) {
+    ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
+    read(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        attributePaths,
+        eventPaths,
+        isFabricFiltered);
   }
 
   /**
@@ -557,35 +591,24 @@ public class ChipDeviceController {
   private native PaseVerifierParams computePaseVerifier(
       long deviceControllerPtr, long devicePtr, long setupPincode, long iterations, byte[] salt);
 
-  private native void subscribeToPath(
+  private native void subscribe(
       long deviceControllerPtr,
       long callbackHandle,
       long devicePtr,
       List<ChipAttributePath> attributePaths,
-      int minInterval,
-      int maxInterval);
-
-  public native void readPath(
-      long deviceControllerPtr,
-      long callbackHandle,
-      long devicePtr,
-      List<ChipAttributePath> attributePaths);
-
-  private native void subscribeToEventPath(
-      long deviceControllerPtr,
-      long callbackHandle,
-      long devicePtr,
       List<ChipEventPath> eventPaths,
       int minInterval,
       int maxInterval,
       boolean keepSubscriptions,
       boolean isFabricFiltered);
 
-  public native void readEventPath(
+  private native void read(
       long deviceControllerPtr,
       long callbackHandle,
       long devicePtr,
-      List<ChipEventPath> eventPaths);
+      List<ChipAttributePath> attributePaths,
+      List<ChipEventPath> eventPaths,
+      boolean isFabricFiltered);
 
   private native long newDeviceController(ControllerParams params);
 

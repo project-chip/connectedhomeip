@@ -36,16 +36,70 @@ typedef NS_ENUM(NSUInteger, MTROTAImageDigestType) {
 
 @interface MTROTAHeader : NSObject
 
-@property (nonatomic, strong) NSNumber * vendorID;
-@property (nonatomic, strong) NSNumber * productID;
-@property (nonatomic, strong) NSNumber * payloadSize;
-@property (nonatomic, strong) NSNumber * softwareVersion;
-@property (nonatomic, strong) NSString * softwareVersionString;
-@property (nonatomic, strong) NSString * releaseNotesURL;
-@property (nonatomic, strong) NSData * imageDigest;
+/**
+ * The identifier of the vendor whose product this image is meant for.
+ *
+ *
+ * This field can be compared to the vendor id received in the Query Image
+ * command to determine whether an image matches.
+ *
+ * This field may be 0, in which case the image might apply to products from
+ * more than one vendor.  If it's nonzero, it must match the vendor id in Query
+ * Image for this image to be considered.
+ */
+@property (nonatomic, copy) NSNumber * vendorID;
+/**
+ * The identifier of the specific product the image is meant for.  May be 0, if
+ * the image might apply to more than one product.  This is allowed, but not
+ * required, to be matched against the product id received in Query Image.
+ */
+@property (nonatomic, copy) NSNumber * productID;
+/**
+ * The size of the actual image payload, which follows the header in the OTA
+ * file.
+ */
+@property (nonatomic, copy) NSNumber * payloadSize;
+/**
+ * The version of the software contained in this image.  This is the version the
+ * OTA requestor will be updated to if this image is installed.  This can be
+ * used to determine whether this image is newer than what the requestor is
+ * currently running, by comparing it to the SoftwareVersion in the Query Image
+ * command.
+ */
+@property (nonatomic, copy) NSNumber * softwareVersion;
+/**
+ * Human-readable version of softwareVersion.  This must not be used for
+ * deciding which versions are newer or older; use softwareVersion for that.
+ */
+@property (nonatomic, copy) NSString * softwareVersionString;
+/**
+ * If not nil a URL pointing to release notes for the software update
+ * represented by the image.
+ */
+@property (nonatomic, copy, nullable) NSString * releaseNotesURL;
+/**
+ * A digest of the payload that follows the header.  Can be used to verify that
+ * the payload is not truncated or corrupted.
+ */
+@property (nonatomic, copy) NSData * imageDigest;
+/**
+ * The specific algorithm that was used to compute imageDigest.
+ */
 @property (nonatomic, assign) MTROTAImageDigestType imageDigestType;
-@property (nonatomic, strong) NSNumber * minApplicableVersion;
-@property (nonatomic, strong) NSNumber * maxApplicableVersion;
+/**
+ * If not nil, specifies the smallest software version that this update can be
+ * applied on top of.  In that case, this value must be compared to the
+ * SoftwareVersion in the QueryImage command to check whether this image is
+ * valid for the OTA requestor.
+ */
+@property (nonatomic, copy, nullable) NSNumber * minApplicableVersion;
+/**
+ * If not nil, specifies the largest software version that this update can be
+ * applied on top of.  In that case, this value must be compared to the
+ * SoftwareVersion in the QueryImage command to check whether this image is
+ * valid for the OTA requestor.
+ */
+@property (nonatomic, copy, nullable) NSNumber * maxApplicableVersion;
 
 @end
 

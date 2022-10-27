@@ -28,11 +28,17 @@
 #include <qrcodegen.h>
 #endif // QR_CODE_ENABLED
 #include <sl_simple_button_instances.h>
+
+#ifdef ENABLE_WSTK_LEDS
 #include <sl_simple_led_instances.h>
+#endif // ENABLE_WSTK_LEDS
+
 #include <sl_system_kernel.h>
 
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/EFR32/NetworkCommissioningWiFiDriver.h>
 #endif
 
 #ifdef DISPLAY_ENABLED
@@ -51,6 +57,10 @@ using namespace chip::app::Clusters::WindowCovering;
 #define APP_STATE_LED &sl_led_led0
 #define APP_ACTION_LED &sl_led_led1
 
+#ifdef SL_WIFI
+chip::app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance()));
+#endif
 //------------------------------------------------------------------------------
 // Timers
 //------------------------------------------------------------------------------
@@ -145,6 +155,21 @@ WindowAppImpl::WindowAppImpl() {}
 
 void WindowAppImpl::OnTaskCallback(void * parameter)
 {
+#ifdef SL_WIFI
+    /*
+     * Wait for the WiFi to be initialized
+     */
+    EFR32_LOG("APP: Wait WiFi Init");
+    while (!wfx_hw_ready())
+    {
+        vTaskDelay(10);
+    }
+    EFR32_LOG("APP: Done WiFi Init");
+    /* We will init server when we get IP */
+    sWiFiNetworkCommissioningInstance.Init();
+    /* added for commisioning with wifi */
+#endif
+
     sInstance.Run();
 }
 
@@ -158,18 +183,6 @@ void WindowAppImpl::OnIconTimeout(WindowApp::Timer & timer)
 
 CHIP_ERROR WindowAppImpl::Init()
 {
-#ifdef SL_WIFI
-    /*
-     * Wait for the WiFi to be initialized
-     */
-    EFR32_LOG("APP: Wait WiFi Init");
-    while (!wfx_hw_ready())
-    {
-        vTaskDelay(10);
-    }
-    EFR32_LOG("APP: Done WiFi Init");
-    /* We will init server when we get IP */
-#endif
     WindowApp::Init();
 
     // Initialize App Task
@@ -189,9 +202,11 @@ CHIP_ERROR WindowAppImpl::Init()
     }
 
     // Initialize LEDs
+#ifdef ENABLE_WSTK_LEDS
     LEDWidget::InitGpio();
     mStatusLED.Init(APP_STATE_LED);
     mActionLED.Init(APP_ACTION_LED);
+#endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
     slLCD.Init();
@@ -361,17 +376,21 @@ void WindowAppImpl::UpdateLEDs()
     Cover & cover = GetCover();
     if (mResetWarning)
     {
+#ifdef ENABLE_WSTK_LEDS
         mStatusLED.Set(false);
         mStatusLED.Blink(500);
 
         mActionLED.Set(false);
         mActionLED.Blink(500);
+#endif // ENABLE_WSTK_LEDS
     }
     else
     {
         if (mState.isWinking)
         {
+#ifdef ENABLE_WSTK_LEDS
             mStatusLED.Blink(200, 200);
+#endif // ENABLE_WSTK_LEDS
         }
         else
 #if CHIP_ENABLE_OPENTHREAD
@@ -381,10 +400,22 @@ void WindowAppImpl::UpdateLEDs()
 #endif
 
         {
+#ifdef ENABLE_WSTK_LEDS
             mStatusLED.Blink(950, 50);
+#endif // ENABLE_WSTK_LEDS
         }
-        else if (mState.haveBLEConnections) { mStatusLED.Blink(100, 100); }
-        else { mStatusLED.Blink(50, 950); }
+        else if (mState.haveBLEConnections)
+        {
+#ifdef ENABLE_WSTK_LEDS
+            mStatusLED.Blink(100, 100);
+#endif // ENABLE_WSTK_LEDS
+        }
+        else
+        {
+#ifdef ENABLE_WSTK_LEDS
+            mStatusLED.Blink(50, 950);
+#endif // ENABLE_WSTK_LEDS
+        }
 
         // Action LED
         NPercent100ths current;
@@ -402,19 +433,27 @@ void WindowAppImpl::UpdateLEDs()
 
         if (OperationalState::Stall != cover.mLiftOpState)
         {
+#ifdef ENABLE_WSTK_LEDS
             mActionLED.Blink(100);
+#endif // ENABLE_WSTK_LEDS
         }
         else if (LimitStatus::IsUpOrOpen == liftLimit)
         {
+#ifdef ENABLE_WSTK_LEDS
             mActionLED.Set(true);
+#endif // ENABLE_WSTK_LEDS
         }
         else if (LimitStatus::IsDownOrClose == liftLimit)
         {
+#ifdef ENABLE_WSTK_LEDS
             mActionLED.Set(false);
+#endif // ENABLE_WSTK_LEDS
         }
         else
         {
+#ifdef ENABLE_WSTK_LEDS
             mActionLED.Blink(1000);
+#endif // ENABLE_WSTK_LEDS
         }
     }
 }
@@ -463,8 +502,10 @@ void WindowAppImpl::UpdateLCD()
 
 void WindowAppImpl::OnMainLoop()
 {
+#ifdef ENABLE_WSTK_LEDS
     mStatusLED.Animate();
     mActionLED.Animate();
+#endif // ENABLE_WSTK_LEDS
 }
 
 //------------------------------------------------------------------------------

@@ -53,7 +53,16 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 1, 2, 3, 4, 65528, 65529, 65531, 65532, 65533]
+              contains: [0, 2, 3, 4, 65528, 65529, 65531, 65532, 65533]
+
+    - label: "TH reads optional attribute (Extension) in AttributeList"
+      PICS: ACL.S.A0001
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
 
     - label: "TH reads AcceptedCommandList attribute from DUT"
       command: "readAttribute"

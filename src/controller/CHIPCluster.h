@@ -52,6 +52,7 @@ using ReadResponseFailureCallback     = void (*)(void * context, CHIP_ERROR err)
 using ReadDoneCallback                = void (*)(void * context);
 using SubscriptionEstablishedCallback = void (*)(void * context);
 using ResubscriptionAttemptCallback   = void (*)(void * context, CHIP_ERROR aError, uint32_t aNextResubscribeIntervalMsec);
+using SubscriptionOnDoneCallback      = std::function<void(void)>;
 
 class DLL_EXPORT ClusterBase
 {
@@ -61,6 +62,12 @@ public:
     // Temporary function to set command timeout before we move over to InvokeCommand
     // TODO: remove when we start using InvokeCommand everywhere
     void SetCommandTimeout(Optional<System::Clock::Timeout> timeout) { mTimeout = timeout; }
+
+    /**
+     * Returns the current command timeout set via SetCommandTimeout, or an
+     * empty optional if no timeout has been set.
+     */
+    Optional<System::Clock::Timeout> GetCommandTimeout() { return mTimeout; }
 
     ClusterId GetClusterId() const { return mClusterId; }
 
@@ -256,12 +263,13 @@ public:
                        ReadResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
                        SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
                        ResubscriptionAttemptCallback resubscriptionAttemptCb = nullptr, bool aIsFabricFiltered = true,
-                       bool aKeepPreviousSubscriptions = false, const Optional<DataVersion> & aDataVersion = NullOptional)
+                       bool aKeepPreviousSubscriptions = false, const Optional<DataVersion> & aDataVersion = NullOptional,
+                       SubscriptionOnDoneCallback subscriptionDoneCb = nullptr)
     {
         return SubscribeAttribute<typename AttributeInfo::DecodableType, typename AttributeInfo::DecodableArgType>(
             context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), reportCb, failureCb, minIntervalFloorSeconds,
             maxIntervalCeilingSeconds, subscriptionEstablishedCb, resubscriptionAttemptCb, aIsFabricFiltered,
-            aKeepPreviousSubscriptions, aDataVersion);
+            aKeepPreviousSubscriptions, aDataVersion, subscriptionDoneCb);
     }
 
     template <typename DecodableType, typename DecodableArgType>
@@ -270,8 +278,9 @@ public:
                                   uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
                                   SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
                                   ResubscriptionAttemptCallback resubscriptionAttemptCb = nullptr, bool aIsFabricFiltered = true,
-                                  bool aKeepPreviousSubscriptions            = false,
-                                  const Optional<DataVersion> & aDataVersion = NullOptional)
+                                  bool aKeepPreviousSubscriptions               = false,
+                                  const Optional<DataVersion> & aDataVersion    = NullOptional,
+                                  SubscriptionOnDoneCallback subscriptionDoneCb = nullptr)
     {
         auto onReportCb = [context, reportCb](const app::ConcreteAttributePath & aPath, const DecodableType & aData) {
             if (reportCb != nullptr)
@@ -305,7 +314,7 @@ public:
         return Controller::SubscribeAttribute<DecodableType>(
             &mExchangeManager, mSession.Get().Value(), mEndpoint, clusterId, attributeId, onReportCb, onFailureCb,
             minIntervalFloorSeconds, maxIntervalCeilingSeconds, onSubscriptionEstablishedCb, onResubscriptionAttemptCb,
-            aIsFabricFiltered, aKeepPreviousSubscriptions, aDataVersion);
+            aIsFabricFiltered, aKeepPreviousSubscriptions, aDataVersion, subscriptionDoneCb);
     }
 
     /**
@@ -366,7 +375,7 @@ public:
             }
         };
 
-        auto onSubscriptionEstablishedCb = [context, subscriptionEstablishedCb]() {
+        auto onSubscriptionEstablishedCb = [context, subscriptionEstablishedCb](const app::ReadClient & readClient) {
             if (subscriptionEstablishedCb != nullptr)
             {
                 subscriptionEstablishedCb(context);

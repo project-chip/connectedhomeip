@@ -15,23 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *
- *    Copyright (c) 2020-21 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance  the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 #include "color-control-server.h"
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -176,6 +159,11 @@ void ColorControlServer::handleModeSwitch(EndpointId endpoint, uint8_t newColorM
     }
 
     Attributes::EnhancedColorMode::Set(endpoint, newColorMode);
+    if (newColorMode == ColorControlServer::ColorMode::COLOR_MODE_EHSV)
+    {
+        // Transpose COLOR_MODE_EHSV to COLOR_MODE_HSV after setting EnhancedColorMode
+        newColorMode = ColorControlServer::ColorMode::COLOR_MODE_HSV;
+    }
     Attributes::ColorMode::Set(endpoint, newColorMode);
 
     colorModeTransition = static_cast<uint8_t>((newColorMode << 4) + oldColorMode);
@@ -788,7 +776,14 @@ bool ColorControlServer::moveHueCommand(EndpointId endpoint, uint8_t moveMode, u
     }
 
     // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_HSV);
+    if (isEnhanced)
+    {
+        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_EHSV);
+    }
+    else
+    {
+        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_HSV);
+    }
 
     // now, kick off the state machine.
     initHueSat(endpoint, colorHueTransitionState, colorSaturationTransitionState);
@@ -955,7 +950,14 @@ bool ColorControlServer::moveToHueCommand(EndpointId endpoint, uint16_t hue, uin
     stopAllColorTransitions(endpoint);
 
     // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_HSV);
+    if (isEnhanced)
+    {
+        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_EHSV);
+    }
+    else
+    {
+        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_HSV);
+    }
 
     // now, kick off the state machine.
     initHueSat(endpoint, colorHueTransitionState, colorSaturationTransitionState);
@@ -1067,7 +1069,14 @@ bool ColorControlServer::moveToHueAndSaturationCommand(EndpointId endpoint, uint
     stopAllColorTransitions(endpoint);
 
     // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_HSV);
+    if (isEnhanced)
+    {
+        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_EHSV);
+    }
+    else
+    {
+        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_HSV);
+    }
 
     // now, kick off the state machine.
     initHueSat(endpoint, colorHueTransitionState, colorSaturationTransitionState);
@@ -1157,7 +1166,14 @@ bool ColorControlServer::stepHueCommand(EndpointId endpoint, uint8_t stepMode, u
     }
 
     // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, COLOR_MODE_HSV);
+    if (isEnhanced)
+    {
+        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_EHSV);
+    }
+    else
+    {
+        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_HSV);
+    }
 
     // now, kick off the state machine.
     initHueSat(endpoint, colorHueTransitionState, colorSaturationTransitionState);
@@ -2008,8 +2024,8 @@ EmberAfStatus ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t
     }
 
     // now, kick off the state machine.
-    Attributes::ColorTemperature::Get(endpoint, &(colorTempTransitionState->initialValue));
-    Attributes::ColorTemperature::Get(endpoint, &(colorTempTransitionState->currentValue));
+    Attributes::ColorTemperatureMireds::Get(endpoint, &(colorTempTransitionState->initialValue));
+    Attributes::ColorTemperatureMireds::Get(endpoint, &(colorTempTransitionState->currentValue));
 
     colorTempTransitionState->finalValue     = colorTemperature;
     colorTempTransitionState->stepsRemaining = transitionTime;
@@ -2080,7 +2096,7 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
     if (status == EMBER_ZCL_STATUS_SUCCESS && !startUpColorTemp.IsNull())
     {
         uint16_t updatedColorTemp = MAX_TEMPERATURE_VALUE;
-        status                    = Attributes::ColorTemperature::Get(endpoint, &updatedColorTemp);
+        status                    = Attributes::ColorTemperatureMireds::Get(endpoint, &updatedColorTemp);
 
         if (status == EMBER_ZCL_STATUS_SUCCESS)
         {
@@ -2097,7 +2113,7 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
                 // existing setting of ColorTemp attribute will be left unchanged (i.e., treated as
                 // if startup color temp was set to null).
                 updatedColorTemp = startUpColorTemp.Value();
-                status           = Attributes::ColorTemperature::Set(endpoint, updatedColorTemp);
+                status           = Attributes::ColorTemperatureMireds::Set(endpoint, updatedColorTemp);
 
                 if (status == EMBER_ZCL_STATUS_SUCCESS)
                 {
@@ -2134,7 +2150,7 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
         emberEventControlSetDelayMS(configureTempEventControl(endpoint), UPDATE_TIME_MS);
     }
 
-    Attributes::ColorTemperature::Set(endpoint, colorTempTransitionState->currentValue);
+    Attributes::ColorTemperatureMireds::Set(endpoint, colorTempTransitionState->currentValue);
 
     emberAfColorControlClusterPrintln("Color Temperature %d", colorTempTransitionState->currentValue);
 
@@ -2209,7 +2225,7 @@ bool ColorControlServer::moveColorTempCommand(const app::ConcreteCommandPath & c
 
     // now, kick off the state machine.
     colorTempTransitionState->initialValue = 0;
-    Attributes::ColorTemperature::Get(endpoint, &colorTempTransitionState->initialValue);
+    Attributes::ColorTemperatureMireds::Get(endpoint, &colorTempTransitionState->initialValue);
     colorTempTransitionState->currentValue = colorTempTransitionState->initialValue;
 
     if (moveMode == MOVE_MODE_UP)
@@ -2327,7 +2343,7 @@ bool ColorControlServer::stepColorTempCommand(const app::ConcreteCommandPath & c
 
     // now, kick off the state machine.
     colorTempTransitionState->initialValue = 0;
-    Attributes::ColorTemperature::Get(endpoint, &colorTempTransitionState->initialValue);
+    Attributes::ColorTemperatureMireds::Get(endpoint, &colorTempTransitionState->initialValue);
     colorTempTransitionState->currentValue = colorTempTransitionState->initialValue;
 
     if (stepMode == MOVE_MODE_UP)

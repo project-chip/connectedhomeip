@@ -31,7 +31,7 @@ tests:
 
     - label: "Check GoToLiftPercentage command 50%"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT sends GoToLiftPercentage command with 50% to TH"
@@ -70,7 +70,7 @@ tests:
 
     - label: "Check GoToTiltPercentage command 50%"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT sends GoToTiltPercentage command with 50% to TH"

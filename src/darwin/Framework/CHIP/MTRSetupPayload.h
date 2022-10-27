@@ -45,11 +45,13 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
 @interface MTROptionalQRCodeInfo : NSObject
 @property (nonatomic, copy) NSNumber * infoType;
 @property (nonatomic, copy) NSNumber * tag;
-@property (nonatomic, copy) NSNumber * integerValue;
-@property (nonatomic, copy) NSString * stringValue;
+// Exactly one of integerValue and stringValue will be non-nil, depending on the
+// the value of "infoType".
+@property (nonatomic, copy, nullable) NSNumber * integerValue;
+@property (nonatomic, copy, nullable) NSString * stringValue;
 @end
 
-@interface MTRSetupPayload : NSObject
+@interface MTRSetupPayload : NSObject <NSSecureCoding>
 
 @property (nonatomic, copy) NSNumber * version;
 @property (nonatomic, copy) NSNumber * vendorID;
@@ -66,13 +68,47 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
 @property (nonatomic, assign) BOOL hasShortDiscriminator;
 @property (nonatomic, copy) NSNumber * setUpPINCode;
 
-@property (nonatomic, copy) NSString * serialNumber;
+@property (nonatomic, copy, nullable) NSString * serialNumber;
 - (nullable NSArray<MTROptionalQRCodeInfo *> *)getAllOptionalVendorData:(NSError * __autoreleasing *)error;
 
 /**
  * Generate a random Matter-valid setup PIN.
  */
 + (NSUInteger)generateRandomPIN;
+
+/**
+ * Generate a random Matter-valid setup passcode.
+ */
++ (NSNumber *)generateRandomSetupPasscode API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+
+/**
+ * Create an MTRSetupPayload with the given onboarding payload.
+ *
+ * Will return nil on errors (e.g. if the onboarding payload cannot be parsed).
+ */
++ (MTRSetupPayload * _Nullable)setupPayloadWithOnboardingPayload:(NSString *)onboardingPayload
+                                                           error:(NSError * __autoreleasing *)error
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+
+/**
+ * Initialize an MTRSetupPayload with the given passcode and discriminator.
+ * This will pre-set version, product id, and vendor id to 0.
+ */
+- (instancetype)initWithSetupPasscode:(NSNumber *)setupPasscode
+                        discriminator:(NSNumber *)discriminator API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+
+/** Get 11 digit manual entry code from the setup payload. */
+- (nullable NSString *)manualEntryCode;
+
+/**
+ * Get a QR code from the setup payload.
+ *
+ * Returns nil on failure (e.g. if the setup payload does not have all the
+ * information a QR code needs).
+ */
+- (NSString * _Nullable)qrCodeString:(NSError * __autoreleasing *)error
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.91
+            image: connectedhomeip/chip-build:0.6.03
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -72,7 +72,10 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --enable-flashbundle \
-                        --target-glob 'qpg-{lock,light,shell,persistent-storage}' \
+                        --target qpg-qpg6105-lock \
+                        --target qpg-qpg6105-light \
+                        --target qpg-qpg6105-shell \
+                        --target qpg-qpg6105-persistent-storage \
                         build \
                         --copy-artifacts-to out/artifacts \
                      "
@@ -80,6 +83,17 @@ jobs:
               timeout-minutes: 5
               run: |
                   config/qpg/chip-gn/build.sh
+
+            - name: Prepare some bloat report from the previous builds
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    qpg qpg6105+debug lighting-app \
+                    out/qpg-qpg6105-light/chip-qpg6105-lighting-example.out \
+                    /tmp/bloat_reports/
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    qpg qpg6105+debug lock-app \
+                    out/qpg-qpg6105-lock/chip-qpg6105-lock-example.out \
+                    /tmp/bloat_reports/
 
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2

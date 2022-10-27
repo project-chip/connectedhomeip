@@ -23,6 +23,7 @@ declare_args() {
   efr32_sdk_target = ""
   sl_ot_efr32_root = "${chip_root}/third_party/openthread/ot-efr32"
   sl_openthread_root = "${chip_root}/third_party/openthread/ot-efr32/openthread"
+  use_thread_coap_lib = false
 }
 
 assert(efr32_sdk_target != "", "efr32_sdk_target must be specified")
@@ -60,14 +61,14 @@ if (use_silabs_thread_lib) {
   config("openthread_efr32_config") {
     defines = [
       "RADIO_CONFIG_DMP_SUPPORT=1",
-      "${efr32_board}=1",
-      "${efr32_mcu}",
+      "${silabs_board}=1",
+      "${silabs_mcu}",
       "OPENTHREAD_CORE_CONFIG_PLATFORM_CHECK_FILE=\"openthread-core-efr32-config-check.h\"",
     ]
 
     include_dirs = [
       "${chip_root}/examples/platform/efr32",
-      "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}",
+      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}",
       "${sl_ot_efr32_root}/src/src",
       "${sl_openthread_root}/src/",
     ]
@@ -131,7 +132,7 @@ if (use_silabs_thread_lib) {
       ":libopenthread-platform",
       ":openthread_core_config_efr32",
       "${segger_rtt_root}:segger_rtt",
-      "${sl_openthread_root}/include/openthread:openthread-platform",
+      "${sl_openthread_root}/include/openthread:openthread",
       "${sl_openthread_root}/src/core/:libopenthread_core_headers",
     ]
 
@@ -143,11 +144,17 @@ if (use_silabs_thread_lib) {
       XTD = "mtd"
     }
 
+    # Use silabs openthread library stack with or without coap api enabled
+    COAP_API = ""
+    if (use_thread_coap_lib) {
+      COAP_API = "coap_"
+    }
+
     public_configs += [ "${sl_openthread_root}:openthread_${XTD}_config" ]
 
     libs = [
-      "${sl_ot_efr32_root}/libs/libsl_ot_stack_${XTD}_${efr32_family}_gcc.a",
-      "${sl_ot_efr32_root}/libs/libsl_platform_${XTD}_dmp_${efr32_family}_gcc.a",
+      "${sl_ot_efr32_root}/libs/libsl_ot_stack_${XTD}_${COAP_API}${silabs_family}_gcc.a",
+      "${sl_ot_efr32_root}/libs/libsl_platform_${XTD}_dmp_${silabs_family}_gcc.a",
     ]
   }
 }

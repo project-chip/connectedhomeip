@@ -34,7 +34,13 @@
 #include "common/bk_err.h"
 #include "common/bk_include.h"
 
+#if CONFIG_FLASH_ORIGIN_API
 #include "BkDriverFlash.h"
+#else
+#include "driver/flash.h"
+#include <driver/flash_partition.h>
+#endif
+
 #include "flash_namespace_value.h"
 
 #include "wlan_ui_pub.h"

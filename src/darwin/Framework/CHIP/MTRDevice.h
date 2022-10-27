@@ -50,7 +50,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * The current state of the device.
  *
  * The three states:
- *   MTRDeviceStateUnknkown
+ *   MTRDeviceStateUnknown
  *      Unable to determine the state of the device at the moment.
  *
  *   MTRDeviceStateReachable
@@ -87,7 +87,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  *                    MTRDeviceResponseHandler.
  *
  * @param expectedValueInterval  maximum interval in milliseconds during which reads of the attribute will return the value being
- * written. This value will be clamped to timeoutMs
+ * written. This value must be within [1, UINT32_MAX], and will be clamped to this range.
  *
  * TODO: document that -readAttribute... will return the expected value for the [endpoint,cluster,attribute] until one of the
  * following:
@@ -96,7 +96,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  *  3. We succeed at writing the attribute.
  *  4. We fail at writing the attribute and give up on the write
  *
- * @param timeout   timeout in milliseconds for timed write, or nil.
+ * @param timeout   timeout in milliseconds for timed write, or nil. This value must be within [1, UINT16_MAX], and will be clamped
+ * to this range.
  * TODO: make timeout arguments uniform
  */
 - (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
@@ -117,13 +118,18 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * @param expectedValues  array of dictionaries containing the expected values in the same format as
  *                       attribute read completion handler. Requires MTRAttributePathKey values.
  *                       See MTRDeviceResponseHandler definition for dictionary details.
+ *                       The expectedValues and expectedValueInterval arguments need to be both
+ *                       nil or both non-nil, or both will be both ignored.
+ *
  * TODO: document better the expectedValues is how this command is expected to change attributes when read, and that the next
  * readAttribute will get these values
  *
  * @param expectedValueInterval  maximum interval in milliseconds during which reads of the attribute will return the value being
- * written. This value will be clamped to timeout
+ * written. If the value is less than 1, both this value and expectedValues will be ignored.
+            If this value is greater than UINT32_MAX, it will be clamped to UINT32_MAX.
  *
- * @param timeout   timeout in milliseconds for timed invoke, or nil.
+ * @param timeout   timeout in milliseconds for timed invoke, or nil. This value must be within [1, UINT16_MAX], and will be clamped
+ * to this range.
  *
  * @param completion  response handler will receive either values or error.
  */
@@ -136,6 +142,27 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion;
+
+/**
+ * Open a commissioning window on the device.
+ *
+ * On success, completion will be called on queue with the MTRSetupPayload that
+ * can be used to commission the device.
+ *
+ * @param setupPasscode The setup passcode to use for the commissioning window.
+ *                      See MTRSetupPayload's generateRandomSetupPasscode for
+ *                      generating a valid random passcode.
+ * @param discriminator The discriminator to use for the commissionable
+ *                      advertisement.
+ * @param duration      Duration, in seconds, during which the commissioning
+ *                      window will be open.
+ */
+- (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
+                                   discriminator:(NSNumber *)discriminator
+                                        duration:(NSNumber *)duration
+                                           queue:(dispatch_queue_t)queue
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 @end
 

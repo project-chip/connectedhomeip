@@ -578,9 +578,9 @@ typedef void (*BinaryInputBasicAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BinaryInputBasicAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*DescriptorDeviceListListAttributeCallback)(
+typedef void (*DescriptorDeviceTypeListListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & data);
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType> & data);
 typedef void (*DescriptorServerListListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<chip::ClusterId> & data);
 typedef void (*DescriptorClientListListAttributeCallback)(void * context,
@@ -1112,12 +1112,6 @@ typedef void (*TestClusterAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*TestClusterAttributeListListAttributeCallback)(void * context,
                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*FaultInjectionGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*FaultInjectionAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*FaultInjectionAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 
 class MTRDefaultSuccessCallbackBridge : public MTRCallbackBridge<DefaultSuccessCallback>
 {
@@ -3267,43 +3261,46 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDescriptorDeviceListListAttributeCallbackBridge : public MTRCallbackBridge<DescriptorDeviceListListAttributeCallback>
+class MTRDescriptorDeviceTypeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<DescriptorDeviceTypeListListAttributeCallback>
 {
 public:
-    MTRDescriptorDeviceListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                                       bool keepAlive = false) :
-        MTRCallbackBridge<DescriptorDeviceListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    MTRDescriptorDeviceTypeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                           MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<DescriptorDeviceTypeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRDescriptorDeviceListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                       MTRDeviceController * controller, ResponseHandler handler,
-                                                       MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<DescriptorDeviceListListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                     keepAlive){};
+    MTRDescriptorDeviceTypeListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                           MTRDeviceController * controller, ResponseHandler handler,
+                                                           MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<DescriptorDeviceTypeListListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                         keepAlive){};
 
-    MTRDescriptorDeviceListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                       MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<DescriptorDeviceListListAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+    MTRDescriptorDeviceTypeListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                           MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<DescriptorDeviceTypeListListAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & value);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType> &
+            value);
 };
 
-class MTRDescriptorDeviceListListAttributeCallbackSubscriptionBridge : public MTRDescriptorDeviceListListAttributeCallbackBridge
+class MTRDescriptorDeviceTypeListListAttributeCallbackSubscriptionBridge
+    : public MTRDescriptorDeviceTypeListListAttributeCallbackBridge
 {
 public:
-    MTRDescriptorDeviceListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                   MTRDeviceController * controller, ResponseHandler handler,
-                                                                   MTRActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
-        MTRDescriptorDeviceListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+    MTRDescriptorDeviceTypeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                       MTRDeviceController * controller, ResponseHandler handler,
+                                                                       MTRActionBlock action,
+                                                                       SubscriptionEstablishedHandler establishedHandler) :
+        MTRDescriptorDeviceTypeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRDescriptorDeviceListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                   ResponseHandler handler, MTRActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
-        MTRDescriptorDeviceListListAttributeCallbackBridge(queue, device, handler, action, true),
+    MTRDescriptorDeviceTypeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                       ResponseHandler handler, MTRActionBlock action,
+                                                                       SubscriptionEstablishedHandler establishedHandler) :
+        MTRDescriptorDeviceTypeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -15142,150 +15139,6 @@ public:
                                                                        ResponseHandler handler, MTRActionBlock action,
                                                                        SubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRFaultInjectionGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<FaultInjectionGeneratedCommandListListAttributeCallback>
-{
-public:
-    MTRFaultInjectionGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<FaultInjectionGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
-
-    MTRFaultInjectionGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                     MTRDeviceController * controller, ResponseHandler handler,
-                                                                     MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<FaultInjectionGeneratedCommandListListAttributeCallback>(queue, nodeID, controller, handler, action,
-                                                                                   OnSuccessFn, keepAlive){};
-
-    MTRFaultInjectionGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                     ResponseHandler handler, MTRActionBlock action,
-                                                                     bool keepAlive = false) :
-        MTRCallbackBridge<FaultInjectionGeneratedCommandListListAttributeCallback>(queue, device, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class MTRFaultInjectionGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRFaultInjectionGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    MTRFaultInjectionGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRFaultInjectionGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    MTRFaultInjectionGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        MTRFaultInjectionGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRFaultInjectionAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<FaultInjectionAcceptedCommandListListAttributeCallback>
-{
-public:
-    MTRFaultInjectionAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<FaultInjectionAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRFaultInjectionAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                    MTRDeviceController * controller, ResponseHandler handler,
-                                                                    MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<FaultInjectionAcceptedCommandListListAttributeCallback>(queue, nodeID, controller, handler, action,
-                                                                                  OnSuccessFn, keepAlive){};
-
-    MTRFaultInjectionAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                    ResponseHandler handler, MTRActionBlock action,
-                                                                    bool keepAlive = false) :
-        MTRCallbackBridge<FaultInjectionAcceptedCommandListListAttributeCallback>(queue, device, handler, action, OnSuccessFn,
-                                                                                  keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class MTRFaultInjectionAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRFaultInjectionAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    MTRFaultInjectionAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
-        MTRFaultInjectionAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    MTRFaultInjectionAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
-        MTRFaultInjectionAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRFaultInjectionAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<FaultInjectionAttributeListListAttributeCallback>
-{
-public:
-    MTRFaultInjectionAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<FaultInjectionAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRFaultInjectionAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                              MTRDeviceController * controller, ResponseHandler handler,
-                                                              MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<FaultInjectionAttributeListListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                            keepAlive){};
-
-    MTRFaultInjectionAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                              ResponseHandler handler, MTRActionBlock action,
-                                                              bool keepAlive = false) :
-        MTRCallbackBridge<FaultInjectionAttributeListListAttributeCallback>(queue, device, handler, action, OnSuccessFn,
-                                                                            keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class MTRFaultInjectionAttributeListListAttributeCallbackSubscriptionBridge
-    : public MTRFaultInjectionAttributeListListAttributeCallbackBridge
-{
-public:
-    MTRFaultInjectionAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                          MTRDeviceController * controller, ResponseHandler handler,
-                                                                          MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
-        MTRFaultInjectionAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    MTRFaultInjectionAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
-        MTRFaultInjectionAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

@@ -68,7 +68,7 @@
     ],
     "LocalizationConfiguration": ["Test_TC_LCFG_1_1"],
     "TimeFormatLocalization": ["Test_TC_LTIME_1_2"],
-    "UnitLocalization": ["Test_TC_LUNIT_1_1"],
+    "UnitLocalization": ["Test_TC_LUNIT_1_2"],
     "UserLabel": [
         "Test_TC_ULABEL_1_1",
         "Test_TC_ULABEL_2_1",
@@ -226,12 +226,7 @@
         "TestCommissioningWindow"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
-    "SoftwareDiagnostics": [
-        "Test_TC_DGSW_1_1",
-        "Test_TC_DGSW_2_1",
-        "Test_TC_DGSW_2_2",
-        "Test_TC_DGSW_2_3"
-    ],
+    "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],
     "Subscriptions": ["TestSubscribe_OnOff"],
     "DoorLock": [
         "DL_UsersAndCredentials",

@@ -147,6 +147,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::CallbackGenerateNOCChain(const chi
     const chip::ByteSpan & DAC, const chip::ByteSpan & PAI,
     chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion)
 {
+    VerifyOrReturnError(mCppCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mOnNOCCompletionCallback = onCompletion;
 
     TLVReader reader;
@@ -178,12 +179,8 @@ CHIP_ERROR MTROperationalCredentialsDelegate::CallbackGenerateNOCChain(const chi
     chip::ByteSpan firmwareInfoSpan;
     chip::Credentials::DeviceAttestationVendorReservedDeconstructor vendorReserved;
 
-    __block chip::Optional<chip::Controller::CommissioningParameters> commissioningParameters;
-    // Dereferencing mCppCommissioner as it would be set to point to a valid Cpp commissioner by now, as we are in the middle of
-    // commissioning
-    dispatch_sync(mChipWorkQueue, ^{
-        commissioningParameters = mCppCommissioner->GetCommissioningParameters();
-    });
+    chip::Optional<chip::Controller::CommissioningParameters> commissioningParameters
+        = mCppCommissioner->GetCommissioningParameters();
     VerifyOrReturnError(commissioningParameters.HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
     // Attestation Elements, nonce and signature will have a value in Commissioning Params as the CSR needs a signature or else we
@@ -231,9 +228,11 @@ void MTROperationalCredentialsDelegate::onNOCChainGenerationComplete(NSData * op
         return;
     }
 
-    // use ipk and adminSubject from CommissioningParameters if not passed in.
-    // Dereferencing mCppCommissioner as it would be set to point to a valid Cpp commissioner by now, as we are in the middle of
-    // commissioning
+    if (mCppCommissioner == nullptr) {
+        setNSError(CHIP_ERROR_INCORRECT_STATE, error);
+        return;
+    }
+
     __block chip::Optional<chip::Controller::CommissioningParameters> commissioningParameters;
     dispatch_sync(mChipWorkQueue, ^{
         commissioningParameters = mCppCommissioner->GetCommissioningParameters();

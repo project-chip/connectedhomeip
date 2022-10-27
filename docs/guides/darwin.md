@@ -230,7 +230,10 @@ requirements
     [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-15_6-release-notes)
     for currently known issues.
 -   Please refer to the iOS/iPadOS 16.0
-    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-16-release-notes)
+    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-16-release-notes)
+    for currently known issues.
+-   Please refer to the iOS/iPadOS 16.1
+    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-16_1-release-notes)
     for currently known issues.
 -   Further issues should be reported
     [here](https://github.com/project-chip/connectedhomeip/issues)

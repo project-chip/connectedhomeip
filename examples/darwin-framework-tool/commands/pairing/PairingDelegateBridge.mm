@@ -25,7 +25,7 @@
 @implementation CHIPToolPairingDelegate
 - (void)onStatusUpdate:(MTRPairingStatus)status
 {
-    NSLog(@"Pairing Status Update: %lu", status);
+    NSLog(@"Pairing Status Update: %tu", status);
     switch (status) {
     case MTRPairingStatusSuccess:
         ChipLogProgress(chipTool, "Secure Pairing Success");

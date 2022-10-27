@@ -32,7 +32,9 @@
 
 #include <dns-sd-internal.h>
 #include <glib.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
+#endif
 
 using namespace chip::Dnssd;
 using namespace chip::DeviceLayer::Internal;
@@ -91,13 +93,13 @@ void OnRegister(dnssd_error_e result, dnssd_service_h service, void * data)
     if (result != DNSSD_ERROR_NONE)
     {
         ChipLogError(DeviceLayer, "DNSsd %s: Error: %d", __func__, result);
-        rCtx->mCallback(rCtx->mCbContext, nullptr, GetChipError(result));
+        rCtx->mCallback(rCtx->mCbContext, nullptr, nullptr, GetChipError(result));
         // After this point, the context might be no longer valid
         rCtx->mInstance->RemoveContext(rCtx);
         return;
     }
 
-    rCtx->mCallback(rCtx->mCbContext, rCtx->mType, CHIP_NO_ERROR);
+    rCtx->mCallback(rCtx->mCbContext, rCtx->mType, rCtx->mName, CHIP_NO_ERROR);
 }
 
 gboolean RegisterAsync(GMainLoop * mainLoop, gpointer userData)
@@ -122,7 +124,7 @@ gboolean OnBrowseTimeout(void * userData)
     auto * bCtx = reinterpret_cast<BrowseContext *>(userData);
 
     bCtx->MainLoopQuit();
-    bCtx->mCallback(bCtx->mCbContext, bCtx->mServices.data(), bCtx->mServices.size(), CHIP_NO_ERROR);
+    bCtx->mCallback(bCtx->mCbContext, bCtx->mServices.data(), bCtx->mServices.size(), true, CHIP_NO_ERROR);
 
     // After this point the context might be no longer valid
     bCtx->mInstance->RemoveContext(bCtx);
@@ -213,7 +215,7 @@ exit:
 
     if (ret != DNSSD_ERROR_NONE)
     {
-        bCtx->mCallback(bCtx->mCbContext, nullptr, 0, GetChipError(ret));
+        bCtx->mCallback(bCtx->mCbContext, nullptr, 0, true, GetChipError(ret));
         // After this point the context might be no longer valid
         bCtx->mInstance->RemoveContext(bCtx);
     }
@@ -297,11 +299,13 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     char * ipv4           = nullptr;
     char * ipv6           = nullptr;
     int port              = 0;
+    char * interface      = nullptr;
     unsigned short txtLen = 0;
     uint8_t * txtRecord   = nullptr;
     std::vector<TextEntry> textEntries;
     DnssdService dnssdService = {};
     chip::Inet::IPAddress ipAddr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // In fact, if cancel resolve fails, we can not do anything about it
     int ret = dnssd_cancel_resolve_service(service);
@@ -350,6 +354,14 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
 
     dnssdService.mPort = static_cast<uint16_t>(port);
 
+    ret = dnssd_service_get_interface(service, &interface);
+    VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_interface() failed. ret: %d", ret));
+
+    err = chip::Inet::InterfaceId::InterfaceNameToId(interface, dnssdService.mInterface);
+    VerifyOrExit(
+        err == CHIP_NO_ERROR,
+        ChipLogError(DeviceLayer, "chip::Inet::InterfaceId::InterfaceNameToId() failed. ret: %" CHIP_ERROR_FORMAT, err.Format()));
+
     ret = dnssd_service_get_all_txt_record(service, &txtLen, reinterpret_cast<void **>(&txtRecord));
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_all_txt_record() failed. ret: %d", ret));
 
@@ -369,7 +381,14 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     return;
 
 exit:
-    rCtx->mCallback(rCtx->mCbContext, nullptr, chip::Span<chip::Inet::IPAddress>(), GetChipError(ret));
+    if (err == CHIP_NO_ERROR)
+    {
+        rCtx->mCallback(rCtx->mCbContext, nullptr, chip::Span<chip::Inet::IPAddress>(), GetChipError(ret));
+    }
+    else
+    {
+        rCtx->mCallback(rCtx->mCbContext, nullptr, chip::Span<chip::Inet::IPAddress>(), err);
+    }
     rCtx->mInstance->RemoveContext(rCtx);
 }
 
@@ -524,7 +543,7 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
                 if (ret != DNSSD_ERROR_NONE)
                 {
                     ChipLogError(DeviceLayer, "dnssd_service_add_txt_record() failed. ret: %d", ret);
-                    callback(context, nullptr, err = GetChipError(ret));
+                    callback(context, nullptr, nullptr, err = GetChipError(ret));
                 }
             }
 
@@ -573,7 +592,7 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
 exit:
     if (err != CHIP_NO_ERROR)
     { // Notify caller about error
-        callback(context, nullptr, err);
+        callback(context, nullptr, nullptr, err);
         RemoveContext(serviceCtx);
     }
     return err;
@@ -612,7 +631,7 @@ CHIP_ERROR DnssdTizen::Browse(const char * type, DnssdServiceProtocol protocol, 
 exit:
     if (err != CHIP_NO_ERROR)
     { // Notify caller about error
-        callback(context, nullptr, 0, err);
+        callback(context, nullptr, 0, true, err);
         RemoveContext(browseCtx);
     }
     return err;
@@ -652,10 +671,7 @@ CHIP_ERROR DnssdTizen::Resolve(const DnssdService & browseResult, chip::Inet::In
 
 exit:
     if (err != CHIP_NO_ERROR)
-    { // Notify caller about error
-        callback(context, nullptr, chip::Span<chip::Inet::IPAddress>(), err);
         RemoveContext(resolveCtx);
-    }
     return err;
 }
 
@@ -721,18 +737,23 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    if (chip::DeviceLayer::ThreadStackMgr().IsThreadEnabled())
+    if (DeviceLayer::ThreadStackMgr().IsThreadEnabled())
     {
-        if (strcmp(service->mHostName, "") != 0)
-        {
-            chip::DeviceLayer::ThreadStackMgr().SetupSrpHost(service->mHostName);
-        }
-
         std::string regtype = GetFullType(service->mType, service->mProtocol);
         Span<const char * const> subTypes(service->mSubTypes, service->mSubTypeSize);
         Span<const TextEntry> textEntries(service->mTextEntries, service->mTextEntrySize);
-        return chip::DeviceLayer::ThreadStackMgr().AddSrpService(service->mName, regtype.c_str(), service->mPort, subTypes,
-                                                                 textEntries);
+        CHIP_ERROR err;
+
+        if (strcmp(service->mHostName, "") != 0)
+        {
+            err = DeviceLayer::ThreadStackMgr().SetupSrpHost(service->mHostName);
+            VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+        }
+
+        err = DeviceLayer::ThreadStackMgr().AddSrpService(service->mName, regtype.c_str(), service->mPort, subTypes, textEntries);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+        return CHIP_NO_ERROR;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
@@ -741,6 +762,15 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
 
 CHIP_ERROR ChipDnssdRemoveServices()
 {
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    if (DeviceLayer::ThreadStackMgr().IsThreadEnabled())
+    {
+        DeviceLayer::ThreadStackMgr().InvalidateAllSrpServices();
+        return DeviceLayer::ThreadStackMgr().RemoveInvalidSrpServices();
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
     return DnssdTizen::GetInstance().UnregisterAllServices();
 }
 
@@ -750,13 +780,29 @@ CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context)
+                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
+                           intptr_t * browseIdentifier)
 {
     VerifyOrReturnError(type != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSupportedProtocol(protocol), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+    *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+    if (DeviceLayer::ThreadStackMgr().IsThreadEnabled())
+    {
+        std::string fullType = GetFullType(type, protocol);
+        return DeviceLayer::ThreadStackMgr().DnsBrowse(fullType.c_str(), callback, context);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+
     return DnssdTizen::GetInstance().Browse(type, protocol, addressType, interface, callback, context);
+}
+
+CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
@@ -766,7 +812,20 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId
     VerifyOrReturnError(IsSupportedProtocol(browseResult->mProtocol), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+    if (DeviceLayer::ThreadStackMgr().IsThreadEnabled())
+    {
+        std::string fullType = GetFullType(browseResult->mType, browseResult->mProtocol);
+        return DeviceLayer::ThreadStackMgr().DnsResolve(fullType.c_str(), browseResult->mName, callback, context);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+
     return DnssdTizen::GetInstance().Resolve(*browseResult, interface, callback, context);
+}
+
+CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 } // namespace Dnssd

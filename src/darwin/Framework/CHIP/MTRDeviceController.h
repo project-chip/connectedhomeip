@@ -40,6 +40,39 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 @property (readonly, nonatomic, nullable) NSNumber * controllerNodeId;
 
 /**
+ * Set up a commissioning session for a device, using the provided setup payload
+ * to discover it and connect to it.
+ *
+ * @param payload a setup payload (probably created from a QR code or numeric
+ *                code onboarding payload).
+ * @param newNodeID the planned node id for the node.
+ * @error error indication if discovery can't start at all (e.g. because the
+ *              setup payload is invalid).
+ *
+ * The IP and port for the device will be discovered automatically based on the
+ * provided discriminator.
+ *
+ * Then a PASE session will be established with the device, unless an error
+ * occurs.  MTRDevicePairingDelegate will be notified as follows:
+ *
+ * * Discovery fails: onStatusUpdate with MTRPairingStatusFailed.
+ *
+ * * Discovery succeeds but commissioning session setup fails: onPairingComplete
+ *   with an error.
+ *
+ * * Commissioning session setup succeeds: onPairingComplete with no error.
+ *
+ * Once a commissioning session is set up, getDeviceBeingCommissioned
+ * can be used to get an MTRBaseDevice and discover what sort of network
+ * credentials the device might need, and commissionDevice can be used to
+ * commission the device.
+ */
+- (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
+                                   newNodeID:(NSNumber *)newNodeID
+                                       error:(NSError * __autoreleasing *)error
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+
+/**
  * Start pairing for a device with the given ID, using the provided setup PIN
  * to establish a PASE connection.
  *
@@ -135,11 +168,22 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 - (void)setNocChainIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer queue:(dispatch_queue_t)queue;
 
 /**
+ * Return the attestation challenge for the secure session of the device being commissioned.
+ *
+ * Attempts to retrieve the attestation challenge for a commissionee with the given Device ID.
+ * Returns nil if given Device ID does not match an active commissionee, or if a Secure Session is not availale.
+ */
+- (nullable NSData *)fetchAttestationChallengeForDeviceId:(uint64_t)deviceId;
+
+/**
  * Compute a PASE verifier and passcode ID for the desired setup pincode.
  *
  * @param[in] setupPincode    The desired PIN code to use
  * @param[in] iterations      The number of iterations to use when generating the verifier
  * @param[in] salt            The 16-byte salt for verifier computation
+ *
+ * Returns nil on errors (e.g. salt has the wrong size), otherwise the computed
+ * verifier bytes.
  */
 - (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode iterations:(uint32_t)iterations salt:(NSData *)salt;
 

@@ -224,35 +224,42 @@ public:
     bool IsExtensionBasicCritical() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kExtBasicCriticalWrong)); }
     bool IsExtensionBasicCAPresent() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kExtBasicCAMissing)); }
     bool IsExtensionBasicCACorrect() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kExtBasicCAWrong)); }
-    bool IsExtensionBasicPathLenPresent(AttCertType & attCertType)
-    {
-        bool normallyPresent = (attCertType != kAttCertType_DAC);
-        bool testCaseWrong   = (mEnabled && mFlags.Has(CertErrorFlags::kExtBasicPathLenWrong));
-        return (normallyPresent ^ testCaseWrong);
-    }
     int GetExtensionBasicPathLenValue(AttCertType & attCertType)
     {
-        if (mFlags.Has(CertErrorFlags::kExtBasicPathLen0))
+        if (mEnabled && mFlags.Has(CertErrorFlags::kExtBasicPathLen0))
         {
             return 0;
         }
-        if (mFlags.Has(CertErrorFlags::kExtBasicPathLen1))
+        if (mEnabled && mFlags.Has(CertErrorFlags::kExtBasicPathLen1))
         {
             return 1;
         }
-        if (mFlags.Has(CertErrorFlags::kExtBasicPathLen2))
+        if (mEnabled && mFlags.Has(CertErrorFlags::kExtBasicPathLen2))
         {
             return 2;
         }
-        if (attCertType == kAttCertType_PAA)
+        if (mEnabled && mFlags.Has(CertErrorFlags::kExtBasicPathLenWrong))
         {
-            return 1;
+            if (attCertType == kAttCertType_DAC)
+            {
+                return 0;
+            }
+            else
+            {
+                return IsExtensionBasicCAPresent() ? static_cast<int>(kPathLength_NotSpecified) : 2;
+            }
+        }
+
+        // Correct Values:
+        if (attCertType == kAttCertType_DAC)
+        {
+            return IsExtensionBasicCAPresent() ? static_cast<int>(kPathLength_NotSpecified) : 0;
         }
         if (attCertType == kAttCertType_PAI)
         {
             return 0;
         }
-        return 0;
+        return 1;
     }
     bool IsExtensionBasicPathLenPresent()
     {
@@ -398,12 +405,13 @@ extern bool Cmd_ResignCert(int argc, char * argv[]);
 extern bool Cmd_ValidateAttCert(int argc, char * argv[]);
 extern bool Cmd_ValidateCert(int argc, char * argv[]);
 extern bool Cmd_PrintCert(int argc, char * argv[]);
+extern bool Cmd_PrintCD(int argc, char * argv[]);
 extern bool Cmd_GenAttCert(int argc, char * argv[]);
 
-extern bool ReadCert(const char * fileName, X509 * cert);
-extern bool ReadCert(const char * fileName, X509 * cert, CertFormat & origCertFmt);
-extern bool ReadCertDERRaw(const char * fileName, chip::MutableByteSpan & cert);
-extern bool LoadChipCert(const char * fileName, bool isTrused, chip::Credentials::ChipCertificateSet & certSet,
+extern bool ReadCert(const char * fileNameOrStr, X509 * cert);
+extern bool ReadCert(const char * fileNameOrStr, X509 * cert, CertFormat & origCertFmt);
+extern bool ReadCertDER(const char * fileNameOrStr, chip::MutableByteSpan & cert);
+extern bool LoadChipCert(const char * fileNameOrStr, bool isTrused, chip::Credentials::ChipCertificateSet & certSet,
                          chip::MutableByteSpan & chipCert);
 
 extern bool WriteCert(const char * fileName, X509 * cert, CertFormat certFmt);
@@ -423,7 +431,7 @@ extern bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_
                         X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig);
 extern bool GenerateKeyPair(EVP_PKEY * key);
 extern bool GenerateKeyPair_Secp256k1(EVP_PKEY * key);
-extern bool ReadKey(const char * fileName, std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key,
+extern bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key,
                     bool ignorErrorIfUnsupportedCurve = false);
 extern bool WriteKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt);
 extern bool SerializeKeyPair(EVP_PKEY * key, chip::Crypto::P256SerializedKeypair & serializedKeypair);

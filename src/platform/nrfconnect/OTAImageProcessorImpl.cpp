@@ -71,7 +71,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
         writer.image_id = image_id;
         writer.open     = [](int id, size_t size) { return dfu_target_init(DFU_TARGET_IMAGE_TYPE_MCUBOOT, id, size, nullptr); };
         writer.write    = [](const uint8_t * chunk, size_t chunk_size) { return dfu_target_write(chunk, chunk_size); };
-        writer.close    = [](bool success) { return dfu_target_done(success); };
+        writer.close    = [](bool success) { return success ? dfu_target_done(success) : dfu_target_reset(); };
 
         ReturnErrorOnFailure(System::MapErrorZephyr(dfu_multi_image_register_writer(&writer)));
     };
@@ -213,8 +213,8 @@ void FlashHandler::DoAction(Action aAction)
 {
 #if CONFIG_PM_DEVICE && CONFIG_NORDIC_QSPI_NOR && !CONFIG_SOC_NRF52840 // nRF52 is optimized per default
     // utilize the QSPI driver sleep power mode
-    const auto * qspi_dev = device_get_binding(DT_LABEL(DT_INST(0, nordic_qspi_nor)));
-    if (qspi_dev)
+    const auto * qspi_dev = DEVICE_DT_GET(DT_INST(0, nordic_qspi_nor));
+    if (device_is_ready(qspi_dev))
     {
         const auto requestedAction = Action::WAKE_UP == aAction ? PM_DEVICE_ACTION_RESUME : PM_DEVICE_ACTION_SUSPEND;
         (void) pm_device_action_run(qspi_dev, requestedAction); // not much can be done in case of a failure

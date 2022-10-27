@@ -31,7 +31,7 @@ tests:
 
     - label: "Check Attribute defining the cluster Features"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT reads the (65532) _FeatureMap_ attribute from TH"
@@ -63,7 +63,7 @@ tests:
 
     - label: "Check Attribute defining the product"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT reads the Type attribute from TH"
@@ -121,7 +121,7 @@ tests:
 
     - label: "Check Attribute defining the working status"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT reads the Mode attribute from TH"

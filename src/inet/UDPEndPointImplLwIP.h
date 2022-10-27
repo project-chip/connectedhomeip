@@ -61,6 +61,7 @@ private:
     static void LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, const ip_addr_t * addr, u16_t port);
 
     udp_pcb * mUDP; // LwIP User datagram protocol (UDP) control block.
+    std::atomic_int mDelayReleaseCount{ 0 };
 };
 
 using UDPEndPointImpl = UDPEndPointImplLwIP;

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,11 +25,13 @@
 
 #include <DiagnosticDataProviderImpl.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/CHIPMemString.h>
 
 #include <lwip/tcpip.h>
 
 extern "C" {
 #include <bl602_hal/bl_sys.h>
+#include <bl60x_fw_api.h>
 #include <bl_efuse.h>
 #include <bl_main.h>
 #include <wifi_mgmr.h>
@@ -162,25 +164,60 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason
     return CHIP_NO_ERROR;
 }
 
+static int bl_netif_get_all_ip6(struct netif * netif, ip6_addr_t if_ip6[])
+{
+    if (netif == NULL || if_ip6 == NULL)
+    {
+        return 0;
+    }
+
+    int addr_count = 0;
+    for (int i = 0; (i < LWIP_IPV6_NUM_ADDRESSES) && (i < kMaxIPv6AddrCount); i++)
+    {
+        if (!ip_addr_cmp(&netif->ip6_addr[i], IP6_ADDR_ANY))
+        {
+            memcpy(&if_ip6[addr_count++], &netif->ip6_addr[i], sizeof(ip6_addr_t));
+        }
+    }
+
+    return addr_count;
+}
+
 CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
 {
     NetworkInterface * ifp = new NetworkInterface();
     struct netif * netif;
-    uint8_t mac_addr[6];
 
     netif = wifi_mgmr_sta_netif_get();
     if (netif)
     {
-        strncpy(ifp->Name, netif->name, Inet::InterfaceId::kMaxIfNameLength);
-        ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
-        ifp->name                                          = CharSpan::fromCharString(ifp->Name);
-        ifp->isOperational                                 = true;
-        ifp->type                                          = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+        Platform::CopyString(ifp->Name, netif->name);
+        ifp->name          = CharSpan::fromCharString(ifp->Name);
+        ifp->isOperational = true;
+        ifp->type          = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
         ifp->offPremiseServicesReachableIPv4.SetNull();
         ifp->offPremiseServicesReachableIPv6.SetNull();
-        bl_efuse_read_mac(mac_addr);
-        memcpy(ifp->MacAddress, mac_addr, sizeof(mac_addr));
+        bl_efuse_read_mac(ifp->MacAddress);
+        ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
+
+        uint32_t ip, gw, mask;
+        wifi_mgmr_sta_ip_get(&ip, &gw, &mask);
+        memcpy(ifp->Ipv4AddressesBuffer[0], &ip, kMaxIPv4AddrSize);
+        ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
+        ifp->IPv4Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, 1);
+
+        uint8_t ipv6_addr_count = 0;
+        ip6_addr_t ip6_addr[kMaxIPv6AddrCount];
+        ipv6_addr_count = bl_netif_get_all_ip6(netif, ip6_addr);
+        for (uint8_t idx = 0; idx < ipv6_addr_count; ++idx)
+        {
+            memcpy(ifp->Ipv6AddressesBuffer[idx], ip6_addr[idx].addr, kMaxIPv6AddrSize);
+            ifp->Ipv6AddressSpans[idx] = ByteSpan(ifp->Ipv6AddressesBuffer[idx], kMaxIPv6AddrSize);
+        }
+        ifp->IPv6Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, ipv6_addr_count);
     }
+
+    *netifpp = ifp;
 
     return CHIP_NO_ERROR;
 }
@@ -204,8 +241,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
 {
     static uint8_t macAddress[kMaxHardwareAddrSize];
 
-    wifi_mgmr_get_bssid(macAddress);
-    BssId = ByteSpan(macAddress, 6);
+    memcpy(macAddress, wifiMgmr.wifi_mgmr_stat_info.bssid, kMaxHardwareAddrSize);
 
     return CHIP_NO_ERROR;
 }
@@ -214,8 +250,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityTyp
 {
     int authmode;
 
-    authmode     = mgmr_get_security_type();
-    securityType = MapAuthModeToSecurityType(authmode);
+    // authmode     = mgmr_get_security_type();
+    // securityType = MapAuthModeToSecurityType(authmode);
     return CHIP_NO_ERROR;
 }
 
@@ -229,51 +265,85 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNu
 {
     channelNumber = 0;
 
-    channelNumber = mgmr_get_current_channel_num();
+    // channelNumber = mgmr_get_current_channel_num();
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 {
-    rssi = mgmr_get_rssi();
+    // rssi = mgmr_get_rssi();
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
 {
-    beaconLostCount = wifi_mgmr_beacon_loss_cnt();
+    wifi_diagnosis_info_t * info;
+
+    info = bl_diagnosis_get();
+    if (info)
+    {
+        beaconLostCount = info->beacon_loss;
+    }
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
 {
-    currentMaxRate = 0;
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
 {
-    packetMulticastRxCount = wifi_mgmr_tx_multicast_cnt_get();
+    wifi_diagnosis_info_t * info;
+
+    info = bl_diagnosis_get();
+    if (info)
+    {
+        packetMulticastRxCount = info->multicast_recv;
+    }
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
 {
-    packetMulticastTxCount = wifi_mgmr_tx_multicast_cnt_get();
+    wifi_diagnosis_info_t * info;
+
+    info = bl_diagnosis_get();
+    if (info)
+    {
+        packetMulticastTxCount = info->multicast_send;
+    }
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
 {
-    packetUnicastRxCount = wifi_mgmr_rx_unicast_cnt_get();
+    wifi_diagnosis_info_t * info;
+
+    info = bl_diagnosis_get();
+    if (info)
+    {
+        packetUnicastRxCount = info->unicast_recv;
+    }
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
 {
-    packetUnicastTxCount = wifi_mgmr_tx_unicast_cnt_get();
+    wifi_diagnosis_info_t * info;
+
+    info = bl_diagnosis_get();
+    if (info)
+    {
+        packetUnicastTxCount = info->multicast_send;
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -290,9 +360,17 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
 {
-    beaconRxCount = wifi_mgmr_beacon_recv_cnt();
+    wifi_diagnosis_info_t * info;
+
+    info = bl_diagnosis_get();
+    if (info)
+    {
+        beaconRxCount = info->beacon_recv;
+    }
+
     return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer
+wifi_diagnosis_info_t * info;
 } // namespace chip

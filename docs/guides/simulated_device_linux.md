@@ -88,15 +88,12 @@ interact with it using chip-tool
 1. Follow the instruction to build chip-tool in the
    [chip-tool readme](../../examples/chip-tool).
 
-2. Run this command to initiate the pairing.
+2. Run this command to commission.
     ```
-    ./out/debug/standalone/chip-tool pairing ethernet 0x654321 20202021 3842 [IP ADDRESS of App] 5542
+    ./out/debug/standalone/chip-tool pairing code 0x654321 MT:-24J0AFN00KA0648G00
     ```
-3. Run this command to complete the commissioning.
-    ```
-    ./out/debug/standalone/chip-tool generalcommissioning commissioning-complete 0x654321 0
-    ```
-4. Most tests will start at this point and now an send cluster commands with
+    or whatever is listed on the "SetupQRCode:" line in the log output.
+3. Most tests will start at this point and now an send cluster commands with
    chip-tool as follow.
 
     ```

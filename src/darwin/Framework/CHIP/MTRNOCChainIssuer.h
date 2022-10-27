@@ -22,6 +22,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef void (^MTRNOCChainGenerationCompleteHandler)(NSData * operationalCertificate, NSData * intermediateCertificate,
+    NSData * rootCertificate, NSData * _Nullable ipk, NSNumber * _Nullable adminSubject, NSError * __autoreleasing * error);
+
 @protocol MTRNOCChainIssuer <NSObject>
 @required
 
@@ -43,9 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)onNOCChainGenerationNeeded:(CSRInfo *)csrInfo
                    attestationInfo:(AttestationInfo *)attestationInfo
-      onNOCChainGenerationComplete:(void (^)(NSData * operationalCertificate, NSData * intermediateCertificate,
-                                       NSData * rootCertificate, NSData * ipk, NSNumber * adminSubject,
-                                       NSError * __autoreleasing * error))onNOCChainGenerationComplete;
+      onNOCChainGenerationComplete:(MTRNOCChainGenerationCompleteHandler)onNOCChainGenerationComplete;
 
 @end
 

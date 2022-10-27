@@ -23,6 +23,7 @@
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <vector>
 
 class CredentialIssuerCommands
 {
@@ -54,6 +55,16 @@ public:
     virtual CHIP_ERROR SetupDeviceAttestation(chip::Controller::SetupParams & setupParams,
                                               const chip::Credentials::AttestationTrustStore * trustStore) = 0;
 
+    /**
+     * @brief Add a list of additional non-default CD verifying keys (by certificate)
+     *
+     * Must be called AFTER SetupDeviceAttestation.
+     *
+     * @param additionalCdCerts - vector of X.509 DER verifying cert bodies
+     * @return CHIP_NO_ERROR on succes, another CHIP_ERROR on internal failures.
+     */
+    virtual CHIP_ERROR AddAdditionalCDVerifyingCerts(const std::vector<std::vector<uint8_t>> & additionalCdCerts) = 0;
+
     virtual chip::Controller::OperationalCredentialsDelegate * GetCredentialIssuer() = 0;
 
     /**
@@ -79,6 +90,7 @@ public:
     enum CredentialIssuerOptions : uint8_t
     {
         kMaximizeCertificateSizes = 0, // If set, certificate chains will be maximized for testing via padding
+        kAllowTestCdSigningKey    = 1, // If set, allow development/test SDK CD verifying key to be used
     };
 
     virtual void SetCredentialIssuerOption(CredentialIssuerOptions option, bool isEnabled)

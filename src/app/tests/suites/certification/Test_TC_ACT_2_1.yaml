@@ -58,24 +58,23 @@ tests:
       verification: |
           ./chip-tool descriptor read parts-list 1 0
 
-          On TH(chip-tool), verify the PartsList value as 13 entries (number may vary by DUT capabilities)
+          On TH(chip-tool), verify the PartsList value as 12 entries (number may vary by DUT capabilities)
 
-          [1658393733.358450][13576:13581] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 3528858866
-          [1658393733.358548][13576:13581] CHIP:TOO:   parts list: 13 entries
-          [1658393733.358579][13576:13581] CHIP:TOO:     [1]: 1
-          [1658393733.358615][13576:13581] CHIP:TOO:     [2]: 2
-          [1658393733.358640][13576:13581] CHIP:TOO:     [3]: 3
-          [1658393733.358665][13576:13581] CHIP:TOO:     [4]: 4
-          [1658393733.358699][13576:13581] CHIP:TOO:     [5]: 5
-          [1658393733.358724][13576:13581] CHIP:TOO:     [6]: 6
-          [1658393733.358756][13576:13581] CHIP:TOO:     [7]: 7
-          [1658393733.358781][13576:13581] CHIP:TOO:     [8]: 8
-          [1658393733.358804][13576:13581] CHIP:TOO:     [9]: 9
-          [1658393733.358838][13576:13581] CHIP:TOO:     [10]: 10
-          [1658393733.358863][13576:13581] CHIP:TOO:     [11]: 11
-          [1658393733.358895][13576:13581] CHIP:TOO:     [12]: 12
-          [1658393733.358921][13576:13581] CHIP:TOO:     [13]: 13
-          [1658393733.359051][13576:13581] CHIP:EM: Sending Standalone Ack for MessageCounter:3177509 on exchange 11364i
+          [1661775581.434024][11909:11914] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 2309949467
+          [1661775581.434098][11909:11914] CHIP:TOO:   parts list: 12 entries
+          [1661775581.434129][11909:11914] CHIP:TOO:     [1]: 1
+          [1661775581.434155][11909:11914] CHIP:TOO:     [2]: 3
+          [1661775581.434180][11909:11914] CHIP:TOO:     [3]: 4
+          [1661775581.434205][11909:11914] CHIP:TOO:     [4]: 5
+          [1661775581.434230][11909:11914] CHIP:TOO:     [5]: 6
+          [1661775581.434255][11909:11914] CHIP:TOO:     [6]: 7
+          [1661775581.434280][11909:11914] CHIP:TOO:     [7]: 8
+          [1661775581.434304][11909:11914] CHIP:TOO:     [8]: 9
+          [1661775581.434383][11909:11914] CHIP:TOO:     [9]: 10
+          [1661775581.434408][11909:11914] CHIP:TOO:     [10]: 11
+          [1661775581.434434][11909:11914] CHIP:TOO:     [11]: 12
+          [1661775581.434459][11909:11914] CHIP:TOO:     [12]: 13
+          [1661775581.434597][11909:11914] CHIP:EM: Sending Standalone Ack for MessageCounter:142298497 on exchange 3054i
       disabled: true
 
     - label: "Read EndpointLists attribute of Actions server"

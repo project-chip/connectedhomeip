@@ -19,7 +19,7 @@ import("//build_overrides/pigweed.gni")
 import("${chip_root}/examples/platform/efr32/args.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 
-# ARM architecture flags will be set based on efr32_family.
+# ARM architecture flags will be set based on silabs_family.
 arm_platform_config = "${efr32_sdk_build_root}/efr32_arm.gni"
 
 mbedtls_target = "${efr32_sdk_build_root}:efr32_sdk"
@@ -42,6 +42,10 @@ chip_system_config_use_open_thread_inet_endpoints = true
 chip_with_lwip = false
 
 chip_build_tests = false
+
+# Transitional CommissionableDataProvider not used anymore
+# examples/platform/efr32/EFR32DeviceDataProvider is now used.
+chip_use_transitional_commissionable_data_provider = false
 
 openthread_root = "${chip_root}/third_party/openthread/ot-efr32/openthread"
 openthread_core_config_platform_check_file =

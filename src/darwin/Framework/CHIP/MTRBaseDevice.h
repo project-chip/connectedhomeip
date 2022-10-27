@@ -17,6 +17,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class MTRSetupPayload;
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -77,6 +79,22 @@ typedef void (^MTRDeviceResponseHandler)(NSArray<NSDictionary<NSString *, id> *>
 typedef void (^MTRDeviceReportHandler)(NSArray * values);
 typedef void (^MTRDeviceErrorHandler)(NSError * error);
 
+/**
+ * Handler for subscribeWithQueue: resubscription scheduling notifications.
+ * This will be called when subscription loss is detected.
+ *
+ * @param error An error indicating the reason the subscription has been lost.
+ * @param resubscriptionDelay A delay, in milliseconds, before the next
+ *        automatic resubscription will be attempted.
+ */
+typedef void (^MTRDeviceResubscriptionScheduledHandler)(NSError * error, NSNumber * resubscriptionDelay);
+
+/**
+ * Handler for openCommissioningWindowWithSetupPasscode.
+ */
+API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
+typedef void (^MTRDeviceOpenCommissioningWindowHandler)(MTRSetupPayload * _Nullable payload, NSError * _Nullable error);
+
 extern NSString * const MTRAttributePathKey;
 extern NSString * const MTRCommandPathKey;
 extern NSString * const MTREventPathKey;
@@ -126,15 +144,23 @@ extern NSString * const MTRArrayValueType;
  * instances.  Errors for specific paths, not the whole subscription, will be
  * reported via those objects.
  *
- * errorHandler will be called any time there is an error for the
- * entire subscription (with a non-nil "error"), and terminate the subscription.
+ * errorHandler will be called any time there is an error for the entire
+ * subscription (with a non-nil "error"), and terminate the subscription.  This
+ * will generally not be invoked if auto-resubscription is enabled, unless there
+ * is a fatal error during a resubscription attempt.
  *
  * Both report handlers are not supported over XPC at the moment.
  *
- * subscriptionEstablished block, if not nil, will be called once the
+ * The subscriptionEstablished block, if not nil, will be called once the
  * subscription is established.  This will be _after_ the first (priming) call
  * to both report handlers.  Note that if the MTRSubscribeParams are set to
  * automatically resubscribe this can end up being called more than once.
+ *
+ * The resubscriptionScheduled block, if not nil, will be called if
+ * auto-resubscription is enabled, subscription loss is detected, and a
+ * resubscription is scheduled.  This can be called multiple times in a row
+ * without an intervening subscriptionEstablished call if the resubscription
+ * attempts fail.
  */
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
                 minInterval:(uint16_t)minInterval
@@ -144,7 +170,8 @@ extern NSString * const MTRArrayValueType;
      attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
          eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
                errorHandler:(MTRDeviceErrorHandler)errorHandler
-    subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler;
+    subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
+    resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler;
 
 /**
  * Read attribute in a designated attribute path
@@ -218,6 +245,27 @@ extern NSString * const MTRArrayValueType;
  * for one of those clients to shut down the entire stack to stop receiving reports.
  */
 - (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)clientQueue completion:(void (^)(void))completion;
+
+/**
+ * Open a commissioning window on the device.
+ *
+ * On success, completion will be called on queue with the MTRSetupPayload that
+ * can be used to commission the device.
+ *
+ * @param setupPasscode The setup passcode to use for the commissioning window.
+ *                      See MTRSetupPayload's generateRandomSetupPasscode for
+ *                      generating a valid random passcode.
+ * @param discriminator The discriminator to use for the commissionable
+ *                      advertisement.
+ * @param duration      Duration, in seconds, during which the commissioning
+ *                      window will be open.
+ */
+- (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
+                                   discriminator:(NSNumber *)discriminator
+                                        duration:(NSNumber *)duration
+                                           queue:(dispatch_queue_t)queue
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 @end
 

@@ -183,26 +183,45 @@ bool SerializeKeyPair(EVP_PKEY * key, P256SerializedKeypair & serializedKeypair)
     return true;
 }
 
-bool ReadKey(const char * fileName, std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key, bool ignorErrorIfUnsupportedCurve)
+bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key, bool ignorErrorIfUnsupportedCurve)
 {
     bool res            = true;
     uint32_t keyDataLen = 0;
     KeyFormat keyFormat = kKeyFormat_Unknown;
     std::unique_ptr<uint8_t[]> keyData;
 
-    res = ReadFileIntoMem(fileName, nullptr, keyDataLen);
-    VerifyTrueOrExit(res);
-
-    keyData = std::unique_ptr<uint8_t[]>(new uint8_t[keyDataLen]);
-
-    res = ReadFileIntoMem(fileName, keyData.get(), keyDataLen);
-    VerifyTrueOrExit(res);
-
-    keyFormat = DetectKeyFormat(keyData.get(), keyDataLen);
-    if (keyFormat == kKeyFormat_Unknown)
+    // If fileNameOrStr is a file name
+    if (access(fileNameOrStr, R_OK) == 0)
     {
-        fprintf(stderr, "Unrecognized Key Format in File: %s\n", fileName);
-        return false;
+        res = ReadFileIntoMem(fileNameOrStr, nullptr, keyDataLen);
+        VerifyTrueOrExit(res);
+
+        keyData = std::unique_ptr<uint8_t[]>(new uint8_t[keyDataLen]);
+
+        res = ReadFileIntoMem(fileNameOrStr, keyData.get(), keyDataLen);
+        VerifyTrueOrExit(res);
+
+        keyFormat = DetectKeyFormat(keyData.get(), keyDataLen);
+        if (keyFormat == kKeyFormat_Unknown)
+        {
+            fprintf(stderr, "Unrecognized Key Format in File: %s\n", fileNameOrStr);
+            return false;
+        }
+    }
+    // Otherwise, treat fileNameOrStr as a pointer to the key string
+    else
+    {
+        keyDataLen = static_cast<uint32_t>(strlen(fileNameOrStr));
+
+        keyFormat = DetectKeyFormat(reinterpret_cast<const uint8_t *>(fileNameOrStr), keyDataLen);
+        if (keyFormat == kKeyFormat_Unknown)
+        {
+            fprintf(stderr, "Unrecognized Key Format in Input Argument: %s\n", fileNameOrStr);
+            return false;
+        }
+
+        keyData = std::unique_ptr<uint8_t[]>(new uint8_t[keyDataLen]);
+        memcpy(keyData.get(), fileNameOrStr, keyDataLen);
     }
 
     if ((keyFormat == kKeyFormat_X509_Hex) || (keyFormat == kKeyFormat_Chip_Hex) || (keyFormat == kKeyFormat_Chip_Pubkey_Hex))
@@ -269,13 +288,6 @@ bool ReadKey(const char * fileName, std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY 
         else
         {
             EVP_PKEY * tmpKeyPtr = nullptr;
-            if (keyFormat == kKeyFormat_X509_Hex)
-            {
-                size_t len = HexToBytes(reinterpret_cast<char *>(keyBIO.get()), keyDataLen,
-                                        reinterpret_cast<uint8_t *>(keyBIO.get()), keyDataLen);
-                VerifyOrReturnError(2 * len == keyDataLen, false);
-            }
-
             if (d2i_PrivateKey_bio(keyBIO.get(), &tmpKeyPtr) == nullptr)
             {
                 ReportOpenSSLErrorAndExit("d2i_PrivateKey_bio", res = false);
@@ -425,8 +437,6 @@ bool WriteKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
         fprintf(stderr, "Unsupported private key format\n");
         ExitNow(res = false);
     }
-
-    printf("\r\n");
 
 exit:
     CloseFile(file);

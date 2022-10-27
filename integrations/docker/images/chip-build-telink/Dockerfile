@@ -17,11 +17,12 @@ RUN set -x \
     && : # last line
 
 # Setup Zephyr
-ARG ZEPHYR_REVISION=8cf9cc52e4de98d0303d8fed6a57ae956954986d
+ARG ZEPHYR_REVISION=c57ffb4738251a3b670ded02ba514aa5c650563a
 WORKDIR /opt/telink/zephyrproject
 RUN set -x \
     && python3 -m pip install -U --no-cache-dir \
     west==0.12.0 \
+    imgtool==1.7.0 \
     && git clone https://github.com/telink-semi/zephyr \
     && cd zephyr \
     && git reset ${ZEPHYR_REVISION} --hard \

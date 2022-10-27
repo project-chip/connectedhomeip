@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@
 #include <system/SystemError.h>
 
 #include <cstdint>
-#include <drivers/gpio.h>
+#include <zephyr/drivers/gpio.h>
 
 class LightingManager
 {
@@ -45,17 +45,20 @@ public:
 
     using LightingCallback_fn = void (*)(Action_t, int32_t);
 
-    CHIP_ERROR Init(const device * pwmDevice, uint32_t pwmChannel);
+    CHIP_ERROR Init(const device * pwmDevice, uint32_t pwmChannel, uint8_t aMinLevel, uint8_t aMaxLevel, uint8_t aDefaultLevel = 0);
+    void Set(bool aOn);
     bool IsTurnedOn() const { return mState == kState_On; }
     uint8_t GetLevel() const { return mLevel; }
+    uint8_t GetMinLevel() const { return mMinLevel; }
+    uint8_t GetMaxLevel() const { return mMaxLevel; }
     bool InitiateAction(Action_t aAction, int32_t aActor, uint8_t size, uint8_t * value);
     void SetCallbacks(LightingCallback_fn aActionInitiated_CB, LightingCallback_fn aActionCompleted_CB);
 
 private:
-    static constexpr uint8_t kMaxLevel = 255;
-
     friend LightingManager & LightingMgr();
     State_t mState;
+    uint8_t mMinLevel;
+    uint8_t mMaxLevel;
     uint8_t mLevel;
     const device * mPwmDevice;
     uint32_t mPwmChannel;
@@ -63,7 +66,6 @@ private:
     LightingCallback_fn mActionInitiated_CB;
     LightingCallback_fn mActionCompleted_CB;
 
-    void Set(bool aOn);
     void SetLevel(uint8_t aLevel);
     void UpdateLight();
 

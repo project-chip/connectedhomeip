@@ -27,6 +27,9 @@
 
 #include <cinttypes>
 
+#include "access/RequestPath.h"
+#include "access/SubjectDescriptor.h"
+#include <app/RequiredPrivilege.h>
 #include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/CodeUtils.h>
 
@@ -97,6 +100,11 @@ void InteractionModelEngine::Shutdown()
     mTimedHandlers.ReleaseAll();
 
     mReadHandlers.ReleaseAll();
+
+    // Shut down any subscription clients that are still around.  They won't be
+    // able to work after this point anyway, since we're about to drop our refs
+    // to them.
+    ShutdownAllSubscriptions();
 
     //
     // We hold weak references to ReadClient objects. The application ultimately
@@ -253,24 +261,37 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscription(const ScopedNodeId & aPe
 
 void InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId)
 {
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
-    {
-        if (readClient->IsSubscriptionType() && readClient->GetFabricIndex() == aFabricIndex &&
-            readClient->GetPeerNodeId() == aPeerNodeId)
-        {
-            readClient->Close(CHIP_NO_ERROR);
-        }
-    }
+    ShutdownMatchingSubscriptions(MakeOptional(aFabricIndex), MakeOptional(aPeerNodeId));
+}
+void InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex)
+{
+    ShutdownMatchingSubscriptions(MakeOptional(aFabricIndex));
 }
 
 void InteractionModelEngine::ShutdownAllSubscriptions()
 {
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    ShutdownMatchingSubscriptions();
+}
+
+void InteractionModelEngine::ShutdownMatchingSubscriptions(const Optional<FabricIndex> & aFabricIndex,
+                                                           const Optional<NodeId> & aPeerNodeId)
+{
+    // This is assuming that ReadClient::Close will not affect any other
+    // ReadClients in the list.
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
     {
+        // Grab the next client now, because we might be about to delete readClient.
+        auto * nextClient = readClient->GetNextClient();
         if (readClient->IsSubscriptionType())
         {
-            readClient->Close(CHIP_NO_ERROR);
+            bool fabricMatches = !aFabricIndex.HasValue() || (aFabricIndex.Value() == readClient->GetFabricIndex());
+            bool nodeIdMatches = !aPeerNodeId.HasValue() || (aPeerNodeId.Value() == readClient->GetPeerNodeId());
+            if (fabricMatches && nodeIdMatches)
+            {
+                readClient->Close(CHIP_NO_ERROR);
+            }
         }
+        readClient = nextClient;
     }
 }
 
@@ -305,6 +326,79 @@ Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext
     return Status::Success;
 }
 
+CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDescriptor & aSubjectDescriptor,
+                                                       AttributePathIBs::Parser & aAttributePathListParser,
+                                                       bool & aHasValidAttributePath, size_t & aRequestedAttributePathCount)
+{
+    TLV::TLVReader pathReader;
+    aAttributePathListParser.GetReader(&pathReader);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    aHasValidAttributePath       = false;
+    aRequestedAttributePathCount = 0;
+
+    while (CHIP_NO_ERROR == (err = pathReader.Next()))
+    {
+        VerifyOrReturnError(TLV::AnonymousTag() == pathReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+
+        AttributePathIB::Parser path;
+        //
+        // We create an iterator to point to a single item object list that tracks the path we just parsed.
+        // This avoids the 'parse all paths' approach that is employed in ReadHandler since we want to
+        // avoid allocating out of the path store during this minimal initial processing stage.
+        //
+        ObjectList<AttributePathParams> paramsList;
+
+        ReturnErrorOnFailure(path.Init(pathReader));
+        ReturnErrorOnFailure(path.ParsePath(paramsList.mValue));
+
+        if (paramsList.mValue.IsWildcardPath())
+        {
+            AttributePathExpandIterator pathIterator(&paramsList);
+            ConcreteAttributePath readPath;
+
+            // The definition of "valid path" is "path exists and ACL allows access". The "path exists" part is handled by
+            // AttributePathExpandIterator. So we just need to check the ACL bits.
+            for (; pathIterator.Get(readPath); pathIterator.Next())
+            {
+                Access::RequestPath requestPath{ .cluster = readPath.mClusterId, .endpoint = readPath.mEndpointId };
+                err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath,
+                                                       RequiredPrivilege::ForReadAttribute(readPath));
+                if (err == CHIP_NO_ERROR)
+                {
+                    aHasValidAttributePath = true;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            ConcreteAttributePath concretePath(paramsList.mValue.mEndpointId, paramsList.mValue.mClusterId,
+                                               paramsList.mValue.mAttributeId);
+            if (ConcreteAttributePathExists(concretePath))
+            {
+                Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
+
+                err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath,
+                                                       RequiredPrivilege::ForReadAttribute(concretePath));
+                if (err == CHIP_NO_ERROR)
+                {
+                    aHasValidAttributePath = true;
+                }
+            }
+        }
+
+        aRequestedAttributePathCount++;
+    }
+
+    if (err == CHIP_ERROR_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+
+    return err;
+}
+
 Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext,
                                                                                  const PayloadHeader & aPayloadHeader,
                                                                                  System::PacketBufferHandle && aPayload,
@@ -331,63 +425,10 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
         reader.Init(aPayload.Retain());
 
         SubscribeRequestMessage::Parser subscribeRequestParser;
-        CHIP_ERROR err = subscribeRequestParser.Init(reader);
-        if (err != CHIP_NO_ERROR)
-        {
-            return Status::InvalidAction;
-        }
+        VerifyOrReturnError(subscribeRequestParser.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 
-        {
-            size_t requestedAttributePathCount = 0;
-            size_t requestedEventPathCount     = 0;
-            AttributePathIBs::Parser attributePathListParser;
-            err = subscribeRequestParser.GetAttributeRequests(&attributePathListParser);
-            if (err == CHIP_NO_ERROR)
-            {
-                TLV::TLVReader pathReader;
-                attributePathListParser.GetReader(&pathReader);
-                err = TLV::Utilities::Count(pathReader, requestedAttributePathCount, false);
-            }
-            else if (err == CHIP_ERROR_END_OF_TLV)
-            {
-                err = CHIP_NO_ERROR;
-            }
-            if (err != CHIP_NO_ERROR)
-            {
-                return Status::InvalidAction;
-            }
-
-            EventPathIBs::Parser eventpathListParser;
-            err = subscribeRequestParser.GetEventRequests(&eventpathListParser);
-            if (err == CHIP_NO_ERROR)
-            {
-                TLV::TLVReader pathReader;
-                eventpathListParser.GetReader(&pathReader);
-                err = TLV::Utilities::Count(pathReader, requestedEventPathCount, false);
-            }
-            else if (err == CHIP_ERROR_END_OF_TLV)
-            {
-                err = CHIP_NO_ERROR;
-            }
-            if (err != CHIP_NO_ERROR)
-            {
-                return Status::InvalidAction;
-            }
-
-            // The following cast is safe, since we can only hold a few tens of paths in one request.
-            if (!EnsureResourceForSubscription(apExchangeContext->GetSessionHandle()->GetFabricIndex(), requestedAttributePathCount,
-                                               requestedEventPathCount))
-            {
-                return Status::PathsExhausted;
-            }
-        }
-
-        err = subscribeRequestParser.GetKeepSubscriptions(&keepExistingSubscriptions);
-        if (err != CHIP_NO_ERROR)
-        {
-            return Status::InvalidAction;
-        }
-
+        VerifyOrReturnError(subscribeRequestParser.GetKeepSubscriptions(&keepExistingSubscriptions) == CHIP_NO_ERROR,
+                            Status::InvalidAction);
         if (!keepExistingSubscriptions)
         {
             //
@@ -407,9 +448,75 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                 return Loop::Continue;
             });
         }
-    }
 
-    if (aInteractionType == ReadHandler::InteractionType::Read)
+        {
+            size_t requestedAttributePathCount = 0;
+            size_t requestedEventPathCount     = 0;
+            AttributePathIBs::Parser attributePathListParser;
+            bool hasValidAttributePath = false;
+
+            CHIP_ERROR err = subscribeRequestParser.GetAttributeRequests(&attributePathListParser);
+            if (err == CHIP_NO_ERROR)
+            {
+                auto subjectDescriptor = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetSubjectDescriptor();
+                err                    = ParseAttributePaths(subjectDescriptor, attributePathListParser, hasValidAttributePath,
+                                          requestedAttributePathCount);
+                if (err != CHIP_NO_ERROR)
+                {
+                    return Status::InvalidAction;
+                }
+            }
+            else if (err != CHIP_ERROR_END_OF_TLV)
+            {
+                return Status::InvalidAction;
+            }
+
+            EventPathIBs::Parser eventpathListParser;
+            err = subscribeRequestParser.GetEventRequests(&eventpathListParser);
+            if (err == CHIP_NO_ERROR)
+            {
+                TLV::TLVReader pathReader;
+                eventpathListParser.GetReader(&pathReader);
+                ReturnErrorCodeIf(TLV::Utilities::Count(pathReader, requestedEventPathCount, false) != CHIP_NO_ERROR,
+                                  Status::InvalidAction);
+            }
+            else if (err != CHIP_ERROR_END_OF_TLV)
+            {
+                return Status::InvalidAction;
+            }
+
+            if (requestedAttributePathCount == 0 && requestedEventPathCount == 0)
+            {
+                ChipLogError(InteractionModel,
+                             "Subscription from [%u:" ChipLogFormatX64 "] has no attribute or event paths. Rejecting request.",
+                             apExchangeContext->GetSessionHandle()->GetFabricIndex(),
+                             ChipLogValueX64(apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId()));
+                return Status::InvalidAction;
+            }
+
+            //
+            // TODO: We don't have an easy way to do a similar 'path expansion' for events to deduce
+            // access so for now, assume that the presence of any path in the event list means they
+            // might have some access to those events.
+            //
+            if (!hasValidAttributePath && requestedEventPathCount == 0)
+            {
+                ChipLogError(InteractionModel,
+                             "Subscription from [%u:" ChipLogFormatX64 "] has no access at all. Rejecting request.",
+                             apExchangeContext->GetSessionHandle()->GetFabricIndex(),
+                             ChipLogValueX64(apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId()));
+                return Status::InvalidAction;
+            }
+
+            // The following cast is safe, since we can only hold a few tens of paths in one request.
+            if (!EnsureResourceForSubscription(apExchangeContext->GetSessionHandle()->GetFabricIndex(), requestedAttributePathCount,
+                                               requestedEventPathCount))
+            {
+                return Status::PathsExhausted;
+            }
+        }
+    }
+    else
     {
         System::PacketBufferTLVReader reader;
         reader.Init(aPayload.Retain());
@@ -684,6 +791,10 @@ bool InteractionModelEngine::TrimFabricForSubscriptions(FabricIndex aFabricIndex
          eventPathsSubscribedByCurrentFabric > perFabricPathCapacity ||
          subscriptionsEstablishedByCurrentFabric > perFabricSubscriptionCapacity))
     {
+        SubscriptionId subId;
+        candidate->GetSubscriptionId(subId);
+        ChipLogProgress(DataManagement, "Evicting Subscription ID %u:0x%" PRIx32, candidate->GetSubjectDescriptor().fabricIndex,
+                        subId);
         candidate->Close();
         return true;
     }

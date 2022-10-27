@@ -130,7 +130,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                                   established[0] = @YES;
                                   completionHandler(nil);
                               }
-                          }];
+                          }
+                          resubscriptionScheduled:nil];
                   }];
 }
 @end
@@ -181,15 +182,19 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     newConnection.remoteObjectInterface = _clientInterface;
     newConnection.exportedObject = self;
     newConnection.invalidationHandler = ^{
-        NSLog(@"XPC connection disconnected");
-        self.xpcConnection = nil;
-        if (self.xpcDisconnectExpectation) {
-            [self.xpcDisconnectExpectation fulfill];
-            self.xpcDisconnectExpectation = nil;
-        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSLog(@"XPC connection disconnected");
+            self.xpcConnection = nil;
+            if (self.xpcDisconnectExpectation) {
+                [self.xpcDisconnectExpectation fulfill];
+                self.xpcDisconnectExpectation = nil;
+            }
+        });
     };
-    _xpcConnection = newConnection;
-    [newConnection resume];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.xpcConnection = newConnection;
+        [newConnection resume];
+    });
     return YES;
 }
 
@@ -2431,6 +2436,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         completion([MTRDeviceController encodeXPCResponseValues:myValues], nil);
     };
 
+    _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
+
     [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
                                                   deviceId:myNodeId
                                                     params:nil
@@ -2440,7 +2447,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                                                     XCTAssertNil(error);
                                                     [subscribeExpectation fulfill];
                                                 }];
-    [self waitForExpectations:@[ subscribeExpectation ] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ subscribeExpectation, _xpcDisconnectExpectation ] timeout:kTimeoutInSeconds];
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
     [attributeCacheContainer

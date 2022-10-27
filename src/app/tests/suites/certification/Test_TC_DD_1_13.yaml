@@ -65,9 +65,9 @@ tests:
           commissioning mode"
       verification: |
           1. Follow vendor-specific steps from the pairing hint to put DUT into commissioning mode
-
           2. Verify DUT is advertising in commissioning mode. On DUT,
 
+          For devices already on the network:
           $  ./chip-tool discover commissionables
           Verify in TH as commissioner side:
 
@@ -76,10 +76,18 @@ tests:
           [1651192893436] [15304:442604] CHIP: [DIS]         Product ID: 32769
           [1651192893436] [15304:442604] CHIP: [DIS]         Long Discriminator: 3840
           [1651192893436] [15304:442604] CHIP: [DIS]         Pairing Hint: 33
-          [1651192893436] [15304:442604] CHIP: [DIS]         Hostname: DCA6328D6E320000        [1651192893436] [15304:442604] CHIP: [DIS]         Instance Name: 914762134DA8E7D1
+          [1651192893436] [15304:442604] CHIP: [DIS]         Hostname: DCA6328D6E320000
+          [1651192893436] [15304:442604] CHIP: [DIS]         Instance Name: 914762134DA8E7D1
           [1651192893436] [15304:442604] CHIP: [DIS]         IP Address #1: fe80::dea6:32ff:fe8d:6e32
           [1651192893436] [15304:442604] CHIP: [DIS]         Port: 5540
           [1651192893436] [15304:442604] CHIP: [DIS]         Commissioning Mode: 1
           [1651192893436] [15304:442604] CHIP: [DIS]         Mrp Interval idle: 5000 ms
           [1651192893436] [15304:442604] CHIP: [DIS]         Mrp Interval active: 300 ms
+
+          For devices not on the network (i.e. BLE discovery):
+          1. Discover commissionables over BLE using a BLE discovery tool of choice.
+          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
+          OR
+          HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
+          Observe the DUT advertising in a commissionable state
       disabled: true

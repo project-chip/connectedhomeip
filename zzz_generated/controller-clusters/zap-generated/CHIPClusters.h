@@ -631,14 +631,5 @@ public:
     ~TestClusterCluster() {}
 };
 
-class DLL_EXPORT FaultInjectionCluster : public ClusterBase
-{
-public:
-    FaultInjectionCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::FaultInjection::Id, endpoint)
-    {}
-    ~FaultInjectionCluster() {}
-};
-
 } // namespace Controller
 } // namespace chip

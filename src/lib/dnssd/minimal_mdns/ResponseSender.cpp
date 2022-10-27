@@ -196,14 +196,18 @@ CHIP_ERROR ResponseSender::FlushReply()
 
         if (mSendState.SendUnicast())
         {
+#if CHIP_MINMDNS_HIGH_VERBOSITY
             ChipLogDetail(Discovery, "Directly sending mDns reply to peer %s on port %d", srcAddressString,
                           mSendState.GetSourcePort());
+#endif
             ReturnErrorOnFailure(mServer->DirectSend(mResponseBuilder.ReleasePacket(), mSendState.GetSourceAddress(),
                                                      mSendState.GetSourcePort(), mSendState.GetSourceInterfaceId()));
         }
         else
         {
+#if CHIP_MINMDNS_HIGH_VERBOSITY
             ChipLogDetail(Discovery, "Broadcasting mDns reply for query from %s", srcAddressString);
+#endif
             ReturnErrorOnFailure(mServer->BroadcastSend(mResponseBuilder.ReleasePacket(), kMdnsStandardPort,
                                                         mSendState.GetSourceInterfaceId(), mSendState.GetSourceAddress().Type()));
         }

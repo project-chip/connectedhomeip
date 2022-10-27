@@ -51,6 +51,51 @@ bool ToolChipDN::SetCertName(X509_NAME * name) const
         case kOID_AttributeType_CommonName:
             attrNID = NID_commonName;
             break;
+        case kOID_AttributeType_Surname:
+            attrNID = NID_surname;
+            break;
+        case kOID_AttributeType_SerialNumber:
+            attrNID = NID_serialNumber;
+            break;
+        case kOID_AttributeType_CountryName:
+            attrNID = NID_countryName;
+            break;
+        case kOID_AttributeType_LocalityName:
+            attrNID = NID_localityName;
+            break;
+        case kOID_AttributeType_StateOrProvinceName:
+            attrNID = NID_stateOrProvinceName;
+            break;
+        case kOID_AttributeType_OrganizationName:
+            attrNID = NID_organizationName;
+            break;
+        case kOID_AttributeType_OrganizationalUnitName:
+            attrNID = NID_organizationalUnitName;
+            break;
+        case kOID_AttributeType_Title:
+            attrNID = NID_title;
+            break;
+        case kOID_AttributeType_Name:
+            attrNID = NID_name;
+            break;
+        case kOID_AttributeType_GivenName:
+            attrNID = NID_givenName;
+            break;
+        case kOID_AttributeType_Initials:
+            attrNID = NID_initials;
+            break;
+        case kOID_AttributeType_GenerationQualifier:
+            attrNID = NID_generationQualifier;
+            break;
+        case kOID_AttributeType_DNQualifier:
+            attrNID = NID_dnQualifier;
+            break;
+        case kOID_AttributeType_Pseudonym:
+            attrNID = NID_pseudonym;
+            break;
+        case kOID_AttributeType_DomainComponent:
+            attrNID = NID_domainComponent;
+            break;
         case kOID_AttributeType_MatterNodeId:
             attrNID = gNIDChipNodeId;
             break;
@@ -73,40 +118,42 @@ bool ToolChipDN::SetCertName(X509_NAME * name) const
             ExitNow(res = false);
         }
 
+        char chipAttrStr[std::max(kChip64bitAttrUTF8Length, kChip32bitAttrUTF8Length)] = { 0 };
+        int type                                                                       = V_ASN1_UTF8STRING;
+        uint8_t * attrStr                                                              = reinterpret_cast<uint8_t *>(chipAttrStr);
+        int attrLen                                                                    = 0;
+
         if (IsChip64bitDNAttr(rdn[i].mAttrOID))
         {
-            char chipAttrStr[kChip64bitAttrUTF8Length];
-            VerifyOrReturnError(Encoding::Uint64ToHex(rdn[i].mChipVal, chipAttrStr, sizeof(chipAttrStr),
+            VerifyOrReturnError(Encoding::Uint64ToHex(rdn[i].mChipVal, chipAttrStr, kChip64bitAttrUTF8Length,
                                                       Encoding::HexFlags::kUppercase) == CHIP_NO_ERROR,
                                 false);
-
-            if (!X509_NAME_add_entry_by_NID(name, attrNID, MBSTRING_UTF8, reinterpret_cast<uint8_t *>(chipAttrStr),
-                                            sizeof(chipAttrStr), -1, 0))
-            {
-                ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
-            }
+            attrLen = kChip64bitAttrUTF8Length;
         }
         else if (IsChip32bitDNAttr(rdn[i].mAttrOID))
         {
-            char chipAttrStr[kChip32bitAttrUTF8Length];
-            VerifyOrReturnError(Encoding::Uint32ToHex(static_cast<uint32_t>(rdn[i].mChipVal), chipAttrStr, sizeof(chipAttrStr),
+            VerifyOrReturnError(Encoding::Uint32ToHex(static_cast<uint32_t>(rdn[i].mChipVal), chipAttrStr, kChip32bitAttrUTF8Length,
                                                       Encoding::HexFlags::kUppercase) == CHIP_NO_ERROR,
                                 false);
-
-            if (!X509_NAME_add_entry_by_NID(name, attrNID, MBSTRING_UTF8, reinterpret_cast<uint8_t *>(chipAttrStr),
-                                            sizeof(chipAttrStr), -1, 0))
-            {
-                ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
-            }
+            attrLen = kChip32bitAttrUTF8Length;
         }
         else
         {
-            if (!X509_NAME_add_entry_by_NID(name, attrNID, MBSTRING_UTF8,
-                                            reinterpret_cast<uint8_t *>(const_cast<char *>(rdn[i].mString.data())),
-                                            static_cast<int>(rdn[i].mString.size()), -1, 0))
+            if (rdn[i].mAttrOID == kOID_AttributeType_DomainComponent)
             {
-                ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
+                type = V_ASN1_IA5STRING;
             }
+            else if (rdn[i].mAttrIsPrintableString)
+            {
+                type = V_ASN1_PRINTABLESTRING;
+            }
+            attrStr = reinterpret_cast<uint8_t *>(const_cast<char *>(rdn[i].mString.data()));
+            attrLen = static_cast<int>(rdn[i].mString.size());
+        }
+
+        if (!X509_NAME_add_entry_by_NID(name, attrNID, type, attrStr, attrLen, -1, 0))
+        {
+            ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
         }
     }
 
@@ -508,51 +555,52 @@ exit:
     return res;
 }
 
-bool ReadCertPEM(const char * fileName, X509 * cert)
-{
-    bool res    = true;
-    FILE * file = nullptr;
-
-    res = OpenFile(fileName, file);
-    VerifyTrueOrExit(res);
-
-    if (PEM_read_X509(file, &cert, nullptr, nullptr) == nullptr)
-    {
-        ReportOpenSSLErrorAndExit("PEM_read_X509", res = false);
-    }
-
-exit:
-    CloseFile(file);
-    return res;
-}
-
 } // namespace
 
-bool ReadCert(const char * fileName, X509 * cert)
+bool ReadCert(const char * fileNameOrStr, X509 * cert)
 {
     CertFormat origCertFmt;
-    return ReadCert(fileName, cert, origCertFmt);
+    return ReadCert(fileNameOrStr, cert, origCertFmt);
 }
 
-bool ReadCert(const char * fileName, X509 * cert, CertFormat & certFmt)
+bool ReadCert(const char * fileNameOrStr, X509 * cert, CertFormat & certFmt)
 {
     bool res         = true;
     uint32_t certLen = 0;
     std::unique_ptr<uint8_t[]> certBuf;
 
-    res = ReadFileIntoMem(fileName, nullptr, certLen);
-    VerifyTrueOrExit(res);
-
-    certBuf = std::unique_ptr<uint8_t[]>(new uint8_t[certLen]);
-
-    res = ReadFileIntoMem(fileName, certBuf.get(), certLen);
-    VerifyTrueOrExit(res);
-
-    certFmt = DetectCertFormat(certBuf.get(), certLen);
-    if (certFmt == kCertFormat_Unknown)
+    // If fileNameOrStr is a file name
+    if (access(fileNameOrStr, R_OK) == 0)
     {
-        fprintf(stderr, "Unrecognized Cert Format in File: %s\n", fileName);
-        return false;
+        res = ReadFileIntoMem(fileNameOrStr, nullptr, certLen);
+        VerifyTrueOrExit(res);
+
+        certBuf = std::unique_ptr<uint8_t[]>(new uint8_t[certLen]);
+
+        res = ReadFileIntoMem(fileNameOrStr, certBuf.get(), certLen);
+        VerifyTrueOrExit(res);
+
+        certFmt = DetectCertFormat(certBuf.get(), certLen);
+        if (certFmt == kCertFormat_Unknown)
+        {
+            fprintf(stderr, "Unrecognized Cert Format in File: %s\n", fileNameOrStr);
+            return false;
+        }
+    }
+    // Otherwise, treat fileNameOrStr as a pointer to the certificate string
+    else
+    {
+        certLen = static_cast<uint32_t>(strlen(fileNameOrStr));
+
+        certFmt = DetectCertFormat(reinterpret_cast<const uint8_t *>(fileNameOrStr), certLen);
+        if (certFmt == kCertFormat_Unknown)
+        {
+            fprintf(stderr, "Unrecognized Cert Format in the Input Argument: %s\n", fileNameOrStr);
+            return false;
+        }
+
+        certBuf = std::unique_ptr<uint8_t[]>(new uint8_t[certLen]);
+        memcpy(certBuf.get(), fileNameOrStr, certLen);
     }
 
     if ((certFmt == kCertFormat_X509_Hex) || (certFmt == kCertFormat_Chip_Hex))
@@ -565,8 +613,15 @@ bool ReadCert(const char * fileName, X509 * cert, CertFormat & certFmt)
 
     if (certFmt == kCertFormat_X509_PEM)
     {
-        res = ReadCertPEM(fileName, cert);
-        VerifyTrueOrExit(res);
+        VerifyOrReturnError(chip::CanCastTo<int>(certLen), false);
+
+        std::unique_ptr<BIO, void (*)(BIO *)> certBIO(
+            BIO_new_mem_buf(static_cast<const void *>(certBuf.get()), static_cast<int>(certLen)), &BIO_free_all);
+
+        if (PEM_read_bio_X509(certBIO.get(), &cert, nullptr, nullptr) == nullptr)
+        {
+            ReportOpenSSLErrorAndExit("PEM_read_bio_X509", res = false);
+        }
     }
     else if ((certFmt == kCertFormat_X509_DER) || (certFmt == kCertFormat_X509_Hex))
     {
@@ -612,12 +667,12 @@ exit:
     return res;
 }
 
-bool ReadCertDERRaw(const char * fileName, MutableByteSpan & cert)
+bool ReadCertDER(const char * fileNameOrStr, MutableByteSpan & cert)
 {
     bool res = true;
     std::unique_ptr<X509, void (*)(X509 *)> certX509(X509_new(), &X509_free);
 
-    VerifyOrReturnError(ReadCertPEM(fileName, certX509.get()) == true, false);
+    VerifyOrReturnError(ReadCert(fileNameOrStr, certX509.get()), false);
 
     uint8_t * certPtr = cert.data();
     int certLen       = i2d_X509(certX509.get(), &certPtr);
@@ -660,14 +715,14 @@ exit:
     return res;
 }
 
-bool LoadChipCert(const char * fileName, bool isTrused, ChipCertificateSet & certSet, MutableByteSpan & chipCert)
+bool LoadChipCert(const char * fileNameOrStr, bool isTrused, ChipCertificateSet & certSet, MutableByteSpan & chipCert)
 {
     bool res = true;
     CHIP_ERROR err;
     BitFlags<CertDecodeFlags> decodeFlags;
     std::unique_ptr<X509, void (*)(X509 *)> cert(X509_new(), &X509_free);
 
-    res = ReadCert(fileName, cert.get());
+    res = ReadCert(fileNameOrStr, cert.get());
     VerifyTrueOrExit(res);
 
     res = X509ToChipCert(cert.get(), chipCert);
@@ -685,7 +740,7 @@ bool LoadChipCert(const char * fileName, bool isTrused, ChipCertificateSet & cer
     err = certSet.LoadCert(chipCert, decodeFlags);
     if (err != CHIP_NO_ERROR)
     {
-        fprintf(stderr, "Error reading %s\n%s\n", fileName, chip::ErrorStr(err));
+        fprintf(stderr, "Error reading %s\n%s\n", fileNameOrStr, chip::ErrorStr(err));
         ExitNow(res = false);
     }
 
@@ -746,8 +801,6 @@ bool WriteCert(const char * fileName, X509 * cert, CertFormat certFmt)
         fprintf(stderr, "Unsupported certificate format\n");
         ExitNow(res = false);
     }
-
-    printf("\r\n");
 
 exit:
     OPENSSL_free(derCert);
@@ -1219,7 +1272,6 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
     uint16_t vid = certConfig.IsSubjectVIDMismatch() ? static_cast<uint16_t>(subjectVID + 1) : subjectVID;
     uint16_t pid = certConfig.IsSubjectPIDMismatch() ? static_cast<uint16_t>(subjectPID + 1) : subjectPID;
     bool isCA    = (attCertType != kAttCertType_DAC);
-    int pathLen  = kPathLength_NotSpecified;
 
     VerifyOrReturnError(subjectCN != nullptr, false);
     VerifyOrReturnError(caCert != nullptr, false);
@@ -1356,11 +1408,7 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
     }
 
     // Add basic constraints certificate extensions.
-    if (certConfig.IsExtensionBasicPathLenPresent(attCertType) || !certConfig.IsExtensionBasicCAPresent())
-    {
-        pathLen = certConfig.GetExtensionBasicPathLenValue(attCertType);
-    }
-    res = SetBasicConstraintsExtension(newCert, isCA, pathLen, certConfig);
+    res = SetBasicConstraintsExtension(newCert, isCA, certConfig.GetExtensionBasicPathLenValue(attCertType), certConfig);
     VerifyTrueOrExit(res);
 
     // Add key usage certificate extensions.

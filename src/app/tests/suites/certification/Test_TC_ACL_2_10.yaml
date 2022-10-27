@@ -41,7 +41,7 @@ tests:
     - label: "TH1 commissions DUT using admin node ID N1"
       verification: |
           DUT
-          sudo ./chip-all-clusters-app
+          sudo ./chip-all-clusters-app --wifi
 
           TH1
           ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3841
@@ -62,7 +62,7 @@ tests:
           "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin
           node ID N2"
       verification: |
-          Open a commissioning window On TH(Chiptool)1 using below command
+          Open a commissioning window On TH1(Chiptool)using below command
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 180 1  0 --timedInteractionTimeoutMs 1000
           On TH1(Chiptool), verify DUT is commissioned On TH2(Chiptool) fabric
@@ -338,7 +338,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 2 0 --commissioner-nodeid 223344 --commissioner-name beta
 
-          On TH1(Chiptool), Verify Successfully  extension attribute list containg one element .
+          On TH2(Chiptool), Verify Successfully  extension attribute list containg one element .
 
           [1658819083.842765][8349:8354] CHIP:EM: Removed CHIP MessageCounter:249057275 from RetransTable on exchange 59888i
           [1658819083.842800][8349:8354] CHIP:DMG: WriteClient moving to [ResponseRe]
@@ -497,16 +497,20 @@ tests:
 
     - label: "TH1 removes fabric F2 from DUT"
       verification: |
-          ./chip-tool operationalcredentials remove-fabric 2 2 0 --commissioner-name beta --commissioner-nodeid 223344
+          ./chip-tool operationalcredentials remove-fabric 2 1 0
 
-          On TH1(Chiptool), Verify successfully removed fabric F2
 
-          [1657289809.358455][19309:19314] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          [1657289809.358500][19309:19314] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
-          [1657289809.358559][19309:19314] CHIP:TOO:   NOCResponse: {
-          [1657289809.358600][19309:19314] CHIP:TOO:     statusCode: 0
-          [1657289809.358620][19309:19314] CHIP:TOO:     fabricIndex: 2
-          [1657289809.358641][19309:19314] CHIP:TOO:    }
+          On TH1(Chiptool), Verify successfully removed fabric F2 with statusCode as 0(Success)
+
+          [1661404505.702969][18706:18711] CHIP:DMG:
+          [1661404505.702979][18706:18711] CHIP:DMG: 	InteractionModelRevision = 1
+          [1661404505.702987][18706:18711] CHIP:DMG: },
+          [1661404505.703020][18706:18711] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1661404505.703047][18706:18711] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1661404505.703081][18706:18711] CHIP:TOO:   NOCResponse: {
+          [1661404505.703104][18706:18711] CHIP:TOO:     statusCode: 0
+          [1661404505.703126][18706:18711] CHIP:TOO:     fabricIndex: 2
+          [1661404505.703139][18706:18711] CHIP:TOO:    }
       disabled: true
 
     - label: "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute"

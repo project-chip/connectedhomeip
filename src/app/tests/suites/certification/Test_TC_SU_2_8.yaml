@@ -47,6 +47,7 @@ tests:
     - label:
           "DUT sends a QueryImage command to TH1/OTA-P. TH1/OTA-P does not
           respond with QueryImageResponse."
+      PICS: MCORE.OTA.Retry
       verification: |
           ./chip-tool otasoftwareupdaterequestor write default-ota-providers "[{"fabricIndex": 1, "providerNodeID": 3735928559, "endpoint": 0}]" 0x0000001234567890 0
 

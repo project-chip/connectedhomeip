@@ -51,8 +51,8 @@
 	branch  = master
 [submodule "qpg_sdk"]
 	path = third_party/qpg_sdk/repo
-	url = https://github.com/Qorvo/qpg-connectedhomeip
-	branch  = master
+	url = https://github.com/Qorvo/QMatter
+	branch  = v0.9.0.0-libs
 	platforms = qpg
 [submodule "zap"]
 	path = third_party/zap/repo
@@ -233,11 +233,6 @@
 	url = https://github.com/TexasInstruments/cc13xx_cc26xx_sdk.git
 	branch = main
 	platforms = cc13x2_26x2
-[submodule "third_party/bouffalolab/bl602"]
-	path = third_party/bouffalolab/bl602_sdk/repo
-	url = https://github.com/bouffalolab/bl_iot_sdk_matter.git
-	branch = bl602_release
-	platforms = bl602
 [submodule "third_party/ti_simplelink_sdk/repo_cc32xx"]
 	path = third_party/ti_simplelink_sdk/repo_cc32xx
 	url = https://github.com/TexasInstruments/cc32xx_open_sdk.git
@@ -273,3 +268,33 @@
 [submodule "third_party/boringssl/repo/src"]
 	path = third_party/boringssl/repo/src
 	url = https://github.com/google/boringssl.git
+[submodule "boufalolab_repo"]
+	path = third_party/bouffalolab/repo
+	url = https://github.com/bouffalolab/bl_iot_sdk.git
+	branch = master
+	platforms = bouffalolab,bl602
+[submodule "third_party/mt793x_sdk/filogic"]
+	path = third_party/mt793x_sdk/filogic
+	url = https://github.com/MediaTek-Labs/genio-matter-bsp.git
+	branch = main
+	platforms = genio
+[submodule "third_party/mt793x_sdk/mDNSResponder"]
+	path = third_party/mt793x_sdk/mDNSResponder
+	url = https://github.com/matter-mtk/genio-matter-mdnsresponder.git
+	branch = main
+	platforms = genio
+[submodule "third_party/mt793x_sdk/lwip"]
+	path = third_party/mt793x_sdk/lwip
+	url = https://github.com/matter-mtk/genio-matter-lwip.git
+	branch = main
+	platforms = genio
+[submodule "open-iot-sdk"]
+	path = third_party/open-iot-sdk/sdk
+	url = https://git.gitlab.arm.com/iot/open-iot-sdk/sdk.git
+	branch = main
+	platforms = openiotsdk
+[submodule "open-iot-sdk-storage"]
+	path = third_party/open-iot-sdk/storage
+	url = https://git.gitlab.arm.com/iot/open-iot-sdk/storage.git
+	branch = main
+    platforms = openiotsdk

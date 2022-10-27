@@ -90,7 +90,7 @@ tests:
           [1653478044.911109][30351:30356] CHIP:TOO:   Networks: 1 entries
           [1653478044.911192][30351:30356] CHIP:TOO:     [1]: {
           [1653478044.911238][30351:30356] CHIP:TOO:       NetworkID: 47524C50726976617465
-          [1653478044.911280][30351:30356] CHIP:TOO:       Connected: FALSE
+          [1653478044.911280][30351:30356] CHIP:TOO:       Connected: TRUE
           [1653478044.911322][30351:30356] CHIP:TOO:      }
           [1653478044.911474][30351:30356] CHIP:EM: Sending Standalone Ack for MessageCounter:3575760 on exchange 51774i
       disabled: true

@@ -33,172 +33,21 @@ tests:
           "Commissioner and Commissionee discover each other and connect via the
           discovery mode applicable for the DUT."
       verification: |
-          Verify in DUT as commissionee side: sudo ./chip-all-clusters-app --wifi --discriminator 3841
-
-          [1653471956.966855][10713:10713] CHIP:SPT: PASE PBKDF iterations set to 1000
-          [1653471956.966887][10713:10713] CHIP:SPT: LinuxCommissionableDataProvider didn"t get a PASE salt, generating one.
-          [1653471956.972152][10713:10713] CHIP:DL: Device Configuration:
-          [1653471956.972270][10713:10713] CHIP:DL:   Serial Number: TEST_SN
-          [1653471956.972315][10713:10713] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          [1653471956.972354][10713:10713] CHIP:DL:   Product Id: 32769 (0x8001)
-          [1653471956.972388][10713:10713] CHIP:DL:   Hardware Version: 0
-          [1653471956.972413][10713:10713] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
-          [1653471956.972435][10713:10713] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3841 (0xF01)
-          [1653471956.972464][10713:10713] CHIP:DL:   Manufacturing Date: (not set)
-          [1653471956.972488][10713:10713] CHIP:DL:   Device Type: 65535 (0xFFFF)
-          [1653471956.972509][10713:10713] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
-          [1653471956.972546][10713:10713] CHIP:SVR: SetupQRCode: [MT:-24J0CEK01KA0648G00]
-          [1653471956.972579][10713:10713] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1653471956.972600][10713:10713] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0CEK01KA0648G00
-          [1653471956.972632][10713:10713] CHIP:SVR: Manual pairing code: [34970112332]
-          [1653471956.972654][10713:10713] CHIP:-: ==== Onboarding payload for Custom Commissioning Flows ====
-          [1653471956.972715][10713:10713] CHIP:SVR: SetupQRCode: [MT:-24J048N01KA0648G00]
-          [1653471956.972748][10713:10713] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1653471956.972769][10713:10713] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
-          [1653471956.972803][10713:10713] CHIP:SVR: Manual pairing code: [749701123365521327694]
+          1. Place the DUT commissionee into a commissioning mode
+          For example DUT=chip-all-clusters-app: ./chip-all-clusters-app --wifi --discriminator 3841
 
           Verify on TH as commissioner side:
-          connectedhomeip/examples/chip-tool/out/debug$  ./chip-tool discover commissionables
-          Waiting for device responses...
-          CHIP:CTL: Generating ICAC
-          CHIP:DL: AUDIT: ===== RANDOM NUMBER GENERATOR AUDIT START ====
-          CHIP:DL: AUDIT: * Validate buf1 and buf2 are <<<different every run/boot!>>>
-          CHIP:DL: AUDIT: * Validate r1 and r2 are <<<different every run/boot!>>>
-          CHIP:DL: AUDIT: * buf1: 3BE3E264C0A0A053248E93609D22044A
-          CHIP:DL: AUDIT: * buf2: E69C8767AD6B60907AD3633E774F38EB
-          CHIP:DL: AUDIT: * r1: 0x2A0E6454 r2: 0x16315893
-          CHIP:DL: AUDIT: ===== RANDOM NUMBER GENERATOR AUDIT END ====
-          CHIP:DL: writing settings to file (/tmp/chip_counters.ini-9yXPat)
-          CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
-          CHIP:DL: NVS set: chip-counters/reboot-count = 23 (0x17)
-          CHIP:DL: Got Ethernet interface: eth0
-          CHIP:DL: Found the primary Ethernet interface:eth0
-          CHIP:DL: Got WiFi interface: wlan0
-          CHIP:DL: Failed to reset WiFi statistic counts
-          CHIP:IN: UDP::Init bind&listen port=5541
-          CHIP:IN: UDP::Init bound to port=5541
-          CHIP:IN: UDP::Init bind&listen port=5541
-          CHIP:IN: UDP::Init bound to port=5541
-          CHIP:IN: TransportMgr initialized
-          CHIP:DIS: Init fabric pairing table with server storage
-          CHIP:DL: writing settings to file (/tmp/chip_counters.ini-zgCtZd)
-          CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
-          CHIP:DL: NVS set: chip-counters/GlobalMCTR = 25000 (0x61A8)
-          CHIP:CTL: System State Initialized...
-          CHIP:DL: MDNS failed to join multicast group on veth5731933 for address type IPv4: ../th
-          CHIP:DL: MDNS failed to join multicast group on vethbf7bfa6 for address type IPv4: ../th
-          CHIP:DL: MDNS failed to join multicast group on vethcf434e5 for address type IPv4: ../th
-          CHIP:ZCL: Using ZAP configuration...
-          CHIP:DIS: Verifying the received credentials
-          CHIP:IN: Generating compressed fabric ID using uncompressed fabric ID 0x0000000000000000
-          CHIP:IN: 0x04, 0x66, 0xd6, 0xcf, 0x4c, 0x1e, 0x11, 0xc3,
-          CHIP:IN: 0x52, 0x4f, 0xa6, 0x8c, 0x6e, 0x65, 0x46, 0xdc,
-          CHIP:IN: 0x90, 0x1b, 0x5f, 0x42, 0x9f, 0x69, 0xd1, 0xb7,
-          CHIP:IN: 0x7d, 0xf3, 0x6b, 0x54, 0x12, 0x6c, 0x12, 0x59,
-          CHIP:IN: 0x5b, 0xc3, 0x07, 0x1c, 0x5c, 0xf4, 0x4e, 0x5f,
-          CHIP:IN: 0x71, 0x06, 0x9a, 0xbb, 0x2f, 0xef, 0x20, 0x0d,
-          CHIP:IN: 0x0e, 0x9b, 0x26, 0x3e, 0x8d, 0x46, 0x09, 0xd8,
-          CHIP:IN: 0xfd, 0xa1, 0xc0, 0x10, 0x4f, 0x05, 0x14, 0x99,
-          CHIP:IN: 0x22,
-          CHIP:IN: Generated compressed fabric ID
-          CHIP:IN: 0x4a, 0x53, 0x1e, 0x52, 0x06, 0xed, 0x06, 0xda,
-          CHIP:DIS: Added new fabric at index: 1, Initialized: 1
-          CHIP:DIS: Assigned compressed fabric ID: 0x4A531E5206ED06DA, node ID: 0x000000000001B669
-          CHIP:CTL: Joined the fabric at index 1. Compressed fabric ID is: 0x4A531E5206ED06DA
-          CHIP:DL: CHIP task running
-          CHIP:DIS: Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/UDP
-          CHIP:DIS: Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/UDP
-          CHIP:DIS: Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/UDP
-          CHIP:DIS: Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/UDP
-          CHIP:DIS: Discovered Node:
-          CHIP:DIS:      Host name:              EEAABADABAD0DDCA        CHIP:DIS:      Port:                   5540
-          CHIP:DIS:      Long discriminator:     3840
-          CHIP:DIS:      Vendor ID:              9050
-          CHIP:DIS:      Product ID:             65279
-          CHIP:DIS:      Commissioning Mode      1
-          CHIP:DIS:      Device Type             0
-          CHIP:DIS:      Device Name
-          CHIP:DIS:      Rotating Id             00007C5F6E176CD40F68685D100A1CF8A98B
-          CHIP:DIS:      Pairing Instruction
-          CHIP:DIS:      Pairing Hint            0x21
-          CHIP:DIS:      Address 0:              2402:e280:2108:181:dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 2:              192.168.1.12
-          CHIP:DIS: Discovered Node:
-          CHIP:DIS:      Host name:              EEAABADABAD0DDCA        CHIP:DIS:      Port:                   5540
-          CHIP:DIS:      Long discriminator:     3840
-          CHIP:DIS:      Vendor ID:              9050
-          CHIP:DIS:      Product ID:             65279
-          CHIP:DIS:      Commissioning Mode      1
-          CHIP:DIS:      Device Type             0
-          CHIP:DIS:      Device Name
-          CHIP:DIS:      Rotating Id             00007C5F6E176CD40F68685D100A1CF8A98B
-          CHIP:DIS:      Pairing Instruction
-          CHIP:DIS:      Pairing Hint            0x21
-          CHIP:DIS:      Address 0:              2402:e280:2108:181:dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 2:              192.168.1.12
-          CHIP:DIS: Discovered Node:
-          CHIP:DIS:      Host name:              EEAABADABAD0DDCA        CHIP:DIS:      Port:                   5540
-          CHIP:DIS:      Long discriminator:     3840
-          CHIP:DIS:      Vendor ID:              9050
-          CHIP:DIS:      Product ID:             65279
-          CHIP:DIS:      Commissioning Mode      1
-          CHIP:DIS:      Device Type             0
-          CHIP:DIS:      Device Name
-          CHIP:DIS:      Rotating Id             00007C5F6E176CD40F68685D100A1CF8A98B
-          CHIP:DIS:      Pairing Instruction
-          CHIP:DIS:      Pairing Hint            0x21
-          CHIP:DIS:      Address 0:              2402:e280:2108:181:dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 2:              192.168.1.12
-          CHIP:DIS: Discovered Node:
-          CHIP:DIS:      Host name:              EEAABADABAD0DDCA        CHIP:DIS:      Port:                   5540
-          CHIP:DIS:      Long discriminator:     3840
-          CHIP:DIS:      Vendor ID:              9050
-          CHIP:DIS:      Product ID:             65279
-          CHIP:DIS:      Commissioning Mode      1
-          CHIP:DIS:      Device Type             0
-          CHIP:DIS:      Device Name
-          CHIP:DIS:      Rotating Id             00007C5F6E176CD40F68685D100A1CF8A98B
-          CHIP:DIS:      Pairing Instruction
-          CHIP:DIS:      Pairing Hint            0x21
-          CHIP:DIS:      Address 0:              2402:e280:2108:181:dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 2:              192.168.1.12
-          CHIP:DIS: Discovered Node:
-          CHIP:DIS:      Host name:              EEAABADABAD0DDCA        CHIP:DIS:      Port:                   5540
-          CHIP:DIS:      Long discriminator:     3840
-          CHIP:DIS:      Vendor ID:              9050
-          CHIP:DIS:      Product ID:             65279
-          CHIP:DIS:      Commissioning Mode      1
-          CHIP:DIS:      Device Type             0
-          CHIP:DIS:      Device Name
-          CHIP:DIS:      Rotating Id             00007C5F6E176CD40F68685D100A1CF8A98B
-          CHIP:DIS:      Pairing Instruction
-          CHIP:DIS:      Pairing Hint            0x21
-          CHIP:DIS:      Address 0:              2402:e280:2108:181:dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 2:              192.168.1.12
-          CHIP:DIS: Discovered Node:
-          CHIP:DIS:      Host name:              EEAABADABAD0DDCA        CHIP:DIS:      Port:                   5540
-          CHIP:DIS:      Long discriminator:     3840
-          CHIP:DIS:      Vendor ID:              9050
-          CHIP:DIS:      Product ID:             65279
-          CHIP:DIS:      Commissioning Mode      1
-          CHIP:DIS:      Device Type             0
-          CHIP:DIS:      Device Name
-          CHIP:DIS:      Rotating Id             00007C5F6E176CD40F68685D100A1CF8A98B
-          CHIP:DIS:      Pairing Instruction
-          CHIP:DIS:      Pairing Hint            0x21
-          CHIP:DIS:      Address 0:              2402:e280:2108:181:dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 1:              fe80::dea6:32ff:fef9:f0a1
-          CHIP:DIS:      Address 2:              192.168.1.12
 
+          For devices not on the network (i.e. BLE discovery):
+          1. Pair the device over the applicable Discovery transport using TH=chip-tool
 
-          connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3841
-
-          connectedhomeip/examples/chip-tool/out/debug$ sudo ./chip-tool basic read product-name 1 0
+          For devices already on the network:
+          connectedhomeip/examples/chip-tool/out/debug$  ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
+          [1657226543861] [30621:16744161] CHIP: [IN] SecureSession[0x6000007cc000]: Activated - Type:1 LSID:47293
+          [1657226543861] [30621:16744161] CHIP: [IN] New secure session activated for device <FFFFFFFB00000000, 0>, LSID:47293 PSID:201!
+          [1657226543861] [30621:16744161] CHIP: [CTL] Remote device completed SPAKE2+ handshake
+          [1657226543861] [30621:16744161] CHIP: [CTL] Stopping commissioning discovery over DNS-SD
+          [1657226543861] [30621:16744161] CHIP: [TOO] Pairing Success
       disabled: true
 
     - label:

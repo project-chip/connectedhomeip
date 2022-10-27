@@ -301,6 +301,20 @@
 #endif // CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
 
 /**
+ *  @def CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH
+ *
+ *  @brief
+ *    Length of the shared secret to use for unit tests or when CHIP_CONFIG_SECURITY_TEST_MODE is enabled.
+ *
+ *    Note that the default value of 32 includes the null terminator.
+ *    WARNING: `strlen(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE)` will result in different keys
+ *              than expected and give unexpected results for shared secrets that contain '\x00'.
+ */
+#ifndef CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH
+#define CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH 32
+#endif // CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH
+
+/**
  *  @def CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES
  *
  *  @brief
@@ -896,7 +910,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief The maximum size of the lambda which can be post into system event queue.
  */
 #ifndef CHIP_CONFIG_LAMBDA_EVENT_SIZE
-#define CHIP_CONFIG_LAMBDA_EVENT_SIZE (16)
+#define CHIP_CONFIG_LAMBDA_EVENT_SIZE (24)
 #endif
 
 /**
@@ -978,7 +992,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * Binds to number of KeySet entries to support per fabric (Need at least 1 for Identity Protection Key)
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC
-#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC 2
+#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC 3
 #endif
 
 #if CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC < 1
@@ -1282,6 +1296,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS 30
 #endif // CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS
 
+/**
+ * @def CHIP_CONFIG_NUM_CD_KEY_SLOTS
+ *
+ * @brief Number of custom CD signing keys supported by default CD keystore
+ *
+ */
+#ifndef CHIP_CONFIG_NUM_CD_KEY_SLOTS
+#define CHIP_CONFIG_NUM_CD_KEY_SLOTS 5
+#endif // CHIP_CONFIG_NUM_CD_KEY_SLOTS
 /**
  * @}
  */

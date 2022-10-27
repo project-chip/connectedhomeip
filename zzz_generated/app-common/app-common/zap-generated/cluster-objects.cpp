@@ -2565,7 +2565,7 @@ namespace Events {
 } // namespace PulseWidthModulation
 namespace Descriptor {
 namespace Structs {
-namespace DeviceType {
+namespace DeviceTypeStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -2608,7 +2608,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace DeviceType
+} // namespace DeviceTypeStruct
 } // namespace Structs
 
 namespace Commands {
@@ -2619,8 +2619,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::DeviceList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, deviceList));
+    case Attributes::DeviceTypeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, deviceTypeList));
         break;
     case Attributes::ServerList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, serverList));
@@ -14682,8 +14682,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::CompensationText::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, compensationText));
         break;
-    case Attributes::ColorTemperature::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperature));
+    case Attributes::ColorTemperatureMireds::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMireds));
         break;
     case Attributes::ColorMode::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, colorMode));
@@ -20761,6 +20761,9 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         break;
     case Attributes::NullableRangeRestrictedInt16s::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, nullableRangeRestrictedInt16s));
+        break;
+    case Attributes::WriteOnlyInt8u::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, writeOnlyInt8u));
         break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));

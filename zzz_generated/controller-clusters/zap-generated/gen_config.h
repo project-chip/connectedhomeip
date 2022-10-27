@@ -94,7 +94,6 @@
 #define EMBER_AF_ACCOUNT_LOGIN_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_ELECTRICAL_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_TEST_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
-#define EMBER_AF_FAULT_INJECTION_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
 
@@ -357,7 +356,3 @@
 // Use this macro to check if the client side of the Test Cluster cluster is included
 #define ZCL_USING_TEST_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_TEST_CLUSTER_CLIENT
-
-// Use this macro to check if the client side of the Fault Injection cluster is included
-#define ZCL_USING_FAULT_INJECTION_CLUSTER_CLIENT
-#define EMBER_AF_PLUGIN_FAULT_INJECTION_CLIENT

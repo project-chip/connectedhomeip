@@ -706,6 +706,16 @@ CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR AES_CTR_crypt(const uint8_t * input, size_t input_length, const uint8_t * key, size_t key_length, const uint8_t * nonce,
+                         size_t nonce_length, uint8_t * output)
+{
+    // Discard tag portion of CCM to apply only CTR mode encryption/decryption.
+    constexpr size_t kTagLen = Crypto::kAES_CCM128_Tag_Length;
+    uint8_t tag[kTagLen];
+
+    return AES_CCM_encrypt(input, input_length, nullptr, 0, key, key_length, nonce, nonce_length, output, tag, kTagLen);
+}
+
 CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_key, uint64_t fabric_id,
                                       MutableByteSpan & out_compressed_fabric_id)
 {

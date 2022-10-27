@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2021 Project CHIP Authors
+#    Copyright (c) 2022 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 project(chip-telink-lighting-example)
 
 include(${CHIP_ROOT}/config/telink/app/enable-gnu-std.cmake)
+include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
 target_compile_options(app PRIVATE -fpermissive)
 
@@ -46,7 +47,6 @@ add_definitions(
     "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
 )
 
-# TODO - re-use chip_data_model.cmake to add cluster implementations.
 target_sources(app PRIVATE
                src/AppTask.cpp
                src/LightingManager.cpp
@@ -56,56 +56,14 @@ target_sources(app PRIVATE
                ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
-               ${TELINK_COMMON}/util/src/ThreadUtil.cpp
-               ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
-               ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
-               ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
-               ${CHIP_ROOT}/src/app/util/af-event.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-size-util.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-storage.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-table.cpp
-               ${CHIP_ROOT}/src/app/util/binding-table.cpp
-               ${CHIP_ROOT}/src/app/util/ember-compatibility-functions.cpp
-               ${CHIP_ROOT}/src/app/util/ember-print.cpp
-               ${CHIP_ROOT}/src/app/util/error-mapping.cpp
-               ${CHIP_ROOT}/src/app/util/message.cpp
-               ${CHIP_ROOT}/src/app/util/privilege-storage.cpp
-               ${CHIP_ROOT}/src/app/util/util.cpp
-               ${CHIP_ROOT}/src/app/server/EchoHandler.cpp
-               ${CHIP_ROOT}/src/app/server/Dnssd.cpp
-               ${CHIP_ROOT}/src/app/server/OnboardingCodesUtil.cpp
-               ${CHIP_ROOT}/src/app/server/Server.cpp
-               ${CHIP_ROOT}/src/app/server/CommissioningWindowManager.cpp
-               ${CHIP_ROOT}/src/app/clusters/access-control-server/access-control-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/administrator-commissioning-server/administrator-commissioning-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/basic/basic.cpp
-               ${CHIP_ROOT}/src/app/clusters/bindings/BindingManager.cpp
-               ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
-               ${CHIP_ROOT}/src/app/clusters/bindings/PendingNotificationMap.cpp
-               ${CHIP_ROOT}/src/app/clusters/descriptor/descriptor.cpp
-               ${CHIP_ROOT}/src/app/clusters/identify-server/identify-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/ethernet-network-diagnostics-server/ethernet-network-diagnostics-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/localization-configuration-server/localization-configuration-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/time-format-localization-server/time-format-localization-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/fixed-label-server/fixed-label-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/user-label-server/user-label-server.cpp               
-               ${CHIP_ROOT}/src/app/clusters/thread-network-diagnostics-server/thread-network-diagnostics-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/software-diagnostics-server/software-diagnostics-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/switch-server/switch-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/general-diagnostics-server/general-diagnostics-server.cpp               	       
-               ${CHIP_ROOT}/src/app/clusters/group-key-mgmt-server/group-key-mgmt-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/level-control/level-control.cpp
-               ${CHIP_ROOT}/src/app/clusters/color-control-server/color-control-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/occupancy-sensor-server/occupancy-sensor-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
-               ${CHIP_ROOT}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
-               ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
-               ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
-               ${CHIP_ROOT}/src/app/clusters/groups-server/groups-server.cpp
-               )
+               ${TELINK_COMMON}/util/src/ThreadUtil.cpp)
+
+chip_configure_data_model(app
+    INCLUDE_SERVER
+    ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lighting-common/lighting-app.zap
+    GEN_DIR ${GEN_DIR}/lighting-app/zap-generated
+)
+
+if(CONFIG_CHIP_OTA_REQUESTOR)
+    target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
+endif()

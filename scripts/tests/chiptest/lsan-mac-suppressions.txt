@@ -19,17 +19,28 @@ leak:drbg_bytes
 # TODO: OpenSSL ERR_get_state seems to leak.
 leak:ERR_get_state
 
-# TODO: BLE initialization allocates some UUIDs and strings that seem to leak.
-leak:[BleConnection initWithDiscriminator:]
-leak:[CBXpcConnection initWithDelegate:queue:options:sessionType:]
+# TODO: https://github.com/project-chip/connectedhomeip/issues/22333
+leak:[MTRBaseCluster* subscribeAttribute*WithMinInterval:maxInterval:params:subscriptionEstablished:reportHandler:]
 
-# TODO: ClusterBase::SubscribeAttribute creates a subscription that cannot
-# actually be shut down in any way.
-leak:ClusterBase::SubscribeAttribute
+#TODO: Figure out why nw_path_monitor_create leaks. The leak can be reproduced using:
+# -- testFile.cpp
+#
+##include <Network/Network.h>
+#
+#int main(int argc, char **argv) {
+#  auto monitor = nw_path_monitor_create();
+#  nw_release(monitor);
+#  return 0;
+#}
+#
+# -- testFile.mm (with -fobj-arc)
+##include <Network/Network.h>
+#
+#int main(int argc, char **argv) {
+#  __auto_type monitor = nw_path_monitor_create();
+#  return 0;
+#}
+leak:nw_path_monitor_create
 
-# TODO: Figure out how we are managing to leak NSData while using ARC!
-leak:[CHIPToolKeypair signMessageECDSA_RAW:]
-
-# TODO: Figure out how we are managing to leak NSData while using ARC, though
-# this may just be a leak deep inside the CFPreferences stuff somewhere.
-leak:[CHIPToolPersistentStorageDelegate storageDataForKey:]
+# TODO: See the previous comment about nw_path_monitor_create, since it also applies to nw_path_monitor_start
+leak:nw_path_monitor_start

@@ -42,6 +42,22 @@ using namespace chip::Ble;
  */
 class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
 {
+
+public:
+    void HandleBootEvent(void);
+    void HandleConnectEvent(volatile sl_bt_msg_t * evt);
+    void HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt);
+    void HandleWriteEvent(volatile sl_bt_msg_t * evt);
+    void UpdateMtu(volatile sl_bt_msg_t * evt);
+    void HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId);
+    void HandleTXCharCCCDWrite(volatile sl_bt_msg_t * evt);
+    void HandleSoftTimerEvent(volatile sl_bt_msg_t * evt);
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    static void HandleC3ReadRequest(volatile sl_bt_msg_t * evt);
+#endif
+
+private:
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend BLEManager;
@@ -137,28 +153,15 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     CHIP_ERROR EncodeAdditionalDataTlv();
 #endif
-    void UpdateMtu(volatile sl_bt_msg_t * evt);
-    void HandleBootEvent(void);
-    void HandleConnectEvent(volatile sl_bt_msg_t * evt);
-    void HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt);
-    void HandleWriteEvent(volatile sl_bt_msg_t * evt);
-    void HandleTXCharCCCDWrite(volatile sl_bt_msg_t * evt);
     void HandleRXCharWrite(volatile sl_bt_msg_t * evt);
-    void HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId);
-    void HandleSoftTimerEvent(volatile sl_bt_msg_t * evt);
     bool RemoveConnection(uint8_t connectionHandle);
     void AddConnection(uint8_t connectionHandle, uint8_t bondingHandle);
     void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
     void CancelBleAdvTimeoutTimer(void);
     CHIPoBLEConState * GetConnectionState(uint8_t conId, bool allocate = false);
     static void DriveBLEState(intptr_t arg);
-    static void bluetoothStackEventHandler(void * p_arg);
     static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
     uint8_t GetTimerHandle(uint8_t connectionHandle, bool allocate);
-
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    static void HandleC3ReadRequest(volatile sl_bt_msg_t * evt);
-#endif
 };
 
 /**

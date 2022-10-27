@@ -38,6 +38,7 @@ qpg_executable("persistent_storage_app") {
   output_name = "chip-${qpg_target_ic}-persistent_storage-example.out"
 
   deps = []
+  defines = []
 
   public_deps = [
     ":sdk",

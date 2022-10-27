@@ -17,9 +17,10 @@
  */
 package chip.devicecontroller.model;
 
-import androidx.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 /** Class for tracking CHIP node state in a hierarchical manner. */
 public final class NodeState {
@@ -31,6 +32,16 @@ public final class NodeState {
 
   public Map<Integer, EndpointState> getEndpointStates() {
     return endpoints;
+  }
+
+  // Called from native code only, which ignores access modifiers.
+  private void setDataVersion(int endpointId, long clusterId, int dataVersion) {
+    EndpointState endpointState = getEndpointState(endpointId);
+    ClusterState clusterState = endpointState.getClusterState(clusterId);
+
+    if (clusterState != null) {
+      clusterState.setDataVersion(dataVersion);
+    }
   }
 
   // Called from native code only, which ignores access modifiers.
@@ -65,8 +76,10 @@ public final class NodeState {
       endpointState.getClusterStates().put(clusterId, clusterState);
     }
 
-    // This will overwrite previous events.
-    clusterState.getEventStates().put(eventId, eventStateToAdd);
+    if (!clusterState.getEventStates().containsKey(eventId)) {
+      clusterState.getEventStates().put(eventId, new ArrayList<EventState>());
+    }
+    clusterState.getEventStates().get(eventId).add(eventStateToAdd);
   }
 
   @Override

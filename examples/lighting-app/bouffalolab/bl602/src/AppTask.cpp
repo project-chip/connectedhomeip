@@ -55,7 +55,7 @@
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_EVENT_QUEUE_SIZE 10
-#define APP_TASK_STACK_SIZE (8192)
+#define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
 #define STATUS_LED_GPIO_NUM GPIO_NUM_2 // Use LED1 (blue LED) as status LED on DevKitC
 
@@ -92,7 +92,7 @@ BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 
 AppTask AppTask::sAppTask;
-static DeviceCallbacks EchoCallbacks;
+// static DeviceCallbacks EchoCallbacks;
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -168,6 +168,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err;
 
     log_info("App Task entered\r\n");
+    log_async_init();
     enable_async_log();
 
     err = sWiFiNetworkCommissioningInstance.Init();
@@ -576,10 +577,24 @@ void AppTask::LightStateUpdateEventHandler(void)
         {
             statusLED.SetBrightness(0);
             statusLED.Set(0);
+            PostLightActionRequest(AppEvent::kEventType_Light, LightingManager::OFF_ACTION);
         }
         else
         {
             statusLED.SetBrightness(level);
+            PostLightActionRequest(AppEvent::kEventType_Light, LightingManager::ON_ACTION);
         }
     } while (0);
+}
+
+void AppTask::LightStateInit(void)
+{
+    uint8_t onoff       = 1;
+    uint8_t level       = 254;
+    EndpointId endpoint = 1;
+
+    emberAfWriteAttribute(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, (uint8_t *) &level,
+                          ZCL_INT8U_ATTRIBUTE_TYPE);
+
+    emberAfWriteAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &onoff, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }

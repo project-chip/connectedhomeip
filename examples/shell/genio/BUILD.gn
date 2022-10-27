@@ -1,0 +1,85 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/mt793x_sdk.gni")
+
+#import("${chip_root}/build/chip/tools.gni")
+
+import("${build_root}/config/defaults.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${mt793x_sdk_build_root}/mt793x_executable.gni")
+import("${mt793x_sdk_build_root}/mt793x_sdk.gni")
+
+assert(current_os == "freertos")
+
+mt793x_project_dir = "${chip_root}/examples/shell/genio"
+mt793x_ex_plat_dir = "${chip_root}/examples/platform/mt793x"
+
+declare_args() {
+  # Dump memory usage at link time.
+  chip_print_memory_usage = true
+}
+
+mt793x_sdk("sdk") {
+  sources = [ "${mt793x_project_dir}/include/CHIPProjectConfig.h" ]
+
+  include_dirs = [
+    "${chip_root}/src/platform/mt793x",
+    "${mt793x_project_dir}/include",
+    "${mt793x_ex_plat_dir}",
+  ]
+}
+
+mt793x_executable("shell_app") {
+  output_name = "chip-mt793x-shell-example.out"
+
+  sources = [ "src/main.cpp" ]
+
+  deps = [
+    ":sdk",
+    "${chip_root}/examples/shell/shell_common:shell_common",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/platform",
+    "${mt793x_ex_plat_dir}:genio-matter-shell",
+  ]
+
+  include_dirs = [ "include" ]
+
+  defines = []
+
+  ldscript = "mt793x_xip.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  if (chip_print_memory_usage) {
+    ldflags += [
+      "-Wl,--print-memory-usage",
+      "-fstack-usage",
+    ]
+  }
+
+  output_dir = root_out_dir
+}
+
+group("mt793x") {
+  deps = [ ":shell_app" ]
+}
+
+group("default") {
+  deps = [ ":mt793x" ]
+}

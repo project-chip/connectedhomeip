@@ -418,9 +418,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace Descriptor {
 namespace Attributes {
 
-namespace DeviceList {
+namespace DeviceTypeList {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace DeviceList
+} // namespace DeviceTypeList
 
 namespace ServerList {
 static constexpr AttributeId Id = 0x00000001;
@@ -3046,9 +3046,9 @@ namespace CompensationText {
 static constexpr AttributeId Id = 0x00000006;
 } // namespace CompensationText
 
-namespace ColorTemperature {
+namespace ColorTemperatureMireds {
 static constexpr AttributeId Id = 0x00000007;
-} // namespace ColorTemperature
+} // namespace ColorTemperatureMireds
 
 namespace ColorMode {
 static constexpr AttributeId Id = 0x00000008;
@@ -4931,6 +4931,10 @@ static constexpr AttributeId Id = 0x00004028;
 namespace NullableRangeRestrictedInt16s {
 static constexpr AttributeId Id = 0x00004029;
 } // namespace NullableRangeRestrictedInt16s
+
+namespace WriteOnlyInt8u {
+static constexpr AttributeId Id = 0x0000402A;
+} // namespace WriteOnlyInt8u
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

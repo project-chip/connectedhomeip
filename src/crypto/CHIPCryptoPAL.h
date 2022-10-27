@@ -78,6 +78,8 @@ constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
 
 constexpr size_t kAES_CCM128_Key_Length   = 128u / 8u;
 constexpr size_t kAES_CCM128_Block_Length = kAES_CCM128_Key_Length;
+constexpr size_t kAES_CCM128_Nonce_Length = 13;
+constexpr size_t kAES_CCM128_Tag_Length   = 16;
 
 /* These sizes are hardcoded here to remove header dependency on underlying crypto library
  * in a public interface file. The validity of these sizes is verified by static_assert in
@@ -614,10 +616,29 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
  * @param plaintext Buffer to write plaintext into
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length, const uint8_t * aad, size_t aad_length,
                            const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length, const uint8_t * nonce,
                            size_t nonce_length, uint8_t * plaintext);
+
+/**
+ * @brief A function that implements AES-CTR encryption/decryption
+ *
+ * This implements the AES-CTR-Encrypt/Decrypt() cryptographic primitives per sections
+ * 3.7.1 and 3.7.2 of the specification. For an empty input, the user of the API
+ * can provide an empty string, or a nullptr, and provide input as 0.
+ * The output buffer can also be an empty string, or a nullptr for this case.
+ *
+ * @param input Input text to encrypt/decrypt
+ * @param input_length Length of ciphertext
+ * @param key Decryption key
+ * @param key_length Length of Decryption key (in bytes)
+ * @param nonce Encryption nonce
+ * @param nonce_length Length of encryption nonce
+ * @param output Buffer to write output into
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR AES_CTR_crypt(const uint8_t * input, size_t input_length, const uint8_t * key, size_t key_length, const uint8_t * nonce,
+                         size_t nonce_length, uint8_t * output);
 
 /**
  * @brief Generate a PKCS#10 CSR, usable for Matter, from a P256Keypair.
@@ -1414,6 +1435,15 @@ enum class CertificateChainValidationResult
 CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t rootCertificateLen, const uint8_t * caCertificate,
                                     size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen,
                                     CertificateChainValidationResult & result);
+
+enum class AttestationCertType
+{
+    kPAA = 0,
+    kPAI = 1,
+    kDAC = 2,
+};
+
+CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, AttestationCertType certType);
 
 /**
  * @brief Validate notBefore timestamp of a certificate (candidateCertificate) against validity period of the

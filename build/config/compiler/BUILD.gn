@@ -19,7 +19,7 @@ import("${build_root}/config/compiler/compiler.gni")
 import("${build_root}/config/sysroot.gni")
 import("${build_root}/config/target.gni")
 
-if (current_os == "mac") {
+if (current_os == "mac" || current_os == "ios") {
   import("${build_root}/config/mac/mac_sdk.gni")
 }
 
@@ -49,13 +49,11 @@ config("debug_default") {
 
 config("abi_default") {
   cflags = []
-  if (current_os == "mac") {
+  if (current_os == "mac" || current_os == "ios") {
     cflags += [
       "-target",
       mac_target_triple,
     ]
-  } else if (current_os == "ios") {
-    # iOS ABI currently set by chip_xcode_build_connector.sh
   }
 
   if (current_os != "mac" && current_os != "ios") {
@@ -258,8 +256,18 @@ config("strict_warnings") {
     cflags += [
       "-Wimplicit-fallthrough",
       "-Wheader-hygiene",
+      "-Wshorten-64-to-32",
       "-Wformat-type-confusion",
     ]
+
+    # TODO: can make this back fatal in once pigweed updates can be taken again.
+    #       See https://github.com/project-chip/connectedhomeip/pull/22079
+    #
+    # Currently `./scripts/build/build_examples.py --target linux-arm64-light-rpc-ipv6only-clang build`
+    # fails in third_party/pigweed/repo/pw_protobuf
+    if (current_cpu == "arm64" && current_os == "linux") {
+      cflags += [ "-Wno-error=shorten-64-to-32" ]
+    }
   }
 
   if (!is_asan && (current_os == "linux" || current_os == "android")) {

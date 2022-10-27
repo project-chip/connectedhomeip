@@ -28,31 +28,31 @@ config:
 tests:
     - label: "Factory Reset the DUT"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "Commission TH and DUT to setup the Thread"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "The cluster Identifier 49 (0x0031) is present in the ServerList
           attribute"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "The FeatureMap attribute value is 2"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
           "MaxNetworks attribute value is at least 1 which is saved as
           MaxNetworksValue for future use"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH sends ArmFailSafe command to the DUT"

@@ -50,17 +50,59 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Read the global attribute: FeatureMap"
-      PICS:
-          TSTAT.S.F00 || TSTAT.S.F01 || TSTAT.S.F02 || TSTAT.S.F03 ||
-          TSTAT.S.F04 || TSTAT.S.F05
+    - label: "Given TSTAT.S.F00(HEAT ensure featuremap has the correct bit set"
+      PICS: TSTAT.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           constraints:
               type: bitmap32
-              minValue: 1
-              maxValue: 63
+              hasMasksSet: [0x1]
+
+    - label: "Given TSTAT.S.F01(COOL) ensure featuremap has the correct bit set"
+      PICS: TSTAT.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label: "Given TSTAT.S.F02(OCC) ensure featuremap has the correct bit set"
+      PICS: TSTAT.S.F02
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4]
+
+    - label: "Given TSTAT.S.F03(SCH) ensure featuremap has the correct bit set"
+      PICS: TSTAT.S.F03
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x8]
+
+    - label: "Given TSTAT.S.F04(SB) ensure featuremap has the correct bit set"
+      PICS: TSTAT.S.F04
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x10]
+
+    - label: "Given TSTAT.S.F05(AUTO) ensure featuremap has the correct bit set"
+      PICS: TSTAT.S.F05
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x20]
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"

@@ -170,6 +170,9 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     case ClusterErrorBoolean::Id: {
         return StatusIB(Protocols::InteractionModel::Status::Failure, 17).ToChipError();
     }
+    case WriteOnlyInt8u::Id: {
+        return StatusIB(Protocols::InteractionModel::Status::UnsupportedRead).ToChipError();
+    }
     default: {
         break;
     }

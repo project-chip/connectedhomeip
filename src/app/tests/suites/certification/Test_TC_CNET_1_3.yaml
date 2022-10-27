@@ -223,9 +223,8 @@ tests:
           [1650370342.693995][7450:7455] CHIP:EM: Sending Standalone Ack for MessageCounter:2345375 on exchange 25146i
       disabled: true
 
-    - label:
-          "NOTE: Repeat the test case by Commission DUT to TH on the Thread and
-          Ethernet setups"
+    - label: "NOTE"
       verification: |
-          verification step to be updated.
+          Repeat the test case by Commission DUT to TH on the Thread and
+          Ethernet setups
       disabled: true

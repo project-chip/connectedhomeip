@@ -33,17 +33,9 @@ CHIP_ROOT="${SCRIPT_PATH%/scripts/tools/zap/run_zaptool.sh}"
 
 (
 
-    cd "$CHIP_ROOT" &&
-        git submodule update --init third_party/zap/repo
+    "$CHIP_ROOT"/scripts/tools/zap/zap_bootstrap.sh
 
-    cd "third_party/zap/repo"
-    if ! npm list installed-check &>/dev/null; then
-        npm install installed-check
-    fi
-
-    if ! ./node_modules/.bin/installed-check -c &>/dev/null; then
-        npm install
-    fi
+    cd "$CHIP_ROOT/third_party/zap/repo"
 
     echo "ARGS: ${ZAP_ARGS[@]}"
 

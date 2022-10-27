@@ -46,8 +46,7 @@ Desktop 20.10 (aarch64)**
 Start the tv-app. Set ports to not conflict with other Matter apps you might run
 on the same machine (chip-tool, tv-casting-app, etc)
 
-    $ ./out/host/chip-tv-app --secured-device-port 5640
-    --secured-commissioner-port 5552
+    $ ./out/debug/chip-tv-app --secured-device-port 5640 --secured-commissioner-port 5552
 
 Using the tv-app shell, invoke the controller commands:
 
@@ -118,8 +117,8 @@ entry in the UDC cache):
 You can use chip-tool to launch apps by invoking the Application Launcher
 cluster on endpoint 1 using chiptool:
 
-    $ ./out/host/chip-tool applicationlauncher launch-app Data CatalogVendorId ApplicationId node-id endpoint-id
-    $ ./out/host/chip-tool applicationlauncher launch-app foo1 1 App2 1234 1
+    $ ./out/debug/chip-tool applicationlauncher launch-app Data CatalogVendorId ApplicationId node-id endpoint-id
+    $ ./out/debug/chip-tool applicationlauncher launch-app foo1 1 App2 1234 1
 
 -   Target Navigation from chip-tool
 
@@ -128,14 +127,14 @@ player) and on Content App endpoints:
 
 Read targets for a given endpoint:
 
-    $ ./out/host/chip-tool targetnavigator read attr-name node-id endpoint-id
-    $ ./out/host/chip-tool targetnavigator read target-navigator-list 1234 1 (video player endpoint 1)
-    $ ./out/host/chip-tool targetnavigator read target-navigator-list 1234 6 (content app endpoint 6 - requires app to be launched)
+    $ ./out/debug/chip-tool targetnavigator read attr-name node-id endpoint-id
+    $ ./out/debug/chip-tool targetnavigator read target-navigator-list 1234 1 (video player endpoint 1)
+    $ ./out/debug/chip-tool targetnavigator read target-navigator-list 1234 6 (content app endpoint 6 - requires app to be launched)
 
 Navigate to a new target:
 
-    $ ./out/host/chip-tool targetnavigator navigate-target Target Data node-id endpoint-id
-    $ ./out/host/chip-tool targetnavigator navigate-target 2 foo1 1234 6 (target id 2 on endpoint 6)
+    $ ./out/debug/chip-tool targetnavigator navigate-target Target Data node-id endpoint-id
+    $ ./out/debug/chip-tool targetnavigator navigate-target 2 foo1 1234 6 (target id 2 on endpoint 6)
 
 ## Casting
 
@@ -147,11 +146,11 @@ player and/or a Content App on it.
 
 Start the tv-app:
 
-    $ ./out/host/chip-tv-app --secured-device-port 5640 --secured-commissioner-port 5552
+    $ ./out/debug/chip-tv-app --secured-device-port 5640 --secured-commissioner-port 5552
 
 Start the tv-casting-app:
 
-    $ ./out/host/chip-tv-casting-app
+    $ ./out/debug/chip-tv-casting-app
 
 TV casting app should discover video players on the network. Into the shell,
 enter "1" to select the first one in the list:

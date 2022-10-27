@@ -84,7 +84,7 @@ tests:
           Kill the OTA Provider App during the transfer of the image to the DUT before it completely transfers the image.
 
           Wait for atleast 5 minutes or more until reading the UpdateState Attribute of the OTA Requestor returns the value as Idle (Value 1)
-          chip-tool otasoftwareupdaterequestor read update-state 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor read update-state 0x1234567890 0
 
           [1651259701990] [18726:35135506] CHIP: [DMG] ReportDataMessage =
           [1651259701990] [18726:35135506] CHIP: [DMG] {
@@ -117,7 +117,7 @@ tests:
 
 
           Relaunch the OTA Provider App and initiate another query
-          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           Verify that the DUT starts a new transfer of software image when sending another QueryImage request i.e. Start Offset field in ReceiveInit message received on OTA Provider side is 0
 

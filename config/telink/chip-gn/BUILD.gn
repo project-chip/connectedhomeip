@@ -21,6 +21,10 @@ import("${build_root}/chip/tests.gni")
 assert(current_os == "zephyr")
 
 declare_args() {
+  chip_build_example_providers = false
+}
+
+declare_args() {
   chip_build_pw_rpc_lib = false
 }
 
@@ -32,6 +36,10 @@ group("telink") {
 
   if (chip_build_tests) {
     deps += [ "${chip_root}/src:tests" ]
+  }
+
+  if (chip_build_example_providers) {
+    deps += [ "${chip_root}/examples/providers:device_info_provider" ]
   }
 }
 

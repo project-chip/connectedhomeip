@@ -61,13 +61,7 @@ CHIP_ERROR SetupPayloadParseCommand::Run()
     NSString * codeString = [NSString stringWithCString:mCode encoding:NSASCIIStringEncoding];
     NSError * error;
     MTRSetupPayload * payload;
-    MTROnboardingPayloadType codeType;
-    if (IsQRCode(codeString)) {
-        codeType = MTROnboardingPayloadTypeQRCode;
-    } else {
-        codeType = MTROnboardingPayloadTypeManualCode;
-    }
-    payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:codeString ofType:codeType error:&error];
+    payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:codeString error:&error];
     if (error) {
         LogNSError("Error: ", error);
         return CHIP_ERROR_INTERNAL;
@@ -82,7 +76,7 @@ CHIP_ERROR SetupPayloadParseCommand::Print(MTRSetupPayload * payload)
     NSLog(@"Version:       %@", payload.version);
     NSLog(@"VendorID:      %@", payload.vendorID);
     NSLog(@"ProductID:     %@", payload.productID);
-    NSLog(@"Custom flow:   %lu    (%@)", payload.commissioningFlow, CustomFlowString(payload.commissioningFlow));
+    NSLog(@"Custom flow:   %tu    (%@)", payload.commissioningFlow, CustomFlowString(payload.commissioningFlow));
     {
         if (payload.rendezvousInformation == nil) {
             NSLog(@"Capabilities:  UNKNOWN");
@@ -110,7 +104,7 @@ CHIP_ERROR SetupPayloadParseCommand::Print(MTRSetupPayload * payload)
                 }
             }
 
-            NSLog(@"Capabilities:  0x%02lX (%@)", value, humanFlags);
+            NSLog(@"Capabilities:  0x%02lX (%@)", static_cast<long>(value), humanFlags);
         }
     }
     NSLog(@"Discriminator: %@", payload.discriminator);

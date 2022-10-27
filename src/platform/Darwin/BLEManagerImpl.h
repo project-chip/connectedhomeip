@@ -47,7 +47,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
-    void _Shutdown() {}
+    void _Shutdown();
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
@@ -64,6 +64,10 @@ private:
     friend BLEManagerImpl & BLEMgrImpl(void);
 
     static BLEManagerImpl sInstance;
+
+    BleConnectionDelegate * mConnectionDelegate   = nullptr;
+    BlePlatformDelegate * mPlatformDelegate       = nullptr;
+    BleApplicationDelegate * mApplicationDelegate = nullptr;
 };
 
 /**

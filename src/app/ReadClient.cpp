@@ -30,6 +30,7 @@
 #include <assert.h>
 #include <lib/core/CHIPTLVTypes.h>
 #include <lib/support/FibonacciUtils.h>
+#include <messaging/ReliableMessageMgr.h>
 
 namespace chip {
 namespace app {
@@ -88,9 +89,10 @@ void ReadClient::StopResubscription()
 
 ReadClient::~ReadClient()
 {
-    Close(CHIP_NO_ERROR, /* allowResubscription = */ false, /* allowOnDone = */ false);
     if (IsSubscriptionType())
     {
+        StopResubscription();
+
         // Only remove ourselves from the engine's tracker list if we still continue to have a valid pointer to it.
         // This won't be the case if the engine shut down before this destructor was called (in which case, mpImEngine
         // will point to null)
@@ -150,7 +152,7 @@ CHIP_ERROR ReadClient::ScheduleResubscription(uint32_t aTimeTillNextResubscripti
     return CHIP_NO_ERROR;
 }
 
-void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription, bool allowOnDone)
+void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
 {
     if (IsReadType())
     {
@@ -190,10 +192,9 @@ void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription, bool allowOn
         StopResubscription();
     }
 
-    if (allowOnDone)
-    {
-        mpCallback.OnDone(this);
-    }
+    mExchange.Release();
+
+    mpCallback.OnDone(this);
 }
 
 const char * ReadClient::GetStateStr() const
@@ -798,7 +799,19 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
     else
     {
         VerifyOrReturnError(mReadPrepareParams.mSessionHolder, CHIP_ERROR_INCORRECT_STATE);
-        timeout = System::Clock::Seconds16(mMaxInterval) + mReadPrepareParams.mSessionHolder->GetAckTimeout();
+
+        //
+        // To calculate the duration we're willing to wait for a report to come to us, we take into account the maximum interval of
+        // the subscription AND the time it takes for the report to make it to us in the worst case. This latter bit involves
+        // computing the Ack timeout from the publisher for the ReportData message being sent to us using our IDLE interval as the
+        // basis for that computation.
+        //
+        // TODO: We need to find a good home for this logic that will correctly compute this based on transport. For now, this will
+        // suffice since we don't use TCP as a transport currently and subscriptions over BLE aren't really a thing.
+        //
+        auto publisherTransmissionTimeout =
+            GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()).mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
+        timeout = System::Clock::Seconds16(mMaxInterval) + publisherTransmissionTimeout;
     }
 
     // EFR32/MBED/INFINION/K32W's chrono count return long unsinged, but other platform returns unsigned
@@ -938,9 +951,6 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
     Span<EventPathParams> eventPaths(aReadPrepareParams.mpEventPathParamsList, aReadPrepareParams.mEventPathParamsListSize);
     Span<DataVersionFilter> dataVersionFilters(aReadPrepareParams.mpDataVersionFilterList,
                                                aReadPrepareParams.mDataVersionFilterListSize);
-
-    VerifyOrReturnError(aReadPrepareParams.mAttributePathParamsListSize != 0 || aReadPrepareParams.mEventPathParamsListSize != 0,
-                        CHIP_ERROR_INVALID_ARGUMENT);
 
     System::PacketBufferHandle msgBuf;
     System::PacketBufferTLVWriter writer;

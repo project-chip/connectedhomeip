@@ -36,6 +36,10 @@
 
 namespace chip {
 class FabricTable;
+
+namespace Controller {
+    class DeviceCommissioner;
+}
 } // namespace chip
 
 NS_ASSUME_NONNULL_BEGIN
@@ -93,6 +97,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)shutDownCppController;
 
 /**
+ * Notification that the MTRControllerFactory has finished shutting down
+ * this controller and will not be touching it anymore.  This is guaranteed to
+ * be called after initWithFactory succeeds.
+ *
+ * Only MTRControllerFactory should be calling this.
+ */
+- (void)deinitFromFactory;
+
+/**
  * Ensure we have a CASE session to the given node ID and then call the provided
  * connection callback.  This may be called on any queue (including the Matter
  * event queue) and will always call the provided connection callback on the
@@ -108,11 +121,38 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)getSessionForNode:(chip::NodeId)nodeID completionHandler:(MTRInternalDeviceConnectionCallback)completionHandler;
 
 /**
+ * Get a session for the commissionee device with the given device id.  This may
+ * be called on any queue (including the Matter event queue) and will always
+ * call the provided connection callback on the Matter queue, asynchronously.
+ * Consumers must be prepared to run on the Matter queue (an in particular must
+ * not use any APIs that will try to do sync dispatch to the Matter queue).
+ *
+ * If the controller is not running when this function is called, will return NO
+ * and never invoke the completion.  If the controller is not running when the
+ * async dispatch on the Matter queue would happen, an error will be dispatched
+ * to the completion handler.
+ */
+- (BOOL)getSessionForCommissioneeDevice:(chip::NodeId)deviceID completion:(MTRInternalDeviceConnectionCallback)completion;
+
+/**
  * Invalidate the CASE session for the given node ID.  This is a temporary thing
  * just to support MTRBaseDevice's invalidateCASESession.  Must not be called on
  * the Matter event queue.
  */
 - (void)invalidateCASESessionForNode:(chip::NodeId)nodeID;
+
+/**
+ * Try to asynchronously dispatch the given block on the Matter queue.  If the
+ * controller is not running either at call time or when the block would be
+ * about to run, the provided error handler will be called with an error.  Note
+ * that this means the error handler might be called on an arbitrary queue, and
+ * might be called before this function returns or after it returns.
+ *
+ * The DeviceCommissioner pointer passed to the callback should only be used
+ * synchronously during the callback invocation.
+ */
+- (void)asyncDispatchToMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
+                      errorHandler:(void (^)(NSError *))errorHandler;
 
 #pragma mark - Device-specific data and SDK access
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages

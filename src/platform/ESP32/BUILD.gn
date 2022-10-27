@@ -23,7 +23,12 @@ declare_args() {
   # DeviceAttestationCredentialsProvider and DeviceInstanceInforProvider
   chip_use_factory_data_provider = false
   chip_use_device_info_provider = false
+  chip_config_software_version_number = 0
 }
+
+defines = [
+  "CHIP_CONFIG_SOFTWARE_VERSION_NUMBER=${chip_config_software_version_number}",
+]
 
 static_library("ESP32") {
   sources = [
@@ -35,6 +40,7 @@ static_library("ESP32") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "ConnectivityManagerImpl_Ethernet.cpp",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",

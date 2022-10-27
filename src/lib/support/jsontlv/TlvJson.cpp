@@ -95,7 +95,7 @@ void InsertKeyValue(Json::Value & json, const KeyContext & keyContext, T val)
     }
     else if (keyContext.keyType == KeyContext::kStructField)
     {
-        snprintf(keyBuf, sizeof(keyBuf), "%" PRIu32, keyContext.key);
+        snprintf(keyBuf, sizeof(keyBuf), "%u", keyContext.key);
         json[keyBuf] = val;
     }
     else

@@ -238,7 +238,13 @@
         "Test_TC_SC_5_3",
         "Test_TC_SC_6_1"
     ],
-    "SoftwareDiagnostics": ["Test_TC_DGSW_3_1", "Test_TC_DGSW_3_2"],
+    "SoftwareDiagnostics": [
+        "Test_TC_DGSW_2_1",
+        "Test_TC_DGSW_2_2",
+        "Test_TC_DGSW_2_3",
+        "Test_TC_DGSW_3_1",
+        "Test_TC_DGSW_3_2"
+    ],
     "WiFiNetworkDiagnostics": [
         "Test_TC_DGWIFI_2_2",
         "Test_TC_DGWIFI_3_1",
@@ -306,7 +312,7 @@
         "Test_TC_LTIME_3_1"
     ],
     "UnitLocalization": [
-        "Test_TC_LUNIT_1_2",
+        "Test_TC_LUNIT_1_1",
         "Test_TC_LUNIT_2_1",
         "Test_TC_LUNIT_3_1"
     ],

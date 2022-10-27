@@ -51,6 +51,7 @@ shared_library("ChipDeviceCtrl") {
   if (chip_controller) {
     sources += [
       "ChipCommissionableNodeController-ScriptBinding.cpp",
+      "ChipDeviceController-Discovery.cpp",
       "ChipDeviceController-IssueNocChain.cpp",
       "ChipDeviceController-ScriptBinding.cpp",
       "ChipDeviceController-ScriptDevicePairingDelegate.cpp",
@@ -69,6 +70,7 @@ shared_library("ChipDeviceCtrl") {
       "chip/internal/ChipThreadWork.h",
       "chip/internal/CommissionerImpl.cpp",
       "chip/logging/LoggingRedirect.cpp",
+      "chip/native/PyChipError.cpp",
       "chip/utils/DeviceProxyUtils.cpp",
     ]
   } else {
@@ -109,6 +111,7 @@ shared_library("ChipDeviceCtrl") {
     public_deps += [
       "${chip_root}/src/controller/data_model",
       "${chip_root}/src/credentials:file_attestation_trust_store",
+      "${chip_root}/third_party/jsoncpp",
     ]
   } else {
     public_deps += [ "$chip_data_model" ]
@@ -296,7 +299,7 @@ chip_python_wheel_action("chip-core") {
     py_package_reqs += [ "pyobjc-framework-corebluetooth" ]
   } else if (current_os == "linux") {
     py_package_reqs += [
-      "dbus-python",
+      "dbus-python==1.2.18",
       "pygobject",
     ]
   }
@@ -312,8 +315,10 @@ chip_python_wheel_action("chip-core") {
   }
 
   if (current_os == "mac") {
-    py_platform_tag =
-        "macosx_" + string_replace(mac_deployment_target, ".", "_")
+    py_platform_tag = string_replace(
+            string_replace(mac_deployment_target, "macos", "macosx."),
+            ".",
+            "_")
   } else {
     py_platform_tag = current_os
   }

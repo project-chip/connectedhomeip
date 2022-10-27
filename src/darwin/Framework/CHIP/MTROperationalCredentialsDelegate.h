@@ -57,7 +57,10 @@ public:
     void SetDeviceID(chip::NodeId deviceId) { mDeviceBeingPaired = deviceId; }
     void ResetDeviceID() { mDeviceBeingPaired = chip::kUndefinedNodeId; }
 
-    void SetDeviceCommissioner(chip::Controller::DeviceCommissioner * cppCommissioner) { mCppCommissioner = cppCommissioner; }
+    void SetDeviceCommissioner(chip::Controller::DeviceCommissioner * _Nullable cppCommissioner)
+    {
+        mCppCommissioner = cppCommissioner;
+    }
 
     chip::Optional<chip::Controller::CommissioningParameters> GetCommissioningParameters()
     {

@@ -53,7 +53,9 @@ AdditionalDataPayloadGenerator::generateAdditionalDataPayload(AdditionalDataPayl
     TLVWriter innerWriter;
 
     // Initialize TLVWriter
-    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+    auto tempBuffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize);
+    VerifyOrReturnError(!tempBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+    writer.Init(std::move(tempBuffer));
 
     ReturnErrorOnFailure(writer.OpenContainer(AnonymousTag(), kTLVType_Structure, innerWriter));
 

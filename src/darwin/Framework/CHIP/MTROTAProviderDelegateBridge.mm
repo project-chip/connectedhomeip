@@ -378,6 +378,60 @@ bool GetPeerNodeInfo(CommandHandler * commandHandler, const ConcreteCommandPath 
     *outNodeId = desc.subject;
     return true;
 }
+
+// Ensures we have a usable CommandHandler and do not have an error.
+//
+// When this function returns non-null, it's safe to go ahead and use the return
+// value to send a response.
+//
+// When this function returns null, the CommandHandler::Handle should not be
+// used anymore.
+CommandHandler * _Nullable EnsureValidState(
+    CommandHandler::Handle & handle, const ConcreteCommandPath & cachedCommandPath, const char * prefix, NSError * _Nullable error)
+{
+    CommandHandler * handler = handle.Get();
+    if (handler == nullptr) {
+        ChipLogError(Controller, "%s: no CommandHandler to send response", prefix);
+        return nullptr;
+    }
+
+    if (error != nil) {
+        auto * desc = [error description];
+        auto err = [MTRError errorToCHIPErrorCode:error];
+        ChipLogError(Controller, "%s: application returned error: '%s', sending error: '%s'", prefix,
+            [desc cStringUsingEncoding:NSUTF8StringEncoding], chip::ErrorStr(err));
+
+        handler->AddStatus(cachedCommandPath, StatusIB(err).mStatus);
+        handle.Release();
+        return nullptr;
+    }
+
+    return handler;
+}
+
+// Ensures we have a usable CommandHandler and that our args don't involve any
+// errors, for the case when we have data to send back.
+//
+// When this function returns non-null, it's safe to go ahead and use whatever
+// object "data" points to to add a response to the command.
+//
+// When this function returns null, the CommandHandler::Handle should not be
+// used anymore.
+CommandHandler * _Nullable EnsureValidState(CommandHandler::Handle & handle, const ConcreteCommandPath & cachedCommandPath,
+    const char * prefix, NSObject * _Nullable data, NSError * _Nullable error)
+{
+    CommandHandler * handler = EnsureValidState(handle, cachedCommandPath, prefix, error);
+    VerifyOrReturnValue(handler != nullptr, nullptr);
+
+    if (data == nil) {
+        ChipLogError(Controller, "%s: no data to send as a response", prefix);
+        handler->AddStatus(cachedCommandPath, Protocols::InteractionModel::Status::Failure);
+        handle.Release();
+        return nullptr;
+    }
+
+    return handler;
+}
 } // anonymous namespace
 
 void MTROTAProviderDelegateBridge::HandleQueryImage(
@@ -403,8 +457,11 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
     auto completionHandler = ^(
         MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error) {
         dispatch_async(mWorkQueue, ^{
-            CommandHandler * handler = handle.Get();
+            CommandHandler * handler = EnsureValidState(handle, cachedCommandPath, "QueryImage", data, error);
             VerifyOrReturn(handler != nullptr);
+
+            ChipLogDetail(Controller, "QueryImage: application responded with: %s",
+                [[data description] cStringUsingEncoding:NSUTF8StringEncoding]);
 
             Commands::QueryImageResponse::Type response;
             ConvertFromQueryImageResponseParms(data, response);
@@ -472,8 +529,11 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * com
     auto completionHandler
         = ^(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error) {
               dispatch_async(mWorkQueue, ^{
-                  CommandHandler * handler = handle.Get();
+                  CommandHandler * handler = EnsureValidState(handle, cachedCommandPath, "ApplyUpdateRequest", data, error);
                   VerifyOrReturn(handler != nullptr);
+
+                  ChipLogDetail(Controller, "ApplyUpdateRequest: application responded with: %s",
+                      [[data description] cStringUsingEncoding:NSUTF8StringEncoding]);
 
                   Commands::ApplyUpdateResponse::Type response;
                   ConvertFromApplyUpdateRequestResponseParms(data, response);
@@ -509,7 +569,7 @@ void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * co
 
     auto completionHandler = ^(NSError * _Nullable error) {
         dispatch_async(mWorkQueue, ^{
-            CommandHandler * handler = handle.Get();
+            CommandHandler * handler = EnsureValidState(handle, cachedCommandPath, "NotifyUpdateApplied", error);
             VerifyOrReturn(handler != nullptr);
 
             handler->AddStatus(cachedCommandPath, Protocols::InteractionModel::Status::Success);

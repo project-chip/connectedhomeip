@@ -28,6 +28,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/SafeInt.h>
 
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
@@ -72,6 +73,7 @@ enum
     kOptionCSRResponseAttestationSignatureInvalid       = 0x101d,
     kOptionCSRResponseCSRExistingKeyPair                = 0x101e,
     kDeviceOption_TestEventTriggerEnableKey             = 0x101f,
+    kCommissionerOption_FabricID                        = 0x1020,
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -117,6 +119,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "cert_error_attestation_signature_incorrect_type", kNoArgument, kOptionCSRResponseAttestationSignatureIncorrectType },
     { "cert_error_attestation_signature_invalid", kNoArgument, kOptionCSRResponseAttestationSignatureInvalid },
     { "enable-key", kArgumentRequired, kDeviceOption_TestEventTriggerEnableKey },
+    { "commissioner-fabric-id", kArgumentRequired, kCommissionerOption_FabricID },
     {}
 };
 
@@ -182,6 +185,9 @@ const char * sDeviceOptionHelp =
     "  --unsecured-commissioner-port <port>\n"
     "       A 16-bit unsigned integer specifying the port to use for unsecured commissioner messages (default is 5550).\n"
     "\n"
+    "  --commissioner-fabric-id <fabricid>\n"
+    "       The fabric ID to be used when this device is a commissioner (default in code is 1).\n"
+    "\n"
     "  --command <command-name>\n"
     "       A name for a command to execute during startup.\n"
     "\n"
@@ -228,16 +234,11 @@ bool Base64ArgToVector(const char * arg, size_t maxSize, std::vector<uint8_t> & 
     outVector.resize(maxSize);
 
     size_t argLen = strlen(arg);
-    if (argLen > maxBase64Size)
-    {
-        return false;
-    }
+    VerifyOrReturnValue(argLen <= maxBase64Size, false);
+    VerifyOrReturnValue(chip::CanCastTo<uint32_t>(argLen), false);
 
-    size_t decodedLen = chip::Base64Decode32(arg, argLen, reinterpret_cast<uint8_t *>(outVector.data()));
-    if (decodedLen == 0)
-    {
-        return false;
-    }
+    size_t decodedLen = chip::Base64Decode32(arg, static_cast<uint32_t>(argLen), reinterpret_cast<uint8_t *>(outVector.data()));
+    VerifyOrReturnValue(decodedLen != 0, false);
 
     outVector.resize(decodedLen);
     return true;
@@ -458,6 +459,11 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
             retval = false;
         }
 
+        break;
+    }
+    case kCommissionerOption_FabricID: {
+        char * eptr;
+        LinuxDeviceOptions::GetInstance().commissionerFabricId = (chip::FabricId) strtoull(aValue, &eptr, 0);
         break;
     }
 

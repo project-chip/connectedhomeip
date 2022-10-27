@@ -28,12 +28,12 @@ config:
 tests:
     - label: "Factory reset the DUT"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "Commmission TH and DUT on Ethernet setup"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label:
@@ -130,7 +130,7 @@ tests:
     - label: "TH reads InterfaceEnabled attribute from the DUT"
       PICS: CNET.S.A0004
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "TH reads LastNetworkingStatus attribute from the DUT"

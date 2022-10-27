@@ -70,24 +70,25 @@ tests:
       PICS: DGSW.C.A0001
       verification: |
           ./chip-tool softwarediagnostics read current-heap-free 1 0
-          Verify the thread-metrics attribute has entries with ThreadMetrics Struct on TH(all-clusters-app) Log:
+
+          Verify the value of CurrentHeapFree is in range uint64 on TH(all-clusters-app) Log:
 
           [1659972026.540043][3458:3458] CHIP:IM: Received Read request
           [1659972026.540208][3458:3458] CHIP:DMG: ReadRequestMessage =
           [1659972026.540273][3458:3458] CHIP:DMG: {
-          [1659972026.540325][3458:3458] CHIP:DMG: 	AttributePathIBs =
-          [1659972026.540387][3458:3458] CHIP:DMG: 	[
-          [1659972026.540444][3458:3458] CHIP:DMG: 		AttributePathIB =
-          [1659972026.540510][3458:3458] CHIP:DMG: 		{
-          [1659972026.540577][3458:3458] CHIP:DMG: 			Endpoint = 0x0,
-          [1659972026.540661][3458:3458] CHIP:DMG: 			Cluster = 0x34,
-          [1659972026.540737][3458:3458] CHIP:DMG: 			Attribute = 0x0000_0001,
-          [1659972026.540810][3458:3458] CHIP:DMG: 		}
+          [1659972026.540325][3458:3458] CHIP:DMG:         AttributePathIBs =
+          [1659972026.540387][3458:3458] CHIP:DMG:         [
+          [1659972026.540444][3458:3458] CHIP:DMG:                 AttributePathIB =
+          [1659972026.540510][3458:3458] CHIP:DMG:                 {
+          [1659972026.540577][3458:3458] CHIP:DMG:                         Endpoint = 0x0,
+          [1659972026.540661][3458:3458] CHIP:DMG:                         Cluster = 0x34,
+          [1659972026.540737][3458:3458] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1659972026.540810][3458:3458] CHIP:DMG:                 }
           [1659972026.540878][3458:3458] CHIP:DMG:
-          [1659972026.540939][3458:3458] CHIP:DMG: 	],
+          [1659972026.540939][3458:3458] CHIP:DMG:         ],
           [1659972026.541006][3458:3458] CHIP:DMG:
-          [1659972026.541118][3458:3458] CHIP:DMG: 	isFabricFiltered = true,
-          [1659972026.541182][3458:3458] CHIP:DMG: 	InteractionModelRevision = 1
+          [1659972026.541118][3458:3458] CHIP:DMG:         isFabricFiltered = true,
+          [1659972026.541182][3458:3458] CHIP:DMG:         InteractionModelRevision = 1
           [1659972026.541239][3458:3458] CHIP:DMG: },
           [1659972026.541397][3458:3458] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1659972026.541584][3458:3458] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
@@ -102,7 +103,7 @@ tests:
       verification: |
           ./chip-tool  softwarediagnostics  read current-heap-used 1 0
 
-          Verify the value of CurrentHeapUsed is in range uint6 on TH(all-clusters-app) Log:
+          Verify the value of CurrentHeapUsed is in range uint64 on TH(all-clusters-app) Log:
 
           [1659972063.411625][3458:3458] CHIP:IM: Received Read request
           [1659972063.411702][3458:3458] CHIP:DMG: ReadRequestMessage =

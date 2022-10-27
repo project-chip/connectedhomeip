@@ -226,43 +226,5 @@ tests:
           to make sure all mandatory (and applicable optional)
           attributes/commands are implemented."
       verification: |
-          FOR ENDPOINTS 2
-
-
-          ./chip-tool descriptor read  parts-list 1 2
-
-          Verify parts-list response on the TH(Chip-tool) Log:
-
-          [1660127879.565330][46472:46477] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1237610137
-          [1660127879.565473][46472:46477] CHIP:TOO:   parts list: 0 entries
-
-          ./chip-tool descriptor read device-list 1 2
-
-          Verify DeviceList response on the TH(Chip-tool) Log:
-
-          [1660127725.802512][46460:46465] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1237610137
-          [1660127725.802614][46460:46465] CHIP:TOO:   device list: 1 entries
-          [1660127725.802669][46460:46465] CHIP:TOO:     [1]: {
-          [1660127725.802707][46460:46465] CHIP:TOO:       Type: 256
-          [1660127725.802745][46460:46465] CHIP:TOO:       Revision: 1
-          [1660127725.802781][46460:46465] CHIP:TOO:      }
-
-          ./chip-tool descriptor read server-list 1 2
-
-          Verify server list on the TH (Chip-tool) Log:
-
-          [1660146145.982691][46811:46816] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 1051414887
-          [1660146145.982733][46811:46816] CHIP:TOO:   server list: 5 entries
-          [1660146145.982744][46811:46816] CHIP:TOO:     [1]: 4
-          [1660146145.982752][46811:46816] CHIP:TOO:     [2]: 6
-          [1660146145.982759][46811:46816] CHIP:TOO:     [3]: 29
-          [1660146145.982771][46811:46816] CHIP:TOO:     [4]: 47
-          [1660146145.982778][46811:46816] CHIP:TOO:     [5]: 1030
-
-          ./chip-tool descriptor read client-list 1 2
-
-          Verify client list on the TH (Chip-tool) Log:
-
-          [1660146160.390200][46818:46823] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0002 DataVersion: 1051414887
-          [1660146160.390211][46818:46823] CHIP:TOO:   client list: 0 entries
+          This step is redundant as during certification the appropriate tests are being run
       disabled: true

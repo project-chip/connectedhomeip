@@ -21,7 +21,6 @@
 #include "AppEvent.h"
 #include "ButtonHandler.h"
 #include "LEDWidget.h"
-#include "qrcodegen.h"
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -131,6 +130,23 @@ void NetWorkCommissioningInstInit()
 {
     sWiFiNetworkCommissioningInstance.Init();
 }
+
+void OnIdentifyStart(Identify *)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStart");
+}
+
+void OnIdentifyStop(Identify *)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStop");
+}
+
+static Identify gIdentify1 = {
+    chip::EndpointId{ 1 },
+    OnIdentifyStart,
+    OnIdentifyStop,
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_NONE,
+};
 
 static void InitServer(intptr_t context)
 {
@@ -314,6 +330,9 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     P6_LOG("App Task started");
 
+    // Users and credentials should be checked once from flash on boot
+    LockMgr().ReadConfigValues();
+
     while (true)
     {
         BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
@@ -369,18 +388,18 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::LockActionEventHandler(AppEvent * event)
 {
-    bool initiated = false;
     LockManager::Action_t action;
     int32_t actor;
-    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (event->Type == AppEvent::kEventType_Lock)
+    switch (event->Type)
     {
+    case AppEvent::kEventType_Lock: {
         action = static_cast<LockManager::Action_t>(event->LockEvent.Action);
         actor  = event->LockEvent.Actor;
+        break;
     }
-    else if (event->Type == AppEvent::kEventType_Button)
-    {
+
+    case AppEvent::kEventType_Button: {
         if (LockMgr().NextState() == true)
         {
             action = LockManager::LOCK_ACTION;
@@ -389,21 +408,18 @@ void AppTask::LockActionEventHandler(AppEvent * event)
         {
             action = LockManager::UNLOCK_ACTION;
         }
+
         actor = AppEvent::kEventType_Button;
-    }
-    else
-    {
-        err = APP_ERROR_UNHANDLED_EVENT;
+        break;
     }
 
-    if (err == CHIP_NO_ERROR)
-    {
-        initiated = LockMgr().InitiateAction(actor, action);
+    default:
+        return;
+    }
 
-        if (!initiated)
-        {
-            P6_LOG("Action is already in progress or active.");
-        }
+    if (!LockMgr().InitiateAction(actor, action))
+    {
+        P6_LOG("Action is already in progress or active.");
     }
 }
 

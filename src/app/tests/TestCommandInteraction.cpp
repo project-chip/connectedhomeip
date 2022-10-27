@@ -245,7 +245,10 @@ public:
 
     static void TestCommandHandlerWithProcessReceivedEmptyDataMsg(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerRejectMultipleCommands(nlTestSuite * apSuite, void * apContext);
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     static void TestCommandHandlerReleaseWithExchangeClosed(nlTestSuite * apSuite, void * apContext);
+#endif
 
     static void TestCommandSenderCommandSuccessResponseFlow(nlTestSuite * apSuite, void * apContext);
     static void TestCommandSenderCommandAsyncSuccessResponseFlow(nlTestSuite * apSuite, void * apContext);
@@ -496,10 +499,21 @@ void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSu
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     TestExchangeDelegate delegate;
-    commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
+
+    auto exchange = ctx.NewExchangeToAlice(&delegate, false);
+    commandHandler.mExchangeCtx.Grab(exchange);
+
     err = commandHandler.SendCommandResponse();
 
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
+
+    //
+    // Ordinarily, the ExchangeContext will close itself upon sending the final message / error'ing out on a responder exchange
+    // when unwinding back from an OnMessageReceived callback. Since that isn't the case in this artificial setup here
+    // (where we created a responder exchange that's not responding to anything), we need
+    // to explicitly close it out. This is not expected in normal application logic.
+    //
+    exchange->Close();
 }
 
 void TestCommandInteraction::TestCommandSenderWithSendCommand(nlTestSuite * apSuite, void * apContext)
@@ -532,7 +546,8 @@ void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite 
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     TestExchangeDelegate delegate;
-    commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
+    auto exchange = ctx.NewExchangeToAlice(&delegate, false);
+    commandHandler.mExchangeCtx.Grab(exchange);
 
     err = commandHandler.PrepareCommand(path);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -540,6 +555,7 @@ void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = commandHandler.SendCommandResponse();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
     commandHandler.Close();
 }
 
@@ -565,7 +581,8 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
     System::PacketBufferHandle commandPacket;
 
     TestExchangeDelegate delegate;
-    commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
+    auto exchange = ctx.NewExchangeToAlice(&delegate, false);
+    commandHandler.mExchangeCtx.Grab(exchange);
 
     AddInvokeResponseData(apSuite, apContext, &commandHandler, aNeedStatusCode);
     err = commandHandler.Finalize(commandPacket);
@@ -580,6 +597,14 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
     err = invokeResponseMessageParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
+
+    //
+    // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
+    // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here
+    // (where we created a responder exchange that's not responding to anything), we need to explicitly close it out. This is not
+    // expected in normal application logic.
+    //
+    exchange->Close();
 }
 
 void TestCommandInteraction::TestCommandHandlerWithSendSimpleCommandData(nlTestSuite * apSuite, void * apContext)
@@ -625,7 +650,8 @@ void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite *
     System::PacketBufferHandle commandPacket;
 
     TestExchangeDelegate delegate;
-    commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
+    auto exchange = ctx.NewExchangeToAlice(&delegate, false);
+    commandHandler.mExchangeCtx.Grab(exchange);
 
     auto path = MakeTestCommandPath();
 
@@ -642,6 +668,14 @@ void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite *
     err = invokeResponseMessageParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
+
+    //
+    // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
+    // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here
+    //  (where we created a responder exchange that's not responding to anything), we need to explicitly close it out. This is not
+    //  expected in normal application logic.
+    //
+    exchange->Close();
 }
 
 void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite * apSuite, void * apContext)
@@ -652,7 +686,8 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite 
     System::PacketBufferHandle commandPacket;
 
     TestExchangeDelegate delegate;
-    commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
+    auto exchange = ctx.NewExchangeToAlice(&delegate, false);
+    commandHandler.mExchangeCtx.Grab(exchange);
 
     auto path = MakeTestCommandPath();
 
@@ -669,7 +704,49 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite 
     err = invokeResponseMessageParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
+
+    //
+    // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
+    // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here
+    // (where we created a responder exchange that's not responding to anything), we need to explicitly close it out. This is not
+    // expected in normal application logic.
+    //
+    exchange->Close();
 }
+
+/**
+ * Helper macro we can use to pretend we got a reply from the server in cases
+ * when the reply was actually dropped due to us not wanting the client's state
+ * machine to advance.
+ *
+ * When this macro is used, the client has sent a message and is waiting for an
+ * ack+response, and the server has sent a response that got dropped and is
+ * waiting for an ack (and maybe a response).
+ *
+ * What this macro then needs to do is:
+ *
+ * 1. Pretend that the client got an ack (and clear out the corresponding ack
+ *    state).
+ * 2. Pretend that the client got a message from the server, with the id of the
+ *    message that was dropped, which requires an ack, so the client will send
+ *    that ack in its next message.
+ *
+ * This is a macro so we get useful line numbers on assertion failures
+ */
+#define PretendWeGotReplyFromServer(aSuite, aContext, aClientExchange)                                                             \
+    {                                                                                                                              \
+        Messaging::ReliableMessageMgr * localRm    = (aContext).GetExchangeManager().GetReliableMessageMgr();                      \
+        Messaging::ExchangeContext * localExchange = aClientExchange;                                                              \
+        NL_TEST_ASSERT(aSuite, localRm->TestGetCountRetransTable() == 2);                                                          \
+                                                                                                                                   \
+        localRm->ClearRetransTable(localExchange);                                                                                 \
+        NL_TEST_ASSERT(aSuite, localRm->TestGetCountRetransTable() == 1);                                                          \
+                                                                                                                                   \
+        localRm->EnumerateRetransTable([localExchange](auto * entry) {                                                             \
+            localExchange->SetPendingPeerAckMessageCounter(entry->retainedBuf.GetMessageCounter());                                \
+            return Loop::Break;                                                                                                    \
+        });                                                                                                                        \
+    }
 
 // Command Sender sends invoke request, command handler drops invoke response, then test injects status response message with
 // busy to client, client sends out a status response with invalid action.
@@ -714,8 +791,11 @@ void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, v
     Test::MessageCapturer messageLog(ctx);
     messageLog.mCaptureStandaloneAcks = false;
 
-    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
-    rm->ClearRetransTable(commandSender.mExchangeCtx.Get());
+    // Since we are dropping packets, things are not getting acked.  Set up our
+    // MRP state to look like what it would have looked like if the packet had
+    // not gotten dropped.
+    PretendWeGotReplyFromServer(apSuite, ctx, commandSender.mExchangeCtx.Get());
+
     ctx.GetLoopback().mSentMessageCount                 = 0;
     ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
@@ -780,9 +860,13 @@ void TestCommandInteraction::TestCommandInvalidMessage2(nlTestSuite * apSuite, v
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
     Test::MessageCapturer messageLog(ctx);
-    messageLog.mCaptureStandaloneAcks  = false;
-    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
-    rm->ClearRetransTable(commandSender.mExchangeCtx.Get());
+    messageLog.mCaptureStandaloneAcks = false;
+
+    // Since we are dropping packets, things are not getting acked.  Set up our
+    // MRP state to look like what it would have looked like if the packet had
+    // not gotten dropped.
+    PretendWeGotReplyFromServer(apSuite, ctx, commandSender.mExchangeCtx.Get());
+
     ctx.GetLoopback().mSentMessageCount                 = 0;
     ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
@@ -849,8 +933,11 @@ void TestCommandInteraction::TestCommandInvalidMessage3(nlTestSuite * apSuite, v
     Test::MessageCapturer messageLog(ctx);
     messageLog.mCaptureStandaloneAcks = false;
 
-    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
-    rm->ClearRetransTable(commandSender.mExchangeCtx.Get());
+    // Since we are dropping packets, things are not getting acked.  Set up our
+    // MRP state to look like what it would have looked like if the packet had
+    // not gotten dropped.
+    PretendWeGotReplyFromServer(apSuite, ctx, commandSender.mExchangeCtx.Get());
+
     ctx.GetLoopback().mSentMessageCount                 = 0;
     ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
@@ -917,8 +1004,11 @@ void TestCommandInteraction::TestCommandInvalidMessage4(nlTestSuite * apSuite, v
     Test::MessageCapturer messageLog(ctx);
     messageLog.mCaptureStandaloneAcks = false;
 
-    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
-    rm->ClearRetransTable(commandSender.mExchangeCtx.Get());
+    // Since we are dropping packets, things are not getting acked.  Set up our
+    // MRP state to look like what it would have looked like if the packet had
+    // not gotten dropped.
+    PretendWeGotReplyFromServer(apSuite, ctx, commandSender.mExchangeCtx.Get());
+
     ctx.GetLoopback().mSentMessageCount                 = 0;
     ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
@@ -1001,7 +1091,8 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure(nlTe
     System::PacketBufferHandle commandPacket;
 
     TestExchangeDelegate delegate;
-    commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
+    auto exchange = ctx.NewExchangeToAlice(&delegate, false);
+    commandHandler.mExchangeCtx.Grab(exchange);
 
     auto path = MakeTestCommandPath();
 
@@ -1022,6 +1113,14 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure(nlTe
     err = invokeResponseMessageParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
+
+    //
+    // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
+    // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here
+    // (where we created a responder exchange that's not responding to anything), we need to explicitly close it out. This is not
+    // expected in normal application logic.
+    //
+    exchange->Close();
 }
 
 void TestCommandInteraction::TestCommandHandlerWithSendSimpleStatusCode(nlTestSuite * apSuite, void * apContext)
@@ -1060,7 +1159,8 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
             System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
             TestExchangeDelegate delegate;
-            commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
+            auto exchange = ctx.NewExchangeToAlice(&delegate, false);
+            commandHandler.mExchangeCtx.Grab(exchange);
 
             chip::isCommandDispatched = false;
             GenerateInvokeRequest(apSuite, apContext, commandDatabuf, messageIsTimed, kTestCommandIdNoData);
@@ -1075,6 +1175,15 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
                 NL_TEST_ASSERT(apSuite, status == Protocols::InteractionModel::Status::Success);
             }
             NL_TEST_ASSERT(apSuite, chip::isCommandDispatched == (messageIsTimed == transactionIsTimed));
+
+            //
+            // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
+            // OnMessageReceived callback and not having sent a subsequent message (as is the case when calling ProcessInvokeRequest
+            // above, which doesn't actually send back a response in these cases). Since that isn't the case in this artificial
+            // setup here (where we created a responder exchange that's not responding to anything), we need to explicitly close it
+            // out. This is not expected in normal application logic.
+            //
+            exchange->Close();
         }
     }
 }
@@ -1284,6 +1393,11 @@ void TestCommandInteraction::TestCommandHandlerRejectMultipleCommands(nlTestSuit
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+//
+// This test needs a special unit-test only API being exposed in ExchangeContext to be able to correctly simulate
+// the release of a session on the exchange.
+//
 void TestCommandInteraction::TestCommandHandlerReleaseWithExchangeClosed(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -1303,10 +1417,14 @@ void TestCommandInteraction::TestCommandHandlerReleaseWithExchangeClosed(nlTestS
     // Verify that async command handle has been allocated
     NL_TEST_ASSERT(apSuite, asyncCommandHandle.Get() != nullptr);
 
-    // Close the exchange associated with the handle and verify the handle can be gracefully released
-    asyncCommandHandle.Get()->mExchangeCtx->Close();
+    // Mimick closure of the exchange that would happen on a session release and verify that releasing the handle there-after
+    // is handled gracefully.
+    asyncCommandHandle.Get()->mExchangeCtx->GetSessionHolder().Release();
+    asyncCommandHandle.Get()->mExchangeCtx->OnSessionReleased();
+
     asyncCommandHandle = nullptr;
 }
+#endif
 
 } // namespace app
 } // namespace chip
@@ -1332,7 +1450,10 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestCommandHandlerWithProcessReceivedNotExistCommand", chip::app::TestCommandInteraction::TestCommandHandlerWithProcessReceivedNotExistCommand),
     NL_TEST_DEF("TestCommandHandlerWithProcessReceivedEmptyDataMsg", chip::app::TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg),
     NL_TEST_DEF("TestCommandHandlerRejectMultipleCommands", chip::app::TestCommandInteraction::TestCommandHandlerRejectMultipleCommands),
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     NL_TEST_DEF("TestCommandHandlerReleaseWithExchangeClosed", chip::app::TestCommandInteraction::TestCommandHandlerReleaseWithExchangeClosed),
+#endif
 
     NL_TEST_DEF("TestCommandSenderCommandSuccessResponseFlow", chip::app::TestCommandInteraction::TestCommandSenderCommandSuccessResponseFlow),
     NL_TEST_DEF("TestCommandSenderCommandAsyncSuccessResponseFlow", chip::app::TestCommandInteraction::TestCommandSenderCommandAsyncSuccessResponseFlow),

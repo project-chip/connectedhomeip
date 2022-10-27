@@ -13,7 +13,7 @@ class {{filename}}: public TestCommandBridge
           {{#if (isString type)}}
           AddArgument("{{name}}", &m{{asUpperCamelCase name}});
           {{else}}
-          AddArgument("{{name}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &m{{asUpperCamelCase name}});
+          AddArgument("{{name}}", {{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, &m{{asUpperCamelCase name}});
           {{/if}}
         {{/chip_tests_config}}
     }
@@ -170,7 +170,7 @@ class {{filename}}: public TestCommandBridge
         MTRReadParams * params = [[MTRReadParams alloc] init];
         params.fabricFiltered = [NSNumber numberWithBool:{{fabricFiltered}}];
         {{/if_is_fabric_scoped_struct}}
-        [cluster readAttribute{{asUpperCamelCase attribute}}With
+        [cluster readAttribute{{#if (isStrEqual (asUpperCamelCase cluster) "Descriptor")}}{{#if (isStrEqual (asUpperCamelCase attribute) "DeviceTypeList")}}DeviceList{{else}}{{asUpperCamelCase attribute}}{{/if}}{{else}}{{asUpperCamelCase attribute}}{{/if}}With
         {{~#if_is_fabric_scoped_struct attributeObject.type~}}
         Params:params completionHandler:
         {{~else~}}

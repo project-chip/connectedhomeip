@@ -391,6 +391,20 @@ public:
     virtual CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) = 0;
 
     /**
+     * Stop discovery (of commissionable or commissioner nodes).
+     *
+     * Some back ends may not support stopping discovery, so consumers should
+     * not assume they will stop getting callbacks after calling this.
+     */
+    virtual CHIP_ERROR StopDiscovery() = 0;
+
+    /**
+     * Verify the validity of an address that appears to be out of date (for example
+     * because establishing a connection to it has failed).
+     */
+    virtual CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) = 0;
+
+    /**
      * Provides the system-wide implementation of the service resolver
      */
     static Resolver & Instance();

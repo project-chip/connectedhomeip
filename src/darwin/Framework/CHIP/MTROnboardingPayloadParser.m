@@ -22,17 +22,23 @@
 
 @implementation MTROnboardingPayloadParser
 
++ (bool)isQRCode:(NSString *)codeString
+{
+    return [codeString hasPrefix:@"MT:"];
+}
+
 + (nullable MTRSetupPayload *)setupPayloadForOnboardingPayload:(NSString *)onboardingPayload
-                                                        ofType:(MTROnboardingPayloadType)type
                                                          error:(NSError * __autoreleasing *)error
 {
     MTRSetupPayload * payload;
+    // MTROnboardingPayloadTypeNFC is of type QR code and handled same as QR code
+    MTROnboardingPayloadType type =
+        [self isQRCode:onboardingPayload] ? MTROnboardingPayloadTypeQRCode : MTROnboardingPayloadTypeManualCode;
     switch (type) {
     case MTROnboardingPayloadTypeManualCode:
         payload = [self setupPayloadForManualCodeOnboardingPayload:onboardingPayload error:error];
         break;
     case MTROnboardingPayloadTypeQRCode:
-    case MTROnboardingPayloadTypeNFC:
         payload = [self setupPayloadForQRCodeOnboardingPayload:onboardingPayload error:error];
         break;
     default:

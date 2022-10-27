@@ -33,7 +33,7 @@ tests:
 
     - label: "Commission TH and DUT on Thread setup"
       verification: |
-          verification step to be updated.
+
       disabled: true
 
     - label: "DUT sends the ScanNetwork command to the TH"

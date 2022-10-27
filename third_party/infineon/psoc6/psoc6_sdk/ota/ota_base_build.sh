@@ -1,6 +1,6 @@
 OUT_DIR=$1
 HEX_NAME=$2
-ANYCLOUD_DIR=third_party/p6/p6_sdk/libs/anycloud-ota/
+ANYCLOUD_DIR=third_party/infineon/psoc6/psoc6_sdk/libs/anycloud-ota/
 
 mv "$OUT_DIR"/"$HEX_NAME".hex "$OUT_DIR"/"$HEX_NAME".unsigned.hex
 

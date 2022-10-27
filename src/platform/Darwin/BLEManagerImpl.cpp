@@ -52,8 +52,40 @@ CHIP_ERROR BLEManagerImpl::_Init()
     BleApplicationDelegateImpl * appDelegate   = new BleApplicationDelegateImpl();
     BleConnectionDelegateImpl * connDelegate   = new BleConnectionDelegateImpl();
     BlePlatformDelegateImpl * platformDelegate = new BlePlatformDelegateImpl();
+
+    mApplicationDelegate = appDelegate;
+    mConnectionDelegate  = connDelegate;
+    mPlatformDelegate    = platformDelegate;
+
     err = BleLayer::Init(platformDelegate, connDelegate, appDelegate, &DeviceLayer::SystemLayer());
+
+    if (CHIP_NO_ERROR != err)
+    {
+        _Shutdown();
+    }
+
     return err;
+}
+
+void BLEManagerImpl::_Shutdown()
+{
+    if (mApplicationDelegate)
+    {
+        delete mApplicationDelegate;
+        mApplicationDelegate = nullptr;
+    }
+
+    if (mConnectionDelegate)
+    {
+        delete mConnectionDelegate;
+        mConnectionDelegate = nullptr;
+    }
+
+    if (mPlatformDelegate)
+    {
+        delete mPlatformDelegate;
+        mPlatformDelegate = nullptr;
+    }
 }
 
 bool BLEManagerImpl::_IsAdvertisingEnabled(void)

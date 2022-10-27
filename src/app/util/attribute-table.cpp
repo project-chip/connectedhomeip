@@ -15,32 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *
- *    Copyright (c) 2020 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-/***************************************************************************/
-/**
- * @file
- * @brief This file contains the code to manipulate
- *the Smart Energy attribute table.  This handles
- *external calls to read/write the table, as well as
- *internal ones.
- *******************************************************************************
- ******************************************************************************/
-
 // this file contains all the common includes for clusters in the zcl-util
 
 #include <app/util/attribute-storage.h>
@@ -91,14 +65,6 @@ EmberAfStatus emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attr
     return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType,
                               true,   // override read-only?
                               false); // just test?
-}
-
-EmberAfStatus emberAfVerifyAttributeWrite(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
-                                          EmberAfAttributeType dataType)
-{
-    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType,
-                              false, // override read-only?
-                              true); // just test?
 }
 
 EmberAfStatus emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,

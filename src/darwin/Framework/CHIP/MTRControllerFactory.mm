@@ -39,6 +39,7 @@
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#include <lib/support/Pool.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <platform/PlatformManager.h>
 
@@ -54,6 +55,7 @@ static NSString * const kErrorControllersInit = @"Init controllers array failure
 static NSString * const kErrorControllerFactoryInit = @"Init failure while initializing controller factory";
 static NSString * const kErrorKeystoreInit = @"Init failure while initializing persistent storage keystore";
 static NSString * const kErrorCertStoreInit = @"Init failure while initializing persistent storage operational certificate store";
+static NSString * const kErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
 static NSString * const kErrorOtaProviderInit = @"Init failure while creating an OTA provider delegate";
 
 @interface MTRControllerFactory ()
@@ -274,6 +276,22 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
             return;
         }
 
+        if (startupParams.cdCerts) {
+            auto cdTrustStore = _deviceAttestationVerifier->GetCertificationDeclarationTrustStore();
+            if (cdTrustStore == nullptr) {
+                MTR_LOG_ERROR("Error: %@", kErrorCDCertStoreInit);
+                return;
+            }
+
+            for (NSData * cdSigningCert in startupParams.cdCerts) {
+                errorCode = cdTrustStore->AddTrustedKey(AsByteSpan(cdSigningCert));
+                if (errorCode != CHIP_NO_ERROR) {
+                    MTR_LOG_ERROR("Error: %@", kErrorCDCertStoreInit);
+                    return;
+                }
+            }
+        }
+
         chip::Controller::FactoryInitParams params;
         if (startupParams.port != nil) {
             params.listenPort = [startupParams.port unsignedShortValue];
@@ -291,6 +309,19 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
             MTR_LOG_ERROR("Error: %@", kErrorControllerFactoryInit);
             return;
         }
+
+        // This needs to happen after DeviceControllerFactory::Init,
+        // because that creates (lazily, by calling functions with
+        // static variables in them) some static-lifetime objects.
+        chip::HeapObjectPoolExitHandling::IgnoreLeaksOnExit();
+
+        // Make sure we don't leave a system state running while we have no
+        // controllers started.  This is working around the fact that a system
+        // state is brought up live on factory init, and not when it comes time
+        // to actually start a controller, and does not actually clean itself up
+        // until its refcount (which starts as 0) goes to 0.
+        _controllerFactory->RetainSystemState();
+        _controllerFactory->ReleaseSystemState();
 
         self->_isRunning = YES;
     });
@@ -576,6 +607,8 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
             [controller shutDownCppController];
         });
     }
+
+    [controller deinitFromFactory];
 }
 
 - (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex
@@ -612,6 +645,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     _storageDelegate = storageDelegate;
     _otaProviderDelegate = nil;
     _paaCerts = nil;
+    _cdCerts = nil;
     _port = nil;
     _startServer = NO;
 

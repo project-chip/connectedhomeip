@@ -19,7 +19,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "DeviceNetworkProvisioningDelegateImpl.h"
-#include "platform/Infineon/PSOC6/P6Utils.h"
+#include <platform/Infineon/PSOC6/P6Utils.h>
 
 namespace chip {
 namespace DeviceLayer {

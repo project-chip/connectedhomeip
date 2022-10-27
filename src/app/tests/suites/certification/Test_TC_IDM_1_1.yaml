@@ -67,7 +67,7 @@ tests:
           [1655717373.047599][10909:10909] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
           [1655717373.047665][10909:10909] CHIP:DMG: AccessControl: allowed
 
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs,  verify that TH all-clusters-app sent success response
 
           [1657867897.521090][2728:2733] CHIP:DMG: },
           [1657867897.521162][2728:2733] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x0
@@ -129,8 +129,7 @@ tests:
           [1655717456.106904][10909:10909] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
           [1655717456.106954][10909:10909] CHIP:DMG: AccessControl: allowed
 
-
-          On DUT as a client side, verify that TH all-clusters-app sent success response
+          If the DUT has to provision to verify the logs,  verify that TH all-clusters-app sent success response
           [1657868210.442226][2746:2751] CHIP:DMG:
           [1657868210.442265][2746:2751] CHIP:DMG:         InteractionModelRevision = 1
           [1657868210.442306][2746:2751] CHIP:DMG: },

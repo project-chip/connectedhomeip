@@ -290,7 +290,9 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
     // Let's make sure atleast number is >= than the minimum messages required to complete the
     // handshake.
     NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount >= sTestPaseMessageCount);
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 0);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 0);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
     if (mrpCommissionerConfig.HasValue())
@@ -312,6 +314,21 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
                        pairingCommissioner.GetRemoteMRPConfig().mActiveRetransTimeout ==
                            mrpAccessoryConfig.Value().mActiveRetransTimeout);
     }
+
+    // Now evict the PASE sessions.
+    auto session = pairingCommissioner.CopySecureSession();
+    NL_TEST_ASSERT(inSuite, session.HasValue());
+    session.Value()->AsSecureSession()->MarkForEviction();
+
+    session = pairingAccessory.CopySecureSession();
+    NL_TEST_ASSERT(inSuite, session.HasValue());
+    session.Value()->AsSecureSession()->MarkForEviction();
+
+    // And check that this did not result in any new notifications.
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 0);
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingErrors == 0);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
     loopback.SetLoopbackTransportDelegate(nullptr);
 }

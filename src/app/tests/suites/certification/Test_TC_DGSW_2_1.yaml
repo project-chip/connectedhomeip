@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 43.2.1. [TC-DGSW-2.1] Attributes with server as DUT
 
@@ -20,49 +21,83 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Software Diagnostics"
+    cluster: "Basic"
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+    - label: "Commission DUT to TH"
+      verification: |
 
-    #issue 873
-    - label:
-          "Reads a list of ThreadMetrics struct non-global attribute from DUT."
-      command: "readAttribute"
-      attribute: "ThreadMetrics"
+      disabled: true
+
+    - label: "TH reads a list of ThreadMetrics struct attribute from DUT."
       PICS: DGSW.S.A0000
-      response:
-          constraints:
-              type: list
+      verification: |
+          ./chip-tool softwarediagnostics read thread-metrics 1 0
 
-    - label: "Reads CurrentHeapFree non-global attribute value from DUT"
-      command: "readAttribute"
-      attribute: "CurrentHeapFree"
+          Verify the thread-metrics attribute has entries with ThreadMetrics Struct.
+          Verify in TH(chip-tool) Log
+
+          [1654697032.107109][7037:7042] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0000 DataVersion: 1044289564
+          [1654697032.107255][7037:7042] CHIP:TOO:   ThreadMetrics: 6 entries
+          [1654697032.107333][7037:7042] CHIP:TOO:     [1]: {
+          [1654697032.107376][7037:7042] CHIP:TOO:       Id: 8972
+          [1654697032.107413][7037:7042] CHIP:TOO:       Name: 8972
+          [1654697032.107449][7037:7042] CHIP:TOO:      }
+          [1654697032.107492][7037:7042] CHIP:TOO:     [2]: {
+          [1654697032.107526][7037:7042] CHIP:TOO:       Id: 8971
+          [1654697032.107559][7037:7042] CHIP:TOO:       Name: 8971
+          [1654697032.107591][7037:7042] CHIP:TOO:      }
+          [1654697032.107632][7037:7042] CHIP:TOO:     [3]: {
+          [1654697032.107667][7037:7042] CHIP:TOO:       Id: 8970
+          [1654697032.107700][7037:7042] CHIP:TOO:       Name: 8970
+          [1654697032.107733][7037:7042] CHIP:TOO:      }
+          [1654697032.107774][7037:7042] CHIP:TOO:     [4]: {
+          [1654697032.107808][7037:7042] CHIP:TOO:       Id: 8969
+          [1654697032.107842][7037:7042] CHIP:TOO:       Name: 8969
+          [1654697032.107875][7037:7042] CHIP:TOO:      }
+          [1654697032.107915][7037:7042] CHIP:TOO:     [5]: {
+          [1654697032.107950][7037:7042] CHIP:TOO:       Id: 8968
+          [1654697032.107982][7037:7042] CHIP:TOO:       Name: 8968
+          [1654697032.108015][7037:7042] CHIP:TOO:      }
+          [1654697032.108056][7037:7042] CHIP:TOO:     [6]: {
+          [1654697032.108090][7037:7042] CHIP:TOO:       Id: 8967
+          [1654697032.108122][7037:7042] CHIP:TOO:       Name: 8967
+          [1654697032.108154][7037:7042] CHIP:TOO:      }
+      disabled: true
+
+    - label: "TH reads an attribute value from DUT."
       PICS: DGSW.S.A0001
-      response:
-          constraints:
-              type: int64u
+      verification: |
+          ./chip-tool softwarediagnostics read current-heap-free 1 0
 
-    - label: "Reads CurrentHeapUsed non-global attribute value from DUT"
-      command: "readAttribute"
-      attribute: "CurrentHeapUsed"
+          Verify the value of CurrentHeapFree is in range uint64
+          Verify in TH(chip-tool) Log
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0001 DataVersion: 3412237516
+          [1649662648.863327][8004:8009] CHIP:TOO:   CurrentHeapFree: 590864
+      disabled: true
+
+    - label: "TH reads an attribute value from DUT."
       PICS: DGSW.S.A0002
-      response:
-          constraints:
-              type: int64u
+      verification: |
+          ./chip-tool  softwarediagnostics  read current-heap-used 1 0
 
-    - label:
-          "Reads CurrentHeapHighWaterMark non-global attribute value from DUT"
-      command: "readAttribute"
-      attribute: "CurrentHeapHighWatermark"
+          Verify the value of CurrentHeapUsed is in range uint64
+          Verify in TH(chip-tool) Log
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0002 DataVersion: 3412237516
+          [1649662811.289909][8018:8023] CHIP:TOO:   CurrentHeapUsed: 1098368
+      disabled: true
+
+    - label: "TH reads an attribute value from DUT."
       PICS: DGSW.S.A0003
-      response:
-          constraints:
-              type: int64u
+      verification: |
+          ./chip-tool softwarediagnostics read current-heap-high-watermark 1 0
+
+          Verify the value of CurrentHeapHighWatermark is in range uint64
+          Verify in TH(chip-tool) Log
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0003 DataVersion: 3412237516
+          [1649662865.831203][8025:8030] CHIP:TOO:   CurrentHeapHighWatermark: 1099312
+      disabled: true
