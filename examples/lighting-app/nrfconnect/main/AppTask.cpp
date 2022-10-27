@@ -28,6 +28,7 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/DeferredAttributePersistenceProvider.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #include <app/server/Dnssd.h>
@@ -88,6 +89,12 @@ bool sIsThreadEnabled                    = false;
 bool sHaveBLEConnections                 = false;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+DeferredAttribute gCurrentLevelPersister(ConcreteAttributePath(kLightEndpointId, Clusters::LevelControl::Id,
+                                                               Clusters::LevelControl::Attributes::CurrentLevel::Id));
+DeferredAttributePersistenceProvider gDeferredAttributePersister(Server::GetInstance().GetAttributePersister(),
+                                                                 Span<DeferredAttribute>(&gCurrentLevelPersister, 1),
+                                                                 System::Clock::Milliseconds32(5000));
 
 } // namespace
 
@@ -195,6 +202,7 @@ CHIP_ERROR AppTask::Init()
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+    app::SetAttributePersistenceProvider(&gDeferredAttributePersister);
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
