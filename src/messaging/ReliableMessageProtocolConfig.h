@@ -39,7 +39,7 @@ namespace chip {
  *    subsequent failures in milliseconds.
  *
  *  This is the default value, that might be adjusted by end device depending on its
- *  needs (e.g. sleeping period) using Service Discovery TXT record CRA key.
+ *  needs (e.g. sleeping period) using Service Discovery TXT record SAI key.
  *
  */
 #ifndef CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
@@ -54,10 +54,10 @@ namespace chip {
  *    failure in milliseconds.
  *
  * This is the default value, that might be adjusted by end device depending on its
- * needs (e.g. sleeping period) using Service Discovery TXT record CRI key.
+ * needs (e.g. sleeping period) using Service Discovery TXT record SII key.
  */
 #ifndef CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-#define CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL (5000_ms32)
+#define CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL (300_ms32)
 #endif // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
 
 /**
