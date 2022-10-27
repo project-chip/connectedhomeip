@@ -23,6 +23,9 @@
 
 #pragma once
 
+#include <condition_variable>
+#include <mutex>
+
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
 
@@ -93,9 +96,35 @@ private:
     static PlatformManagerImpl sInstance;
 
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+
+    class CallbackIndirection
+    {
+    public:
+        CallbackIndirection(GSourceFunc callback, void * userData) : mCallback(callback), mUserData(userData) {}
+        void Wait(std::unique_lock<std::mutex> & lock);
+        static gboolean Callback(CallbackIndirection * self);
+
+    private:
+        GSourceFunc mCallback;
+        void * mUserData;
+        // Sync primitives to wait for the callback to be executed.
+        std::condition_variable mDoneCond;
+        bool mDone = false;
+    };
+
+    // XXX: Mutex for guarding access to glib main event loop callback indirection
+    //      synchronization primitives. This is a workaround to suppress TSAN warnings.
+    //      TSAN does not know that from the thread synchronization perspective the
+    //      g_source_attach() function should be treated as pthread_create(). Memory
+    //      access to shared data before the call to g_source_attach() without mutex
+    //      is not a race condition - the callback will not be executed on glib main
+    //      event loop thread before the call to g_source_attach().
+    std::mutex mGLibMainLoopCallbackIndirectionMutex;
+
     GMainLoop * mGLibMainLoop;
     GThread * mGLibMainLoopThread;
-#endif
+
+#endif // CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 };
 
 /**
