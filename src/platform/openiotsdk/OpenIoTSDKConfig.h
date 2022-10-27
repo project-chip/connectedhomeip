@@ -24,16 +24,9 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
-
-#include "iotsdk/BufferedBlockDevice.h"
-#include "iotsdk/FlashIAPBlockDevice.h"
-
-extern "C" {
-#include "flash_cs300.h"
-#include "hal/flash_api.h"
-#include "iotsdk/TDBStore.h"
-}
 #include <string.h>
+
+#include <iotsdk/TDBStore.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -105,7 +98,6 @@ public:
 
 private:
     static iotsdk::storage::TDBStore * tdb;
-    static iotsdk::storage::FlashIAPBlockDevice * flash_bd;
 };
 
 } // namespace Internal

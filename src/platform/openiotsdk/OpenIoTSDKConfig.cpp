@@ -28,6 +28,9 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <platform/openiotsdk/OpenIoTSDKConfig.h>
+#include <platform/openiotsdk/OpenIoTSDKPort.h>
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -413,19 +416,11 @@ CHIP_ERROR OpenIoTSDKConfig::Init(void)
         return CHIP_NO_ERROR;
     }
 
-    flash_bd = new iotsdk::storage::FlashIAPBlockDevice(get_ram_drive_instance(), 0, 0);
-
-    if (!flash_bd)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
-
     // Create a TDBStore using the underlying storage
-    tdb = new iotsdk::storage::TDBStore(flash_bd);
+    tdb = new iotsdk::storage::TDBStore(GetBlockDevice());
 
     if (!tdb)
     {
-        delete flash_bd;
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -434,7 +429,6 @@ CHIP_ERROR OpenIoTSDKConfig::Init(void)
     kv_status err = tdb->init();
     if (err != kv_status::OK)
     {
-        delete flash_bd;
         delete tdb;
         // zero tdb as we use it keep track of init
         tdb = nullptr;
@@ -444,8 +438,7 @@ CHIP_ERROR OpenIoTSDKConfig::Init(void)
     return CHIP_NO_ERROR;
 }
 
-iotsdk::storage::TDBStore * OpenIoTSDKConfig::tdb                 = nullptr;
-iotsdk::storage::FlashIAPBlockDevice * OpenIoTSDKConfig::flash_bd = nullptr;
+iotsdk::storage::TDBStore * OpenIoTSDKConfig::tdb = nullptr;
 
 } // namespace Internal
 } // namespace DeviceLayer
