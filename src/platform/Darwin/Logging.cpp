@@ -20,7 +20,7 @@ namespace chip {
 namespace Logging {
 namespace Platform {
 
-void ENFORCE_FORMAT(3, 0) getDarwinLogMessageFormat(const char * module, uint8_t category, const char * msg, 
+void ENFORCE_FORMAT(3, 0) getDarwinLogMessageFormat(const char * module, uint8_t category, const char * msg,
         va_list v, uint16_t size, char * formattedMsg)
 {
     timeval time;
