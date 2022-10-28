@@ -25,6 +25,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMemString.h>
+#include <lib/support/Iterator.h>
 
 namespace chip {
 namespace Credentials {
