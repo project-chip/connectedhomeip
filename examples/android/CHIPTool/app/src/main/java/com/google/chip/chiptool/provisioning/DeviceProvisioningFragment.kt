@@ -45,6 +45,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
+import java.lang.IllegalArgumentException
 
 @ExperimentalCoroutinesApi
 class DeviceProvisioningFragment : Fragment() {
@@ -138,7 +139,33 @@ class DeviceProvisioningFragment : Fragment() {
       if (thread != null) {
         network = NetworkCredentials.forThread(NetworkCredentials.ThreadCredentials(thread.operationalDataset))
       }
-
+      if(network == null) {
+        throw IllegalArgumentException("Network credentials is empty.")
+      }
+      deviceController.setDeviceAttestationFailureCallback(600
+      ) { devicePtr, errorCode ->
+        Log.i(TAG, "Device attestation errorCode: $errorCode")
+        requireActivity().runOnUiThread(Runnable {
+          val alertDialog: AlertDialog? = activity?.let {
+            val builder = AlertDialog.Builder(it)
+            builder.apply {
+              setPositiveButton("Continue",
+                DialogInterface.OnClickListener { dialog, id ->
+                  deviceController.continueCommissioning(devicePtr, true)
+                })
+              setNegativeButton("No",
+                DialogInterface.OnClickListener { dialog, id ->
+                  deviceController.continueCommissioning(devicePtr, false)
+                })
+            }
+            builder.setTitle("Device Attestation")
+            builder.setMessage("Device Attestation failed for device under commissioning. Do you wish to continue pairing?")
+            // Create the AlertDialog
+            builder.create()
+          }
+          alertDialog?.show()
+        })
+      }
       deviceController.pairDevice(gatt, connId, deviceId, deviceInfo.setupPinCode, network)
       DeviceIdUtil.setNextAvailableId(requireContext(), deviceId + 1)
     }

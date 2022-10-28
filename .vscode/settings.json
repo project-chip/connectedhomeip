@@ -115,7 +115,8 @@
         "condition_variable": "cpp",
         "numeric": "cpp",
         "random": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "shared_mutex": "cpp"
     },
     // Configure paths or glob patterns to exclude from file watching.
     "files.watcherExclude": {
