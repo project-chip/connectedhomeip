@@ -50,8 +50,8 @@ namespace Platform {
  * @param[out] formattedMsg The address of the log message to write the log message format to.
  *
  */
-void ENFORCE_FORMAT(3, 0) getDarwinLogMessageFormat(const char * module, uint8_t category, const char * msg,
-        va_list v, uint16_t size, char * formattedMsg);
+void ENFORCE_FORMAT(3, 0) getDarwinLogMessageFormat(const char * module, uint8_t category, const char * msg, va_list v,
+                                                    uint16_t size, char * formattedMsg);
 
 } // namespace Platform
 } // namespace Logging

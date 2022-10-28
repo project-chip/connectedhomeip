@@ -2,8 +2,8 @@
 
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
-#include <platform/logging/LogV.h>
 #include <platform/Darwin/Logging.h>
+#include <platform/logging/LogV.h>
 
 #include <lib/core/CHIPConfig.h>
 
@@ -20,8 +20,8 @@ namespace chip {
 namespace Logging {
 namespace Platform {
 
-void ENFORCE_FORMAT(3, 0) getDarwinLogMessageFormat(const char * module, uint8_t category, const char * msg,
-        va_list v, uint16_t size, char * formattedMsg)
+void ENFORCE_FORMAT(3, 0) getDarwinLogMessageFormat(const char * module, uint8_t category, const char * msg, va_list v,
+                                                    uint16_t size, char * formattedMsg)
 {
     timeval time;
     gettimeofday(&time, nullptr);
@@ -30,8 +30,8 @@ void ENFORCE_FORMAT(3, 0) getDarwinLogMessageFormat(const char * module, uint8_t
     uint64_t ktid;
     pthread_threadid_np(nullptr, &ktid);
 
-    int32_t prefixLen = snprintf(formattedMsg, size, "[%ld] [%lld:%lld] CHIP: [%s] ", ms, (long long) getpid(),
-                                 (long long) ktid, module);
+    int32_t prefixLen =
+        snprintf(formattedMsg, size, "[%ld] [%lld:%lld] CHIP: [%s] ", ms, (long long) getpid(), (long long) ktid, module);
 
     if (prefixLen < 0)
     {

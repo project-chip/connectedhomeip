@@ -17,10 +17,10 @@
 
 #include "MTRLogger.h"
 #import <MTRLogging.h>
-#import <lib/support/logging/CHIPLogging.h>
-#include <platform/Darwin/Logging.h>
 #include <dispatch/dispatch.h>
+#import <lib/support/logging/CHIPLogging.h>
 #import <os/log.h>
+#include <platform/Darwin/Logging.h>
 #import <pthread.h>
 
 // MARK: - OsLogMTRLogger
@@ -98,8 +98,9 @@ static dispatch_queue_t log_work_queue;
  */
 static ENFORCE_FORMAT(3, 0) void cpp_log_redirect_callback(const char * module, uint8_t category, const char * msg, va_list args)
 {
-    char * formatted_msg = ((char *)malloc(CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE));
-    chip::Logging::Platform::getDarwinLogMessageFormat(module, category, msg, args, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE, formatted_msg);
+    char * formatted_msg = ((char *) malloc(CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE));
+    chip::Logging::Platform::getDarwinLogMessageFormat(
+        module, category, msg, args, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE, formatted_msg);
 
     // Delegate the log to the MTRLogging system
     dispatch_async([MTRLoggingConfiguration getLogWorkQueue], ^{
@@ -133,8 +134,7 @@ static ENFORCE_FORMAT(3, 0) void cpp_log_redirect_callback(const char * module, 
 
 + (id<MTRLogger>)getLogger
 {
-    if (custom_logger == nil)
-    {
+    if (custom_logger == nil) {
         return [MTRLoggingConfiguration getOsLogger];
     }
 
@@ -143,8 +143,7 @@ static ENFORCE_FORMAT(3, 0) void cpp_log_redirect_callback(const char * module, 
 
 + (id<MTRLogger>)getOsLogger
 {
-    if (os_logger == nil)
-    {
+    if (os_logger == nil) {
         os_logger = [OsLogMTRLogger sharedInstance];
     }
     return os_logger;
@@ -152,8 +151,7 @@ static ENFORCE_FORMAT(3, 0) void cpp_log_redirect_callback(const char * module, 
 
 + (dispatch_queue_t)getLogWorkQueue
 {
-    if (log_work_queue == nil)
-    {
+    if (log_work_queue == nil) {
         log_work_queue = dispatch_queue_create("com.csa.matter.framework.log.workqueue", DISPATCH_QUEUE_SERIAL);
     }
     return log_work_queue;
@@ -185,11 +183,10 @@ static ENFORCE_FORMAT(3, 0) void cpp_log_redirect_callback(const char * module, 
 
     // Format the message
     NSString * message = [[NSString alloc] initWithFormat:format arguments:args];
-    if (logger != nil)
-    {
+    if (logger != nil) {
         dispatch_async([MTRLoggingConfiguration getLogWorkQueue], ^{
-                // Log the message to the MTRLogger
-                [logger logAtLevel:level message:message];
+            // Log the message to the MTRLogger
+            [logger logAtLevel:level message:message];
         });
     }
     [os_logger logAtLevel:level message:message];
