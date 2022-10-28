@@ -24,11 +24,11 @@
 class DeviceAttestationDelegateBridge : public chip::Credentials::DeviceAttestationDelegate
 {
 public:
-    DeviceAttestationDelegateBridge(jlong deviceController, jobject deviceAttestationDelegate,
-                                    chip::Optional<uint16_t> expiryTimeoutSecs, bool shouldWaitAfterDeviceAttestation) :
+    DeviceAttestationDelegateBridge(jobject deviceAttestationDelegate, chip::Optional<uint16_t> expiryTimeoutSecs,
+                                    bool shouldWaitAfterDeviceAttestation) :
         mResult(chip::Credentials::AttestationVerificationResult::kSuccess),
-        mDeviceController(deviceController), mDeviceAttestationDelegate(deviceAttestationDelegate),
-        mExpiryTimeoutSecs(expiryTimeoutSecs), mShouldWaitAfterDeviceAttestation(shouldWaitAfterDeviceAttestation)
+        mDeviceAttestationDelegate(deviceAttestationDelegate), mExpiryTimeoutSecs(expiryTimeoutSecs),
+        mShouldWaitAfterDeviceAttestation(shouldWaitAfterDeviceAttestation)
     {}
 
     ~DeviceAttestationDelegateBridge();
@@ -45,7 +45,6 @@ public:
 
 private:
     chip::Credentials::AttestationVerificationResult mResult;
-    jlong mDeviceController;
     jobject mDeviceAttestationDelegate = nullptr;
     chip::Optional<uint16_t> mExpiryTimeoutSecs;
     const bool mShouldWaitAfterDeviceAttestation;

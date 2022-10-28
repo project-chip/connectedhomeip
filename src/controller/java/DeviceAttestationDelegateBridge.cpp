@@ -87,7 +87,7 @@ void DeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(
         {
             jmethodID onDeviceAttestationCompletedMethod;
             JniReferences::GetInstance().FindMethod(env, mDeviceAttestationDelegate, "onDeviceAttestationCompleted",
-                                                    "(JJLchip/devicecontroller/AttestationInfo;I)V",
+                                                    "(JLchip/devicecontroller/AttestationInfo;I)V",
                                                     &onDeviceAttestationCompletedMethod);
             VerifyOrReturn(onDeviceAttestationCompletedMethod != nullptr,
                            ChipLogError(Controller, "Could not find deviceAttestation completed method"));
@@ -95,19 +95,19 @@ void DeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(
             CHIP_ERROR err = N2J_AttestationInfo(env, info, javaAttestationInfo);
             VerifyOrReturn(err == CHIP_NO_ERROR,
                            ChipLogError(Controller, "Failed to create AttestationInfo, error: %s", err.AsString()));
-            env->CallVoidMethod(mDeviceAttestationDelegate, onDeviceAttestationCompletedMethod, mDeviceController,
-                                reinterpret_cast<jlong>(device), javaAttestationInfo, static_cast<jint>(attestationResult));
+            env->CallVoidMethod(mDeviceAttestationDelegate, onDeviceAttestationCompletedMethod, reinterpret_cast<jlong>(device),
+                                javaAttestationInfo, static_cast<jint>(attestationResult));
         }
         else if ((attestationResult != chip::Credentials::AttestationVerificationResult::kSuccess) &&
                  env->IsInstanceOf(mDeviceAttestationDelegate, failureCallbackCls))
         {
             jmethodID onDeviceAttestationFailedMethod;
-            JniReferences::GetInstance().FindMethod(env, mDeviceAttestationDelegate, "onDeviceAttestationFailed", "(JJI)V",
+            JniReferences::GetInstance().FindMethod(env, mDeviceAttestationDelegate, "onDeviceAttestationFailed", "(JI)V",
                                                     &onDeviceAttestationFailedMethod);
             VerifyOrReturn(onDeviceAttestationFailedMethod != nullptr,
                            ChipLogError(Controller, "Could not find deviceAttestation failed method"));
-            env->CallVoidMethod(mDeviceAttestationDelegate, onDeviceAttestationFailedMethod, mDeviceController,
-                                reinterpret_cast<jlong>(device), static_cast<jint>(attestationResult));
+            env->CallVoidMethod(mDeviceAttestationDelegate, onDeviceAttestationFailedMethod, reinterpret_cast<jlong>(device),
+                                static_cast<jint>(attestationResult));
         }
     }
 }

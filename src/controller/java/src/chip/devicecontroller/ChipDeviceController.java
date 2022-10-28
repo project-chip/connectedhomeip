@@ -102,7 +102,8 @@ public class ChipDeviceController {
    * When {@link
    * DeviceAttestationDelegate.DeviceAttestationCompletionCallback#onDeviceAttestationCompleted(long,
    * long, AttestationInfo, int)} is received,
-   * {@link #continueCommissioning(long, boolean)} must be called.
+   * {@link #continueCommissioning(long, boolean)}
+   * must be called.
    * 
    * @param failSafeExpiryTimeout the value to set for the fail-safe timer before
    *                              onDeviceAttestationCompleted is invoked.
@@ -113,7 +114,7 @@ public class ChipDeviceController {
    */
   public void setDeviceAttestationCompletionCallback(int failSafeExpiryTimeout,
       DeviceAttestationDelegate.DeviceAttestationCompletionCallback completionCallback) {
-    setDeviceAttestationDelegate(failSafeExpiryTimeout, completionCallback);
+    setDeviceAttestationDelegate(deviceControllerPtr, failSafeExpiryTimeout, completionCallback);
   }
 
   /**
@@ -123,8 +124,8 @@ public class ChipDeviceController {
    * 
    * When {@link
    * DeviceAttestationDelegate.DeviceAttestationFailureCallback#onDeviceAttestationFailed(long,
-   * long, int)} is received, {@link #continueCommissioning(long, boolean)} must
-   * be called.
+   * long, int)} is received,
+   * {@link #continueCommissioning(long, boolean)} must be called.
    * 
    * @param failSafeExpiryTimeout the value to set for the fail-safe timer before
    *                              onDeviceAttestationFailed is invoked.
@@ -134,7 +135,7 @@ public class ChipDeviceController {
    */
   public void setDeviceAttestationFailureCallback(int failSafeExpiryTimeout,
       DeviceAttestationDelegate.DeviceAttestationFailureCallback failureCallback) {
-    setDeviceAttestationDelegate(failSafeExpiryTimeout, failureCallback);
+    setDeviceAttestationDelegate(deviceControllerPtr, failSafeExpiryTimeout, failureCallback);
   }
 
   public void pairDevice(
@@ -713,6 +714,7 @@ public class ChipDeviceController {
   private native long newDeviceController(ControllerParams params);
 
   private native void setDeviceAttestationDelegate(
+      long deviceControllerPtr,
       int failSafeExpiryTimeout,
       DeviceAttestationDelegate delegate);
 

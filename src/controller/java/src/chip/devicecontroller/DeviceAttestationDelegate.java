@@ -25,25 +25,20 @@ public interface DeviceAttestationDelegate {
      * This allows the callback to stop commissioning after examining the device
      * info (DAC, PAI, CD).
      *
-     * @param deviceControllerPtr Controller corresponding to the commissioning
-     *                            process
-     * @param devicePtr           Handle of device being commissioned
-     * @param attestationInfo     Attestation information for the device
-     * @param errorCode           Error code on attestation failure. 0 if success.
+     * @param devicePtr       Handle of device being commissioned
+     * @param attestationInfo Attestation information for the device
+     * @param errorCode       Error code on attestation failure. 0 if success.
      */
-    void onDeviceAttestationCompleted(
-        long deviceControllerPtr, long devicePtr, AttestationInfo attestationInfo, int errorCode);
+    void onDeviceAttestationCompleted(long devicePtr, AttestationInfo attestationInfo, int errorCode);
   }
 
   public interface DeviceAttestationFailureCallback extends DeviceAttestationDelegate {
     /**
      * The callback will be invoked when device attestation failed
      * 
-     * @param deviceControllerPtr Controller corresponding to the commissioning
-     *                            process
-     * @param devicePtr           Handle of device being commissioned
-     * @param errorCode           Error code for the failure.
+     * @param devicePtr Handle of device being commissioned
+     * @param errorCode Error code for the failure.
      */
-    void onDeviceAttestationFailed(long deviceControllerPtr, long devicePtr, int errorCode);
+    void onDeviceAttestationFailed(long devicePtr, int errorCode);
   }
 }

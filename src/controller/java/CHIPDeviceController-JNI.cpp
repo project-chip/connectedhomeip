@@ -385,7 +385,7 @@ exit:
 }
 
 JNI_METHOD(void, setDeviceAttestationDelegate)
-(JNIEnv * env, jobject self, jlong handle, jobject deviceAttestationDelegate, jint failSafeExpiryTimeout)
+(JNIEnv * env, jobject self, jlong handle, jint failSafeExpiryTimeout, jobject deviceAttestationDelegate)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -1484,7 +1484,7 @@ CHIP_ERROR CreateDeviceAttestationDelegateBridge(JNIEnv * env, jlong handle, job
         shouldWaitAfterDeviceAttestation = true;
     }
     *deviceAttestationDelegateBridge =
-        new DeviceAttestationDelegateBridge(handle, deviceAttestationDelegateRef, timeoutSecs, shouldWaitAfterDeviceAttestation);
+        new DeviceAttestationDelegateBridge(deviceAttestationDelegateRef, timeoutSecs, shouldWaitAfterDeviceAttestation);
 exit:
     return err;
 }
