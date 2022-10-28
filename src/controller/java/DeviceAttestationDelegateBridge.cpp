@@ -45,14 +45,14 @@ CHIP_ERROR N2J_AttestationInfo(JNIEnv * env, const chip::Credentials::DeviceAtte
     constructor = env->GetMethodID(infoClass, "<init>", "([B[B[B)V");
     VerifyOrExit(constructor != nullptr, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    err = JniReferences::GetInstance().N2J_ByteArray(env, DAC.data(), DAC.size(), javaDAC);
+    err = JniReferences::GetInstance().N2J_ByteArray(env, DAC.data(), static_cast<jsize>(DAC.size()), javaDAC);
     SuccessOrExit(err);
-    err = JniReferences::GetInstance().N2J_ByteArray(env, PAI.data(), PAI.size(), javaPAI);
+    err = JniReferences::GetInstance().N2J_ByteArray(env, PAI.data(), static_cast<jsize>(PAI.size()), javaPAI);
     SuccessOrExit(err);
     if (certificationDeclarationSpan.HasValue())
     {
         err = JniReferences::GetInstance().N2J_ByteArray(env, certificationDeclarationSpan.Value().data(),
-                                                         certificationDeclarationSpan.Value().size(), javaCD);
+                                                         static_cast<jsize>(certificationDeclarationSpan.Value().size()), javaCD);
         SuccessOrExit(err);
     }
     outAttestationInfo = (jobject) env->NewObject(infoClass, constructor, javaDAC, javaPAI, javaCD);
