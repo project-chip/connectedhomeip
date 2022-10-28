@@ -21,7 +21,7 @@ namespace Logging {
 namespace Platform {
 
 void ENFORCE_FORMAT(3, 0) getDarwinLogMessageFormat(const char * module, uint8_t category, const char * msg, 
-        va_list v, uint16_t size, char *formattedMsg)
+        va_list v, uint16_t size, char * formattedMsg)
 {
     timeval time;
     gettimeofday(&time, nullptr);
@@ -32,6 +32,7 @@ void ENFORCE_FORMAT(3, 0) getDarwinLogMessageFormat(const char * module, uint8_t
 
     int32_t prefixLen = snprintf(formattedMsg, size, "[%ld] [%lld:%lld] CHIP: [%s] ", ms, (long long) getpid(),
                                  (long long) ktid, module);
+
     if (prefixLen < 0)
     {
         // In the event that we could not format the message, simply copy over the

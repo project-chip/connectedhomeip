@@ -218,7 +218,11 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list args)
 
     if (redirect != nullptr)
     {
-        redirect(moduleName, category, msg, args);
+        // if the redirect is going to read these args we need to make a copy
+        // of them otherwise the va_list may be modified and unreadable
+        va_list copy;
+        va_copy(copy, args);
+        redirect(moduleName, category, msg, copy);
     }
     Platform::LogV(moduleName, category, msg, args);
 }
