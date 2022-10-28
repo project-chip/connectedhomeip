@@ -69,8 +69,6 @@ class DoorLockClusterFabricDelegate : public chip::FabricTable::Delegate
 };
 static DoorLockClusterFabricDelegate gFabricDelegate;
 
-void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId);
-
 /**********************************************************
  * DoorLockServer public methods
  *********************************************************/
@@ -3380,7 +3378,7 @@ void DoorLockServer::ScheduleAutoRelock(chip::EndpointId endpointId, uint32_t ti
     emberEventControlSetInactive(&AutolockEvent);
 
     AutolockEvent.endpoint = endpointId;
-    AutolockEvent.callback = emberAfPluginDoorLockOnAutoRelock;
+    AutolockEvent.callback = DoorLockOnAutoRelockCallback;
 
     uint32_t timeoutMs =
         (DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC >= timeoutSec) ? timeoutSec * MILLISECOND_TICKS_PER_SECOND : DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC;
@@ -3751,8 +3749,10 @@ void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttr
 // Timer callbacks
 // =============================================================================
 
-void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId)
+void DoorLockServer::DoorLockOnAutoRelockCallback(chip::EndpointId endpointId)
 {
+    emberAfDoorLockClusterPrintln("Door Auto relock timer expired. Locking...");
     emberEventControlSetInactive(&DoorLockServer::Instance().AutolockEvent);
     DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kLocked, DlOperationSource::kAuto);
+    emberAfPluginDoorLockOnAutoRelock(endpointId);
 }

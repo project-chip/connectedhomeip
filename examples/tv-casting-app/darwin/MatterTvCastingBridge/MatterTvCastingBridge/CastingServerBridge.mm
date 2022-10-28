@@ -402,6 +402,28 @@
     });
 }
 
+- (void)shutdownAllSubscriptions:(dispatch_queue_t _Nonnull)clientQueue requestSentHandler:(nullable void (^)())requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().shutdownAllSubscriptions() called");
+    dispatch_async(_chipWorkQueue, ^{
+        CastingServer::GetInstance()->ShutdownAllSubscriptions();
+        dispatch_async(clientQueue, ^{
+            requestSentHandler();
+        });
+    });
+}
+
+- (void)disconnect:(dispatch_queue_t _Nonnull)clientQueue requestSentHandler:(nullable void (^)())requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().disconnect() called");
+    dispatch_async(_chipWorkQueue, ^{
+        CastingServer::GetInstance()->Disconnect();
+        dispatch_async(clientQueue, ^{
+            requestSentHandler();
+        });
+    });
+}
+
 - (void)contentLauncher_launchUrl:(ContentApp * _Nonnull)contentApp
                        contentUrl:(NSString * _Nonnull)contentUrl
                 contentDisplayStr:(NSString * _Nonnull)contentDisplayStr

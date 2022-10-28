@@ -214,6 +214,11 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, Inet::InterfaceId interface,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 // Implemention of Java-specific functions
 
 void InitializeWithObjects(jobject resolverObject, jobject browserObject, jobject mdnsCallbackObject)

@@ -37,9 +37,28 @@ config NORDIC_QSPI_NOR_STACK_WRITE_BUFFER_SIZE
 
 endif # CHIP_QSPI_NOR
 
+config CHIP_SPI_NOR
+	bool "Enable SPI NOR feature set"
+	imply SPI
+	imply SPI_NOR
+	imply MULTITHREADING
+	imply PM_OVERRIDE_EXTERNAL_DRIVER_CHECK
+	help
+		Enables SPI NOR with the set of options
+		configuring pages and buffer sizes.
+
+if CHIP_SPI_NOR
+
+config SPI_NOR_FLASH_LAYOUT_PAGE_SIZE
+	int
+	default 4096
+
+endif # CHIP_SPI_NOR
+
 config CHIP_DFU_OVER_BT_SMP
 	bool "Enable DFU over Bluetooth LE SMP feature set"
-	imply CHIP_QSPI_NOR
+	imply CHIP_QSPI_NOR if BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
+	imply CHIP_SPI_NOR if BOARD_NRF7002DK_NRF5340_CPUAPP
 	imply BOOTLOADER_MCUBOOT
 	help
 		Enables Device Firmware Upgrade over Bluetoot LE with SMP

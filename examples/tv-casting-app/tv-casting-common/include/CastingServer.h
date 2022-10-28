@@ -97,6 +97,16 @@ public:
     CHIP_ERROR PurgeVideoPlayerCache();
 
     /**
+     * Tears down all active subscriptions.
+     */
+    void ShutdownAllSubscriptions();
+
+    /**
+     *  Mark any open session with the currently connected Video player as expired.
+     */
+    void Disconnect();
+
+    /**
      * @brief Content Launcher cluster
      */
     CHIP_ERROR ContentLauncher_LaunchURL(

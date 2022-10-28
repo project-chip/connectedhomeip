@@ -73,6 +73,7 @@ assert(!(use_wf200 && chip_enable_openthread))
 if (chip_enable_wifi) {
   assert(use_rs911x || use_wf200)
   enable_openthread_cli = false
+  import("${chip_root}/src/platform/EFR32/wifi_args.gni")
 }
 
 # ThunderBoards, Explorer Kit and MGM240L do not support LCD (No LCD)
@@ -91,14 +92,28 @@ if (chip_enable_wifi) {
   }
   wifi_sdk_dir = "${chip_root}/src/platform/EFR32/wifi"
   efr32_lwip_defs = [ "LWIP_NETIF_API=1" ]
-  efr32_lwip_defs += [
-    "LWIP_IPV4=1",
-    "LWIP_ARP=1",
-    "LWIP_ICMP=1",
-    "LWIP_DHCP=1",
-    "LWIP_IPV6_ND=1",
-    "LWIP_IGMP=1",
-  ]
+  if (lwip_ipv4) {
+    efr32_lwip_defs += [
+      "LWIP_IPV4=1",
+
+      # adds following options to provide
+      # them to .cpp source files
+      # flags ported from lwipopts file
+      # TODO: move lwipopts to one location
+      "LWIP_ARP=1",
+      "LWIP_ICMP=1",
+      "LWIP_IGMP=1",
+      "LWIP_DHCP=1",
+      "LWIP_DNS=0",
+    ]
+  } else {
+    efr32_lwip_defs += [ "LWIP_IPV4=0" ]
+  }
+  if (lwip_ipv6) {
+    efr32_lwip_defs += [ "LWIP_IPV6=1" ]
+  } else {
+    efr32_lwip_defs += [ "LWIP_IPV6=0" ]
+  }
 
   if (use_rs911x) {
     wiseconnect_sdk_root =

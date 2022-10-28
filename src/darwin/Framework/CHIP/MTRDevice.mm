@@ -92,6 +92,16 @@ typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 }
 @end
 
+NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max)
+{
+    if ([aNumber compare:min] == NSOrderedAscending) {
+        return min;
+    } else if ([aNumber compare:max] == NSOrderedDescending) {
+        return max;
+    }
+    return aNumber;
+}
+
 #pragma mark - SubscriptionCallback class declaration
 using namespace chip;
 using namespace chip::app;
@@ -136,8 +146,6 @@ private:
 @property (nonatomic) NSMutableDictionary<MTRAttributePath *, MTRPair<NSDate *, NSDictionary *> *> * expectedValueCache;
 
 @property (nonatomic) BOOL expirationCheckScheduled;
-
-@property (nonatomic) MTRAsyncCallbackWorkQueue * asyncCallbackWorkQueue;
 @end
 
 @implementation MTRDevice
@@ -382,7 +390,7 @@ private:
     // Create work item, set ready handler to perform task, then enqueue the work
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:_queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.nodeID controller:self.deviceController];
+        MTRBaseDevice * baseDevice = [self newBaseDevice];
 
         [baseDevice
             readAttributeWithEndpointId:endpointID
@@ -398,7 +406,7 @@ private:
                                  }
 
                                  // TODO: better retry logic
-                                 if (retryCount < 2) {
+                                 if (error && (retryCount < 2)) {
                                      [workItem retryWork];
                                  } else {
                                      [workItem endWork];
@@ -424,20 +432,29 @@ private:
                expectedValueInterval:(NSNumber *)expectedValueInterval
                    timedWriteTimeout:(NSNumber * _Nullable)timeout
 {
-    // Start the asynchronous operation
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.nodeID controller:self.deviceController];
-    [baseDevice
-        writeAttributeWithEndpointId:endpointID
-                           clusterId:clusterID
-                         attributeId:attributeID
-                               value:value
-                   timedWriteTimeout:timeout
-                         clientQueue:self.queue
-                          completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                              if (values) {
-                                  [self _handleAttributeReport:values];
-                              }
-                          }];
+    if (timeout) {
+        timeout = MTRClampedNumber(timeout, @(1), @(UINT16_MAX));
+    }
+    expectedValueInterval = MTRClampedNumber(expectedValueInterval, @(1), @(UINT32_MAX));
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:_queue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [self newBaseDevice];
+        [baseDevice
+            writeAttributeWithEndpointId:endpointID
+                               clusterId:clusterID
+                             attributeId:attributeID
+                                   value:value
+                       timedWriteTimeout:timeout
+                             clientQueue:self.queue
+                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                  if (values) {
+                                      [self _handleAttributeReport:values];
+                                  }
+                                  [workItem endWork];
+                              }];
+    };
+    workItem.readyHandler = readyHandler;
+    [_asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     // Commit change into expected value cache
     MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointId:endpointID
@@ -452,28 +469,43 @@ private:
                           clusterID:(NSNumber *)clusterID
                           commandID:(NSNumber *)commandID
                       commandFields:(id)commandFields
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
-              expectedValueInterval:(NSNumber *)expectedValueInterval
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion
 {
-    // Perform this operation
-    MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.nodeID controller:self.deviceController];
-    [baseDevice
-        invokeCommandWithEndpointId:endpointID
-                          clusterId:clusterID
-                          commandId:commandID
-                      commandFields:commandFields
-                 timedInvokeTimeout:timeout
-                        clientQueue:self.queue
-                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                             dispatch_async(clientQueue, ^{
-                                 completion(values, error);
-                             });
-                         }];
+    if (timeout) {
+        timeout = MTRClampedNumber(timeout, @(1), @(UINT16_MAX));
+    }
+    if (!expectedValueInterval || ([expectedValueInterval compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueInterval = MTRClampedNumber(expectedValueInterval, @(1), @(UINT32_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:_queue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRBaseDevice * baseDevice = [self newBaseDevice];
+        [baseDevice
+            invokeCommandWithEndpointId:endpointID
+                              clusterId:clusterID
+                              commandId:commandID
+                          commandFields:commandFields
+                     timedInvokeTimeout:timeout
+                            clientQueue:self.queue
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 dispatch_async(clientQueue, ^{
+                                     completion(values, error);
+                                 });
+                                 [workItem endWork];
+                             }];
+    };
+    workItem.readyHandler = readyHandler;
+    [_asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
-    [self setExpectedValues:expectedValues expectedValueInterval:expectedValueInterval];
+    if (expectedValues) {
+        [self setExpectedValues:expectedValues expectedValueInterval:expectedValueInterval];
+    }
 }
 
 - (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
@@ -482,7 +514,7 @@ private:
                                            queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
 {
-    auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.nodeID controller:self.deviceController];
+    auto * baseDevice = [self newBaseDevice];
     [baseDevice openCommissioningWindowWithSetupPasscode:setupPasscode
                                            discriminator:discriminator
                                                 duration:duration
@@ -700,6 +732,11 @@ private:
 
     [self _checkExpiredExpectedValues];
     os_unfair_lock_unlock(&self->_lock);
+}
+
+- (MTRBaseDevice *)newBaseDevice
+{
+    return [[MTRBaseDevice alloc] initWithNodeID:self.nodeID controller:self.deviceController];
 }
 
 @end

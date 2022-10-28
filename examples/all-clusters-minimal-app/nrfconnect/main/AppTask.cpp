@@ -149,9 +149,7 @@ CHIP_ERROR AppTask::Init()
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
-#if CONFIG_CHIP_OTA_REQUESTOR
-    InitBasicOTARequestor();
-#endif
+
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
     ConfigurationMgr().LogDeviceConfig();
@@ -371,6 +369,11 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * aEvent, intptr_t /* aArg 
         Instance().mIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
         Instance().mIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
         UpdateStatusLED();
+        break;
+    case DeviceEventType::kDnssdPlatformInitialized:
+#if CONFIG_CHIP_OTA_REQUESTOR
+        InitBasicOTARequestor();
+#endif
         break;
     default:
         break;

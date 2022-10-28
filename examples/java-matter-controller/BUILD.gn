@@ -23,19 +23,14 @@ android_binary("java-matter-controller") {
   output_name = "java-matter-controller"
 
   deps = [
-    ":android",
     "${chip_root}/src/controller/java",
     "${chip_root}/src/setup_payload/java",
-    "${chip_root}/third_party/android_deps:annotation",
+    "${chip_root}/third_party/java_deps:annotation",
   ]
 
   sources = [ "java/src/com/matter/controller/Main.java" ]
 
   javac_flags = [ "-Xlint:deprecation" ]
-}
-
-java_prebuilt("android") {
-  jar_path = "${android_sdk_root}/platforms/android-21/android.jar"
 }
 
 group("default") {
