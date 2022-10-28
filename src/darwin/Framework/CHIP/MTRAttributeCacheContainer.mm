@@ -103,7 +103,7 @@ static CHIP_ERROR AppendAttibuteValueToArray(
             getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull queue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
                 if (handle) {
                     [handle.proxy readAttributeCacheWithController:controllerId
-                                                            nodeId:[nodeId unsignedLongLongValue]
+                                                            nodeId:nodeId.unsignedLongLongValue
                                                         endpointId:endpointId
                                                          clusterId:clusterId
                                                        attributeId:attributeId

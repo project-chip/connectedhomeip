@@ -36,8 +36,8 @@ using namespace chip;
         return nil;
     }
 
-    if (!IsValidFabricId([fabricID unsignedLongLongValue])) {
-        MTR_LOG_ERROR("%llu is not a valid fabric id to initialize a device controller with", [fabricID unsignedLongLongValue]);
+    if (!IsValidFabricId(fabricID.unsignedLongLongValue)) {
+        MTR_LOG_ERROR("%llu is not a valid fabric id to initialize a device controller with", fabricID.unsignedLongLongValue);
         return nil;
     }
 
@@ -127,7 +127,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
 - (uint64_t)fabricId
 {
-    return [self.fabricID unsignedLongLongValue];
+    return self.fabricID.unsignedLongLongValue;
 }
 
 - (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner fabricId:(uint64_t)fabricId ipk:(NSData *)ipk

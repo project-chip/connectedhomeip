@@ -66,7 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
         getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull proxyQueue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
             if (handle) {
                 [handle.proxy subscribeWithController:self.controller
-                                               nodeId:[self.nodeId unsignedLongLongValue]
+                                               nodeId:self.nodeId.unsignedLongLongValue
                                           minInterval:minInterval
                                           maxInterval:maxInterval
                                                params:[MTRDeviceController encodeXPCSubscribeParams:params]
@@ -103,7 +103,7 @@ NS_ASSUME_NONNULL_BEGIN
         getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull queue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
             if (handle) {
                 [handle.proxy readAttributeWithController:self.controller
-                                                   nodeId:[self.nodeId unsignedLongLongValue]
+                                                   nodeId:self.nodeId.unsignedLongLongValue
                                                endpointId:endpointId
                                                 clusterId:clusterId
                                               attributeId:attributeId
@@ -140,7 +140,7 @@ NS_ASSUME_NONNULL_BEGIN
         getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull queue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
             if (handle) {
                 [handle.proxy writeAttributeWithController:self.controller
-                                                    nodeId:[self.nodeId unsignedLongLongValue]
+                                                    nodeId:self.nodeId.unsignedLongLongValue
                                                 endpointId:endpointId
                                                  clusterId:clusterId
                                                attributeId:attributeId
@@ -178,7 +178,7 @@ NS_ASSUME_NONNULL_BEGIN
         getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull queue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
             if (handle) {
                 [handle.proxy invokeCommandWithController:self.controller
-                                                   nodeId:[self.nodeId unsignedLongLongValue]
+                                                   nodeId:self.nodeId.unsignedLongLongValue
                                                endpointId:endpointId
                                                 clusterId:clusterId
                                                 commandId:commandId
@@ -253,7 +253,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                 }
                                             }];
             [handle.proxy subscribeAttributeWithController:self.controller
-                                                    nodeId:[self.nodeId unsignedLongLongValue]
+                                                    nodeId:self.nodeId.unsignedLongLongValue
                                                 endpointId:endpointId
                                                  clusterId:clusterId
                                                attributeId:attributeId

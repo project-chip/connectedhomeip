@@ -98,12 +98,12 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
             completion(error);
         });
     };
-    [deviceController getBaseDevice:[deviceId unsignedLongLongValue]
+    [deviceController getBaseDevice:deviceId.unsignedLongLongValue
                               queue:workQueue
                   completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                       if (error) {
                           NSLog(@"Error: Failed to get connected device (%llu) for attribute cache: %@",
-                              [deviceId unsignedLongLongValue], error);
+                              deviceId.unsignedLongLongValue, error);
                           completionHandler(error);
                           return;
                       }
@@ -126,7 +126,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                               }
                           }
                           subscriptionEstablished:^() {
-                              NSLog(@"Attribute cache subscription succeeded for device %llu", [deviceId unsignedLongLongValue]);
+                              NSLog(@"Attribute cache subscription succeeded for device %llu", deviceId.unsignedLongLongValue);
                               if (![established[0] boolValue]) {
                                   established[0] = @YES;
                                   completionHandler(nil);

@@ -225,7 +225,7 @@ static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, vo
 {
     if (self = [super init]) {
         _isPASEDevice = NO;
-        _nodeID = [nodeID unsignedLongLongValue];
+        _nodeID = nodeID.unsignedLongLongValue;
         _deviceController = controller;
     }
     return self;

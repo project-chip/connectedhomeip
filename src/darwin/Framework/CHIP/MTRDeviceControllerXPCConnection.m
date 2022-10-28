@@ -167,7 +167,7 @@
                 if (handle) {
                     MTR_LOG_DEBUG("CHIP XPC connection requests to stop reports");
                     [handle.proxy stopReportsWithController:controller
-                                                     nodeId:[nodeId unsignedLongLongValue]
+                                                     nodeId:nodeId.unsignedLongLongValue
                                                  completion:^{
                                                      __auto_type handleRetainer = handle;
                                                      (void) handleRetainer;

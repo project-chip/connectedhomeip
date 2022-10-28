@@ -278,8 +278,8 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
             chip::MutableByteSpan noc(nocBuffer);
 
             if (commissionerParams.operationalKeypair != nullptr) {
-                errorCode = _operationalCredentialsDelegate->GenerateNOC([startupParams.nodeId unsignedLongLongValue],
-                    [startupParams.fabricID unsignedLongLongValue], chip::kUndefinedCATs,
+                errorCode = _operationalCredentialsDelegate->GenerateNOC(startupParams.nodeId.unsignedLongLongValue,
+                    startupParams.fabricID.unsignedLongLongValue, chip::kUndefinedCATs,
                     commissionerParams.operationalKeypair->Pubkey(), noc);
 
                 if ([self checkForStartError:errorCode logMsg:kErrorGenerateNOC]) {
@@ -300,8 +300,8 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
                     return;
                 }
 
-                errorCode = _operationalCredentialsDelegate->GenerateNOC([startupParams.nodeId unsignedLongLongValue],
-                    [startupParams.fabricID unsignedLongLongValue], chip::kUndefinedCATs, pubKey, noc);
+                errorCode = _operationalCredentialsDelegate->GenerateNOC(startupParams.nodeId.unsignedLongLongValue,
+                    startupParams.fabricID.unsignedLongLongValue, chip::kUndefinedCATs, pubKey, noc);
 
                 if ([self checkForStartError:errorCode logMsg:kErrorGenerateNOC]) {
                     return;
@@ -624,7 +624,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     if (deviceToRemove == device) {
         self.nodeIDToDeviceMap[device.nodeID] = nil;
     } else {
-        MTR_LOG_ERROR("Error: Cannot remove device %p with nodeID %llu", device, [device.nodeID unsignedLongLongValue]);
+        MTR_LOG_ERROR("Error: Cannot remove device %p with nodeID %llu", device, device.nodeID.unsignedLongLongValue);
     }
     os_unfair_lock_unlock(&_deviceMapLock);
 }

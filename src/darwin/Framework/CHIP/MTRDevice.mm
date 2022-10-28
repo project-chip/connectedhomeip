@@ -294,7 +294,7 @@ private:
 
     _subscriptionActive = YES;
 
-    [_deviceController getSessionForNode:[_nodeID unsignedLongLongValue]
+    [_deviceController getSessionForNode:_nodeID.unsignedLongLongValue
                        completionHandler:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
                            const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
                            if (error != nil) {
@@ -745,7 +745,7 @@ private:
 
 + (instancetype)deviceWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController
 {
-    return [MTRDevice deviceWithNodeID:@(nodeID) controller:deviceController];
+    return [self deviceWithNodeID:@(nodeID) controller:deviceController];
 }
 
 @end

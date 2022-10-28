@@ -43,12 +43,12 @@ size_t const MTRSizeThreadPSKc = chip::Thread::kSizePSKc;
                                        panID:(NSData *)panID
 {
     if (self = [super init]) {
-        _networkName = networkName;
-        _extendedPANID = extendedPANID;
-        _masterKey = masterKey;
-        _PSKc = PSKc;
-        _channelNumber = channelNumber;
-        _panID = panID;
+        _networkName = [networkName copy];
+        _extendedPANID = [extendedPANID copy];
+        _masterKey = [masterKey copy];
+        _PSKc = [PSKc copy];
+        _channelNumber = [channelNumber copy];
+        _panID = [panID copy];
         _cppThreadOperationalDataset = chip::Thread::OperationalDataset();
         if ([self _populateCppOperationalDataset]) {
             return self;
