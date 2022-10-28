@@ -1,15 +1,15 @@
-# Matter Bridge User's Guide
+# Unify Matter Bridge User's Guide
 
-The Unify Matter Bridge is a Unify IoT Service that allows interaction with Unify devices from a Matter fabric.
-For a more thorough description, have a look at the [Unify Matter Bridge Overview](../../silabs_examples/unify-matter-bridge/readme_overview.md).
+The Unify Matter Bridge is a Unify IoT Service that enables interaction with Unify devices from a Matter fabric.
+For a more thorough description see the [Unify Matter Bridge Overview](../../silabs_examples/unify-matter-bridge/readme_overview.md).
 
 As a prerequisite for the Matter Bridge to work, at least one Unify protocol controller should be set up and running.
-For now we will assume that you have setup the Z-Wave Protocol Controller (uic-zpc) to run on a Raspberry Pi 4 and connected it to an MQTT broker in your network.
+For now, we will assume that you have set up the Z-Wave Protocol Controller (uic-zpc) to run on a Raspberry Pi 4 and connected it to an MQTT broker in your network.
 Read the [Unify Host SDK's Getting Started Guide](https://siliconlabs.github.io/UnifySDK/doc/getting_started.html) for information on how to set this up.
 
 Once a protocol controller is running, the Matter Bridge can be started.
 
-The following assumes that you have build the Unify Matter Bridge application by following the _[Build Guide](./readme_building.md)_ and have transferred the _`unify-matter-bridge`_ to your RPi4 running the 32-bit version of Debian Buster.
+The following documentation assumes that you have built the Unify Matter Bridge application by following the _[Build Guide](./readme_building.md)_ and have transferred the _`unify-matter-bridge`_ to your RPi4 running the 32-bit version of Debian Buster.
 
 > **Note:**
 > 
@@ -24,40 +24,46 @@ The following assumes that you have build the Unify Matter Bridge application by
 
 <br>
 
-- [Running the Matter Bridge](#running-the-matter-bridge)
-  - [Important configurations](#important-configurations)
-- [Commissioning the bridge to a network](#commissioning-the-bridge-to-a-network)
-- [Testing the bridge using the chip tool](#testing-the-bridge-using-the-chip-tool)
-- [Sending a group command](#sending-a-group-command)
-- [Command line arguments](#command-line-arguments)
+- [Unify Matter Bridge User's Guide](#unify-matter-bridge-users-guide)
+  - [Running the Matter Bridge](#running-the-matter-bridge)
+    - [Important configurations](#important-configurations)
+    - [Starting the Matter Bridge](#starting-the-matter-bridge)
+  - [Commissioning the bridge to a network](#commissioning-the-bridge-to-a-network)
+    - [Using the chip-tool to commission](#using-the-chip-tool-to-commission)
+    - [Toggle an OnOff device](#toggle-an-onoff-device)
+  - [Toggle a group of OnOff devices](#toggle-a-group-of-onoff-devices)
+  - [Command line arguments](#command-line-arguments)
 
 ## Running the Matter Bridge
 
-At start up, the Matter Bridge needs to connect to the Matter Fabric as well as the MQTT Broker.
-It is therefore crucial that you have access to port 1883, the default MQTT Broker's port, as well as a network setup that allows mDNS through.
+At start-up, the Matter Bridge needs to connect to the Matter Fabric as well as the MQTT Broker.
+It is therefore critical that you have access to port 1883, the default MQTT Broker's port, as well as a network setup that allows mDNS through.
 
-There are a few important runtime configurations that needs to be considered as well as some other configuration options.
-A full list of commandline parameters is listed are the [Command line arguments](#command-line-arguments) section.
+There are a few important runtime configurations that need to be considered as well as some other configuration options.
+A full list of command-line parameters is listed are the [Command line arguments](#command-line-arguments) section.
 
 ### Important configurations
 - #### Network Interface
   Choosing the network interface on which the Matter Fabric runs - ie. on a regular RPi4 setup it would be `wlan0` for WiFi and `eth0` for ethernet.
   Specify this with the '`--interface`' argument, as such:
+
   ```bash
   ./unify-matter-bridge --interface eth0
   ```
 
 - #### Key-Value store (KVS)
   The Matter Bridge uses a Key-Value store for persisting various run-time configurations.
-  Make sure to have read/write access to the default path '`/var/chip_unify_bridge.kvs`' or provide the path to where it is allowed to write this data to.
-  If you delete this file prior to start up, you will reset everything and the bridge will not belong to any Matter Fabric until it has yet again been comissioned.
+  Make sure to have read/write access to the default path '`/var/chip_unify_bridge.kvs`' or provide the path to where it is allowed to write this data.
+  If this file is deleted before start-up, you will reset everything and the bridge will not belong to any Matter Fabric until it has yet again been commissioned.
+
   ```bash
   ./unify-matter-bridge --kvs ./matter-bridge.kvs
   ```
 
 - #### MQTT Host
-  If you have followed the [Unify Host SDK's Getting Started Guide](https://siliconlabs.github.io/UnifySDK/doc/getting_started.html) to the letter, your MQTT Broker should be running on '`localhost`'.
-  In the case where you have decided to run the MQTT broker on a different host, you can tell the Unify Matter Bridge to connect to a different host.
+  If you have followed the [Unify Host SDK's Getting Started Guide](https://siliconlabs.github.io/UnifySDK/doc/getting_started.html), your MQTT Broker should now be running on '`localhost`'.
+  If you have decided to run the MQTT broker on a different host, you can tell the Unify Matter Bridge to connect to a different host.
+  
   ```bash
   ./unify-matter-bridge --mqtt.host 10.0.0.42
   ```
@@ -65,6 +71,7 @@ A full list of commandline parameters is listed are the [Command line arguments]
 - #### Vendor and Product ID
   If you do have access to the EAP, and you want to use the Google Home App, you need to set a specific VID and PID for the Matter Bridge.
   This can be done in the following way:
+  
   ```bash
   ./unify-matter-bridge --vendor fff1 --product 8001
   ```
@@ -78,14 +85,13 @@ Now that you have decided on the configuration parameters it is time to start th
 
 ## Commissioning the bridge to a network
 
-For the bridge to be included into the Matter network, it needs to be commissioned.
+To include the bridge in the Matter network, it must first be commissioned.
 The first time the bridge starts it will automatically go into commissioning mode, after 10 minutes the bridge will exit commissioning mode again.
-If the bridge has not been commissioned within this window, the application must be restarted to open the commissioning window again or you can 
-write `commission` in the CLI when running the bridge.
+If the bridge has not been commissioned within this window, the application must be restarted to open the commissioning window again or the window can be opened by writing `commission` in the CLI when running the bridge. The commission command may also be used for multi-fabric commissioning.
 
-The Unify Matter Bridge uses the "On Network" commissioning method - for now there is no Bluetooth commissioning support.
+The Unify Matter Bridge uses the "On Network" commissioning method - for now, there is no Bluetooth commissioning support.
 
-The commisioning procedure requires a pairing code to be used.
+The commissioning procedure requires a pairing code to be used.
 This pairing code is written to the console when running the Matter Bridge.
 Look for something similar to the following example with a pairing code of '`MT:-24J029Q00KA0648G00`':
 This code can be used when commissioning with the CLI commissioning tool `chip-tool`.
@@ -169,7 +175,7 @@ Finally, a multicast command may be sent using the chip-tool
 
 The Unify Matter Bridge provides the following command line arguments:
 
-Using the _--help_ the following help text appear.
+Using the _--help_ the following help text appears.
 
 ```bash
 Usage: ./unify_matter_bridge [Options]

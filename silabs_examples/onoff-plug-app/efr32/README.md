@@ -4,18 +4,23 @@ An example showing the use of MATTER on the Silicon Labs EFR32 MG12.
 
 <hr>
 
--   [MATTER EFR32 Onoff-plug Example](#matter-efr32-onoff-plug-example)
-    -   [Introduction](#introduction)
-    -   [Building](#building)
-        -   [Note](#note)
-    -   [Flashing the Application](#flashing-the-application)
-    -   [Viewing Logging Output](#viewing-logging-output)
-    -   [Running the Complete Example](#running-the-complete-example)
-        -   [Notes](#notes)
-    -   [Running RPC console](#running-rpc-console)
-    -   [Device Tracing](#device-tracing)
-    -   [Memory settings](#memory-settings)
-    -   [OTA Software Update](#ota-software-update)
+- [MATTER EFR32 Onoff-plug Example](#matter-efr32-onoff-plug-example)
+  - [Introduction](#introduction)
+  - [Building](#building)
+  - [Flashing the Application](#flashing-the-application)
+  - [Viewing Logging Output](#viewing-logging-output)
+  - [Running the Complete Example](#running-the-complete-example)
+    - [Notes](#notes)
+  - [Running RPC console](#running-rpc-console)
+  - [Device Tracing](#device-tracing)
+  - [Memory settings](#memory-settings)
+  - [OTA Software Update](#ota-software-update)
+  - [Group Communication (Multicast)](#group-communication-multicast)
+  - [Building options](#building-options)
+    - [Disabling logging](#disabling-logging)
+    - [Debug build / release build](#debug-build--release-build)
+    - [Disabling LCD](#disabling-lcd)
+    - [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
@@ -55,11 +60,16 @@ Silicon Labs platform.
 -   Install some additional tools (likely already present for MATTER
     developers):
 
-    -   Linux: `sudo apt-get install git libwebkitgtk-1.0-0 ninja-build`
+    -   Linux: `sudo apt-get install git ninja-build`
 
     -   Mac OS X: `brew install ninja`
 
 -   Supported hardware:
+
+    -   > For the latest supported hardware please refer to the
+        > [Hardware Requirements](https://github.com/SiliconLabs/matter/blob/latest/docs/silabs/general/HARDWARE_REQUIREMENTS.md)
+        > in the Silicon Labs Matter Github Repo
+
 
     MG12 boards:
 

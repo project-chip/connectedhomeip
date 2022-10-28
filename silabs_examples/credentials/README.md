@@ -77,24 +77,37 @@ Simplicity Commander.
 
 1. Enter the creds.py directory:
 
-> `cd silabs_examples/credentials`
+    ```shell
+    cd silabs_examples/credentials`
+    ```
 
 2. Set the environment:
 
-> `export BASE_SDK_PATH=../../third_party/silabs/gecko_sdk`<br> 
-> `export ARM_GCC_DIR=<ARM GNU toolchain path>`<br>
+    ```shell
+    export BASE_SDK_PATH=../../third_party/silabs/gecko_sdk`<br> 
+    export ARM_GCC_DIR=<ARM GNU toolchain path>`<br>
+    ```
 
 Example:
-> `export BASE_SDK_PATH=/home/myUserName/matter/third_party/silabs/gecko_sdk/`<br>
-> `export ARM_GCC_DIR=/usr`<br>
+
+```shell
+export BASE_SDK_PATH=/home/myUserName/matter/third_party/silabs/gecko_sdk/`<br>
+export ARM_GCC_DIR=/usr`<br>
+```
 
 3. Execute the setup script
 
 On Linux, the serial port should have the form `/dev/tty*`, for instance:
-> `python3 ./creds.py -p /dev/ttyACM0 -S 440266330 -B brd4186c -C pai_cert.pem -K pai_priv.pem -D cd.bin`
+
+```shell
+python3 ./creds.py -p /dev/ttyACM0 -S 440266330 -B brd4186c -C pai_cert.pem -K pai_priv.pem -D cd.bin
+```
 
 On macOS, use `/dev/cu.*` instead of `/dev/tty.*`, for instance:
-> `python3 ./creds.py -p /dev/cu.usbmodem0004402663301 -S 440266330 -B brd4186c -C pai_cert.pem -K pai_priv.pem -D cd.bin`
+
+```shell
+python3 ./creds.py -p /dev/cu.usbmodem0004402663301 -S 440266330 -B brd4186c -C pai_cert.pem -K pai_priv.pem -D cd.bin
+```
 
 
 This script:
@@ -111,19 +124,26 @@ This script:
 
 The parameters are as follows:
 
-> -p, --port Serial port used to connect to the target device<br> -S, --serial
-> Serial number of the connected device<br> -B, --board Target board, currently
-> brd4164a, brd4166a, brd4186a, or brd4186c<br> -C, --pai_cert PAI certificate
-> file in PEM format<br> -K, --pai_key PAI private key file in PEM format<br>
-> -D, --cd CD file (binary)<br>
+```shell
+-p, --port Serial port used to connect to the target device
+-S, --serial Serial number of the connected device
+-B, --board Target board, currently brd4164a, brd4166a, brd4186a, or brd4186c
+-C, --pai_cert PAI certificate file in PEM format
+-K, --pai_key PAI private key file in PEM format
+-D, --cd CD file (binary)
+```
 
 4. Copy the generated header into the Matter code:
 
-> `cp ./temp/efr32_creds.h ${MATTER_HOME}/examples/platform/efr32/`
+    ```shell
+    cp ./temp/efr32_creds.h ${MATTER_HOME}/examples/platform/efr32/
+    ```
 
 5. Rebuild the example app with the new credentials enabled, for instance:
 
-> `./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32/ ./out/lighting-app BRD4186C chip_build_platform_attestation_credentials_provider=true`
+    ```shell
+    ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32/ ./out/lighting-app BRD4186C chip_build_platform_attestation_credentials_provider=true
+    ```
 
 ## Validation
 
@@ -139,7 +159,9 @@ On MG12, the last page starts at address 0x000FF800, in MG24, the last page is
 located at 0x0817E000. These addresses can be found in the memory map of the
 board's datasheet. For instance, for a MG24 board:
 
-> `commander readmem --range 0x0817E000:+2048 --serialno 440266330`
+```shell
+commander readmem --range 0x0817E000:+2048 --serialno 440266330`
+```
 
 The output should look something like:
 
@@ -193,7 +215,9 @@ of 463 octets:
 This should match the contents of the DER-formatted PAI certificate, which is
 stored by the setup script as ./temp/pai_cert.der :
 
-> `$ xxd ./temp/pai_cert.der`
+```shell
+$ xxd ./temp/pai_cert.der
+```
 
     00000000: 3082 01cb 3082 0171 a003 0201 0202 0856  0...0..q.......V
     00000010: ad82 22ad 945b 6430 0a06 082a 8648 ce3d  .."..[d0...*.H.=
@@ -213,7 +237,9 @@ a size of 488 octets:
 This should match the contents of the DER-formatted DAC certificate, which is
 stored by the setup script as ./temp/dac_cert.der :
 
-> `$ xxd ./temp/dac_cert.der`
+```shell
+$ xxd ./temp/dac_cert.der
+```
 
     00000000: 3082 01e4 3082 018a a003 0201 0202 041a  0...0...........
     00000010: 3dee 5a30 0a06 082a 8648 ce3d 0403 0230  =.Z0...*.H.=...0
@@ -233,7 +259,10 @@ with a size of 541 octets.
 The CD is a binary file, and is neither modified, nor validated by the setup
 script, it is simply stored in flash after the DAC:
 
-> `$ xxd cd.bin`
+```shell
+$ xxd cd.bin
+```
+
 
     00000000: 3082 0219 0609 2a86 4886 f70d 0107 02a0  0.....*.H.......
     00000010: 8202 0a30 8202 0602 0103 310d 300b 0609  ...0......1.0...

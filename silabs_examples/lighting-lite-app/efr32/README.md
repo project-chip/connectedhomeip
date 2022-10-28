@@ -1,10 +1,10 @@
-# CHIP EFR32 Lighting lite Example
+# Matter EFR32 Lighting lite Example
 
-An example showing the use of CHIP on the Silicon Labs EFR32 in a minimalistic memory requirement configuration.
+An example showing the use of Matter on the Silicon Labs EFR32 in a minimal memory requirement configuration.
 
 <hr>
 
-- [CHIP EFR32 Lighting lite Example](#chip-efr32-lighting-lite-example)
+- [Matter EFR32 Lighting lite Example](#matter-efr32-lighting-lite-example)
   - [Introduction](#introduction)
   - [Building](#building)
   - [Flashing the Application](#flashing-the-application)
@@ -28,7 +28,7 @@ An example showing the use of CHIP on the Silicon Labs EFR32 in a minimalistic m
 ## Introduction
 
 The EFR32 lighting lite example provides a baseline demonstration of a Light control
-device, built using CHIP and the Silicon Labs Gecko SDK. It can be controlled by
+device, built using Matter and the Silicon Labs Gecko SDK. It can be controlled by
 a Chip controller over Openthread network.
 
 The EFR32 device can be commissioned over Bluetooth Low Energy where the device
@@ -38,7 +38,7 @@ which will then join the network.
 
 
 The lighting lite example is intended to serve both as a means to explore the
-workings of CHIP as well as a minimalistic template for creating real products
+workings of Matter as well as a minimal template for creating real products
 featuring the lowest memory requirements possible based on the Silicon Labs platform.
 
 <a name="building"></a>
@@ -56,11 +56,16 @@ featuring the lowest memory requirements possible based on the Silicon Labs plat
 
 -   Install some additional tools (likely already present for CHIP developers):
 
-    -   Linux: `sudo apt-get install git libwebkitgtk-1.0-0 ninja-build`
+    -   Linux: `sudo apt-get install git ninja-build`
 
     -   Mac OS X: `brew install ninja`
 
 -   Supported hardware:
+
+    -   > For the latest supported hardware please refer to the
+        > [Hardware Requirements](https://github.com/SiliconLabs/matter/blob/latest/docs/silabs/general/HARDWARE_REQUIREMENTS.md)
+        > in the Silicon Labs Matter Github Repo
+
 
     MG12 boards:
 

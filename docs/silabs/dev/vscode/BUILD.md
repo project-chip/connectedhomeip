@@ -60,7 +60,8 @@ This step is identical to the steps for building on Linux/Mac, Refer to
 that [ section ](#linMac).
 
 ## ![](../../images/win_run_setup.gif)
-
+### Note for Windows Developers
+During bootstrap, an error might occur. Check if pip.exe is installed in ./environment/gn_out/python-venv/Scripts. If it does not exist, install pip.exe in that directory and rebuild the example.
 
 -----
 

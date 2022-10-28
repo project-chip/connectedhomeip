@@ -35,11 +35,19 @@
 
     1. [Setting up environment](dev/vscode/SETUP.md)
     2. [Running tasks](dev/vscode/TASKS.md)
-        1. [Build](dev/vscode/BUILD.md)
-        2. [Flash](dev/vscode/FLASH.md)
-        3. [Debug](dev/vscode/DEBUG.md) <br><br>
+        1. [Create](dev/vscode/CREATE.md)
+        2. [Build](dev/vscode/BUILD.md)
+        3. [Flash](dev/vscode/FLASH.md)
+        4. [Debug](dev/vscode/DEBUG.md) <br><br>
 
-7. Reference Guides
+7. Matter Overview Guides
+   1. [Commissioning Process Overview](general/COMMISSIONING.md)
+   2. [Security Overview](general/SECURITY.md)
+   5. [Matter Attestation Credentials for EFR32](../../silabs_examples/credentials/README.md)
+   3. [Matter Sleepy End Devices over Openthread](general/OT_SLEEPY_END_DEVICE.md)
+   4. [Matter OTA Software Update](general/OTA_SOFTWARE_UPDATE.md)
+   <br><br>
+8. Reference Guides
 
     1. [Matter Hardware Requirements](general/HARDWARE_REQUIREMENTS.md)
     2. [Matter Software Requirements](general/SOFTWARE_REQUIREMENTS.md)
@@ -47,17 +55,14 @@
     4. [Matter Commit Hashes](general/COMMIT_HASHES.md)
     5. [How to Flash a Silicon Labs Device](general/FLASH_SILABS_DEVICE.md)
     6. [How to Find Your Raspberry Pi](general/FIND_RASPI.md)
-    7. [Silicon Labs Matter Commit Hashes](general/COMMIT_HASHES.md)
-    8. [Building a Custom Matter Device](general/CUSTOM_MATTER_DEVICE.md)
-    9. [Matter OTA Software Update](general/OTA_SOFTWARE_UPDATE.md)
-    10. [Matter Attestation Credentials for EFR32](../../silabs_examples/credentials/README.md)
-    11. [Using Simplicity Studio's Pin Tool and Project Configurator with Matter](./general/PINTOOL.md)
-    12. [Using Simplicity Studio's BLE GATT Configurator with Matter](./general/GATT.md)
-    13. [Using Simplicity Studio's Energy Profiler with Matter](./general/EP.md)
-    14. [Using Wireshark to Capture Network Traffic in Matter](./general/WIRESHARK.md)
-    15. [Matter EFR32 Flash Savings Guide](general/CODE_SIZE_SAVINGS.md)<br><br>
+    7. [Building a Custom Matter Device](general/CUSTOM_MATTER_DEVICE.md)
+    8.  [Using Simplicity Studio's Pin Tool and Project Configurator with Matter](./general/PINTOOL.md)
+    9.  [Using Simplicity Studio's BLE GATT Configurator with Matter](./general/GATT.md)
+    10. [Using Simplicity Studio's Energy Profiler with Matter](./general/EP.md)
+    11. [Using Wireshark to Capture Network Traffic in Matter](./general/WIRESHARK.md)
+    12. [Matter EFR32 Flash Savings Guide](general/CODE_SIZE_SAVINGS.md)<br><br>
 
-8. Frequently Asked Questions (FAQ) / Troubleshooting
+9.  Frequently Asked Questions (FAQ) / Troubleshooting
 
     - [Thread FAQ](thread/FAQ.md)
     - [Wi-Fi FAQ](wifi/FAQ.md)

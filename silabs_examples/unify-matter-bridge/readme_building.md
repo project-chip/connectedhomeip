@@ -43,7 +43,9 @@ This library must first be compiled for the target system, by changing directory
 
 ```bash
 root@docker:/uic$ cmake -DCMAKE_INSTALL_PREFIX=$PWD/stage -GNinja -DCMAKE_TOOLCHAIN_FILE=../cmake/armhf_debian.cmake  -B build_unify_armhf/ -S components
+
 root@docker:/uic$ cmake --build build_unify_armhf
+
 root@docker:/uic$ cmake --install build_unify_armhf --prefix $PWD/stage
 ```
 
@@ -52,6 +54,7 @@ The first path is for the staged Unify library and the second one is for cross c
 
 ```bash
 root@docker:/uic$ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$PWD/stage/share/pkgconfig
+
 root@docker:/uic$ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/lib/arm-linux-gnueabihf/pkgconfig
 ```
 
@@ -59,7 +62,8 @@ root@docker:/uic$ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/lib/arm-linux-gnu
 
 Now setup the Matter environment.
 
-After having all the necessary submodules source the environment of Matter with the below command.
+Once you have all the necessary submodules, source the environment of Matter with the command below.
+
 The source command will load a number of build tools, and will make sure the correct toolchains and compilers are used for compiling the Unify Matter Bridge.
 
 ```bash
@@ -70,7 +74,9 @@ root@docker:/matter$ source ./scripts/activate.sh
 
 ```bash
 root@docker:/matter$ cd silabs_examples/unify-matter-bridge/linux/
+
 root@docker:/matter/silabs_examples/unify-matter-bridge/linux$ gn gen out/armhf --args='target_cpu="arm"'
+
 root@docker:/matter/silabs_examples/unify-matter-bridge/linux$ ninja -C out/armhf
 ```
 
@@ -78,13 +84,16 @@ After building, the `unify-matter-bridge` binary is located at `/matter/silabs_e
 
 ### Compile the chip-tool
 
-The `chip-tool`is a CLI tool that can be used to commission the bridge and to control end devices.
+The `chip-tool` is a CLI tool that can be used to commission the bridge and to control end devices.
+
 ```bash
 root@docker:/matter$ cd examples/chip-tool
+
 root@docker:/matter/examples/chip-tool$ gn gen out/armhf --args='target_cpu="arm"'
+
 root@docker:/matter/examples/chip-tool$ ninja -C out/armhf
 ```
-After building the chip-tool binary is located at `/matter/examples/chip-tool/out/armhf/obj/bin/chip-tool`.
+After building, the chip-tool binary is located at `/matter/examples/chip-tool/out/armhf/obj/bin/chip-tool`.
 
 ### Unit Testing
 
@@ -98,9 +107,9 @@ Documentation on unit testing can be found within the
 
 Common errors one might encounter:
 
-1. If you did not source the `matter/scripts/activate.sh` `gn` and other common
-   build tools won't be found.
-2. If you did not export the `pkgconfig` for the `arm-linux-gnueabihf` toolchain
+1. If you do not source the `matter/scripts/activate.sh`, `gn` and other common
+   build tools will not be found.
+2. If you do not export the `pkgconfig` for the `arm-linux-gnueabihf` toolchain
    you will get errors such as `G_STATIC_ASSERT(sizeof (unsigned long long) == sizeof (guint64));`
 3. If you are compiling unit tests do not try to compile the Unify Matter Bridge at
    the same time. This will not work as when compiling unit tests you are also

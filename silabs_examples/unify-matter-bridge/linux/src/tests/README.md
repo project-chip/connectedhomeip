@@ -1,20 +1,17 @@
 # Unify matter bridge unit testing
 
-For unit testing the matter bridge we are tapping into the test eco system of
-Matter. Writing a unit test is done with the NL Unit test framework and Matter
-helper functions. Please refer to [Test example](TestExample.cpp) for writing a
-simple unit test. After writing a unit test remember to add the source file in
-the [BUILD.gn](BUILD.gn).
+The Matter bridge test infrastructure leverages the test ecosystem of Matter itself. Writing a unit test is done with the NL Unit test framework and Matter
+helper functions. Please refer to [Test example](TestExample.cpp) for an example of how to write a simple unit test. After writing a unit test remember to add the source file in the [BUILD.gn](BUILD.gn).
 
 ## Compiling the unit test
 
-When wanting to compile the unit test use the below GN command to generate the ninja files:
+Before compiliing a unit test, use the following GN command to generate the ninja files necessary for the build process:
 
 ```bash
 silabs_examples/unify-matter-bridge/linux$ gn gen out/host --args='chip_build_tests=true use_coverage=true'
 ```
 
-After generating the ninja files generating the tests is done as below:
+After generating the ninja files, the tests are generated with the following command:
 
 ```bash
 silabs_examples/unify-matter-bridge/linux$ ninja -C out/host check
@@ -25,8 +22,7 @@ be found.
 
 ## Running the unit test
 
-So far we are not aware of how to run all the unit tests so running a unit test
-currently is done by locating your test binary and executing it.
+Unit tests are run by first locating your test binary and then executing it.
 
 ```bash
 matter/silabs_examples/unify-matter-bridge/linux$ ./out/host/tests/TestExample
@@ -38,7 +34,7 @@ matter/silabs_examples/unify-matter-bridge/linux$ ./out/host/tests/TestExample
 
 ## Getting unit test coverage
 
-For getting unit test coverage the Matter repo has a helper script. So after generating your test files you can run the below script:
+To understand unit test coverage, run the following helper script:
 
 ```bash
 matter/silabs_examples/unify-matter-bridge/linux$ ../../../scripts/build_coverage.sh --output_root out/host
