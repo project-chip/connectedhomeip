@@ -134,8 +134,8 @@ class Efr32Builder(GnBuilder):
             self.extra_gn_options.append('enable_sleepy_device=true chip_openthread_ftd=false')
 
         if enable_low_power:
-            self.extra_gn_options.append('chip_build_libshell=false enable_openthread_cli=false show_qr_code=false disable_lcd=true')
-
+            self.extra_gn_options.append(
+                'chip_build_libshell=false enable_openthread_cli=false show_qr_code=false disable_lcd=true')
 
     def GnBuildArgs(self):
         return self.extra_gn_options
