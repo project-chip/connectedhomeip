@@ -33,73 +33,6 @@ using EpochKey      = GroupDataProvider::EpochKey;
 using KeySet        = GroupDataProvider::KeySet;
 using GroupSession  = GroupDataProvider::GroupSession;
 
-static constexpr size_t kPersistentBufferMax = 128;
-
-template <size_t kMaxSerializedSize>
-struct PersistentData
-{
-    virtual ~PersistentData() = default;
-
-    virtual CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) = 0;
-    virtual CHIP_ERROR Serialize(TLV::TLVWriter & writer) const    = 0;
-    virtual CHIP_ERROR Deserialize(TLV::TLVReader & reader)        = 0;
-    virtual void Clear()                                           = 0;
-
-    virtual CHIP_ERROR Save(PersistentStorageDelegate * storage)
-    {
-        VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
-
-        uint8_t buffer[kMaxSerializedSize] = { 0 };
-        DefaultStorageKeyAllocator key;
-        // Update storage key
-        ReturnErrorOnFailure(UpdateKey(key));
-
-        // Serialize the data
-        TLV::TLVWriter writer;
-        writer.Init(buffer, sizeof(buffer));
-        ReturnErrorOnFailure(Serialize(writer));
-
-        // Save serialized data
-        return storage->SyncSetKeyValue(key.KeyName(), buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
-    }
-
-    CHIP_ERROR Load(PersistentStorageDelegate * storage)
-    {
-        VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
-
-        uint8_t buffer[kMaxSerializedSize] = { 0 };
-        DefaultStorageKeyAllocator key;
-
-        // Set data to defaults
-        Clear();
-
-        // Update storage key
-        ReturnErrorOnFailure(UpdateKey(key));
-
-        // Load the serialized data
-        uint16_t size  = static_cast<uint16_t>(sizeof(buffer));
-        CHIP_ERROR err = storage->SyncGetKeyValue(key.KeyName(), buffer, size);
-        VerifyOrReturnError(CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND != err, CHIP_ERROR_NOT_FOUND);
-        ReturnErrorOnFailure(err);
-
-        // Decode serialized data
-        TLV::TLVReader reader;
-        reader.Init(buffer, size);
-        return Deserialize(reader);
-    }
-
-    virtual CHIP_ERROR Delete(PersistentStorageDelegate * storage)
-    {
-        VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
-
-        DefaultStorageKeyAllocator key;
-        // Update storage key
-        ReturnErrorOnFailure(UpdateKey(key));
-        // Delete stored data
-        return storage->SyncDeleteKeyValue(key.KeyName());
-    }
-};
-
 struct LinkedData : public PersistentData<kPersistentBufferMax>
 {
     static constexpr uint16_t kMinLinkId = 1;
@@ -112,59 +45,6 @@ struct LinkedData : public PersistentData<kPersistentBufferMax>
     uint16_t prev   = 0;
     uint16_t max_id = 0;
     bool first      = true;
-};
-
-struct FabricList : public PersistentData<kPersistentBufferMax>
-{
-    static constexpr TLV::Tag TagFirstFabric() { return TLV::ContextTag(1); }
-    static constexpr TLV::Tag TagFabricCount() { return TLV::ContextTag(2); }
-
-    chip::FabricIndex first_fabric = kUndefinedFabricIndex;
-    uint8_t fabric_count           = 0;
-
-    FabricList() = default;
-    FabricList(chip::FabricIndex first) : first_fabric(first), fabric_count(1) {}
-
-    CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
-    {
-        key.GroupFabricList();
-        return CHIP_NO_ERROR;
-    }
-
-    void Clear() override
-    {
-        first_fabric = kUndefinedFabricIndex;
-        fabric_count = 0;
-    }
-
-    CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
-    {
-        TLV::TLVType container;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
-
-        ReturnErrorOnFailure(writer.Put(TagFirstFabric(), static_cast<uint16_t>(first_fabric)));
-        ReturnErrorOnFailure(writer.Put(TagFabricCount(), static_cast<uint16_t>(fabric_count)));
-
-        return writer.EndContainer(container);
-    }
-
-    CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
-    {
-        ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag()));
-        VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_INTERNAL);
-
-        TLV::TLVType container;
-        ReturnErrorOnFailure(reader.EnterContainer(container));
-
-        // first_fabric
-        ReturnErrorOnFailure(reader.Next(TagFirstFabric()));
-        ReturnErrorOnFailure(reader.Get(first_fabric));
-        // fabric_count
-        ReturnErrorOnFailure(reader.Next(TagFabricCount()));
-        ReturnErrorOnFailure(reader.Get(fabric_count));
-
-        return reader.ExitContainer(container);
-    }
 };
 
 struct FabricData : public PersistentData<kPersistentBufferMax>

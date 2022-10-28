@@ -44,6 +44,9 @@ public:
     DefaultStorageKeyAllocator() = default;
     const char * KeyName() { return mKeyName; }
 
+    // Fabric List
+    const char * FabricList() { return SetConst("g/gfl"); }
+
     // Fabric Table
     const char * FabricIndexInfo() { return SetConst("g/fidx"); }
     const char * FabricNOC(FabricIndex fabric) { return Format("f/%x/n", fabric); }
@@ -85,7 +88,6 @@ public:
     // Group Data Provider
 
     // List of fabric indices that have endpoint-to-group associations defined.
-    const char * GroupFabricList() { return SetConst("g/gfl"); }
     const char * FabricGroups(chip::FabricIndex fabric) { return Format("f/%x/g", fabric); }
     const char * FabricGroup(chip::FabricIndex fabric, chip::GroupId group) { return Format("f/%x/g/%x", fabric, group); }
     const char * FabricGroupKey(chip::FabricIndex fabric, uint16_t index) { return Format("f/%x/gk/%x", fabric, index); }

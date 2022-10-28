@@ -21,6 +21,7 @@
 #include <sys/types.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/PersistentData.h>
 #include <app/util/basic-types.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
@@ -229,7 +230,7 @@ public:
     virtual ~GroupDataProvider() = default;
 
     // Not copyable
-    GroupDataProvider(const GroupDataProvider &) = delete;
+    GroupDataProvider(const GroupDataProvider &)             = delete;
     GroupDataProvider & operator=(const GroupDataProvider &) = delete;
 
     uint16_t GetMaxGroupsPerFabric() const { return mMaxGroupsPerFabric; }
