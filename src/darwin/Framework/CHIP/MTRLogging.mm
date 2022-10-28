@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "MTRLogger.h"
 #import <MTRLogging.h>
 #import <lib/support/logging/CHIPLogging.h>
 #include <platform/Darwin/Logging.h>
@@ -86,57 +87,81 @@
 
 @implementation MTRLoggingConfiguration
 
-static id<MTRLogger> singleton_logger;
+static id<MTRLogger> custom_logger;
+static id<MTRLogger> os_logger;
+
+// queue used to serialize all work performed by the MTRLogger
+static dispatch_queue_t log_work_queue;
 
 /**
  * A log redirection function that will be used to capture logs from the Matter C++ SDK.
  */
 static ENFORCE_FORMAT(3, 0) void cpp_log_redirect_callback(const char * module, uint8_t category, const char * msg, va_list args)
 {
-    char formatted_msg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    char * formatted_msg = ((char *)malloc(CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE));
     chip::Logging::Platform::getDarwinLogMessageFormat(module, category, msg, args, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE, formatted_msg);
 
     // Delegate the log to the MTRLogging system
-    switch (category) {
-    case chip::Logging::LogCategory::kLogCategory_Error:
-        [MTRLogging logAtLevel:MTRLogLevelError format:@"%s", formatted_msg];
-        break;
+    dispatch_async([MTRLoggingConfiguration getLogWorkQueue], ^{
+        switch (category) {
+        case chip::Logging::LogCategory::kLogCategory_Error:
+            [MTRLogging logAtLevel:MTRLogLevelError format:@"%s", formatted_msg];
+            break;
 
-    case chip::Logging::LogCategory::kLogCategory_Progress:
-        [MTRLogging logAtLevel:MTRLogLevelInfo format:@"%s", formatted_msg];
-        break;
+        case chip::Logging::LogCategory::kLogCategory_Progress:
+            [MTRLogging logAtLevel:MTRLogLevelInfo format:@"%s", formatted_msg];
+            break;
 
-    case chip::Logging::LogCategory::kLogCategory_Detail:
-        [MTRLogging logAtLevel:MTRLogLevelDebug format:@"%s", formatted_msg];
-        break;
+        case chip::Logging::LogCategory::kLogCategory_Detail:
+            [MTRLogging logAtLevel:MTRLogLevelDebug format:@"%s", formatted_msg];
+            break;
 
-    default:
-        [MTRLogging logAtLevel:MTRLogLevelInfo format:@"%s", formatted_msg];
-        break;
-    }
+        default:
+            [MTRLogging logAtLevel:MTRLogLevelInfo format:@"%s", formatted_msg];
+            break;
+        }
+
+        free(formatted_msg);
+    });
 }
 
-+ (void)setLogger:(id<MTRLogger>)logger 
++ (void)setLogger:(id<MTRLogger>)logger
 {
-    singleton_logger = logger;
+    custom_logger = logger;
     chip::Logging::SetLogRedirectCallback(cpp_log_redirect_callback);
 }
 
 + (id<MTRLogger>)getLogger
 {
-    if (singleton_logger == nil)
+    if (custom_logger == nil)
     {
-        singleton_logger = [OsLogMTRLogger sharedInstance];
+        return [MTRLoggingConfiguration getOsLogger];
     }
-    return singleton_logger;
+
+    return custom_logger;
+}
+
++ (id<MTRLogger>)getOsLogger
+{
+    if (os_logger == nil)
+    {
+        os_logger = [OsLogMTRLogger sharedInstance];
+    }
+    return os_logger;
+}
+
++ (dispatch_queue_t)getLogWorkQueue
+{
+    if (log_work_queue == nil)
+    {
+        log_work_queue = dispatch_queue_create("com.csa.matter.framework.log.workqueue", DISPATCH_QUEUE_SERIAL);
+    }
+    return log_work_queue;
 }
 
 @end
 
 @implementation MTRLogging
-
-// queue used to serialize all work performed by the MTRLogger
-static dispatch_queue_t logQueue;
 
 + (void)logAtLevel:(MTRLogLevel)level format:(NSString *)format, ... NS_FORMAT_FUNCTION(2, 3)
 {
@@ -148,26 +173,26 @@ static dispatch_queue_t logQueue;
 
 + (void)logAtLevelV:(MTRLogLevel)level format:(NSString *)format args:(va_list)args NS_FORMAT_FUNCTION(2, 0)
 {
-    if (logQueue == nil)
-    {
-        logQueue = dispatch_queue_create("com.csa.matter.framework.log.workqueue", DISPATCH_QUEUE_SERIAL);
-    }
+    id<MTRLogger> os_logger = [MTRLoggingConfiguration getOsLogger];
 
     // Fetch the currently-active MTRLogger
     id<MTRLogger> logger = [MTRLoggingConfiguration getLogger];
 
     // Early return if logging is not currently enabled at the requested level.
-    if (![logger isLoggingEnabledAtLevel:level]) {
+    if (logger != nil && ![logger isLoggingEnabledAtLevel:level]) {
         return;
     }
 
     // Format the message
     NSString * message = [[NSString alloc] initWithFormat:format arguments:args];
-
-    dispatch_async(logQueue, ^{
-        // Log the message to the MTRLogger
-        [logger logAtLevel:level message:message];
-    });
+    if (logger != nil)
+    {
+        dispatch_async([MTRLoggingConfiguration getLogWorkQueue], ^{
+                // Log the message to the MTRLogger
+                [logger logAtLevel:level message:message];
+        });
+    }
+    [os_logger logAtLevel:level message:message];
 }
 
 @end
