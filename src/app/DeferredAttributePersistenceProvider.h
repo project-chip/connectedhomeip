@@ -28,14 +28,15 @@ public:
     explicit DeferredAttribute(const ConcreteAttributePath & path) : mPath(path) {}
 
     bool Matches(const ConcreteAttributePath & path) const { return mPath == path; }
-    CHIP_ERROR PrepareWrite(AttributePersistenceProvider & persister, const EmberAfAttributeMetadata * metadata,
-                            const ByteSpan & value);
-    void Flush();
+    bool IsArmed() const { return static_cast<bool>(mValue); }
+    System::Clock::Timestamp GetFlushTime() const { return mFlushTime; }
+
+    CHIP_ERROR PrepareWrite(System::Clock::Timestamp flushTime, const ByteSpan & value);
+    void Flush(AttributePersistenceProvider & persister);
 
 private:
     const ConcreteAttributePath mPath;
-    AttributePersistenceProvider * mPersister;
-    const EmberAfAttributeMetadata * mMetadata;
+    System::Clock::Timestamp mFlushTime;
     Platform::ScopedMemoryBufferWithSize<uint8_t> mValue;
 };
 
@@ -57,11 +58,20 @@ public:
         mDeferredAttributes(deferredAttributes), mWriteDelay(writeDelay)
     {}
 
-    CHIP_ERROR WriteValue(const ConcreteAttributePath & path, const EmberAfAttributeMetadata * metadata, const ByteSpan & value);
-    CHIP_ERROR ReadValue(const ConcreteAttributePath & path, const EmberAfAttributeMetadata * metadata, MutableByteSpan & value);
+    /*
+     * If the written attribute is one of the deferred attributes specified in the constructor,
+     * postpone the write operation by the configured delay. If this attribute changes within the
+     * delay period, further postpone the operation so that the actual write happens once the
+     * attribute has remained constant for the write delay period.
+     *
+     * For other attributes, immediately pass the write operation to the decorated persister.
+     */
+    CHIP_ERROR WriteValue(const ConcreteAttributePath & path, const ByteSpan & value) override;
+    CHIP_ERROR ReadValue(const ConcreteAttributePath & path, const EmberAfAttributeMetadata * metadata,
+                         MutableByteSpan & value) override;
 
 private:
-    static void Flush(System::Layer *, void * deferredAttr) { static_cast<DeferredAttribute *>(deferredAttr)->Flush(); }
+    void FlushAndScheduleNext();
 
     AttributePersistenceProvider & mPersister;
     const Span<DeferredAttribute> mDeferredAttributes;

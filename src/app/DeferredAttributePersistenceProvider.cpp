@@ -21,11 +21,9 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR DeferredAttribute::PrepareWrite(AttributePersistenceProvider & persister, const EmberAfAttributeMetadata * metadata,
-                                           const ByteSpan & value)
+CHIP_ERROR DeferredAttribute::PrepareWrite(System::Clock::Timestamp flushTime, const ByteSpan & value)
 {
-    mPersister = &persister;
-    mMetadata  = metadata;
+    mFlushTime = flushTime;
 
     if (mValue.AllocatedSize() != value.size())
     {
@@ -37,33 +35,63 @@ CHIP_ERROR DeferredAttribute::PrepareWrite(AttributePersistenceProvider & persis
     return CHIP_NO_ERROR;
 }
 
-void DeferredAttribute::Flush()
+void DeferredAttribute::Flush(AttributePersistenceProvider & persister)
 {
-    VerifyOrReturn(mValue);
-    mPersister->WriteValue(mPath, mMetadata, ByteSpan(mValue.Get(), mValue.AllocatedSize()));
+    VerifyOrReturn(IsArmed());
+    persister.WriteValue(mPath, ByteSpan(mValue.Get(), mValue.AllocatedSize()));
     mValue.Release();
 }
 
-CHIP_ERROR DeferredAttributePersistenceProvider::WriteValue(const ConcreteAttributePath & path,
-                                                            const EmberAfAttributeMetadata * metadata, const ByteSpan & value)
+CHIP_ERROR DeferredAttributePersistenceProvider::WriteValue(const ConcreteAttributePath & path, const ByteSpan & value)
 {
     for (DeferredAttribute & da : mDeferredAttributes)
     {
         if (da.Matches(path))
         {
-            ReturnErrorOnFailure(da.PrepareWrite(mPersister, metadata, value));
-            DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(mWriteDelay), Flush, &da);
+            ReturnErrorOnFailure(da.PrepareWrite(System::SystemClock().GetMonotonicTimestamp() + mWriteDelay, value));
+            FlushAndScheduleNext();
             return CHIP_NO_ERROR;
         }
     }
 
-    return mPersister.WriteValue(path, metadata, value);
+    return mPersister.WriteValue(path, value);
 }
 
 CHIP_ERROR DeferredAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & path,
                                                            const EmberAfAttributeMetadata * metadata, MutableByteSpan & value)
 {
     return mPersister.ReadValue(path, metadata, value);
+}
+
+void DeferredAttributePersistenceProvider::FlushAndScheduleNext()
+{
+    const System::Clock::Timestamp now     = System::SystemClock().GetMonotonicTimestamp();
+    System::Clock::Timestamp nextFlushTime = System::Clock::Timestamp::max();
+
+    for (DeferredAttribute & da : mDeferredAttributes)
+    {
+        if (!da.IsArmed())
+        {
+            continue;
+        }
+
+        if (da.GetFlushTime() <= now)
+        {
+            da.Flush(mPersister);
+        }
+        else
+        {
+            nextFlushTime = chip::min(nextFlushTime, da.GetFlushTime());
+        }
+    }
+
+    if (nextFlushTime != System::Clock::Timestamp::max())
+    {
+        DeviceLayer::SystemLayer().StartTimer(
+            nextFlushTime - now,
+            [](System::Layer *, void * me) { static_cast<DeferredAttributePersistenceProvider *>(me)->FlushAndScheduleNext(); },
+            this);
+    }
 }
 
 } // namespace app

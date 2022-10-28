@@ -340,7 +340,7 @@ public:
 
     Credentials::OperationalCertificateStore * GetOpCertStore() { return mOpCertStore; }
 
-    app::DefaultAttributePersistenceProvider & GetAttributePersister() { return mAttributePersister; }
+    app::DefaultAttributePersistenceProvider & GetDefaultAttributePersister() { return mAttributePersister; }
 
     /**
      * This function send the ShutDown event before stopping
