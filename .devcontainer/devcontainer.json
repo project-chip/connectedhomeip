@@ -4,7 +4,6 @@
         "--cap-add=SYS_PTRACE",
         "--security-opt",
         "seccomp=unconfined",
-        "--network=host",
         "--privileged",
         "-v",
         "/dev/bus/usb:/dev/bus/usb:ro",
@@ -12,7 +11,9 @@
         "--add-host=host.docker.internal:host-gateway"
     ],
     "mounts": [
-        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
+        // Provide a path to your local FastModelsPortfolio_11.16
+        "source=/path/to/FastModelsPortfolio_11.16,target=/opt/FastModelsPortfolio_11.16,type=bind,consistency=cached"
     ],
     "build": {
         "dockerfile": "Dockerfile",

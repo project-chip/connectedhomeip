@@ -15,7 +15,7 @@
 ARG BUILD_VERSION
 
 # All tools required for compilation belong in chip-build, forms "truth" for CHIP build tooling
-FROM connectedhomeip/chip-build-vscode:${BUILD_VERSION}
+FROM connectedhomeip/chip-build-openiotsdk:latest
 
 # This Dockerfile contains things useful for an interactive development environment
 ARG USERNAME=vscode
@@ -55,38 +55,38 @@ RUN chmod +x /home/$USERNAME/bin/restyle-path
 RUN chown -R $USERNAME:$USERNAME /home/$USERNAME
 RUN echo "PATH=/home/$USERNAME/bin:${PATH}" >> /home/$USERNAME/.bashrc
 
-# $USERNAME needs to own the esp-idf and tools for the examples to build
-RUN chown -R $USERNAME:$USERNAME /opt/espressif/esp-idf
-RUN chown -R $USERNAME:$USERNAME /opt/espressif/tools
+# # $USERNAME needs to own the esp-idf and tools for the examples to build
+# RUN chown -R $USERNAME:$USERNAME /opt/espressif/esp-idf
+# RUN chown -R $USERNAME:$USERNAME /opt/espressif/tools
 
-# $USERNAME needs to own west configuration to build nRF Connect examples
-RUN chown -R $USERNAME:$USERNAME /opt/NordicSemiconductor/nrfconnect/
+# # $USERNAME needs to own west configuration to build nRF Connect examples
+# RUN chown -R $USERNAME:$USERNAME /opt/NordicSemiconductor/nrfconnect/
 
-# allow read/write access to header and libraries
-RUN chown -R $USERNAME:$USERNAME /opt/ubuntu-21.04-aarch64-sysroot/usr/
+# # allow read/write access to header and libraries
+# RUN chown -R $USERNAME:$USERNAME /opt/ubuntu-21.04-aarch64-sysroot/usr/
 
-# allow licenses to be accepted
-RUN chown -R $USERNAME:$USERNAME /opt/android/sdk
+# # allow licenses to be accepted
+# RUN chown -R $USERNAME:$USERNAME /opt/android/sdk
 
-# AmebaD requires access to change build_info.h
-RUN chown -R $USERNAME:$USERNAME /opt/ameba/ambd_sdk_with_chip_non_NDA/
+# # AmebaD requires access to change build_info.h
+# RUN chown -R $USERNAME:$USERNAME /opt/ameba/ambd_sdk_with_chip_non_NDA/
 
 # NXP uses a patch_sdk script to change SDK files
-RUN mkdir -p /opt/sdk/sdks/
-RUN chown -R $USERNAME:$USERNAME /opt/sdk/sdks/
+# RUN mkdir -p /opt/sdk/sdks/
+# RUN chown -R $USERNAME:$USERNAME /opt/sdk/sdks/
 
-RUN chown -R $USERNAME:$USERNAME /opt/fsl-imx-xwayland/5.15-kirkstone/
+# RUN chown -R $USERNAME:$USERNAME /opt/fsl-imx-xwayland/5.15-kirkstone/
 
-# Add access to openocd for VSCode debugging
-RUN chown -R $USERNAME:$USERNAME /opt/openocd
+# # Add access to openocd for VSCode debugging
+# RUN chown -R $USERNAME:$USERNAME /opt/openocd
 
-# Fix Tizen SDK paths for new user
-RUN sed -i '/^TIZEN_SDK_DATA_PATH/d' $TIZEN_SDK_ROOT/sdk.info \
-    && echo TIZEN_SDK_DATA_PATH=/home/$USERNAME/tizen-sdk-data >> $TIZEN_SDK_ROOT/sdk.info \
-    && ln -sf /home/$USERNAME/.tizen-cli-config $TIZEN_SDK_ROOT/tools/.tizen-cli-config \
-    && : # last line
+# # Fix Tizen SDK paths for new user
+# RUN sed -i '/^TIZEN_SDK_DATA_PATH/d' $TIZEN_SDK_ROOT/sdk.info \
+#     && echo TIZEN_SDK_DATA_PATH=/home/$USERNAME/tizen-sdk-data >> $TIZEN_SDK_ROOT/sdk.info \
+#     && ln -sf /home/$USERNAME/.tizen-cli-config $TIZEN_SDK_ROOT/tools/.tizen-cli-config \
+#     && : # last line
 
-ENV TIZEN_ROOTFS /tizen_rootfs
+# ENV TIZEN_ROOTFS /tizen_rootfs
 
 # Fast Model GDB plugins path for debugging support
 ENV FAST_MODEL_PLUGINS_PATH /opt/FastModelsPortfolio_11.16/plugins/Linux64_GCC-9.3
