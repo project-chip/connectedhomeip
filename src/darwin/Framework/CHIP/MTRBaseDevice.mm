@@ -221,11 +221,11 @@ static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, vo
     return self;
 }
 
-- (instancetype)initWithNodeID:(chip::NodeId)nodeID controller:(MTRDeviceController *)controller
+- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     if (self = [super init]) {
         _isPASEDevice = NO;
-        _nodeID = nodeID;
+        _nodeID = nodeID.unsignedLongLongValue;
         _deviceController = controller;
     }
     return self;
@@ -260,14 +260,14 @@ public:
 } // anonymous namespace
 
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                minInterval:(uint16_t)minInterval
-                maxInterval:(uint16_t)maxInterval
+                minInterval:(NSNumber *)minInterval
+                maxInterval:(NSNumber *)maxInterval
                      params:(nullable MTRSubscribeParams *)params
-             cacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
-     attributeReportHandler:(nullable void (^)(NSArray * value))attributeReportHandler
-         eventReportHandler:(nullable void (^)(NSArray * value))eventReportHandler
+    attributeCacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
+     attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
+         eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
                errorHandler:(void (^)(NSError * error))errorHandler
-    subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler
+    subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
     resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
 {
     if (self.isPASEDevice) {
@@ -297,8 +297,8 @@ public:
                                // We want to get event reports at the minInterval, not the maxInterval.
                                eventPath->mIsUrgentEvent = true;
                                ReadPrepareParams readParams(session.Value());
-                               readParams.mMinIntervalFloorSeconds = minInterval;
-                               readParams.mMaxIntervalCeilingSeconds = maxInterval;
+                               readParams.mMinIntervalFloorSeconds = [minInterval unsignedShortValue];
+                               readParams.mMaxIntervalCeilingSeconds = [maxInterval unsignedShortValue];
                                readParams.mpAttributePathParamsList = attributePath.get();
                                readParams.mAttributePathParamsListSize = 1;
                                readParams.mpEventPathParamsList = eventPath.get();
@@ -1256,7 +1256,7 @@ exit:
         }];
 }
 
-- (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)clientQueue completion:(void (^)(void))completion
+- (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)clientQueue completion:(dispatch_block_t)completion
 {
     // This method must only be used for MTRDeviceOverXPC. However, for unit testing purpose, the method purges all read clients.
     MTR_LOG_DEBUG("Unexpected call to deregister report handlers");
@@ -1448,6 +1448,33 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
         return nil;
     }
     return decodedData.GetDecodedObject();
+}
+
+@end
+
+@implementation MTRBaseDevice (Deprecated)
+
+- (void)subscribeWithQueue:(dispatch_queue_t)queue
+                minInterval:(uint16_t)minInterval
+                maxInterval:(uint16_t)maxInterval
+                     params:(MTRSubscribeParams * _Nullable)params
+             cacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
+     attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
+         eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
+               errorHandler:(MTRDeviceErrorHandler)errorHandler
+    subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
+    resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
+{
+    [self subscribeWithQueue:queue
+                    minInterval:@(minInterval)
+                    maxInterval:@(maxInterval)
+                         params:params
+        attributeCacheContainer:attributeCacheContainer
+         attributeReportHandler:attributeReportHandler
+             eventReportHandler:eventReportHandler
+                   errorHandler:errorHandler
+        subscriptionEstablished:subscriptionEstablishedHandler
+        resubscriptionScheduled:resubscriptionScheduledHandler];
 }
 
 @end

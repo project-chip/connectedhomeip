@@ -540,7 +540,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         }
     }
 
-    *fabric = fabricTable.FindFabric(pubKey, params.fabricId);
+    *fabric = fabricTable.FindFabric(pubKey, params.fabricID.unsignedLongLongValue);
     return YES;
 }
 

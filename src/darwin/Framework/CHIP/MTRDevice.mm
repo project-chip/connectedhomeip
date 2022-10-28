@@ -150,12 +150,12 @@ private:
 
 @implementation MTRDevice
 
-- (instancetype)initWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController
+- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     if (self = [super init]) {
         _lock = OS_UNFAIR_LOCK_INIT;
-        _nodeID = nodeID;
-        _deviceController = deviceController;
+        _nodeID = [nodeID copy];
+        _deviceController = controller;
         _queue = dispatch_queue_create("com.apple.matter.framework.xpc.workqueue", DISPATCH_QUEUE_SERIAL);
         ;
         _readCache = [NSMutableDictionary dictionary];
@@ -166,9 +166,9 @@ private:
     return self;
 }
 
-+ (instancetype)deviceWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController
++ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
-    return [deviceController deviceForNodeID:nodeID];
+    return [controller deviceForNodeID:nodeID];
 }
 
 #pragma mark Subscription and delegate handling
@@ -294,7 +294,7 @@ private:
 
     _subscriptionActive = YES;
 
-    [_deviceController getSessionForNode:_nodeID
+    [_deviceController getSessionForNode:_nodeID.unsignedLongLongValue
                        completionHandler:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
                            const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
                            if (error != nil) {
@@ -737,6 +737,15 @@ private:
 - (MTRBaseDevice *)newBaseDevice
 {
     return [[MTRBaseDevice alloc] initWithNodeID:self.nodeID controller:self.deviceController];
+}
+
+@end
+
+@implementation MTRDevice (Deprecated)
+
++ (instancetype)deviceWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController
+{
+    return [self deviceWithNodeID:@(nodeID) controller:deviceController];
 }
 
 @end

@@ -1,4 +1,4 @@
-{{> header}}
+{{> header excludeZapComment=true}}
 
 #import <Foundation/Foundation.h>
 
@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRCluster{{asUpperCamelCase name}} : MTRCluster
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
+                               endpointID:(NSNumber *)endpointID
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 
 {{#chip_cluster_commands}}
@@ -44,6 +44,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+@interface MTRCluster{{asUpperCamelCase name}} (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
 
 @end
 

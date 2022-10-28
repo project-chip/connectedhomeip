@@ -44,7 +44,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * retrieved when performing actions using a combination of MTRBaseDevice
  * and MTRAsyncCallbackQueue.
  */
-+ (instancetype)deviceWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController;
++ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller MTR_NEWLY_AVAILABLE;
 
 /**
  * The current state of the device.
@@ -163,6 +163,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                                            queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
     API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+
+@end
+
+@interface MTRDevice (Deprecated)
+
+/**
+ * Deprecated MTRDevice APIs.
+ */
++ (instancetype)deviceWithNodeID:(uint64_t)nodeID
+                deviceController:(MTRDeviceController *)deviceController
+    MTR_NEWLY_DEPRECATED("Please use deviceWithNodeID:controller:");
 
 @end
 

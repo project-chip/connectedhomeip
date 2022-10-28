@@ -1,4 +1,4 @@
-{{> header}}
+{{> header excludeZapComment=true}}
 
 #import <Foundation/Foundation.h>
 
@@ -26,7 +26,7 @@ using chip::SessionHandle;
 {{#chip_client_clusters includeAll=true}}
 @implementation MTRBaseCluster{{asUpperCamelCase name}}
 
-- (instancetype)initWithDevice:(MTRBaseDevice *)device endpoint:(uint16_t)endpoint queue:(dispatch_queue_t)queue
+- (instancetype)initWithDevice:(MTRBaseDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
 {
     if (self = [super initWithQueue:queue]) {
         if (device == nil) {
@@ -34,7 +34,9 @@ using chip::SessionHandle;
         }
 
         _device = device;
-        _endpoint = endpoint;
+        {{!TODO consider range-checking the incoming number to make sure it's
+                actually in the uint16_t range}}
+        _endpoint = [endpointID unsignedShortValue];
     }
     return self;
 }
@@ -241,6 +243,17 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 {{/if}}
 {{/chip_server_cluster_attributes}}
+
+@end
+
+@implementation MTRBaseCluster{{asUpperCamelCase name}} (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue
+{
+    return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
+}
 
 @end
 
