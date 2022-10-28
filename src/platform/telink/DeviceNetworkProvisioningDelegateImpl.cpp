@@ -24,7 +24,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionThreadNetwork(ByteSpan threadData)
+CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::ProvisionThread(ByteSpan threadData)
 {
 #if CHIP_ENABLE_OPENTHREAD
     CHIP_ERROR error = CHIP_NO_ERROR;

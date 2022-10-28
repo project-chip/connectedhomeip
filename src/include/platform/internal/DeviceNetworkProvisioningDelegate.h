@@ -24,6 +24,7 @@
 #pragma once
 
 #include <lib/core/CHIPCore.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
 namespace chip {

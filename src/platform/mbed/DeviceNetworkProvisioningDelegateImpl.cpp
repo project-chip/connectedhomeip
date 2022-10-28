@@ -25,7 +25,7 @@ using namespace ::chip::DeviceLayer::NetworkCommissioning;
 namespace chip {
 namespace DeviceLayer {
 
-CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * key)
+CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::ProvisionWiFi(const char * ssid, const char * key)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     MutableCharSpan emptyBufferForDebugText;
@@ -46,7 +46,7 @@ CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const ch
 #endif
 }
 
-CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionThreadNetwork(ByteSpan threadData)
+CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::ProvisionThread(ByteSpan threadData)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

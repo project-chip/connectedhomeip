@@ -17,30 +17,20 @@
 
 #pragma once
 
-#include <platform/internal/GenericDeviceNetworkProvisioningDelegateImpl.h>
+#include <platform/internal/DeviceNetworkProvisioningDelegate.h>
 
 namespace chip {
 namespace DeviceLayer {
 
-namespace Internal {
-
-template <class ImplClass>
-class GenericDeviceNetworkProvisioningDelegateImpl;
-
-} // namespace Internal
-
-class DeviceNetworkProvisioningDelegateImpl final
-    : public Internal::GenericDeviceNetworkProvisioningDelegateImpl<DeviceNetworkProvisioningDelegateImpl>
+class DeviceNetworkProvisioningDelegateImpl final : public Internal::DeviceNetworkProvisioningDelegate
 {
-    friend class GenericDeviceNetworkProvisioningDelegateImpl<DeviceNetworkProvisioningDelegateImpl>;
-
-private:
+public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    CHIP_ERROR _ProvisionWiFiNetwork(const char * ssid, const char * passwd);
+    CHIP_ERROR ProvisionWiFi(const char * ssid, const char * passwd) override;
 #else
-    CHIP_ERROR _ProvisionWiFiNetwork(const char * ssid, const char * passwd) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR ProvisionWiFi(const char * ssid, const char * passwd) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #endif
-    CHIP_ERROR _ProvisionThreadNetwork(ByteSpan threadData);
+    CHIP_ERROR ProvisionThread(ByteSpan threadData) override;
 };
 
 } // namespace DeviceLayer

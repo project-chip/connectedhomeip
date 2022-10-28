@@ -24,7 +24,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * passwd)
+CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::ProvisionWiFi(const char * ssid, const char * passwd)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

@@ -20,7 +20,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionThreadNetwork(ByteSpan threadData)
+CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::ProvisionThread(ByteSpan threadData)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     CHIP_ERROR error = CHIP_NO_ERROR;

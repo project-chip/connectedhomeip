@@ -28,7 +28,7 @@ namespace chip {
 namespace DeviceLayer {
 
 CHIP_ERROR
-DeviceNetworkProvisioningDelegateImpl::_ProvisionThreadNetwork(ByteSpan threadData)
+DeviceNetworkProvisioningDelegateImpl::ProvisionThread(ByteSpan threadData)
 {
 #if CHIP_ENABLE_OPENTHREAD
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -44,7 +44,7 @@ exit:
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * key)
+CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::ProvisionWiFi(const char * ssid, const char * key)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
