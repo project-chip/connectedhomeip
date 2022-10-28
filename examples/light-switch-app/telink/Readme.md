@@ -1,3 +1,13 @@
+# Matter Telink Light Switch Example Application
+
+The Telink Light Switch Example demonstrates how to remotely control a
+lighting devices such as light bulbs or LEDs. The application should be used
+together with the
+[lighting app example](../../lighting-app/telink/README.md). The light
+switch uses buttons to test changing the lighting application example LED state
+and works as a brightness dimmer. You can use this example as a reference for
+creating your own application.
+
 ![Telink B91 EVK](http://wiki.telink-semi.cn/wiki/assets/Hardware/B91_Generic_Starter_Kit_Hardware_Guide/connection_chart.png)
 
 ## Build and flash
@@ -210,14 +220,14 @@ feature for another Telink example:
 
 -   set CONFIG_CHIP_OTA_REQUESTOR=y in corresponding "prj.conf" configuration
     file.
--   remove "boards/tlsr9518adk80d.overlay" file to enable 2MB flash storage.
 
 After build application with enabled OTA feature, use next binary files:
 
--   zephyr_final.bin - main binary to flash PCB (Use 2MB PCB).
+-   zephyr.bin - main binary to flash PCB (Use 2MB PCB).
 -   zephyr-ota.bin - binary for OTA Provider
--   zephyr.bin - ignore this file.
--   zephyr.signed.bin - ignore this file.
+
+All binaries has the same SW version. To test OTA “zephyr-ota.bin” should have higher SW version than base
+SW. Set CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 in corresponding “prj.conf” conﬁguration file.
 
 Usage of OTA:
 

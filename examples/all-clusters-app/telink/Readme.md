@@ -1,3 +1,9 @@
+# Matter Telink All Clusters Example Application
+
+The Telink All Clusters Example Application implements various ZCL clusters
+populated on three endpoints. You can use this example as a reference for
+creating your own application.
+
 ![Telink B91 EVK](http://wiki.telink-semi.cn/wiki/assets/Hardware/B91_Generic_Starter_Kit_Hardware_Guide/connection_chart.png)
 
 ## Build and flash
@@ -54,7 +60,7 @@ The following buttons are available on **tlsr9518adk80d** board:
 | Name     | Function               | Description                                                                                            |
 | :------- | :--------------------- | :----------------------------------------------------------------------------------------------------- |
 | Button 1 | Factory reset          | Perform factory reset to forget currently commissioned Thread network and back to uncommissioned state |
-| Button 2 | Lighting control       | Manually triggers the lighting state                                                                   |
+| Button 2 | Not used               | Not used                                                                                               |
 | Button 3 | Thread start           | Commission thread with static credentials and enables the Thread on device                             |
 | Button 4 | Open commission window | The button is opening commissioning window to perform commissioning over BLE                           |
 
@@ -85,69 +91,6 @@ following states:
 
     - \${NODE_ID_TO_ASSIGN} is the node id to assign to the lightbulb
 
-3. Switch on the light:
-
-    ```
-    ${CHIP_TOOL_DIR}/chip-tool onoff on 1
-    ```
-
-    here:
-
-    - **onoff** is name of cluster
-    - **on** command to the cluster
-    - **1** ID of endpoint
-
-4. Switch off the light:
-
-    ```
-    ${CHIP_TOOL_DIR}/chip-tool onoff off 1
-    ```
-
-    here:
-
-    - **onoff** is name of cluster
-    - **off** command to the cluster
-    - **1** ID of endpoint
-
-5. Read the light state:
-
-    ```
-    ${CHIP_TOOL_DIR}/chip-tool onoff read on-off 1
-    ```
-
-    here:
-
-    - **onoff** is name of cluster
-    - **read** command to the cluster
-    - **on-off** attribute to read
-    - **1** ID of endpoint
-
-6. Change brightness of light:
-
-    ```
-    ${CHIP_TOOL_DIR}/chip-tool levelcontrol move-to-level 32 0 0 0 1
-    ```
-
-    here:
-
-    - **levelcontrol** is name of cluster
-    - **move-to-level** command to the cluster
-    - **32** brightness value
-    - **0** transition time
-    - **0** option mask
-    - **0** option override
-    - **1** ID of endpoint
-
-7. Read brightness level:
-    ```
-    ./chip-tool levelcontrol read current-level 1
-    ```
-    here:
-    - **levelcontrol** is name of cluster
-    - **read** command to the cluster
-    - **current-level** attribute to read
-    - **1** ID of endpoint
-
 ### OTA with Linux OTA Provider
 
 OTA feature enabled by default only for ota-requestor-app example. To enable OTA
@@ -155,14 +98,14 @@ feature for another Telink example:
 
 -   set CONFIG_CHIP_OTA_REQUESTOR=y in corresponding "prj.conf" configuration
     file.
--   remove "boards/tlsr9518adk80d.overlay" file to enable 2MB flash storage.
 
 After build application with enabled OTA feature, use next binary files:
 
--   zephyr_final.bin - main binary to flash PCB (Use 2MB PCB).
+-   zephyr.bin - main binary to flash PCB (Use 2MB PCB).
 -   zephyr-ota.bin - binary for OTA Provider
--   zephyr.bin - ignore this file.
--   zephyr.signed.bin - ignore this file.
+
+All binaries has the same SW version. To test OTA “zephyr-ota.bin” should have higher SW version than base
+SW. Set CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 in corresponding “prj.conf” conﬁguration file.
 
 Usage of OTA:
 
