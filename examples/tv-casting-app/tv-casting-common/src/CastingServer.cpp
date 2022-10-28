@@ -25,20 +25,7 @@ using namespace chip::app::Clusters::ContentLauncher::Commands;
 
 CastingServer * CastingServer::castingServer_ = nullptr;
 
-CastingServer::CastingServer()
-{
-#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
-    // generate and set a random uniqueId for generating rotatingId
-    uint8_t rotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
-    for (size_t i = 0; i < sizeof(rotatingDeviceIdUniqueId); i++)
-    {
-        rotatingDeviceIdUniqueId[i] = chip::Crypto::GetRandU8();
-    }
-
-    ByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
-    chip::DeviceLayer::ConfigurationMgr().SetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
-#endif // CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
-}
+CastingServer::CastingServer() {}
 
 CastingServer * CastingServer::GetInstance()
 {
@@ -49,20 +36,44 @@ CastingServer * CastingServer::GetInstance()
     return castingServer_;
 }
 
-void CastingServer::Init()
+CHIP_ERROR CastingServer::Init(AppParams * AppParams)
 {
     if (mInited)
     {
-        return;
+        return CHIP_NO_ERROR;
     }
 
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    // if this class's client provided a RotatingDeviceIdUniqueId, use that
+    if (AppParams != nullptr && AppParams->GetRotatingDeviceIdUniqueId().HasValue())
+    {
+        ByteSpan rotatingDeviceIdUniqueId(AppParams->GetRotatingDeviceIdUniqueId().Value());
+        chip::DeviceLayer::ConfigurationMgr().SetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueId);
+    }
+#ifdef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
+    else
+    {
+        // otherwise, generate and set a random uniqueId for generating rotatingId
+        uint8_t rotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
+        for (size_t i = 0; i < sizeof(rotatingDeviceIdUniqueId); i++)
+        {
+            rotatingDeviceIdUniqueId[i] = chip::Crypto::GetRandU8();
+        }
+
+        // ByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
+        chip::DeviceLayer::ConfigurationMgr().SetRotatingDeviceIdUniqueId(ByteSpan(rotatingDeviceIdUniqueId));
+    }
+#endif // CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
+#endif // CHIP_ENABLE_ROTATING_DEVICE_ID
+
     // Initialize binding handlers
-    ReturnOnFailure(InitBindingHandlers());
+    ReturnErrorOnFailure(InitBindingHandlers());
 
     // Add callback to send Content casting commands after commissioning completes
-    ReturnOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0));
+    ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0));
 
     mInited = true;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CastingServer::InitBindingHandlers()
@@ -88,6 +99,12 @@ CHIP_ERROR CastingServer::TargetVideoPlayerInfoInit(NodeId nodeId, FabricIndex f
 
 CHIP_ERROR CastingServer::DiscoverCommissioners()
 {
+    TargetVideoPlayerInfo * connectableVideoPlayerList = ReadCachedTargetVideoPlayerInfos();
+    if (connectableVideoPlayerList == nullptr || !connectableVideoPlayerList[0].IsInitialized())
+    {
+        ChipLogProgress(AppServer, "No cached video players found during discovery");
+    }
+
     // Send discover commissioners request
     return mCommissionableNodeController.DiscoverCommissioners(
         Dnssd::DiscoveryFilter(Dnssd::DiscoveryFilterType::kDeviceType, static_cast<uint16_t>(35)));
@@ -120,15 +137,32 @@ CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(Dnssd::Discovered
     mTargetVideoPlayerVendorId   = selectedCommissioner->commissionData.vendorId;
     mTargetVideoPlayerProductId  = selectedCommissioner->commissionData.productId;
     mTargetVideoPlayerDeviceType = selectedCommissioner->commissionData.deviceType;
+    mTargetVideoPlayerNumIPs     = selectedCommissioner->resolutionData.numIPs;
+    for (size_t i = 0; i < mTargetVideoPlayerNumIPs && i < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; i++)
+    {
+        mTargetVideoPlayerIpAddress[i] = selectedCommissioner->resolutionData.ipAddress[i];
+    }
     chip::Platform::CopyString(mTargetVideoPlayerDeviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
                                selectedCommissioner->commissionData.deviceName);
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-const Dnssd::DiscoveredNodeData * CastingServer::GetDiscoveredCommissioner(int index)
+const Dnssd::DiscoveredNodeData *
+CastingServer::GetDiscoveredCommissioner(int index, chip::Optional<TargetVideoPlayerInfo *> & outAssociatedConnectableVideoPlayer)
 {
-    return mCommissionableNodeController.GetDiscoveredCommissioner(index);
+    const Dnssd::DiscoveredNodeData * discoveredNodeData = mCommissionableNodeController.GetDiscoveredCommissioner(index);
+    if (discoveredNodeData != nullptr)
+    {
+        for (size_t i = 0; i < kMaxCachedVideoPlayers && mCachedTargetVideoPlayerInfo[i].IsInitialized(); i++)
+        {
+            if (mCachedTargetVideoPlayerInfo[i].IsSameAs(discoveredNodeData))
+            {
+                outAssociatedConnectableVideoPlayer = MakeOptional(&mCachedTargetVideoPlayerInfo[i]);
+            }
+        }
+    }
+    return discoveredNodeData;
 }
 
 void CastingServer::ReadServerClustersForNode(NodeId nodeId)
@@ -301,7 +335,8 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
             CastingServer::GetInstance()->mOnConnectionSuccessClientCallback,
             CastingServer::GetInstance()->mOnConnectionFailureClientCallback,
             CastingServer::GetInstance()->mTargetVideoPlayerVendorId, CastingServer::GetInstance()->mTargetVideoPlayerProductId,
-            CastingServer::GetInstance()->mTargetVideoPlayerDeviceType, CastingServer::GetInstance()->mTargetVideoPlayerDeviceName);
+            CastingServer::GetInstance()->mTargetVideoPlayerDeviceType, CastingServer::GetInstance()->mTargetVideoPlayerDeviceName,
+            CastingServer::GetInstance()->mTargetVideoPlayerNumIPs, CastingServer::GetInstance()->mTargetVideoPlayerIpAddress);
 
         CastingServer::GetInstance()->mCommissioningCompleteCallback(err);
     }
@@ -387,6 +422,28 @@ void CastingServer::SetDefaultFabricIndex(std::function<void(TargetVideoPlayerIn
         return;
     }
     ChipLogError(AppServer, " -- No initialized fabrics with video players");
+}
+
+void CastingServer::ShutdownAllSubscriptions()
+{
+    ChipLogProgress(AppServer, "Shutting down ALL Subscriptions");
+    app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptions();
+}
+
+void CastingServer::Disconnect()
+{
+    TargetVideoPlayerInfo * currentVideoPlayer = GetActiveTargetVideoPlayer();
+
+    if (currentVideoPlayer != nullptr && currentVideoPlayer->IsInitialized())
+    {
+        chip::OperationalDeviceProxy * operationalDeviceProxy = currentVideoPlayer->GetOperationalDeviceProxy();
+        if (operationalDeviceProxy != nullptr)
+        {
+            ChipLogProgress(AppServer, "Disconnecting from VideoPlayer with nodeId=0x" ChipLogFormatX64 " fabricIndex=%d",
+                            ChipLogValueX64(currentVideoPlayer->GetNodeId()), currentVideoPlayer->GetFabricIndex());
+            operationalDeviceProxy->Disconnect();
+        }
+    }
 }
 
 /**
@@ -821,6 +878,97 @@ CHIP_ERROR CastingServer::ApplicationBasic_SubscribeToAllowedVendorList(
     ReturnErrorOnFailure(mAllowedVendorListSubscriber.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
     return mAllowedVendorListSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
                                                            onSubscriptionEstablished);
+}
+
+CHIP_ERROR CastingServer::ApplicationBasic_ReadVendorName(
+    TargetEndpointInfo * endpoint, void * context,
+    chip::Controller::ReadResponseSuccessCallback<
+        chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType>
+        successFn,
+    chip::Controller::ReadResponseFailureCallback failureFn)
+{
+    ReturnErrorOnFailure(mVendorNameReader.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mVendorNameReader.ReadAttribute(context, successFn, failureFn);
+}
+
+CHIP_ERROR
+CastingServer::ApplicationBasic_ReadVendorID(
+    TargetEndpointInfo * endpoint, void * context,
+    chip::Controller::ReadResponseSuccessCallback<
+        chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType>
+        successFn,
+    chip::Controller::ReadResponseFailureCallback failureFn)
+{
+    ReturnErrorOnFailure(mVendorIDReader.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mVendorIDReader.ReadAttribute(context, successFn, failureFn);
+}
+
+CHIP_ERROR CastingServer::ApplicationBasic_ReadApplicationName(
+    TargetEndpointInfo * endpoint, void * context,
+    chip::Controller::ReadResponseSuccessCallback<
+        chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableArgType>
+        successFn,
+    chip::Controller::ReadResponseFailureCallback failureFn)
+{
+    ReturnErrorOnFailure(mApplicationNameReader.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mApplicationNameReader.ReadAttribute(context, successFn, failureFn);
+}
+
+CHIP_ERROR
+CastingServer::ApplicationBasic_ReadProductID(
+    TargetEndpointInfo * endpoint, void * context,
+    chip::Controller::ReadResponseSuccessCallback<
+        chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType>
+        successFn,
+    chip::Controller::ReadResponseFailureCallback failureFn)
+{
+    ReturnErrorOnFailure(mProductIDReader.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mProductIDReader.ReadAttribute(context, successFn, failureFn);
+}
+
+CHIP_ERROR CastingServer::ApplicationBasic_ReadApplication(
+    TargetEndpointInfo * endpoint, void * context,
+    chip::Controller::ReadResponseSuccessCallback<
+        chip::app::Clusters::ApplicationBasic::Attributes::Application::TypeInfo::DecodableArgType>
+        successFn,
+    chip::Controller::ReadResponseFailureCallback failureFn)
+{
+    ReturnErrorOnFailure(mApplicationReader.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mApplicationReader.ReadAttribute(context, successFn, failureFn);
+}
+
+CHIP_ERROR
+CastingServer::ApplicationBasic_ReadStatus(
+    TargetEndpointInfo * endpoint, void * context,
+    chip::Controller::ReadResponseSuccessCallback<
+        chip::app::Clusters::ApplicationBasic::Attributes::Status::TypeInfo::DecodableArgType>
+        successFn,
+    chip::Controller::ReadResponseFailureCallback failureFn)
+{
+    ReturnErrorOnFailure(mStatusReader.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mStatusReader.ReadAttribute(context, successFn, failureFn);
+}
+
+CHIP_ERROR CastingServer::ApplicationBasic_ReadApplicationVersion(
+    TargetEndpointInfo * endpoint, void * context,
+    chip::Controller::ReadResponseSuccessCallback<
+        chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableArgType>
+        successFn,
+    chip::Controller::ReadResponseFailureCallback failureFn)
+{
+    ReturnErrorOnFailure(mApplicationVersionReader.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mApplicationVersionReader.ReadAttribute(context, successFn, failureFn);
+}
+
+CHIP_ERROR CastingServer::ApplicationBasic_ReadAllowedVendorList(
+    TargetEndpointInfo * endpoint, void * context,
+    chip::Controller::ReadResponseSuccessCallback<
+        chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo::DecodableArgType>
+        successFn,
+    chip::Controller::ReadResponseFailureCallback failureFn)
+{
+    ReturnErrorOnFailure(mAllowedVendorListReader.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mAllowedVendorListReader.ReadAttribute(context, successFn, failureFn);
 }
 
 /*

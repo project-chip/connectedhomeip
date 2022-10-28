@@ -235,7 +235,7 @@ class VendorIDSuccessHandlerJNI
     : public SuccessHandlerJNI<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType>
 {
 public:
-    VendorIDSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Short;)V") {}
+    VendorIDSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Integer;)V") {}
     jobject ConvertToJObject(chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType responseData);
 };
 
@@ -252,7 +252,7 @@ class ProductIDSuccessHandlerJNI
     : public SuccessHandlerJNI<chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType>
 {
 public:
-    ProductIDSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Short;)V") {}
+    ProductIDSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Integer;)V") {}
     jobject ConvertToJObject(chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType responseData);
 };
 

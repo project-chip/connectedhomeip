@@ -37,6 +37,7 @@
 #include "TestInetCommon.h"
 #include "TestInetCommonOptions.h"
 
+#include <assert.h>
 #include <errno.h>
 #include <vector>
 

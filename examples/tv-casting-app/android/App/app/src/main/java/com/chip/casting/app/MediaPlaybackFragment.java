@@ -24,6 +24,8 @@ public class MediaPlaybackFragment extends Fragment {
 
   private View.OnClickListener subscribeToCurrentStateButtonClickListener;
 
+  private View.OnClickListener shutdownALlSubscriptionsButtonClickListener;
+
   private static final ContentApp kContentApp = new ContentApp((short) 4, null);
 
   public MediaPlaybackFragment(TvCastingApp tvCastingApp) {
@@ -123,6 +125,15 @@ public class MediaPlaybackFragment extends Fragment {
           }
         };
 
+    this.shutdownALlSubscriptionsButtonClickListener =
+        new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            Log.d(TAG, "Shutting down all subscriptions");
+            tvCastingApp.shutdownAllSubscriptions();
+          }
+        };
+
     return inflater.inflate(R.layout.fragment_media_playback, container, false);
   }
 
@@ -133,5 +144,9 @@ public class MediaPlaybackFragment extends Fragment {
     getView()
         .findViewById(R.id.subscribeToCurrentStateButton)
         .setOnClickListener(subscribeToCurrentStateButtonClickListener);
+
+    getView()
+        .findViewById(R.id.shutdownAllSubscriptionsButton)
+        .setOnClickListener(shutdownALlSubscriptionsButtonClickListener);
   }
 }

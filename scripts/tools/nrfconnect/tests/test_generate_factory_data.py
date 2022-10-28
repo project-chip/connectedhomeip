@@ -153,7 +153,9 @@ class TestGenerateFactoryData(unittest.TestCase):
                                    '--vendor_id', '0x127F',
                                    '--product_id', '0xABCD',
                                    '--vendor_name', 'Nordic Semiconductor ASA',
-                                   '--product_name', 'Lock',
+                                   '--product_name', 'Lock Gen2',
+                                   '--product_label', 'Lock',
+                                   '--part_number', 'PCA10056',
                                    '--date', '2022-07-20',
                                    '--hw_ver', '101',
                                    '--hw_ver_str', 'v1.1',
@@ -177,7 +179,9 @@ class TestGenerateFactoryData(unittest.TestCase):
             self.assertEqual(factory_data.get('vendor_id'), 0x127F)
             self.assertEqual(factory_data.get('product_id'), 0xABCD)
             self.assertEqual(factory_data.get('vendor_name'), 'Nordic Semiconductor ASA')
-            self.assertEqual(factory_data.get('product_name'), 'Lock')
+            self.assertEqual(factory_data.get('product_name'), 'Lock Gen2')
+            self.assertEqual(factory_data.get('product_label'), 'Lock')
+            self.assertEqual(factory_data.get('part_number'), 'PCA10056')
             self.assertEqual(factory_data.get('date'), '2022-07-20')
             self.assertEqual(factory_data.get('hw_ver'), 101)
             self.assertEqual(factory_data.get('hw_ver_str'), 'v1.1')

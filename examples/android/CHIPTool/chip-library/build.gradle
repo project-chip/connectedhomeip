@@ -33,7 +33,8 @@ android {
                     '../../../setup_payload/java/src',
                     '../../../controller/java/zap-generated',
                     '../../../controller/java/src',
-                    '../../../platform/android/java'
+                    '../../../platform/android/java',
+                    '../app/src/main/java/com/google/chip/chiptool'
             ]
         }
     }

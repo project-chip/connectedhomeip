@@ -738,6 +738,7 @@ void wfx_rsi_task(void * arg)
     }
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
 /********************************************************************************************
  * @fn   void wfx_dhcp_got_ipv4(uint32_t ip)
  * @brief
@@ -761,6 +762,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     wfx_ip_changed_notify(IP_STATUS_SUCCESS);
     wfx_rsi.dev_state |= WFX_RSI_ST_STA_READY;
 }
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
 /*
  * WARNING - Taken from RSI and broken up

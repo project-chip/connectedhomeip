@@ -399,6 +399,12 @@ public:
     virtual CHIP_ERROR StopDiscovery() = 0;
 
     /**
+     * Verify the validity of an address that appears to be out of date (for example
+     * because establishing a connection to it has failed).
+     */
+    virtual CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) = 0;
+
+    /**
      * Provides the system-wide implementation of the service resolver
      */
     static Resolver & Instance();

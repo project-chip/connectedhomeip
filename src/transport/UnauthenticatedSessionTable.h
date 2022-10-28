@@ -87,7 +87,8 @@ public:
         switch (mPeerAddress.GetTransportType())
         {
         case Transport::Type::kUdp:
-            return GetRemoteMRPConfig().mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
+            return GetRetransmissionTimeout(mRemoteMRPConfig.mActiveRetransTimeout, mRemoteMRPConfig.mIdleRetransTimeout,
+                                            GetLastPeerActivityTime(), kMinActiveTime);
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
         default:
@@ -111,9 +112,12 @@ public:
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & peerAddress) { mPeerAddress = peerAddress; }
 
-    bool IsPeerActive() { return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < kMinActiveTime); }
+    bool IsPeerActive() const
+    {
+        return ((System::SystemClock().GetMonotonicTimestamp() - GetLastPeerActivityTime()) < kMinActiveTime);
+    }
 
-    System::Clock::Timestamp GetMRPBaseTimeout() override
+    System::Clock::Timestamp GetMRPBaseTimeout() const override
     {
         return IsPeerActive() ? GetRemoteMRPConfig().mActiveRetransTimeout : GetRemoteMRPConfig().mIdleRetransTimeout;
     }

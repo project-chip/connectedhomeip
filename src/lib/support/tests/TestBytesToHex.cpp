@@ -433,8 +433,10 @@ const nlTest sTests[] = {
     NL_TEST_DEF("TestBytesToHexErrors", TestBytesToHexErrors),                       //
     NL_TEST_DEF("TestBytesToHexUint64", TestBytesToHexUint64),                       //
     NL_TEST_DEF("TestHexToBytesAndUint", TestHexToBytesAndUint),                     //
-    NL_TEST_DEF("TestLogBufferAsHex", TestLogBufferAsHex),                           //
-    NL_TEST_SENTINEL()                                                               //
+#ifdef CHIP_PROGRESS_LOGGING
+    NL_TEST_DEF("TestLogBufferAsHex", TestLogBufferAsHex), //
+#endif
+    NL_TEST_SENTINEL() //
 };
 
 } // namespace

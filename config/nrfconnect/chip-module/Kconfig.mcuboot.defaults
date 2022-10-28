@@ -52,6 +52,38 @@ config FPROTECT
     bool
     default y
 
+# nRF7002DK uses SPI NOR external flash
+if BOARD_NRF7002DK_NRF5340_CPUAPP
+
+config SPI
+    bool
+    default y
+
+config SPI_NOR
+    bool
+    default y
+
+choice SPI_NOR_SFDP
+	default SPI_NOR_SFDP_DEVICETREE
+endchoice
+
+config SPI_NOR_FLASH_LAYOUT_PAGE_SIZE
+    int
+    default 4096
+
+config MULTITHREADING
+    bool
+    default y
+
+config PM_OVERRIDE_EXTERNAL_DRIVER_CHECK
+    bool
+    default y
+
+endif
+
+# All boards beside nRF7002DK use QSPI NOR external flash
+if BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
+
 config NORDIC_QSPI_NOR
     bool
     default y
@@ -63,6 +95,8 @@ config NORDIC_QSPI_NOR_FLASH_LAYOUT_PAGE_SIZE
 config NORDIC_QSPI_NOR_STACK_WRITE_BUFFER_SIZE
     int
     default 16
+
+endif
 
 config BOOT_MAX_IMG_SECTORS
     int

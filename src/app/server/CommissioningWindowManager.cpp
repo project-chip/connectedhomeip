@@ -217,6 +217,13 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
 
     mPairingSession.Clear();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    if (!mIsBLE && !mListeningForPASE)
+    {
+        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(true);
+    }
+#endif
+
     ReturnErrorOnFailure(mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
         Protocols::SecureChannel::MsgType::PBKDFParamRequest, &mPairingSession));
     mListeningForPASE = true;
@@ -400,13 +407,6 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
     DeviceLayer::ConfigurationMgr().NotifyOfAdvertisementStart();
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    if (!mIsBLE && !IsCommissioningWindowOpen())
-    {
-        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(true);
-    }
-#endif
-
 #if CONFIG_NETWORK_LAYER_BLE
     if (mIsBLE)
     {
@@ -446,16 +446,16 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
 {
     RestoreDiscriminator();
 
-    mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
-    mListeningForPASE = false;
-    mPairingSession.Clear();
-
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    if (!mIsBLE && IsCommissioningWindowOpen())
+    if (!mIsBLE && mListeningForPASE)
     {
         DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(false);
     }
 #endif
+
+    mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
+    mListeningForPASE = false;
+    mPairingSession.Clear();
 
     // If aShuttingDown, don't try to change our DNS-SD advertisements.
     if (!aShuttingDown)

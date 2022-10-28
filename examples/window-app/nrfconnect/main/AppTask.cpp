@@ -304,7 +304,8 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     {
         // Actually trigger Factory Reset
         Instance().mMode = OperatingMode::Normal;
-        ConfigurationMgr().InitiateFactoryReset();
+        LOG_INF("Factory Reset triggered");
+        chip::Server::GetInstance().ScheduleFactoryReset();
     }
 }
 
@@ -528,12 +529,9 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * aEvent, intptr_t)
         Instance().mIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
         UpdateStatusLED();
         break;
-    case DeviceEventType::kThreadConnectivityChange:
+    case DeviceEventType::kDnssdPlatformInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR
-        if (aEvent->ThreadConnectivityChange.Result == kConnectivity_Established)
-        {
-            InitBasicOTARequestor();
-        }
+        InitBasicOTARequestor();
 #endif
         break;
     default:

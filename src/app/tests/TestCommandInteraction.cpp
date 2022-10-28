@@ -714,6 +714,40 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite 
     exchange->Close();
 }
 
+/**
+ * Helper macro we can use to pretend we got a reply from the server in cases
+ * when the reply was actually dropped due to us not wanting the client's state
+ * machine to advance.
+ *
+ * When this macro is used, the client has sent a message and is waiting for an
+ * ack+response, and the server has sent a response that got dropped and is
+ * waiting for an ack (and maybe a response).
+ *
+ * What this macro then needs to do is:
+ *
+ * 1. Pretend that the client got an ack (and clear out the corresponding ack
+ *    state).
+ * 2. Pretend that the client got a message from the server, with the id of the
+ *    message that was dropped, which requires an ack, so the client will send
+ *    that ack in its next message.
+ *
+ * This is a macro so we get useful line numbers on assertion failures
+ */
+#define PretendWeGotReplyFromServer(aSuite, aContext, aClientExchange)                                                             \
+    {                                                                                                                              \
+        Messaging::ReliableMessageMgr * localRm    = (aContext).GetExchangeManager().GetReliableMessageMgr();                      \
+        Messaging::ExchangeContext * localExchange = aClientExchange;                                                              \
+        NL_TEST_ASSERT(aSuite, localRm->TestGetCountRetransTable() == 2);                                                          \
+                                                                                                                                   \
+        localRm->ClearRetransTable(localExchange);                                                                                 \
+        NL_TEST_ASSERT(aSuite, localRm->TestGetCountRetransTable() == 1);                                                          \
+                                                                                                                                   \
+        localRm->EnumerateRetransTable([localExchange](auto * entry) {                                                             \
+            localExchange->SetPendingPeerAckMessageCounter(entry->retainedBuf.GetMessageCounter());                                \
+            return Loop::Break;                                                                                                    \
+        });                                                                                                                        \
+    }
+
 // Command Sender sends invoke request, command handler drops invoke response, then test injects status response message with
 // busy to client, client sends out a status response with invalid action.
 void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, void * apContext)
@@ -757,8 +791,11 @@ void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, v
     Test::MessageCapturer messageLog(ctx);
     messageLog.mCaptureStandaloneAcks = false;
 
-    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
-    rm->ClearRetransTable(commandSender.mExchangeCtx.Get());
+    // Since we are dropping packets, things are not getting acked.  Set up our
+    // MRP state to look like what it would have looked like if the packet had
+    // not gotten dropped.
+    PretendWeGotReplyFromServer(apSuite, ctx, commandSender.mExchangeCtx.Get());
+
     ctx.GetLoopback().mSentMessageCount                 = 0;
     ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
@@ -823,9 +860,13 @@ void TestCommandInteraction::TestCommandInvalidMessage2(nlTestSuite * apSuite, v
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
     Test::MessageCapturer messageLog(ctx);
-    messageLog.mCaptureStandaloneAcks  = false;
-    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
-    rm->ClearRetransTable(commandSender.mExchangeCtx.Get());
+    messageLog.mCaptureStandaloneAcks = false;
+
+    // Since we are dropping packets, things are not getting acked.  Set up our
+    // MRP state to look like what it would have looked like if the packet had
+    // not gotten dropped.
+    PretendWeGotReplyFromServer(apSuite, ctx, commandSender.mExchangeCtx.Get());
+
     ctx.GetLoopback().mSentMessageCount                 = 0;
     ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
@@ -892,8 +933,11 @@ void TestCommandInteraction::TestCommandInvalidMessage3(nlTestSuite * apSuite, v
     Test::MessageCapturer messageLog(ctx);
     messageLog.mCaptureStandaloneAcks = false;
 
-    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
-    rm->ClearRetransTable(commandSender.mExchangeCtx.Get());
+    // Since we are dropping packets, things are not getting acked.  Set up our
+    // MRP state to look like what it would have looked like if the packet had
+    // not gotten dropped.
+    PretendWeGotReplyFromServer(apSuite, ctx, commandSender.mExchangeCtx.Get());
+
     ctx.GetLoopback().mSentMessageCount                 = 0;
     ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
@@ -960,8 +1004,11 @@ void TestCommandInteraction::TestCommandInvalidMessage4(nlTestSuite * apSuite, v
     Test::MessageCapturer messageLog(ctx);
     messageLog.mCaptureStandaloneAcks = false;
 
-    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
-    rm->ClearRetransTable(commandSender.mExchangeCtx.Get());
+    // Since we are dropping packets, things are not getting acked.  Set up our
+    // MRP state to look like what it would have looked like if the packet had
+    // not gotten dropped.
+    PretendWeGotReplyFromServer(apSuite, ctx, commandSender.mExchangeCtx.Get());
+
     ctx.GetLoopback().mSentMessageCount                 = 0;
     ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;

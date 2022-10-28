@@ -20,6 +20,9 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
+#if defined(ENABLE_CHIP_SHELL)
+#include "EventHandlerLibShell.h"
+#endif // ENABLE_CHIP_SHELL
 
 #ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
@@ -160,6 +163,15 @@ CHIP_ERROR AppTask::Init()
         EFR32_LOG("BaseApplication::Init() failed");
         appError(err);
     }
+
+#if defined(ENABLE_CHIP_SHELL)
+    err = RegisterLockEvents();
+    if (err != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("RegisterLockEvents() failed");
+        appError(err);
+    }
+#endif // ENABLE_CHIP_SHELL
 
     // Initial lock state
     chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state;

@@ -20,4 +20,6 @@
     <string name="subscribe_to_current_state_button_text">Subscribe</string>
     <string name="current_state_text">Reported Current State</string>
     <string name="endpoint_prompt_text">Endpoint ID</string>
+    <string name="shutdown_all_subscriptions_button_text">Shutdown all Subscriptions</string>
+    <string name="disconnect_button_text">Disconnect from Video Player</string>
 </resources>

@@ -24,7 +24,8 @@ CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> gCASEClientPool;
 CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIndex,
                                              std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                                              std::function<void(CHIP_ERROR)> onConnectionFailure, uint16_t vendorId,
-                                             uint16_t productId, uint16_t deviceType, const char * deviceName)
+                                             uint16_t productId, uint16_t deviceType, const char * deviceName, size_t numIPs,
+                                             chip::Inet::IPAddress * ipAddress)
 {
     ChipLogProgress(NotSpecified, "TargetVideoPlayerInfo nodeId=0x" ChipLogFormatX64 " fabricIndex=%d", ChipLogValueX64(nodeId),
                     fabricIndex);
@@ -33,6 +34,12 @@ CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIn
     mVendorId    = vendorId;
     mProductId   = productId;
     mDeviceType  = deviceType;
+    mNumIPs      = numIPs;
+    for (size_t i = 0; i < numIPs && i < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; i++)
+    {
+        mIpAddress[i] = ipAddress[i];
+    }
+
     chip::Platform::CopyString(mDeviceName, chip::Dnssd::kMaxDeviceNameLen + 1, deviceName);
     for (auto & endpointInfo : mEndpoints)
     {
@@ -117,4 +124,48 @@ void TargetVideoPlayerInfo::PrintInfo()
             endpointInfo.PrintInfo();
         }
     }
+}
+
+bool TargetVideoPlayerInfo::IsSameAs(const chip::Dnssd::DiscoveredNodeData * discoveredNodeData)
+{
+    // return false because 'this' VideoPlayer is not null
+    if (discoveredNodeData == nullptr)
+    {
+        return false;
+    }
+
+    // return false because deviceNames are different
+    if (strcmp(mDeviceName, discoveredNodeData->commissionData.deviceName) != 0)
+    {
+        return false;
+    }
+
+    // return false because not even a single IP Address matches
+    if (mNumIPs > 0)
+    {
+        bool matchFound = false;
+        for (size_t i = 0; i < mNumIPs && i < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; i++)
+        {
+            for (size_t j = 0;
+                 j < discoveredNodeData->resolutionData.numIPs && j < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; j++)
+            {
+                if (mIpAddress[i] == discoveredNodeData->resolutionData.ipAddress[j])
+                {
+                    matchFound = true;
+                    break;
+                }
+            }
+            if (matchFound)
+            {
+                break;
+            }
+        }
+
+        if (!matchFound)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }

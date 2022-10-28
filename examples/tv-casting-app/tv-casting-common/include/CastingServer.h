@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "AppParams.h"
 #include "ApplicationBasic.h"
 #include "ApplicationLauncher.h"
 #include "Channel.h"
@@ -51,10 +52,11 @@ public:
     void operator=(const CastingServer &) = delete;
     static CastingServer * GetInstance();
 
-    void Init();
+    CHIP_ERROR Init(AppParams * AppParams = nullptr);
 
     CHIP_ERROR DiscoverCommissioners();
-    const chip::Dnssd::DiscoveredNodeData * GetDiscoveredCommissioner(int index);
+    const chip::Dnssd::DiscoveredNodeData *
+    GetDiscoveredCommissioner(int index, chip::Optional<TargetVideoPlayerInfo *> & outAssociatedConnectableVideoPlayer);
     CHIP_ERROR OpenBasicCommissioningWindow(std::function<void(CHIP_ERROR)> commissioningCompleteCallback,
                                             std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                                             std::function<void(CHIP_ERROR)> onConnectionFailure,
@@ -93,6 +95,16 @@ public:
                                            std::function<void(TargetEndpointInfo *)> onNewOrUpdatedEndpoint);
 
     CHIP_ERROR PurgeVideoPlayerCache();
+
+    /**
+     * Tears down all active subscriptions.
+     */
+    void ShutdownAllSubscriptions();
+
+    /**
+     *  Mark any open session with the currently connected Video player as expired.
+     */
+    void Disconnect();
 
     /**
      * @brief Content Launcher cluster
@@ -333,6 +345,55 @@ public:
         chip::Controller::ReadResponseFailureCallback failureFn, uint16_t minInterval, uint16_t maxInterval,
         chip::Controller::SubscriptionEstablishedCallback onSubscriptionEstablished);
 
+    CHIP_ERROR
+    ApplicationBasic_ReadVendorName(TargetEndpointInfo * endpoint, void * context,
+                                    chip::Controller::ReadResponseSuccessCallback<
+                                        chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType>
+                                        successFn,
+                                    chip::Controller::ReadResponseFailureCallback failureFn);
+    CHIP_ERROR
+    ApplicationBasic_ReadVendorID(TargetEndpointInfo * endpoint, void * context,
+                                  chip::Controller::ReadResponseSuccessCallback<
+                                      chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType>
+                                      successFn,
+                                  chip::Controller::ReadResponseFailureCallback failureFn);
+    CHIP_ERROR ApplicationBasic_ReadApplicationName(
+        TargetEndpointInfo * endpoint, void * context,
+        chip::Controller::ReadResponseSuccessCallback<
+            chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableArgType>
+            successFn,
+        chip::Controller::ReadResponseFailureCallback failureFn);
+    CHIP_ERROR
+    ApplicationBasic_ReadProductID(TargetEndpointInfo * endpoint, void * context,
+                                   chip::Controller::ReadResponseSuccessCallback<
+                                       chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType>
+                                       successFn,
+                                   chip::Controller::ReadResponseFailureCallback failureFn);
+    CHIP_ERROR
+    ApplicationBasic_ReadApplication(TargetEndpointInfo * endpoint, void * context,
+                                     chip::Controller::ReadResponseSuccessCallback<
+                                         chip::app::Clusters::ApplicationBasic::Attributes::Application::TypeInfo::DecodableArgType>
+                                         successFn,
+                                     chip::Controller::ReadResponseFailureCallback failureFn);
+    CHIP_ERROR
+    ApplicationBasic_ReadStatus(TargetEndpointInfo * endpoint, void * context,
+                                chip::Controller::ReadResponseSuccessCallback<
+                                    chip::app::Clusters::ApplicationBasic::Attributes::Status::TypeInfo::DecodableArgType>
+                                    successFn,
+                                chip::Controller::ReadResponseFailureCallback failureFn);
+    CHIP_ERROR ApplicationBasic_ReadApplicationVersion(
+        TargetEndpointInfo * endpoint, void * context,
+        chip::Controller::ReadResponseSuccessCallback<
+            chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableArgType>
+            successFn,
+        chip::Controller::ReadResponseFailureCallback failureFn);
+    CHIP_ERROR ApplicationBasic_ReadAllowedVendorList(
+        TargetEndpointInfo * endpoint, void * context,
+        chip::Controller::ReadResponseSuccessCallback<
+            chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo::DecodableArgType>
+            successFn,
+        chip::Controller::ReadResponseFailureCallback failureFn);
+
     /*
      * @brief Channel cluster
      */
@@ -361,6 +422,8 @@ private:
     uint16_t mTargetVideoPlayerProductId                                  = 0;
     uint16_t mTargetVideoPlayerDeviceType                                 = 0;
     char mTargetVideoPlayerDeviceName[chip::Dnssd::kMaxDeviceNameLen + 1] = {};
+    size_t mTargetVideoPlayerNumIPs                                       = 0; // number of valid IP addresses
+    chip::Inet::IPAddress mTargetVideoPlayerIpAddress[chip::Dnssd::CommonResolutionData::kMaxIPAddresses];
 
     chip::Controller::CommissionableNodeController mCommissionableNodeController;
     std::function<void(CHIP_ERROR)> mCommissioningCompleteCallback;
@@ -440,6 +503,15 @@ private:
     StatusSubscriber mStatusSubscriber;
     ApplicationVersionSubscriber mApplicationVersionSubscriber;
     AllowedVendorListSubscriber mAllowedVendorListSubscriber;
+
+    VendorNameReader mVendorNameReader;
+    VendorIDReader mVendorIDReader;
+    ApplicationNameReader mApplicationNameReader;
+    ProductIDReader mProductIDReader;
+    ApplicationReader mApplicationReader;
+    StatusReader mStatusReader;
+    ApplicationVersionReader mApplicationVersionReader;
+    AllowedVendorListReader mAllowedVendorListReader;
 
     /*
      * @brief Channel cluster

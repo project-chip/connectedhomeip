@@ -23,9 +23,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import chip.devicecontroller.NetworkCredentials
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.util.FragmentUtil
+import com.google.chip.chiptool.NetworkCredentialsParcelable
 import kotlinx.android.synthetic.main.enter_thread_network_fragment.channelEd
 import kotlinx.android.synthetic.main.enter_thread_network_fragment.masterKeyEd
 import kotlinx.android.synthetic.main.enter_thread_network_fragment.panIdEd
@@ -44,7 +44,7 @@ class EnterNetworkFragment : Fragment() {
     )
 
   interface Callback {
-    fun onNetworkCredentialsEntered(networkCredentials: NetworkCredentials)
+    fun onNetworkCredentialsEntered(networkCredentials: NetworkCredentialsParcelable)
   }
 
   override fun onCreateView(
@@ -79,8 +79,8 @@ class EnterNetworkFragment : Fragment() {
       return
     }
 
-    val networkCredentials = NetworkCredentials.forWiFi(
-      NetworkCredentials.WiFiCredentials(ssid.toString(), pwd.toString())
+    val networkCredentials = NetworkCredentialsParcelable.forWiFi(
+      NetworkCredentialsParcelable.WiFiCredentials(ssid.toString(), pwd.toString())
     )
     FragmentUtil.getHost(this, Callback::class.java)
       ?.onNetworkCredentialsEntered(networkCredentials)
@@ -130,7 +130,7 @@ class EnterNetworkFragment : Fragment() {
     )
 
     val networkCredentials =
-      NetworkCredentials.forThread(NetworkCredentials.ThreadCredentials(operationalDataset))
+      NetworkCredentialsParcelable.forThread(NetworkCredentialsParcelable.ThreadCredentials(operationalDataset))
     FragmentUtil.getHost(this, Callback::class.java)
       ?.onNetworkCredentialsEntered(networkCredentials)
   }
