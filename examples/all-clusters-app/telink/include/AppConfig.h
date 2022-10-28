@@ -18,7 +18,7 @@
 
 #pragma once
 
-// ---- All Clusters Application example config ----   
+// ---- All Clusters Application example config ----
 
 // Buttons config
 #define BUTTON_PORT DEVICE_DT_GET(DT_NODELABEL(gpioc))

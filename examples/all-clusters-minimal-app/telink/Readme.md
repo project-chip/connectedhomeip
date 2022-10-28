@@ -1,8 +1,8 @@
 # Matter Telink All Clusters Minimal Example Application
 
-The Telink All Clusters Minimal Example Application implements various ZCL clusters
-populated on three endpoints. You can use this example as a reference for
-creating your own application.
+The Telink All Clusters Minimal Example Application implements various ZCL
+clusters populated on three endpoints. You can use this example as a reference
+for creating your own application.
 
 ![Telink B91 EVK](http://wiki.telink-semi.cn/wiki/assets/Hardware/B91_Generic_Starter_Kit_Hardware_Guide/connection_chart.png)
 
@@ -104,8 +104,9 @@ After build application with enabled OTA feature, use next binary files:
 -   zephyr.bin - main binary to flash PCB (Use 2MB PCB).
 -   zephyr-ota.bin - binary for OTA Provider
 
-All binaries has the same SW version. To test OTA “zephyr-ota.bin” should have higher SW version than base
-SW. Set CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 in corresponding “prj.conf” conﬁguration file.
+All binaries has the same SW version. To test OTA “zephyr-ota.bin” should have
+higher SW version than base SW. Set CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 in
+corresponding “prj.conf” conﬁguration file.
 
 Usage of OTA:
 

@@ -104,8 +104,9 @@ After build application with enabled OTA feature, use next binary files:
 -   zephyr.bin - main binary to flash PCB (Use 2MB PCB).
 -   zephyr-ota.bin - binary for OTA Provider
 
-All binaries has the same SW version. To test OTA “zephyr-ota.bin” should have higher SW version than base
-SW. Set CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 in corresponding “prj.conf” conﬁguration file.
+All binaries has the same SW version. To test OTA “zephyr-ota.bin” should have
+higher SW version than base SW. Set CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 in
+corresponding “prj.conf” conﬁguration file.
 
 Usage of OTA:
 
