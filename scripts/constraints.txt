@@ -234,7 +234,14 @@ pyserial==3.5
     #   mbed-tools
     #   mobly
 pytest==6.2.5 ; platform_machine != "aarch64" and sys_platform == "linux"
-    # via -r requirements.mbed.txt
+    # via
+    #   -r requirements.mbed.txt
+    #   pytest-json-report
+    #   pytest-metadata
+pytest-json-report==1.5.0
+    # via -r requirements.openiotsdk.txt
+pytest-metadata==2.0.2
+    # via pytest-json-report
 python-dateutil==2.8.1
     # via
     #   pandas

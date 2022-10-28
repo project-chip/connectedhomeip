@@ -21,7 +21,6 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
-#include <app/util/time-util.h>
 #include <app/util/util.h>
 
 #include <messaging/ExchangeContext.h>

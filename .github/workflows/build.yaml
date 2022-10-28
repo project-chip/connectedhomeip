@@ -32,7 +32,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.6.03
+            image: connectedhomeip/chip-build:0.6.05
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -133,7 +133,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.6.03
+            image: connectedhomeip/chip-build:0.6.05
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -210,6 +210,10 @@ jobs:
                         BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
                         BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
                     done
+            - name: Ensure codegen is done for sanitize
+              timeout-minutes: 45
+              run: |
+                  ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/sanitizers"
             - name: Clang-tidy validation
               timeout-minutes: 45
               run: |
@@ -283,7 +287,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.6.03
+            image: connectedhomeip/chip-build:0.6.05
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -401,6 +405,10 @@ jobs:
                       scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
                       BUILD_TYPE=$BUILD_TYPE scripts/tests/gn_tests.sh
                   done
+            - name: Ensure codegen is done for sanitize
+              timeout-minutes: 45
+              run: |
+                  ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/default"
             - name: Clang-tidy validation
               timeout-minutes: 45
               run: |

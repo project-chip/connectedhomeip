@@ -116,10 +116,15 @@ using HKDF_sha_crypto = HKDF_shaHSM;
 using HKDF_sha_crypto = HKDF_sha;
 #endif
 
-// Wait at most 30 seconds for the response from the peer.
-// This timeout value assumes the underlying transport is reliable.
-// The session establishment fails if the response is not received within timeout window.
-static constexpr ExchangeContext::Timeout kSigma_Response_Timeout = System::Clock::Seconds16(30);
+// Amounts of time to allow for server-side processing of messages.
+//
+// These timeout values only allow for the server-side processing and assume that any transport-specific
+// latency will be added to them.
+//
+// The session establishment fails if the response is not received within the resulting timeout window,
+// which accounts for both transport latency and the server-side latency.
+static constexpr ExchangeContext::Timeout kExpectedLowProcessingTime  = System::Clock::Seconds16(2);
+static constexpr ExchangeContext::Timeout kExpectedHighProcessingTime = System::Clock::Seconds16(30);
 
 CASESession::~CASESession()
 {
@@ -260,7 +265,7 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     mSessionResumptionStorage = sessionResumptionStorage;
     mLocalMRPConfig           = mrpLocalConfig;
 
-    mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
+    mExchangeCtxt->UseSuggestedResponseTimeout(kExpectedLowProcessingTime);
     mPeerNodeId  = peerScopedNodeId.GetNodeId();
     mLocalNodeId = fabricInfo->GetNodeId();
 
@@ -1723,8 +1728,8 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Payl
     else
     {
         mExchangeCtxt = ec;
-        mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
     }
+    mExchangeCtxt->UseSuggestedResponseTimeout(kExpectedHighProcessingTime);
 
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;

@@ -1,43 +1,51 @@
-#CHIP EFR32 Window Covering Example
+# Matter EFR32 Window Covering Example
 
-An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
+An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
 
 <hr>
 
--   [CHIP EFR32 Window Covering Example](#chip-efr32-window-covering-example)
-
+-   [Matter EFR32 Window Covering Example](#matter-efr32-window-covering-example)
     -   [Introduction](#introduction)
     -   [Building](#building)
-        -   [Note](#note)
     -   [Flashing the Application](#flashing-the-application)
     -   [Viewing Logging Output](#viewing-logging-output)
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
-    -   [Running Pigweed RPC console](#running-pigweed-rpc-console)
     -   [OTA Software Update](#ota-software-update)
+    -   [Building options](#building-options)
+        -   [Disabling logging](#disabling-logging)
+        -   [Debug build / release build](#debug-build--release-build)
+        -   [Disabling LCD](#disabling-lcd)
+        -   [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
+
+> **NOTE:** Silicon Laboratories now maintains a public matter GitHub repo with
+> frequent releases thoroughly tested and validated. Developers looking to
+> develop matter products with silabs hardware are encouraged to use our latest
+> release with added tools and documentation.
+> [Silabs Matter Github](https://github.com/SiliconLabs/matter/releases)
 
 <a name="intro"></a>
 
 ## Introduction
 
 The EFR32 window-covering example provides a baseline demonstration of a Window
-Covering device, built using CHIP and the Silicon Labs gecko SDK. It can be
-controlled by a Chip controller over Openthread network.
+Covering device, built using Matter and the Silicon Labs gecko SDK. It can be
+controlled by a Chip controller over an Openthread or Wifi network.
 
 The EFR32 device can be commissioned over Bluetooth Low Energy where the device
 and the Chip controller will exchange security information with the Rendez-vous
-procedure. Thread Network credentials are then provided to the EFR32 device
-which will then join the network.
+procedure. In the case of Thread, the Thread Network credentials are provided to
+the EFR32 device which will then join the Thread network.
 
-The LCD on the Silabs WSTK shows a QR Code containing the needed commissioning
-information for the BLE connection and starting the Rendez-vous procedure. Once
-the device is commissioned, the displays shows a representation of the window
-covering state.
+If the LCD is enabled, the LCD on the Silabs WSTK shows a QR Code containing the
+needed commissioning information for the BLE connection and starting the
+Rendez-vous procedure. Once the device is commissioned, the displays shows a
+representation of the window covering state.
 
 The window-covering example is intended to serve both as a means to explore the
-workings of CHIP as well as a template for creating real products based on the
+workings of Matter as well as a template for creating real products based on the
 Silicon Labs platform.
 
 <a name="building"></a>
@@ -56,12 +64,16 @@ Silicon Labs platform.
 -   Install some additional tools(likely already present for CHIP developers):
 
            # Linux
-           $ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
+           $ sudo apt-get install git ninja-build
 
            # Mac OS X
            $ brew install ninja
 
 -   Supported hardware:
+
+    -   > For the latest supported hardware please refer to the
+        > [Hardware Requirements](https://github.com/SiliconLabs/matter/blob/latest/docs/silabs/general/HARDWARE_REQUIREMENTS.md)
+        > in the Silicon Labs Matter Github Repo
 
     MG12 boards:
 

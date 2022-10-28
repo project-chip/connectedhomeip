@@ -27,26 +27,7 @@ except:
     from idl.matter_idl_parser import CreateParser
 
 from idl.generators import FileSystemGeneratorStorage, GeneratorStorage
-from idl.generators.java import JavaGenerator
-from idl.generators.bridge import BridgeGenerator
-
-
-class CodeGeneratorTypes(enum.Enum):
-    """
-    Represents every generator type supported by codegen and maps
-    the simple enum value (user friendly and can be a command line input)
-    into underlying generators.
-    """
-    JAVA = enum.auto()
-    BRIDGE = enum.auto()
-
-    def CreateGenerator(self, *args, **kargs):
-        if self == CodeGeneratorTypes.JAVA:
-            return JavaGenerator(*args, **kargs)
-        elif self == CodeGeneratorTypes.BRIDGE:
-            return BridgeGenerator(*args, **kargs)
-        else:
-            raise Error("Unknown code generator type")
+from idl.generators.registry import CodeGenerator, GENERATORS
 
 
 class ListGeneratedFilesStorage(GeneratorStorage):
@@ -73,11 +54,6 @@ __LOG_LEVELS__ = {
     'fatal': logging.FATAL,
 }
 
-__GENERATORS__ = {
-    'java': CodeGeneratorTypes.JAVA,
-    'bridge': CodeGeneratorTypes.BRIDGE,
-}
-
 
 @click.command()
 @click.option(
@@ -88,7 +64,7 @@ __GENERATORS__ = {
 @click.option(
     '--generator',
     default='JAVA',
-    type=click.Choice(__GENERATORS__.keys(), case_sensitive=False),
+    type=click.Choice(GENERATORS.keys(), case_sensitive=False),
     help='What code generator to run')
 @click.option(
     '--output-dir',
@@ -129,8 +105,7 @@ def main(log_level, generator, output_dir, dry_run, name_only, expected_outputs,
         storage = FileSystemGeneratorStorage(output_dir)
 
     logging.info("Running code generator %s" % generator)
-    generator = __GENERATORS__[
-        generator].CreateGenerator(storage, idl=idl_tree)
+    generator = CodeGenerator.FromString(generator).Create(storage, idl=idl_tree)
     generator.render(dry_run)
 
     if expected_outputs:

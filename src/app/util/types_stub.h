@@ -297,27 +297,6 @@ typedef struct
  * node might play in a network.
  */
 
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberNodeType
-#else
-typedef uint8_t EmberNodeType;
-enum
-#endif
-{
-    /** The device is not joined. */
-    EMBER_UNKNOWN_DEVICE = 0,
-    /** Will relay messages and can act as a parent to other nodes. */
-    EMBER_COORDINATOR = 1,
-    /** Will relay messages and can act as a parent to other nodes. */
-    EMBER_ROUTER = 2,
-    /** Communicates only with its parent and will not relay messages. */
-    EMBER_END_DEVICE = 3,
-    /** An end device whose radio can be turned off to save power.
-     *  The application must call ::emberPollForData() to receive messages.
-     */
-    EMBER_SLEEPY_END_DEVICE = 4,
-};
-
 /**
  * @brief Defines the possible incoming message types.
  */
@@ -721,19 +700,6 @@ typedef struct
     uint8_t special;
     EmberVersionType type;
 } EmberVersion;
-
-/** @brief This structure contains information about child nodes.
- *
- */
-typedef struct
-{
-    EmberEUI64 eui64;
-    EmberNodeType type;
-    EmberNodeId id;
-    uint8_t phy;
-    uint8_t power;
-    uint8_t timeout;
-} EmberChildData;
 
 /**
  * @brief A distinguished network ID that will never be assigned

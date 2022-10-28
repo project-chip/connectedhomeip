@@ -28,7 +28,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.6.02
+            image: connectedhomeip/chip-build:0.6.05
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.15
@@ -96,6 +96,13 @@ jobs:
                      if [ "$idl_file" = './examples/placeholder/linux/apps/app2/config.matter' ]; then continue; fi
                      if [ "$idl_file" = './examples/thermostat/thermostat-common/thermostat.matter' ]; then continue; fi
                      if [ "$idl_file" = './examples/window-app/common/window-app.matter' ]; then continue; fi
+
+                     # Test files are intentionally small and not spec-compilant, just parse-compliant
+                     if [ "$idl_file" = "./scripts/idl/tests/inputs/cluster_struct_attribute.matter" ]; then continue; fi
+                     if [ "$idl_file" = "./scripts/idl/tests/inputs/global_struct_attribute.matter" ]; then continue; fi
+                     if [ "$idl_file" = "./scripts/idl/tests/inputs/optional_argument.matter" ]; then continue; fi
+                     if [ "$idl_file" = "./scripts/idl/tests/inputs/several_clusters.matter" ]; then continue; fi
+                     if [ "$idl_file" = "./scripts/idl/tests/inputs/simple_attribute.matter" ]; then continue; fi
 
                      ./scripts/run_in_build_env.sh "./scripts/idl_lint.py --log-level warn $idl_file" >/dev/null || exit 1
                  done

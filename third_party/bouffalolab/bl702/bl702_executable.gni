@@ -42,7 +42,6 @@ template("bl702_executable") {
     "${chip_root}/scripts/flashing/bouffalolab_firmware_utils.py",
     "${chip_root}/scripts/flashing/firmware_utils.py",
 
-    "${chip_root}/examples/platform/bouffalolab/bl702/flash_config/bl_factory_params_IoTKitA_32M.dts",
     "${chip_root}/examples/platform/bouffalolab/bl702/flash_config/partition_cfg_2M.toml",
   ]
   copy(flashing_runtime_target) {
@@ -61,10 +60,6 @@ template("bl702_executable") {
   flashing_options += [ "--pt" ]
   flashing_options +=
       [ rebase_path("partition_cfg_2M.toml", root_out_dir, root_out_dir) ]
-  flashing_options += [ "--dts" ]
-  flashing_options += [ rebase_path("bl_factory_params_IoTKitA_32M.dts",
-                                    root_out_dir,
-                                    root_out_dir) ]
   flashing_options += [ "--ota" ]
   flashing_options += [ "ota_images/" ]
 

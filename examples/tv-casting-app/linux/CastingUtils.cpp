@@ -41,7 +41,9 @@ CHIP_ERROR DiscoverCommissioners()
 
 CHIP_ERROR RequestCommissioning(int index)
 {
-    const Dnssd::DiscoveredNodeData * selectedCommissioner = CastingServer::GetInstance()->GetDiscoveredCommissioner(index);
+    chip::Optional<TargetVideoPlayerInfo *> associatedConnectableVideoPlayer;
+    const Dnssd::DiscoveredNodeData * selectedCommissioner =
+        CastingServer::GetInstance()->GetDiscoveredCommissioner(index, associatedConnectableVideoPlayer);
     if (selectedCommissioner == nullptr)
     {
         ChipLogError(AppServer, "No such commissioner with index %d exists", index);
@@ -89,11 +91,19 @@ void InitCommissioningFlow(intptr_t commandArg)
     // Display discovered commissioner TVs to ask user to select one
     for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
     {
-        const Dnssd::DiscoveredNodeData * commissioner = CastingServer::GetInstance()->GetDiscoveredCommissioner(i);
+        chip::Optional<TargetVideoPlayerInfo *> associatedConnectableVideoPlayer;
+        const Dnssd::DiscoveredNodeData * commissioner =
+            CastingServer::GetInstance()->GetDiscoveredCommissioner(i, associatedConnectableVideoPlayer);
         if (commissioner != nullptr)
         {
             ChipLogProgress(AppServer, "Discovered Commissioner #%d", commissionerCount++);
             commissioner->LogDetail();
+            if (associatedConnectableVideoPlayer.HasValue())
+            {
+                TargetVideoPlayerInfo * targetVideoPlayerInfo = associatedConnectableVideoPlayer.Value();
+                ChipLogProgress(AppServer, "Previously connected with nodeId 0x" ChipLogFormatX64 " fabricIndex: %d",
+                                ChipLogValueX64(targetVideoPlayerInfo->GetNodeId()), targetVideoPlayerInfo->GetFabricIndex());
+            }
         }
     }
 

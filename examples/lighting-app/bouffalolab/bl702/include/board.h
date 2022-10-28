@@ -57,22 +57,31 @@
 #define LED_G_PIN_PORT 1
 #define LED_G_PIN 16
 
-#define LED1_PIN LED_B_PIN_PORT
-
 #define MAX_PWM_CHANNEL 3
+
+#elif defined(XT_ZB6_DevKit)
+
+#define LED_B_PIN_PORT 3
+#define LED_B_PIN 18
+
+#define LED_R_PIN_PORT 4
+#define LED_R_PIN 19
+
+#define LED_G_PIN_PORT 0
+#define LED_G_PIN 20
+
+#define MAX_PWM_CHANNEL 1
 
 #else
 
-#define LED1_PIN 22
-
-#define LED_B_PIN_PORT 1
-#define LED_B_PIN 31
+#define LED_B_PIN_PORT 2
+#define LED_B_PIN 22
 #define MAX_PWM_CHANNEL 1
 
 #endif
 
-#if APP_BOARD_BTN
-#define LED_BTN_RESET 11
+#if defined(BOARD_BTN_BOOT_PIN)
+#define LED_BTN_RESET 31
 #endif
 
 #define SPI_WIFI_MISO_PIN 4

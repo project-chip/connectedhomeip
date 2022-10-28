@@ -41,8 +41,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0
 #endif
 
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
-
 #define CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS 1
 
 // ========== Platform-specific Configuration =========

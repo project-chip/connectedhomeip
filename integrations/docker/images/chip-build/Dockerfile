@@ -69,12 +69,12 @@ RUN set -x \
     && git lfs install \
     && : # last line
 
-# Cmake (Mbed OS requires >=3.19.0-rc3 version which is not available in Ubuntu 20.04 repository)
+# Cmake v3.23.1
 RUN set -x \
     && (cd /tmp \
-    && wget --progress=dot:giga https://github.com/Kitware/CMake/releases/download/v3.19.3/cmake-3.19.3-Linux-x86_64.sh \
-    && sh cmake-3.19.3-Linux-x86_64.sh --exclude-subdir --prefix=/usr/local \
-    && rm -rf cmake-3.19.3-Linux-x86_64.sh) \
+    && wget --progress=dot:giga https://github.com/Kitware/CMake/releases/download/v3.23.1/cmake-3.23.1-Linux-x86_64.sh \
+    && sh cmake-3.23.1-Linux-x86_64.sh --exclude-subdir --prefix=/usr/local \
+    && rm -rf cmake-3.23.1-Linux-x86_64.sh) \
     && exec bash \
     && : # last line
 

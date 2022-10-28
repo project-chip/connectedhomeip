@@ -53,3 +53,5 @@
 
 // Enable some test-only interaction model APIs.
 #define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
+
+#define CHIP_ENABLE_ROTATING_DEVICE_ID 1

@@ -32,7 +32,7 @@ public class TvCastingApp {
   private final String TARGET_SERVICE_TYPE = "_matterd._udp.";
   private final List<Long> DEVICE_TYPE_FILTER = Arrays.asList(35L); // Video player = 35;
 
-  public native void init();
+  public native boolean init(AppParameters appParameters);
 
   public native void setDACProvider(DACProvider provider);
 
@@ -47,11 +47,14 @@ public class TvCastingApp {
     multicastLock.setReferenceCounted(true);
     multicastLock.acquire();
 
+    List<VideoPlayer> preCommissionedVideoPlayers = readCachedVideoPlayers();
+
     NsdDiscoveryListener nsdDiscoveryListener =
         new NsdDiscoveryListener(
             nsdManager,
             TARGET_SERVICE_TYPE,
             DEVICE_TYPE_FILTER,
+            preCommissionedVideoPlayers,
             discoverySuccessCallback,
             discoveryFailureCallback);
 
@@ -63,6 +66,7 @@ public class TvCastingApp {
             new Runnable() {
               @Override
               public void run() {
+                Log.d(TAG, "TvCastingApp stopping Video Player commissioner discovery");
                 nsdManager.stopServiceDiscovery(nsdDiscoveryListener);
                 multicastLock.release();
               }
@@ -90,6 +94,10 @@ public class TvCastingApp {
       SuccessCallback<VideoPlayer> onConnectionSuccess,
       FailureCallback onConnectionFailure,
       SuccessCallback<ContentApp> onNewOrUpdatedEndpointCallback);
+
+  public native void shutdownAllSubscriptions();
+
+  public native void disconnect();
 
   public native List<VideoPlayer> getActiveTargetVideoPlayers();
 
@@ -275,7 +283,7 @@ public class TvCastingApp {
   /**
    * APPLICATION BASIC
    *
-   * <p>TODO: Add APIs to subscribe to Application, Status and AllowedVendorList
+   * <p>TODO: Add APIs to subscribe to & read Application, Status and AllowedVendorList
    */
   public native boolean applicationBasic_subscribeToVendorName(
       ContentApp contentApp,
@@ -287,7 +295,7 @@ public class TvCastingApp {
 
   public native boolean applicationBasic_subscribeToVendorID(
       ContentApp contentApp,
-      SuccessCallback<Short> readSuccessHandler,
+      SuccessCallback<Integer> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
       int maxInterval,
@@ -303,7 +311,7 @@ public class TvCastingApp {
 
   public native boolean applicationBasic_subscribeToProductID(
       ContentApp contentApp,
-      SuccessCallback<Short> readSuccessHandler,
+      SuccessCallback<Integer> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
       int maxInterval,
@@ -316,6 +324,31 @@ public class TvCastingApp {
       int minInterval,
       int maxInterval,
       SubscriptionEstablishedCallback subscriptionEstablishedHandler);
+
+  public native boolean applicationBasic_readVendorName(
+      ContentApp contentApp,
+      SuccessCallback<String> readSuccessHandler,
+      FailureCallback readFailureHandler);
+
+  public native boolean applicationBasic_readVendorID(
+      ContentApp contentApp,
+      SuccessCallback<Integer> readSuccessHandler,
+      FailureCallback readFailureHandler);
+
+  public native boolean applicationBasic_readApplicationName(
+      ContentApp contentApp,
+      SuccessCallback<String> readSuccessHandler,
+      FailureCallback readFailureHandler);
+
+  public native boolean applicationBasic_readProductID(
+      ContentApp contentApp,
+      SuccessCallback<Integer> readSuccessHandler,
+      FailureCallback readFailureHandler);
+
+  public native boolean applicationBasic_readApplicationVersion(
+      ContentApp contentApp,
+      SuccessCallback<String> readSuccessHandler,
+      FailureCallback readFailureHandlerr);
 
   static {
     System.loadLibrary("TvCastingApp");

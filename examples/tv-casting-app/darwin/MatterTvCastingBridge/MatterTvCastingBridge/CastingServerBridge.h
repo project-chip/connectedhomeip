@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#import "AppParameters.h"
 #import "ContentApp.h"
 #import "ContentLauncherTypes.h"
 #import "DiscoveredNodeData.h"
@@ -31,6 +32,10 @@
 @interface CastingServerBridge : NSObject
 
 + (CastingServerBridge * _Nullable)getSharedInstance;
+
+- (void)initApp:(AppParameters * _Nullable)appParameters
+             clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    initAppStatusHandler:(nullable void (^)(bool))initAppStatusHandler;
 
 /*!
  @brief Browse for on-network commissioner TVs
@@ -160,6 +165,24 @@
         onConnectionSuccessCallback:(void (^_Nonnull)(VideoPlayer * _Nonnull))onConnectionSuccessCallback
         onConnectionFailureCallback:(void (^_Nonnull)(MatterError * _Nonnull))onConnectionFailureCallback
      onNewOrUpdatedEndpointCallback:(void (^_Nonnull)(ContentApp * _Nonnull))onNewOrUpdatedEndpointCallback;
+
+/*!
+ @brief Tears down all active subscriptions.
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Called after the request has been sent
+ */
+- (void)shutdownAllSubscriptions:(dispatch_queue_t _Nonnull)clientQueue requestSentHandler:(nullable void (^)())requestSentHandler;
+
+/*!
+ @brief  Mark any open session with the currently connected Video player as expired.
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Called after the request has been sent
+ */
+- (void)disconnect:(dispatch_queue_t _Nonnull)clientQueue requestSentHandler:(nullable void (^)())requestSentHandler;
 
 /*!
  @brief Send a ContentLauncher:LaunchURL request to a TV
@@ -1003,6 +1026,100 @@
                                      successCallback:(void (^_Nonnull)(NSString * _Nonnull))successCallback
                                      failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
                      subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback;
-@end
 
+/*!
+ @brief Read ApplicationBasic:VendorName
+
+ @param contentApp Content app endpoint to target
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+ */
+- (void)applicationBasic_readVendorName:(ContentApp * _Nonnull)contentApp
+                            clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                     requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                        successCallback:(void (^_Nonnull)(NSString * _Nonnull))successCallback
+                        failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback;
+
+/*!
+ @brief Read ApplicationBasic:VendorID
+
+ @param contentApp Content app endpoint to target
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+ */
+- (void)applicationBasic_readVendorID:(ContentApp * _Nonnull)contentApp
+                          clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                   requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                      successCallback:(void (^_Nonnull)(NSNumber * _Nonnull))successCallback
+                      failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback;
+
+/*!
+ @brief Read ApplicationBasic:ApplicationName
+
+ @param contentApp Content app endpoint to target
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+ */
+- (void)applicationBasic_readApplicationName:(ContentApp * _Nonnull)contentApp
+                                 clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                          requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                             successCallback:(void (^_Nonnull)(NSString * _Nonnull))successCallback
+                             failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback;
+
+/*!
+ @brief Read ApplicationBasic:ProductID
+
+ @param contentApp Content app endpoint to target
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+ */
+- (void)applicationBasic_readProductID:(ContentApp * _Nonnull)contentApp
+                           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                    requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                       successCallback:(void (^_Nonnull)(uint16_t))successCallback
+                       failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback;
+
+/*!
+ @brief Read ApplicationBasic:ApplicationVersion
+
+ @param contentApp Content app endpoint to target
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Handler to call on sending the request
+
+ @param successCallback Callback for when a read report is successfully received
+
+ @param failureCallback Callback for when there is a failure in receiving a read report
+ */
+- (void)applicationBasic_readApplicationVersion:(ContentApp * _Nonnull)contentApp
+                                    clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                             requestSentHandler:(void (^_Nonnull)(MatterError * _Nonnull))requestSentHandler
+                                successCallback:(void (^_Nonnull)(NSString * _Nonnull))successCallback
+                                failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback;
+@end
 #endif /* CastingServerBridge_h */

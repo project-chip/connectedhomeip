@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 53;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -571,7 +571,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B20252A12459E34F00F97062 /* Build configuration list for PBXNativeTarget "Matter" */;
 			buildPhases = (
-				0C40A67D246C9AC700885C81 /* Run Script */,
+				0C40A67D246C9AC700885C81 /* Run GN Build (chip_xcode_build_connector) */,
 				B20252882459E34F00F97062 /* Headers */,
 				B20252892459E34F00F97062 /* Sources */,
 				B202528A2459E34F00F97062 /* Frameworks */,
@@ -659,8 +659,9 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0C40A67D246C9AC700885C81 /* Run Script */ = {
+		0C40A67D246C9AC700885C81 /* Run GN Build (chip_xcode_build_connector) */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -668,7 +669,7 @@
 			);
 			inputPaths = (
 			);
-			name = "Run Script";
+			name = "Run GN Build (chip_xcode_build_connector)";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -823,9 +824,9 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-Wl,-unexported_symbol,\"__Z*\"";
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx";
+				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvos appletvsimulator watchos watchsimulator";
 				SUPPORTS_TEXT_BASED_API = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -897,7 +898,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.csa.matter;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 			};
 			name = Debug;
 		};
@@ -914,7 +916,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 			};
 			name = Debug;
 		};
@@ -969,9 +971,9 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-Wl,-unexported_symbol,\"__Z*\"";
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx";
+				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvos appletvsimulator watchos watchsimulator";
 				SUPPORTS_TEXT_BASED_API = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -1018,14 +1020,14 @@
 					"-Wformat-security",
 				);
 				OTHER_LDFLAGS = "";
-				"OTHER_LDFLAGS[arch=*]" = (
-					"-lnetwork",
+				"OTHER_LDFLAGS[sdk=*]" = (
+					"-framework",
+					CoreData,
 					"-framework",
 					Foundation,
 					"-framework",
 					CoreBluetooth,
-					"-framework",
-					CoreData,
+					"-lnetwork",
 					"-Wl,-unexported_symbol,\"__Z*\"",
 				);
 				"OTHER_LDFLAGS[sdk=macosx*]" = (
@@ -1044,8 +1046,9 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.csa.matter;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
 				STRIP_STYLE = "non-global";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 			};
 			name = Release;
 		};
@@ -1063,7 +1066,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 			};
 			name = Release;
 		};

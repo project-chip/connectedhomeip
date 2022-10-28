@@ -18,6 +18,12 @@ import("//build_overrides/chip.gni")
 import("${build_root}/config/android_abi.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 
+if (defined(build_java_matter_controller)) {
+  build_java_matter_controller = build_java_matter_controller
+} else {
+  build_java_matter_controller = false
+}
+
 shared_library("jni") {
   output_name = "libSetupPayloadParser"
 
@@ -34,10 +40,11 @@ shared_library("jni") {
 android_library("java") {
   output_name = "SetupPayloadParser.jar"
 
-  data_deps = [
-    ":jni",
-    "${chip_root}/build/chip/java:shared_cpplib",
-  ]
+  data_deps = [ ":jni" ]
+
+  if (!build_java_matter_controller) {
+    data_deps += [ "${chip_root}/build/chip/java:shared_cpplib" ]
+  }
 
   sources = [
     "src/chip/setuppayload/DiscoveryCapability.java",

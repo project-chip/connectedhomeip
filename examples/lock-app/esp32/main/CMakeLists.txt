@@ -16,6 +16,8 @@
 #
 # (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
 
+get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
+
 if (CONFIG_ENABLE_PW_RPC)
 idf_component_register(INCLUDE_DIRS
                      "${CMAKE_CURRENT_LIST_DIR}"
@@ -67,8 +69,7 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/identify-server"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/groups-server"
                      PRIV_REQUIRES bt chip QRCode)
-
-get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
+add_dependencies(${COMPONENT_LIB} app-codegen)
 
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
@@ -186,6 +187,8 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/groups-server"
                       PRIV_REQUIRES chip QRCode bt)
 
+add_dependencies(${COMPONENT_LIB} app-codegen)
+
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
@@ -193,3 +196,9 @@ target_compile_options(${COMPONENT_LIB} PUBLIC
 )
 
 endif (CONFIG_ENABLE_PW_RPC)
+
+get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
+
+include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
+
+chip_app_component_codegen("${CHIP_ROOT}/examples/lock-app/lock-common/lock-app.matter")

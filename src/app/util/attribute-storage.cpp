@@ -27,7 +27,6 @@
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/callbacks/PluginCallbacks.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 
 using namespace chip;
@@ -296,46 +295,10 @@ bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType)
     return dataType == ZCL_ARRAY_ATTRIBUTE_TYPE;
 }
 
-// This function is used to call the per-cluster default response callback
-void emberAfClusterDefaultResponseCallback(EndpointId endpoint, ClusterId clusterId, CommandId commandId, EmberAfStatus status,
-                                           uint8_t clientServerMask)
-{
-    const EmberAfCluster * cluster = emberAfFindCluster(endpoint, clusterId, clientServerMask);
-    if (cluster != nullptr)
-    {
-        EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_DEFAULT_RESPONSE_FUNCTION);
-        if (f != nullptr)
-        {
-            ((EmberAfDefaultResponseFunction) f)(endpoint, commandId, status);
-        }
-    }
-}
-
-// This function is used to call the per-cluster message sent callback
-void emberAfClusterMessageSentCallback(const MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen,
-                                       uint8_t * message, EmberStatus status)
-{
-    if (apsFrame != nullptr && message != nullptr && msgLen != 0)
-    {
-        const EmberAfCluster * cluster = emberAfFindCluster(
-            apsFrame->sourceEndpoint, apsFrame->clusterId,
-            (((message[0] & ZCL_FRAME_CONTROL_DIRECTION_MASK) == ZCL_FRAME_CONTROL_SERVER_TO_CLIENT) ? CLUSTER_MASK_SERVER
-                                                                                                     : CLUSTER_MASK_CLIENT));
-        if (cluster != nullptr)
-        {
-            EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_MESSAGE_SENT_FUNCTION);
-            if (f != nullptr)
-            {
-                ((EmberAfMessageSentFunction) f)(destination, apsFrame, msgLen, message, status);
-            }
-        }
-    }
-}
-
 // This function is used to call the per-cluster attribute changed callback
 void emAfClusterAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
-    const EmberAfCluster * cluster = emberAfFindCluster(attributePath.mEndpointId, attributePath.mClusterId, CLUSTER_MASK_SERVER);
+    const EmberAfCluster * cluster = emberAfFindServerCluster(attributePath.mEndpointId, attributePath.mClusterId);
     if (cluster != nullptr)
     {
         EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION);
@@ -350,7 +313,7 @@ void emAfClusterAttributeChangedCallback(const app::ConcreteAttributePath & attr
 EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
-    const EmberAfCluster * cluster = emberAfFindCluster(attributePath.mEndpointId, attributePath.mClusterId, CLUSTER_MASK_SERVER);
+    const EmberAfCluster * cluster = emberAfFindServerCluster(attributePath.mEndpointId, attributePath.mClusterId);
     if (cluster == nullptr)
     {
         return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
@@ -700,23 +663,10 @@ uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClu
     return 0xFF;
 }
 
-// Returns whether the given endpoint has the client or server of the given
-// cluster on it.
-bool emberAfContainsCluster(EndpointId endpoint, ClusterId clusterId)
-{
-    return (emberAfFindCluster(endpoint, clusterId, 0) != nullptr);
-}
-
 // Returns whether the given endpoint has the server of the given cluster on it.
 bool emberAfContainsServer(EndpointId endpoint, ClusterId clusterId)
 {
-    return (emberAfFindCluster(endpoint, clusterId, CLUSTER_MASK_SERVER) != nullptr);
-}
-
-// Returns whether the given endpoint has the client of the given cluster on it.
-bool emberAfContainsClient(EndpointId endpoint, ClusterId clusterId)
-{
-    return (emberAfFindCluster(endpoint, clusterId, CLUSTER_MASK_CLIENT) != nullptr);
+    return (emberAfFindServerCluster(endpoint, clusterId) != nullptr);
 }
 
 // This will find the first server that has the clusterId given from the index of endpoint.
@@ -764,7 +714,7 @@ void EnabledEndpointsWithServerCluster::EnsureMatchingEndpoint()
 } // namespace chip
 
 // Finds the cluster that matches endpoint, clusterId, direction.
-const EmberAfCluster * emberAfFindCluster(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
+const EmberAfCluster * emberAfFindServerCluster(EndpointId endpoint, ClusterId clusterId)
 {
     uint16_t ep = emberAfIndexFromEndpoint(endpoint);
     if (ep == kEmberInvalidEndpointIndex)
@@ -772,7 +722,7 @@ const EmberAfCluster * emberAfFindCluster(EndpointId endpoint, ClusterId cluster
         return nullptr;
     }
 
-    return emberAfFindClusterInType(emAfEndpoints[ep].endpointType, clusterId, mask);
+    return emberAfFindClusterInType(emAfEndpoints[ep].endpointType, clusterId, CLUSTER_MASK_SERVER);
 }
 
 // Returns cluster within the endpoint; Does not ignore disabled endpoints
@@ -793,18 +743,12 @@ uint16_t emberAfFindClusterServerEndpointIndex(EndpointId endpoint, ClusterId cl
     return findClusterEndpointIndex(endpoint, clusterId, CLUSTER_MASK_SERVER);
 }
 
-// Client wrapper for findClusterEndpointIndex
-uint16_t emberAfFindClusterClientEndpointIndex(EndpointId endpoint, ClusterId clusterId)
-{
-    return findClusterEndpointIndex(endpoint, clusterId, CLUSTER_MASK_CLIENT);
-}
-
 // Returns the endpoint index within a given cluster
 static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterId, uint8_t mask)
 {
     uint16_t i, epi = 0;
 
-    if (emberAfFindCluster(endpoint, clusterId, mask) == nullptr)
+    if (emberAfFindServerCluster(endpoint, clusterId) == nullptr)
     {
         return kEmberInvalidEndpointIndex;
     }
@@ -1422,7 +1366,7 @@ app::AttributeAccessInterface * GetAttributeAccessOverride(EndpointId endpointId
 
 uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::ClusterId cluster)
 {
-    const EmberAfCluster * clusterObj = emberAfFindCluster(endpoint, cluster, CLUSTER_MASK_SERVER);
+    const EmberAfCluster * clusterObj = emberAfFindServerCluster(endpoint, cluster);
     VerifyOrReturnError(clusterObj != nullptr, 0);
     return clusterObj->attributeCount;
 }
@@ -1430,7 +1374,7 @@ uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::Cluster
 uint16_t emberAfGetServerAttributeIndexByAttributeId(chip::EndpointId endpoint, chip::ClusterId cluster,
                                                      chip::AttributeId attributeId)
 {
-    const EmberAfCluster * clusterObj = emberAfFindCluster(endpoint, cluster, CLUSTER_MASK_SERVER);
+    const EmberAfCluster * clusterObj = emberAfFindServerCluster(endpoint, cluster);
     VerifyOrReturnError(clusterObj != nullptr, UINT16_MAX);
 
     for (uint16_t i = 0; i < clusterObj->attributeCount; i++)
@@ -1445,7 +1389,7 @@ uint16_t emberAfGetServerAttributeIndexByAttributeId(chip::EndpointId endpoint, 
 
 Optional<AttributeId> emberAfGetServerAttributeIdByIndex(EndpointId endpoint, ClusterId cluster, uint16_t attributeIndex)
 {
-    const EmberAfCluster * clusterObj = emberAfFindCluster(endpoint, cluster, CLUSTER_MASK_SERVER);
+    const EmberAfCluster * clusterObj = emberAfFindServerCluster(endpoint, cluster);
     if (clusterObj == nullptr || clusterObj->attributeCount <= attributeIndex)
     {
         return Optional<AttributeId>::Missing();

@@ -253,18 +253,3 @@ uint16_t emberAfLongStringLength(const uint8_t * buffer)
     uint16_t length = emberAfGetInt16u(buffer, 0, 2);
     return (length == 0xFFFF ? 0 : length);
 }
-
-uint8_t emberAfGetDate(uint8_t * message, uint16_t currentIndex, uint16_t msgLen, EmberAfDate * destination)
-{
-    if ((currentIndex + 4) > msgLen)
-    {
-        emberAfDebugPrintln("GetDate, %x bytes short", 4);
-        emberAfDebugFlush();
-        return 0;
-    }
-    destination->year       = message[(currentIndex + 0)];
-    destination->month      = message[(currentIndex + 1)];
-    destination->dayOfMonth = message[(currentIndex + 2)];
-    destination->dayOfWeek  = message[(currentIndex + 3)];
-    return 4;
-}

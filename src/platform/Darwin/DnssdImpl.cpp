@@ -36,10 +36,11 @@ constexpr const char * kLocalDot    = "local.";
 constexpr const char * kProtocolTcp = "._tcp";
 constexpr const char * kProtocolUdp = "._udp";
 
-constexpr DNSServiceFlags kRegisterFlags    = kDNSServiceFlagsNoAutoRename;
-constexpr DNSServiceFlags kBrowseFlags      = 0;
-constexpr DNSServiceFlags kGetAddrInfoFlags = kDNSServiceFlagsTimeout | kDNSServiceFlagsShareConnection;
-constexpr DNSServiceFlags kResolveFlags     = kDNSServiceFlagsShareConnection;
+constexpr DNSServiceFlags kRegisterFlags        = kDNSServiceFlagsNoAutoRename;
+constexpr DNSServiceFlags kBrowseFlags          = 0;
+constexpr DNSServiceFlags kGetAddrInfoFlags     = kDNSServiceFlagsTimeout | kDNSServiceFlagsShareConnection;
+constexpr DNSServiceFlags kResolveFlags         = kDNSServiceFlagsShareConnection;
+constexpr DNSServiceFlags kReconfirmRecordFlags = 0;
 
 bool IsSupportedProtocol(DnssdServiceProtocol protocol)
 {
@@ -444,6 +445,50 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
     auto regtype     = GetFullType(service);
     auto interfaceId = GetInterfaceId(interface);
     return Resolve(context, callback, interfaceId, service->mAddressType, regtype.c_str(), service->mName);
+}
+
+CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
+{
+    VerifyOrReturnError(hostname != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    auto interfaceId = interface.GetPlatformInterface();
+    auto rrclass     = kDNSServiceClass_IN;
+    auto fullname    = GetHostNameWithDomain(hostname);
+
+    uint16_t rrtype;
+    uint16_t rdlen;
+    const void * rdata;
+
+    in6_addr ipv6;
+#if INET_CONFIG_ENABLE_IPV4
+    in_addr ipv4;
+#endif // INET_CONFIG_ENABLE_IPV4
+
+    if (address.IsIPv6())
+    {
+        ipv6   = address.ToIPv6();
+        rrtype = kDNSServiceType_AAAA;
+        rdlen  = static_cast<uint16_t>(sizeof(in6_addr));
+        rdata  = &ipv6;
+    }
+#if INET_CONFIG_ENABLE_IPV4
+    else if (address.IsIPv4())
+    {
+        ipv4   = address.ToIPv4();
+        rrtype = kDNSServiceType_A;
+        rdlen  = static_cast<uint16_t>(sizeof(in_addr));
+        rdata  = &ipv4;
+    }
+#endif // INET_CONFIG_ENABLE_IPV4
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    auto error = DNSServiceReconfirmRecord(kReconfirmRecordFlags, interfaceId, fullname.c_str(), rrtype, rrclass, rdlen, rdata);
+    LogOnFailure(__func__, error);
+
+    return Error::ToChipError(error);
 }
 
 } // namespace Dnssd

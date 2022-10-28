@@ -28,6 +28,7 @@ public class NsdDiscoveryListener implements NsdManager.DiscoveryListener {
   private final NsdManager nsdManager;
   private final String targetServiceType;
   private final List<Long> deviceTypeFilter;
+  private final List<VideoPlayer> preCommissionedVideoPlayers;
   private final SuccessCallback<DiscoveredNodeData> successCallback;
   private final FailureCallback failureCallback;
 
@@ -35,11 +36,13 @@ public class NsdDiscoveryListener implements NsdManager.DiscoveryListener {
       NsdManager nsdManager,
       String targetServiceType,
       List<Long> deviceTypeFilter,
+      List<VideoPlayer> preCommissionedVideoPlayers,
       SuccessCallback<DiscoveredNodeData> successCallback,
       FailureCallback failureCallback) {
     this.nsdManager = nsdManager;
     this.targetServiceType = targetServiceType;
     this.deviceTypeFilter = deviceTypeFilter;
+    this.preCommissionedVideoPlayers = preCommissionedVideoPlayers;
     this.successCallback = successCallback;
     this.failureCallback = failureCallback;
   }
@@ -55,7 +58,12 @@ public class NsdDiscoveryListener implements NsdManager.DiscoveryListener {
     if (service.getServiceType().equals(targetServiceType)) {
       nsdManager.resolveService(
           service,
-          new NsdResolveListener(nsdManager, deviceTypeFilter, successCallback, failureCallback));
+          new NsdResolveListener(
+              nsdManager,
+              deviceTypeFilter,
+              preCommissionedVideoPlayers,
+              successCallback,
+              failureCallback));
     } else {
       Log.d(TAG, "Ignoring discovered service: " + service.toString());
     }

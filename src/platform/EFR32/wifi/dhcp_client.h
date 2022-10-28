@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#if LWIP_IPV4 && LWIP_DHCP
+
 #pragma once
 #ifdef __cplusplus
 extern "C" {
@@ -39,3 +41,5 @@ uint8_t dhcpclient_poll(void * arg);
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* LWIP_IPV4 && LWIP_DHCP */

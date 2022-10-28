@@ -35,7 +35,7 @@
 #include <bl_romfs.h>
 #endif
 
-HOSAL_UART_DEV_DECL(uart_stdio, 0, 16, 7, 115200);
+HOSAL_UART_DEV_DECL(uart_stdio, 0, 16, 7, CHIP_UART_BAUDRATE);
 
 extern uint8_t _heap_start;
 extern uint8_t _heap_size; // @suppress("Type cannot be resolved")

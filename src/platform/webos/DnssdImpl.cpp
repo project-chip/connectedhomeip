@@ -869,5 +869,10 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId
                                             browseResult->mAddressType, Inet::IPAddressType::kAny, interface, callback, context);
 }
 
+CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 } // namespace Dnssd
 } // namespace chip

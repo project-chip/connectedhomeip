@@ -22,7 +22,7 @@
  *
  */
 
-#include <messaging/ReliableMessageProtocolConfig.h>
+#include <messaging/ReliableMessageMgr.h>
 
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
@@ -51,7 +51,7 @@ void ClearLocalMRPConfigOverride()
 ReliableMessageProtocolConfig GetDefaultMRPConfig()
 {
     // Default MRP intervals are defined in spec <2.11.3. Parameters and Constants>
-    static constexpr const System::Clock::Milliseconds32 idleRetransTimeout   = 4000_ms32;
+    static constexpr const System::Clock::Milliseconds32 idleRetransTimeout   = 300_ms32;
     static constexpr const System::Clock::Milliseconds32 activeRetransTimeout = 300_ms32;
     return ReliableMessageProtocolConfig(idleRetransTimeout, activeRetransTimeout);
 }
@@ -86,6 +86,24 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
 
     return (config == GetDefaultMRPConfig()) ? Optional<ReliableMessageProtocolConfig>::Missing()
                                              : Optional<ReliableMessageProtocolConfig>::Value(config);
+}
+
+System::Clock::Timestamp GetRetransmissionTimeout(System::Clock::Timestamp activeInterval, System::Clock::Timestamp idleInterval,
+                                                  System::Clock::Timestamp lastActivityTime,
+                                                  System::Clock::Timestamp activityThreshold)
+{
+    auto timeSinceLastActivity = (System::SystemClock().GetMonotonicTimestamp() - lastActivityTime);
+
+    // Calculate the retransmission timeout and take into account that an active/idle state change can happen
+    // in the middle.
+    System::Clock::Timestamp timeout(0);
+    for (uint8_t i = 0; i < CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1; i++)
+    {
+        auto baseInterval = ((timeSinceLastActivity + timeout) < activityThreshold) ? activeInterval : idleInterval;
+        timeout += Messaging::ReliableMessageMgr::GetBackoff(baseInterval, i, /* computeMaxPossible */ true);
+    }
+
+    return timeout;
 }
 
 } // namespace chip

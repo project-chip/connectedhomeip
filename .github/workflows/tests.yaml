@@ -44,7 +44,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.03
+            image: connectedhomeip/chip-build:0.6.05
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -189,7 +189,7 @@ jobs:
                         --target linux-x64-ota-provider-${BUILD_VARIANT} \
                         --target linux-x64-ota-requestor-${BUILD_VARIANT} \
                         --target linux-x64-tv-app-${BUILD_VARIANT} \
-                        --target linux-x64-bridge-app-${BUILD_VARIANT} \
+                        --target linux-x64-bridge-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -207,7 +207,7 @@ jobs:
                      --ota-provider-app ./out/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
                      --ota-requestor-app ./out/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
                      --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --bridge-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-bridge-app \
+                     --bridge-app ./out/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v2
@@ -293,7 +293,7 @@ jobs:
                         --target darwin-x64-ota-provider-${BUILD_VARIANT} \
                         --target darwin-x64-ota-requestor-${BUILD_VARIANT} \
                         --target darwin-x64-tv-app-${BUILD_VARIANT} \
-                        --target darwin-x64-bridge-app-${BUILD_VARIANT} \
+                        --target darwin-x64-bridge-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -312,7 +312,7 @@ jobs:
                      --ota-provider-app ./out/darwin-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
                      --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
                      --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --bridge-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-bridge-app \
+                     --bridge-app ./out/darwin-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v2
@@ -347,7 +347,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.03
+            image: connectedhomeip/chip-build:0.6.05
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
