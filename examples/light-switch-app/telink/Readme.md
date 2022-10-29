@@ -82,15 +82,18 @@ following states:
 
 1. Build
    [chip-tool cli](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
+
 2. Pair with device
 
     ```
-    ${CHIP_TOOL_DIR}/chip-tool pairing code ${NODE_ID_TO_ASSIGN} MT:D8XA0CQM00KA0648G00
+    ${CHIP_TOOL_DIR}/chip-tool pairing ble-thread ${NODE_ID} hex:${DATASET} ${PIN_CODE} ${DISCRIMINATOR}
     ```
 
-    here:
+    Example:
 
-    - \${NODE_ID_TO_ASSIGN} is the node id to assign to the light switch
+    ```
+    ./chip-tool pairing ble-thread 1234 hex:0e080000000000010000000300000f35060004001fffe0020811111111222222220708fd61f77bd3df233e051000112233445566778899aabbccddeeff030e4f70656e54687265616444656d6f010212340410445f2b5ca6f2a93a55ce570a70efeecb0c0402a0fff8 20202021 3840
+    ```
 
 ### Binding cluster and endpoints
 
