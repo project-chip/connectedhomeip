@@ -387,6 +387,14 @@
         },
 
         {
+            "name": "CHIP All Clusters App (Linux)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/debug/standalone/chip-all-clusters-app",
+            "cwd": "${workspaceFolder}"
+        },
+
+        {
             "name": "OTA Requestor App (Linux)",
             "type": "lldb",
             "request": "launch",

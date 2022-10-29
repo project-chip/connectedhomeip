@@ -39,6 +39,7 @@
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#include <lib/support/Pool.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <platform/PlatformManager.h>
 
@@ -309,6 +310,19 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
             return;
         }
 
+        // This needs to happen after DeviceControllerFactory::Init,
+        // because that creates (lazily, by calling functions with
+        // static variables in them) some static-lifetime objects.
+        chip::HeapObjectPoolExitHandling::IgnoreLeaksOnExit();
+
+        // Make sure we don't leave a system state running while we have no
+        // controllers started.  This is working around the fact that a system
+        // state is brought up live on factory init, and not when it comes time
+        // to actually start a controller, and does not actually clean itself up
+        // until its refcount (which starts as 0) goes to 0.
+        _controllerFactory->RetainSystemState();
+        _controllerFactory->ReleaseSystemState();
+
         self->_isRunning = YES;
     });
 
@@ -526,7 +540,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         }
     }
 
-    *fabric = fabricTable.FindFabric(pubKey, params.fabricId);
+    *fabric = fabricTable.FindFabric(pubKey, params.fabricID.unsignedLongLongValue);
     return YES;
 }
 

@@ -26,7 +26,7 @@ concurrency:
 jobs:
     darwin:
         name: Build Darwin
-        timeout-minutes: 120
+        timeout-minutes: 210
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
@@ -64,7 +64,7 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Run iOS Build Debug
-              timeout-minutes: 30
+              timeout-minutes: 50
               working-directory: src/darwin/Framework
               # For now disable unguarded-availability-new warnings because we
               # internally use APIs that we are annotating as only available on
@@ -72,7 +72,7 @@ jobs:
               # target versions instead?
               run: xcodebuild -target "Matter" -sdk iphoneos OTHER_CFLAGS='${inherited} -Wno-unguarded-availability-new'
             - name: Run iOS Build Release
-              timeout-minutes: 30
+              timeout-minutes: 50
               working-directory: src/darwin/Framework
               # For now disable unguarded-availability-new warnings because we
               # internally use APIs that we are annotating as only available on
@@ -86,7 +86,7 @@ jobs:
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true
             - name: Run macOS Build
-              timeout-minutes: 40
+              timeout-minutes: 70
               # Enable -Werror by hand here, because the Xcode config can't
               # enable it for various reasons.  Keep whatever Xcode settings
               # for OTHER_CFLAGS exist by using ${inherited}.
@@ -118,7 +118,7 @@ jobs:
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true
             - name: Run Framework Tests
-              timeout-minutes: 15
+              timeout-minutes: 20
               # For now disable unguarded-availability-new warnings because we
               # internally use APIs that we are annotating as only available on
               # new enough versions.  Maybe we should change out deployment

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 53;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -99,7 +99,6 @@
 		7596A84F2877E6A9004DAE0E /* MTRCluster_internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 7596A84E2877E6A9004DAE0E /* MTRCluster_internal.h */; };
 		7596A8512878709F004DAE0E /* MTRAsyncCallbackQueueTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7596A8502878709F004DAE0E /* MTRAsyncCallbackQueueTests.m */; };
 		7596A85528788557004DAE0E /* MTRClusters.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7596A85228788557004DAE0E /* MTRClusters.mm */; };
-		7596A85628788557004DAE0E /* MTRClustersObjc_internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 7596A85328788557004DAE0E /* MTRClustersObjc_internal.h */; };
 		7596A85728788557004DAE0E /* MTRClusters.h in Headers */ = {isa = PBXBuildFile; fileRef = 7596A85428788557004DAE0E /* MTRClusters.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		88EBF8CE27FABDD500686BC1 /* MTRDeviceAttestationDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 88EBF8CB27FABDD500686BC1 /* MTRDeviceAttestationDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		88EBF8CF27FABDD500686BC1 /* MTRDeviceAttestationDelegateBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88EBF8CC27FABDD500686BC1 /* MTRDeviceAttestationDelegateBridge.mm */; };
@@ -241,7 +240,6 @@
 		7596A84E2877E6A9004DAE0E /* MTRCluster_internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRCluster_internal.h; sourceTree = "<group>"; };
 		7596A8502878709F004DAE0E /* MTRAsyncCallbackQueueTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRAsyncCallbackQueueTests.m; sourceTree = "<group>"; };
 		7596A85228788557004DAE0E /* MTRClusters.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MTRClusters.mm; path = "zap-generated/MTRClusters.mm"; sourceTree = "<group>"; };
-		7596A85328788557004DAE0E /* MTRClustersObjc_internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MTRClustersObjc_internal.h; path = "zap-generated/MTRClustersObjc_internal.h"; sourceTree = "<group>"; };
 		7596A85428788557004DAE0E /* MTRClusters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MTRClusters.h; path = "zap-generated/MTRClusters.h"; sourceTree = "<group>"; };
 		88EBF8CB27FABDD500686BC1 /* MTRDeviceAttestationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDeviceAttestationDelegate.h; sourceTree = "<group>"; };
 		88EBF8CC27FABDD500686BC1 /* MTRDeviceAttestationDelegateBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceAttestationDelegateBridge.mm; sourceTree = "<group>"; };
@@ -333,7 +331,6 @@
 				7596A83D28751220004DAE0E /* MTRBaseClusters_internal.h */,
 				7596A85428788557004DAE0E /* MTRClusters.h */,
 				7596A85228788557004DAE0E /* MTRClusters.mm */,
-				7596A85328788557004DAE0E /* MTRClustersObjc_internal.h */,
 				D4772A45285AE98300383630 /* MTRClusterConstants.h */,
 			);
 			name = CHIPGeneratedFiles;
@@ -564,6 +561,7 @@
 				511913FC28C100EF009235E9 /* MTRBaseSubscriptionCallback.h in Headers */,
 				51E0310027EA20D20083DC9C /* MTRControllerAccessControl.h in Headers */,
 				7596A85628788557004DAE0E /* MTRClustersObjc_internal.h in Headers */,
+				991DC08B247704DC00C13860 /* MTRLogging.h in Headers */,
 				7596A84828762783004DAE0E /* MTRAsyncCallbackWorkQueue.h in Headers */,
 				5A7947E527C0129F00434CF2 /* MTRDeviceController+XPC.h in Headers */,
 				B2E0D7B4245B0B5C003C5B48 /* MTRError_Internal.h in Headers */,
@@ -578,7 +576,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B20252A12459E34F00F97062 /* Build configuration list for PBXNativeTarget "Matter" */;
 			buildPhases = (
-				0C40A67D246C9AC700885C81 /* Run Script */,
+				0C40A67D246C9AC700885C81 /* Run GN Build (chip_xcode_build_connector) */,
 				B20252882459E34F00F97062 /* Headers */,
 				B20252892459E34F00F97062 /* Sources */,
 				B202528A2459E34F00F97062 /* Frameworks */,
@@ -666,8 +664,9 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0C40A67D246C9AC700885C81 /* Run Script */ = {
+		0C40A67D246C9AC700885C81 /* Run GN Build (chip_xcode_build_connector) */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -675,7 +674,7 @@
 			);
 			inputPaths = (
 			);
-			name = "Run Script";
+			name = "Run GN Build (chip_xcode_build_connector)";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -853,6 +852,8 @@
 					CHIP_HAVE_CONFIG_H,
 					"CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
 					"$(inherited)",
+					"MTR_NEWLY_AVAILABLE=",
+					"MTR_NEWLY_DEPRECATED(message)=",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(CHIP_ROOT)/src",
@@ -1001,6 +1002,8 @@
 					CHIP_HAVE_CONFIG_H,
 					"CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
 					"$(inherited)",
+					"MTR_NEWLY_AVAILABLE=",
+					"MTR_NEWLY_DEPRECATED(message)=",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(CHIP_ROOT)/src",

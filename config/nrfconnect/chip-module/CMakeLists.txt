@@ -236,6 +236,10 @@ if (CONFIG_CHIP_ENABLE_DNSSD_SRP)
     chip_gn_arg_string("chip_mdns" "platform")
 endif()
 
+if (CONFIG_CHIP_CRYPTO_PSA)
+    chip_gn_arg_string("chip_crypto" "psa")
+endif()
+
 if (CHIP_PROJECT_CONFIG)
     chip_gn_arg_string("chip_project_config_include"        ${CHIP_PROJECT_CONFIG})
     chip_gn_arg_string("chip_system_project_config_include" ${CHIP_PROJECT_CONFIG})

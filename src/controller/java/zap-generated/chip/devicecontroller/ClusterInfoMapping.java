@@ -19,7 +19,6 @@
 
 package chip.devicecontroller;
 
-import androidx.annotation.Nullable;
 import chip.clusterinfo.ClusterCommandCallback;
 import chip.clusterinfo.ClusterInfo;
 import chip.clusterinfo.CommandParameterInfo;
@@ -33,6 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import javax.annotation.Nullable;
 
 public class ClusterInfoMapping {
 

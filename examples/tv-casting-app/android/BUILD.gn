@@ -62,6 +62,7 @@ android_library("java") {
   ]
 
   sources = [
+    "App/app/src/main/jni/com/chip/casting/AppParameters.java",
     "App/app/src/main/jni/com/chip/casting/ContentApp.java",
     "App/app/src/main/jni/com/chip/casting/ContentLauncherTypes.java",
     "App/app/src/main/jni/com/chip/casting/DACProvider.java",

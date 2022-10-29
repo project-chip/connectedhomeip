@@ -19,10 +19,10 @@
 
 package chip.devicecontroller;
 
-import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 
 public class ChipClusters {
 

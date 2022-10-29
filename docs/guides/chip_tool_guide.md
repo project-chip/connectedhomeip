@@ -868,3 +868,100 @@ In this command:
 -   _<node_id\>_ is the ID of the node that is going to receive the binding.
 -   _<endpoint_id\>_ is the ID of the endpoint on which the `binding` cluster is
     implemented.
+
+### Multi-admin scenario
+
+Multi-admin feature allows you to join Matter device to several Matter fabrics
+and administer it by several different Matter administrators. First you need to
+commission the Matter device to first fabric following the
+[Using CHIP Tool for Matter device testing](#using) section.
+
+Before it is possible to commission a Matter device to a new fabric, the
+administrator from first fabric must open the commissioning window for a new
+administrator from another fabric.
+
+To open the commissioning window on the paired Matter device, use the following
+command pattern:
+
+```
+$ ./chip-tool pairing open-commissioning-window <node_id> <option> <window_timeout> <iteration> <discriminator>
+```
+
+In this command:
+
+-   _<node_id\>_ is the ID of the node that should open commissioning window
+-   _<option\>_ is equal to 1 for Enhanced Commissioning Method and 0 for Basic
+    Commissioning Method
+-   _<window_timeout\>_ is time in seconds, before the commissioning window
+    closes
+-   _<iteration\>_ is number of PBKDF iterations to use to derive the PAKE
+    verifier
+-   _<discriminator\>_ is device specific discriminator determined during
+    commissioning
+
+> **Note:** The _<iteration\>_ and _<discriminator\>_ values are ignored if the
+> _<option\>_ is set to 0.
+
+**Example of command:**
+
+```
+$ ./chip-tool pairing open-commissioning-window 1 1 300 1000 2365
+```
+
+Note manual pairing code or QR code payload printed in the command output, as it
+will be required by the second Matter admin to join Matter device to its fabric.
+
+**Example of output:**
+
+```
+[1663675289.149337][56387:56392] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
+[1663675289.149356][56387:56392] CHIP:CTL: Successfully opened pairing window on the device
+[1663675289.149409][56387:56392] CHIP:CTL: Manual pairing code: [36281602573]
+[1663675289.149445][56387:56392] CHIP:CTL: SetupQRCode: [MT:4CT91AFN00YHEE7E300]
+```
+
+To commission the Matter device to a new fabric, you need to run another
+instance of CHIP Tool, using the following command pattern:
+
+```
+$ ./chip-tool pairing code <payload> <node_id> --commissioner-name <commissioner_name>
+```
+
+In this command:
+
+-   _<payload\>_ is the the QR code payload or a manual pairing code generated
+    by the first commissioner instance when opened commissioning window
+-   _<node_id\>_ is the user-defined ID of the node being commissioned. It
+    doesn't need to be the same ID, as for the first fabric.
+-   _<commissioner_name\>_ is the name of the second fabric. Valid values are
+    "alpha", "beta", "gamma", and integers greater than or equal to 4. The
+    default if not specified is "alpha".
+
+**Example of command:**
+
+```
+$ ./chip-tool pairing code 36281602573 1 --commissioner-name beta
+```
+
+After completing the above steps, the Matter device should be able to receive
+and answer Matter commands sent in the second fabric. For example, you can use
+the following command pattern to toggle the `OnOff` attribute state on a device
+supporting `OnOff` cluster:
+
+```
+$ ./chip-tool onoff toggle <node_id> <endpoint_id> --commissioner-name <commissioner_name>
+```
+
+In this command:
+
+-   _<node_id\>_ is the user-defined ID of the commissioned node.
+-   _<endpoint_id\>_ is the ID of the endpoint with OnOff cluster implemented.
+-   _<commissioner_name\>_ is the name of the second fabric. Valid values are
+    "alpha", "beta", "gamma", and integers greater than or equal to 4. The
+    default if not specified is "alpha".
+
+**Example of command:**
+
+```
+$ ./chip-tool onoff toggle 1 1 --commissioner-name beta
+```

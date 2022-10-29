@@ -310,6 +310,11 @@ class AndroidBuilder(Builder):
             title="Setting up Android deps through Gradle",
         )
 
+        self._Execute(
+            ["third_party/java_deps/set_up_java_deps.sh"],
+            title="Setting up Java deps",
+        )
+
         if not os.path.exists(self.output_dir):
             # NRF does a in-place update  of SDK tools
             if not self._runner.dry_run:

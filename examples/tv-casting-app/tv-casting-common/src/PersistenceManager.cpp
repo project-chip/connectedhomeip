@@ -71,7 +71,7 @@ CHIP_ERROR PersistenceManager::WriteAllVideoPlayers(TargetVideoPlayerInfo videoP
 
     TLV::TLVType outerContainerType = TLV::kTLVType_Structure;
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kCastingDataVersionTag), kCastingDataVersion));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kCurrentCastingDataVersionTag), kCurrentCastingDataVersion));
 
     TLV::TLVType videoPlayersContainerType = TLV::kTLVType_Array;
     // Video Players container starts
@@ -92,6 +92,27 @@ CHIP_ERROR PersistenceManager::WriteAllVideoPlayers(TargetVideoPlayerInfo videoP
             ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(kVideoPlayerDeviceNameTag),
                                                     (const uint8_t *) videoPlayer->GetDeviceName(),
                                                     static_cast<uint32_t>(strlen(videoPlayer->GetDeviceName()) + 1)));
+            ReturnErrorOnFailure(
+                tlvWriter.Put(TLV::ContextTag(kVideoPlayerNumIPsTag), static_cast<uint64_t>(videoPlayer->GetNumIPs())));
+            const Inet::IPAddress * ipAddress = videoPlayer->GetIpAddresses();
+            if (ipAddress != nullptr && videoPlayer->GetNumIPs() > 0)
+            {
+                TLV::TLVType ipAddressesContainerType = TLV::kTLVType_Array;
+                // IP Addresses container starts
+                ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::ContextTag(kIpAddressesContainerTag), TLV::kTLVType_Structure,
+                                                              ipAddressesContainerType));
+                for (size_t i = 0; i < videoPlayer->GetNumIPs() && i < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; i++)
+                {
+                    char ipAddressStr[Inet::IPAddress::kMaxStringLength];
+                    ipAddress[i].ToString(ipAddressStr, Inet::IPAddress::kMaxStringLength);
+                    ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(kVideoPlayerIPAddressTag),
+                                                            (const uint8_t *) ipAddressStr,
+                                                            static_cast<uint32_t>(strlen(ipAddressStr) + 1)));
+                }
+                // IP Addresses container ends
+                ReturnErrorOnFailure(tlvWriter.EndContainer(ipAddressesContainerType));
+            }
+
             TargetEndpointInfo * endpoints = videoPlayer->GetEndpoints();
             if (endpoints != nullptr)
             {
@@ -132,7 +153,7 @@ CHIP_ERROR PersistenceManager::WriteAllVideoPlayers(TargetVideoPlayerInfo videoP
             ReturnErrorOnFailure(tlvWriter.Finalize());
             ChipLogProgress(AppServer,
                             "PersistenceManager::WriteAllVideoPlayers TLV(CastingData).LengthWritten: %d bytes and version: %d",
-                            tlvWriter.GetLengthWritten(), kCastingDataVersion);
+                            tlvWriter.GetLengthWritten(), kCurrentCastingDataVersion);
             return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kCastingDataKey, castingData,
                                                                                tlvWriter.GetLengthWritten());
         }
@@ -162,7 +183,7 @@ CHIP_ERROR PersistenceManager::ReadAllVideoPlayers(TargetVideoPlayerInfo outVide
     ReturnErrorOnFailure(reader.Next());
     TLV::Tag outerContainerTag      = reader.GetTag();
     uint8_t outerContainerTagTagNum = static_cast<uint8_t>(TLV::TagNumFromTag(outerContainerTag));
-    VerifyOrReturnError(outerContainerTagTagNum == kCastingDataVersionTag, CHIP_ERROR_INVALID_TLV_TAG);
+    VerifyOrReturnError(outerContainerTagTagNum == kCurrentCastingDataVersionTag, CHIP_ERROR_INVALID_TLV_TAG);
     uint32_t version;
     ReturnErrorOnFailure(reader.Get(version));
     ChipLogProgress(AppServer, "PersistenceManager::ReadAllVideoPlayers TLV(CastingData) version: %d", version);
@@ -178,6 +199,8 @@ CHIP_ERROR PersistenceManager::ReadAllVideoPlayers(TargetVideoPlayerInfo outVide
     uint16_t productId                                  = 0;
     uint16_t deviceType                                 = 0;
     char deviceName[chip::Dnssd::kMaxDeviceNameLen + 1] = {};
+    size_t numIPs                                       = 0;
+    Inet::IPAddress ipAddress[chip::Dnssd::CommonResolutionData::kMaxIPAddresses];
     CHIP_ERROR err;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
@@ -188,47 +211,91 @@ CHIP_ERROR PersistenceManager::ReadAllVideoPlayers(TargetVideoPlayerInfo outVide
             return CHIP_ERROR_INVALID_TLV_TAG;
         }
 
-        uint8_t viewPlayersContainerTagNum = static_cast<uint8_t>(TLV::TagNumFromTag(videoPlayersContainerTag));
-        if (viewPlayersContainerTagNum == kNodeIdTag)
+        uint8_t videoPlayersContainerTagNum = static_cast<uint8_t>(TLV::TagNumFromTag(videoPlayersContainerTag));
+        if (videoPlayersContainerTagNum == kNodeIdTag)
         {
             ReturnErrorOnFailure(reader.Get(nodeId));
             continue;
         }
 
-        if (viewPlayersContainerTagNum == kFabricIndexTag)
+        if (videoPlayersContainerTagNum == kFabricIndexTag)
         {
             ReturnErrorOnFailure(reader.Get(fabricIndex));
             continue;
         }
 
-        if (viewPlayersContainerTagNum == kVideoPlayerVendorIdTag)
+        if (videoPlayersContainerTagNum == kVideoPlayerVendorIdTag)
         {
             ReturnErrorOnFailure(reader.Get(vendorId));
             continue;
         }
 
-        if (viewPlayersContainerTagNum == kVideoPlayerProductIdTag)
+        if (videoPlayersContainerTagNum == kVideoPlayerProductIdTag)
         {
             ReturnErrorOnFailure(reader.Get(productId));
             continue;
         }
 
-        if (viewPlayersContainerTagNum == kVideoPlayerDeviceTypeIdTag)
+        if (videoPlayersContainerTagNum == kVideoPlayerDeviceTypeIdTag)
         {
             ReturnErrorOnFailure(reader.Get(deviceType));
             continue;
         }
 
-        if (viewPlayersContainerTagNum == kVideoPlayerDeviceNameTag)
+        if (videoPlayersContainerTagNum == kVideoPlayerDeviceNameTag)
         {
             ReturnErrorOnFailure(reader.GetBytes(reinterpret_cast<uint8_t *>(deviceName), chip::Dnssd::kMaxDeviceNameLen + 1));
             continue;
         }
 
-        if (viewPlayersContainerTagNum == kContentAppEndpointsContainerTag)
+        if (videoPlayersContainerTagNum == kVideoPlayerNumIPsTag)
+        {
+            ReturnErrorOnFailure(reader.Get(reinterpret_cast<uint64_t &>(numIPs)));
+            continue;
+        }
+
+        if (videoPlayersContainerTagNum == kIpAddressesContainerTag)
+        {
+            // Entering IP Addresses container
+            TLV::TLVType ipAddressesContainerType = TLV::kTLVType_Array;
+            ReturnErrorOnFailure(reader.EnterContainer(ipAddressesContainerType));
+
+            size_t ipCount = 0;
+            while ((err = reader.Next()) == CHIP_NO_ERROR)
+            {
+                TLV::Tag ipAddressesContainerTag = reader.GetTag();
+                if (!TLV::IsContextTag(ipAddressesContainerTag))
+                {
+                    ChipLogError(AppServer, "Unexpected non-context TLV tag.");
+                    return CHIP_ERROR_INVALID_TLV_TAG;
+                }
+
+                uint8_t ipAddressesContainerTagNum = static_cast<uint8_t>(TLV::TagNumFromTag(ipAddressesContainerTag));
+                if (ipAddressesContainerTagNum == kVideoPlayerIPAddressTag)
+                {
+                    char ipAddressStr[Inet::IPAddress::kMaxStringLength];
+                    ReturnErrorOnFailure(
+                        reader.GetBytes(reinterpret_cast<uint8_t *>(ipAddressStr), Inet::IPAddress::kMaxStringLength));
+
+                    Inet::IPAddress addressInet;
+                    VerifyOrReturnError(Inet::IPAddress::FromString(ipAddressStr, addressInet), CHIP_ERROR_INVALID_TLV_ELEMENT);
+                    ipAddress[ipCount] = addressInet;
+                    ipCount++;
+                    continue;
+                }
+            }
+            if (err == CHIP_END_OF_TLV)
+            {
+                // Exiting IP Addresses container
+                ReturnErrorOnFailure(reader.ExitContainer(ipAddressesContainerType));
+                continue;
+            }
+        }
+
+        if (videoPlayersContainerTagNum == kContentAppEndpointsContainerTag)
         {
             outVideoPlayers[videoPlayerIndex].Initialize(nodeId, fabricIndex, nullptr, nullptr, vendorId, productId, deviceType,
-                                                         deviceName);
+                                                         deviceName, numIPs, ipAddress);
             // Entering Content App Endpoints container
             TLV::TLVType contentAppEndpointArrayContainerType = TLV::kTLVType_Array;
             ReturnErrorOnFailure(reader.EnterContainer(contentAppEndpointArrayContainerType));

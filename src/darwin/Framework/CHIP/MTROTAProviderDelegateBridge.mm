@@ -128,7 +128,7 @@ private:
 
         auto fileDesignator = [[NSString alloc] initWithBytes:fd length:fdl encoding:NSUTF8StringEncoding];
         auto offset = @(mTransfer.GetStartOffset());
-        auto completionHandler = ^(NSError * error) {
+        auto completionHandler = ^(NSError * _Nullable error) {
             dispatch_async(mWorkQueue, ^{
                 if (error != nil) {
                     LogErrorOnFailure([MTRError errorToCHIPErrorCode:error]);

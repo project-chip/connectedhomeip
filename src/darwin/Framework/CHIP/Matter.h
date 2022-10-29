@@ -17,6 +17,14 @@
 
 #import <Foundation/Foundation.h>
 
+#ifndef MTR_NEWLY_DEPRECATED
+#define MTR_NEWLY_DEPRECATED(message)
+#endif
+
+#ifndef MTR_NEWLY_AVAILABLE
+#define MTR_NEWLY_AVAILABLE
+#endif
+
 #import <Matter/MTRAsyncCallbackWorkQueue.h>
 #import <Matter/MTRAttestationInfo.h>
 #import <Matter/MTRAttributeCacheContainer.h>

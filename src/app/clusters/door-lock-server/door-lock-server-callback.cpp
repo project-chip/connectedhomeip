@@ -61,6 +61,8 @@ emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Opti
     return false;
 }
 
+void __attribute__((weak)) emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId) {}
+
 // =============================================================================
 // 'Default' pre-change callbacks for cluster attributes
 // =============================================================================

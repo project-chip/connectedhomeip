@@ -90,6 +90,10 @@ public:
     static constexpr Key kConfigKey_GroupKeyBase = QorvoConfigKey(kFileId_ChipConfig, 0x0F);
     static constexpr Key kConfigKey_GroupKeyMax  = QorvoConfigKey(kFileId_ChipConfig, 0x1E); // Allows 16 Group Keys to be created.
 
+    static constexpr Key kCounterKey_RebootCount           = QorvoConfigKey(kFileId_ChipCounter, 0x01);
+    static constexpr Key kCounterKey_BootReason            = QorvoConfigKey(kFileId_ChipCounter, 0x02);
+    static constexpr Key kCounterKey_TotalOperationalHours = QorvoConfigKey(kFileId_ChipCounter, 0x03);
+
     static constexpr Key kConfigKey_CounterKeyBase = QorvoConfigKey(kFileId_ChipCounter, 0x00);
     static constexpr Key kConfigKey_CounterKeyMax =
         QorvoConfigKey(kFileId_ChipCounter, 0x1F); // Allows 32 Counter Keys to be created.
