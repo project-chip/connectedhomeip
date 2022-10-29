@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
  * The expected lengths of each of the NSData fields in the MTRThreadOperationalDataset
  */
 extern size_t const MTRSizeThreadNetworkName;
-extern size_t const MTRSizeThreadExtendedPanID MTR_NEWLY_DEPRECATED("Please use MTRSizeThreadExtendedPANID");
+extern size_t const MTRSizeThreadExtendedPanId MTR_NEWLY_DEPRECATED("Please use MTRSizeThreadExtendedPANID");
 extern size_t const MTRSizeThreadExtendedPANID MTR_NEWLY_AVAILABLE;
 extern size_t const MTRSizeThreadMasterKey;
 extern size_t const MTRSizeThreadPSKc;

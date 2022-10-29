@@ -23,7 +23,7 @@
 
 size_t const MTRSizeThreadNetworkName = chip::Thread::kSizeNetworkName;
 size_t const MTRSizeThreadExtendedPANID = chip::Thread::kSizeExtendedPanId;
-size_t const MTRSizeThreadExtendedPanID = MTRSizeThreadExtendedPANID;
+size_t const MTRSizeThreadExtendedPanId = MTRSizeThreadExtendedPANID;
 size_t const MTRSizeThreadMasterKey = chip::Thread::kSizeMasterKey;
 size_t const MTRSizeThreadPSKc = chip::Thread::kSizePSKc;
 size_t const MTRSizeThreadPANID = 2; // Thread's PAN ID is 2 bytes
