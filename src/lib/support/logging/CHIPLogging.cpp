@@ -223,6 +223,7 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list args)
         va_list copy;
         va_copy(copy, args);
         redirect(moduleName, category, msg, copy);
+        va_end(copy);
     }
     Platform::LogV(moduleName, category, msg, args);
 }
