@@ -79,7 +79,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 @interface MTRAttributeCacheContainer (Test)
 // Obsolete method is moved to this test suite to keep tests compatible
 - (void)subscribeWithDeviceController:(MTRDeviceController *)deviceController
-                             deviceId:(NSNumber *)deviceId
+                             deviceID:(NSNumber *)deviceID
                                params:(MTRSubscribeParams * _Nullable)params
                           clientQueue:(dispatch_queue_t)clientQueue
                            completion:(void (^)(NSError * _Nullable error))completion;
@@ -87,7 +87,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
 @implementation MTRAttributeCacheContainer (Test)
 - (void)subscribeWithDeviceController:(MTRDeviceController *)deviceController
-                             deviceId:(NSNumber *)deviceId
+                             deviceID:(NSNumber *)deviceID
                                params:(MTRSubscribeParams * _Nullable)params
                           clientQueue:clientQueue
                            completion:(void (^)(NSError * _Nullable error))completion
@@ -98,12 +98,12 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
             completion(error);
         });
     };
-    [deviceController getBaseDevice:deviceId.unsignedLongLongValue
+    [deviceController getBaseDevice:deviceID.unsignedLongLongValue
                               queue:workQueue
                   completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                       if (error) {
                           NSLog(@"Error: Failed to get connected device (%llu) for attribute cache: %@",
-                              deviceId.unsignedLongLongValue, error);
+                              deviceID.unsignedLongLongValue, error);
                           completionHandler(error);
                           return;
                       }
@@ -126,7 +126,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                               }
                           }
                           subscriptionEstablished:^() {
-                              NSLog(@"Attribute cache subscription succeeded for device %llu", deviceId.unsignedLongLongValue);
+                              NSLog(@"Attribute cache subscription succeeded for device %llu", deviceID.unsignedLongLongValue);
                               if (![established[0] boolValue]) {
                                   established[0] = @YES;
                                   completionHandler(nil);
@@ -325,7 +325,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [_xpcListener resume];
     _controllerUUID = [[NSUUID UUID] UUIDString];
     _remoteDeviceController =
-        [MTRDeviceController sharedControllerWithId:_controllerUUID
+        [MTRDeviceController sharedControllerWithID:_controllerUUID
                                     xpcConnectBlock:^NSXPCConnection * {
                                         return [[NSXPCConnection alloc] initWithListenerEndpoint:self.xpcListener.endpoint];
                                     }];
@@ -346,9 +346,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myClusterId = @200;
     NSNumber * myAttributeId = @300;
     NSArray * myValues = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
 
@@ -375,9 +375,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                              XCTAssertNotNil(device);
                              XCTAssertNil(error);
                              NSLog(@"Device acquired. Reading...");
-                             [device readAttributeWithEndpointId:myEndpointId
-                                                       clusterId:myClusterId
-                                                     attributeId:myAttributeId
+                             [device readAttributeWithEndpointID:myEndpointId
+                                                       clusterID:myClusterId
+                                                     attributeID:myAttributeId
                                                           params:nil
                                                      clientQueue:dispatch_get_main_queue()
                                                       completion:^(id _Nullable value, NSError * _Nullable error) {
@@ -405,9 +405,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myClusterId = @200;
     NSNumber * myAttributeId = @300;
     NSArray * myValues = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     MTRReadParams * myParams = [[MTRReadParams alloc] init];
@@ -437,9 +437,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                              XCTAssertNotNil(device);
                              XCTAssertNil(error);
                              NSLog(@"Device acquired. Reading...");
-                             [device readAttributeWithEndpointId:myEndpointId
-                                                       clusterId:myClusterId
-                                                     attributeId:myAttributeId
+                             [device readAttributeWithEndpointID:myEndpointId
+                                                       clusterID:myClusterId
+                                                     attributeID:myAttributeId
                                                           params:myParams
                                                      clientQueue:dispatch_get_main_queue()
                                                       completion:^(id _Nullable value, NSError * _Nullable error) {
@@ -490,9 +490,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                              XCTAssertNotNil(device);
                              XCTAssertNil(error);
                              NSLog(@"Device acquired. Reading...");
-                             [device readAttributeWithEndpointId:myEndpointId
-                                                       clusterId:myClusterId
-                                                     attributeId:myAttributeId
+                             [device readAttributeWithEndpointID:myEndpointId
+                                                       clusterID:myClusterId
+                                                     attributeID:myAttributeId
                                                           params:nil
                                                      clientQueue:dispatch_get_main_queue()
                                                       completion:^(id _Nullable value, NSError * _Nullable error) {
@@ -521,9 +521,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSDictionary * myValue =
         [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type", [NSNumber numberWithInteger:654321], @"value", nil];
     NSArray * myResults = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId]
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId]
     } ];
 
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -549,9 +549,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                              XCTAssertNotNil(device);
                              XCTAssertNil(error);
                              NSLog(@"Device acquired. Writing...");
-                             [device writeAttributeWithEndpointId:myEndpointId
-                                                        clusterId:myClusterId
-                                                      attributeId:myAttributeId
+                             [device writeAttributeWithEndpointID:myEndpointId
+                                                        clusterID:myClusterId
+                                                      attributeID:myAttributeId
                                                             value:myValue
                                                 timedWriteTimeout:nil
                                                       clientQueue:dispatch_get_main_queue()
@@ -583,9 +583,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type", [NSNumber numberWithInteger:654321], @"value", nil];
     NSNumber * myTimedWriteTimeout = @1234;
     NSArray * myResults = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId]
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId]
     } ];
 
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -612,9 +612,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                              XCTAssertNotNil(device);
                              XCTAssertNil(error);
                              NSLog(@"Device acquired. Writing...");
-                             [device writeAttributeWithEndpointId:myEndpointId
-                                                        clusterId:myClusterId
-                                                      attributeId:myAttributeId
+                             [device writeAttributeWithEndpointID:myEndpointId
+                                                        clusterID:myClusterId
+                                                      attributeID:myAttributeId
                                                             value:myValue
                                                 timedWriteTimeout:myTimedWriteTimeout
                                                       clientQueue:dispatch_get_main_queue()
@@ -668,9 +668,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                              XCTAssertNotNil(device);
                              XCTAssertNil(error);
                              NSLog(@"Device acquired. Writing...");
-                             [device writeAttributeWithEndpointId:myEndpointId
-                                                        clusterId:myClusterId
-                                                      attributeId:myAttributeId
+                             [device writeAttributeWithEndpointID:myEndpointId
+                                                        clusterID:myClusterId
+                                                      attributeID:myAttributeId
                                                             value:myValue
                                                 timedWriteTimeout:nil
                                                       clientQueue:dispatch_get_main_queue()
@@ -702,7 +702,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                                                                                    [NSNumber numberWithFloat:1.0], @"value", nil]],
                                             @"value", nil];
     NSArray * myResults = @[
-        @{ @"commandPath" : [MTRCommandPath commandPathWithEndpointId:myEndpointId clusterId:myClusterId commandId:myCommandId] }
+        @{ @"commandPath" : [MTRCommandPath commandPathWithEndpointID:myEndpointId clusterID:myClusterId commandID:myCommandId] }
     ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
     XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
@@ -728,9 +728,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                              XCTAssertNotNil(device);
                              XCTAssertNil(error);
                              NSLog(@"Device acquired. Invoking command...");
-                             [device invokeCommandWithEndpointId:myEndpointId
-                                                       clusterId:myClusterId
-                                                       commandId:myCommandId
+                             [device invokeCommandWithEndpointID:myEndpointId
+                                                       clusterID:myClusterId
+                                                       commandID:myCommandId
                                                    commandFields:myFields
                                               timedInvokeTimeout:nil
                                                      clientQueue:dispatch_get_main_queue()
@@ -764,7 +764,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                                                                                    [NSNumber numberWithFloat:1.0], @"value", nil]],
                                             @"value", nil];
     NSArray * myResults = @[
-        @{ @"commandPath" : [MTRCommandPath commandPathWithEndpointId:myEndpointId clusterId:myClusterId commandId:myCommandId] }
+        @{ @"commandPath" : [MTRCommandPath commandPathWithEndpointID:myEndpointId clusterID:myClusterId commandID:myCommandId] }
     ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
     XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
@@ -791,9 +791,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                              XCTAssertNotNil(device);
                              XCTAssertNil(error);
                              NSLog(@"Device acquired. Invoking command...");
-                             [device invokeCommandWithEndpointId:myEndpointId
-                                                       clusterId:myClusterId
-                                                       commandId:myCommandId
+                             [device invokeCommandWithEndpointID:myEndpointId
+                                                       clusterID:myClusterId
+                                                       commandID:myCommandId
                                                    commandFields:myFields
                                               timedInvokeTimeout:myTimedInvokeTimeout
                                                      clientQueue:dispatch_get_main_queue()
@@ -850,9 +850,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                              XCTAssertNotNil(device);
                              XCTAssertNil(error);
                              NSLog(@"Device acquired. Invoking command...");
-                             [device invokeCommandWithEndpointId:myEndpointId
-                                                       clusterId:myClusterId
-                                                       commandId:myCommandId
+                             [device invokeCommandWithEndpointID:myEndpointId
+                                                       clusterID:myClusterId
+                                                       commandID:myCommandId
                                                    commandFields:myFields
                                               timedInvokeTimeout:nil
                                                      clientQueue:dispatch_get_main_queue()
@@ -882,9 +882,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myMinInterval = @5;
     NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -916,9 +916,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
-            [device subscribeAttributeWithEndpointId:myEndpointId
-                clusterId:myClusterId
-                attributeId:myAttributeId
+            [device subscribeAttributeWithEndpointID:myEndpointId
+                clusterID:myClusterId
+                attributeID:myAttributeId
                 minInterval:myMinInterval
                 maxInterval:myMaxInterval
                 params:nil
@@ -950,9 +950,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Inject another report
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1000,9 +1000,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     myParams.fabricFiltered = @NO;
     myParams.keepPreviousSubscriptions = @NO;
     __block NSArray * myReport = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1036,9 +1036,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
-            [device subscribeAttributeWithEndpointId:myEndpointId
-                clusterId:myClusterId
-                attributeId:myAttributeId
+            [device subscribeAttributeWithEndpointID:myEndpointId
+                clusterID:myClusterId
+                attributeID:myAttributeId
                 minInterval:myMinInterval
                 maxInterval:myMaxInterval
                 params:myParams
@@ -1070,9 +1070,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Inject another report
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1151,9 +1151,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
-            [device subscribeAttributeWithEndpointId:myEndpointId
-                clusterId:myClusterId
-                attributeId:myAttributeId
+            [device subscribeAttributeWithEndpointID:myEndpointId
+                clusterID:myClusterId
+                attributeID:myAttributeId
                 minInterval:myMinInterval
                 maxInterval:myMaxInterval
                 params:nil
@@ -1182,9 +1182,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Inject another report
     reportExpectation = [self expectationWithDescription:@"Report sent"];
     myReport = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1230,9 +1230,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myMinInterval = @5;
     NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:@([myEndpointId unsignedShortValue] + 1)
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:@([myEndpointId unsignedShortValue] + 1)
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1265,9 +1265,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
-            [device subscribeAttributeWithEndpointId:myEndpointId
-                clusterId:myClusterId
-                attributeId:myAttributeId
+            [device subscribeAttributeWithEndpointID:myEndpointId
+                clusterID:myClusterId
+                attributeID:myAttributeId
                 minInterval:myMinInterval
                 maxInterval:myMaxInterval
                 params:nil
@@ -1299,9 +1299,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Inject another report
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1346,9 +1346,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myMinInterval = @5;
     NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:@([myClusterId unsignedLongValue] + 1)
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:@([myClusterId unsignedLongValue] + 1)
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1381,9 +1381,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
-            [device subscribeAttributeWithEndpointId:myEndpointId
-                clusterId:myClusterId
-                attributeId:myAttributeId
+            [device subscribeAttributeWithEndpointID:myEndpointId
+                clusterID:myClusterId
+                attributeID:myAttributeId
                 minInterval:myMinInterval
                 maxInterval:myMaxInterval
                 params:nil
@@ -1415,9 +1415,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Inject another report
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1462,9 +1462,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myMinInterval = @5;
     NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:@([myAttributeId unsignedLongValue] + 1)],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:@([myAttributeId unsignedLongValue] + 1)],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1497,9 +1497,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
-            [device subscribeAttributeWithEndpointId:myEndpointId
-                clusterId:myClusterId
-                attributeId:myAttributeId
+            [device subscribeAttributeWithEndpointID:myEndpointId
+                clusterID:myClusterId
+                attributeID:myAttributeId
                 minInterval:myMinInterval
                 maxInterval:myMaxInterval
                 params:nil
@@ -1531,9 +1531,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Inject another report
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1578,9 +1578,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myMinInterval = @5;
     NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1613,9 +1613,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
-            [device subscribeAttributeWithEndpointId:myEndpointId
-                clusterId:myClusterId
-                attributeId:myAttributeId
+            [device subscribeAttributeWithEndpointID:myEndpointId
+                clusterID:myClusterId
+                attributeID:myAttributeId
                 minInterval:myMinInterval
                 maxInterval:myMaxInterval
                 params:nil
@@ -1647,9 +1647,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Inject another report
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1694,9 +1694,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myMinInterval = @5;
     NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1728,9 +1728,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
-            [device subscribeAttributeWithEndpointId:nil
-                clusterId:myClusterId
-                attributeId:myAttributeId
+            [device subscribeAttributeWithEndpointID:nil
+                clusterID:myClusterId
+                attributeID:myAttributeId
                 minInterval:myMinInterval
                 maxInterval:myMaxInterval
                 params:nil
@@ -1762,9 +1762,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Inject another report
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1809,9 +1809,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myMinInterval = @5;
     NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1843,9 +1843,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
-            [device subscribeAttributeWithEndpointId:myEndpointId
-                clusterId:nil
-                attributeId:myAttributeId
+            [device subscribeAttributeWithEndpointID:myEndpointId
+                clusterID:nil
+                attributeID:myAttributeId
                 minInterval:myMinInterval
                 maxInterval:myMaxInterval
                 params:nil
@@ -1877,9 +1877,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Inject another report
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -1924,9 +1924,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myMinInterval = @5;
     NSNumber * myMaxInterval = @60;
     __block NSArray * myReport = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
@@ -1958,9 +1958,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
-            [device subscribeAttributeWithEndpointId:myEndpointId
-                clusterId:myClusterId
-                attributeId:nil
+            [device subscribeAttributeWithEndpointID:myEndpointId
+                clusterID:myClusterId
+                attributeID:nil
                 minInterval:myMinInterval
                 maxInterval:myMaxInterval
                 params:nil
@@ -1992,9 +1992,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Inject another report
     reportExpectation = [self expectationWithDescription:@"2nd report sent"];
     myReport = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @771234 }
     } ];
     [clientObject handleReportWithController:uuid
@@ -2084,9 +2084,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                 XCTAssertNotNil(device);
                 XCTAssertNil(error);
                 NSLog(@"Device acquired. Subscribing...");
-                [device subscribeAttributeWithEndpointId:myEndpointId
-                    clusterId:myClusterId
-                    attributeId:myAttributeId
+                [device subscribeAttributeWithEndpointID:myEndpointId
+                    clusterID:myClusterId
+                    attributeID:myAttributeId
                     minInterval:myMinInterval
                     maxInterval:myMaxInterval
                     params:nil
@@ -2116,15 +2116,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
             [self expectationWithDescription:[NSString stringWithFormat:@"Report(%d) for second subscriber sent", count]], nil];
         myReports = @[
             @[ @{
-                @"attributePath" : [MTRAttributePath attributePathWithEndpointId:endpointIds[0]
-                                                                       clusterId:clusterIds[0]
-                                                                     attributeId:attributeIds[0]],
+                @"attributePath" : [MTRAttributePath attributePathWithEndpointID:endpointIds[0]
+                                                                       clusterID:clusterIds[0]
+                                                                     attributeID:attributeIds[0]],
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:123456 + count * 100] }
             } ],
             @[ @{
-                @"attributePath" : [MTRAttributePath attributePathWithEndpointId:endpointIds[1]
-                                                                       clusterId:clusterIds[1]
-                                                                     attributeId:attributeIds[1]],
+                @"attributePath" : [MTRAttributePath attributePathWithEndpointID:endpointIds[1]
+                                                                       clusterID:clusterIds[1]
+                                                                     attributeID:attributeIds[1]],
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:123457 + count * 100] }
             } ]
         ];
@@ -2174,15 +2174,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         reportExpectations[0].inverted = YES;
         myReports = @[
             @[ @{
-                @"attributePath" : [MTRAttributePath attributePathWithEndpointId:endpointIds[0]
-                                                                       clusterId:clusterIds[0]
-                                                                     attributeId:attributeIds[0]],
+                @"attributePath" : [MTRAttributePath attributePathWithEndpointID:endpointIds[0]
+                                                                       clusterID:clusterIds[0]
+                                                                     attributeID:attributeIds[0]],
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:223456 + count * 100] }
             } ],
             @[ @{
-                @"attributePath" : [MTRAttributePath attributePathWithEndpointId:endpointIds[1]
-                                                                       clusterId:clusterIds[1]
-                                                                     attributeId:attributeIds[1]],
+                @"attributePath" : [MTRAttributePath attributePathWithEndpointID:endpointIds[1]
+                                                                       clusterID:clusterIds[1]
+                                                                     attributeID:attributeIds[1]],
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:223457 + count * 100] }
             } ]
         ];
@@ -2236,15 +2236,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         reportExpectations[1].inverted = YES;
         myReports = @[
             @[ @{
-                @"attributePath" : [MTRAttributePath attributePathWithEndpointId:endpointIds[0]
-                                                                       clusterId:clusterIds[0]
-                                                                     attributeId:attributeIds[0]],
+                @"attributePath" : [MTRAttributePath attributePathWithEndpointID:endpointIds[0]
+                                                                       clusterID:clusterIds[0]
+                                                                     attributeID:attributeIds[0]],
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:223456 + count * 100] }
             } ],
             @[ @{
-                @"attributePath" : [MTRAttributePath attributePathWithEndpointId:endpointIds[1]
-                                                                       clusterId:clusterIds[1]
-                                                                     attributeId:attributeIds[1]],
+                @"attributePath" : [MTRAttributePath attributePathWithEndpointID:endpointIds[1]
+                                                                       clusterID:clusterIds[1]
+                                                                     attributeID:attributeIds[1]],
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:223457 + count * 100] }
             } ]
         ];
@@ -2267,7 +2267,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     uint64_t myNodeId = 9876543210;
 
     __auto_type unspecifiedRemoteDeviceController =
-        [MTRDeviceController sharedControllerWithId:nil
+        [MTRDeviceController sharedControllerWithID:nil
                                     xpcConnectBlock:^NSXPCConnection * {
                                         return [[NSXPCConnection alloc] initWithListenerEndpoint:self.xpcListener.endpoint];
                                     }];
@@ -2312,7 +2312,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
     [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
-                                                  deviceId:@(myNodeId)
+                                                  deviceID:@(myNodeId)
                                                     params:nil
                                                clientQueue:dispatch_get_main_queue()
                                                 completion:^(NSError * _Nullable error) {
@@ -2350,7 +2350,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
     [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
-                                                  deviceId:@(myNodeId)
+                                                  deviceID:@(myNodeId)
                                                     params:myParams
                                                clientQueue:dispatch_get_main_queue()
                                                 completion:^(NSError * _Nullable error) {
@@ -2384,7 +2384,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
     [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
-                                                  deviceId:@(myNodeId)
+                                                  deviceID:@(myNodeId)
                                                     params:nil
                                                clientQueue:dispatch_get_main_queue()
                                                 completion:^(NSError * _Nullable error) {
@@ -2404,9 +2404,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myClusterId = @200;
     NSNumber * myAttributeId = @300;
     NSArray * myValues = @[ @{
-        @"attributePath" : [MTRAttributePath attributePathWithEndpointId:myEndpointId
-                                                               clusterId:myClusterId
-                                                             attributeId:myAttributeId],
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
 
@@ -2440,7 +2440,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
 
     [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
-                                                  deviceId:@(myNodeId)
+                                                  deviceID:@(myNodeId)
                                                     params:nil
                                                clientQueue:dispatch_get_main_queue()
                                                 completion:^(NSError * _Nullable error) {
@@ -2452,9 +2452,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
     [attributeCacheContainer
-        readAttributeWithEndpointId:myEndpointId
-                          clusterId:myClusterId
-                        attributeId:myAttributeId
+        readAttributeWithEndpointID:myEndpointId
+                          clusterID:myClusterId
+                        attributeID:myAttributeId
                         clientQueue:dispatch_get_main_queue()
                          completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                              NSLog(@"Read cached value: %@", values);
@@ -2502,7 +2502,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     };
 
     [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
-                                                  deviceId:@(myNodeId)
+                                                  deviceID:@(myNodeId)
                                                     params:nil
                                                clientQueue:dispatch_get_main_queue()
                                                 completion:^(NSError * _Nullable error) {
@@ -2514,9 +2514,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
     [attributeCacheContainer
-        readAttributeWithEndpointId:myEndpointId
-                          clusterId:myClusterId
-                        attributeId:myAttributeId
+        readAttributeWithEndpointID:myEndpointId
+                          clusterID:myClusterId
+                        attributeID:myAttributeId
                         clientQueue:dispatch_get_main_queue()
                          completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                              NSLog(@"Read cached value: %@", values);
@@ -2537,7 +2537,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     XCTestExpectation * responseExpectation = [self expectationWithDescription:@"Read response received"];
 
     // Test with a device controller which wouldn't connect to XPC listener successfully
-    __auto_type failingDeviceController = [MTRDeviceController sharedControllerWithId:_controllerUUID
+    __auto_type failingDeviceController = [MTRDeviceController sharedControllerWithID:_controllerUUID
                                                                       xpcConnectBlock:^NSXPCConnection * {
                                                                           return nil;
                                                                       }];
@@ -2548,9 +2548,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                              XCTAssertNotNil(device);
                              XCTAssertNil(error);
                              NSLog(@"Device acquired. Reading...");
-                             [device readAttributeWithEndpointId:myEndpointId
-                                                       clusterId:myClusterId
-                                                     attributeId:myAttributeId
+                             [device readAttributeWithEndpointID:myEndpointId
+                                                       clusterID:myClusterId
+                                                     attributeID:myAttributeId
                                                           params:nil
                                                      clientQueue:dispatch_get_main_queue()
                                                       completion:^(id _Nullable value, NSError * _Nullable error) {

@@ -49,10 +49,10 @@ typedef void (^MTRGetProxyHandleHandler)(dispatch_queue_t queue, MTRDeviceContro
 
 - (void)getProxyHandleWithCompletion:(MTRGetProxyHandleHandler)completion;
 - (void)registerReportHandlerWithController:(id<NSCopying>)controller
-                                     nodeId:(NSNumber *)nodeId
+                                     nodeID:(NSNumber *)nodeID
                                     handler:(MTRXPCReportHandler)handler;
 - (void)deregisterReportHandlersWithController:(id<NSCopying>)controller
-                                        nodeId:(NSNumber *)nodeId
+                                        nodeID:(NSNumber *)nodeID
                                     completion:(dispatch_block_t)completion;
 
 @end

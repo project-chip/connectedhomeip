@@ -32,7 +32,7 @@ typedef NSXPCConnection * _Nonnull (^MTRXPCConnectBlock)(void);
  * Returns a shared remote device controller associated with an implementation specific id and implementation specific way to
  * connect to an XPC listener.
  */
-+ (MTRDeviceControllerOverXPC *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerId
++ (MTRDeviceControllerOverXPC *)sharedControllerWithID:(id<NSCopying> _Nullable)controllerID
                                        xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock;
 
 @end

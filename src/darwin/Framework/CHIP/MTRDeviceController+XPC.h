@@ -36,12 +36,12 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
 /**
  * Returns a shared device controller proxy for the controller object over XPC connection.
  *
- * @param controllerId    an implementation specific id in case multiple shared device controllers are available over XPC connection
+ * @param controllerID    an implementation specific id in case multiple shared device controllers are available over XPC connection
  * @param xpcConnectBlock block to connect to an XPC listener serving the shared device controllers in an implementation specific
  * way
  */
-+ (MTRDeviceController *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerId
-                                xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock;
++ (MTRDeviceController *)sharedControllerWithID:(id<NSCopying> _Nullable)controllerID
+                                xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock MTR_NEWLY_AVAILABLE;
 
 /**
  * Returns an encoded values object to send over XPC for read, write and command interactions
@@ -77,6 +77,14 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
 
 @end
 
+@interface MTRDeviceController (Deprecated_XPC)
+
++ (MTRDeviceController *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerID
+                                xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock
+    MTR_NEWLY_DEPRECATED("Please use sharedControllerWithID:xpcConnectBlock:");
+
+@end
+
 /**
  * Protocol that remote object must support over XPC
  */
@@ -84,7 +92,7 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
 
 @optional
 /**
- * Gets device controller ID corresponding to a specific fabric Id
+ * Gets device controller ID corresponding to a specific fabric ID
  */
 - (void)getDeviceControllerWithFabricId:(uint64_t)fabricId
                              completion:(MTRDeviceControllerGetterHandler)completion MTR_NEWLY_DEPRECATED("This never called.");

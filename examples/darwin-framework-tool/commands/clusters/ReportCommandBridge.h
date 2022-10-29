@@ -56,9 +56,9 @@ public:
         MTRReadParams * params = [[MTRReadParams alloc] init];
         params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
         [device
-            readAttributeWithEndpointId:[NSNumber numberWithUnsignedShort:endpointId]
-                              clusterId:[NSNumber numberWithUnsignedInteger:mClusterId]
-                            attributeId:[NSNumber numberWithUnsignedInteger:mAttributeId]
+            readAttributeWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
+                              clusterID:[NSNumber numberWithUnsignedInteger:mClusterId]
+                            attributeID:[NSNumber numberWithUnsignedInteger:mAttributeId]
                                  params:params
                             clientQueue:callbackQueue
                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
@@ -129,9 +129,9 @@ public:
             = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
         params.autoResubscribe = mAutoResubscribe.HasValue() ? [NSNumber numberWithBool:mAutoResubscribe.Value()] : nil;
 
-        [device subscribeAttributeWithEndpointId:[NSNumber numberWithUnsignedShort:endpointId]
-            clusterId:[NSNumber numberWithUnsignedInteger:mClusterId]
-            attributeId:[NSNumber numberWithUnsignedInteger:mAttributeId]
+        [device subscribeAttributeWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
+            clusterID:[NSNumber numberWithUnsignedInteger:mClusterId]
+            attributeID:[NSNumber numberWithUnsignedInteger:mAttributeId]
             minInterval:[NSNumber numberWithUnsignedInteger:mMinInterval]
             maxInterval:[NSNumber numberWithUnsignedInteger:mMaxInterval]
             params:params

@@ -147,7 +147,7 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
         auto controller = [factory startControllerOnExistingFabric:controllerParams];
         if (controller == nil) {
             // Maybe we didn't have this fabric yet.
-            controllerParams.vendorId = @(chip::VendorId::TestVendor1);
+            controllerParams.vendorID = @(chip::VendorId::TestVendor1);
             controller = [factory startControllerOnNewFabric:controllerParams];
         }
         if (controller == nil) {
