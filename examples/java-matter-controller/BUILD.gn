@@ -19,9 +19,10 @@ import("${build_root}/config/android_abi.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 import("${chip_root}/build/chip/tools.gni")
 
+build_java_matter_controller = true
+
 android_binary("java-matter-controller") {
   output_name = "java-matter-controller"
-
   deps = [
     "${chip_root}/src/controller/java",
     "${chip_root}/src/setup_payload/java",

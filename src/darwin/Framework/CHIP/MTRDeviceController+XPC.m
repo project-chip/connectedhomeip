@@ -48,7 +48,7 @@ static MTRAttributePath * _Nullable decodeAttributePath(NSArray * _Nullable path
     if (pathArray == nil || [pathArray count] != 3) {
         return nil;
     }
-    return [MTRAttributePath attributePathWithEndpointId:pathArray[0] clusterId:pathArray[1] attributeId:pathArray[2]];
+    return [MTRAttributePath attributePathWithEndpointID:pathArray[0] clusterID:pathArray[1] attributeID:pathArray[2]];
 }
 
 static MTRCommandPath * _Nullable decodeCommandPath(NSArray * _Nullable pathArray)
@@ -56,7 +56,7 @@ static MTRCommandPath * _Nullable decodeCommandPath(NSArray * _Nullable pathArra
     if (pathArray == nil || [pathArray count] != 3) {
         return nil;
     }
-    return [MTRCommandPath commandPathWithEndpointId:pathArray[0] clusterId:pathArray[1] commandId:pathArray[2]];
+    return [MTRCommandPath commandPathWithEndpointID:pathArray[0] clusterID:pathArray[1] commandID:pathArray[2]];
 }
 
 static void decodeReadParams(NSDictionary<NSString *, id> * inParams, MTRReadParams * outParams)
@@ -66,10 +66,10 @@ static void decodeReadParams(NSDictionary<NSString *, id> * inParams, MTRReadPar
 
 @implementation MTRDeviceController (XPC)
 
-+ (MTRDeviceController *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerId
-                                xpcConnectBlock:(NSXPCConnection * (^)(void) )connectBlock
++ (MTRDeviceController *)sharedControllerWithID:(id<NSCopying> _Nullable)controllerID
+                                xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock
 {
-    return [MTRDeviceControllerOverXPC sharedControllerWithId:controllerId xpcConnectBlock:connectBlock];
+    return [MTRDeviceControllerOverXPC sharedControllerWithID:controllerID xpcConnectBlock:xpcConnectBlock];
 }
 
 + (NSArray<NSDictionary<NSString *, id> *> * _Nullable)encodeXPCResponseValues:
@@ -169,6 +169,16 @@ static void decodeReadParams(NSDictionary<NSString *, id> * inParams, MTRReadPar
     result.keepPreviousSubscriptions = params[kKeepPreviousSubscriptionsKey];
     result.autoResubscribe = params[kAutoResubscribeKey];
     return result;
+}
+
+@end
+
+@implementation MTRDeviceController (Deprecated_XPC)
+
++ (MTRDeviceController *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerID
+                                xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock
+{
+    return [MTRDeviceController sharedControllerWithID:controllerID xpcConnectBlock:xpcConnectBlock];
 }
 
 @end
