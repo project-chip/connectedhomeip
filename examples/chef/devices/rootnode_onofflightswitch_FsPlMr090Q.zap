@@ -1,5 +1,5 @@
 {
-  "featureLevel": 81,
+  "featureLevel": 82,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -2886,7 +2886,7 @@
           "mfgCode": null,
           "define": "THREAD_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "channel",
@@ -3972,7 +3972,7 @@
           "mfgCode": null,
           "define": "WIFI_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "bssid",
@@ -4258,7 +4258,7 @@
           "mfgCode": null,
           "define": "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "PHYRate",
@@ -7292,5 +7292,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 259
     }
-  ]
+  ],
+  "log": []
 }
