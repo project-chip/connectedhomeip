@@ -67,7 +67,7 @@ NS_ASSUME_NONNULL_BEGIN
  * the controller's fabric, but attempts to actually use the MTRBaseDevice will
  * fail (asynchronously) in that case.
  */
-- (instancetype)initWithNodeID:(chip::NodeId)nodeID controller:(MTRDeviceController *)controller;
+- (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
 @end
 

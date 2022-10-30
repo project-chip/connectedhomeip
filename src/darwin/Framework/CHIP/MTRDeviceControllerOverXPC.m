@@ -37,13 +37,13 @@ static void SetupXPCQueue(void)
 
 @implementation MTRDeviceControllerOverXPC
 
-+ (MTRDeviceControllerOverXPC *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerId
-                                       xpcConnectBlock:(NSXPCConnection * (^)(void) )connectBlock
++ (MTRDeviceControllerOverXPC *)sharedControllerWithID:(id<NSCopying> _Nullable)controllerID
+                                       xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock
 {
     SetupXPCQueue();
-    return [[MTRDeviceControllerOverXPC alloc] initWithControllerId:controllerId
+    return [[MTRDeviceControllerOverXPC alloc] initWithControllerID:controllerID
                                                           workQueue:globalWorkQueue
-                                                       connectBlock:connectBlock];
+                                                       connectBlock:xpcConnectBlock];
 }
 
 - (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
@@ -83,7 +83,7 @@ static void SetupXPCQueue(void)
     return NO;
 }
 
-- (BOOL)commissionDevice:(uint64_t)deviceId
+- (BOOL)commissionDevice:(uint64_t)deviceID
      commissioningParams:(MTRCommissioningParameters *)commissioningParams
                    error:(NSError * __autoreleasing *)error
 {
@@ -102,7 +102,7 @@ static void SetupXPCQueue(void)
     return NO;
 }
 
-- (nullable MTRBaseDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error
+- (nullable MTRBaseDevice *)getDeviceBeingCommissioned:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
 {
     MTR_LOG_ERROR("MTRDevice doesn't support getDeviceBeingCommissioned over XPC");
     return nil;
@@ -114,7 +114,7 @@ static void SetupXPCQueue(void)
 {
     dispatch_async(_workQueue, ^{
         dispatch_group_t group = dispatch_group_create();
-        if (!self.controllerId) {
+        if (!self.controllerID) {
             dispatch_group_enter(group);
             [self.xpcConnection getProxyHandleWithCompletion:^(
                 dispatch_queue_t _Nonnull queue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
@@ -123,7 +123,7 @@ static void SetupXPCQueue(void)
                         if (error) {
                             MTR_LOG_ERROR("Failed to fetch any shared remote controller");
                         } else {
-                            self.controllerId = controller;
+                            self.controllerID = controller;
                         }
                         dispatch_group_leave(group);
                         __auto_type handleRetainer = handle;
@@ -136,9 +136,9 @@ static void SetupXPCQueue(void)
             }];
         }
         dispatch_group_notify(group, queue, ^{
-            if (self.controllerId) {
-                MTRDeviceOverXPC * device = [[MTRDeviceOverXPC alloc] initWithController:self.controllerId
-                                                                                deviceId:deviceID
+            if (self.controllerID) {
+                MTRDeviceOverXPC * device = [[MTRDeviceOverXPC alloc] initWithController:self.controllerID
+                                                                                deviceID:@(deviceID)
                                                                            xpcConnection:self.xpcConnection];
                 completionHandler(device, nil);
             } else {
@@ -165,22 +165,22 @@ static void SetupXPCQueue(void)
     return nil;
 }
 
-- (instancetype)initWithControllerId:(id)controllerId
+- (instancetype)initWithControllerID:(id)controllerID
                            workQueue:(dispatch_queue_t)queue
-                       xpcConnection:(MTRDeviceControllerXPCConnection *)connection
+                       xpcConnection:(MTRDeviceControllerXPCConnection *)xpcConnection
 {
-    _controllerId = controllerId;
+    _controllerID = controllerID;
     _workQueue = queue;
-    _xpcConnection = connection;
+    _xpcConnection = xpcConnection;
     return self;
 }
 
 // This is interface for unit testing
-- (instancetype)initWithControllerId:(id)controllerId
+- (instancetype)initWithControllerID:(id)controllerID
                            workQueue:(dispatch_queue_t)queue
-                        connectBlock:(NSXPCConnection * (^)(void) )connectBlock
+                        connectBlock:(MTRXPCConnectBlock)connectBlock
 {
-    return [self initWithControllerId:controllerId
+    return [self initWithControllerID:controllerID
                             workQueue:queue
                         xpcConnection:[MTRDeviceControllerXPCConnection connectionWithWorkQueue:queue connectBlock:connectBlock]];
 }
