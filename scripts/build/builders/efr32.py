@@ -115,6 +115,8 @@ class Efr32Builder(GnBuilder):
                  board: Efr32Board = Efr32Board.BRD4161A,
                  enable_rpcs: bool = False,
                  enable_ota_requestor: bool = False,
+                 enable_sed: bool = False,
+                 enable_low_power: bool = False
                  ):
         super(Efr32Builder, self).__init__(
             root=app.BuildRoot(root),
@@ -127,6 +129,13 @@ class Efr32Builder(GnBuilder):
 
         if enable_ota_requestor:
             self.extra_gn_options.append('chip_enable_ota_requestor=true')
+
+        if enable_sed:
+            self.extra_gn_options.append('enable_sleepy_device=true chip_openthread_ftd=false')
+
+        if enable_low_power:
+            self.extra_gn_options.append(
+                'chip_build_libshell=false enable_openthread_cli=false show_qr_code=false disable_lcd=true')
 
     def GnBuildArgs(self):
         return self.extra_gn_options
