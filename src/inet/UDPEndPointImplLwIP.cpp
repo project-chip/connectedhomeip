@@ -371,8 +371,8 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
                                                 u16_t port)
 {
     Platform::UniquePtr<struct pbuf> pbufFreeGuard(p);
-    UDPEndPointImplLwIP * ep       = static_cast<UDPEndPointImplLwIP *>(arg);
-    System::PacketBufferHandle buf = System::PacketBufferHandle();
+    UDPEndPointImplLwIP * ep = static_cast<UDPEndPointImplLwIP *>(arg);
+    System::PacketBufferHandle buf;
     if (ep->mState == State::kClosed)
     {
         return;
