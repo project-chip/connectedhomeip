@@ -100,34 +100,25 @@ Where `mySSID` is **your AP's SSID** and `mypassword` is **your AP's password**.
 
 <br>
 
+The required channel becomes available for connection when the WLAN connection region is configured during compilation to one that supports the channel, such as for Japan for channel 13. 
+
+In order to use the desired channel, before building, make sure the WLAN connection region is configured correctly by reviewing/modifying the following lines in 
+**/examples/platform/efr32/rs911x/rsi_wlan_config.h**:
 ```c
-The required channel becomes available for connection when the WLAN connection
-region is configured during compilation to one that supports the channel. For
-e.g. Japan for channel 13. Refer below build instructions.
-
-Instructions :
-
-Before building, make sure the WLAN connection region is configured correctly by reviewing/modifying the following lines under
-
-/third_party/silabs/matter_support/wifi/rs911x/rsi_wlan_config.h
-
 //Make sure this is set to RSI_ENABLE
-
 #define RSI_SET_REGION_SUPPORT RSI_ENABLE
 
-Note that the channels available for WLAN connection depend on the region selected
+// Note that the channels available for WLAN connection depend on the region selected
 // Make sure this is set to 1 to configure from RSI_REGION_CODE value below
-
+// 0: region configurations taken from beacon
+// 1: region configurations taken from user
 #define RSI_SET_REGION_FROM_USER_OR_BEACON 1
 
-1: region configurations taken from user
-0: region configurations taken from beacon
+// 0 : Default Region domain
+// 1 : US
+// 2 : EUROPE
+// 3 : JAPAN
 #define RSI_REGION_CODE 3
-
-0 : Default Region domain
-1 : US
-2 : EUROPE
-3 : JAPAN
 ```
 
 <br>
@@ -155,14 +146,13 @@ Note:
 
 <br>
 
-### 5 . Homepod associated failures
+### 5 . Apple Homepod associated failures
 
 <br>
 
-`Error: if commissioning failure with error :3000001` (homepod is on the
-network)
+If there is an Apple Homepod on the network paired with a Thread device, and a commissioning failure is seen with error `3000001`:
 
-> Remove the homepod and retry to do the commissioning.
+> Either remove the Apple Homepod from the network, or unpair it from all Thread devices, before re-trying the commissioning.
 
 <br>
 
@@ -170,35 +160,69 @@ network)
 
 <br>
 
-> 1. Verify router configuration specifically related to IPV6 SLAAC, Internet
->    Group Management Protocol (IGMP) snooping.
-> 2. Delete all the files of chip-tool /tmp folder. (`rm -rf /tmp/chip_*`)
-> 3. Factory reset of your access point after checking the router configuration.
+1. Verify router configuration specifically related to IPV6 SLAAC, Internet Group Management Protocol (IGMP) snooping.
+2. Delete all the files of chip-tool /tmp folder. (`rm -rf /tmp/chip_*`)
+3. After checking the router configuration, factory-reset your access point.
 
 <br>
 
 ### 7. Commissioning failure at step 16
 
-> Verify the access point settings, SSID, PSK, secirity type, REGION, CHANNEL.
+<br>
+
+Verify the access point settings, SSID, PSK, secirity type, REGION, CHANNEL.
 
 <br>
 
 ### 8 . Inconsistent logs
 
-> Verify external power is supplied to rs911x
+<br>
+
+Verify external power is supplied to rs911x
 
 <br>
 
 ### 9 . To enable different security options on AP/Router 
 
+<br>
+
 1. Get the router address by entering `route -n` or ifconfig of ipconfig.
+2. Enter the router address in the browser and enter the appropriate username and password.
+3. Select the appropriate band.
+4. In security, select type (WPA / WPA2 / WPA3). 
 
-2. Enter router address in the browser and enter the appropriate username and
-    password.
+<br>
 
-3. Select appropriate band.
+### 10. CHIP Logs are not available on MG12 + WF200 due to image size constraints:
 
-4. In security, select type(WPA/WPA2/WPA3). 
+<br>
+
+Due to the Door Lock App taking up more space than available flash on the MG12 + WF200 device combination, `chip_logging=false` needs to be included on the command line while building the app image, 
+to disable CHIP logs and thereby reduce the image size.
+
+This prevents debugging the code on the MG12 + WF200 device combination.
+
+In order to work around this constraint:
+
+1. **For Apps other than Door Lock -** Apps other than Door Lock do not have a size constraint. Enable CHIP Logging by removing this from the build 
+command line: `chip_logging=false`
+
+    `./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32 out/wf200_lighting_app BRD4161A is_debug=false --wifi wf200 |& tee out/wf200_lock_app.log`
+
+<br>
+
+2. **For the Door Lock App -** Disable either the LCD or the use of QR codes, depending on your debugging needs. Disabling one of these will sufficiently reduce the image size to allow 
+CHIP Logging to be enabled. 
+
+    If you disabled QR Codes, you may use the CHIP Tool for commissioning the device.
+
+    If you disabled the LCD and need to debug with QR Codes, the URL to display the QR Code will be printed in the device logs.
+
+    Disable LCD and enable CHIP Logging:
+    `./scripts/examples/gn_efr32_example.sh examples/lock-app/efr32 out/wf200_lock_app BRD4161A is_debug=false disable_lcd=true --wifi wf200 |& tee out/wf200_lock_app.log`
+
+    Disable QR Code and enable CHIP Logging:
+    `./scripts/examples/gn_efr32_example.sh examples/lock-app/efr32 out/wf200_lock_app BRD4161A is_debug=false show_qr_code=false --wifi wf200 |& tee out/wf200_lock.log`
 
 ---
 
