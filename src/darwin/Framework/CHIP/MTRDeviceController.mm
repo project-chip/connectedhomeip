@@ -456,9 +456,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
 // Keep this available until clients have migrated
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-implementations"
-- (BOOL)pairDevice:(uint64_t)deviceID
- onboardingPayload:(NSString *)onboardingPayload
-             error:(NSError * __autoreleasing *)error
+- (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error
 #pragma clang diagnostic pop
 {
     VerifyOrReturnValue([self checkIsRunning:error], NO);
