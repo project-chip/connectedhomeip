@@ -269,19 +269,20 @@ void BroadcastPacket(mdns::Minimal::ServerBase * server)
         return;
     }
 
+    CHIP_ERROR err;
     if (gOptions.unicastAnswers)
     {
-        if (server->BroadcastUnicastQuery(builder.ReleasePacket(), gOptions.querySendPort) != CHIP_NO_ERROR)
+        if ((err = server->BroadcastUnicastQuery(builder.ReleasePacket(), gOptions.querySendPort)) != CHIP_NO_ERROR)
         {
-            printf("Error sending\n");
+            printf("Error sending: %" CHIP_ERROR_FORMAT "\n", err.Format());
             return;
         }
     }
     else
     {
-        if (server->BroadcastSend(builder.ReleasePacket(), gOptions.querySendPort) != CHIP_NO_ERROR)
+        if ((err = server->BroadcastSend(builder.ReleasePacket(), gOptions.querySendPort)) != CHIP_NO_ERROR)
         {
-            printf("Error sending\n");
+            printf("Error broadcast sending: %" CHIP_ERROR_FORMAT "\n", err.Format());
             return;
         }
     }

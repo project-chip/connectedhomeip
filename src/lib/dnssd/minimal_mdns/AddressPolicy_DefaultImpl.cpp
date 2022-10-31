@@ -22,103 +22,49 @@ namespace mdns {
 namespace Minimal {
 namespace {
 
-/// Checks if the current interface is powered on
-/// and not local loopback.
-template <typename T>
-bool IsCurrentInterfaceUsable(T & iterator)
+class SimpleInterfacesIterator : public mdns::Minimal::ListenIterator
 {
-    if (!iterator.IsUp())
+private:
+    enum class ReturnState
     {
-        return false; // not a usable interface
-    }
-    char name[chip::Inet::InterfaceId::kMaxIfNameLength];
-    if (iterator.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to get interface name.");
-        return false;
-    }
-
-    // TODO: need a better way to ignore local loopback interfaces/addresses
-    // We do not want to listen on local loopback even though they are up and
-    // support multicast
-    //
-    // Some way to detect 'is local looback' that is smarter (e.g. at least
-    // strict string compare on linux instead of substring) would be better.
-    //
-    // This would reject likely valid interfaces like 'lollipop' or 'lostinspace'
-    if (strncmp(name, "lo", 2) == 0)
-    {
-        /// local loopback interface is not usable by MDNS
-        return false;
-    }
-    return true;
-}
-
-class AllInterfaces : public mdns::Minimal::ListenIterator
-{
+        kStart,
+#if INET_CONFIG_ENABLE_IPV4
+        kIPv4,
+#endif
+        kEnd,
+    };
 public:
-    AllInterfaces() { SkipToFirstValidInterface(); }
+    SimpleInterfacesIterator() : mState(ReturnState::kStart) {}
 
     bool Next(chip::Inet::InterfaceId * id, chip::Inet::IPAddressType * type) override
     {
-        if (!mIterator.HasCurrent())
+        *id = chip::Inet::InterfaceId::Null();
+
+        switch (mState)
         {
+#if INET_CONFIG_ENABLE_IPV4
+        case ReturnState::kStart:
+            *type  = chip::Inet::IPAddressType::kIPv6;
+            mState = ReturnState::kIPv4;
+            return true;
+        case ReturnState::kIPv4:
+            *type  = chip::Inet::IPAddressType::kIPv4;
+            mState = ReturnState::kEnd;
+            return true;
+#else
+        case ReturnState::kStart:
+            *type  = chip::Inet::IPAddressType::kIPv6;
+            mState = ReturnState::kEnd;
+            return true;
+#endif
+        case ReturnState::kEnd:
+        default:
             return false;
         }
-
-#if INET_CONFIG_ENABLE_IPV4
-        if (mState == State::kIpV4)
-        {
-            *id    = mIterator.GetInterfaceId();
-            *type  = chip::Inet::IPAddressType::kIPv4;
-            mState = State::kIpV6;
-            return true;
-        }
-#endif
-
-        *id   = mIterator.GetInterfaceId();
-        *type = chip::Inet::IPAddressType::kIPv6;
-#if INET_CONFIG_ENABLE_IPV4
-        mState = State::kIpV4;
-#endif
-
-        for (mIterator.Next(); SkipCurrentInterface(); mIterator.Next())
-        {
-        }
-        return true;
     }
 
 private:
-#if INET_CONFIG_ENABLE_IPV4
-    enum class State
-    {
-        kIpV4,
-        kIpV6,
-    };
-    State mState = State::kIpV4;
-#endif
-    chip::Inet::InterfaceIterator mIterator;
-
-    void SkipToFirstValidInterface()
-    {
-        do
-        {
-            if (!SkipCurrentInterface())
-            {
-                break;
-            }
-        } while (mIterator.Next());
-    }
-
-    bool SkipCurrentInterface()
-    {
-        if (!mIterator.HasCurrent())
-        {
-            return false; // nothing to try.
-        }
-
-        return !IsCurrentInterfaceUsable(mIterator);
-    }
+    ReturnState mState;
 };
 
 class AllAddressesIterator : public mdns::Minimal::IpAddressIterator
@@ -175,7 +121,7 @@ class DefaultAddressPolicy : public AddressPolicy
 public:
     chip::Platform::UniquePtr<ListenIterator> GetListenEndpoints() override
     {
-        return chip::Platform::UniquePtr<ListenIterator>(chip::Platform::New<AllInterfaces>());
+        return chip::Platform::UniquePtr<ListenIterator>(chip::Platform::New<SimpleInterfacesIterator>());
     }
 
     chip::Platform::UniquePtr<IpAddressIterator> GetIpAddressesForEndpoint(chip::Inet::InterfaceId interfaceId,
