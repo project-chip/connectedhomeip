@@ -178,8 +178,8 @@ class MyPostCommissioningListener : public PostCommissioningListener
 
         Optional<SessionHandle> opt   = mSecureSession.Get();
         SessionHandle & sessionHandle = opt.Value();
-        ContentAppPlatform::GetInstance().ManageClientAccess(*mExchangeMgr, sessionHandle, mVendorId, localNodeId, bindings,
-                                                             OnSuccessResponse, OnFailureResponse);
+        ContentAppPlatform::GetInstance().ManageClientAccess(*mExchangeMgr, sessionHandle, mVendorId, mProductId, localNodeId,
+                                                             bindings, OnSuccessResponse, OnFailureResponse);
         clearContext();
     }
 
@@ -498,26 +498,15 @@ Access::Privilege ContentAppFactoryImpl::GetVendorPrivilege(uint16_t vendorId)
     return Access::Privilege::kOperate;
 }
 
-constexpr ClusterId kClusterIdDescriptor = 0x001d;
-constexpr ClusterId kClusterIdOnOff      = 0x0006;
-constexpr ClusterId kClusterIdWakeOnLAN  = 0x0503;
-// constexpr ClusterId kClusterIdChannel             = 0x0504;
-// constexpr ClusterId kClusterIdTargetNavigator     = 0x0505;
-constexpr ClusterId kClusterIdMediaPlayback = 0x0506;
-// constexpr ClusterId kClusterIdMediaInput          = 0x0507;
-constexpr ClusterId kClusterIdLowPower        = 0x0508;
-constexpr ClusterId kClusterIdKeypadInput     = 0x0509;
-constexpr ClusterId kClusterIdContentLauncher = 0x050a;
-constexpr ClusterId kClusterIdAudioOutput     = 0x050b;
-// constexpr ClusterId kClusterIdApplicationLauncher = 0x050c;
-// constexpr ClusterId kClusterIdAccountLogin        = 0x050e;
-
-std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoint(EndpointId endpointId, uint16_t vendorId)
+std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoint(EndpointId endpointId, uint16_t vendorId,
+                                                                                   uint16_t productId)
 {
     if (endpointId == kLocalVideoPlayerEndpointId)
     {
-        return { kClusterIdDescriptor, kClusterIdOnOff,       kClusterIdWakeOnLAN,       kClusterIdMediaPlayback,
-                 kClusterIdLowPower,   kClusterIdKeypadInput, kClusterIdContentLauncher, kClusterIdAudioOutput };
+        return { chip::app::Clusters::Descriptor::Id,      chip::app::Clusters::OnOff::Id,
+                 chip::app::Clusters::WakeOnLan::Id,       chip::app::Clusters::MediaPlayback::Id,
+                 chip::app::Clusters::LowPower::Id,        chip::app::Clusters::KeypadInput::Id,
+                 chip::app::Clusters::ContentLauncher::Id, chip::app::Clusters::AudioOutput::Id };
     }
     return {};
 }

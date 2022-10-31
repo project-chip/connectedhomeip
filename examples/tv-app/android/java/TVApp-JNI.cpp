@@ -290,8 +290,8 @@ class MyPostCommissioningListener : public PostCommissioningListener
 
         Optional<SessionHandle> opt   = mSecureSession.Get();
         SessionHandle & sessionHandle = opt.Value();
-        ContentAppPlatform::GetInstance().ManageClientAccess(*mExchangeMgr, sessionHandle, mVendorId, localNodeId, bindings,
-                                                             OnSuccessResponse, OnFailureResponse);
+        ContentAppPlatform::GetInstance().ManageClientAccess(*mExchangeMgr, sessionHandle, mVendorId, mProductId, localNodeId,
+                                                             bindings, OnSuccessResponse, OnFailureResponse);
         clearContext();
     }
 

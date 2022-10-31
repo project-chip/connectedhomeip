@@ -513,7 +513,7 @@ CHIP_ERROR ContentAppPlatform::GetACLEntryIndex(size_t * foundIndex, FabricIndex
 // Add ACLs on this device for the given client,
 // and create bindings on the given client so that it knows what it has access to.
 CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle,
-                                                  uint16_t targetVendorId, NodeId localNodeId,
+                                                  uint16_t targetVendorId, uint16_t targetProductId, NodeId localNodeId,
                                                   std::vector<Binding::Structs::TargetStruct::Type> bindings,
                                                   Controller::WriteResponseSuccessCallback successCb,
                                                   Controller::WriteResponseFailureCallback failureCb)
@@ -584,8 +584,8 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
         {
             ChipLogProgress(Controller, "ContentAppPlatform::ManageClientAccess non-Admin privilege granted");
             // a vendor with non-admin privilege gets access to select clusters on ep1
-            std::list<ClusterId> allowedClusterList =
-                mContentAppFactory->GetAllowedClusterListForStaticEndpoint(kLocalVideoPlayerEndpointId, targetVendorId);
+            std::list<ClusterId> allowedClusterList = mContentAppFactory->GetAllowedClusterListForStaticEndpoint(
+                kLocalVideoPlayerEndpointId, targetVendorId, targetProductId);
 
             for (const auto & clusterId : allowedClusterList)
             {

@@ -68,9 +68,10 @@ public:
     // When a vendor has admin privileges, it will get access to all clusters on ep1
     virtual Access::Privilege GetVendorPrivilege(uint16_t vendorId) = 0;
 
-    // Get the cluster list this vendorId should have on static endpoints such as ep1 for casting video clients.
+    // Get the cluster list this vendorId/productId should have on static endpoints such as ep1 for casting video clients.
     // When a vendor has admin privileges, it will get access to all clusters on ep1
-    virtual std::list<ClusterId> GetAllowedClusterListForStaticEndpoint(EndpointId endpointId, uint16_t vendorId) = 0;
+    virtual std::list<ClusterId> GetAllowedClusterListForStaticEndpoint(EndpointId endpointId, uint16_t vendorId,
+                                                                        uint16_t productId) = 0;
 };
 
 class DLL_EXPORT ContentAppPlatform
@@ -154,6 +155,7 @@ public:
      * @param[in] exchangeMgr     Exchange manager to be used to get an exchange context.
      * @param[in] sessionHandle   Reference to an established session.
      * @param[in] targetVendorId  Vendor ID for the target device.
+     * @param[in] targetProductId Product ID for the target device.
      * @param[in] localNodeId     The NodeId for the local device.
      * @param[in] bindings        Any additional bindings to include. This may include current bindings.
      * @param[in] successCb       The function to be called on success of adding the binding.
@@ -162,7 +164,8 @@ public:
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR ManageClientAccess(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle, uint16_t targetVendorId,
-                                  NodeId localNodeId, std::vector<app::Clusters::Binding::Structs::TargetStruct::Type> bindings,
+                                  uint16_t targetProductId, NodeId localNodeId,
+                                  std::vector<app::Clusters::Binding::Structs::TargetStruct::Type> bindings,
                                   Controller::WriteResponseSuccessCallback successCb,
                                   Controller::WriteResponseFailureCallback failureCb);
 
