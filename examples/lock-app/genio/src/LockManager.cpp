@@ -695,7 +695,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
 				}
 		}
 	}
-	
+
     ChipLogDetail(Zcl,
                   "Door Lock App: specified PIN code was not found in the database, ignoring command to set lock state to \"%s\" "
                   "[endpointId=%d]",

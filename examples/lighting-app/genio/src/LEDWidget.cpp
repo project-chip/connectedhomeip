@@ -202,5 +202,3 @@ uint8_t LEDWidget::GetMinLevel(void)
 {
     return MIN_LVL;
 }
-
-

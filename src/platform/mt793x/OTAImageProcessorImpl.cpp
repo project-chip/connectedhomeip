@@ -146,7 +146,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INVALID_FILE_IDENTIFIER);
         return;
     }
-    
+
     if (IsSpanUsable(block)) {
         filogic_ota_state_t filogic_err;
         filogic_ota_io_write_sync(imageProcessor->mFilogicCtx, block.data(), block.size(), &filogic_err);
@@ -156,7 +156,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
             return;
         }
     }
-    
+
     ChipLogProgress(SoftwareUpdate, "OTA downloaded bytes: %ld", static_cast<uint32_t>(imageProcessor->mParams.downloadedBytes));
 
     imageProcessor->mParams.downloadedBytes += block.size();

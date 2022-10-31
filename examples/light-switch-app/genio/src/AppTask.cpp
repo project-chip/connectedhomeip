@@ -256,7 +256,7 @@ void AppTask::LightSwitchActionEventHandler(AppEvent * aEvent)
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
         MT793X_LOG("Button was pressed!");
-        
+
         BindingCommandData * data = chip::Platform::New<BindingCommandData>();
         data->commandId           = chip::app::Clusters::OnOff::Commands::Toggle::Id;
         data->clusterId           = chip::app::Clusters::OnOff::Id;
@@ -349,7 +349,7 @@ void AppTask::SingleButtonEventHandler(AppEvent * aEvent)
                 MT793X_LOG("not handled key release event, mFunction = %x", sAppTask.mFunction);
                 break;
         }
-        
+
         sStatusLED.Set(false);
 
         sAppTask.mFunction = kFunction_NoneSelected;

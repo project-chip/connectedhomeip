@@ -160,7 +160,7 @@ CHIP_ERROR AppTask::Init()
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
-	
+
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
@@ -178,9 +178,9 @@ CHIP_ERROR AppTask::Init()
     }
 
     MT793X_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
-	
-	
-	
+
+
+
 	 // Initial lock state
     chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state;
     chip::EndpointId endpointId{ 1 };
@@ -252,7 +252,7 @@ CHIP_ERROR AppTask::Init()
         MT793X_LOG("LockMgr().Init() failed");
         appError(error);
     }
-	
+
 	LockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     sStatusLED.Init(LED_STATUS);
@@ -474,7 +474,7 @@ void AppTask::SingleButtonEventHandler(AppEvent * aEvent)
                 MT793X_LOG("not handled key release event, mFunction = %x", sAppTask.mFunction);
                 break;
         }
-        
+
         sStatusLED.Set(false);
 
         sAppTask.mFunction = kFunction_NoneSelected;
@@ -548,8 +548,8 @@ void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
         MT793X_LOG("Unlock Action has been initiated")
         sLockLED.Set(false);
     }
-	
-		
+
+
 	if (aActor == AppEvent::kEventType_Button)
     {
         mSyncClusterToButtonAction = true;

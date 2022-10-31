@@ -263,7 +263,7 @@ void vStartRunning(void)
     assert(chip::DeviceLayer::PlatformMgr().StartEventLoopTask() == CHIP_NO_ERROR);
 
     assert(GetAppTask().StartAppTask() == CHIP_NO_ERROR);
-    
+
     OTAConfig::Init();
 #ifdef ENABLE_CHIP_SHELL
     chip::startShellTask();
