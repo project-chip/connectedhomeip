@@ -28,8 +28,8 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <app/util/af-types.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
@@ -46,15 +46,12 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
     if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
     {
-        LightMgr().InitiateAction(AppEvent::kEventType_Light,
-                        ((*value) ?
-                            LightingManager::ON_ACTION :
-                            LightingManager::OFF_ACTION), 0);
+        LightMgr().InitiateAction(AppEvent::kEventType_Light, ((*value) ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION),
+                                  0);
     }
     else if (clusterId == LevelControl::Id && attributeId == LevelControl::Attributes::CurrentLevel::Id)
     {
-        LightMgr().InitiateAction(AppEvent::kEventType_Light,
-                        LightingManager::LEVEL_ACTION, value);
+        LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::LEVEL_ACTION, value);
     }
     else if (clusterId == ColorControl::Id)
     {
@@ -86,9 +83,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             }
 
             ChipLogProgress(Zcl, "New XY color: %u|%u", xy.x, xy.y);
-            LightMgr().InitiateAction(AppEvent::kEventType_Light,
-                    LightingManager::COLOR_ACTION_XY,
-                    (uint8_t *) &xy);
+            LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_XY, (uint8_t *) &xy);
         }
         /* HSV color space */
         else if (attributeId == ColorControl::Attributes::CurrentHue::Id ||
@@ -116,18 +111,14 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                 hsv.s = *value;
             }
             ChipLogProgress(Zcl, "New HSV color: %u|%u", hsv.h, hsv.s);
-            LightMgr().InitiateAction(AppEvent::kEventType_Light,
-                    LightingManager::COLOR_ACTION_HSV,
-                    (uint8_t *) &hsv);
+            LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_HSV, (uint8_t *) &hsv);
         }
         else if (attributeId == ColorControl::Attributes::ColorTemperatureMireds::Id)
         {
             CtColor_t ct;
             ct.ctMireds = *reinterpret_cast<uint16_t *>(value);
             ChipLogProgress(Zcl, "New CT color: %u", ct.ctMireds);
-            LightMgr().InitiateAction(AppEvent::kEventType_Light,
-                    LightingManager::COLOR_ACTION_CT,
-                    (uint8_t *) &ct.ctMireds);
+            LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::COLOR_ACTION_CT, (uint8_t *) &ct.ctMireds);
         }
     }
     else if (clusterId == OnOffSwitchConfiguration::Id)

@@ -22,7 +22,6 @@
 
 #include "LEDWidget.h"
 
-
 #define MIN_LVL (1)
 #define MAX_LVL (254)
 
@@ -49,7 +48,7 @@ void LEDWidget::Init(enum led_id led)
 {
     filogic_led_init();
 
-    mLed = led;
+    mLed   = led;
     mLevel = MAX_LVL;
 
     mTimer = xTimerCreate(Name(),
@@ -154,25 +153,32 @@ void LEDWidget::SetLevel(uint8_t level)
 {
     uint8_t fdim = 0;
 
-    if(level >= MIN_LVL &&
-            level <= MAX_LVL) {
+    if (level >= MIN_LVL && level <= MAX_LVL)
+    {
         mLevel = level;
-    } else {
+    }
+    else
+    {
         return;
     }
 
     fdim = (level - MIN_LVL) / ((MAX_LVL - MIN_LVL) / (filogic_led_get_max_dim_level() - filogic_led_get_min_dim_level()));
 
-    if(fdim > filogic_led_get_max_dim_level())
+    if (fdim > filogic_led_get_max_dim_level())
     {
         fdim = filogic_led_get_max_dim_level();
     }
 
-    if(mLed == LED_LIGHT) {
+    if (mLed == LED_LIGHT)
+    {
         filogic_led_light_dim(fdim);
-    } else if(mLed == LED_STATUS) {
+    }
+    else if (mLed == LED_STATUS)
+    {
         filogic_led_status_dim(fdim);
-    } else {
+    }
+    else
+    {
         assert(0);
     }
 }
@@ -180,11 +186,16 @@ void LEDWidget::SetLevel(uint8_t level)
 uint8_t LEDWidget::GetLevel(void)
 {
     uint8_t dim = 0;
-    if(mLed == LED_LIGHT) {
-        dim =  filogic_led_light_get_cur_dim_level();
-    } else if(mLed == LED_STATUS) {
+    if (mLed == LED_LIGHT)
+    {
+        dim = filogic_led_light_get_cur_dim_level();
+    }
+    else if (mLed == LED_STATUS)
+    {
         dim = filogic_led_status_get_cur_dim_level();
-    } else {
+    }
+    else
+    {
         assert(0);
     }
 

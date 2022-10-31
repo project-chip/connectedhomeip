@@ -56,7 +56,7 @@ void PlatformEventHandler(const ChipDeviceEvent * event, intptr_t arg)
     {
     case DeviceEventType::kInternetConnectivityChange:
         if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established ||
-                event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
+            event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
         {
             ChipLogProgress(SoftwareUpdate, "Internet connect established!!");
             InitRequestor();

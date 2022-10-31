@@ -34,10 +34,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/mt793x/NetworkCommissioningWiFiDriver.h>
 
-#include "AppTask.h"
 #include "AppConfig.h"
+#include "AppTask.h"
 #include "qrcodegen.h"
-
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000

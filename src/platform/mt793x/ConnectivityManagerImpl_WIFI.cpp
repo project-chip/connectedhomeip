@@ -112,9 +112,7 @@ void ConnectivityManagerImpl::_OnWiFiPlatformEvent(const ChipDeviceEvent * event
     if (event->Type != DeviceEventType::kMtkWiFiEvent)
         return;
 
-    ChipLogProgress(DeviceLayer, "%s WiFi event %s",
-                    __func__,
-                    filogic_event_to_name(event->Platform.FilogicEvent.event));
+    ChipLogProgress(DeviceLayer, "%s WiFi event %s", __func__, filogic_event_to_name(event->Platform.FilogicEvent.event));
 
     const filogic_async_event_data * event_data;
     bool hadIPv4Conn = mFlags.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
@@ -174,8 +172,7 @@ void ConnectivityManagerImpl::_OnWiFiPlatformEvent(const ChipDeviceEvent * event
 
         ChipLogProgress(DeviceLayer, "ip addr: %s", event_data->u.ipv4_str.addr);
         DriveStationState();
-        UpdateInternetConnectivityState(TRUE, hadIPv6Conn,
-                                        event_data->u.ipv4_str.addr);
+        UpdateInternetConnectivityState(TRUE, hadIPv6Conn, event_data->u.ipv4_str.addr);
     }
 
     if (!hadIPv6Conn && event_data->event_id == FILOGIC_STA_IPV6_ADDR_READY)
@@ -185,13 +182,12 @@ void ConnectivityManagerImpl::_OnWiFiPlatformEvent(const ChipDeviceEvent * event
             ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
         }
 
-        const char *addrv6 = (const char *)&event_data->u.ipv6_str.addr[0];
+        const char * addrv6 = (const char *) &event_data->u.ipv6_str.addr[0];
         ChipLogProgress(DeviceLayer, "ip addr: %s", addrv6);
 
         DriveStationState();
 
-        UpdateInternetConnectivityState(hadIPv4Conn, TRUE,
-                                        event_data->u.ipv6_str.addr);
+        UpdateInternetConnectivityState(hadIPv4Conn, TRUE, event_data->u.ipv6_str.addr);
     }
     else if (event->Platform.FilogicEvent.event == FILOGIC_STA_CONNECTED_TO_AP)
     {
@@ -643,9 +639,7 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
     }
 }
 
-void ConnectivityManagerImpl::UpdateInternetConnectivityState(bool haveIPv4Conn,
-                                                              bool haveIPv6Conn,
-                                                              const uint8_t * ipAddr)
+void ConnectivityManagerImpl::UpdateInternetConnectivityState(bool haveIPv4Conn, bool haveIPv6Conn, const uint8_t * ipAddr)
 {
     ChipLogProgress(DeviceLayer, "%s", __func__);
 
@@ -678,8 +672,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(bool haveIPv4Conn,
 
         (void) PlatformMgr().PostEvent(&event);
 
-        ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv4",
-                                     (haveIPv4Conn) ? "ESTABLISHED" : "LOST");
+        ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv4", (haveIPv4Conn) ? "ESTABLISHED" : "LOST");
     }
 
     // If the internet connectivity state has changed...
@@ -697,8 +690,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(bool haveIPv4Conn,
 
         (void) PlatformMgr().PostEvent(&event);
 
-        ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv6",
-                                     (haveIPv6Conn) ? "ESTABLISHED" : "LOST");
+        ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv6", (haveIPv6Conn) ? "ESTABLISHED" : "LOST");
     }
 }
 #endif

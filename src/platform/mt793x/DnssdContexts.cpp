@@ -17,13 +17,13 @@
 #include "DnssdImpl.h"
 #include "MdnsError.h"
 
-#include "dnssd_ipc.h"
 #include "dns_sd.h"
+#include "dnssd_ipc.h"
 #include <inet/IPAddress.h>
+#include <lib/support/CHIPMemString.h>
+#include <lwip/inet.h>
 #include <lwip/ip4_addr.h>
 #include <lwip/ip6_addr.h>
-#include <lwip/inet.h>
-#include <lib/support/CHIPMemString.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip::Dnssd;
@@ -247,7 +247,7 @@ GenericContext * MdnsContexts::GetBySockFd(int fd)
     return NULL;
 }
 
-int MdnsContexts::GetSelectFd(fd_set *pSelectFd)
+int MdnsContexts::GetSelectFd(fd_set * pSelectFd)
 {
     int maxFd = 0;
     std::vector<GenericContext *>::iterator iter;
@@ -259,7 +259,8 @@ int MdnsContexts::GetSelectFd(fd_set *pSelectFd)
         int curFd = DNSServiceRefSockFD((*iter)->serviceRef);
         (*iter)->mSelectCount += 1;
         FD_SET(curFd, pSelectFd);
-        if(curFd > maxFd) maxFd = curFd;
+        if (curFd > maxFd)
+            maxFd = curFd;
     }
 
     return maxFd;
@@ -267,10 +268,10 @@ int MdnsContexts::GetSelectFd(fd_set *pSelectFd)
 
 BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol)
 {
-    type     = ContextType::Browse;
-    context  = cbContext;
-    callback = cb;
-    protocol = cbContextProtocol;
+    type         = ContextType::Browse;
+    context      = cbContext;
+    callback     = cb;
+    protocol     = cbContextProtocol;
     mSelectCount = 0;
 }
 
@@ -289,10 +290,10 @@ void BrowseContext::DispatchSuccess()
 
 ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType)
 {
-    type     = ContextType::Resolve;
-    context  = cbContext;
-    callback = cb;
-    protocol = GetProtocol(cbAddressType);
+    type         = ContextType::Resolve;
+    context      = cbContext;
+    callback     = cb;
+    protocol     = GetProtocol(cbAddressType);
     mSelectCount = 0;
 }
 
@@ -329,29 +330,30 @@ CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct socka
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Inet::IPAddress ip;
-    //ReturnErrorOnFailure(chip::Inet::IPAddress::GetIPAddressFromSockAddr(*address, ip));
-    if(address->sa_family == AF_INET6)
+    // ReturnErrorOnFailure(chip::Inet::IPAddress::GetIPAddressFromSockAddr(*address, ip));
+    if (address->sa_family == AF_INET6)
     {
         ip6_addr_t _ip6_adr;
-        struct sockaddr_in6 * addr_in6 = (struct sockaddr_in6 *)address;
+        struct sockaddr_in6 * addr_in6 = (struct sockaddr_in6 *) address;
         inet6_addr_to_ip6addr(&_ip6_adr, &addr_in6->sin6_addr);
         ip = chip::Inet::IPAddress(_ip6_adr);
     }
-    else if(address->sa_family == AF_INET)
+    else if (address->sa_family == AF_INET)
     {
         ip4_addr_t _ip4_adr;
-        struct sockaddr_in * addr_in = (struct sockaddr_in *)address;
+        struct sockaddr_in * addr_in = (struct sockaddr_in *) address;
         inet_addr_to_ip4addr(&_ip4_adr, &addr_in->sin_addr);
         ip = chip::Inet::IPAddress(_ip4_adr);
     }
     else
     {
-        ChipLogDetail(Discovery, "Mdns: %s interface: %" PRIu32 " unknown sa_family(%d)", __func__, interfaceId, address->sa_family);
+        ChipLogDetail(Discovery, "Mdns: %s interface: %" PRIu32 " unknown sa_family(%d)", __func__, interfaceId,
+                      address->sa_family);
         // TODO: assign correct error code
-        err = (CHIP_ERROR)1;
+        err = (CHIP_ERROR) 1;
     }
 
-    if(err == CHIP_NO_ERROR)
+    if (err == CHIP_NO_ERROR)
     {
         interfaces[interfaceId].addresses.push_back(ip);
     }
@@ -370,11 +372,11 @@ CHIP_ERROR ResolveContext::OnNewLocalOnlyAddress()
     struct sockaddr_in sockaddr;
     memset(&sockaddr, 0, sizeof(sockaddr));
     sockaddr.sin_family = AF_INET;
-    #define MDNS_TCP_SERVERADDR  "127.0.0.1"
-    #define MDNS_TCP_SERVERPORT  5354
+#define MDNS_TCP_SERVERADDR "127.0.0.1"
+#define MDNS_TCP_SERVERPORT 5354
     sockaddr.sin_addr.s_addr = inet_addr(MDNS_TCP_SERVERADDR);
-    sockaddr.sin_port   = htons(MDNS_TCP_SERVERPORT);
-    sockaddr.sin_len    = sizeof(sockaddr);
+    sockaddr.sin_port        = htons(MDNS_TCP_SERVERPORT);
+    sockaddr.sin_len         = sizeof(sockaddr);
 
     return OnNewAddress(kDNSServiceInterfaceIndexLocalOnly, reinterpret_cast<struct sockaddr *>(&sockaddr));
 }
@@ -440,8 +442,8 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
     }
     else
     {
-        //FIX: get the netif from interfaceId
-        struct netif * sta_if = netif_default;
+        // FIX: get the netif from interfaceId
+        struct netif * sta_if        = netif_default;
         interface.service.mInterface = Inet::InterfaceId(sta_if);
     }
 

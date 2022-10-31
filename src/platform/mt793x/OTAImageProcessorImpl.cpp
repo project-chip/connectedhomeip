@@ -45,7 +45,8 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 
     filogic_ota_apply_sync(mFilogicCtx, &err);
 
-    if (err != FILOGIC_OTA_SUCCESS) {
+    if (err != FILOGIC_OTA_SUCCESS)
+    {
         ChipLogError(SoftwareUpdate, "OTA image apply fail");
         return CHIP_ERROR_INTERNAL;
     }
@@ -63,7 +64,8 @@ CHIP_ERROR OTAImageProcessorImpl::Abort()
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 {
     CHIP_ERROR err = SetBlock(block);
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
@@ -78,11 +80,13 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
 
-    if (imageProcessor == nullptr) {
+    if (imageProcessor == nullptr)
+    {
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
         return;
     }
-    else if (imageProcessor->mDownloader == nullptr) {
+    else if (imageProcessor->mDownloader == nullptr)
+    {
         ChipLogError(SoftwareUpdate, "mDownloader is null");
         return;
     }
@@ -92,13 +96,15 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     filogic_ota_state_t filogic_err;
     filogic_ota_init_sync(imageProcessor->mFilogicCtx, &filogic_err);
 
-    if (filogic_err != FILOGIC_OTA_SUCCESS) {
+    if (filogic_err != FILOGIC_OTA_SUCCESS)
+    {
         ChipLogError(SoftwareUpdate, "Filogic ota init fail");
         return;
     }
 
     imageProcessor->mHeaderParser.Init();
-    if (!imageProcessor->mHeaderParser.IsInitialized()) {
+    if (!imageProcessor->mHeaderParser.IsInitialized())
+    {
         ChipLogError(SoftwareUpdate, "Header parser init fail!!");
     }
     imageProcessor->mParams.downloadedBytes = 0;
@@ -108,7 +114,8 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
-    if (imageProcessor == nullptr) {
+    if (imageProcessor == nullptr)
+    {
         return;
     }
 
@@ -118,7 +125,8 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
-    if (imageProcessor == nullptr) {
+    if (imageProcessor == nullptr)
+    {
         return;
     }
 
@@ -129,11 +137,13 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
-    if (imageProcessor == nullptr) {
+    if (imageProcessor == nullptr)
+    {
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
         return;
     }
-    else if (imageProcessor->mDownloader == nullptr) {
+    else if (imageProcessor->mDownloader == nullptr)
+    {
         ChipLogError(SoftwareUpdate, "mDownloader is null");
         return;
     }
@@ -141,16 +151,19 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     ByteSpan block = imageProcessor->mBlock;
     CHIP_ERROR err = imageProcessor->ProcessHeader(block);
 
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         ChipLogError(SoftwareUpdate, "OTA process block header fail %" CHIP_ERROR_FORMAT, err.Format());
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INVALID_FILE_IDENTIFIER);
         return;
     }
 
-    if (IsSpanUsable(block)) {
+    if (IsSpanUsable(block))
+    {
         filogic_ota_state_t filogic_err;
         filogic_ota_io_write_sync(imageProcessor->mFilogicCtx, block.data(), block.size(), &filogic_err);
-        if (filogic_err != FILOGIC_OTA_SUCCESS) {
+        if (filogic_err != FILOGIC_OTA_SUCCESS)
+        {
             ChipLogError(SoftwareUpdate, "OTA process block fail %d", filogic_err);
             imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
             return;
@@ -166,22 +179,26 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 // // Store block data for HandleProcessBlock to access
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
-    if (!IsSpanUsable(block)) {
+    if (!IsSpanUsable(block))
+    {
         ReleaseBlock();
         return CHIP_NO_ERROR;
     }
 
-    if (mBlock.size() < block.size()) {
+    if (mBlock.size() < block.size())
+    {
         ReleaseBlock();
 
         mBlock = MutableByteSpan(static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size())), block.size());
-        if (mBlock.data() == nullptr) {
+        if (mBlock.data() == nullptr)
+        {
             return CHIP_ERROR_NO_MEMORY;
         }
     }
 
     CHIP_ERROR err = CopySpanToMutableSpan(block, mBlock);
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         ChipLogError(SoftwareUpdate, "Cannot copy block data: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
@@ -191,7 +208,8 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 
 CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
 {
-    if (mBlock.data() != nullptr) {
+    if (mBlock.data() != nullptr)
+    {
         chip::Platform::MemoryFree(mBlock.data());
     }
 
@@ -202,7 +220,8 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
 bool OTAImageProcessorImpl::IsFirstImageRun()
 {
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
-    if (requestor == nullptr) {
+    if (requestor == nullptr)
+    {
         return false;
     }
 
@@ -212,13 +231,15 @@ bool OTAImageProcessorImpl::IsFirstImageRun()
 CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 {
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
-    if (requestor == nullptr) {
+    if (requestor == nullptr)
+    {
         return CHIP_ERROR_INTERNAL;
     }
 
     uint32_t currentVersion;
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
-    if (currentVersion != requestor->GetTargetVersion()) {
+    if (currentVersion != requestor->GetTargetVersion())
+    {
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
@@ -228,7 +249,8 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
 {
     ChipLogProgress(SoftwareUpdate, "ProcessHeader enter!!");
-    if (mHeaderParser.IsInitialized()) {
+    if (mHeaderParser.IsInitialized())
+    {
         OTAImageHeader header;
         CHIP_ERROR error = mHeaderParser.AccumulateAndDecode(block, header);
 

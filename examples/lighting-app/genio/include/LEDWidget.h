@@ -20,8 +20,8 @@
 #include <FreeRTOS.h>
 #include <timers.h>
 
-#include "DimmableLEDIf.h"
 #include "ColorFormat.h"
+#include "DimmableLEDIf.h"
 #include <hal_gpio.h>
 
 enum led_id
@@ -52,11 +52,11 @@ public:
     void Blink(int duration);
 
     /* set to ON or OFF */
-    virtual void    Set (bool state);
+    virtual void Set(bool state);
     /* Get On/Off state */
-    virtual bool    Get (void);
+    virtual bool Get(void);
     /* change light level */
-    virtual void    SetLevel (uint8_t level);
+    virtual void SetLevel(uint8_t level);
     /* Get current level*/
     virtual uint8_t GetLevel(void);
     virtual uint8_t GetMaxLevel(void);

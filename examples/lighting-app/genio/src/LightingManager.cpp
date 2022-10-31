@@ -24,13 +24,12 @@
 #include <FreeRTOS.h>
 
 #ifdef __PWM_DIMMABLE_LED__
-  #include "DimmableLEDWidget.h"
-  DimmableLEDWidget sDimLED;
+#include "DimmableLEDWidget.h"
+DimmableLEDWidget sDimLED;
 #else
-  #include "LEDWidget.h"
-  LEDWidget sDimLED;
+#include "LEDWidget.h"
+LEDWidget sDimLED;
 #endif /* __PWM_DIMMABLE_LED__ */
-
 
 LightingManager LightingManager::sLight;
 
@@ -92,13 +91,14 @@ void LightingManager::SetAutoTurnOffDuration(uint32_t aDurationInSecs)
     mAutoTurnOffDuration = aDurationInSecs;
 }
 
-bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction, uint8_t* aValue)
+bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction, uint8_t * aValue)
 {
     bool action_initiated = false;
     State_t new_state;
     RgbColor_t rgb;
 
-    if (sLightTimer == NULL) return action_initiated;
+    if (sLightTimer == NULL)
+        return action_initiated;
 
     switch (aAction)
     {
@@ -106,68 +106,59 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction, uint8_t* 
         if (mState == kState_OffCompleted)
         {
             action_initiated = true;
-            new_state = kState_OnInitiated;
+            new_state        = kState_OnInitiated;
         }
-        if(*aValue == 0) break;
+        if (*aValue == 0)
+            break;
     case LEVEL_ACTION:
-        if(mState == kState_OnCompleted &&
-                *aValue >= sDimLED.GetMinLevel() && *aValue <= sDimLED.GetMaxLevel())
+        if (mState == kState_OnCompleted && *aValue >= sDimLED.GetMinLevel() && *aValue <= sDimLED.GetMaxLevel())
         {
             action_initiated = true;
             /**
              * NEST HUB uses minimal as off state.
              */
-            new_state = ((*aValue == sDimLED.GetMinLevel())?kState_OffInitiated:kState_LevelInitiated);
+            new_state = ((*aValue == sDimLED.GetMinLevel()) ? kState_OffInitiated : kState_LevelInitiated);
         }
         break;
     case OFF_ACTION:
         if (mState == kState_OnCompleted)
         {
             action_initiated = true;
-            new_state = kState_OffInitiated;
+            new_state        = kState_OffInitiated;
         }
         break;
-    case COLOR_ACTION:
-        {
-            rgb = *reinterpret_cast<RgbColor_t *>(aValue);
-        }
-        break;
-    case COLOR_ACTION_XY:
-        {
-            XyColor_t xy = *reinterpret_cast<XyColor_t *>(aValue);
-            rgb = XYToRgb(sDimLED.GetLevel(), xy.x, xy.y);
-        }
-        break;
-    case COLOR_ACTION_HSV:
-        {
-            HsvColor_t hsv = *reinterpret_cast<HsvColor_t *>(aValue);
-            hsv.v = sDimLED.GetLevel();
-            rgb = HsvToRgb(hsv);
-            MT793X_LOG("LightingManager HSV(%d,%d) to RGB(%d,%d,%d)",
-                    hsv.h, hsv.s,
-                    rgb.r, rgb.g, rgb.b);
-        }
-        break;
-    case COLOR_ACTION_CT:
-        {
-            CtColor_t ct;
-            ct.ctMireds = *reinterpret_cast<uint16_t *>(aValue);
-            rgb = CTToRgb(ct);
-        }
-        break;
+    case COLOR_ACTION: {
+        rgb = *reinterpret_cast<RgbColor_t *>(aValue);
+    }
+    break;
+    case COLOR_ACTION_XY: {
+        XyColor_t xy = *reinterpret_cast<XyColor_t *>(aValue);
+        rgb          = XYToRgb(sDimLED.GetLevel(), xy.x, xy.y);
+    }
+    break;
+    case COLOR_ACTION_HSV: {
+        HsvColor_t hsv = *reinterpret_cast<HsvColor_t *>(aValue);
+        hsv.v          = sDimLED.GetLevel();
+        rgb            = HsvToRgb(hsv);
+        MT793X_LOG("LightingManager HSV(%d,%d) to RGB(%d,%d,%d)", hsv.h, hsv.s, rgb.r, rgb.g, rgb.b);
+    }
+    break;
+    case COLOR_ACTION_CT: {
+        CtColor_t ct;
+        ct.ctMireds = *reinterpret_cast<uint16_t *>(aValue);
+        rgb         = CTToRgb(ct);
+    }
+    break;
     default:
         ChipLogProgress(NotSpecified, "LightMgr:Unknown");
         break;
     }
 
-    if(aAction == COLOR_ACTION_XY ||
-       aAction == COLOR_ACTION_HSV ||
-       aAction == COLOR_ACTION_CT ||
-       aAction == COLOR_ACTION)
+    if (aAction == COLOR_ACTION_XY || aAction == COLOR_ACTION_HSV || aAction == COLOR_ACTION_CT || aAction == COLOR_ACTION)
     {
-        new_state = kState_ColorInitiated;
+        new_state        = kState_ColorInitiated;
         action_initiated = true;
-        aAction = COLOR_ACTION;
+        aAction          = COLOR_ACTION;
     }
 
     if (action_initiated)
@@ -191,14 +182,21 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction, uint8_t* 
             mActionInitiated_CB(aAction, aActor);
         }
 
-        if(mState == kState_OnInitiated) {
+        if (mState == kState_OnInitiated)
+        {
             sDimLED.Set(true);
-        } else if(mState == kState_OffInitiated) {
+        }
+        else if (mState == kState_OffInitiated)
+        {
             sDimLED.Set(false);
-        } else if(mState == kState_LevelInitiated) {
+        }
+        else if (mState == kState_LevelInitiated)
+        {
             MT793X_LOG("LightingManager: set level %d", *aValue);
             sDimLED.SetLevel(*aValue);
-        } else if(mState == kState_ColorInitiated) {
+        }
+        else if (mState == kState_ColorInitiated)
+        {
             MT793X_LOG("LightingManager: set color(%d,%d,%d)", rgb.r, rgb.g, rgb.b);
             sDimLED.Color(rgb);
         }
@@ -209,7 +207,8 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction, uint8_t* 
 
 void LightingManager::StartTimer(uint32_t aTimeoutMs)
 {
-    if (sLightTimer == NULL) return;
+    if (sLightTimer == NULL)
+        return;
 
     if (xTimerIsTimerActive(sLightTimer))
     {
@@ -311,9 +310,7 @@ void LightingManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
         }
 
         if (light->mAutoTurnOff &&
-                (actionCompleted == ON_ACTION ||
-                 actionCompleted == LEVEL_ACTION ||
-                 actionCompleted == COLOR_ACTION))
+            (actionCompleted == ON_ACTION || actionCompleted == LEVEL_ACTION || actionCompleted == COLOR_ACTION))
         {
             // Start the timer for auto turn off
             light->StartTimer(light->mAutoTurnOffDuration * 1000);

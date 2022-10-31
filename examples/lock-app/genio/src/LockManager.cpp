@@ -41,15 +41,15 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
     if (LockParams.numberOfUsers > kMaxUsers)
     {
         MT793X_LOG("Max number of users is greater than %d, the maximum amount of users currently supported on this platform",
-                  kMaxUsers);
+                   kMaxUsers);
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
     if (LockParams.numberOfCredentialsPerUser > kMaxCredentialsPerUser)
     {
         MT793X_LOG("Max number of credentials per user is greater than %d, the maximum amount of users currently supported on this "
-                  "platform",
-                  kMaxCredentialsPerUser);
+                   "platform",
+                   kMaxCredentialsPerUser);
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
@@ -132,33 +132,33 @@ bool LockManager::ReadConfigValues()
 {
     size_t outLen;
     MT793XConfig::ReadConfigValueBin(MT793XConfig::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
-                                    sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
+                                     sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
 
     MT793XConfig::ReadConfigValueBin(MT793XConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
-                                    sizeof(EmberAfPluginDoorLockCredentialInfo) * ArraySize(mLockCredentials), outLen);
+                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * ArraySize(mLockCredentials), outLen);
 
     MT793XConfig::ReadConfigValueBin(MT793XConfig::kConfigKey_LockUserName, reinterpret_cast<uint8_t *>(mUserNames),
-                                    sizeof(mUserNames), outLen);
+                                     sizeof(mUserNames), outLen);
 
     MT793XConfig::ReadConfigValueBin(MT793XConfig::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
-                                    sizeof(mCredentialData), outLen);
+                                     sizeof(mCredentialData), outLen);
 
     MT793XConfig::ReadConfigValueBin(MT793XConfig::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials),
-                                    sizeof(DlCredential) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser,
-                                    outLen);
+                                     sizeof(DlCredential) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser,
+                                     outLen);
 
     MT793XConfig::ReadConfigValueBin(MT793XConfig::kConfigKey_WeekDaySchedules, reinterpret_cast<uint8_t *>(mWeekdaySchedule),
-                                    sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
-                                        LockParams.numberOfUsers,
-                                    outLen);
+                                     sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
+                                         LockParams.numberOfUsers,
+                                     outLen);
 
     MT793XConfig::ReadConfigValueBin(MT793XConfig::kConfigKey_YearDaySchedules, reinterpret_cast<uint8_t *>(mYeardaySchedule),
-                                    sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
-                                        LockParams.numberOfUsers,
-                                    outLen);
+                                     sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
+                                         LockParams.numberOfUsers,
+                                     outLen);
 
     MT793XConfig::ReadConfigValueBin(MT793XConfig::kConfigKey_HolidaySchedules, reinterpret_cast<uint8_t *>(&(mHolidaySchedule)),
-                                    sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules, outLen);
+                                     sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules, outLen);
 
     return true;
 }
@@ -378,21 +378,20 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
 
     for (size_t i = 0; i < totalCredentials; ++i)
     {
-        mCredentials[userIndex][i]                 = credentials[i];
+        mCredentials[userIndex][i] = credentials[i];
     }
-
 
     userInStorage.credentials = chip::Span<const DlCredential>(mCredentials[userIndex], totalCredentials);
 
     // Save user information in NVM flash
     MT793XConfig::WriteConfigValueBin(MT793XConfig::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&mLockUsers),
-                                     sizeof(EmberAfPluginDoorLockUserInfo) * LockParams.numberOfUsers);
+                                      sizeof(EmberAfPluginDoorLockUserInfo) * LockParams.numberOfUsers);
 
     MT793XConfig::WriteConfigValueBin(MT793XConfig::kConfigKey_UserCredentials, reinterpret_cast<const uint8_t *>(mCredentials),
-                                     sizeof(DlCredential) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser);
+                                      sizeof(DlCredential) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser);
 
     MT793XConfig::WriteConfigValueBin(MT793XConfig::kConfigKey_LockUserName, reinterpret_cast<const uint8_t *>(mUserNames),
-                                     sizeof(mUserNames));
+                                      sizeof(mUserNames));
 
     ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", endpointId, userIndex);
 
@@ -473,10 +472,10 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
 
     // Save credential information in NVM flash
     MT793XConfig::WriteConfigValueBin(MT793XConfig::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
-                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * LockParams.numberOfCredentialsPerUser);
+                                      sizeof(EmberAfPluginDoorLockCredentialInfo) * LockParams.numberOfCredentialsPerUser);
 
     MT793XConfig::WriteConfigValueBin(MT793XConfig::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
-                                     sizeof(mCredentialData));
+                                      sizeof(mCredentialData));
 
     ChipLogProgress(Zcl, "Successfully set the credential [credentialType=%u]", to_underlying(credentialType));
 
@@ -531,9 +530,9 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
     scheduleInStorage.status               = status;
 
     // Save schedule information in NVM flash
-    MT793XConfig::WriteConfigValueBin(MT793XConfig::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *>(mWeekdaySchedule),
-                                     sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
-                                         LockParams.numberOfUsers);
+    MT793XConfig::WriteConfigValueBin(
+        MT793XConfig::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *>(mWeekdaySchedule),
+        sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser * LockParams.numberOfUsers);
 
     return DlStatus::kSuccess;
 }
@@ -580,9 +579,9 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
     scheduleInStorage.status                  = status;
 
     // Save schedule information in NVM flash
-    MT793XConfig::WriteConfigValueBin(MT793XConfig::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *>(mYeardaySchedule),
-                                     sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
-                                         LockParams.numberOfUsers);
+    MT793XConfig::WriteConfigValueBin(
+        MT793XConfig::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *>(mYeardaySchedule),
+        sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser * LockParams.numberOfUsers);
 
     return DlStatus::kSuccess;
 }
@@ -625,8 +624,8 @@ DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
 
     // Save schedule information in NVM flash
     MT793XConfig::WriteConfigValueBin(MT793XConfig::kConfigKey_HolidaySchedules,
-                                     reinterpret_cast<const uint8_t *>(&(mHolidaySchedule)),
-                                     sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules);
+                                      reinterpret_cast<const uint8_t *>(&(mHolidaySchedule)),
+                                      sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules);
 
     return DlStatus::kSuccess;
 }
@@ -665,7 +664,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
         {
             ChipLogDetail(Zcl, "Door Lock App: setting door lock state to \"%s\" [endpointId=%d]", lockStateToString(lockState),
                           endpointId);
-			DoorLockServer::Instance().SetLockState(endpointId, lockState);
+            DoorLockServer::Instance().SetLockState(endpointId, lockState);
             return true;
         }
 
@@ -675,26 +674,28 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
     }
 
     // Check the PIN code and the user status
-	for(uint8_t i = 0; i < kMaxUsers; i++) {
-		for(uint8_t j = 0; j < kMaxCredentialsPerUser; j++) {
-			if (mLockCredentials[ mCredentials[i][j].CredentialIndex - 1 ].credentialType != DlCredentialType::kPin ||
-				mLockCredentials[ mCredentials[i][j].CredentialIndex - 1 ].status == DlCredentialStatus::kAvailable)
-				{
-					continue;
-				}
+    for (uint8_t i = 0; i < kMaxUsers; i++)
+    {
+        for (uint8_t j = 0; j < kMaxCredentialsPerUser; j++)
+        {
+            if (mLockCredentials[mCredentials[i][j].CredentialIndex - 1].credentialType != DlCredentialType::kPin ||
+                mLockCredentials[mCredentials[i][j].CredentialIndex - 1].status == DlCredentialStatus::kAvailable)
+            {
+                continue;
+            }
 
-				if (mLockCredentials[ mCredentials[i][j].CredentialIndex - 1 ].credentialData.data_equal(pin.Value()) &&
-					mLockUsers[i].userStatus != DlUserStatus::kOccupiedDisabled )
-				{
-					ChipLogDetail(Zcl,
-								  "Lock App: specified PIN code was found in the database, setting lock state to \"%s\" [endpointId=%d]",
-								  lockStateToString(lockState), mEndpointId);
-					DoorLockServer::Instance().SetLockState(endpointId, lockState);
+            if (mLockCredentials[mCredentials[i][j].CredentialIndex - 1].credentialData.data_equal(pin.Value()) &&
+                mLockUsers[i].userStatus != DlUserStatus::kOccupiedDisabled)
+            {
+                ChipLogDetail(
+                    Zcl, "Lock App: specified PIN code was found in the database, setting lock state to \"%s\" [endpointId=%d]",
+                    lockStateToString(lockState), mEndpointId);
+                DoorLockServer::Instance().SetLockState(endpointId, lockState);
 
-					return true;
-				}
-		}
-	}
+                return true;
+            }
+        }
+    }
 
     ChipLogDetail(Zcl,
                   "Door Lock App: specified PIN code was not found in the database, ignoring command to set lock state to \"%s\" "

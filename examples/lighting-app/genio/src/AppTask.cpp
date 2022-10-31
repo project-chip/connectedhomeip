@@ -20,15 +20,15 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-#include "LEDWidget.h"
 #include "ColorFormat.h"
+#include "LEDWidget.h"
 
 #include "qrcodegen.h"
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/on-off-server/on-off-server.h>
@@ -73,10 +73,10 @@
 
 #if defined(ENABLE_CHIP_SHELL)
 using chip::Shell::Engine;
+using chip::Shell::PrintCommandHelp;
 using chip::Shell::shell_command_t;
 using chip::Shell::streamer_get;
 using chip::Shell::streamer_printf;
-using chip::Shell::PrintCommandHelp;
 
 using namespace chip::app::Clusters;
 
@@ -91,8 +91,8 @@ TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
-LEDWidget       sStatusLED;
-uint8_t         sLightLEDLevelChangedCount = 0;
+LEDWidget sStatusLED;
+uint8_t sLightLEDLevelChangedCount = 0;
 
 bool sIsWiFiProvisioned = false;
 bool sIsWiFiEnabled     = false;
@@ -181,7 +181,7 @@ CHIP_ERROR ColorLightCommandHandler(int argc, char ** argv)
         return LightHelpHandler(argc, argv);
     }
 
-    rgb = (atoi(argv[2]) << 16) | (atoi(argv[1]) << 8) | atoi(argv[0]) ;
+    rgb = (atoi(argv[2]) << 16) | (atoi(argv[1]) << 8) | atoi(argv[0]);
     MT793X_LOG("ColorLightCommandHandler: %x", rgb);
 
     GetAppTask().PostLightActionRequest(0, LightingManager::COLOR_ACTION, rgb);
@@ -439,22 +439,22 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     LightingManager::Action_t action;
     int32_t actor;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t level = 0;
+    uint8_t level  = 0;
 
     if (aEvent->Type == AppEvent::kEventType_Light)
     {
         action = static_cast<LightingManager::Action_t>(aEvent->LightEvent.Action);
         actor  = aEvent->LightEvent.Actor;
-        level = aEvent->LightEvent.Value;
+        level  = aEvent->LightEvent.Value;
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
         if (LightMgr().IsLightOn() && sLightLEDLevelChangedCount >= 4)
         {
             sLightLEDLevelChangedCount = 1;
-            action = LightingManager::OFF_ACTION;
+            action                     = LightingManager::OFF_ACTION;
         }
-        else if(LightMgr().IsLightOn() && sLightLEDLevelChangedCount < 4)
+        else if (LightMgr().IsLightOn() && sLightLEDLevelChangedCount < 4)
         {
             sLightLEDLevelChangedCount += 1;
             action = LightingManager::LEVEL_ACTION;
@@ -473,14 +473,14 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
 
     if (err == CHIP_NO_ERROR)
     {
-        if(action == LightingManager::COLOR_ACTION)
+        if (action == LightingManager::COLOR_ACTION)
         {
             RgbColor_t rbg;
             uint32_t rbg_raw = aEvent->LightEvent.Value;
-            rbg.r = rbg_raw & 0xFF;
-            rbg.g = (rbg_raw & 0xFF00) >> 8;
-            rbg.b = (rbg_raw & 0xFF0000) >> 16;
-            initiated = LightMgr().InitiateAction(AppEvent::kEventType_Light, action, (uint8_t*) &rbg);
+            rbg.r            = rbg_raw & 0xFF;
+            rbg.g            = (rbg_raw & 0xFF00) >> 8;
+            rbg.b            = (rbg_raw & 0xFF0000) >> 16;
+            initiated        = LightMgr().InitiateAction(AppEvent::kEventType_Light, action, (uint8_t *) &rbg);
         }
         else
         {

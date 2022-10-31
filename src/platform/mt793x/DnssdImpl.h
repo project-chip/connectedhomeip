@@ -39,7 +39,7 @@ struct GenericContext
     ContextType type;
     void * context;
     DNSServiceRef serviceRef;
-    uint32_t      mSelectCount;
+    uint32_t mSelectCount;
 
     virtual ~GenericContext() {}
 
@@ -63,7 +63,7 @@ public:
     CHIP_ERROR RemoveAllOfType(ContextType type);
     CHIP_ERROR Has(GenericContext * context);
     GenericContext * GetBySockFd(int fd);
-    int GetSelectFd(fd_set* pSelectFd);
+    int GetSelectFd(fd_set * pSelectFd);
 
     /**
      * @brief

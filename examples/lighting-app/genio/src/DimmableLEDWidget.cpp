@@ -17,26 +17,31 @@
 
 #ifdef __PWM_DIMMABLE_LED__
 
+#include "DimmableLEDWidget.h"
 #include <assert.h>
 #include <stdio.h>
-#include "DimmableLEDWidget.h"
 
 #include "hal_pwm.h"
 
-#define LIGHT_LEVEL_MIN     (0)
-#define LIGHT_LEVEL_MAX     (100)
+#define LIGHT_LEVEL_MIN (0)
+#define LIGHT_LEVEL_MAX (100)
 #define LIGHT_LEVEL_DEFAULT (50)
 #define PWM_FREQUENCY_DEFAULT (1000)
-#define LEVEL_TO_PWM_RATIO(level) ((level) * 10)
+#define LEVEL_TO_PWM_RATIO(level) ((level) *10)
 
 static hal_pwm_channel_t convert_gpio_to_pwm_channel(hal_gpio_pin_t gpio)
 {
     hal_pwm_channel_t ret = HAL_PWM_MAX;
-    if(gpio >= HAL_GPIO_29 && gpio <= HAL_GPIO_40) {
-        ret = (hal_pwm_channel_t) (gpio - HAL_GPIO_29);
-    } else if(gpio >= HAL_GPIO_45 && gpio <= HAL_GPIO_52) {
-        ret = (hal_pwm_channel_t) (gpio - HAL_GPIO_45);
-    } else {
+    if (gpio >= HAL_GPIO_29 && gpio <= HAL_GPIO_40)
+    {
+        ret = (hal_pwm_channel_t)(gpio - HAL_GPIO_29);
+    }
+    else if (gpio >= HAL_GPIO_45 && gpio <= HAL_GPIO_52)
+    {
+        ret = (hal_pwm_channel_t)(gpio - HAL_GPIO_45);
+    }
+    else
+    {
         assert(false);
     }
 
@@ -46,17 +51,22 @@ static hal_pwm_channel_t convert_gpio_to_pwm_channel(hal_gpio_pin_t gpio)
 void DimmableLEDWidget::Init(hal_gpio_pin_t gpio)
 {
     hal_pwm_channel_t pwm_channel = HAL_PWM_MAX;
-    uint32_t total_count = 0;
-    mGpioPin = gpio;
-    mState = false;
-    mLevel = LIGHT_LEVEL_DEFAULT;
+    uint32_t total_count          = 0;
+    mGpioPin                      = gpio;
+    mState                        = false;
+    mLevel                        = LIGHT_LEVEL_DEFAULT;
 
     hal_gpio_init(mGpioPin);
-    if(mGpioPin >= HAL_GPIO_29 && mGpioPin <= HAL_GPIO_40) {
+    if (mGpioPin >= HAL_GPIO_29 && mGpioPin <= HAL_GPIO_40)
+    {
         assert(HAL_PINMUX_STATUS_OK == hal_pinmux_set_function(mGpioPin, 3));
-    } else if(mGpioPin >= HAL_GPIO_45 && mGpioPin <= HAL_GPIO_52) {
+    }
+    else if (mGpioPin >= HAL_GPIO_45 && mGpioPin <= HAL_GPIO_52)
+    {
         assert(HAL_PINMUX_STATUS_OK == hal_pinmux_set_function(mGpioPin, 5));
-    } else {
+    }
+    else
+    {
         /* This GPIO is not supported PWM */
         assert(false);
     }
@@ -64,20 +74,21 @@ void DimmableLEDWidget::Init(hal_gpio_pin_t gpio)
     pwm_channel = convert_gpio_to_pwm_channel(mGpioPin);
 
     assert(HAL_PWM_STATUS_OK == hal_pwm_init(pwm_channel, HAL_PWM_CLOCK_26MHZ));
-    assert(HAL_PWM_STATUS_OK == hal_pwm_set_frequency(
-                pwm_channel, PWM_FREQUENCY_DEFAULT, &total_count));
-    assert(HAL_PWM_STATUS_OK == hal_pwm_set_duty_cycle(pwm_channel,
-                LEVEL_TO_PWM_RATIO(mLevel)));
+    assert(HAL_PWM_STATUS_OK == hal_pwm_set_frequency(pwm_channel, PWM_FREQUENCY_DEFAULT, &total_count));
+    assert(HAL_PWM_STATUS_OK == hal_pwm_set_duty_cycle(pwm_channel, LEVEL_TO_PWM_RATIO(mLevel)));
 }
 
-void DimmableLEDWidget::Set (bool state)
+void DimmableLEDWidget::Set(bool state)
 {
     hal_pwm_channel_t pwm_channel = convert_gpio_to_pwm_channel(mGpioPin);
 
-    if(state && !mState) {
+    if (state && !mState)
+    {
         mState = true;
         assert(HAL_PWM_STATUS_OK == hal_pwm_start(pwm_channel));
-    } else if(!state && mState) {
+    }
+    else if (!state && mState)
+    {
         mState = false;
         assert(HAL_PWM_STATUS_OK == hal_pwm_stop(pwm_channel));
     }
@@ -92,12 +103,10 @@ void DimmableLEDWidget::SetLevel(uint8_t level)
 {
     hal_pwm_channel_t pwm_channel = convert_gpio_to_pwm_channel(mGpioPin);
 
-    if(level >= LIGHT_LEVEL_MIN &&
-       level <= LIGHT_LEVEL_MAX &&
-       level != mLevel) {
+    if (level >= LIGHT_LEVEL_MIN && level <= LIGHT_LEVEL_MAX && level != mLevel)
+    {
         mLevel = level;
-        assert(HAL_PWM_STATUS_OK == hal_pwm_set_duty_cycle(pwm_channel,
-                    LEVEL_TO_PWM_RATIO(mLevel)));
+        assert(HAL_PWM_STATUS_OK == hal_pwm_set_duty_cycle(pwm_channel, LEVEL_TO_PWM_RATIO(mLevel)));
     }
 }
 

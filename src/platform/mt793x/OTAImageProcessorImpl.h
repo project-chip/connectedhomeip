@@ -62,7 +62,7 @@ private:
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;
-    void          * mFilogicCtx;
+    void * mFilogicCtx;
 };
 
 } // namespace chip

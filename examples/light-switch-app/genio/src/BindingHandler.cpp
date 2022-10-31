@@ -110,7 +110,7 @@ void ProcessOnOffGroupBindingCommand(CommandId commandId, const EmberBindingTabl
     }
 }
 
-//void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, DeviceProxy * peer_device, void * context)
+// void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, DeviceProxy * peer_device, void * context)
 void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device, void * context)
 {
     VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));

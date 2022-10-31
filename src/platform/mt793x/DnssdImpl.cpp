@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include "MdnsError.h"
 #include "DnssdImpl.h"
+#include "MdnsError.h"
 #include "lib/dnssd/platform/Dnssd.h"
 
 #include "dns_sd.h"
@@ -25,13 +25,13 @@
 #include <lwip/ip4_addr.h>
 #include <lwip/ip6_addr.h>
 
-#include <errno.h>
 #include "FreeRTOS.h"
 #include "event_groups.h"
-#include "task.h"
-#include "task_def.h"
 #include "lwip/sockets.h"
 #include "mDNSDebug.h"
+#include "task.h"
+#include "task_def.h"
+#include <errno.h>
 
 #include "platform/CHIPDeviceLayer.h"
 #include <lib/support/CHIPMem.h>
@@ -132,14 +132,12 @@ static const char * GetProtocolString(DnssdServiceProtocol protocol)
     return protocol == DnssdServiceProtocol::kDnssdProtocolTcp ? "_tcp" : "_udp";
 }
 
-CHIP_ERROR ChipDnssdPublishService(const DnssdService * service,
-                                   DnssdPublishCallback callback,
-                                   void * context)
+CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
-    CHIP_ERROR          error = CHIP_NO_ERROR;
+    CHIP_ERROR error = CHIP_NO_ERROR;
     DNSServiceErrorType err;
-    DNSServiceFlags     flags = 0;
-    char                ServiceType[kDnssdTypeMaxSize + 10] = { 0 };
+    DNSServiceFlags flags                    = 0;
+    char ServiceType[kDnssdTypeMaxSize + 10] = { 0 };
 
     (void) callback;
     (void) context;
@@ -164,14 +162,10 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service,
         TXTRecordCreate(&PublishTxtRecord, 0, NULL);
         for (size_t i = 0; i < service->mTextEntrySize; i++)
         {
-            ChipLogProgress(ServiceProvisioning, "service: key %s size %d data %s",
-                            service->mTextEntries[i].mKey,
-                            service->mTextEntries[i].mDataSize,
-                            service->mTextEntries[i].mData);
+            ChipLogProgress(ServiceProvisioning, "service: key %s size %d data %s", service->mTextEntries[i].mKey,
+                            service->mTextEntries[i].mDataSize, service->mTextEntries[i].mData);
 
-            err = TXTRecordSetValue(&PublishTxtRecord,
-                                    service->mTextEntries[i].mKey,
-                                    service->mTextEntries[i].mDataSize,
+            err = TXTRecordSetValue(&PublishTxtRecord, service->mTextEntries[i].mKey, service->mTextEntries[i].mDataSize,
                                     service->mTextEntries[i].mData);
             VerifyOrExit(err == 0, error = CHIP_ERROR_INTERNAL);
         }
@@ -179,9 +173,9 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service,
 
     if (client != NULL)
     {
-        //ChipLogProgress(ServiceProvisioning, "ChipDnssdPublishService - DNSServiceRefDeallocate");
-        //DNSServiceRefDeallocate(client);
-        //client = NULL;
+        // ChipLogProgress(ServiceProvisioning, "ChipDnssdPublishService - DNSServiceRefDeallocate");
+        // DNSServiceRefDeallocate(client);
+        // client = NULL;
     }
 
     ChipLogProgress(ServiceProvisioning, "ChipDnssdPublishService - client %p", client);
@@ -225,17 +219,11 @@ CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 
 static DNSServiceRef BrowseClient = NULL;
 
-void ChipDNSServiceBrowseReply(DNSServiceRef            sdRef,
-                               DNSServiceFlags          flags,
-                               uint32_t                 interfaceIndex,
-                               DNSServiceErrorType      errorCode,
-                               const char *             serviceName,
-                               const char *             regtype,
-                               const char *             replyDomain,
-                               void *                   context)
+void ChipDNSServiceBrowseReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode,
+                               const char * serviceName, const char * regtype, const char * replyDomain, void * context)
 {
     DnssdBrowseCallback ChipBrowseHandler = (DnssdBrowseCallback) context;
-    DnssdService        service;
+    DnssdService service;
 
     ChipLogProgress(ServiceProvisioning, "ChipDNSServiceBrowseReply %s", serviceName);
     strcpy(service.mName, serviceName);
@@ -243,17 +231,13 @@ void ChipDNSServiceBrowseReply(DNSServiceRef            sdRef,
     ChipBrowseHandler(NULL, &service, 1, true, CHIP_NO_ERROR);
 }
 
-CHIP_ERROR ChipDnssdBrowse(const char *                 type,
-                           DnssdServiceProtocol         protocol,
-                           chip::Inet::IPAddressType    addressType,
-                           chip::Inet::InterfaceId      interface,
-                           DnssdBrowseCallback          callback,
-                           void *                       context,
-                           intptr_t *                   browseIdentifier)
+CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
+                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
+                           intptr_t * browseIdentifier)
 {
-    CHIP_ERROR          error = CHIP_NO_ERROR;
+    CHIP_ERROR error = CHIP_NO_ERROR;
     DNSServiceErrorType err;
-    char                ServiceType[kDnssdTypeMaxSize + 10] = { 0 };
+    char ServiceType[kDnssdTypeMaxSize + 10] = { 0 };
 
     (void) addressType;
     ChipLogProgress(ServiceProvisioning, "ChipDnssdBrowse %s", type);
@@ -295,31 +279,30 @@ static void resolve_client_task(void * parameter)
         FD_ZERO(&readfds);
         nfds = MdnsContexts::GetInstance().GetSelectFd(&readfds);
 
-        if(nfds == 0)
+        if (nfds == 0)
         {
-            uxBits = xEventGroupWaitBits(gResolveTaskWakeEvent, 1,
-                        pdTRUE, pdFALSE, portMAX_DELAY);
+            uxBits = xEventGroupWaitBits(gResolveTaskWakeEvent, 1, pdTRUE, pdFALSE, portMAX_DELAY);
             continue;
         }
 
         tv.tv_sec  = 0;
-        tv.tv_usec = 100000; //100ms
+        tv.tv_usec = 100000; // 100ms
 
-        result = select(nfds+1, &readfds, (fd_set *) NULL, (fd_set *) NULL, &tv);
+        result = select(nfds + 1, &readfds, (fd_set *) NULL, (fd_set *) NULL, &tv);
         if (result > 0)
         {
             DNSServiceErrorType error = kDNSServiceErr_NoError;
 
-            for(fd = 0; fd <= nfds; ++fd)
+            for (fd = 0; fd <= nfds; ++fd)
             {
                 if (FD_ISSET(fd, &readfds))
                 {
                     DNSServiceRef resolveClient = NULL;
-                    void *context = MdnsContexts::GetInstance().GetBySockFd(fd);
-                    if(context)
+                    void * context              = MdnsContexts::GetInstance().GetBySockFd(fd);
+                    if (context)
                     {
                         auto sdCtx = reinterpret_cast<ResolveContext *>(context);
-                        error = DNSServiceProcessResult(sdCtx->serviceRef);
+                        error      = DNSServiceProcessResult(sdCtx->serviceRef);
                         {
                             mdnslogInfo("DNSServiceProcessResult(%d) returned %d\n", fd, error);
                         }
@@ -330,10 +313,10 @@ static void resolve_client_task(void * parameter)
         else
         {
             // remove timeout contexts
-            for(fd = 0; fd <= nfds; ++fd)
+            for (fd = 0; fd <= nfds; ++fd)
             {
-                GenericContext *context = MdnsContexts::GetInstance().GetBySockFd(fd);
-                if(context && context->mSelectCount > 10)
+                GenericContext * context = MdnsContexts::GetInstance().GetBySockFd(fd);
+                if (context && context->mSelectCount > 10)
                 {
                     context->Finalize(kDNSServiceErr_Timeout);
                 }
@@ -375,30 +358,23 @@ static void GetAddrInfo(ResolveContext * sdCtx)
     for (auto & interface : sdCtx->interfaces)
     {
         DNSServiceRef resolveClient = NULL;
-        auto interfaceId = interface.first;
-        auto hostname    = interface.second.fullyQualifiedDomainName.c_str();
+        auto interfaceId            = interface.first;
+        auto hostname               = interface.second.fullyQualifiedDomainName.c_str();
 
         DNSServiceRefDeallocate(sdCtx->serviceRef);
 
-        auto err = DNSServiceGetAddrInfo(&resolveClient, 0, interfaceId, protocol, hostname, OnGetAddrInfo, sdCtx);
+        auto err          = DNSServiceGetAddrInfo(&resolveClient, 0, interfaceId, protocol, hostname, OnGetAddrInfo, sdCtx);
         sdCtx->serviceRef = resolveClient;
         VerifyOrReturn(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
     }
 }
 
-void ChipDNSServiceResolveReply(DNSServiceRef           sdRef,
-                                DNSServiceFlags         flags,
-                                uint32_t                interfaceIndex,
-                                DNSServiceErrorType     errorCode,
-                                const char *            fullname,
-                                const char *            hosttarget,
-                                uint16_t                port,
-                                /* In network byte order */ uint16_t txtLen,
-                                const unsigned char *   txtRecord,
-                                void *                  context)
+void ChipDNSServiceResolveReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode,
+                                const char * fullname, const char * hosttarget, uint16_t port,
+                                /* In network byte order */ uint16_t txtLen, const unsigned char * txtRecord, void * context)
 {
     ChipLogProgress(ServiceProvisioning, "ChipDNSServiceResolveReply");
-    if(context)
+    if (context)
     {
         auto sdCtx = reinterpret_cast<ResolveContext *>(context);
 
@@ -419,20 +395,18 @@ void ChipDNSServiceResolveReply(DNSServiceRef           sdRef,
 
 uint32_t GetInterfaceId(chip::Inet::InterfaceId interfaceId)
 {
-    return interfaceId.IsPresent() ? (uint32_t) (void *)interfaceId.GetPlatformInterface() : kDNSServiceInterfaceIndexAny;
+    return interfaceId.IsPresent() ? (uint32_t)(void *) interfaceId.GetPlatformInterface() : kDNSServiceInterfaceIndexAny;
 }
 
-CHIP_ERROR ChipDnssdResolve(DnssdService *          service,
-                            chip::Inet::InterfaceId interface,
-                            DnssdResolveCallback    callback,
-                            void *                  context)
+CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
+                            void * context)
 {
-    DNSServiceRef       resolveClient = NULL;
-    CHIP_ERROR          error = CHIP_NO_ERROR;
+    DNSServiceRef resolveClient = NULL;
+    CHIP_ERROR error            = CHIP_NO_ERROR;
     DNSServiceErrorType err;
-    char                ServiceType[kDnssdTypeMaxSize + 10] = { 0 };
-    int                 dns_fd;
-    uint32_t            interfaceIndex = GetInterfaceId(interface);
+    char ServiceType[kDnssdTypeMaxSize + 10] = { 0 };
+    int dns_fd;
+    uint32_t interfaceIndex = GetInterfaceId(interface);
 
     ChipLogProgress(ServiceProvisioning, "ChipDnssdResolve %s", service->mName);
     strcpy(ServiceType, service->mType);
@@ -442,32 +416,37 @@ CHIP_ERROR ChipDnssdResolve(DnssdService *          service,
     auto sdCtx = chip::Platform::New<ResolveContext>(context, callback, service->mAddressType);
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
 
-    err = DNSServiceResolve(&resolveClient, 0, interfaceIndex, service->mName, ServiceType, SERVICE_DOMAIN, ChipDNSServiceResolveReply, sdCtx);
+    err = DNSServiceResolve(&resolveClient, 0, interfaceIndex, service->mName, ServiceType, SERVICE_DOMAIN,
+                            ChipDNSServiceResolveReply, sdCtx);
     ChipLogProgress(ServiceProvisioning, "DNSServiceResolve %d", (int) err);
     if (err)
     {
-        return  CHIP_ERROR_INTERNAL;
+        return CHIP_ERROR_INTERNAL;
     }
 
     sdCtx->serviceRef = resolveClient;
-    error = MdnsContexts::GetInstance().Add(sdCtx, sdCtx->serviceRef);
-    if(error == CHIP_NO_ERROR)
+    error             = MdnsContexts::GetInstance().Add(sdCtx, sdCtx->serviceRef);
+    if (error == CHIP_NO_ERROR)
     {
         if (gResolveTask == NULL)
         {
             gResolveTaskWakeEvent = xEventGroupCreate();
-            if(gResolveTaskWakeEvent == NULL)
+            if (gResolveTaskWakeEvent == NULL)
             {
                 ChipLogProgress(ServiceProvisioning, "Cannot create resolve_task event group");
                 return CHIP_ERROR_INTERNAL;
             }
 
-            if(pdPASS != xTaskCreate(resolve_client_task, "mdnsr", (15 * 1024) / sizeof(portSTACK_TYPE), (void *)service, TASK_PRIORITY_NORMAL, &gResolveTask))
+            if (pdPASS !=
+                xTaskCreate(resolve_client_task, "mdnsr", (15 * 1024) / sizeof(portSTACK_TYPE), (void *) service,
+                            TASK_PRIORITY_NORMAL, &gResolveTask))
             {
                 ChipLogProgress(ServiceProvisioning, "Cannot create resolve_task");
                 return CHIP_ERROR_INTERNAL;
             }
-        } else {
+        }
+        else
+        {
             // wake up task
             xEventGroupSetBits(gResolveTaskWakeEvent, 1);
         }

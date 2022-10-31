@@ -45,8 +45,8 @@
 #endif
 
 #include "filogic.h"
-#include "mt7933_pos.h"
 #include "mdns.h"
+#include "mt7933_pos.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -99,9 +99,9 @@ void ConnectivityManagerImpl::OnInternetConnectivityChangeEvent(const ChipDevice
 
     ChipLogProgress(DeviceLayer, "%s", __func__);
 
-    //chip::app::DnssdServer::Instance().StartServer();
+    // chip::app::DnssdServer::Instance().StartServer();
 
-    //if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established ||
+    // if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established ||
     //    event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
     {
         mdns_update_interface();

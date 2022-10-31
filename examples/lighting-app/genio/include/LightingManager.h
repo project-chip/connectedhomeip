@@ -59,7 +59,7 @@ public:
     CHIP_ERROR Init();
     bool IsLightOn();
     bool IsActionInProgress();
-    bool InitiateAction(int32_t aActor, Action_t aAction, uint8_t* aValue);
+    bool InitiateAction(int32_t aActor, Action_t aAction, uint8_t * aValue);
     void EnableAutoTurnOff(bool aOn);
     void SetAutoTurnOffDuration(uint32_t aDurationInSecs);
 
