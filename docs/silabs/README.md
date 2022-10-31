@@ -18,23 +18,23 @@
 4. Matter over Wi-Fi
 
     1. [Matter Wi-Fi Demo Overview](wifi/DEMO_OVERVIEW.md)
-    2. [Building A Matter Wi-Fi End Device](wifi/SW_SETUP.md)
-    3. [Running Matter Demo over Wi-Fi](wifi/RUN_DEMO.md)
+    2. [Building a Matter Wi-Fi End Device](wifi/SW_SETUP.md)
+    3. [Running the Matter Demo over Wi-Fi](wifi/RUN_DEMO.md)
        <br><br>
 
 5. Matter Bridging to Zigbee/Z-Wave
 
     1. [Unify Matter Bridge Overview](../../silabs_examples/unify-matter-bridge/readme_overview.md)
     2. [Building the Matter Bridge](../../silabs_examples/unify-matter-bridge/readme_building.md)
-    3. [Getting Started](../../silabs_examples/unify-matter-bridge/readme_user.md#Running-the-Matter-Bridge)
-    4. [Control a Z-Wave OnOff device](../../silabs_examples/unify-matter-bridge/readme_user.md#Testing-the-bridge-using-the-chip-tool)
-    5. [Toggle a group of OnOff devices](../../silabs_examples/unify-matter-bridge/readme_user.md#toggle-a-group-of-onoff-devices)
+    3. [Running the Matter Bridge](../../silabs_examples/unify-matter-bridge/readme_user.md#Running-the-Matter-Bridge)
+    4. [Controlling a Z-Wave OnOff device](../../silabs_examples/unify-matter-bridge/readme_user.md#Testing-the-bridge-using-the-chip-tool)
+    5. [Toggling a Group of OnOff devices](../../silabs_examples/unify-matter-bridge/readme_user.md#toggle-a-group-of-onoff-devices)
 <br><br>
 
 6. Development using VS Code
 
-    1. [Setting up environment](dev/vscode/SETUP.md)
-    2. [Running tasks](dev/vscode/TASKS.md)
+    1. [Setting up the Environment](dev/vscode/SETUP.md)
+    2. [Running Tasks](dev/vscode/TASKS.md)
         1. [Create](dev/vscode/CREATE.md)
         2. [Build](dev/vscode/BUILD.md)
         3. [Flash](dev/vscode/FLASH.md)

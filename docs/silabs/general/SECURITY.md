@@ -6,7 +6,9 @@ Each Matter device gets two certificates. The first, the **device certificate**,
 
 Communication between Matter devices is protected with different keys in different stages. At the commissioning stage, the key is a result of the Password Authenticated Session Establishment (**PASE**) process over the commissioning channel using the passcode from the device's QR code as the input. During this initial setup, verification of possession of the passcode by both commissioner and joining device is confirmed. At the operational stage, the key is a result of the Certificate Authenticated Session Establishment (**CASE**) process over the operational channel using the operational certificate as the input. These sessions are used during normal operation between controller and device to validate that both are part of the Matter network.
 
-### Principles - 
+### Principles
+
+The following are guiding principles for the Matter security design: 
 
 1. **No anonymous joining** - Always requires “proof of ownership” (that is, a device-specific passcode)
 
