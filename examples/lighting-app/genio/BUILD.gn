@@ -69,12 +69,12 @@ mt793x_executable("lighting_app") {
   ]
 
   sources = [
-    "src/LEDWidget.cpp",
-    "src/DimmableLEDWidget.cpp",
     "src/AppTask.cpp",
+    "src/ColorFormat.cpp",
+    "src/DimmableLEDWidget.cpp",
+    "src/LEDWidget.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
-    "src/ColorFormat.cpp",
     "src/main.cpp",
   ]
 

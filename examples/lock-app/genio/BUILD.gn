@@ -70,8 +70,8 @@ mt793x_executable("lock_app") {
   defines = []
 
   sources = [
-    "src/LEDWidget.cpp",
     "src/AppTask.cpp",
+    "src/LEDWidget.cpp",
     "src/LockManager.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",

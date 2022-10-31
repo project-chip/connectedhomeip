@@ -71,16 +71,16 @@ mt793x_executable("thermostat") {
 
   sources = [
     "src/AppTask.cpp",
+    "src/LEDWidget.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
-    "src/LEDWidget.cpp",
   ]
 
   deps = [
     ":sdk",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/thermostat/thermostat-common",
     "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/examples/thermostat/thermostat-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
     "${mt793x_examples_plat_dir}:genio-matter-shell",

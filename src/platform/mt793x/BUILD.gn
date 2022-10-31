@@ -21,6 +21,7 @@ assert(chip_device_platform == "mt793x")
 
 static_library("mt793x") {
   sources = [
+    "../FreeRTOS/SystemTimeSupport.cpp",
     "../SingletonConfigurationManager.cpp",
     "BLEGattProfile.c",
     "BLEManagerImpl.cpp",
@@ -37,8 +38,6 @@ static_library("mt793x") {
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "DnssdContexts.cpp",
-    "MdnsError.cpp",
-    "MdnsError.h",
     "DnssdImpl.cpp",
     "DnssdImpl.h",
     "KeyValueStoreManagerImpl.cpp",
@@ -46,11 +45,12 @@ static_library("mt793x") {
     "Logging.cpp",
     "MT793XConfig.cpp",
     "MT793XConfig.h",
+    "MdnsError.cpp",
+    "MdnsError.h",
     "MtkWiFiEvents.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
-    "../FreeRTOS/SystemTimeSupport.cpp",
   ]
 
   if (chip_enable_ota_requestor) {

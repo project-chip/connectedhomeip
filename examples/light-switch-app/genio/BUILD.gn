@@ -70,11 +70,11 @@ mt793x_executable("light_switch_app") {
   defines = []
 
   sources = [
-    "src/BindingHandler.cpp",
     "src/AppTask.cpp",
+    "src/BindingHandler.cpp",
+    "src/LEDWidget.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
-    "src/LEDWidget.cpp",
   ]
 
   deps = [
