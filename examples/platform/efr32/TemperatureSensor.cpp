@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018 Nest Labs, Inc.
+ *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,33 +17,30 @@
  *    limitations under the License.
  */
 
-#pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-struct AppEvent;
-typedef void (*EventHandler)(AppEvent *);
+#include "TemperatureSensor.h"
+#include "sl_sensor_rht.h"
 
-struct AppEvent
+#define SENSOR_TEMP_OFFSET 800
+
+sl_status_t TemperatureSensor::Init(void)
 {
-    enum AppEventTypes
-    {
-        kEventType_Button = 0,
-        kEventType_Timer,
-        kEventType_Install,
-    };
+    return sl_sensor_rht_init();
+}
 
-    uint16_t Type;
+sl_status_t TemperatureSensor::GetTemp(uint32_t * rh, int16_t * t)
+{
+    // Sensor resolution 0.001 C
+    // DataModel resolution 0.01 C
+    int32_t temp;
+    sl_status_t status = sl_sensor_rht_get(rh, &temp);
+    *t                 = static_cast<int16_t>(temp / 10) - SENSOR_TEMP_OFFSET;
+    return status;
+}
 
-    union
-    {
-        struct
-        {
-            uint8_t Action;
-        } ButtonEvent;
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-    };
-
-    EventHandler Handler;
-};
+#ifdef __cplusplus
+}
+#endif
