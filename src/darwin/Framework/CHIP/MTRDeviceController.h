@@ -89,7 +89,8 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 - (BOOL)pairDevice:(uint64_t)deviceID
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
-             error:(NSError * __autoreleasing *)error;
+             error:(NSError * __autoreleasing *)error
+    DEPRECATED_MSG_ATTRIBUTE("Use setupCommissioningSessionWithPayload method.");
 
 /**
  * @deprecated - Use the setupCommissioningSessionWithPayload API to pair devices
@@ -107,7 +108,8 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
            address:(NSString *)address
               port:(uint16_t)port
       setupPINCode:(uint32_t)setupPINCode
-             error:(NSError * __autoreleasing *)error;
+             error:(NSError * __autoreleasing *)error
+    DEPRECATED_MSG_ATTRIBUTE("Use setupCommissioningSessionWithPayload method.");
 
 /**
  * @deprecated - Use the setupCommissioningSessionWithPayload API to pair devices
@@ -121,7 +123,11 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * for this controller.  That delegate is expected to call commissionDevice
  * after that point if it wants to commission the device.
  */
-- (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error;
+- (BOOL)pairDevice:(uint64_t)deviceID 
+ onboardingPayload:(NSString *)onboardingPayload
+             error:(NSError * __autoreleasing *)error
+    DEPRECATED_MSG_ATTRIBUTE("Use setupCommissioningSessionWithPayload method.");
+
 - (BOOL)commissionDevice:(uint64_t)deviceId
      commissioningParams:(MTRCommissioningParameters *)commissioningParams
                    error:(NSError * __autoreleasing *)error;
