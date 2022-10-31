@@ -56,7 +56,6 @@ K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppE
 LEDWidget sStatusLED;
 
 Button sFactoryResetButton;
-Button sThreadStartButton;
 Button sBleAdvStartButton;
 
 bool sIsThreadProvisioned = false;
@@ -103,6 +102,8 @@ CHIP_ERROR AppTask::Init()
 #endif
 
     // We only have network commissioning on endpoint 0.
+    // Set up a valid Network Commissioning cluster on endpoint 0 is done in
+    // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 
     ConfigurationMgr().LogDeviceConfig();
@@ -172,33 +173,6 @@ void AppTask::FactoryResetHandler(AppEvent * aEvent)
 {
     LOG_INF("Factory Reset triggered.");
     chip::Server::GetInstance().ScheduleFactoryReset();
-}
-
-void AppTask::StartThreadButtonEventHandler(void)
-{
-    AppEvent event;
-
-    event.Type               = AppEvent::kEventType_Button;
-    event.ButtonEvent.Action = kButtonPushEvent;
-    event.Handler            = StartThreadHandler;
-    sAppTask.PostEvent(&event);
-}
-
-void AppTask::StartThreadHandler(AppEvent * aEvent)
-{
-
-    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
-    {
-        // Switch context from BLE to Thread
-        BLEManagerImpl sInstance;
-        sInstance.SwitchToIeee802154();
-        StartDefaultThreadNetwork();
-        LOG_INF("Device is not commissioned to a Thread network. Starting with the default configuration.");
-    }
-    else
-    {
-        LOG_INF("Device is commissioned to a Thread network.");
-    }
 }
 
 void AppTask::StartBleAdvButtonEventHandler(void)
@@ -307,10 +281,8 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 void AppTask::InitButtons(void)
 {
     sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
-    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
     sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, StartBleAdvButtonEventHandler);
 
     ButtonManagerInst().AddButton(sFactoryResetButton);
-    ButtonManagerInst().AddButton(sThreadStartButton);
     ButtonManagerInst().AddButton(sBleAdvStartButton);
 }

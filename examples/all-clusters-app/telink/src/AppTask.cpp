@@ -142,6 +142,8 @@ CHIP_ERROR AppTask::Init()
 #endif
 
     // We only have network commissioning on endpoint 0.
+    // Set up a valid Network Commissioning cluster on endpoint 0 is done in
+    // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 
     ConfigurationMgr().LogDeviceConfig();
