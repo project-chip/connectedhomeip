@@ -102,21 +102,24 @@ MediaTek platform.
       chiptool onoff on 1 1
 
       chiptool onoff off 1 1
-   ```
+    ```
+
+````
 
 -   You can test the LED by light command as shown below
 
-    ```
-        > light
-          help            Usage: light <subcommand>
-          onoff           Usage: light onoff <subcommand>
-          color           Usage: light color <r:0~255> <g:0~255> <b:0~255>
-          level           Usage: light level <level:0~100>
-    ```
+ ```
+     > light
+       help            Usage: light <subcommand>
+       onoff           Usage: light onoff <subcommand>
+       color           Usage: light color <r:0~255> <g:0~255> <b:0~255>
+       level           Usage: light level <level:0~100>
+ ```
 
 ### Notes
 
 -   Depending on your network settings your router might not provide native ipv6
-    addresses to your devices (Border router / PC). If this is the case, you
-    need to add a static ipv6 addresses on both device and then an ipv6 route to
-    the border router on your PC
+ addresses to your devices (Border router / PC). If this is the case, you
+ need to add a static ipv6 addresses on both device and then an ipv6 route to
+ the border router on your PC
+````
