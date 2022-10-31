@@ -102,6 +102,16 @@ MediaTek platform.
       chiptool onoff on 1 1
 
       chiptool onoff off 1 1
+   ```
+
+-   You can test the LED by light command as shown below
+
+    ```
+        > light
+          help            Usage: light <subcommand>
+          onoff           Usage: light onoff <subcommand>
+          color           Usage: light color <r:0~255> <g:0~255> <b:0~255>
+          level           Usage: light level <level:0~100>
     ```
 
 ### Notes

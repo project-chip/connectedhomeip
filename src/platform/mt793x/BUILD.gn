@@ -36,7 +36,11 @@ static_library("mt793x") {
     "ConnectivityManagerImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
+    "DnssdContexts.cpp",
+    "MdnsError.cpp",
+    "MdnsError.h",
     "DnssdImpl.cpp",
+    "DnssdImpl.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
@@ -46,7 +50,7 @@ static_library("mt793x") {
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
-    "SystemTimeSupport.cpp",
+    "../FreeRTOS/SystemTimeSupport.cpp",
   ]
 
   if (chip_enable_ota_requestor) {

@@ -28,6 +28,7 @@
 
 #include <platform/PlatformManager.h>
 #include <platform/mt793x/MT793XConfig.h>
+#include <platform/PlatformManager.h>
 
 #include <lib/core/CHIPEncoding.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
@@ -86,6 +87,14 @@ const MT793XConfig::Key MT793XConfig::kConfigKey_GroupKeyBase = { .Namespace = k
                                                                   .Name      = "group-key-base" };
 const MT793XConfig::Key MT793XConfig::kConfigKey_GroupKeyMax  = { .Namespace = kConfigNamespace_ChipConfig,
                                                                  .Name      = "group-key-max" };
+const MT793XConfig::Key MT793XConfig::kConfigKey_LockUser          = { .Namespace = kConfigNamespace_ChipConfig, .Name ="lock-user" };
+const MT793XConfig::Key MT793XConfig::kConfigKey_Credential        = { .Namespace = kConfigNamespace_ChipConfig, .Name ="credential" };
+const MT793XConfig::Key MT793XConfig::kConfigKey_LockUserName      = { .Namespace = kConfigNamespace_ChipConfig, .Name ="lock-user-name" };
+const MT793XConfig::Key MT793XConfig::kConfigKey_CredentialData    = { .Namespace = kConfigNamespace_ChipConfig, .Name ="credential-data" };
+const MT793XConfig::Key MT793XConfig::kConfigKey_UserCredentials   = { .Namespace = kConfigNamespace_ChipConfig, .Name ="user-credential" };
+const MT793XConfig::Key MT793XConfig::kConfigKey_WeekDaySchedules  = { .Namespace = kConfigNamespace_ChipConfig, .Name ="weekday-sched" };
+const MT793XConfig::Key MT793XConfig::kConfigKey_YearDaySchedules  = { .Namespace = kConfigNamespace_ChipConfig, .Name ="yearday-sched" };
+const MT793XConfig::Key MT793XConfig::kConfigKey_HolidaySchedules  = { .Namespace = kConfigNamespace_ChipConfig, .Name ="holiday-sched" };
 // CHIP Counter Keys
 const MT793XConfig::Key MT793XConfig::kConfigKey_BootCount = { .Namespace = kConfigNamespace_ChipCounters, .Name = "boot-count" };
 const MT793XConfig::Key MT793XConfig::kConfigKey_TotalOperationalHours = { .Namespace = kConfigNamespace_ChipCounters,

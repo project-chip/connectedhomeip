@@ -23,6 +23,8 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
 
+#include <app/server/Dnssd.h>
+
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
 #include <lwip/nd6.h>
@@ -44,6 +46,7 @@
 
 #include "filogic.h"
 #include "mt7933_pos.h"
+#include "mdns.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -86,6 +89,23 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     _OnWiFiPlatformEvent(event);
 #endif
+    OnInternetConnectivityChangeEvent(event);
+}
+
+void ConnectivityManagerImpl::OnInternetConnectivityChangeEvent(const ChipDeviceEvent * event)
+{
+    if (event->Type != DeviceEventType::kInternetConnectivityChange)
+        return;
+
+    ChipLogProgress(DeviceLayer, "%s", __func__);
+
+    //chip::app::DnssdServer::Instance().StartServer();
+
+    //if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established ||
+    //    event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
+    {
+        mdns_update_interface();
+    }
 }
 
 } // namespace DeviceLayer

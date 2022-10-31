@@ -20,6 +20,8 @@
 #include <FreeRTOS.h>
 #include <timers.h>
 
+#include "DimmableLEDIf.h"
+#include "ColorFormat.h"
 #include <hal_gpio.h>
 
 enum led_id
@@ -35,27 +37,36 @@ enum led_color
     LED_BLUE
 };
 
-class LEDWidget
+class LEDWidget : public DimmableLEDIf
 {
 public:
     // bind this LEDWidget with the specified LED
     void Init(enum led_id led);
     // retrieve the name of this LED
     const char * Name(void);
-    // set to ON or OFF, no blink
-    void Set(bool state);
     // change the color
-    void Color(enum led_color color);
+    void Color(RgbColor_t color);
     // specify the ON, OFF duration
     void Blink(int on, int off);
     // specify evenly ON and OFF both to 'duration'
     void Blink(int duration);
 
+    /* set to ON or OFF */
+    virtual void    Set (bool state);
+    /* Get On/Off state */
+    virtual bool    Get (void);
+    /* change light level */
+    virtual void    SetLevel (uint8_t level);
+    /* Get current level*/
+    virtual uint8_t GetLevel(void);
+    virtual uint8_t GetMaxLevel(void);
+    virtual uint8_t GetMinLevel(void);
+
 private:
     enum led_id mLed;
-    enum led_color mColor;
     int mOn;
     int mOff;
+    uint8_t mLevel; /* Current level */
     bool mState;
     void Toggle(void);
     void DoSet(bool state);
