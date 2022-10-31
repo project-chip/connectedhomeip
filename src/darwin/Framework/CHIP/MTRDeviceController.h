@@ -123,7 +123,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * for this controller.  That delegate is expected to call commissionDevice
  * after that point if it wants to commission the device.
  */
-- (BOOL)pairDevice:(uint64_t)deviceID 
+- (BOOL)pairDevice:(uint64_t)deviceID
  onboardingPayload:(NSString *)onboardingPayload
              error:(NSError * __autoreleasing *)error
     DEPRECATED_MSG_ATTRIBUTE("Use setupCommissioningSessionWithPayload method.");
