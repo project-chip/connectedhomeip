@@ -29,7 +29,6 @@ client cluster Identify = 3 {
     kActuator = 5;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct IdentifyRequest {
     INT16U identifyTime = 0;
@@ -49,7 +48,6 @@ client cluster Groups = 4 {
     kGroupNames = 0x1;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct AddGroupRequest {
     group_id groupId = 0;
@@ -117,7 +115,6 @@ client cluster Scenes = 5 {
     int8u attributeValue[] = 1;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct AddSceneRequest {
     group_id groupId = 0;
@@ -238,7 +235,6 @@ client cluster OnOff = 6 {
     kSceneNames = 0x1;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct OffWithEffectRequest {
     OnOffEffectIdentifier effectId = 0;
@@ -260,7 +256,6 @@ client cluster OnOff = 6 {
 }
 
 client cluster OnOffSwitchConfiguration = 7 {
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster LevelControl = 8 {
@@ -280,8 +275,6 @@ client cluster LevelControl = 8 {
     kFrequency = 0x4;
   }
 
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct MoveToLevelRequest {
     INT8U level = 0;
@@ -348,7 +341,6 @@ client cluster LevelControl = 8 {
 }
 
 client cluster BinaryInputBasic = 15 {
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster Descriptor = 29 {
@@ -357,7 +349,6 @@ client cluster Descriptor = 29 {
     int16u revision = 1;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster Binding = 30 {
@@ -369,7 +360,6 @@ client cluster Binding = 30 {
     fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster AccessControl = 31 {
@@ -428,7 +418,6 @@ client cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster Actions = 37 {
@@ -504,7 +493,6 @@ client cluster Actions = 37 {
     ActionErrorEnum error = 3;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct InstantActionRequest {
     INT16U actionID = 0;
@@ -606,7 +594,6 @@ client cluster Basic = 40 {
     boolean reachableNewValue = 0;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster OtaSoftwareUpdateProvider = 41 {
@@ -630,7 +617,6 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     kDownloadProtocolNotSupported = 3;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct QueryImageRequest {
     vendor_id vendorId = 0;
@@ -726,7 +712,6 @@ client cluster OtaSoftwareUpdateRequestor = 42 {
     nullable INT64S platformCode = 3;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct AnnounceOtaProviderRequest {
     node_id providerNodeId = 0;
@@ -779,7 +764,6 @@ client cluster UnitLocalization = 45 {
 }
 
 client cluster PowerSourceConfiguration = 46 {
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster PowerSource = 47 {
@@ -848,7 +832,6 @@ client cluster PowerSource = 47 {
     kReplaceable = 0x8;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster GeneralCommissioning = 48 {
@@ -871,8 +854,6 @@ client cluster GeneralCommissioning = 48 {
     int16u maxCumulativeFailsafeSeconds = 1;
   }
 
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct ArmFailSafeRequest {
     INT16U expiryLengthSeconds = 0;
@@ -969,8 +950,6 @@ client cluster NetworkCommissioning = 49 {
     int8u lqi = 7;
   }
 
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct ScanNetworksRequest {
     optional nullable OCTET_STRING<32> ssid = 0;
@@ -1148,7 +1127,6 @@ client cluster GeneralDiagnostics = 51 {
     BootReasonType bootReason = 0;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct TestEventTriggerRequest {
     OCTET_STRING<16> enableKey = 0;
@@ -1177,8 +1155,6 @@ client cluster SoftwareDiagnostics = 52 {
     optional OCTET_STRING faultRecording = 2;
   }
 
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
 
   command ResetWatermarks(): DefaultSuccess = 0;
 }
@@ -1272,8 +1248,6 @@ client cluster ThreadNetworkDiagnostics = 53 {
     NetworkFault previous[] = 1;
   }
 
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
 
   command ResetCounts(): DefaultSuccess = 0;
 }
@@ -1322,7 +1296,6 @@ client cluster WiFiNetworkDiagnostics = 54 {
     WiFiConnectionStatus connectionStatus = 0;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   command ResetCounts(): DefaultSuccess = 0;
 }
@@ -1341,8 +1314,6 @@ client cluster EthernetNetworkDiagnostics = 55 {
     k400g = 9;
   }
 
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
 
   command ResetCounts(): DefaultSuccess = 0;
 }
@@ -1362,7 +1333,6 @@ client cluster BridgedDeviceBasic = 57 {
     boolean reachableNewValue = 0;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster Switch = 59 {
@@ -1404,7 +1374,6 @@ client cluster Switch = 59 {
     INT8U totalNumberOfPressesCounted = 1;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster AdministratorCommissioning = 60 {
@@ -1420,7 +1389,6 @@ client cluster AdministratorCommissioning = 60 {
     kWindowNotOpen = 4;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct OpenCommissioningWindowRequest {
     INT16U commissioningTimeout = 0;
@@ -1468,7 +1436,6 @@ client cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct AttestationRequestRequest {
     OCTET_STRING attestationNonce = 0;
@@ -1568,7 +1535,6 @@ client cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime2 = 7;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct KeySetWriteRequest {
     GroupKeySetStruct groupKeySet = 0;
@@ -1601,7 +1567,6 @@ client cluster GroupKeyManagement = 63 {
 }
 
 client cluster FixedLabel = 64 {
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster UserLabel = 65 {
@@ -1612,7 +1577,6 @@ client cluster BooleanState = 69 {
     boolean stateValue = 0;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster ModeSelect = 80 {
@@ -1631,7 +1595,6 @@ client cluster ModeSelect = 80 {
     enum16 value = 1;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct ChangeToModeRequest {
     INT8U newMode = 0;
@@ -2012,7 +1975,6 @@ client cluster DoorLock = 257 {
     nullable INT16U dataIndex = 6;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct LockDoorRequest {
     optional OCTET_STRING pinCode = 0;
@@ -2277,7 +2239,6 @@ client cluster WindowCovering = 258 {
     kProtection = 0x800;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct GoToLiftValueRequest {
     INT16U liftValue = 0;
@@ -2305,7 +2266,6 @@ client cluster WindowCovering = 258 {
 }
 
 client cluster BarrierControl = 259 {
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct BarrierControlGoToPercentRequest {
     INT8U percentOpen = 0;
@@ -2395,8 +2355,6 @@ client cluster PumpConfigurationAndControl = 512 {
   info event TurbineOperation = 16 {
   }
 
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster Thermostat = 513 {
@@ -2462,7 +2420,6 @@ client cluster Thermostat = 513 {
     nullable int16s coolSetpoint = 2;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct SetpointRaiseLowerRequest {
     SetpointAdjustMode mode = 0;
@@ -2540,7 +2497,6 @@ client cluster FanControl = 514 {
 }
 
 client cluster ThermostatUserInterfaceConfiguration = 516 {
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster ColorControl = 768 {
@@ -2613,7 +2569,6 @@ client cluster ColorControl = 768 {
     kUpdateStartHue = 0x8;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct MoveToHueRequest {
     INT8U hue = 0;
@@ -2785,8 +2740,6 @@ client cluster ColorControl = 768 {
 }
 
 client cluster BallastConfiguration = 769 {
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster IlluminanceMeasurement = 1024 {
@@ -2795,11 +2748,9 @@ client cluster IlluminanceMeasurement = 1024 {
     kCmos = 1;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster TemperatureMeasurement = 1026 {
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster PressureMeasurement = 1027 {
@@ -2807,23 +2758,18 @@ client cluster PressureMeasurement = 1027 {
     kExt = 0x1;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster FlowMeasurement = 1028 {
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster RelativeHumidityMeasurement = 1029 {
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster OccupancySensing = 1030 {
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster WakeOnLan = 1283 {
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster Channel = 1284 {
@@ -2857,7 +2803,6 @@ client cluster Channel = 1284 {
     LineupInfoTypeEnum lineupInfoType = 3;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct ChangeChannelRequest {
     CHAR_STRING match = 0;
@@ -2894,7 +2839,6 @@ client cluster TargetNavigator = 1285 {
     char_string<32> name = 1;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct NavigateTargetRequest {
     INT8U target = 0;
@@ -2936,7 +2880,6 @@ client cluster MediaPlayback = 1286 {
     nullable int64u position = 1;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct SkipForwardRequest {
     INT64U deltaPositionMilliseconds = 0;
@@ -2995,7 +2938,6 @@ client cluster MediaInput = 1287 {
     char_string<32> description = 3;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct SelectInputRequest {
     INT8U index = 0;
@@ -3013,7 +2955,6 @@ client cluster MediaInput = 1287 {
 }
 
 client cluster LowPower = 1288 {
-  readonly attribute int16u clusterRevision = 65533;
 
   command Sleep(): DefaultSuccess = 0;
 }
@@ -3120,7 +3061,6 @@ client cluster KeypadInput = 1289 {
     kNumberKeys = 0x4;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct SendKeyRequest {
     CecKeyCode keyCode = 0;
@@ -3207,7 +3147,6 @@ client cluster ContentLauncher = 1290 {
     MetricTypeEnum metric = 2;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct LaunchContentRequest {
     ContentSearch search = 0;
@@ -3250,7 +3189,6 @@ client cluster AudioOutput = 1291 {
     char_string<32> name = 2;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct SelectOutputRequest {
     INT8U index = 0;
@@ -3286,7 +3224,6 @@ client cluster ApplicationLauncher = 1292 {
     char_string applicationId = 1;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct LaunchAppRequest {
     Application application = 0;
@@ -3324,11 +3261,9 @@ client cluster ApplicationBasic = 1293 {
     char_string applicationId = 1;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster AccountLogin = 1294 {
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct GetSetupPINRequest {
     CHAR_STRING<100> tempAccountIdentifier = 0;
@@ -3349,7 +3284,6 @@ client cluster AccountLogin = 1294 {
 }
 
 client cluster ElectricalMeasurement = 2820 {
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster TestCluster = 4294048773 {
@@ -3465,7 +3399,6 @@ client cluster TestCluster = 4294048773 {
     fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct TestAddArgumentsRequest {
     INT8U arg1 = 0;

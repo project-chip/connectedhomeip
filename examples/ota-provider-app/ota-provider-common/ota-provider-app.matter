@@ -70,7 +70,6 @@ client cluster AccessControl = 31 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 server cluster AccessControl = 31 {
@@ -136,7 +135,6 @@ server cluster AccessControl = 31 {
   readonly attribute int16u accessControlEntriesPerFabric = 4;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
   readonly attribute int16u clusterRevision = 65533;
 }
 

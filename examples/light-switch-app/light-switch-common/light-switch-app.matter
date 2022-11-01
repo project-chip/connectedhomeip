@@ -36,7 +36,6 @@ client cluster Identify = 3 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 server cluster Identify = 3 {
@@ -68,7 +67,6 @@ server cluster Identify = 3 {
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct IdentifyRequest {
@@ -159,7 +157,6 @@ client cluster Scenes = 5 {
     int8u attributeValue[] = 1;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct AddSceneRequest {
     group_id groupId = 0;
@@ -280,7 +277,6 @@ client cluster OnOff = 6 {
     kSceneNames = 0x1;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   command Off(): DefaultSuccess = 0;
   command On(): DefaultSuccess = 1;
@@ -450,7 +446,6 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     kDownloadProtocolNotSupported = 3;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct QueryImageRequest {
     vendor_id vendorId = 0;
@@ -1542,7 +1537,6 @@ client cluster ColorControl = 768 {
     kUpdateStartHue = 0x8;
   }
 
-  readonly attribute int16u clusterRevision = 65533;
 
   request struct MoveToHueRequest {
     INT8U hue = 0;

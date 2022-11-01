@@ -45,7 +45,7 @@
   }
 
   {{/zcl_events}}
-  {{#all_user_cluster_attributes_irrespective_of_manufatucuring_specification name side}}
+  {{#all_user_cluster_attributes_irrespective_of_manufatucuring_specification name 'server'}}
   {{! ensure indent }}{{#unless isWritableAttribute~}}
     readonly {{!marker to place a space even with whitespace removal~}}
   {{~/unless~}}
