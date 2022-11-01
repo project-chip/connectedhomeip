@@ -39,7 +39,6 @@ android_binary("java-matter-controller") {
     "java/src/com/matter/controller/commands/common/CredentialsIssuer.java",
     "java/src/com/matter/controller/commands/common/IPAddress.java",
     "java/src/com/matter/controller/commands/common/MatterCommand.java",
-    "java/src/com/matter/controller/commands/common/MutableInteger.java",
     "java/src/com/matter/controller/config/PersistentStorage.java",
     "java/src/com/matter/controller/config/PersistentStorageOpCertStore.java",
     "java/src/com/matter/controller/config/PersistentStorageOperationalKeystore.java",

@@ -21,6 +21,9 @@ package com.matter.controller.commands.common;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.Nullable;
 
 public class Argument {
@@ -44,14 +47,14 @@ public class Argument {
     this.mDesc = Optional.ofNullable(desc);
   }
 
-  public Argument(String name, MutableInteger value, @Nullable String desc) {
+  public Argument(String name, AtomicBoolean value, @Nullable String desc) {
     this.mName = name;
     this.mType = ArgumentType.BOOL;
     this.mValue = (Object) value;
     this.mDesc = Optional.ofNullable(desc);
   }
 
-  public Argument(String name, short min, short max, MutableInteger value, @Nullable String desc) {
+  public Argument(String name, short min, short max, AtomicInteger value, @Nullable String desc) {
     this.mName = name;
     this.mType = ArgumentType.NUMBER_INT16;
     this.mMin = min;
@@ -60,7 +63,7 @@ public class Argument {
     this.mDesc = Optional.ofNullable(desc);
   }
 
-  public Argument(String name, int min, int max, MutableInteger value, @Nullable String desc) {
+  public Argument(String name, int min, int max, AtomicInteger value, @Nullable String desc) {
     this.mName = name;
     this.mType = ArgumentType.NUMBER_INT32;
     this.mMin = min;
@@ -69,7 +72,7 @@ public class Argument {
     this.mDesc = Optional.ofNullable(desc);
   }
 
-  public Argument(String name, long min, long max, MutableInteger value, @Nullable String desc) {
+  public Argument(String name, long min, long max, AtomicLong value, @Nullable String desc) {
     this.mName = name;
     this.mType = ArgumentType.NUMBER_INT64;
     this.mMin = min;
@@ -103,8 +106,8 @@ public class Argument {
         isValidArgument = value.equals(str);
         break;
       case NUMBER_INT32:
-        MutableInteger num = (MutableInteger) mValue;
-        num.setValue(Integer.parseInt(value));
+        AtomicInteger num = (AtomicInteger) mValue;
+        num.set(Integer.parseInt(value));
         isValidArgument = (num.intValue() >= mMin && num.intValue() <= mMax);
         break;
       case ADDRESS:

@@ -22,6 +22,8 @@ import com.matter.controller.config.PersistentStorage;
 import com.matter.controller.config.PersistentStorageOpCertStore;
 import com.matter.controller.config.PersistentStorageOperationalKeystore;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class MatterCommand extends Command {
   private final PersistentStorage mDefaultStorage = new PersistentStorage();
@@ -34,9 +36,9 @@ public abstract class MatterCommand extends Command {
   private final StringBuffer mCommissionerName = new StringBuffer();
   private final StringBuffer mPaaTrustStorePath = new StringBuffer();
   private final StringBuffer mCDTrustStorePath = new StringBuffer();
-  private final MutableInteger mCommissionerNodeId = new MutableInteger();
-  private final MutableInteger mUseMaxSizedCerts = new MutableInteger();;
-  private final MutableInteger mOnlyAllowTrustedCdKeys = new MutableInteger();;
+  private final AtomicLong mCommissionerNodeId = new AtomicLong();
+  private final AtomicBoolean mUseMaxSizedCerts = new AtomicBoolean();;
+  private final AtomicBoolean mOnlyAllowTrustedCdKeys = new AtomicBoolean();;
 
   public MatterCommand(String commandName, CredentialsIssuer credIssuerCmds) {
     this(commandName, credIssuerCmds, null);

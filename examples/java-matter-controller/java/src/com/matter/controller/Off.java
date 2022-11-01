@@ -20,11 +20,11 @@ package com.matter.controller;
 
 import com.matter.controller.commands.common.CredentialsIssuer;
 import com.matter.controller.commands.common.MatterCommand;
-import com.matter.controller.commands.common.MutableInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public final class Off extends MatterCommand {
-  private MutableInteger mNodeId = new MutableInteger();
-  private MutableInteger mFabricId = new MutableInteger();
+  private AtomicLong mNodeId = new AtomicLong();
+  private AtomicLong mFabricId = new AtomicLong();
 
   public Off(CredentialsIssuer credIssuerCmds) {
     super("off", credIssuerCmds);

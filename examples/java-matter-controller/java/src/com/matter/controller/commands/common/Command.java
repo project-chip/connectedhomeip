@@ -20,6 +20,9 @@ package com.matter.controller.commands.common;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.Nullable;
 
 /**
@@ -56,13 +59,11 @@ public abstract class Command {
    * @return A pointer to an Optional where the Attribute argument will be stored
    */
   public final Optional<String> getAttribute() {
-    for (Argument arg : mArgs) {
-      if (arg.getType() == ArgumentType.ATTRIBUTE) {
-        return Optional.of((String) arg.getValue());
-      }
-    }
-
-    return Optional.empty();
+    return mArgs
+        .stream()
+        .filter(arg -> arg.getType() == ArgumentType.ATTRIBUTE)
+        .findFirst()
+        .map(arg -> (String) arg.getValue());
   }
 
   public final String getArgumentName(int index) {
@@ -82,20 +83,20 @@ public abstract class Command {
   }
 
   /**
-   * @brief Add a bool Integer command argument
+   * @brief Add a bool command argument
    * @param name The name that will be displayed in the command help
    * @param out A pointer to a MutableInteger where the argv value will be stored
    * @param desc The description of the argument that will be displayed in the command help
    * @return The number of arguments currently added to the command
    */
-  public final int addArgument(String name, MutableInteger out, @Nullable String desc) {
+  public final int addArgument(String name, AtomicBoolean out, @Nullable String desc) {
     Argument arg = new Argument(name, out, desc);
     mArgs.add(arg);
     return mArgs.size();
   }
 
   /**
-   * @brief Add a short Integer command argument
+   * @brief Add a short command argument
    * @param name The name that will be displayed in the command help
    * @param min The minimum value of the argv value
    * @param max The minimum value of the argv value
@@ -104,14 +105,14 @@ public abstract class Command {
    * @return The number of arguments currently added to the command
    */
   public final int addArgument(
-      String name, short min, short max, MutableInteger out, @Nullable String desc) {
+      String name, short min, short max, AtomicInteger out, @Nullable String desc) {
     Argument arg = new Argument(name, min, max, out, desc);
     mArgs.add(arg);
     return mArgs.size();
   }
 
   /**
-   * @brief Add a int Integer command argument
+   * @brief Add an int command argument
    * @param name The name that will be displayed in the command help
    * @param min The minimum value of the argv value
    * @param max The minimum value of the argv value
@@ -120,7 +121,7 @@ public abstract class Command {
    * @return The number of arguments currently added to the command
    */
   public final int addArgument(
-      String name, int min, int max, MutableInteger out, @Nullable String desc) {
+      String name, int min, int max, AtomicInteger out, @Nullable String desc) {
     Argument arg = new Argument(name, min, max, out, desc);
     mArgs.add(arg);
     return mArgs.size();
@@ -136,7 +137,7 @@ public abstract class Command {
    * @return The number of arguments currently added to the command
    */
   public final int addArgument(
-      String name, long min, long max, MutableInteger out, @Nullable String desc) {
+      String name, long min, long max, AtomicLong out, @Nullable String desc) {
     Argument arg = new Argument(name, min, max, out, desc);
     mArgs.add(arg);
     return mArgs.size();
