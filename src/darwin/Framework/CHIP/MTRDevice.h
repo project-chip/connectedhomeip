@@ -166,17 +166,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 
 @end
 
-@interface MTRDevice (Deprecated)
-
-/**
- * Deprecated MTRDevice APIs.
- */
-+ (instancetype)deviceWithNodeID:(uint64_t)nodeID
-                deviceController:(MTRDeviceController *)deviceController
-    MTR_NEWLY_DEPRECATED("Please use deviceWithNodeID:controller:");
-
-@end
-
 @protocol MTRDeviceDelegate <NSObject>
 @required
 /**
@@ -203,6 +192,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * @param eventReport  An array of response-value objects as described in MTRDeviceResponseHandler
  */
 - (void)device:(MTRDevice *)device receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
+
+@end
+
+@interface MTRDevice (Deprecated)
+
+/**
+ * Deprecated MTRDevice APIs.
+ */
++ (instancetype)deviceWithNodeID:(uint64_t)nodeID
+                deviceController:(MTRDeviceController *)deviceController
+    MTR_NEWLY_DEPRECATED("Please use deviceWithNodeID:controller:");
 
 @end
 

@@ -18,7 +18,6 @@
 #import <Foundation/Foundation.h>
 
 #import <Matter/MTRNOCChainIssuer.h>
-#import <Matter/MTROnboardingPayloadParser.h>
 
 @class MTRBaseDevice;
 
@@ -27,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NSError * _Nullable error);
 
 @class MTRCommissioningParameters;
+@class MTRSetupPayload;
 @protocol MTRDevicePairingDelegate;
 
 @interface MTRDeviceController : NSObject

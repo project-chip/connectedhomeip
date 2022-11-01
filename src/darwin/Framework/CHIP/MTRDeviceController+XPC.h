@@ -77,14 +77,6 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
 
 @end
 
-@interface MTRDeviceController (Deprecated_XPC)
-
-+ (MTRDeviceController *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerID
-                                xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock
-    MTR_NEWLY_DEPRECATED("Please use sharedControllerWithID:xpcConnectBlock:");
-
-@end
-
 /**
  * Protocol that remote object must support over XPC
  */
@@ -191,6 +183,14 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
                             nodeId:(uint64_t)nodeId
                             values:(id _Nullable)values
                              error:(NSError * _Nullable)error;
+
+@end
+
+@interface MTRDeviceController (Deprecated_XPC)
+
++ (MTRDeviceController *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerID
+                                xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock
+    MTR_NEWLY_DEPRECATED("Please use sharedControllerWithID:xpcConnectBlock:");
 
 @end
 

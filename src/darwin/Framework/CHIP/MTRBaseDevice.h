@@ -269,6 +269,67 @@ extern NSString * const MTRArrayValueType;
 
 @end
 
+@interface MTRAttributePath : NSObject <NSCopying>
+@property (nonatomic, readonly, strong, nonnull) NSNumber * endpoint;
+@property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
+@property (nonatomic, readonly, strong, nonnull) NSNumber * attribute;
+
++ (instancetype)attributePathWithEndpointID:(NSNumber *)endpointID
+                                  clusterID:(NSNumber *)clusterID
+                                attributeID:(NSNumber *)attributeID MTR_NEWLY_AVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+@end
+
+@interface MTREventPath : NSObject
+@property (nonatomic, readonly, strong, nonnull) NSNumber * endpoint;
+@property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
+@property (nonatomic, readonly, strong, nonnull) NSNumber * event;
+
++ (instancetype)eventPathWithEndpointID:(NSNumber *)endpointID
+                              clusterID:(NSNumber *)clusterID
+                                eventID:(NSNumber *)eventID MTR_NEWLY_AVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+@end
+
+@interface MTRCommandPath : NSObject
+@property (nonatomic, readonly, strong, nonnull) NSNumber * endpoint;
+@property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
+@property (nonatomic, readonly, strong, nonnull) NSNumber * command;
+
++ (instancetype)commandPathWithEndpointID:(NSNumber *)endpointID
+                                clusterID:(NSNumber *)clusterID
+                                commandID:(NSNumber *)commandID MTR_NEWLY_AVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+@end
+
+@interface MTRAttributeReport : NSObject
+@property (nonatomic, readonly, strong, nonnull) MTRAttributePath * path;
+// value is nullable because nullable attributes can have nil as value.
+@property (nonatomic, readonly, strong, nullable) id value;
+// If this specific path resulted in an error, the error (in the
+// MTRInteractionErrorDomain or MTRErrorDomain) that corresponds to this
+// path.
+@property (nonatomic, readonly, strong, nullable) NSError * error;
+@end
+
+@interface MTREventReport : NSObject
+@property (nonatomic, readonly, strong, nonnull) MTREventPath * path;
+@property (nonatomic, readonly, strong, nonnull) NSNumber * eventNumber; // chip::EventNumber type (uint64_t)
+@property (nonatomic, readonly, strong, nonnull) NSNumber * priority; // chip::app::PriorityLevel type (uint8_t)
+@property (nonatomic, readonly, strong, nonnull) NSNumber * timestamp; // chip::app::Timestamp.mValue type (uint64_t)
+@property (nonatomic, readonly, strong, nullable) id value;
+// If this specific path resulted in an error, the error (in the
+// MTRInteractionErrorDomain or MTRErrorDomain) that corresponds to this
+// path.
+@property (nonatomic, readonly, strong, nullable) NSError * error;
+@end
+
 @interface MTRBaseDevice (Deprecated)
 
 /**
@@ -331,19 +392,6 @@ extern NSString * const MTRArrayValueType;
 
 @end
 
-@interface MTRAttributePath : NSObject <NSCopying>
-@property (nonatomic, readonly, strong, nonnull) NSNumber * endpoint;
-@property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
-@property (nonatomic, readonly, strong, nonnull) NSNumber * attribute;
-
-+ (instancetype)attributePathWithEndpointID:(NSNumber *)endpointID
-                                  clusterID:(NSNumber *)clusterID
-                                attributeID:(NSNumber *)attributeID MTR_NEWLY_AVAILABLE;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-@end
-
 @interface MTRAttributePath (Deprecated)
 
 + (instancetype)attributePathWithEndpointId:(NSNumber *)endpointId
@@ -351,19 +399,6 @@ extern NSString * const MTRArrayValueType;
                                 attributeId:(NSNumber *)attributeId
     MTR_NEWLY_DEPRECATED("Please use attributePathWithEndpointID:clusterID:attributeID:");
 
-@end
-
-@interface MTREventPath : NSObject
-@property (nonatomic, readonly, strong, nonnull) NSNumber * endpoint;
-@property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
-@property (nonatomic, readonly, strong, nonnull) NSNumber * event;
-
-+ (instancetype)eventPathWithEndpointID:(NSNumber *)endpointID
-                              clusterID:(NSNumber *)clusterID
-                                eventID:(NSNumber *)eventID MTR_NEWLY_AVAILABLE;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
 @end
 
 @interface MTREventPath (Deprecated)
@@ -375,19 +410,6 @@ extern NSString * const MTRArrayValueType;
 
 @end
 
-@interface MTRCommandPath : NSObject
-@property (nonatomic, readonly, strong, nonnull) NSNumber * endpoint;
-@property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
-@property (nonatomic, readonly, strong, nonnull) NSNumber * command;
-
-+ (instancetype)commandPathWithEndpointID:(NSNumber *)endpointID
-                                clusterID:(NSNumber *)clusterID
-                                commandID:(NSNumber *)commandID MTR_NEWLY_AVAILABLE;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-@end
-
 @interface MTRCommandPath (Deprecated)
 
 + (instancetype)commandPathWithEndpointId:(NSNumber *)endpointId
@@ -395,28 +417,6 @@ extern NSString * const MTRArrayValueType;
                                 commandId:(NSNumber *)commandId
     MTR_NEWLY_DEPRECATED("Please use commandPathWithEndpointID:clusterID:commandID:");
 
-@end
-
-@interface MTRAttributeReport : NSObject
-@property (nonatomic, readonly, strong, nonnull) MTRAttributePath * path;
-// value is nullable because nullable attributes can have nil as value.
-@property (nonatomic, readonly, strong, nullable) id value;
-// If this specific path resulted in an error, the error (in the
-// MTRInteractionErrorDomain or MTRErrorDomain) that corresponds to this
-// path.
-@property (nonatomic, readonly, strong, nullable) NSError * error;
-@end
-
-@interface MTREventReport : NSObject
-@property (nonatomic, readonly, strong, nonnull) MTREventPath * path;
-@property (nonatomic, readonly, strong, nonnull) NSNumber * eventNumber; // chip::EventNumber type (uint64_t)
-@property (nonatomic, readonly, strong, nonnull) NSNumber * priority; // chip::app::PriorityLevel type (uint8_t)
-@property (nonatomic, readonly, strong, nonnull) NSNumber * timestamp; // chip::app::Timestamp.mValue type (uint64_t)
-@property (nonatomic, readonly, strong, nullable) id value;
-// If this specific path resulted in an error, the error (in the
-// MTRInteractionErrorDomain or MTRErrorDomain) that corresponds to this
-// path.
-@property (nonatomic, readonly, strong, nullable) NSError * error;
 @end
 
 NS_ASSUME_NONNULL_END
