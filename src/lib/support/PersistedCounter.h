@@ -63,8 +63,6 @@ public:
     PersistedCounter() : mKey(StorageKey::Uninitialized()) {}
     ~PersistedCounter() override {}
 
-    typedef const char * (DefaultStorageKeyAllocator::*KeyType)();
-
     /**
      *  @brief
      *    Initialize a PersistedCounter object.
