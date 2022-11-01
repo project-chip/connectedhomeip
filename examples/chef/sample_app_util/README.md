@@ -144,7 +144,7 @@ The metadata files have a structure as follows:
 - <endpoint_1_name>: ...
 ```
 
-For an example, see [sample_zap_file.yaml](test_files/sample_zap_file.yaml)
+For an example, see [sample_zap_file_hashmeta.yaml](test_files/sample_zap_file_hashmeta.yaml)
 which was generated from [sample_zap_file.zap](test_files/sample_zap_file.zap).
 
 Note that it is more readable in `yaml` format. Since hashes are generated from
@@ -162,7 +162,7 @@ The following conventions are used:
     same as the order they are read from the zap file.
 
 As an example, take a look at
-[sample_zap_file.yaml](test_files/sample_zap_file.yaml)
+sample_zap_file_hashmeta.yaml](test_files/sample_zap_file_hashmeta.yaml)
 
 ## Utility Usage
 
