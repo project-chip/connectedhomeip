@@ -225,7 +225,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
     // Initialize event logging subsystem
-    err = sGlobalEventIdCounter.Init(mDeviceStorage, &DefaultStorageKeyAllocator::IMEventNumber,
+    err = sGlobalEventIdCounter.Init(mDeviceStorage, DefaultStorageKeyAllocator::IMEventNumber(),
                                      CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH);
     SuccessOrExit(err);
 

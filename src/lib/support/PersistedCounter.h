@@ -60,7 +60,7 @@ template <typename T>
 class PersistedCounter : public MonotonicallyIncreasingCounter<T>
 {
 public:
-    PersistedCounter() {}
+    PersistedCounter() : mKey(StorageKey::Uninitialized()) {}
     ~PersistedCounter() override {}
 
     typedef const char * (DefaultStorageKeyAllocator::*KeyType)();
@@ -78,7 +78,7 @@ public:
      *          CHIP_ERROR_INVALID_INTEGER_VALUE if aEpoch is 0.
      *          CHIP_NO_ERROR otherwise
      */
-    CHIP_ERROR Init(PersistentStorageDelegate * aStorage, KeyType aKey, T aEpoch)
+    CHIP_ERROR Init(PersistentStorageDelegate * aStorage, StorageKey aKey, T aEpoch)
     {
         VerifyOrReturnError(aStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(aKey != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -122,7 +122,7 @@ public:
     CHIP_ERROR Advance() override
     {
         VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(mKey != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mKey.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
         ReturnErrorOnFailure(MonotonicallyIncreasingCounter<T>::Advance());
 
@@ -165,9 +165,7 @@ private:
 #endif
 
         T valueLE = Encoding::LittleEndian::HostSwap<T>(aStartValue);
-
-        DefaultStorageKeyAllocator keyAlloc;
-        return mStorage->SyncSetKeyValue((keyAlloc.*mKey)(), &valueLE, sizeof(valueLE));
+        return mStorage->SyncSetKeyValue(mKey, &valueLE, sizeof(valueLE));
     }
 
     /**
@@ -180,11 +178,12 @@ private:
      */
     CHIP_ERROR ReadStartValue(T & aStartValue)
     {
-        DefaultStorageKeyAllocator keyAlloc;
         T valueLE     = 0;
         uint16_t size = sizeof(valueLE);
 
-        CHIP_ERROR err = mStorage->SyncGetKeyValue((keyAlloc.*mKey)(), &valueLE, size);
+        VerifyOrReturnError(mKey.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
+        CHIP_ERROR err = mStorage->SyncGetKeyValue(mKey, &valueLE, size);
         if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
             // No previously-stored value, no worries, the counter is initialized to zero.
@@ -214,9 +213,9 @@ private:
     }
 
     PersistentStorageDelegate * mStorage = nullptr; // start value is stored here
-    KeyType mKey                         = nullptr;
-    T mEpoch                             = 0; // epoch modulus value
-    T mNextEpoch                         = 0; // next epoch start
+    StorageKey mKey;
+    T mEpoch     = 0; // epoch modulus value
+    T mNextEpoch = 0; // next epoch start
 };
 
 } // namespace chip

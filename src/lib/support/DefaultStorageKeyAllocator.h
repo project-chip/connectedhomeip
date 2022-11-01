@@ -22,15 +22,6 @@
 
 #include <stdio.h>
 
-/*
-#include <lib/core/GroupId.h>
-#include <lib/support/EnforceFormat.h>
-#include <lib/support/logging/Constants.h>
-#include <stdarg.h>
-#include <stdlib.h>
-#include <string.h>
-*/
-
 namespace chip {
 
 /**
@@ -49,6 +40,7 @@ public:
 
     const char * KeyName() const { return mKeyNameBuffer; }
 
+    bool IsInitialized() const { return mKeyNameBuffer[0] != 0; }
     bool IsUninitialized() const { return mKeyNameBuffer[0] == 0; }
     bool operator!() const { return IsUninitialized(); }
 
