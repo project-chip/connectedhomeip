@@ -1,5 +1,5 @@
 {
-  "featureLevel": 81,
+  "featureLevel": 82,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -5140,7 +5140,7 @@
           "mfgCode": null,
           "define": "USER_LABEL_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "label list",
@@ -5712,7 +5712,7 @@
           "mfgCode": null,
           "define": "SCENES_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "AddSceneResponse",
@@ -7292,5 +7292,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 257
     }
-  ]
+  ],
+  "log": []
 }

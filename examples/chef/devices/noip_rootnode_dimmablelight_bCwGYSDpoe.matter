@@ -1,11 +1,6 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-struct LabelStruct {
-    char_string<16> label = 0;
-    char_string<16> value = 1;
-}
-
 server cluster Identify = 3 {
   enum IdentifyEffectIdentifier : ENUM8 {
     kBlink = 0;
@@ -105,117 +100,6 @@ server cluster Groups = 4 {
   fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
   fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
   fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
-}
-
-server cluster Scenes = 5 {
-  bitmap ScenesCopyMode : BITMAP8 {
-    kCopyAllScenes = 0x1;
-  }
-
-  struct ExtensionFieldSet {
-    cluster_id clusterId = 0;
-    AttributeValuePair attributeValueList[] = 1;
-  }
-
-  struct AttributeValuePair {
-    optional attrib_id attributeId = 0;
-    int8u attributeValue[] = 1;
-  }
-
-  readonly attribute int8u sceneCount = 0;
-  readonly attribute int8u currentScene = 1;
-  readonly attribute group_id currentGroup = 2;
-  readonly attribute boolean sceneValid = 3;
-  readonly attribute bitmap8 nameSupport = 4;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct AddSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
-    INT16U transitionTime = 2;
-    CHAR_STRING sceneName = 3;
-    ExtensionFieldSet extensionFieldSets[] = 4;
-  }
-
-  request struct ViewSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
-  }
-
-  request struct RemoveSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
-  }
-
-  request struct RemoveAllScenesRequest {
-    group_id groupId = 0;
-  }
-
-  request struct StoreSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
-  }
-
-  request struct RecallSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
-    optional nullable INT16U transitionTime = 2;
-  }
-
-  request struct GetSceneMembershipRequest {
-    group_id groupId = 0;
-  }
-
-  response struct AddSceneResponse = 0 {
-    ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
-  }
-
-  response struct ViewSceneResponse = 1 {
-    ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
-    optional INT16U transitionTime = 3;
-    optional CHAR_STRING sceneName = 4;
-    optional ExtensionFieldSet extensionFieldSets[] = 5;
-  }
-
-  response struct RemoveSceneResponse = 2 {
-    ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
-  }
-
-  response struct RemoveAllScenesResponse = 3 {
-    ENUM8 status = 0;
-    group_id groupId = 1;
-  }
-
-  response struct StoreSceneResponse = 4 {
-    ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
-  }
-
-  response struct GetSceneMembershipResponse = 6 {
-    ENUM8 status = 0;
-    nullable INT8U capacity = 1;
-    group_id groupId = 2;
-    optional INT8U sceneList[] = 3;
-  }
-
-  fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
-  fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
-  fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
-  fabric command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
-  fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
-  fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
-  fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
 }
 
 server cluster OnOff = 6 {
@@ -1388,13 +1272,12 @@ server cluster GroupKeyManagement = 63 {
 }
 
 server cluster FixedLabel = 64 {
-  readonly attribute LabelStruct labelList[] = 0;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
+  struct LabelStruct {
+    char_string<16> label = 0;
+    char_string<16> value = 1;
+  }
 
-server cluster UserLabel = 65 {
-  attribute access(write: manage) LabelStruct labelList[] = 0;
+  readonly attribute LabelStruct labelList[] = 0;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -1658,12 +1541,6 @@ endpoint 0 {
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
-
-  server cluster UserLabel {
-    callback attribute labelList;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 1;
-  }
 }
 endpoint 1 {
   device type anonymousEndpointType = 257;
@@ -1681,19 +1558,6 @@ endpoint 1 {
   }
 
   server cluster Groups {
-    ram      attribute nameSupport;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 3;
-  }
-
-  server cluster Scenes {
-    ram      attribute sceneCount;
-    ram      attribute currentScene;
-    ram      attribute currentGroup;
-    ram      attribute sceneValid;
     ram      attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
