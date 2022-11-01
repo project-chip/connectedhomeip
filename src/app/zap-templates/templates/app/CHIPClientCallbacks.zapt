@@ -15,11 +15,11 @@
 
 // List specific responses
 {{#chip_client_clusters}}
-{{#zcl_attributes_server hasIsOptional=false}}
+{{#all_user_cluster_attributes_irrespective_of_manufatucuring_specification name 'server'}}
 {{#if isArray}}
 typedef void (*{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback)(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} data);
 {{/if}}
-{{/zcl_attributes_server}}
+{{/all_user_cluster_attributes_irrespective_of_manufatucuring_specification}}
 {{/chip_client_clusters}}
 
 {{/if}}
