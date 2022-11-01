@@ -14,9 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <errno.h>
-#include <pthread.h>
-
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
@@ -55,19 +52,9 @@ void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg
     }
 }
 
-pthread_t sPlatformMainThread;
-
 #if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 // uint32_t sBluetoothAdapterId = 0;
 #endif
-
-void * PlatformMainLoop(void *)
-{
-    ChipLogProgress(DeviceLayer, "Platform main loop started.");
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
-    ChipLogProgress(DeviceLayer, "Platform main loop completed.");
-    return nullptr;
-}
 
 } // namespace
 
@@ -126,8 +113,6 @@ void pychip_server_set_callbacks(PostAttributeChangeCallback cb)
 void pychip_server_native_init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    int result;
-    int tmpErrno;
 
     err = chip::Platform::MemoryInit();
     if (err != CHIP_NO_ERROR)
@@ -185,12 +170,10 @@ void pychip_server_native_init()
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
-    result   = pthread_create(&sPlatformMainThread, nullptr, PlatformMainLoop, nullptr);
-    tmpErrno = errno;
-
-    if (result != 0)
+    err = chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: pthread_create failed: %s", strerror(tmpErrno));
+        ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: platform init failed: %s", chip::ErrorStr(err));
     }
 
     return /*err*/;
