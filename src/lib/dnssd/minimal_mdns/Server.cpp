@@ -298,7 +298,7 @@ CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBufferHandle && data, cons
             return chip::Loop::Continue;
         }
 
-        err = info->mListenUdp->SendTo(addr, port, std::move(data));
+        err = info->mListenUdp->SendTo(addr, port, std::move(data), interface);
         return chip::Loop::Break;
     });
 
