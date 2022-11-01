@@ -44,7 +44,7 @@ std::vector<const char *> colordimmablelight_clusters = { "Basic", "Identify", "
 device_type_id                                      = obj.get_device_types(colordimmablelight_clusters);
 const char * dt_colordimmablelight                           = matter_device_type_vs_clusters_map.find(device_type_id[0])->second.second;
 std::string device_type_colordimmablelight(dt_colordimmablelight);
-NL_TEST_ASSERT(inSuite, device_type_colordimmablelight == "colordimmablelight");
+NL_TEST_ASSERT(inSuite, device_type_colordimmablelight == "extendedcolorlight");
 
 }
 
