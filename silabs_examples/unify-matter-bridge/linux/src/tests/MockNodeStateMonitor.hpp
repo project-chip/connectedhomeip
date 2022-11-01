@@ -10,12 +10,21 @@
  * sections of the MSLA applicable to Source Code.
  *
  *****************************************************************************/
-#include "uic_mqtt.h"
-#include "uic_mqtt_wrapper.hpp"
 
-using namespace unify::matter_bridge;
+#ifndef MOCK_NODE_STATE_MONITOR_HPP
+#define MOCK_NODE_STATE_MONITOR_HPP
 
-void UicMqtt::Publish(std::string topic, std::string message, bool retain)
+#include "matter_node_state_monitor.hpp"
+
+class MockNodeStateMonitor : public unify::matter_bridge::matter_node_state_monitor
 {
-    uic_mqtt_publish(topic.c_str(), message.c_str(), message.size(), retain);
-}
+public:
+    MockNodeStateMonitor(unify::matter_bridge::device_translator device_translator, UnifyEmberInterface ember_interface) :
+        matter_node_state_monitor(device_translator, ember_interface)
+    {}
+
+    void call_on_unify_node_added(const unify::node_state_monitor::node & node) { this->on_unify_node_added(node); }
+
+};
+
+#endif

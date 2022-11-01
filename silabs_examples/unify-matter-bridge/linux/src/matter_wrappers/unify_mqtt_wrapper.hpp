@@ -28,12 +28,21 @@
 
 namespace unify::matter_bridge {
 
-class UicMqtt
+class UnifyMqtt
 {
 public:
-    UicMqtt(){};
+    // Constructor and deconstrucor
+    UnifyMqtt(){};
+    virtual ~UnifyMqtt(){};
+
+    // Overwriteable functions used for mocking the MQTT interface
     virtual void Publish(std::string topic, std::string message, bool retain);
-    virtual ~UicMqtt(){};
+    virtual void SubscribeEx(std::string topic,
+                             void (*callback)(const char * topic, const char * message, const size_t message_length, void * user),
+                             void * user);
+    virtual void UnsubscribeEx(std::string topic,
+                             void (*callback)(const char * topic, const char * message, const size_t message_length, void * user),
+                             void * user);
 };
 
 } // namespace unify::matter_bridge

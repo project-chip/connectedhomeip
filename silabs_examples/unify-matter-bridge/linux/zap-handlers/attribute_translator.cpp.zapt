@@ -120,16 +120,15 @@ CHIP_ERROR {{asUpperCamelCase label}}AttributeAccess::Write(const ConcreteDataAt
 
   switch (aPath.mAttributeId) {
   {{#zcl_attributes_server}}
-  {{#if writable}}
+  {{#if isWritable}}
+    case Attributes::{{asUpperCamelCase label}}::Id: {
 
-  case Attributes::{{asUpperCamelCase label}}::Id: {
-
-      Attributes::{{asUpperCamelCase label}}::TypeInfo::DecodableType value;
-      aDecoder.Decode(value);
-      jsn["value"]   = to_json(value);
-      attribute_name = std::string("{{asUpperCamelCase label}}");
-      break;
-  }
+        Attributes::{{asUpperCamelCase label}}::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("{{asUpperCamelCase label}}");
+        break;
+    }
   {{/if}}
   {{/zcl_attributes_server}}
   }
@@ -140,10 +139,9 @@ CHIP_ERROR {{asUpperCamelCase label}}AttributeAccess::Write(const ConcreteDataAt
                   + std::to_string(unify_node->unify_endpoint)
                   + "/{{matterClusterConversion label}}/Attributes/" + attribute_name + "/Desired";
     payload_str = jsn.dump();
-    uic_mqtt_publish(topic.c_str(),
-                     payload_str.c_str(),
-                     payload_str.length(),
-                     true);
+    m_unify_mqtt.Publish(topic,
+                        payload_str,
+                        true);
     return CHIP_ERROR_NO_MESSAGE_HANDLER;
   }
 

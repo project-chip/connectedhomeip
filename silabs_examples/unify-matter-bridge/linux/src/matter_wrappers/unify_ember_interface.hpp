@@ -11,6 +11,10 @@
  *
  *****************************************************************************/
 
+
+#ifndef UNIFY_MQTT_WRAPPER_HPP
+#define UNIFY_MQTT_WRAPPER_HPP
+
 #include "sl_log.h"
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -91,3 +95,5 @@ public:
     virtual chip::EndpointId emberAfEndpointFromIndexUnify(uint16_t index) { return emberAfEndpointFromIndex(index); }
     virtual uint16_t emberAfFixedEndpointCountUnify(void) { return emberAfFixedEndpointCount(); };
 };
+
+#endif // UNIFY_MQTT_WRAPPER_HPP

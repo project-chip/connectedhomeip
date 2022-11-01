@@ -19,7 +19,7 @@
 #include "group_translator.hpp"
 #include "matter_node_state_monitor.hpp"
 #include "sl_log.h"
-#include "uic_mqtt_wrapper.hpp"
+#include "unify_mqtt_wrapper.hpp"
 
 namespace unify::matter_bridge {
 
@@ -34,9 +34,9 @@ class command_translator_interface : public chip::app::CommandHandlerInterface
 {
 public:
     command_translator_interface(const matter_node_state_monitor & node_state_monitor, chip::ClusterId id, const char * name,
-                                 UicMqtt & uic_mqtt) :
+                                 UnifyMqtt & unify_mqtt) :
         chip::app::CommandHandlerInterface(chip::Optional<chip::EndpointId>::Missing(), id),
-        m_node_state_monitor(node_state_monitor), cluster_name(name), m_uic_mqtt(uic_mqtt)
+        m_node_state_monitor(node_state_monitor), cluster_name(name), m_unify_mqtt(unify_mqtt)
     {
         chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this);
     }
@@ -88,10 +88,14 @@ public:
         }
 
         topic = topic + "/" + std::string(cluster_name) + "/Commands/" + cmd;
-
-        std::string msg = payload.dump();
+        std::string msg;
+        if (payload.empty()) {
+            msg = "{}";
+        } else {
+            msg = payload.dump();
+        }
         sl_log_debug("command_translator_interface", "--- send_unify_mqtt_cmd %s -> %s ---", topic.c_str(), msg.c_str());
-        m_uic_mqtt.Publish(topic, msg, true);
+        m_unify_mqtt.Publish(topic, msg, true);
     }
 
     template <typename T>
@@ -128,7 +132,7 @@ public:
 protected:
     const matter_node_state_monitor & m_node_state_monitor;
     const char * cluster_name;
-    UicMqtt & m_uic_mqtt;
+    UnifyMqtt & m_unify_mqtt;
 };
 
 } // namespace unify::matter_bridge

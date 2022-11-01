@@ -425,21 +425,24 @@ void OnOffClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerC
         cmd = "Off";
         Commands::Off::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     case Commands::On::Id: {
         cmd = "On";
         Commands::On::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     case Commands::Toggle::Id: {
         cmd = "Toggle";
         Commands::Toggle::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     case Commands::OffWithEffect::Id: {
@@ -468,7 +471,8 @@ void OnOffClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerC
         cmd = "OnWithRecallGlobalScene";
         Commands::OnWithRecallGlobalScene::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     case Commands::OnWithTimedOff::Id: {
@@ -530,7 +534,8 @@ void OnOffSwitchConfigurationClusterCommandHandler::InvokeCommand(CommandHandler
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -880,7 +885,8 @@ void BinaryInputBasicClusterCommandHandler::InvokeCommand(CommandHandlerInterfac
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -910,7 +916,8 @@ void PulseWidthModulationClusterCommandHandler::InvokeCommand(CommandHandlerInte
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -945,7 +952,8 @@ void BasicClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerC
         cmd = "MfgSpecificPing";
         Commands::MfgSpecificPing::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     }
@@ -1206,7 +1214,8 @@ void LocalizationConfigurationClusterCommandHandler::InvokeCommand(CommandHandle
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -1236,7 +1245,8 @@ void TimeFormatLocalizationClusterCommandHandler::InvokeCommand(CommandHandlerIn
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -1266,7 +1276,8 @@ void UnitLocalizationClusterCommandHandler::InvokeCommand(CommandHandlerInterfac
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -1296,7 +1307,8 @@ void PowerSourceConfigurationClusterCommandHandler::InvokeCommand(CommandHandler
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -1326,7 +1338,8 @@ void PowerSourceClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Ha
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -1412,7 +1425,8 @@ void GeneralCommissioningClusterCommandHandler::InvokeCommand(CommandHandlerInte
         cmd = "CommissioningComplete";
         Commands::CommissioningComplete::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     }
@@ -1563,7 +1577,8 @@ void SoftwareDiagnosticsClusterCommandHandler::InvokeCommand(CommandHandlerInter
         cmd = "ResetWatermarks";
         Commands::ResetWatermarks::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     }
@@ -1601,7 +1616,8 @@ void ThreadNetworkDiagnosticsClusterCommandHandler::InvokeCommand(CommandHandler
         cmd = "ResetCounts";
         Commands::ResetCounts::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     }
@@ -1639,7 +1655,8 @@ void WiFiNetworkDiagnosticsClusterCommandHandler::InvokeCommand(CommandHandlerIn
         cmd = "ResetCounts";
         Commands::ResetCounts::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     }
@@ -1735,7 +1752,8 @@ void SwitchClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -2058,7 +2076,8 @@ void FixedLabelClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Han
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -2088,7 +2107,8 @@ void UserLabelClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Hand
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -2118,7 +2138,8 @@ void ProxyConfigurationClusterCommandHandler::InvokeCommand(CommandHandlerInterf
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -2148,7 +2169,8 @@ void ProxyDiscoveryClusterCommandHandler::InvokeCommand(CommandHandlerInterface:
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -2178,7 +2200,8 @@ void ProxyValidClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Han
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -2208,7 +2231,8 @@ void BooleanStateClusterCommandHandler::InvokeCommand(CommandHandlerInterface::H
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -2795,21 +2819,24 @@ void WindowCoveringClusterCommandHandler::InvokeCommand(CommandHandlerInterface:
         cmd = "UpOrOpen";
         Commands::UpOrOpen::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     case Commands::DownOrClose::Id: {
         cmd = "DownOrClose";
         Commands::DownOrClose::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     case Commands::StopMotion::Id: {
         cmd = "StopMotion";
         Commands::StopMotion::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     case Commands::GoToLiftValue::Id: {
@@ -2922,7 +2949,8 @@ void BarrierControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface:
         cmd = "BarrierControlStop";
         Commands::BarrierControlStop::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     }
@@ -3040,7 +3068,8 @@ void ThermostatClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Han
         cmd = "ClearWeeklySchedule";
         Commands::ClearWeeklySchedule::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     }
@@ -3073,7 +3102,8 @@ void FanControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Han
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -3103,7 +3133,8 @@ void ThermostatUserInterfaceConfigurationClusterCommandHandler::InvokeCommand(Co
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -3953,7 +3984,8 @@ void IlluminanceMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerIn
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -3983,7 +4015,8 @@ void TemperatureMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerIn
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -4013,7 +4046,8 @@ void PressureMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInter
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -4043,7 +4077,8 @@ void FlowMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInterface
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -4073,7 +4108,8 @@ void RelativeHumidityMeasurementClusterCommandHandler::InvokeCommand(CommandHand
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -4103,7 +4139,8 @@ void OccupancySensingClusterCommandHandler::InvokeCommand(CommandHandlerInterfac
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -4133,7 +4170,8 @@ void WakeOnLanClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Hand
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -4307,56 +4345,64 @@ void MediaPlaybackClusterCommandHandler::InvokeCommand(CommandHandlerInterface::
         cmd = "Play";
         Commands::Play::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     case Commands::Pause::Id: {
         cmd = "Pause";
         Commands::Pause::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     case Commands::StopPlayback::Id: {
         cmd = "StopPlayback";
         Commands::StopPlayback::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     case Commands::StartOver::Id: {
         cmd = "StartOver";
         Commands::StartOver::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     case Commands::Previous::Id: {
         cmd = "Previous";
         Commands::Previous::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     case Commands::Next::Id: {
         cmd = "Next";
         Commands::Next::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     case Commands::Rewind::Id: {
         cmd = "Rewind";
         Commands::Rewind::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     case Commands::FastForward::Id: {
         cmd = "FastForward";
         Commands::FastForward::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     case Commands::SkipForward::Id: {
@@ -4454,14 +4500,16 @@ void MediaInputClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Han
         cmd = "ShowInputStatus";
         Commands::ShowInputStatus::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     case Commands::HideInputStatus::Id: {
         cmd = "HideInputStatus";
         Commands::HideInputStatus::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     case Commands::RenameInput::Id: {
@@ -4521,7 +4569,8 @@ void LowPowerClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
         cmd = "Sleep";
         Commands::Sleep::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     }
@@ -4852,7 +4901,8 @@ void ApplicationBasicClusterCommandHandler::InvokeCommand(CommandHandlerInterfac
     nlohmann::json payload = {};
 
     switch (ctxt.mRequestPath.mCommandId)
-    {}
+    {
+    }
 
     if (!cmd.empty())
     {
@@ -4924,7 +4974,8 @@ void AccountLoginClusterCommandHandler::InvokeCommand(CommandHandlerInterface::H
         cmd = "Logout";
         Commands::Logout::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     }
@@ -4962,7 +5013,8 @@ void ElectricalMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInt
         cmd = "GetProfileInfoCommand";
         Commands::GetProfileInfoCommand::DecodableType data;
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
-        {}
+        {
+        }
     }
     break;
     case Commands::GetMeasurementProfileCommand::Id: {

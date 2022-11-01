@@ -1,11 +1,14 @@
 // Unify bridge components
 #include "command_translator.hpp"
 #include "matter_device_translator.hpp"
-#include "matter_node_state_monitor.hpp"
 
 // Chip components
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
+
+// Mocks
+#include "MockMqtt.hpp"
+#include "MockNodeStateMonitor.hpp"
 
 // Third party library
 #include <iostream>
@@ -15,32 +18,7 @@
 using namespace unify::matter_bridge;
 
 static UnifyEmberInterface ember_interface = UnifyEmberInterface();
-
-class MockMatterNodeStateMonitor : public matter_node_state_monitor
-{
-public:
-    MockMatterNodeStateMonitor() : matter_node_state_monitor(device_translator(), ember_interface), test_bridge_ep(matter_endpoint_context()) {}
-
-    const struct bridged_endpoint * bridged_endpoint(chip::EndpointId endpoint) const override
-    {
-        ++nNumBridgedMethodCall;
-        if (endpoint >= 2)
-        {
-            test_bridge_ep.matter_endpoint = endpoint;
-            test_bridge_ep.unify_endpoint = 4;
-            test_bridge_ep.unify_unid = "zw-0x0002";
-            return &test_bridge_ep;
-        }
-        else
-        {
-            return nullptr;
-        }
-    }
-
-    mutable int nNumBridgedMethodCall = 0;
-    mutable struct bridged_endpoint test_bridge_ep;
-};
-
+static device_translator dev_translator = device_translator();
 class MockCommandHandlerCallback : public chip::app::CommandHandler::Callback
 {
 public:
@@ -56,27 +34,29 @@ public:
     int onFinalCalledTimes = 0;
 };
 
-class MockUicMqttPublish : public UicMqtt
-{
-public:
-    void Publish(std::string topic, std::string message, bool retain) override
-    {
-        publish_topic = topic;
-        ++nNumerUicMqttPublishCall;
-    }
-    int nNumerUicMqttPublishCall = 0;
-    std::string publish_topic;
-};
-
 void TestOnOffClusterCommandHandler(nlTestSuite * inSuite, void * aContext)
 {
-    MockMatterNodeStateMonitor test_matter_node_state_monitor;
-    MockUicMqttPublish mqtt_publish_test;
+    // 1
+    // Execute command ON with onoff device
+    MockNodeStateMonitor test_matter_node_state_monitor(dev_translator, ember_interface);
+    MockUnifyMqtt mqtt_publish_test;
     OnOffClusterCommandHandler on_cmd_handler(test_matter_node_state_monitor, mqtt_publish_test);
+    
+    // Create a node with cluster endpoints resembling On/Off.
+    const std::string node_id = "zw-0x0002";
+    const uint8_t endpoint = 4;
+    unify::node_state_monitor::node node_ember_1(node_id);
+    auto &ep                        = node_ember_1.emplace_endpoint(endpoint);
+    auto &onoff_cluster             = ep.emplace_cluster("OnOff");
+    onoff_cluster.supported_commands = { "On", "Off", "Toggle" };
+    onoff_cluster.attributes.emplace("OnOff");
 
-    chip::EndpointId endpoint = 2;
+    test_matter_node_state_monitor.call_on_unify_node_added(node_ember_1);
+    auto bridged_ep = test_matter_node_state_monitor.bridged_endpoint(node_id, endpoint);
+    NL_TEST_ASSERT(inSuite, bridged_ep != nullptr);
+
     chip::app::ConcreteCommandPath test_command_path =
-        chip::app::ConcreteCommandPath(endpoint, chip::app::Clusters::OnOff::Id, chip::app::Clusters::OnOff::Commands::On::Id);
+        chip::app::ConcreteCommandPath(bridged_ep->matter_endpoint, chip::app::Clusters::OnOff::Id, chip::app::Clusters::OnOff::Commands::On::Id);
     MockCommandHandlerCallback mockCommandHandlerDelegate;
     chip::app::CommandHandler test_commandHandler(&mockCommandHandlerDelegate);
     chip::TLV::TLVReader test_tlv_reader;
@@ -85,9 +65,9 @@ void TestOnOffClusterCommandHandler(nlTestSuite * inSuite, void * aContext)
 
     on_cmd_handler.InvokeCommand(ctxt);
 
-    NL_TEST_ASSERT(inSuite, test_matter_node_state_monitor.nNumBridgedMethodCall == 2);
     NL_TEST_ASSERT(inSuite, mqtt_publish_test.nNumerUicMqttPublishCall == 1);
     NL_TEST_ASSERT(inSuite, mqtt_publish_test.publish_topic == "ucl/by-unid/zw-0x0002/ep4/OnOff/Commands/On" );
+    NL_TEST_ASSERT(inSuite, mqtt_publish_test.publish_payload.compare("{}") == 0);
 
 }
 

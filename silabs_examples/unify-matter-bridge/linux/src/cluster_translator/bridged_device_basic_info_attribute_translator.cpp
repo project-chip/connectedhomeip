@@ -57,8 +57,8 @@ const static std::unordered_map<std::string, uint32_t> basic_information_map {
   {"ApplicationVersion", Attributes::UniqueID::Id}};        // uint8_t, string
 
 BridgedDeviceBasicInfoAttributeAccess::BridgedDeviceBasicInfoAttributeAccess(
-  matter_node_state_monitor &node_state_monitor) :
-  attribute_translator_interface(node_state_monitor,
+  matter_node_state_monitor &node_state_monitor, UnifyMqtt &unify_mqtt) :
+  attribute_translator_interface(node_state_monitor, unify_mqtt,
                                  chip::app::Clusters::BridgedDeviceBasic::Id, "attr_translator_BridgedDeviceBasic")
 
 {

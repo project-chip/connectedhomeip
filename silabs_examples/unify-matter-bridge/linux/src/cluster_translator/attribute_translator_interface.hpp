@@ -21,10 +21,16 @@
 #include <sstream>
 #include <regex>
 
+// Matter library
 #include "matter.h"
-#include "uic_mqtt.h"
-#include "matter_node_state_monitor.hpp"
+
+// Matter bridge components
+#include "unify_mqtt_wrapper.hpp"
 #include "matter_device_translator.hpp"
+#include "matter_node_state_monitor.hpp"
+
+// Unify SDK
+#include "uic_mqtt.h"
 #include "sl_log.h"
 
 namespace unify::matter_bridge
@@ -43,11 +49,14 @@ class attribute_translator_interface :
 {
   public:
   attribute_translator_interface(matter_node_state_monitor &node_state_monitor,
-                                 chip::ClusterId id, const char *log_tag) :
+                                 UnifyMqtt &unify_mqtt,
+                                 chip::ClusterId id, 
+                                 const char *log_tag) :
     chip::app::AttributeAccessInterface(
       chip::Optional<chip::EndpointId>::Missing(), id),
     m_node_state_monitor(node_state_monitor),
-    LOG_TAG(log_tag)
+    LOG_TAG(log_tag),
+    m_unify_mqtt(unify_mqtt)
   {
     registerAttributeAccessOverride(this);
 
@@ -143,18 +152,19 @@ class attribute_translator_interface :
     attributes_update_subscription(const bridged_endpoint &ep,
                                    matter_node_state_monitor::update_t update)
   {
+    sl_log_debug(LOG_TAG, "Matter endpoint: %d", ep.matter_endpoint);
     for (const auto &unify_cluster: unify_cluster_names()) {
       std::string topic = "ucl/by-unid/" + ep.unify_unid + "/ep"
                           + std::to_string(ep.unify_endpoint) + "/"
                           + unify_cluster + "/Attributes/+/Reported";
 
       if (update == matter_node_state_monitor::update_t::NODE_ADDED) {
-        uic_mqtt_subscribe_ex(
+        m_unify_mqtt.SubscribeEx(
           topic.c_str(),
           attribute_translator_interface::on_mqtt_message_c_cb,
           this);
       } else if (update == matter_node_state_monitor::update_t::NODE_DELETED) {
-        uic_mqtt_unsubscribe_ex(
+        m_unify_mqtt.UnsubscribeEx(
           topic.c_str(),
           attribute_translator_interface::on_mqtt_message_c_cb,
           this);
@@ -173,6 +183,8 @@ class attribute_translator_interface :
       instance->on_mqtt_message_cb(topic, message, message_length);
     }
   }
+
+  UnifyMqtt & m_unify_mqtt;
 };
 }  // namespace unify::matter_bridge
 

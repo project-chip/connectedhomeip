@@ -2,6 +2,9 @@
 #include "matter_device_translator.hpp"
 #include "matter_node_state_monitor.hpp"
 
+// Mocks 
+#include "MockUnifyEmberInterface.hpp"
+
 // Unify lib components
 #include "sl_log.h"
 namespace unify_zap_types {
@@ -16,69 +19,6 @@ namespace unify_zap_types {
 #include <nlunit-test.h>
 
 #define TEST_LOG_TAG "NodeStateMonitorTest"
-
-class MockedUnifyEmberInterface : public UnifyEmberInterface
-{
-public:
-    MockedUnifyEmberInterface() : UnifyEmberInterface(){};
-
-    chip::EndpointId calledWithId = 101;
-    uint16_t calledWithIndex;
-    EmberAfEndpointType * calledWithEndpoint;
-    chip::Span<const EmberAfDeviceType> calledWithDeviceTypeList = {};
-    chip::EndpointId calledWithParentEndpointId                  = chip::kInvalidEndpointId;
-    bool lastCalledEnabled;
-
-    int calledNTimes = 0;
-
-    // All the endpoints cleared
-    std::vector<chip::EndpointId> cleared_endpoints;
-
-    EmberAfStatus emberAfSetDynamicEndpointUnify(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
-                                                 const chip::Span<chip::DataVersion> & dataVersionStorage,
-                                                 chip::Span<const EmberAfDeviceType> deviceTypeList,
-                                                 chip::EndpointId parentEndpointId) override
-    {
-        calledWithIndex            = index;
-        calledWithId               = id;
-        calledWithEndpoint         = const_cast<EmberAfEndpointType *>(ep);
-        calledWithDeviceTypeList   = deviceTypeList;
-        calledWithParentEndpointId = parentEndpointId;
-        return emberAfSetDynamicEndpoint(index, id, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
-    }
-
-    uint16_t emberAfFixedEndpointCountUnify() override { return emberAfFixedEndpointCount(); }
-
-    chip::EndpointId emberAfClearDynamicEndpointUnify(uint16_t index) override
-    {
-        chip::EndpointId id = emberAfClearDynamicEndpoint(index);
-        if (id != chip::kInvalidEndpointId)
-        {
-            cleared_endpoints.push_back(id);
-        }
-        return id;
-    }
-
-    chip::EndpointId getLastReturnedAvailableEndpointId() { return last_returned_available_endpoint_id; }
-};
-
-class NodeStateMonitorTest : public unify::matter_bridge::matter_node_state_monitor
-{
-public:
-    NodeStateMonitorTest(unify::matter_bridge::device_translator & device_translator, MockedUnifyEmberInterface & ember_interface) :
-        matter_node_state_monitor(device_translator, ember_interface){};
-
-    void call_on_unify_node_added(const unify::node_state_monitor::node & node) { this->on_unify_node_added(node); }
-
-    void call_on_unify_node_removed(const std::string & unid) { this->on_unify_node_removed(unid); }
-
-    void call_on_unify_node_state_changed(const unify::node_state_monitor::node & node) { this->on_unify_node_state_changed(node); }
-
-    long unsigned int listeners_count() { return this->event_listeners.size(); }
-
-    long unsigned int bridged_endpoints_count() { return this->bridged_endpoints.size(); }
-};
-
 struct test_data_struct
 {
     test_data_struct()
@@ -108,6 +48,23 @@ void unify_node_state_update(const unify::matter_bridge::bridged_endpoint & ep,
     test_data.state_update_history.push_back(state);
 }
 
+class WrapNodeStateMonitor : public unify::matter_bridge::matter_node_state_monitor
+{
+public:
+    WrapNodeStateMonitor(unify::matter_bridge::device_translator & device_translator, MockedUnifyEmberInterface & ember_interface) :
+        matter_node_state_monitor(device_translator, ember_interface){};
+
+    void call_on_unify_node_added(const unify::node_state_monitor::node & node) { this->on_unify_node_added(node); }
+
+    void call_on_unify_node_removed(const std::string & unid) { this->on_unify_node_removed(unid); }
+
+    void call_on_unify_node_state_changed(const unify::node_state_monitor::node & node) { this->on_unify_node_state_changed(node); }
+
+    long unsigned int listeners_count() { return this->event_listeners.size(); }
+
+    long unsigned int bridged_endpoints_count() { return this->bridged_endpoints.size(); }
+};
+
 static void TestNodeStateMonitorAddingNode(nlTestSuite * inSuite, void * aContext)
 {
     // 1
@@ -117,7 +74,7 @@ static void TestNodeStateMonitorAddingNode(nlTestSuite * inSuite, void * aContex
     // Initialize the node state monitor
     unify::matter_bridge::device_translator matter_device_translator;
     MockedUnifyEmberInterface unify_ember_interface;
-    NodeStateMonitorTest node_state_monitor(matter_device_translator, unify_ember_interface);
+    WrapNodeStateMonitor node_state_monitor(matter_device_translator, unify_ember_interface);
 
     node_state_monitor.register_event_listener(unify_node_state_update);
     NL_TEST_ASSERT(inSuite, node_state_monitor.listeners_count() == 1);
@@ -172,7 +129,7 @@ static void TestNodeStateMonitoringStateChangingNode(nlTestSuite * inSuite, void
     // Initialize the node state monitor
     unify::matter_bridge::device_translator matter_device_translator;
     MockedUnifyEmberInterface unify_ember_interface;
-    NodeStateMonitorTest node_state_monitor(matter_device_translator, unify_ember_interface);
+    WrapNodeStateMonitor node_state_monitor(matter_device_translator, unify_ember_interface);
     node_state_monitor.register_event_listener(unify_node_state_update);
 
     // Create a node with OnOff Cluster endpoint
@@ -207,7 +164,7 @@ static void TestOnNodeRemoved(nlTestSuite * inSuite, void * aContext)
     // Initialize the node state monitor
     unify::matter_bridge::device_translator matter_device_translator;
     MockedUnifyEmberInterface unify_ember_interface;
-    NodeStateMonitorTest node_state_monitor(matter_device_translator, unify_ember_interface);
+    WrapNodeStateMonitor node_state_monitor(matter_device_translator, unify_ember_interface);
     node_state_monitor.register_event_listener(unify_node_state_update);
 
     // Create a node with OnOff Cluster endpoint
@@ -257,7 +214,7 @@ static void TestMultipleListeners(nlTestSuite * inSuite, void * aContext)
     // Initialize the node state monitor
     unify::matter_bridge::device_translator matter_device_translator;
     MockedUnifyEmberInterface unify_ember_interface;
-    NodeStateMonitorTest node_state_monitor(matter_device_translator, unify_ember_interface);
+    WrapNodeStateMonitor node_state_monitor(matter_device_translator, unify_ember_interface);
 
     // Create a node with OnOff Cluster endpoint
     const std::string node_id = "unid-node-3";
@@ -306,20 +263,41 @@ static void TestEmberInterfaceNodeAdded(nlTestSuite * inSuite, void * aContext)
     // Initialize the node state monitor
     unify::matter_bridge::device_translator matter_device_translator;
     MockedUnifyEmberInterface unify_ember_interface;
-    NodeStateMonitorTest node_state_monitor(matter_device_translator, unify_ember_interface);
+    WrapNodeStateMonitor node_state_monitor(matter_device_translator, unify_ember_interface);
     node_state_monitor.register_event_listener(unify_node_state_update);
 
     // Create a node with clustr endpoints resembling a dimmable light.
     const std::string node_id = "unid-ember-check-1";
     unify::node_state_monitor::node node_ember_1(node_id);
-    auto & ep                        = node_ember_1.emplace_endpoint(1);
-    auto & onoff_cluster             = ep.emplace_cluster("OnOff");
+    auto &ep                        = node_ember_1.emplace_endpoint(1);
+    auto &onoff_cluster             = ep.emplace_cluster("OnOff");
     onoff_cluster.supported_commands = { "On", "Off", "Toggle" };
     onoff_cluster.attributes.emplace("OnOff");
-    ep.emplace_cluster("Level");
-    ep.emplace_cluster("Basic");
-    ep.emplace_cluster("Identify");
-    ep.emplace_cluster("Groups");
+
+    auto &level_cluster = ep.emplace_cluster("Level");
+    level_cluster.supported_commands = { "MoveToLevel", "Move", "Step", "Stop", "MoveToLevelWithOnOff", "MoveWithOnOff", "StepWithOnOff",
+                                         "StopWithOnOff" };
+    level_cluster.attributes.emplace("CurrentLevel");
+
+    auto &basic_cluster = ep.emplace_cluster("Basic");
+    basic_cluster.attributes.emplace("ClusterRevision");
+    basic_cluster.attributes.emplace("ManufacturerName");
+    basic_cluster.attributes.emplace("SerialNumber");
+    basic_cluster.attributes.emplace("HWVersion");
+    basic_cluster.attributes.emplace("PowerSource");
+
+    auto &identify_cluster = ep.emplace_cluster("Identify");
+    identify_cluster.supported_commands = { "Identify", "IdentifyQuery", "TriggerEffect" };
+    identify_cluster.attributes.emplace("IdentifyTime");
+    identify_cluster.attributes.emplace("ClusterRevision");
+
+    auto &groups_cluster = ep.emplace_cluster("Groups");
+    groups_cluster.supported_commands = { "AddGroup", "ViewGroup", "GetGroupMembership", "RemoveGroup", "RemoveAllGroups",
+                                          "AddGroupIfIdentifying", "ViewGroupResponse", "GetGroupMembershipResponse" };
+    groups_cluster.attributes.emplace("NameSupport");
+    groups_cluster.attributes.emplace("ClusterRevision");
+    groups_cluster.attributes.emplace("GroupList");
+
     ep.emplace_cluster("Scenes");
 
     // 1
@@ -341,20 +319,28 @@ static void TestEmberInterfaceNodeAdded(nlTestSuite * inSuite, void * aContext)
     NL_TEST_ASSERT(inSuite, unify_ember_interface.calledWithIndex == matter_endpoint_id - FIXED_ENDPOINT_COUNT);
     NL_TEST_ASSERT(inSuite, unify_ember_interface.cleared_endpoints.empty());
 
-    // Check the cluster mapping to a device of the node deviceId 19 is always
+    // Check the cluster mapping to a device of the node is always
     // present in the device type list. Do not know why.
-    const uint16_t smart_plug_device_id = 0x0101;
+    const uint16_t dimmable_light = 0x0101;
+    const uint16_t bridge_device_id = 0x0013;
 
-    bool matched_device_type = false;
+    bool dimmable_light_device_id_present = false;
+    bool device_is_a_bridge_device = false;
     for (auto & deviceType : unify_ember_interface.calledWithDeviceTypeList)
     {
         sl_log_debug(TEST_LOG_TAG, "Device types in list %d", deviceType.deviceId);
-        if (deviceType.deviceId == smart_plug_device_id)
+        if (deviceType.deviceId == dimmable_light)
         {
-            matched_device_type = true;
+            dimmable_light_device_id_present = true;
+        }
+
+        if (deviceType.deviceId == bridge_device_id)
+        {
+            device_is_a_bridge_device = true;
         }
     }
-    NL_TEST_ASSERT(inSuite, matched_device_type);
+    NL_TEST_ASSERT(inSuite, dimmable_light_device_id_present);
+    NL_TEST_ASSERT(inSuite, device_is_a_bridge_device);
 }
 
 class TestContext

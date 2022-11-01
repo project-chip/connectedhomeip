@@ -139,37 +139,37 @@ int main(int argc, char * argv[])
     device_translator matter_device_translator;
     UnifyEmberInterface ember_interface;
     matter_node_state_monitor node_state_monitor(matter_device_translator, ember_interface);
-    UicMqtt uic_mqtt_handler;
+    UnifyMqtt unify_mqtt_handler;
 
     // Initializing Group cluster command handler
-    GroupClusterCommandHandler group_handler(node_state_monitor, uic_mqtt_handler);
+    GroupClusterCommandHandler group_handler(node_state_monitor, unify_mqtt_handler);
 
     // Initializing Bridged Device Basic Info attributes update handler
-    BridgedDeviceBasicInfoAttributeAccess bridge_device_basic_handler(node_state_monitor);
+    BridgedDeviceBasicInfoAttributeAccess bridge_device_basic_handler(node_state_monitor, unify_mqtt_handler);
 
     // Initializing OnOff command handler
-    OnOffClusterCommandHandler on_cmd_handler(node_state_monitor, uic_mqtt_handler);
-    OnOffAttributeAccess on_off_attribute_handler(node_state_monitor);
+    OnOffClusterCommandHandler on_cmd_handler(node_state_monitor, unify_mqtt_handler);
+    OnOffAttributeAccess on_off_attribute_handler(node_state_monitor, unify_mqtt_handler);
 
    // Initializing Identify Cluster Commands handler
-    IdentifyClusterCommandHandler identify_cluster_commands_handler(node_state_monitor, uic_mqtt_handler);
-    IdentifyAttributeAccess identify_attribute_handler(node_state_monitor);
+    IdentifyClusterCommandHandler identify_cluster_commands_handler(node_state_monitor, unify_mqtt_handler);
+    IdentifyAttributeAccess identify_attribute_handler(node_state_monitor, unify_mqtt_handler);
 
     // Initializing Level Cluster handler
-    LevelControlClusterCommandHandler level_cluster_commands_handler(node_state_monitor, uic_mqtt_handler);
-    LevelControlAttributeAccess level_attribute_handler(node_state_monitor);
+    LevelControlClusterCommandHandler level_cluster_commands_handler(node_state_monitor, unify_mqtt_handler);
+    LevelControlAttributeAccess level_attribute_handler(node_state_monitor, unify_mqtt_handler);
     
     // Initializing color controller cluster command handler 
-    ColorControlClusterCommandHandler color_control_commands_handler(node_state_monitor, uic_mqtt_handler);
-    ColorControlAttributeAccess color_control_attribute_handler(node_state_monitor);
+    ColorControlClusterCommandHandler color_control_commands_handler(node_state_monitor, unify_mqtt_handler);
+    ColorControlAttributeAccess color_control_attribute_handler(node_state_monitor, unify_mqtt_handler);
 
     // Initializing OccupancySensing command handler 
-    OccupancySensingClusterCommandHandler occupancy_sensing_command_handler(node_state_monitor, uic_mqtt_handler);
-    OccupancySensingAttributeAccess occupancy_sensing_attribute_access(node_state_monitor);
+    OccupancySensingClusterCommandHandler occupancy_sensing_command_handler(node_state_monitor, unify_mqtt_handler);
+    OccupancySensingAttributeAccess occupancy_sensing_attribute_access(node_state_monitor, unify_mqtt_handler);
 
     // Initializing Temperature Measurement command handler 
-    TemperatureMeasurementClusterCommandHandler temperature_measurement_command_handler(node_state_monitor, uic_mqtt_handler);
-    TemperatureMeasurementAttributeAccess temperature_measurement_attribute_access(node_state_monitor);
+    TemperatureMeasurementClusterCommandHandler temperature_measurement_command_handler(node_state_monitor, unify_mqtt_handler);
+    TemperatureMeasurementAttributeAccess temperature_measurement_attribute_access(node_state_monitor, unify_mqtt_handler);
 
     matter_running = true;
     auto handle    = run_unify();

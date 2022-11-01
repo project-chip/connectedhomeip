@@ -55,7 +55,7 @@ static_library("unify-matter-bridge-lib") {
     "src/matter_node_state_monitor/matter_cluster_interactor.cpp",
     "src/matter_node_state_monitor/matter_endpoint_builder.cpp",
     "src/matter_node_state_monitor/matter_node_state_monitor.cpp",
-    "src/uic_mqtt_wrapper.cpp",
+    "src/matter_wrappers/unify_mqtt_wrapper.cpp",
     "zap-handlers/gen/attribute_translator.cpp",
     "zap-handlers/gen/attribute_type_size.cpp",
     "zap-handlers/gen/command_translator.cpp",

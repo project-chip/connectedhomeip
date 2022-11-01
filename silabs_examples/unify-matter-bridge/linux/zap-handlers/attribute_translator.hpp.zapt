@@ -29,24 +29,25 @@ namespace unify::matter_bridge
 class {{asUpperCamelCase label}}AttributeAccess : public attribute_translator_interface
 {
   public:
-  {{asUpperCamelCase label}}AttributeAccess(matter_node_state_monitor &node_state_monitor) :
-    attribute_translator_interface(node_state_monitor,
-                                   chip::app::Clusters::{{asUpperCamelCase label}}::Id, "attr_translator_{{asUpperCamelCase label}}")
-                                   
-  {}
+    {{asUpperCamelCase label}}AttributeAccess(matter_node_state_monitor &node_state_monitor, UnifyMqtt &unify_mqtt) : 
+    attribute_translator_interface(node_state_monitor, unify_mqtt, chip::app::Clusters::{{asUpperCamelCase label}}::Id, "attr_translator_{{asUpperCamelCase label}}"), m_unify_mqtt(unify_mqtt)
+    {}
+    
 
-  CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath &aPath,
+    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath &aPath,
                   chip::app::AttributeValueEncoder &aEncoder) override;
-  CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath &aPath,
+    CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath &aPath,
                    chip::app::AttributeValueDecoder &aDecoder) override;
 
   private:
-  void reported_updated(const bridged_endpoint *ep,
-                        const std::string& cluster,
-                        const std::string& attribute,
-                        const nlohmann::json &unify_value) override;
+    void reported_updated(const bridged_endpoint *ep,
+                          const std::string& cluster,
+                          const std::string& attribute,
+                          const nlohmann::json &unify_value) override;
 
-   std::vector<const char *> unify_cluster_names() const override {return std::vector<const char *>({ "{{matterClusterConversion label}}" });}
+    std::vector<const char *> unify_cluster_names() const override {return std::vector<const char *>({ "{{matterClusterConversion label}}" });}
+
+    UnifyMqtt &m_unify_mqtt;
 };
 {{/if}}
 {{/zcl_clusters}}

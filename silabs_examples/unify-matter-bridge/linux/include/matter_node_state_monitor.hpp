@@ -95,7 +95,7 @@ public:
      *
      * @return std::pair<std::string unid, int epid>
      */
-    virtual const struct bridged_endpoint * bridged_endpoint(chip::EndpointId endpoint) const;
+    const struct bridged_endpoint * bridged_endpoint(chip::EndpointId endpoint) const;
 
     enum update_t
     {

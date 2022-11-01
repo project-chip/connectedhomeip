@@ -24,7 +24,8 @@ chip_test_suite("tests") {
     "TestExample.cpp",
     "TestDeviceMapper.cpp",
     "TestOnOffCommandsHandler.cpp",
-    "TestNodeStateMonitor.cpp"
+    "TestNodeStateMonitor.cpp",
+    "TestTemperatureMeasurement.cpp",
   ]
 
   cflags = [ "-Wconversion" ]

@@ -32,7 +32,7 @@ class BridgedDeviceBasicInfoAttributeAccess :
 {
   public:
   BridgedDeviceBasicInfoAttributeAccess(
-    matter_node_state_monitor &node_state_monitor);
+    matter_node_state_monitor &node_state_monitor, UnifyMqtt &unify_mqtt);
   CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath &aPath,
                   chip::app::AttributeValueEncoder &aEncoder) override;
   CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath &aPath,
