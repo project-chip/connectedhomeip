@@ -71,8 +71,8 @@ CHIP_ERROR SimpleSessionResumptionStorage::SaveIndex(const SessionIndex & index)
     const auto len = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    DefaultStorageKeyAllocator keyAlloc;
-    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(keyAlloc.SessionResumptionIndex(), buf.data(), static_cast<uint16_t>(len)));
+    ReturnErrorOnFailure(
+        mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::SessionResumptionIndex(), buf.data(), static_cast<uint16_t>(len)));
 
     return CHIP_NO_ERROR;
 }

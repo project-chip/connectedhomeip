@@ -331,13 +331,13 @@ CHIP_ERROR GroupOutgoingCounters::IncrementCounter(bool isControl)
     if (isControl)
     {
         mGroupControlCounter++;
-        key.GroupControlCounter();
+        key   = DefaultStorageKeyAllocator::GroupControlCounter();
         value = mGroupControlCounter;
     }
     else
     {
         mGroupDataCounter++;
-        key.GroupDataCounter();
+        key   = DefaultStorageKeyAllocator::GroupDataCounter();
         value = mGroupDataCounter;
     }
 

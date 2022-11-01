@@ -42,7 +42,7 @@ namespace chip {
 class StorageKey
 {
 public:
-    StorageKey(const StorageKey & other) = default;
+    StorageKey(const StorageKey & other)             = default;
     StorageKey & operator=(const StorageKey & other) = default;
 
     ~StorageKey() { memset(mKeyNameBuffer, 0, sizeof(mKeyNameBuffer)); }
@@ -52,7 +52,7 @@ public:
     bool IsUninitialized() const { return mKeyNameBuffer[0] == 0; }
     bool operator!() const { return IsUninitialized(); }
 
-    operator const char *() const { return KeyName; }
+    operator const char *() const { return mKeyNameBuffer; }
 
     static StorageKey FromConst(const char * value)
     {

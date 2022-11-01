@@ -46,19 +46,18 @@ StorageKey GetStorageKeyForCert(FabricIndex fabricIndex, CertChainElement elemen
         return DefaultStorageKeyAllocator::FabricICAC(fabricIndex);
         break;
     case CertChainElement::kRcac:
-        return = DefaultStorageKeyAllocator::FabricRCAC(fabricIndex);
+        return DefaultStorageKeyAllocator::FabricRCAC(fabricIndex);
         break;
     default:
         break;
     }
 
-    // FIXME: is this ok?
-    return DefaultStorageKeyAllocator::Uninitialized();
+    return StorageKey::Uninitialized();
 }
 
 bool StorageHasCertificate(PersistentStorageDelegate * storage, FabricIndex fabricIndex, CertChainElement element)
 {
-    StorageKey storageKey = GetStorageKeyForCert(keyAllocator, fabricIndex, element);
+    StorageKey storageKey = GetStorageKeyForCert(fabricIndex, element);
 
     if (!storageKey)
     {
@@ -79,7 +78,7 @@ bool StorageHasCertificate(PersistentStorageDelegate * storage, FabricIndex fabr
 CHIP_ERROR LoadCertFromStorage(PersistentStorageDelegate * storage, FabricIndex fabricIndex, CertChainElement element,
                                MutableByteSpan & outCert)
 {
-    StorageKey storageKey = GetStorageKeyForCert(keyAllocator, fabricIndex, element);
+    StorageKey storageKey = GetStorageKeyForCert(fabricIndex, element);
     if (!storageKey)
     {
         return CHIP_ERROR_INTERNAL;
@@ -113,7 +112,7 @@ CHIP_ERROR LoadCertFromStorage(PersistentStorageDelegate * storage, FabricIndex 
 CHIP_ERROR SaveCertToStorage(PersistentStorageDelegate * storage, FabricIndex fabricIndex, CertChainElement element,
                              const ByteSpan & cert)
 {
-    StorageKey storageKey = GetStorageKeyForCert(keyAllocator, fabricIndex, element);
+    StorageKey storageKey = GetStorageKeyForCert(fabricIndex, element);
     if (!storageKey)
     {
         return CHIP_ERROR_INTERNAL;
@@ -135,7 +134,7 @@ CHIP_ERROR SaveCertToStorage(PersistentStorageDelegate * storage, FabricIndex fa
 
 CHIP_ERROR DeleteCertFromStorage(PersistentStorageDelegate * storage, FabricIndex fabricIndex, CertChainElement element)
 {
-    StorageKey storageKey = GetStorageKeyForCert(keyAllocator, fabricIndex, element);
+    StorageKey storageKey = GetStorageKeyForCert(fabricIndex, element);
     if (!storageKey)
     {
         return CHIP_ERROR_INTERNAL;
