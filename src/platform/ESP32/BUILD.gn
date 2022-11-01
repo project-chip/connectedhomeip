@@ -41,8 +41,6 @@ static_library("ESP32") {
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
     "ConnectivityManagerImpl_Ethernet.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "ESP32Config.cpp",
