@@ -88,7 +88,7 @@ MediaTek platform.
 
 ## Running the Complete Example
 
--   This example needes one lighting-app device and one light-switch-app device
+-   This example needs one lighting-app device and one light-switch-app device.
 
 -   You can provision and control the Chip device using the python controller,
     Chip tool standalone, Android or iOS app
@@ -116,7 +116,7 @@ MediaTek platform.
 
     ```
 
--   Once all setup successfullly, you can control the lighting-app device through the
+-   Once all setup successfully, you can control the lighting-app device through the
     Matter Shell on the light-switch-app device.
 
     ```
