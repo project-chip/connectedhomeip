@@ -28,6 +28,7 @@ class NrfApp(Enum):
     SHELL = auto()
     PUMP = auto()
     PUMP_CONTROLLER = auto()
+    WINDOW_COVERING = auto()
     UNIT_TESTS = auto()
 
     def AppPath(self):
@@ -45,6 +46,8 @@ class NrfApp(Enum):
             return 'examples/pump-app'
         elif self == NrfApp.PUMP_CONTROLLER:
             return 'examples/pump-controller-app'
+        elif self == NrfApp.WINDOW_COVERING:
+            return 'examples/window-app'
         elif self == NrfApp.UNIT_TESTS:
             return 'src/test_driver'
         else:
@@ -65,6 +68,8 @@ class NrfApp(Enum):
             return 'chip-nrf-pump-example'
         elif self == NrfApp.PUMP_CONTROLLER:
             return 'chip-nrf-pump-controller-example'
+        elif self == NrfApp.WINDOW_COVERING:
+            return 'chip-nrf-window-example'
         elif self == NrfApp.UNIT_TESTS:
             return 'chip-nrf-unit-tests'
         else:
@@ -85,6 +90,8 @@ class NrfApp(Enum):
             return 'chip-nrfconnect-pump-example'
         elif self == NrfApp.PUMP_CONTROLLER:
             return 'chip-nrfconnect-pump-controller-example'
+        elif self == NrfApp.WINDOW_COVERING:
+            return 'chip-nrfconnect-window-example'
         elif self == NrfApp.UNIT_TESTS:
             raise Exception(
                 'Unit tests compile natively and do not have a flashbundle')
