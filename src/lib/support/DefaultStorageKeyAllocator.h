@@ -33,7 +33,7 @@ namespace chip {
 class StorageKey
 {
 public:
-    StorageKey(const StorageKey & other)             = default;
+    StorageKey(const StorageKey & other) = default;
     StorageKey & operator=(const StorageKey & other) = default;
 
     ~StorageKey() { memset(mKeyNameBuffer, 0, sizeof(mKeyNameBuffer)); }
