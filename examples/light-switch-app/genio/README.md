@@ -1,4 +1,4 @@
-#CHIP `Genio` Lighting Example
+#CHIP `Genio` Light Switch Example
 
 An example showing the use of CHIP on the MediaTek `Genio` MT793X.
 
@@ -100,11 +100,9 @@ MediaTek platform.
     the lighting-app (nodeID 2) with the CHIP tool by following commands.
 
     ```
-
       chip-tool pairing ble-wifi 1 my-ap myappassword 20202021 3840
 
       chip-tool pairing ble-wifi 2 my-ap myappassword 20202021 3840
-
     ```
 
 -   Next, you have to configure the ACL in the lighting-app device to allow access
@@ -112,7 +110,6 @@ MediaTek platform.
     light-switch-app device by following commands.
 
     ```
-
       chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1], "targets": null }]' 2 0
 
       chip-tool binding write binding '[{"fabricIndex": 1, "node":2, "endpoint":1, "cluster":6}]' 1 1
@@ -123,10 +120,8 @@ MediaTek platform.
     Matter Shell on the light-switch-app device.
 
     ```
-
        > switch onoff on
        > switch onoff off
-
     ```
 
 ### Notes

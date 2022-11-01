@@ -1,4 +1,4 @@
-#CHIP `Genio` Lighting Example
+#CHIP `Genio` Thermostat Example
 
 An example showing the use of CHIP on the MediaTek `Genio` MT793X.
 
@@ -97,9 +97,7 @@ platform.
     Here is an example with the CHIP Tool controller:
 
     ```
-
       chiptool- pairing ble-wifi 1234 my-ap myappassword 20202021 3840
-
     ```
 
 ### Notes
