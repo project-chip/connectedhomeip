@@ -57,12 +57,6 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
 @property (nonatomic, copy, nullable) NSString * stringValue;
 @end
 
-@interface MTROptionalQRCodeInfo (Deprecated)
-
-@property (nonatomic, copy) NSNumber * infoType MTR_NEWLY_DEPRECATED("Please use type");
-
-@end
-
 /**
  * A setup payload that can be created from a pairing code and serialized to a
  * pairing code.
@@ -129,6 +123,12 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
  */
 - (NSString * _Nullable)qrCodeString:(NSError * __autoreleasing *)error
     API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+
+@end
+
+@interface MTROptionalQRCodeInfo (Deprecated)
+
+@property (nonatomic, copy) NSNumber * infoType MTR_NEWLY_DEPRECATED("Please use type");
 
 @end
 
