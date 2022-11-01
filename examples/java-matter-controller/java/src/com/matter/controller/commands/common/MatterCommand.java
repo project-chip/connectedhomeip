@@ -24,24 +24,19 @@ import com.matter.controller.config.PersistentStorageOperationalKeystore;
 import java.util.Optional;
 
 public abstract class MatterCommand extends Command {
-
-  public static final short kMaxGroupsPerFabric = 5;
-  public static final short kMaxGroupKeysPerFabric = 8;
-
-  protected PersistentStorage mDefaultStorage = new PersistentStorage();
-  protected PersistentStorage mCommissionerStorage = new PersistentStorage();
-  protected PersistentStorageOperationalKeystore mOperationalKeystore =
+  private final PersistentStorage mDefaultStorage = new PersistentStorage();
+  private final PersistentStorage mCommissionerStorage = new PersistentStorage();
+  private final PersistentStorageOperationalKeystore mOperationalKeystore =
       new PersistentStorageOperationalKeystore();
-  protected PersistentStorageOpCertStore mOpCertStore = new PersistentStorageOpCertStore();
+  private final PersistentStorageOpCertStore mOpCertStore = new PersistentStorageOpCertStore();
 
-  protected Optional<CredentialsIssuer> mCredIssuerCmds;
-  protected StringBuffer mCommissionerName = new StringBuffer();
-  protected StringBuffer mPaaTrustStorePath = new StringBuffer();
-  protected StringBuffer mCDTrustStorePath = new StringBuffer();
-  protected Optional<Long> mCommissionerNodeId;
-  protected Optional<Short> mBleAdapterId;
-  protected Optional<Boolean> mUseMaxSizedCerts;
-  protected Optional<Boolean> mOnlyAllowTrustedCdKeys;
+  private final Optional<CredentialsIssuer> mCredIssuerCmds;
+  private final StringBuffer mCommissionerName = new StringBuffer();
+  private final StringBuffer mPaaTrustStorePath = new StringBuffer();
+  private final StringBuffer mCDTrustStorePath = new StringBuffer();
+  private final MutableInteger mCommissionerNodeId = new MutableInteger();
+  private final MutableInteger mUseMaxSizedCerts = new MutableInteger();;
+  private final MutableInteger mOnlyAllowTrustedCdKeys = new MutableInteger();;
 
   public MatterCommand(String commandName, CredentialsIssuer credIssuerCmds) {
     this(commandName, credIssuerCmds, null);
@@ -82,7 +77,6 @@ public abstract class MatterCommand extends Command {
         mOnlyAllowTrustedCdKeys,
         "Only allow trusted CD verifying keys (disallow test keys). If not provided or 0 (\"false\"), untrusted CD "
             + "verifying keys are allowed. If 1 (\"true\"), test keys are disallowed.");
-    addArgument("ble-adapter", (short) 0, Short.MAX_VALUE, mBleAdapterId, null);
   }
 
   /////////// Command Interface /////////
@@ -90,17 +84,10 @@ public abstract class MatterCommand extends Command {
   public void run() throws Exception {
     maybeSetUpStack();
     runCommand();
-    shutdown();
     maybeTearDownStack();
   }
 
   protected abstract void runCommand();
-
-  // Shut down the command.  After a Shutdown call the command object is ready
-  // to be used for another command invocation.
-  protected void shutdown() {
-    resetArguments();
-  }
 
   private void maybeSetUpStack() throws Exception {
     mDefaultStorage.init();
@@ -108,5 +95,7 @@ public abstract class MatterCommand extends Command {
     mOpCertStore.init(mDefaultStorage);
   }
 
-  private void maybeTearDownStack() {}
+  private void maybeTearDownStack() {
+    // ToDo:We need to call DeviceController::Shutdown()
+  }
 }

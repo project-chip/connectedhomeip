@@ -22,14 +22,14 @@ import com.matter.controller.commands.common.CredentialsIssuer;
 import com.matter.controller.commands.common.MatterCommand;
 import com.matter.controller.commands.common.MutableInteger;
 
-public class Off extends MatterCommand {
-  private MutableInteger mNodeId;
-  private MutableInteger mFabricId;
+public final class Off extends MatterCommand {
+  private MutableInteger mNodeId = new MutableInteger();
+  private MutableInteger mFabricId = new MutableInteger();
 
   public Off(CredentialsIssuer credIssuerCmds) {
     super("off", credIssuerCmds);
-    addArgument("nodeid", 0L, Long.MAX_VALUE, mNodeId);
-    addArgument("fabricid", 0L, Long.MAX_VALUE, mFabricId);
+    addArgument("nodeid", 0L, Long.MAX_VALUE, mNodeId, null);
+    addArgument("fabricid", 0L, Long.MAX_VALUE, mFabricId, null);
   }
 
   @Override

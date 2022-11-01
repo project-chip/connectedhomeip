@@ -18,10 +18,9 @@
 
 package com.matter.controller.commands.common;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Optional;
+import javax.annotation.Nullable;
 
 /**
  * @brief Matter Controller command
@@ -30,18 +29,16 @@ import java.util.Optional;
  *     Matter devices from the environment.
  */
 public abstract class Command {
-  private String mName;
-  private Optional<String> mHelpText;
-
-  private boolean mIsInteractive = false;
-  private ArrayList<Argument> mArgs = new ArrayList<Argument>();
+  private final String mName;
+  private final ArrayList<Argument> mArgs = new ArrayList<Argument>();
+  private final Optional<String> mHelpText;
 
   public Command(String commandName) {
     this.mName = commandName;
     this.mHelpText = Optional.empty();
   }
 
-  public Command(String commandName, String helpText) {
+  public Command(String commandName, @Nullable String helpText) {
     this.mName = commandName;
     this.mHelpText = Optional.ofNullable(helpText);
   }
@@ -59,22 +56,17 @@ public abstract class Command {
    * @return A pointer to an Optional where the Attribute argument will be stored
    */
   public final Optional<String> getAttribute() {
-    for (int i = 0; i < mArgs.size(); i++) {
-      Argument arg = mArgs.get(i);
-      if (arg.type == ArgumentType.Attribute) {
-        return Optional.of((String) arg.value);
+    for (Argument arg : mArgs) {
+      if (arg.getType() == ArgumentType.ATTRIBUTE) {
+        return Optional.of((String) arg.getValue());
       }
     }
 
     return Optional.empty();
   }
 
-  public final String getArgumentName(int index) throws IndexOutOfBoundsException {
-    if (index < mArgs.size()) {
-      return mArgs.get(index).name;
-    } else {
-      throw new IndexOutOfBoundsException();
-    }
+  public final String getArgumentName(int index) {
+    return mArgs.get(index).getName();
   }
 
   public final int getArgumentsCount() {
@@ -85,12 +77,21 @@ public abstract class Command {
    * @brief Get argument description if it exists
    * @return A pointer to an Optional where the argument description will be stored
    */
-  public final Optional<String> getArgumentDescription(int index) throws IndexOutOfBoundsException {
-    if (index < mArgs.size()) {
-      return mArgs.get(index).desc;
-    } else {
-      throw new IndexOutOfBoundsException();
-    }
+  public final Optional<String> getArgumentDescription(int index) {
+    return mArgs.get(index).getDesc();
+  }
+
+  /**
+   * @brief Add a bool Integer command argument
+   * @param name The name that will be displayed in the command help
+   * @param out A pointer to a MutableInteger where the argv value will be stored
+   * @param desc The description of the argument that will be displayed in the command help
+   * @return The number of arguments currently added to the command
+   */
+  public final int addArgument(String name, MutableInteger out, @Nullable String desc) {
+    Argument arg = new Argument(name, out, desc);
+    mArgs.add(arg);
+    return mArgs.size();
   }
 
   /**
@@ -99,16 +100,28 @@ public abstract class Command {
    * @param min The minimum value of the argv value
    * @param max The minimum value of the argv value
    * @param out A pointer to a MutableInteger where the argv value will be stored
+   * @param desc The description of the argument that will be displayed in the command help
    * @return The number of arguments currently added to the command
    */
-  public final int addArgument(String name, short min, short max, MutableInteger out) {
-    Argument arg = new Argument();
-    arg.type = ArgumentType.Number_int32;
-    arg.name = name;
-    arg.value = (Object) out;
-    arg.min = min;
-    arg.max = max;
+  public final int addArgument(
+      String name, short min, short max, MutableInteger out, @Nullable String desc) {
+    Argument arg = new Argument(name, min, max, out, desc);
+    mArgs.add(arg);
+    return mArgs.size();
+  }
 
+  /**
+   * @brief Add a int Integer command argument
+   * @param name The name that will be displayed in the command help
+   * @param min The minimum value of the argv value
+   * @param max The minimum value of the argv value
+   * @param out A pointer to a MutableInteger where the argv value will be stored
+   * @param desc The description of the argument that will be displayed in the command help
+   * @return The number of arguments currently added to the command
+   */
+  public final int addArgument(
+      String name, int min, int max, MutableInteger out, @Nullable String desc) {
+    Argument arg = new Argument(name, min, max, out, desc);
     mArgs.add(arg);
     return mArgs.size();
   }
@@ -119,16 +132,12 @@ public abstract class Command {
    * @param min The minimum value of the argv value
    * @param max The minimum value of the argv value
    * @param out A pointer to a MutableInteger where the argv value will be stored
+   * @param desc The description of the argument that will be displayed in the command help
    * @return The number of arguments currently added to the command
    */
-  public final int addArgument(String name, long min, long max, MutableInteger out) {
-    Argument arg = new Argument();
-    arg.type = ArgumentType.Number_int64;
-    arg.name = name;
-    arg.value = (Object) out;
-    arg.min = min;
-    arg.max = max;
-
+  public final int addArgument(
+      String name, long min, long max, MutableInteger out, @Nullable String desc) {
+    Argument arg = new Argument(name, min, max, out, desc);
     mArgs.add(arg);
     return mArgs.size();
   }
@@ -139,104 +148,31 @@ public abstract class Command {
    * @param out A pointer to a IPAddress where the argv value will be stored
    * @return The number of arguments currently added to the command
    */
-  public final int addArgument(String name, InetAddress out) {
-    Argument arg = new Argument();
-    arg.type = ArgumentType.Address;
-    arg.name = name;
-    arg.value = (Object) out;
-
+  public final int addArgument(String name, IPAddress out) {
+    Argument arg = new Argument(name, out);
     mArgs.add(arg);
     return mArgs.size();
   }
 
   /**
-   * @brief Add an String command argument
+   * @brief Add a String command argument
    * @param name The name that will be displayed in the command help
    * @param out A pointer to a StringBuffer where the argv value will be stored
    * @param desc The description of the argument that will be displayed in the command help
    * @return The number of arguments currently added to the command
    */
-  public final int addArgument(String name, StringBuffer out, String desc) {
-    Argument arg = new Argument();
-    arg.type = ArgumentType.String;
-    arg.name = name;
-    arg.value = (Object) out;
-    arg.desc = Optional.ofNullable(desc);
-
+  public final int addArgument(String name, StringBuffer out, @Nullable String desc) {
+    Argument arg = new Argument(name, out, desc);
     mArgs.add(arg);
     return mArgs.size();
   }
 
   /**
-   * @brief Add an optional long integer command argument
-   * @param name The name that will be displayed in the command help
-   * @param min The minimum value of the argv value
-   * @param max The minimum value of the argv value
-   * @param out A pointer to an Optional where the argv value will be stored, the argv value could
-   *     be empty
-   * @param desc The description of the argument that will be displayed in the command help
-   * @return The number of arguments currently added to the command
+   * @brief Initialize command arguments
+   * @param argc The number of arguments to a command (Does not include command itself)
+   * @param args Supplied command-line arguments as an array of String objects.
    */
-  public final int addArgument(String name, long min, long max, Optional<Long> out, String desc) {
-    Argument arg = new Argument();
-    arg.type = ArgumentType.Number_int64;
-    arg.name = name;
-    arg.value = (Object) out;
-    arg.min = min;
-    arg.max = max;
-    arg.flags = Argument.kOptional;
-    arg.desc = Optional.ofNullable(desc);
-
-    mArgs.add(arg);
-    return mArgs.size();
-  }
-
-  /**
-   * @brief Add an optional short integer command argument
-   * @param name The name that will be displayed in the command help
-   * @param min The minimum value of the argv value
-   * @param max The minimum value of the argv value
-   * @param out A pointer to an Optional where the argv value will be stored, the argv value could
-   *     be empty
-   * @param desc The description of the argument that will be displayed in the command help
-   * @return The number of arguments currently added to the command
-   */
-  public final int addArgument(
-      String name, short min, short max, Optional<Short> out, String desc) {
-    Argument arg = new Argument();
-    arg.type = ArgumentType.Number_int16;
-    arg.name = name;
-    arg.value = (Object) out;
-    arg.min = min;
-    arg.max = max;
-    arg.flags = Argument.kOptional;
-    arg.desc = Optional.ofNullable(desc);
-
-    mArgs.add(arg);
-    return mArgs.size();
-  }
-
-  /**
-   * @brief Add an optional boolean command argument
-   * @param name The name that will be displayed in the command help
-   * @param out A pointer to an Optional where the argv value will be stored, the argv value could
-   *     be empty
-   * @param desc The description of the argument that will be displayed in the command help
-   * @return The number of arguments currently added to the command
-   */
-  public final int addArgument(String name, Optional<Boolean> out, String desc) {
-    Argument arg = new Argument();
-    arg.type = ArgumentType.Bool;
-    arg.name = name;
-    arg.value = (Object) out;
-    arg.flags = Argument.kOptional;
-    arg.desc = Optional.ofNullable(desc);
-
-    mArgs.add(arg);
-    return mArgs.size();
-  }
-
-  public final void initArguments(int argc, String[] args) throws IllegalArgumentException {
+  public final void initArguments(int argc, String[] args) {
     int argsCount = mArgs.size();
 
     if (argsCount != argc) {
@@ -249,44 +185,9 @@ public abstract class Command {
     }
   }
 
-  public void initArgument(int argIndex, String argValue) throws IllegalArgumentException {
-    boolean isValidArgument = false;
-
-    Argument arg = mArgs.get(argIndex);
-    switch (arg.type) {
-      case Attribute:
-        String str = (String) arg.value;
-        isValidArgument = argValue.equals(str);
-        break;
-      case Number_int32:
-        MutableInteger value = (MutableInteger) arg.value;
-        value.setValue(Integer.parseInt(argValue));
-        isValidArgument = (value.getValue() >= arg.min && value.getValue() <= arg.max);
-        break;
-      case Address:
-        try {
-          arg.value = (Object) InetAddress.getByName(argValue);
-        } catch (UnknownHostException e) {
-          isValidArgument = true;
-        }
-        break;
-    }
-
-    if (!isValidArgument) {
-      throw new IllegalArgumentException("Invalid argument " + arg.name + ": " + argValue);
-    }
+  public void initArgument(int argIndex, String argValue) {
+    mArgs.get(argIndex).setValue(argValue);
   }
-
-  public void resetArguments() {}
 
   public abstract void run() throws Exception;
-
-  public boolean isInteractive() {
-    return mIsInteractive;
-  }
-
-  void runAsInteractive() throws Exception {
-    mIsInteractive = true;
-    run();
-  }
 }

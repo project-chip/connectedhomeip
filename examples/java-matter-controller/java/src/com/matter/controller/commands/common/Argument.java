@@ -18,24 +18,107 @@
 
 package com.matter.controller.commands.common;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Optional;
+import javax.annotation.Nullable;
 
 public class Argument {
-  public static final byte kOptional = (1 << 0);
-  public static final byte kNullable = (1 << 1);
-  public String name;
-  public ArgumentType type;
-  public long min;
-  public long max;
-  public byte flags;
-  public Object value;
-  public Optional<String> desc;
+  private String mName;
+  private ArgumentType mType;
+  private long mMin;
+  private long mMax;
+  private Object mValue;
+  private Optional<String> mDesc = Optional.empty();
 
-  public boolean isOptional() {
-    return ((flags & kOptional) != 0);
+  public Argument(String name, IPAddress value) {
+    this.mName = name;
+    this.mType = ArgumentType.ADDRESS;
+    this.mValue = (Object) value;
   }
 
-  public boolean isNullable() {
-    return ((flags & kNullable) != 0);
+  public Argument(String name, StringBuffer value, @Nullable String desc) {
+    this.mName = name;
+    this.mType = ArgumentType.STRING;
+    this.mValue = (Object) value;
+    this.mDesc = Optional.ofNullable(desc);
+  }
+
+  public Argument(String name, MutableInteger value, @Nullable String desc) {
+    this.mName = name;
+    this.mType = ArgumentType.BOOL;
+    this.mValue = (Object) value;
+    this.mDesc = Optional.ofNullable(desc);
+  }
+
+  public Argument(String name, short min, short max, MutableInteger value, @Nullable String desc) {
+    this.mName = name;
+    this.mType = ArgumentType.NUMBER_INT16;
+    this.mMin = min;
+    this.mMax = max;
+    this.mValue = (Object) value;
+    this.mDesc = Optional.ofNullable(desc);
+  }
+
+  public Argument(String name, int min, int max, MutableInteger value, @Nullable String desc) {
+    this.mName = name;
+    this.mType = ArgumentType.NUMBER_INT32;
+    this.mMin = min;
+    this.mMax = max;
+    this.mValue = (Object) value;
+    this.mDesc = Optional.ofNullable(desc);
+  }
+
+  public Argument(String name, long min, long max, MutableInteger value, @Nullable String desc) {
+    this.mName = name;
+    this.mType = ArgumentType.NUMBER_INT64;
+    this.mMin = min;
+    this.mMax = max;
+    this.mValue = (Object) value;
+    this.mDesc = Optional.ofNullable(desc);
+  }
+
+  public String getName() {
+    return mName;
+  }
+
+  public ArgumentType getType() {
+    return mType;
+  }
+
+  public Object getValue() {
+    return mValue;
+  }
+
+  public Optional<String> getDesc() {
+    return mDesc;
+  }
+
+  public void setValue(String value) {
+    boolean isValidArgument = false;
+
+    switch (mType) {
+      case ATTRIBUTE:
+        String str = (String) mValue;
+        isValidArgument = value.equals(str);
+        break;
+      case NUMBER_INT32:
+        MutableInteger num = (MutableInteger) mValue;
+        num.setValue(Integer.parseInt(value));
+        isValidArgument = (num.intValue() >= mMin && num.intValue() <= mMax);
+        break;
+      case ADDRESS:
+        try {
+          IPAddress ipAddress = (IPAddress) mValue;
+          ipAddress.setAddress(InetAddress.getByName(value));
+        } catch (UnknownHostException e) {
+          isValidArgument = true;
+        }
+        break;
+    }
+
+    if (!isValidArgument) {
+      throw new IllegalArgumentException("Invalid argument " + mName + ": " + value);
+    }
   }
 }

@@ -25,7 +25,27 @@ public class MutableInteger {
     this.value = 0;
   }
 
+  public MutableInteger(boolean value) {
+    this.value = value ? 1 : 0;
+  }
+
+  public MutableInteger(short value) {
+    this.value = value;
+  }
+
   public MutableInteger(int value) {
+    this.value = value;
+  }
+
+  public MutableInteger(long value) {
+    this.value = value;
+  }
+
+  public void setValue(boolean value) {
+    this.value = value ? 1 : 0;
+  }
+
+  public void setValue(short value) {
     this.value = value;
   }
 
@@ -33,7 +53,23 @@ public class MutableInteger {
     this.value = value;
   }
 
-  public long getValue() {
+  public void setValue(long value) {
+    this.value = value;
+  }
+
+  public boolean boolValue() {
+    return (this.value == 0) ? false : true;
+  }
+
+  public short shortValue() {
+    return (short) value;
+  }
+
+  public int intValue() {
+    return (int) value;
+  }
+
+  public long longValue() {
     return value;
   }
 
