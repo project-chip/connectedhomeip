@@ -2173,6 +2173,7 @@ int Setup(void * inContext)
 int Teardown(void * inContext)
 {
     GetAccessControl().Finish();
+    ResetAccessControl();
     return SUCCESS;
 }
 
