@@ -205,6 +205,8 @@ def BuildEfr32Target():
 
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('with-ota-requestor', enable_ota_requestor=True)
+    target.AppendModifier('sed', enable_sed=True)
+    target.AppendModifier('low-power', enable_low_power=True)
 
     return target
 

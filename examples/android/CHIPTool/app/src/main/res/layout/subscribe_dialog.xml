@@ -33,8 +33,7 @@
       android:textSize="16sp"
       android:layout_marginBottom="8dp"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/minIntervalEd"
-      app:layout_constraintBottom_toTopOf="@+id/subscribeBtn"/>
+      app:layout_constraintTop_toBottomOf="@id/minIntervalEd" />
 
   <EditText
       android:id="@+id/keepSubscriptionsEd"
@@ -45,8 +44,7 @@
       android:textSize="16sp"
       android:layout_marginBottom="8dp"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/keepSubscriptionsEd"
-      app:layout_constraintBottom_toTopOf="@+id/subscribeBtn"/>
+      app:layout_constraintTop_toBottomOf="@id/maxIntervalEd" />
 
   <EditText
       android:id="@+id/isFabricFilteredEd"
@@ -57,7 +55,7 @@
       android:textSize="16sp"
       android:layout_marginBottom="8dp"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/isFabricFilteredEd"
+      app:layout_constraintTop_toBottomOf="@id/keepSubscriptionsEd"
       app:layout_constraintBottom_toTopOf="@+id/subscribeBtn"/>
 
   <Button
