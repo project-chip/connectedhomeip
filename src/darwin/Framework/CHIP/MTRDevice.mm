@@ -183,7 +183,7 @@ private:
 
     _weakDelegate = [MTRWeakReference weakReferenceWithObject:delegate];
     _delegateQueue = queue;
-    [self subscribeWithMinInterval:0];
+    [self setupSubscription];
 
     os_unfair_lock_unlock(&self->_lock);
 }
@@ -286,7 +286,7 @@ private:
     os_unfair_lock_unlock(&self->_lock);
 }
 
-- (void)subscribeWithMinInterval:(uint16_t)minInterval
+- (void)setupSubscription
 {
     // for now just subscribe once
     if (_subscriptionActive) {
@@ -312,7 +312,7 @@ private:
                            eventPath->mIsUrgentEvent = true;
                            ReadPrepareParams readParams(session.Value());
 
-                           readParams.mMinIntervalFloorSeconds = minInterval;
+                           readParams.mMinIntervalFloorSeconds = 0;
                            // Select a max interval based on the device's claimed idle sleep interval.
                            auto idleSleepInterval = std::chrono::duration_cast<System::Clock::Seconds32>(
                                session.Value()->GetRemoteMRPConfig().mIdleRetransTimeout);
@@ -322,7 +322,7 @@ private:
                            if (idleSleepInterval.count() > MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX) {
                                idleSleepInterval = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX);
                            }
-                           readParams.mMaxIntervalCeilingSeconds = idleSleepInterval.count();
+                           readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>(idleSleepInterval.count());
 
                            readParams.mpAttributePathParamsList = attributePath.get();
                            readParams.mAttributePathParamsListSize = 1;
