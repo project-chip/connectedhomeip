@@ -18,15 +18,75 @@
 
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/CHIPMemString.h>
+
+#include <stdio.h>
+
+/*
 #include <lib/core/GroupId.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
 #include <stdarg.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+*/
 
 namespace chip {
+
+/**
+ * Represents a key used for addressing a specific storage element.
+ *
+ * May contain generic fixed keys (e.g. "g/fidx") or formatted fabric-specific
+ * keys ("f/%x/..." where %x is the fabric index).
+ */
+class StorageKey
+{
+public:
+    StorageKey(const StorageKey & other) = default;
+    StorageKey & operator=(const StorageKey & other) = default;
+
+    ~StorageKey() { memset(mKeyNameBuffer, 0, sizeof(mKeyNameBuffer)); }
+
+    const char * KeyName() const { return mKeyNameBuffer; }
+
+    bool IsUninitialized() const { return mKeyNameBuffer[0] == 0; }
+    bool operator!() const { return IsUninitialized(); }
+
+    operator const char *() const { return KeyName; }
+
+    static StorageKey FromConst(const char * value)
+    {
+        StorageKey result;
+        Platform::CopyString(result.mKeyNameBuffer, value);
+        return result;
+    }
+
+    static StorageKey ENFORCE_FORMAT(1, 2) Formatted(const char * format, ...)
+    {
+        StorageKey result;
+
+        va_list args;
+        va_start(args, format);
+        vsnprintf(result.mKeyNameBuffer, sizeof(result.mKeyNameBuffer), format, args);
+        va_end(args);
+
+        return result;
+    }
+
+    // Explicit 0-filled key. MUST be initialized later
+    static StorageKey Uninitialized()
+    {
+        StorageKey result;
+        return result;
+    }
+
+private:
+    // May only be created by the underlying constructor methods
+    StorageKey() {}
+
+    // Contains the storage for the key name because some strings may be formatted.
+    char mKeyNameBuffer[PersistentStorageDelegate::kKeyLengthMax + 1] = { 0 };
+};
 
 /**
  * This is the common key allocation policy for all classes using
@@ -40,99 +100,99 @@ namespace chip {
  */
 class DefaultStorageKeyAllocator
 {
-public:
+private:
     DefaultStorageKeyAllocator() = default;
-    const char * KeyName() { return mKeyName; }
 
+public:
     // Fabric Table
-    const char * FabricIndexInfo() { return SetConst("g/fidx"); }
-    const char * FabricNOC(FabricIndex fabric) { return Format("f/%x/n", fabric); }
-    const char * FabricICAC(FabricIndex fabric) { return Format("f/%x/i", fabric); }
-    const char * FabricRCAC(FabricIndex fabric) { return Format("f/%x/r", fabric); }
-    const char * FabricMetadata(FabricIndex fabric) { return Format("f/%x/m", fabric); }
-    const char * FabricOpKey(FabricIndex fabric) { return Format("f/%x/o", fabric); }
+    static StorageKey FabricIndexInfo() { return StorageKey::FromConst("g/fidx"); }
+    static StorageKey FabricNOC(FabricIndex fabric) { return StorageKey::Formatted("f/%x/n", fabric); }
+    static StorageKey FabricICAC(FabricIndex fabric) { return StorageKey::Formatted("f/%x/i", fabric); }
+    static StorageKey FabricRCAC(FabricIndex fabric) { return StorageKey::Formatted("f/%x/r", fabric); }
+    static StorageKey FabricMetadata(FabricIndex fabric) { return StorageKey::Formatted("f/%x/m", fabric); }
+    static StorageKey FabricOpKey(FabricIndex fabric) { return StorageKey::Formatted("f/%x/o", fabric); }
 
     // Fail-safe handling
-    const char * FailSafeCommitMarkerKey() { return SetConst("g/fs/c"); }
-    const char * FailSafeNetworkConfig() { return SetConst("g/fs/n"); }
+    static StorageKey FailSafeCommitMarkerKey() { return StorageKey::FromConst("g/fs/c"); }
+    static StorageKey FailSafeNetworkConfig() { return StorageKey::FromConst("g/fs/n"); }
 
     // LastKnownGoodTime
-    const char * LastKnownGoodTimeKey() { return SetConst("g/lkgt"); }
+    static StorageKey LastKnownGoodTimeKey() { return StorageKey::FromConst("g/lkgt"); }
 
     // Session resumption
-    const char * FabricSession(FabricIndex fabric, NodeId nodeId)
+    static StorageKey FabricSession(FabricIndex fabric, NodeId nodeId)
     {
-        return Format("f/%x/s/%08" PRIX32 "%08" PRIX32, fabric, static_cast<uint32_t>(nodeId >> 32), static_cast<uint32_t>(nodeId));
+        return StorageKey::Formatted("f/%x/s/%08" PRIX32 "%08" PRIX32, fabric, static_cast<uint32_t>(nodeId >> 32),
+                                     static_cast<uint32_t>(nodeId));
     }
-    const char * SessionResumptionIndex() { return SetConst("g/sri"); }
-    const char * SessionResumption(const char * resumptionIdBase64) { return Format("g/s/%s", resumptionIdBase64); }
+
+    static StorageKey SessionResumptionIndex() { return StorageKey::FromConst("g/sri"); }
+    static StorageKey SessionResumption(const char * resumptionIdBase64)
+    {
+        return StorageKey::Formatted("g/s/%s", resumptionIdBase64);
+    }
 
     // Access Control
-    const char * AccessControlAclEntry(FabricIndex fabric, size_t index)
+    static StorageKey AccessControlAclEntry(FabricIndex fabric, size_t index)
     {
-        return Format("f/%x/ac/0/%x", fabric, static_cast<unsigned>(index));
+        return StorageKey::Formatted("f/%x/ac/0/%x", fabric, static_cast<unsigned>(index));
     }
-    const char * AccessControlExtensionEntry(FabricIndex fabric) { return Format("f/%x/ac/1", fabric); }
+
+    static StorageKey AccessControlExtensionEntry(FabricIndex fabric) { return StorageKey::Formatted("f/%x/ac/1", fabric); }
 
     // Group Message Counters
-    const char * GroupDataCounter() { return SetConst("g/gdc"); }
-    const char * GroupControlCounter() { return SetConst("g/gcc"); }
+    static StorageKey GroupDataCounter() { return StorageKey::FromConst("g/gdc"); }
+    static StorageKey GroupControlCounter() { return StorageKey::FromConst("g/gcc"); }
 
     // Device Information Provider
-    const char * UserLabelLengthKey(EndpointId endpoint) { return Format("g/userlbl/%x", endpoint); }
-    const char * UserLabelIndexKey(EndpointId endpoint, uint32_t index) { return Format("g/userlbl/%x/%" PRIx32, endpoint, index); }
+    static StorageKey UserLabelLengthKey(EndpointId endpoint) { return StorageKey::Formatted("g/userlbl/%x", endpoint); }
+    static StorageKey UserLabelIndexKey(EndpointId endpoint, uint32_t index)
+    {
+        return StorageKey::Formatted("g/userlbl/%x/%" PRIx32, endpoint, index);
+    }
 
     // Group Data Provider
 
     // List of fabric indices that have endpoint-to-group associations defined.
-    const char * GroupFabricList() { return SetConst("g/gfl"); }
-    const char * FabricGroups(chip::FabricIndex fabric) { return Format("f/%x/g", fabric); }
-    const char * FabricGroup(chip::FabricIndex fabric, chip::GroupId group) { return Format("f/%x/g/%x", fabric, group); }
-    const char * FabricGroupKey(chip::FabricIndex fabric, uint16_t index) { return Format("f/%x/gk/%x", fabric, index); }
-    const char * FabricGroupEndpoint(chip::FabricIndex fabric, chip::GroupId group, chip::EndpointId endpoint)
+    static StorageKey GroupFabricList() { return StorageKey::FromConst("g/gfl"); }
+    static StorageKey FabricGroups(chip::FabricIndex fabric) { return StorageKey::Formatted("f/%x/g", fabric); }
+    static StorageKey FabricGroup(chip::FabricIndex fabric, chip::GroupId group)
     {
-        return Format("f/%x/g/%x/e/%x", fabric, group, endpoint);
+        return StorageKey::Formatted("f/%x/g/%x", fabric, group);
     }
-    const char * FabricKeyset(chip::FabricIndex fabric, uint16_t keyset) { return Format("f/%x/k/%x", fabric, keyset); }
+    static StorageKey FabricGroupKey(chip::FabricIndex fabric, uint16_t index)
+    {
+        return StorageKey::Formatted("f/%x/gk/%x", fabric, index);
+    }
+    static StorageKey FabricGroupEndpoint(chip::FabricIndex fabric, chip::GroupId group, chip::EndpointId endpoint)
+    {
+        return StorageKey::Formatted("f/%x/g/%x/e/%x", fabric, group, endpoint);
+    }
+    static StorageKey FabricKeyset(chip::FabricIndex fabric, uint16_t keyset)
+    {
+        return StorageKey::Formatted("f/%x/k/%x", fabric, keyset);
+    }
 
-    const char * AttributeValue(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId)
+    static StorageKey AttributeValue(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId)
     {
         // Needs at most 26 chars: 6 for "g/a///", 4 for the endpoint id, 8 each
         // for the cluster and attribute ids.
-        return Format("g/a/%x/%" PRIx32 "/%" PRIx32, endpointId, clusterId, attributeId);
+        return StorageKey::Formatted("g/a/%x/%" PRIx32 "/%" PRIx32, endpointId, clusterId, attributeId);
     }
 
     // TODO: Should store fabric-specific parts of the binding list under keys
     // starting with "f/%x/".
-    const char * BindingTable() { return SetConst("g/bt"); }
-    const char * BindingTableEntry(uint8_t index) { return Format("g/bt/%x", index); }
+    static StorageKey BindingTable() { return StorageKey::FromConst("g/bt"); }
+    static StorageKey BindingTableEntry(uint8_t index) { return StorageKey::Formatted("g/bt/%x", index); }
 
-    const char * OTADefaultProviders() { return SetConst("g/o/dp"); }
-    const char * OTACurrentProvider() { return SetConst("g/o/cp"); }
-    const char * OTAUpdateToken() { return SetConst("g/o/ut"); }
-    const char * OTACurrentUpdateState() { return SetConst("g/o/us"); }
-    const char * OTATargetVersion() { return SetConst("g/o/tv"); }
+    static StorageKey OTADefaultProviders() { return StorageKey::FromConst("g/o/dp"); }
+    static StorageKey OTACurrentProvider() { return StorageKey::FromConst("g/o/cp"); }
+    static StorageKey OTAUpdateToken() { return StorageKey::FromConst("g/o/ut"); }
+    static StorageKey OTACurrentUpdateState() { return StorageKey::FromConst("g/o/us"); }
+    static StorageKey OTATargetVersion() { return StorageKey::FromConst("g/o/tv"); }
 
     // Event number counter.
-    const char * IMEventNumber() { return SetConst("g/im/ec"); }
-
-protected:
-    // The ENFORCE_FORMAT args are "off by one" because this is a class method,
-    // with an implicit "this" as first arg.
-    const char * ENFORCE_FORMAT(2, 3) Format(const char * format, ...)
-    {
-        va_list args;
-        va_start(args, format);
-        vsnprintf(mKeyNameBuffer, sizeof(mKeyNameBuffer), format, args);
-        va_end(args);
-        return mKeyName = mKeyNameBuffer;
-    }
-
-    const char * SetConst(const char * keyName) { return mKeyName = keyName; }
-
-private:
-    const char * mKeyName                                             = nullptr;
-    char mKeyNameBuffer[PersistentStorageDelegate::kKeyLengthMax + 1] = { 0 };
+    static StorageKey IMEventNumber() { return StorageKey::FromConst("g/im/ec"); }
 };
 
 } // namespace chip
