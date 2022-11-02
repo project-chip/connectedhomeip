@@ -488,12 +488,6 @@ static MTRBaseDevice * GetConnectedDevice(void)
     _expectation = nil;
 }
 
-- (void)onAddressUpdated:(NSError *)error
-{
-    XCTAssertEqual(error.code, 0);
-    [_expectation fulfill];
-    _expectation = nil;
-}
 @end
 
 @interface MTRXPCListenerSampleTests : XCTestCase

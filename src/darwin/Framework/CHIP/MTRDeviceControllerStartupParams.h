@@ -225,7 +225,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign, readonly) uint64_t fabricId MTR_NEWLY_DEPRECATED("Please use fabricID");
 @property (nonatomic, copy, nullable) NSNumber * vendorId MTR_NEWLY_DEPRECATED("Please use vendorID");
-@property (nonatomic, copy, nullable) NSNumber * nodeID MTR_NEWLY_DEPRECATED("Please use nodeID");
+@property (nonatomic, copy, nullable) NSNumber * nodeId MTR_NEWLY_DEPRECATED("Please use nodeID");
 
 - (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner
                               fabricId:(uint64_t)fabricId

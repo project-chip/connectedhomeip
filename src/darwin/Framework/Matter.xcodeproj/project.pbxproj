@@ -52,6 +52,7 @@
 		51431AFB27D29CA4008A7943 /* ota-provider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 51431AFA27D29CA4008A7943 /* ota-provider.cpp */; };
 		515C1C6F284F9FFB00A48F0C /* MTRMemory.mm in Sources */ = {isa = PBXBuildFile; fileRef = 515C1C6D284F9FFB00A48F0C /* MTRMemory.mm */; };
 		515C1C70284F9FFB00A48F0C /* MTRMemory.h in Headers */ = {isa = PBXBuildFile; fileRef = 515C1C6E284F9FFB00A48F0C /* MTRMemory.h */; };
+		51669AF02913204400F4AA36 /* MTRBackwardsCompatTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 51669AEF2913204400F4AA36 /* MTRBackwardsCompatTests.m */; };
 		517BF3F0282B62B800A8B7DB /* MTRCertificates.h in Headers */ = {isa = PBXBuildFile; fileRef = 517BF3EE282B62B800A8B7DB /* MTRCertificates.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		517BF3F1282B62B800A8B7DB /* MTRCertificates.mm in Sources */ = {isa = PBXBuildFile; fileRef = 517BF3EF282B62B800A8B7DB /* MTRCertificates.mm */; };
 		517BF3F3282B62CB00A8B7DB /* MTRCertificateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 517BF3F2282B62CB00A8B7DB /* MTRCertificateTests.m */; };
@@ -191,6 +192,7 @@
 		51431AFA27D29CA4008A7943 /* ota-provider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ota-provider.cpp"; path = "../../../app/clusters/ota-provider/ota-provider.cpp"; sourceTree = "<group>"; };
 		515C1C6D284F9FFB00A48F0C /* MTRMemory.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRMemory.mm; sourceTree = "<group>"; };
 		515C1C6E284F9FFB00A48F0C /* MTRMemory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRMemory.h; sourceTree = "<group>"; };
+		51669AEF2913204400F4AA36 /* MTRBackwardsCompatTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRBackwardsCompatTests.m; sourceTree = "<group>"; };
 		517BF3EE282B62B800A8B7DB /* MTRCertificates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRCertificates.h; sourceTree = "<group>"; };
 		517BF3EF282B62B800A8B7DB /* MTRCertificates.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRCertificates.mm; sourceTree = "<group>"; };
 		517BF3F2282B62CB00A8B7DB /* MTRCertificateTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRCertificateTests.m; sourceTree = "<group>"; };
@@ -474,6 +476,7 @@
 				997DED1926955D0200975E97 /* MTRThreadOperationalDatasetTests.mm */,
 				517BF3F2282B62CB00A8B7DB /* MTRCertificateTests.m */,
 				7596A8502878709F004DAE0E /* MTRAsyncCallbackQueueTests.m */,
+				51669AEF2913204400F4AA36 /* MTRBackwardsCompatTests.m */,
 				B202529D2459E34F00F97062 /* Info.plist */,
 			);
 			path = CHIPTests;
@@ -736,6 +739,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				51669AF02913204400F4AA36 /* MTRBackwardsCompatTests.m in Sources */,
 				51D10D2E2808E2CA00E8CA3D /* MTRTestStorage.m in Sources */,
 				7596A8512878709F004DAE0E /* MTRAsyncCallbackQueueTests.m in Sources */,
 				997DED1A26955D0200975E97 /* MTRThreadOperationalDatasetTests.mm in Sources */,
