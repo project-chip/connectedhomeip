@@ -30,7 +30,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.03
+            image: connectedhomeip/chip-build:0.6.05
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.15

@@ -211,7 +211,7 @@ void OTAImageProcessorImpl::TriggerFlashAction(FlashHandler::Action action)
 // external flash power consumption optimization
 void FlashHandler::DoAction(Action aAction)
 {
-#if CONFIG_PM_DEVICE && CONFIG_NORDIC_QSPI_NOR && !CONFIG_SOC_NRF52840 // nRF52 is optimized per default
+#if CONFIG_PM_DEVICE && CONFIG_NORDIC_QSPI_NOR
     // utilize the QSPI driver sleep power mode
     const auto * qspi_dev = DEVICE_DT_GET(DT_INST(0, nordic_qspi_nor));
     if (device_is_ready(qspi_dev))

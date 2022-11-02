@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-telink:0.6.03
+            image: connectedhomeip/chip-build-telink:0.6.05
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -54,37 +54,46 @@ jobs:
                   GH_CONTEXT: ${{ toJson(github) }}
               run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
 
+            - name: Build example Telink All Clusters App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-all-clusters' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9518adk80d all-clusters-app \
+                    out/telink-tlsr9518adk80d-all-clusters/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: Build example Telink All Clusters Minimal App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-all-clusters-minimal' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9518adk80d all-clusters-minimal-app \
+                    out/telink-tlsr9518adk80d-all-clusters-minimal/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
             - name: Build example Telink Lighting App
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-light' build"
-
-            - name: Build example Telink Light Switch App
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-light-switch' build"
-
-            - name: Build example Telink OTA Requestor App
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-ota-requestor' build"
-
-            - name: Get Lighting size stats
-              run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d lighting-app \
                     out/telink-tlsr9518adk80d-light/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
-            - name: Get Light Switch size stats
+            - name: Build example Telink Light Switch App
               run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-light-switch' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d light-switch-app \
                     out/telink-tlsr9518adk80d-light-switch/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
-            - name: Get OTA Requestor size stats
+            - name: Build example Telink OTA Requestor App
               run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-ota-requestor' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d ota-requestor-app \
                     out/telink-tlsr9518adk80d-ota-requestor/zephyr/zephyr.elf \
