@@ -554,6 +554,14 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                 return Status::InvalidAction;
             }
 
+            if (requestedAttributePathCount == 0 && requestedEventPathCount == 0)
+            {
+                ChipLogError(InteractionModel, "Read from [%u:" ChipLogFormatX64 "] is empty. Rejecting request.",
+                             apExchangeContext->GetSessionHandle()->GetFabricIndex(),
+                             ChipLogValueX64(apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId()));
+                return Status::InvalidAction;
+            }
+
             // The following cast is safe, since we can only hold a few tens of paths in one request.
             Status checkResult = EnsureResourceForRead(apExchangeContext->GetSessionHandle()->GetFabricIndex(),
                                                        requestedAttributePathCount, requestedEventPathCount);

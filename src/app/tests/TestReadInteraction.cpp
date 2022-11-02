@@ -297,6 +297,7 @@ public:
     static void TestReadHandlerInvalidAttributePath(nlTestSuite * apSuite, void * apContext);
     static void TestProcessSubscribeRequest(nlTestSuite * apSuite, void * apContext);
     static void TestReadRoundtrip(nlTestSuite * apSuite, void * apContext);
+    static void TestEmptyReadRequest(nlTestSuite * apSuite, void * apContext);
     static void TestPostSubscribeRoundtripChunkReport(nlTestSuite * apSuite, void * apContext);
     static void TestReadRoundtripWithDataVersionFilter(nlTestSuite * apSuite, void * apContext);
     static void TestReadRoundtripWithNoMatchPathDataVersionFilter(nlTestSuite * apSuite, void * apContext);
@@ -563,6 +564,45 @@ void TestReadInteraction::TestReadClientGenerateAttributePathList(nlTestSuite * 
     AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributeRequests();
     err = readClient.GenerateAttributePaths(attributePathListBuilder, attributePaths);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+}
+
+void TestReadInteraction::TestEmptyReadRequest(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+    ctx.GetLoopback().mSentMessageCount = 0;
+    GenerateEvents(apSuite, apContext);
+
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+
+    {
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+                                   chip::app::ReadClient::InteractionType::Read);
+
+        err = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+
+        // Client sends ReadRequest + server sends status response with invalid action + client sends out status reponse with
+        // invalid action, server replies with Ack
+        NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 4);
+        NL_TEST_ASSERT(apSuite, delegate.mError == CHIP_IM_GLOBAL_STATUS(InvalidAction));
+        NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
+        NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
+    }
+    ctx.GetLoopback().mSentMessageCount = 0;
+    engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestReadClientGenerateInvalidAttributePathList(nlTestSuite * apSuite, void * apContext)
@@ -4115,6 +4155,7 @@ namespace {
 const nlTest sTests[] =
 {
     NL_TEST_DEF("TestReadRoundtrip", chip::app::TestReadInteraction::TestReadRoundtrip),
+    NL_TEST_DEF("TestEmptyReadRequest", chip::app::TestReadInteraction::TestEmptyReadRequest),
     NL_TEST_DEF("TestReadRoundtripWithDataVersionFilter", chip::app::TestReadInteraction::TestReadRoundtripWithDataVersionFilter),
     NL_TEST_DEF("TestReadRoundtripWithNoMatchPathDataVersionFilter", chip::app::TestReadInteraction::TestReadRoundtripWithNoMatchPathDataVersionFilter),
     NL_TEST_DEF("TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter", chip::app::TestReadInteraction::TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter),
