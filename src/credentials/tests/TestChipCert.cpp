@@ -428,20 +428,18 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
                                                                          { TestCert::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       } } },
     };
     // clang-format on
-    static const size_t sNumValidationTestCases = ArraySize(sValidationTestCases);
 
     for (const auto & testCase : sValidationTestCases)
     {
         const ChipCertificateData * resultCert = nullptr;
-        err = certSet.Init(kMaxCertsPerTestCase);
+        err                                    = certSet.Init(kMaxCertsPerTestCase);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         for (auto InputCert : testCase.InputCerts)
         {
             if (InputCert.Type != TestCert::kNone)
             {
-                err = LoadTestCert(certSet, InputCert.Type, InputCert.LoadFlags,
-                                   InputCert.DecodeFlags);
+                err = LoadTestCert(certSet, InputCert.Type, InputCert.LoadFlags, InputCert.DecodeFlags);
                 NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
             }
         }

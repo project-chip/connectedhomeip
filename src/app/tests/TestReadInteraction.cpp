@@ -2216,7 +2216,7 @@ void TestReadInteraction::TestReadShutdown(nlTestSuite * apSuite, void * apConte
     for (auto & pClient : pClients)
     {
         pClient = Platform::New<app::ReadClient>(engine, &ctx.GetExchangeManager(), delegate,
-                                                     chip::app::ReadClient::InteractionType::Subscribe);
+                                                 chip::app::ReadClient::InteractionType::Subscribe);
     }
 
     //

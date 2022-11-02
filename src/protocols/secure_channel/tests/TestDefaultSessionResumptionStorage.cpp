@@ -302,8 +302,7 @@ void TestDelete(nlTestSuite * inSuite, void * inContext)
     for (auto & vector : vectors)
     {
         NL_TEST_ASSERT(inSuite,
-                       sessionStorage.Save(vector.node, vector.resumptionId, sharedSecret, chip::CATValues{}) ==
-                           CHIP_NO_ERROR);
+                       sessionStorage.Save(vector.node, vector.resumptionId, sharedSecret, chip::CATValues{}) == CHIP_NO_ERROR);
     }
 
     // Delete values in turn from storage and verify they are removed.
@@ -315,11 +314,9 @@ void TestDelete(nlTestSuite * inSuite, void * inContext)
         chip::CATValues outCats;
         NL_TEST_ASSERT(inSuite, sessionStorage.Delete(vector.node) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite,
-                       sessionStorage.FindByScopedNodeId(vector.node, outResumptionId, outSharedSecret, outCats) !=
-                           CHIP_NO_ERROR);
+                       sessionStorage.FindByScopedNodeId(vector.node, outResumptionId, outSharedSecret, outCats) != CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite,
-                       sessionStorage.FindByResumptionId(vector.resumptionId, outNode, outSharedSecret, outCats) !=
-                           CHIP_NO_ERROR);
+                       sessionStorage.FindByResumptionId(vector.resumptionId, outNode, outSharedSecret, outCats) != CHIP_NO_ERROR);
     }
 
     // Verify no state or link table persistent storage entries were leaked.
