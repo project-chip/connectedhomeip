@@ -203,9 +203,9 @@ CHIP_ERROR BleTransportCapabilitiesRequestMessage::Decode(const PacketBufferHand
     VerifyOrReturnError(CAPABILITIES_MSG_CHECK_BYTE_1 == chip::Encoding::Read8(p), BLE_ERROR_INVALID_MESSAGE);
     VerifyOrReturnError(CAPABILITIES_MSG_CHECK_BYTE_2 == chip::Encoding::Read8(p), BLE_ERROR_INVALID_MESSAGE);
 
-    for (size_t i = 0; i < kCapabilitiesRequestSupportedVersionsLength; i++)
+    for (unsigned char & mSupportedProtocolVersion : msg.mSupportedProtocolVersions)
     {
-        msg.mSupportedProtocolVersions[i] = chip::Encoding::Read8(p);
+        mSupportedProtocolVersion = chip::Encoding::Read8(p);
     }
 
     msg.mMtu        = chip::Encoding::LittleEndian::Read16(p);

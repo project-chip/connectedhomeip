@@ -131,11 +131,11 @@ void RecordWriter::RememberWrittenQnameOffset(size_t offset)
         return;
     }
 
-    for (size_t i = 0; i < kMaxCachedReferences; i++)
+    for (unsigned short & mPreviousQName : mPreviousQNames)
     {
-        if (mPreviousQNames[i] == kInvalidOffset)
+        if (mPreviousQName == kInvalidOffset)
         {
-            mPreviousQNames[i] = offset;
+            mPreviousQName = offset;
             return;
         }
     }
