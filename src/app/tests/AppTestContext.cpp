@@ -52,7 +52,7 @@ CHIP_ERROR AppContext::Init()
 void AppContext::Shutdown()
 {
     Access::GetAccessControl().Finish();
-    Access::ResetAccessControl();
+    Access::ResetAccessControlToDefault();
 
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     Super::Shutdown();

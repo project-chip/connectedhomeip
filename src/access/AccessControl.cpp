@@ -632,7 +632,7 @@ void SetAccessControl(AccessControl & accessControl)
     globalAccessControl = &accessControl;
 }
 
-void ResetAccessControl()
+void ResetAccessControlToDefault()
 {
     globalAccessControl = &defaultAccessControl;
 }
