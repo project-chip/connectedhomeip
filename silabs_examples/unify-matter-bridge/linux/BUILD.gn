@@ -45,6 +45,7 @@ static_library("unify-matter-bridge-lib") {
     "src/cluster_translator/bridged_device_basic_info_attribute_translator.cpp",
     "src/cluster_translator/group_command_translator.cpp",
     "src/cluster_translator/group_translator.cpp",
+    "src/cluster_translator/feature_map_attr_override.cpp",
     "src/demo_uic_cli.cpp",
     "src/device_type_mapper/matter_device_translator.cpp",
     "src/device_type_mapper/matter_device_types_clusters_list_updated.inc",

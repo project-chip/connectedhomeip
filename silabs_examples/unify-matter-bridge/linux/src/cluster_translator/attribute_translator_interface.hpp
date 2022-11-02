@@ -91,6 +91,14 @@ class attribute_translator_interface :
     = 0;
   matter_node_state_monitor &m_node_state_monitor;
 
+  /**
+   * @brief Get the feature map setting for a given cluster
+   * 
+   * @param aPath attribute path (endpoint, cluster, feature map attribute)
+   * @return uint32_t feature map value
+   */
+  virtual uint32_t get_feature_map_settings(const chip::app::ConcreteReadAttributePath & aPath) { return 0; }
+
   private:
   const char *LOG_TAG;
 

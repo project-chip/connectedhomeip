@@ -224,4 +224,18 @@ void matter_node_state_monitor::register_dynamic_endpoint(const struct bridged_e
   }
 }
 
+std::set<chip::ClusterId> matter_node_state_monitor::get_supported_cluster(chip::EndpointId endpoint)
+{
+  std::set<chip::ClusterId> cluster_list;
+  auto ep = bridged_endpoint(endpoint);
+  auto iter                  = bridged_endpoints.find(ep->unify_unid);
+  if (iter != bridged_endpoints.end()) {
+      const EmberAfEndpointType *endpoint_meta_data = const_cast<EmberAfEndpointType*>(*(iter->second.ember_endpoint));
+      for (uint8_t i = 0; i < endpoint_meta_data->clusterCount; i++){
+          cluster_list.insert(endpoint_meta_data->cluster[i].clusterId);
+      }
+  }
+  return cluster_list;
+}
+
 }  // namespace unify::matter_bridge

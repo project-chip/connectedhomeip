@@ -59,29 +59,7 @@ CHIP_ERROR
     case MN::{{asUpperCamelCase label}}::Id: {     // type is {{type}}
       MN::{{asUpperCamelCase label}}::TypeInfo::Type value;
       {{#if (isStrEqual (asUpperCamelCase label) "FeatureMap")  }}
-        {{#if (isStrEqual (asUpperCamelCase parent.label) "LevelControl")}}
-      // Set hardcoded FeatureMap values for LevelControl
-      value = 3;
-        {{else if (isStrEqual (asUpperCamelCase parent.label) "ColorControl")}}
-        {
-          ConcreteAttributePath cc_atrpath = ConcreteAttributePath(aPath.mEndpointId,
-                                                        aPath.mClusterId,
-                                                        MN::ColorCapabilities::Id);
-          MN::ColorCapabilities::TypeInfo::Type colorControlCapabilities;
-          if (EMBER_ZCL_STATUS_SUCCESS == UN::ColorCapabilities::Get(cc_atrpath, colorControlCapabilities)) {
-            value = static_cast<MN::{{asUpperCamelCase label}}::TypeInfo::Type>(colorControlCapabilities);
-          }
-          else {
-            sl_log_warning(LOG_TAG, "Failed to read ColorCapabilities, setting featuremap to HueSaturationSupported");
-            value = 1;
-          }
-        }
-        {{else if (isStrEqual (asUpperCamelCase parent.label) "OnOff")}}
-      // Set hardcoded FeatureMap values for OnOff
-      value = 1;
-        {{else}}
-      UN::{{asUpperCamelCase label}}::Get(atrpath, value);
-        {{/if}}
+      value = get_feature_map_settings(aPath);
       {{else}}
       UN::{{asUpperCamelCase label}}::Get(atrpath, value);
       {{/if}}

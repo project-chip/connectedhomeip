@@ -63,7 +63,7 @@ IdentifyAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribute
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -257,7 +257,7 @@ ScenesAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeVa
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -494,8 +494,7 @@ OnOffAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeVal
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            // Set hardcoded FeatureMap values for OnOff
-            value = 1;
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -727,7 +726,7 @@ OnOffSwitchConfigurationAttributeAccess::Read(const ConcreteReadAttributePath & 
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -964,8 +963,7 @@ LevelControlAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attri
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            // Set hardcoded FeatureMap values for LevelControl
-            value = 3;
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -1390,7 +1388,7 @@ BinaryInputBasicAttributeAccess::Read(const ConcreteReadAttributePath & aPath, A
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -1693,7 +1691,7 @@ PulseWidthModulationAttributeAccess::Read(const ConcreteReadAttributePath & aPat
         {
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -1918,7 +1916,7 @@ BasicAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeVal
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -2337,7 +2335,7 @@ OtaSoftwareUpdateProviderAttributeAccess::Read(const ConcreteReadAttributePath &
         {
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -2484,7 +2482,7 @@ OtaSoftwareUpdateRequestorAttributeAccess::Read(const ConcreteReadAttributePath 
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -2674,7 +2672,7 @@ LocalizationConfigurationAttributeAccess::Read(const ConcreteReadAttributePath &
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -2839,7 +2837,7 @@ TimeFormatLocalizationAttributeAccess::Read(const ConcreteReadAttributePath & aP
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -3019,7 +3017,7 @@ UnitLocalizationAttributeAccess::Read(const ConcreteReadAttributePath & aPath, A
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -3170,7 +3168,7 @@ PowerSourceConfigurationAttributeAccess::Read(const ConcreteReadAttributePath & 
         {
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -3440,7 +3438,7 @@ PowerSourceAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -3984,7 +3982,7 @@ GeneralCommissioningAttributeAccess::Read(const ConcreteReadAttributePath & aPat
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -4181,7 +4179,7 @@ DiagnosticLogsAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Att
         {
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -4335,7 +4333,7 @@ GeneralDiagnosticsAttributeAccess::Read(const ConcreteReadAttributePath & aPath,
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -4551,7 +4549,7 @@ SoftwareDiagnosticsAttributeAccess::Read(const ConcreteReadAttributePath & aPath
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -5013,7 +5011,7 @@ ThreadNetworkDiagnosticsAttributeAccess::Read(const ConcreteReadAttributePath & 
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -6074,7 +6072,7 @@ WiFiNetworkDiagnosticsAttributeAccess::Read(const ConcreteReadAttributePath & aP
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -6434,7 +6432,7 @@ TimeSynchronizationAttributeAccess::Read(const ConcreteReadAttributePath & aPath
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -6724,7 +6722,7 @@ SwitchAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeVa
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -6909,7 +6907,7 @@ OperationalCredentialsAttributeAccess::Read(const ConcreteReadAttributePath & aP
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -7094,7 +7092,7 @@ GroupKeyManagementAttributeAccess::Read(const ConcreteReadAttributePath & aPath,
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -7261,7 +7259,7 @@ FixedLabelAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
         {
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -7389,7 +7387,7 @@ UserLabelAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribut
         {
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -7525,7 +7523,7 @@ ProxyConfigurationAttributeAccess::Read(const ConcreteReadAttributePath & aPath,
         {
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -7654,7 +7652,7 @@ ProxyDiscoveryAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Att
         {
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -7783,7 +7781,7 @@ ProxyValidAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
         {
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -7916,7 +7914,7 @@ BooleanStateAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attri
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -8083,7 +8081,7 @@ ModeSelectAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -8477,7 +8475,7 @@ DoorLockAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribute
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -9371,7 +9369,7 @@ WindowCoveringAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Att
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -9876,7 +9874,7 @@ BarrierControlAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Att
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -10440,7 +10438,7 @@ ThermostatAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -11532,7 +11530,7 @@ FanControlAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -11877,7 +11875,7 @@ ThermostatUserInterfaceConfigurationAttributeAccess::Read(const ConcreteReadAttr
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -12339,20 +12337,7 @@ ColorControlAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attri
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            {
-                ConcreteAttributePath cc_atrpath =
-                    ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, MN::ColorCapabilities::Id);
-                MN::ColorCapabilities::TypeInfo::Type colorControlCapabilities;
-                if (EMBER_ZCL_STATUS_SUCCESS == UN::ColorCapabilities::Get(cc_atrpath, colorControlCapabilities))
-                {
-                    value = static_cast<MN::FeatureMap::TypeInfo::Type>(colorControlCapabilities);
-                }
-                else
-                {
-                    sl_log_warning(LOG_TAG, "Failed to read ColorCapabilities, setting featuremap to HueSaturationSupported");
-                    value = 1;
-                }
-            }
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -13342,7 +13327,7 @@ IlluminanceMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aP
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -13566,7 +13551,7 @@ TemperatureMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aP
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -13800,7 +13785,7 @@ PressureMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aPath
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -14077,7 +14062,7 @@ FlowMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aPath, At
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -14282,7 +14267,7 @@ RelativeHumidityMeasurementAttributeAccess::Read(const ConcreteReadAttributePath
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -14534,7 +14519,7 @@ OccupancySensingAttributeAccess::Read(const ConcreteReadAttributePath & aPath, A
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -14917,7 +14902,7 @@ WakeOnLanAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribut
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -15059,7 +15044,7 @@ ChannelAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeV
         {
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -15192,7 +15177,7 @@ TargetNavigatorAttributeAccess::Read(const ConcreteReadAttributePath & aPath, At
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -15365,7 +15350,7 @@ MediaPlaybackAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attr
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -15582,7 +15567,7 @@ MediaInputAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -15724,7 +15709,7 @@ LowPowerAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribute
         {
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -15852,7 +15837,7 @@ KeypadInputAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         {
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -15985,7 +15970,7 @@ ContentLauncherAttributeAccess::Read(const ConcreteReadAttributePath & aPath, At
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -16142,7 +16127,7 @@ AudioOutputAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -16284,7 +16269,7 @@ ApplicationLauncherAttributeAccess::Read(const ConcreteReadAttributePath & aPath
         {
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -16451,7 +16436,7 @@ ApplicationBasicAttributeAccess::Read(const ConcreteReadAttributePath & aPath, A
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -16664,7 +16649,7 @@ AccountLoginAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attri
         {
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
@@ -17432,7 +17417,7 @@ ElectricalMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aPa
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            UN::FeatureMap::Get(atrpath, value);
+            value = get_feature_map_settings(aPath);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u

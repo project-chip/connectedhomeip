@@ -120,6 +120,14 @@ public:
      */
     void register_event_listener(const event_listener_t & event_listener);
 
+    /**
+     * @brief Get the supported cluster from matter endpoint id
+     *
+     * @param endpoint
+     * @return std::set<chip::ClusterId>
+     */
+    std::set<chip::ClusterId> get_supported_cluster(chip::EndpointId endpoint);
+
 protected:
     /**
      * @brief called when a unify device is added
