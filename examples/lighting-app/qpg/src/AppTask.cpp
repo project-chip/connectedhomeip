@@ -260,6 +260,8 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    PlatformMgr().AddEventHandler(MatterEventHandler, 0);
+
     ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
     // Init ZCL Data Model and start server
@@ -317,8 +319,8 @@ void AppTask::AppTaskMain(void * pvParameter)
         // when the CHIP task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
-            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+            // sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
+            // sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
             sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
@@ -619,5 +621,20 @@ void AppTask::UpdateClusterState(void)
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: updating level %x", status);
+    }
+}
+
+void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
+{
+    if (event->Type == DeviceEventType::kServiceProvisioningChange && event->ServiceProvisioningChange.IsServiceProvisioned)
+    {
+        if (event->ServiceProvisioningChange.IsServiceProvisioned)
+        {
+            sIsThreadProvisioned = true;
+        }
+        else
+        {
+            sIsThreadProvisioned = false;
+        }
     }
 }
