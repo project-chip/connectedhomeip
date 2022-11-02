@@ -174,14 +174,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBaseClusterIdentify (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Groups
  *    Attributes and commands for group configuration and manipulation.
@@ -320,14 +312,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterGroups (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -571,14 +555,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBaseClusterScenes (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster On/Off
  *    Attributes and commands for switching devices between 'On' and 'Off' states.
@@ -793,14 +769,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBaseClusterOnOff (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster On/off Switch Configuration
  *    Attributes and commands for configuring On/Off switching devices.
@@ -943,14 +911,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterOnOffSwitchConfiguration (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -1351,14 +1311,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBaseClusterLevelControl (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Binary Input (Basic)
  *    An interface for reading the value of a binary measurement and accessing various characteristics of that measurement.
@@ -1645,14 +1597,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBaseClusterBinaryInputBasic (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Descriptor
  *    The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its
@@ -1824,14 +1768,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBaseClusterDescriptor (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Binding
  *    The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table.
@@ -1955,14 +1891,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterBinding (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -2172,14 +2100,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBaseClusterAccessControl (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Actions
  *    This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information.
@@ -2353,14 +2273,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterActions (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -2835,14 +2747,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBaseClusterBasic (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster OTA Software Update Provider
  *    Provides an interface for providing OTA software updates
@@ -2955,14 +2859,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterOtaSoftwareUpdateProvider (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -3153,14 +3049,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBaseClusterOtaSoftwareUpdateRequestor (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Localization Configuration
  *    Nodes should be expected to be deployed to any and all regions of the world. These global regions
@@ -3307,14 +3195,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterLocalizationConfiguration (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -3489,14 +3369,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBaseClusterTimeFormatLocalization (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Unit Localization
  *    Nodes should be expected to be deployed to any and all regions of the world. These global regions
@@ -3628,14 +3500,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBaseClusterUnitLocalization (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Power Source Configuration
  *    This cluster is used to describe the configuration and capabilities of a Device's power system.
@@ -3754,14 +3618,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterPowerSourceConfiguration (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -4432,14 +4288,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBaseClusterPowerSource (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster General Commissioning
  *    This cluster is used to manage global aspects of the Commissioning flow.
@@ -4654,14 +4502,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterGeneralCommissioning (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -4937,14 +4777,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBaseClusterNetworkCommissioning (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Diagnostic Logs
  *    The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics.
@@ -5052,14 +4884,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterDiagnosticLogs (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -5334,14 +5158,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBaseClusterGeneralDiagnostics (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Software Diagnostics
  *    The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to
@@ -5523,14 +5339,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterSoftwareDiagnostics (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -6786,14 +6594,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBaseClusterThreadNetworkDiagnostics (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster WiFi Network Diagnostics
  *    The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node
@@ -7136,14 +6936,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBaseClusterWiFiNetworkDiagnostics (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Ethernet Network Diagnostics
  *    The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a
@@ -7410,14 +7202,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterEthernetNetworkDiagnostics (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -7794,14 +7578,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBaseClusterBridgedDeviceBasic (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Switch
  *    This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
@@ -7964,14 +7740,6 @@ light or a window shade.
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterSwitch (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -8140,14 +7908,6 @@ light or a window shade.
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterAdministratorCommissioning (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -8388,14 +8148,6 @@ light or a window shade.
 
 @end
 
-@interface MTRBaseClusterOperationalCredentials (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Group Key Management
  *    The Group Key Management Cluster is the mechanism by which group keys are managed.
@@ -8587,14 +8339,6 @@ light or a window shade.
 
 @end
 
-@interface MTRBaseClusterGroupKeyManagement (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Fixed Label
  *    The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
@@ -8715,14 +8459,6 @@ labels.
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterFixedLabel (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -8852,14 +8588,6 @@ labels.
 
 @end
 
-@interface MTRBaseClusterUserLabel (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Boolean State
  *    This cluster provides an interface to a boolean state called StateValue.
@@ -8980,14 +8708,6 @@ labels.
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterBooleanState (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -9207,14 +8927,6 @@ labels.
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterModeSelect (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -10102,14 +9814,6 @@ labels.
 
 @end
 
-@interface MTRBaseClusterDoorLock (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Window Covering
  *    Provides an interface for controlling and adjusting automatic window coverings.
@@ -10644,14 +10348,6 @@ labels.
 
 @end
 
-@interface MTRBaseClusterWindowCovering (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Barrier Control
  *    This cluster provides control of a barrier (garage door).
@@ -10971,14 +10667,6 @@ labels.
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterBarrierControl (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -11506,14 +11194,6 @@ labels.
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterPumpConfigurationAndControl (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -12657,14 +12337,6 @@ labels.
 
 @end
 
-@interface MTRBaseClusterThermostat (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Fan Control
  *    An interface for controlling a fan in a heating/cooling system.
@@ -12985,14 +12657,6 @@ labels.
 
 @end
 
-@interface MTRBaseClusterFanControl (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Thermostat User Interface Configuration
  *    An interface for configuring the user interface of a thermostat (which may be remote from the thermostat).
@@ -13166,14 +12830,6 @@ labels.
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterThermostatUserInterfaceConfiguration (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -14284,14 +13940,6 @@ labels.
 
 @end
 
-@interface MTRBaseClusterColorControl (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Ballast Configuration
  *    Attributes and commands for configuring a lighting ballast.
@@ -14690,14 +14338,6 @@ labels.
 
 @end
 
-@interface MTRBaseClusterBallastConfiguration (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Illuminance Measurement
  *    Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements.
@@ -14892,14 +14532,6 @@ labels.
 
 @end
 
-@interface MTRBaseClusterIlluminanceMeasurement (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Temperature Measurement
  *    Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements.
@@ -15073,14 +14705,6 @@ labels.
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterTemperatureMeasurement (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -15346,14 +14970,6 @@ labels.
 
 @end
 
-@interface MTRBaseClusterPressureMeasurement (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Flow Measurement
  *    Attributes and commands for configuring the measurement of flow, and reporting flow measurements.
@@ -15530,14 +15146,6 @@ labels.
 
 @end
 
-@interface MTRBaseClusterFlowMeasurement (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Relative Humidity Measurement
  *    Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements.
@@ -15711,14 +15319,6 @@ labels.
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterRelativeHumidityMeasurement (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -16102,14 +15702,6 @@ labels.
 
 @end
 
-@interface MTRBaseClusterOccupancySensing (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Wake on LAN
  *    This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol.
@@ -16230,14 +15822,6 @@ labels.
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterWakeOnLan (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -16407,14 +15991,6 @@ labels.
 
 @end
 
-@interface MTRBaseClusterChannel (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Target Navigator
  *    This cluster provides an interface for UX navigation within a set of targets on a device or endpoint.
@@ -16556,14 +16132,6 @@ labels.
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterTargetNavigator (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -16846,14 +16414,6 @@ labels.
 
 @end
 
-@interface MTRBaseClusterMediaPlayback (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Media Input
  *    This cluster provides an interface for controlling the Input Selector on a media device such as a TV.
@@ -17003,14 +16563,6 @@ labels.
 
 @end
 
-@interface MTRBaseClusterMediaInput (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Low Power
  *    This cluster provides an interface for managing low power mode on a device.
@@ -17117,14 +16669,6 @@ labels.
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterLowPower (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -17235,14 +16779,6 @@ labels.
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterKeypadInput (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -17400,14 +16936,6 @@ labels.
 
 @end
 
-@interface MTRBaseClusterContentLauncher (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Audio Output
  *    This cluster provides an interface for controlling the Output on a media device such as a TV.
@@ -17550,14 +17078,6 @@ labels.
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterAudioOutput (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -17714,14 +17234,6 @@ labels.
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterApplicationLauncher (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -17970,14 +17482,6 @@ labels.
 
 @end
 
-@interface MTRBaseClusterApplicationBasic (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Account Login
  *    This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App
@@ -18091,14 +17595,6 @@ labels.
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRBaseClusterAccountLogin (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
 @end
 
@@ -20616,14 +20112,6 @@ labels.
 
 @end
 
-@interface MTRBaseClusterElectricalMeasurement (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 /**
  * Cluster Test Cluster
  *    The Test Cluster is meant to validate the generated code
@@ -22561,14 +22049,6 @@ labels.
 
 @end
 
-@interface MTRBaseClusterTestCluster (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
-
-@end
-
 typedef NS_ENUM(uint8_t, MTRIdentifyEffectIdentifier) {
     MTRIdentifyEffectIdentifierBlink = 0x00,
     MTRIdentifyEffectIdentifierBreathe = 0x01,
@@ -24016,5 +23496,525 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
     MTRFaultInjectionFaultTypeChipFault = 0x03,
     MTRFaultInjectionFaultTypeCertFault = 0x04,
 };
+
+@interface MTRBaseClusterIdentify (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterGroups (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterScenes (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterOnOff (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterOnOffSwitchConfiguration (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterLevelControl (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterBinaryInputBasic (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterDescriptor (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterBinding (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterAccessControl (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterActions (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterBasic (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterOtaSoftwareUpdateProvider (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterOtaSoftwareUpdateRequestor (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterLocalizationConfiguration (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterTimeFormatLocalization (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterUnitLocalization (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterPowerSourceConfiguration (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterPowerSource (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterGeneralCommissioning (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterNetworkCommissioning (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterDiagnosticLogs (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterGeneralDiagnostics (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterSoftwareDiagnostics (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterThreadNetworkDiagnostics (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterWiFiNetworkDiagnostics (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterEthernetNetworkDiagnostics (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterBridgedDeviceBasic (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterSwitch (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterAdministratorCommissioning (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterOperationalCredentials (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterGroupKeyManagement (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterFixedLabel (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterUserLabel (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterBooleanState (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterModeSelect (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterDoorLock (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterWindowCovering (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterBarrierControl (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterPumpConfigurationAndControl (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterThermostat (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterFanControl (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterThermostatUserInterfaceConfiguration (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterColorControl (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterBallastConfiguration (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterIlluminanceMeasurement (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterTemperatureMeasurement (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterPressureMeasurement (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterFlowMeasurement (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterRelativeHumidityMeasurement (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterOccupancySensing (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterWakeOnLan (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterChannel (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterTargetNavigator (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterMediaPlayback (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterMediaInput (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterLowPower (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterKeypadInput (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterContentLauncher (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterAudioOutput (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterApplicationLauncher (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterApplicationBasic (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterAccountLogin (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterElectricalMeasurement (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
+
+@interface MTRBaseClusterTestCluster (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+
+@end
 
 NS_ASSUME_NONNULL_END

@@ -47,6 +47,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+{{/chip_client_clusters}}
+
+{{#chip_client_clusters includeAll=true}}
 @interface MTRCluster{{asUpperCamelCase name}} (Deprecated)
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device

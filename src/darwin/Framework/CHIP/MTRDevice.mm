@@ -174,7 +174,8 @@ private:
 #pragma mark Subscription and delegate handling
 
 // subscription intervals are in seconds
-#define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_DEFAULT (3600)
+#define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN (2)
+#define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX (60)
 
 - (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
 {
@@ -182,7 +183,7 @@ private:
 
     _weakDelegate = [MTRWeakReference weakReferenceWithObject:delegate];
     _delegateQueue = queue;
-    [self subscribeWithMinInterval:0 maxInterval:MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_DEFAULT];
+    [self setupSubscription];
 
     os_unfair_lock_unlock(&self->_lock);
 }
@@ -285,7 +286,7 @@ private:
     os_unfair_lock_unlock(&self->_lock);
 }
 
-- (void)subscribeWithMinInterval:(uint16_t)minInterval maxInterval:(uint16_t)maxInterval
+- (void)setupSubscription
 {
     // for now just subscribe once
     if (_subscriptionActive) {
@@ -310,8 +311,19 @@ private:
                            // We want to get event reports at the minInterval, not the maxInterval.
                            eventPath->mIsUrgentEvent = true;
                            ReadPrepareParams readParams(session.Value());
-                           readParams.mMinIntervalFloorSeconds = minInterval;
-                           readParams.mMaxIntervalCeilingSeconds = maxInterval;
+
+                           readParams.mMinIntervalFloorSeconds = 0;
+                           // Select a max interval based on the device's claimed idle sleep interval.
+                           auto idleSleepInterval = std::chrono::duration_cast<System::Clock::Seconds32>(
+                               session.Value()->GetRemoteMRPConfig().mIdleRetransTimeout);
+                           if (idleSleepInterval.count() < MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN) {
+                               idleSleepInterval = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN);
+                           }
+                           if (idleSleepInterval.count() > MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX) {
+                               idleSleepInterval = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX);
+                           }
+                           readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>(idleSleepInterval.count());
+
                            readParams.mpAttributePathParamsList = attributePath.get();
                            readParams.mAttributePathParamsListSize = 1;
                            readParams.mpEventPathParamsList = eventPath.get();
