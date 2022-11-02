@@ -570,7 +570,7 @@ private:
         NSDictionary * cachedAttributeDataValue = _readCache[attributePath];
         if (cachedAttributeDataValue
             && ![self _attributeDataValue:attributeDataValue isEqualToDataValue:cachedAttributeDataValue]) {
-            [attributesToReport addObject:cachedAttributeDataValue];
+            [attributesToReport addObject:@{ MTRAttributePathKey : attributePath, MTRDataKey : cachedAttributeDataValue }];
         }
 
         _expectedValueCache[attributePath] = nil;
