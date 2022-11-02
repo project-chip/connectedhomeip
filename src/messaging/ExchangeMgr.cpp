@@ -393,7 +393,7 @@ void ExchangeManager::SendStandaloneAckIfNeeded(const PacketHeader & packetHeade
     }
 
     // The exchange should be closed inside HandleMessage function. So don't bother close it here.
-    }
+}
 
 void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * delegate)
 {
