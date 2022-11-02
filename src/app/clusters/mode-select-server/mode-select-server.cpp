@@ -145,7 +145,7 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
                 emberAfContainsAttribute(endpointId, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id))
             {
                 Attributes::OnMode::TypeInfo::Type onMode;
-                bool onOffValueForStartUp = 0;
+                bool onOffValueForStartUp = false;
                 if (Attributes::OnMode::Get(endpointId, onMode) == EMBER_ZCL_STATUS_SUCCESS &&
                     !emberAfIsKnownVolatileAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
                     OnOffServer::Instance().getOnOffValueForStartUp(endpointId, onOffValueForStartUp) == EMBER_ZCL_STATUS_SUCCESS)
