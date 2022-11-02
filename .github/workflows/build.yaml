@@ -28,7 +28,7 @@ jobs:
         name: Build on Linux (gcc_debug)
         timeout-minutes: 85
 
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         if: github.actor != 'restyled-io[bot]'
 
         container:
@@ -129,7 +129,7 @@ jobs:
         name: Build on Linux (fake, gcc_release, clang, simulated)
         timeout-minutes: 150
 
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         if: github.actor != 'restyled-io[bot]'
 
         container:
@@ -283,7 +283,7 @@ jobs:
         name: Build on Linux (python_lib)
         timeout-minutes: 60
 
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         if: github.actor != 'restyled-io[bot]'
 
         container:

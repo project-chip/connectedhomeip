@@ -20,7 +20,7 @@ on:
 jobs:
     shuffle_names:
         name: Shuffle names
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.15

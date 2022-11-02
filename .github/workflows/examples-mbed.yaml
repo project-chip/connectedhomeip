@@ -33,7 +33,7 @@ jobs:
             APP_PROFILE: release
             APP_TARGET: CY8CPROTO_062_4343W
 
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         if: github.actor != 'restyled-io[bot]'
 
         container:

@@ -27,7 +27,7 @@ jobs:
         name: Linux ARM Cross compile
         timeout-minutes: 70
 
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         if: github.actor != 'restyled-io[bot]'
 
         container:

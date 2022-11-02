@@ -30,7 +30,7 @@ jobs:
         env:
             JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/
 
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         if: github.actor != 'restyled-io[bot]'
 
         container:

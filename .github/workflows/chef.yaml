@@ -25,7 +25,7 @@ concurrency:
 jobs:
     chef_linux:
         name: Chef - Linux CI Examples
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         if: github.actor != 'restyled-io[bot]'
 
         container:
@@ -53,7 +53,7 @@ jobs:
 
     chef_esp32:
         name: Chef - ESP32 CI Examples
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         if: github.actor != 'restyled-io[bot]'
 
         container:
@@ -81,7 +81,7 @@ jobs:
 
     chef_nrfconnect:
         name: Chef - NRFConnect CI Examples
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         if: github.actor != 'restyled-io[bot]'
 
         container:

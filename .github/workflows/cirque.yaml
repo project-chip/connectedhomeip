@@ -32,7 +32,7 @@ jobs:
             DOCKER_RUN_VERSION: 0.6.05
             GITHUB_CACHE_PATH: /tmp/cirque-cache/
 
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         if: github.actor != 'restyled-io[bot]'
 
         # need to run with privilege, which isn't supported by job.XXX.contaner

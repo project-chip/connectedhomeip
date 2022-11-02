@@ -27,7 +27,7 @@ jobs:
         name: ESP32
         timeout-minutes: 120
 
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         if: github.actor != 'restyled-io[bot]'
 
         container:
@@ -115,7 +115,7 @@ jobs:
         name: ESP32_1
         timeout-minutes: 90
 
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         if: github.actor != 'restyled-io[bot]'
 
         container:

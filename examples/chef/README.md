@@ -129,7 +129,7 @@ version for all images in the workflow as needed.
 ```yaml
 chef_$PLATFORM:
     name: Chef - $PLATFORM CI Examples
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: github.actor != 'restyled-io[bot]'
 
     container:

@@ -20,7 +20,7 @@ permissions:
 jobs:
     todos:
         name: Scan for To-Dos
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.15

@@ -8,7 +8,7 @@ on:
 
 jobs:
     cherry_pick_release_v1_0:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         name: Cherry-Pick into SVE
         if: |
             (github.event.pull_request.merged == true)

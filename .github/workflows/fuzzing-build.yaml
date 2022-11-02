@@ -27,7 +27,7 @@ jobs:
         name: Build on Linux
         timeout-minutes: 90
 
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         if: github.actor != 'restyled-io[bot]'
 
         container:

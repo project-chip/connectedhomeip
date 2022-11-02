@@ -27,7 +27,7 @@ jobs:
     pull_request_update:
         name: Report on pull requests
 
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
 
         container:
             image: connectedhomeip/chip-build:0.6.05

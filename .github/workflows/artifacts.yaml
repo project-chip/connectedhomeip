@@ -9,7 +9,7 @@ concurrency:
   
 jobs:
   delete-artifacts:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: kolpav/purge-artifacts-action@v1
         with:

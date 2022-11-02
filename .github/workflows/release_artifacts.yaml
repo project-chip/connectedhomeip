@@ -26,7 +26,7 @@ jobs:
         name: ESP32
         env:
             BUILD_DIRECTORY: examples/all-clusters-app/esp32/build
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
 
         container:
             image: connectedhomeip/chip-build-esp32:0.6.05
@@ -72,7 +72,7 @@ jobs:
             SILABS_BOARD: BRD4161A
             BUILD_DIRECTORY: out/lock_app_debug/BRD4161A
 
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
 
         container:
             image: connectedhomeip/chip-build-efr32:0.6.05
