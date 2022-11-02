@@ -22,7 +22,7 @@ BL602/BL604 is combo chip-set for Wi-Fi 802.11b/g/n and BLE 5.0 base-band/MAC.
 BL702/BL706 is combo chip-set for BLE and IEEE 802.15.4/ZigBee/Thread. In some cases, e.g. in SDK, we use BL702 as a general name for BL702/BL706 family.
 
 ### `XT-ZB6-DevKit`
-<img src="../../platform/bouffalolab/doc/chart/bl706_xtzb6devkit.png" style="zoom:23%;" />
+<img src="../../platform/bouffalolab/doc/chart/bl706_dev_board.jpg" style="zoom:23%;" />
 
 ## Initial setup
 
