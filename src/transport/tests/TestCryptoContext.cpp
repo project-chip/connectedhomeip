@@ -48,8 +48,6 @@ struct PrivacyNonceTestEntry thePrivacyNonceTestVector[] = {
     },
 };
 
-const uint16_t thePrivacyNonceTestVectorLength = sizeof(thePrivacyNonceTestVector) / sizeof(thePrivacyNonceTestVector[0]);
-
 void TestBuildPrivacyNonce(nlTestSuite * apSuite, void * apContext)
 {
     for (auto & i : thePrivacyNonceTestVector)

@@ -262,8 +262,6 @@ static constexpr TestCase sTestCases[] = {
       ByteSpan(sTestCMS_CDContent02), ByteSpan(sTestCMS_SignedMessage02) },
 };
 
-static constexpr size_t sNumTestCases = ArraySize(sTestCases);
-
 static void TestCD_EncodeDecode(nlTestSuite * inSuite, void * inContext)
 {
     for (const auto & testCase : sTestCases)

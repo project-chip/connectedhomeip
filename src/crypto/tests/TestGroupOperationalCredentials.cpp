@@ -80,8 +80,6 @@ struct GroupKeySetTestEntry theGroupKeySetTestVector[] = {
     },
 };
 
-const uint16_t theGroupKeySetTestVectorLength = sizeof(theGroupKeySetTestVector) / sizeof(theGroupKeySetTestVector[0]);
-
 void TestDeriveGroupOperationalCredentials(nlTestSuite * apSuite, void * apContext)
 {
     GroupOperationalCredentials opCreds;

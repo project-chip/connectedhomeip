@@ -1133,8 +1133,6 @@ static void TestChipCert_CertType(nlTestSuite * inSuite, void * inContext)
         {  TestCert::kNode02_02,       kCertType_Node            },
     };
     // clang-format on
-    static const size_t sNumTestCases = ArraySize(sTestCases);
-
     for (auto testCase : sTestCases)
     {
         uint8_t certType;
@@ -1181,8 +1179,6 @@ static void TestChipCert_CertId(nlTestSuite * inSuite, void * inContext)
         {  TestCert::kNode02_02,       0xDEDEDEDE00020002 },
     };
     // clang-format on
-    static const size_t sNumTestCases = ArraySize(sTestCases);
-
     for (auto testCase : sTestCases)
     {
         uint64_t chipId;
