@@ -26,8 +26,6 @@ Instruments CC13XX_26XX family of Wireless MCUs.
 
 ## Introduction
 
-![CC1352R1_LAUNCHXL](doc/images/cc1352r1_launchxl.jpg)
-
 The CC13XX_26XX lock example application provides a working demonstration of a
 connected door lock device. This uses the open-source Matter implementation and
 the Texas Instruments SimpleLink™ CC13XX and CC26XX software development kit.

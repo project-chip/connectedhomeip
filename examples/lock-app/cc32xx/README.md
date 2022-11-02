@@ -24,8 +24,6 @@ Instruments CC32XX family of Wireless MCUs.
 
 ## Introduction
 
-![CC3235SF_LAUNCHXL](doc/images/cc3235sf_launchxl.jpg)
-
 The CC32XX lock example application provides a working demonstration of a
 connected door lock device. This uses the open-source CHIP implementation and
 the Texas Instruments SimpleLink™ Wi-Fi® CC32xx software development kit.
