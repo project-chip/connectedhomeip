@@ -289,9 +289,9 @@ void TestWriteChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
         app::WriteClient writeClient(&ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing());
 
         ByteSpan list[kTestListLength];
-        for (uint8_t j = 0; j < kTestListLength; j++)
+        for (auto & j : list)
         {
-            list[j] = ByteSpan(sByteSpanData, static_cast<uint32_t>(i));
+            j = ByteSpan(sByteSpanData, static_cast<uint32_t>(i));
         }
 
         err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength));

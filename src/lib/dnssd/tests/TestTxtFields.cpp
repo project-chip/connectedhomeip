@@ -293,9 +293,9 @@ bool NodeDataIsEmpty(const DiscoveredNodeData & node)
     {
         return false;
     }
-    for (size_t i = 0; i < sizeof(CommissionNodeData::rotatingId); ++i)
+    for (unsigned char i : node.commissionData.rotatingId)
     {
-        if (node.commissionData.rotatingId[i] != 0)
+        if (i != 0)
         {
             return false;
         }

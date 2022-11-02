@@ -249,9 +249,9 @@ static void TestAES_CTR_128CryptTestVectors(nlTestSuite * inSuite, void * inCont
 {
     HeapChecker heapChecker(inSuite);
     int numOfTestsRan = 0;
-    for (size_t vectorIndex = 0; vectorIndex < kAesCtrTestVectorSize; vectorIndex++)
+    for (const auto & vectorIndex : theAesCtrTestVector)
     {
-        const AesCtrTestEntry * vector = &theAesCtrTestVector[vectorIndex];
+        const AesCtrTestEntry * vector = &vectorIndex;
         if (vector->plaintextLen > 0)
         {
             numOfTestsRan++;

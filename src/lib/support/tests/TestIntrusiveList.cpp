@@ -52,28 +52,28 @@ void TestIntrusiveListRandom(nlTestSuite * inSuite, void * inContext)
         fun(l1p, l2p);
     };
 
-    for (int i = 0; i < 100; ++i)
+    for (auto & i : node)
     {
         switch (std::rand() % 5)
         {
         case 0: // PushFront
-            l1.PushFront(&node[i]);
-            l2.push_front(&node[i]);
+            l1.PushFront(&i);
+            l2.push_front(&i);
             break;
         case 1: // PushBack
-            l1.PushBack(&node[i]);
-            l2.push_back(&node[i]);
+            l1.PushBack(&i);
+            l2.push_back(&i);
             break;
         case 2: // InsertBefore
             op([&](auto & l1p, auto & l2p) {
-                l1.InsertBefore(l1p, &node[i]);
-                l2.insert(l2p, &node[i]);
+                l1.InsertBefore(l1p, &i);
+                l2.insert(l2p, &i);
             });
             break;
         case 3: // InsertAfter
             op([&](auto & l1p, auto & l2p) {
-                l1.InsertAfter(l1p, &node[i]);
-                l2.insert(++l2p, &node[i]);
+                l1.InsertAfter(l1p, &i);
+                l2.insert(++l2p, &i);
             });
             break;
         case 4: // Remove

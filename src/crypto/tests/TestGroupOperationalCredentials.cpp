@@ -86,16 +86,16 @@ void TestDeriveGroupOperationalCredentials(nlTestSuite * apSuite, void * apConte
 {
     GroupOperationalCredentials opCreds;
 
-    for (unsigned i = 0; i < theGroupKeySetTestVectorLength; i++)
+    for (auto & i : theGroupKeySetTestVector)
     {
-        const ByteSpan epochKey(theGroupKeySetTestVector[i].epochKey, KEY_LENGTH);
+        const ByteSpan epochKey(i.epochKey, KEY_LENGTH);
         NL_TEST_ASSERT(apSuite,
                        CHIP_NO_ERROR == Crypto::DeriveGroupOperationalCredentials(epochKey, kCompressedFabricId1, opCreds));
 
-        NL_TEST_ASSERT(apSuite, opCreds.hash == theGroupKeySetTestVector[i].groupKeys->hash);
+        NL_TEST_ASSERT(apSuite, opCreds.hash == i.groupKeys->hash);
         NL_TEST_ASSERT(apSuite,
-                       0 == memcmp(opCreds.encryption_key, theGroupKeySetTestVector[i].groupKeys->encryption_key, KEY_LENGTH));
-        NL_TEST_ASSERT(apSuite, 0 == memcmp(opCreds.privacy_key, theGroupKeySetTestVector[i].groupKeys->privacy_key, KEY_LENGTH));
+                       0 == memcmp(opCreds.encryption_key, i.groupKeys->encryption_key, KEY_LENGTH));
+        NL_TEST_ASSERT(apSuite, 0 == memcmp(opCreds.privacy_key, i.groupKeys->privacy_key, KEY_LENGTH));
     }
 }
 

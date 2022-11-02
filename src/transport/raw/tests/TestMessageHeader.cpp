@@ -381,10 +381,10 @@ void TestSpecComplianceEncode(nlTestSuite * inSuite, void * inContext)
     uint8_t buffer[MAX_FIXED_HEADER_SIZE];
     uint16_t encodeSize;
 
-    for (unsigned i = 0; i < theSpecComplianceTestVectorLength; i++)
+    for (auto & i : theSpecComplianceTestVector)
     {
         PacketHeader packetHeader;
-        testEntry = &theSpecComplianceTestVector[i];
+        testEntry = &i;
 
         packetHeader.SetMessageFlags(testEntry->messageFlags);
         packetHeader.SetSecurityFlags(testEntry->securityFlags);
@@ -408,9 +408,9 @@ void TestSpecComplianceDecode(nlTestSuite * inSuite, void * inContext)
     PacketHeader packetHeader;
     uint16_t decodeSize;
 
-    for (unsigned i = 0; i < theSpecComplianceTestVectorLength; i++)
+    for (auto & i : theSpecComplianceTestVector)
     {
-        testEntry = &theSpecComplianceTestVector[i];
+        testEntry = &i;
 
         NL_TEST_ASSERT(inSuite, packetHeader.Decode(testEntry->encoded, testEntry->size, &decodeSize) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, decodeSize == testEntry->size);
@@ -528,9 +528,9 @@ void TestMsgExtensionsDecode(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, chip::Platform::MemoryInit() == CHIP_NO_ERROR);
 
-    for (unsigned i = 0; i < theTestVectorMsgExtensionsLength; i++)
+    for (auto & theTestVectorMsgExtension : theTestVectorMsgExtensions)
     {
-        testEntry = &theTestVectorMsgExtensions[i];
+        testEntry = &theTestVectorMsgExtension;
 
         System::PacketBufferHandle msg = System::PacketBufferHandle::NewWithData(testEntry->msg, testEntry->msgLength);
 

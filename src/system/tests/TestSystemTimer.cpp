@@ -341,18 +341,18 @@ int gCallbackProcessed[kCancelTimerCount];
 /// Validates that gCallbackProcessed has valid values (0 or 1)
 void ValidateExecutedTimerCounts(nlTestSuite * suite)
 {
-    for (unsigned i = 0; i < kCancelTimerCount; i++)
+    for (int i : gCallbackProcessed)
     {
-        NL_TEST_ASSERT(suite, (gCallbackProcessed[i] == 0) || (gCallbackProcessed[i] == 1));
+        NL_TEST_ASSERT(suite, (i == 0) || (i == 1));
     }
 }
 
 unsigned ExecutedTimerCount()
 {
     unsigned count = 0;
-    for (unsigned i = 0; i < kCancelTimerCount; i++)
+    for (int i : gCallbackProcessed)
     {
-        if (gCallbackProcessed[i] != 0)
+        if (i != 0)
         {
             count++;
         }

@@ -52,15 +52,15 @@ const uint16_t thePrivacyNonceTestVectorLength = sizeof(thePrivacyNonceTestVecto
 
 void TestBuildPrivacyNonce(nlTestSuite * apSuite, void * apContext)
 {
-    for (unsigned i = 0; i < thePrivacyNonceTestVectorLength; i++)
+    for (auto & i : thePrivacyNonceTestVector)
     {
         MessageAuthenticationCode mic;
-        uint16_t sessionId = thePrivacyNonceTestVector[i].sessionId;
-        const ByteSpan expectedPrivacyNonce(thePrivacyNonceTestVector[i].privacyNonce, NONCE_LENGTH);
+        uint16_t sessionId = i.sessionId;
+        const ByteSpan expectedPrivacyNonce(i.privacyNonce, NONCE_LENGTH);
         CryptoContext::NonceStorage privacyNonce;
         CryptoContext::ConstNonceView privacyNonceView(privacyNonce);
 
-        mic.SetTag(nullptr, thePrivacyNonceTestVector[i].mic, MIC_LENGTH);
+        mic.SetTag(nullptr, i.mic, MIC_LENGTH);
 
         NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == chip::CryptoContext::BuildPrivacyNonce(privacyNonce, sessionId, mic));
         NL_TEST_ASSERT(apSuite, 0 == memcmp(privacyNonceView.data(), expectedPrivacyNonce.data(), NONCE_LENGTH));
