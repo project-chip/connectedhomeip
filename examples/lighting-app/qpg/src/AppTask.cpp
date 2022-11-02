@@ -319,8 +319,6 @@ void AppTask::AppTaskMain(void * pvParameter)
         // when the CHIP task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
-            // sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-            // sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
             sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
