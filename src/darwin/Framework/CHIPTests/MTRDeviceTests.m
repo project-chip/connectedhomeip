@@ -122,6 +122,28 @@ static MTRBaseDevice * GetConnectedDevice(void)
 }
 @end
 
+@interface MTRDeviceTestDelegate : NSObject <MTRDeviceDelegate>
+@property (nonatomic) dispatch_block_t onSubscriptionEstablished;
+@end
+
+@implementation MTRDeviceTestDelegate
+- (void)device:(MTRDevice *)device stateChanged:(MTRDeviceState)state
+{
+    if (state == MTRDeviceStateReachable) {
+        self.onSubscriptionEstablished();
+    }
+}
+
+- (void)device:(MTRDevice *)device receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+{
+}
+
+- (void)device:(MTRDevice *)device receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
+{
+}
+
+@end
+
 @interface MTRDeviceTests : XCTestCase
 @end
 
@@ -1357,6 +1379,28 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                      subscriptionEstablished:^() {
                      }];
     [self waitForExpectations:@[ errorExpectation ] timeout:60];
+}
+
+- (void)test017_TestMTRDeviceBasics
+{
+#if MANUAL_INDIVIDUAL_TEST
+    [self initStack];
+    [self waitForCommissionee];
+#endif
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.onSubscriptionEstablished = ^() {
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
 }
 
 - (void)test900_SubscribeAllAttributes
