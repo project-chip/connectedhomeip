@@ -36,13 +36,13 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
         [cluster openBasicCommissioningWindowWithParams:params
                                          expectedValues:nil
                                   expectedValueInterval:nil
-                                      completionHandler:^(NSError * _Nullable error) {
-                                          if (error == nil) {
-                                              self->SetCommandExitStatus(CHIP_NO_ERROR);
-                                          } else {
-                                              self->SetCommandExitStatus(MTRErrorToCHIPErrorCode(error));
-                                          }
-                                      }];
+                                             completion:^(NSError * _Nullable error) {
+                                                 if (error == nil) {
+                                                     self->SetCommandExitStatus(CHIP_NO_ERROR);
+                                                 } else {
+                                                     self->SetCommandExitStatus(MTRErrorToCHIPErrorCode(error));
+                                                 }
+                                             }];
     } else {
         [device
             openCommissioningWindowWithSetupPasscode:[MTRSetupPayload generateRandomSetupPasscode]

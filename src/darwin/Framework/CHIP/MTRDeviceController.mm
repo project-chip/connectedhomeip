@@ -572,36 +572,10 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     return device;
 }
 
-- (BOOL)getBaseDevice:(uint64_t)deviceID
-                queue:(dispatch_queue_t)queue
-    completionHandler:(MTRDeviceConnectionCallback)completionHandler
+- (BOOL)getBaseDevice:(uint64_t)deviceID queue:(dispatch_queue_t)queue completion:(MTRDeviceConnectionCallback)completion
 {
-    NSError * error;
-    if (![self checkIsRunning:&error]) {
-        dispatch_async(queue, ^{
-            completionHandler(nil, error);
-        });
-        return NO;
-    }
-
-    // We know getSessionForNode will return YES here, since we already checked
-    // that we are running.
-    return [self getSessionForNode:deviceID
-                 completionHandler:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
-                     const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
-                     // Create an MTRBaseDevice for the node id involved, now that our
-                     // CASE session is primed.  We don't actually care about the session
-                     // information here.
-                     dispatch_async(queue, ^{
-                         MTRBaseDevice * device;
-                         if (error == nil) {
-                             device = [[MTRBaseDevice alloc] initWithNodeID:@(deviceID) controller:self];
-                         } else {
-                             device = nil;
-                         }
-                         completionHandler(device, error);
-                     });
-                 }];
+    // Will get removed once deviceWithNodeID exists.
+    return [self getBaseDevice:deviceID queue:queue completionHandler:completion];
 }
 
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
@@ -862,7 +836,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     return deviceProxy->GetDeviceTransportType() == chip::Transport::Type::kBle;
 }
 
-- (BOOL)getSessionForNode:(chip::NodeId)nodeID completionHandler:(MTRInternalDeviceConnectionCallback)completionHandler
+- (BOOL)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
 {
     if (![self checkIsRunning]) {
         return NO;
@@ -871,14 +845,14 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     dispatch_async(_chipWorkQueue, ^{
         NSError * error;
         if (![self checkIsRunning:&error]) {
-            completionHandler(nullptr, chip::NullOptional, error);
+            completion(nullptr, chip::NullOptional, error);
             return;
         }
 
-        auto connectionBridge = new MTRDeviceConnectionBridge(completionHandler);
+        auto connectionBridge = new MTRDeviceConnectionBridge(completion);
 
         // MTRDeviceConnectionBridge always delivers errors async via
-        // completionHandler.
+        // completion.
         connectionBridge->connect(self->_cppCommissioner, nodeID);
     });
 
@@ -1010,6 +984,36 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
 - (nullable NSData *)fetchAttestationChallengeForDeviceId:(uint64_t)deviceId
 {
     return [self fetchAttestationChallengeForDeviceID:deviceId];
+}
+
+- (BOOL)getBaseDevice:(uint64_t)deviceID queue:(dispatch_queue_t)queue completionHandler:(MTRDeviceConnectionCallback)completion
+{
+    NSError * error;
+    if (![self checkIsRunning:&error]) {
+        dispatch_async(queue, ^{
+            completion(nil, error);
+        });
+        return NO;
+    }
+
+    // We know getSessionForNode will return YES here, since we already checked
+    // that we are running.
+    return [self getSessionForNode:deviceID
+                        completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
+                            const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
+                            // Create an MTRBaseDevice for the node id involved, now that our
+                            // CASE session is primed.  We don't actually care about the session
+                            // information here.
+                            dispatch_async(queue, ^{
+                                MTRBaseDevice * device;
+                                if (error == nil) {
+                                    device = [[MTRBaseDevice alloc] initWithNodeID:@(deviceID) controller:self];
+                                } else {
+                                    device = nil;
+                                }
+                                completion(device, error);
+                            });
+                        }];
 }
 
 @end
