@@ -15,9 +15,14 @@
 
 import click
 import logging
-import coloredlogs
 import enum
 import sys
+
+try:
+    import coloredlogs
+    _has_coloredlogs = True
+except:
+    _has_coloredlogs = False
 
 try:
     from idl.matter_idl_parser import CreateParser
@@ -94,8 +99,16 @@ def main(log_level, generator, output_dir, dry_run, name_only, expected_outputs,
     Parses MATTER IDL files (.matter) and performs SDK code generation
     as set up by the program arguments.
     """
-    coloredlogs.install(level=__LOG_LEVELS__[
-                        log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
+    if _has_coloredlogs:
+        coloredlogs.install(level=__LOG_LEVELS__[
+                            log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
+    else:
+        logging.basicConfig(
+            level=__LOG_LEVELS__[log_level],
+            format='%(asctime)s %(levelname)-7s %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S'
+        )
+
     logging.info("Parsing idl from %s" % idl_path)
     idl_tree = CreateParser().parse(open(idl_path, "rt").read())
 

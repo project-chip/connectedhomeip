@@ -98,7 +98,7 @@ void init(const log_backend *)
     pw_sys_io_Init();
 }
 
-void processMessage(const struct log_backend * const backend, union log_msg2_generic * msg)
+void processMessage(const struct log_backend * const backend, union log_msg_generic * msg)
 {
     int ret = k_sem_take(&sLoggerLock, K_FOREVER);
     assert(ret == 0);

@@ -19,8 +19,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSUInteger, MTRDiscoveryCapabilities) {
-    MTRDiscoveryCapabilitiesNone = 0, // Device does not support any method for rendezvous
+typedef NS_OPTIONS(NSUInteger, MTRDiscoveryCapabilities) {
+    MTRDiscoveryCapabilitiesUnknown = 0, // Device capabilities are not known (e.g. all we have is a manual pairing code).
+    MTRDiscoveryCapabilitiesNone MTR_NEWLY_DEPRECATED("Please use MTRDiscoveryCapabilitiesUnknown") = 0,
     MTRDiscoveryCapabilitiesSoftAP = 1 << 0, // Device supports WiFi softAP
     MTRDiscoveryCapabilitiesBLE = 1 << 1, // Device supports BLE
     MTRDiscoveryCapabilitiesOnNetwork = 1 << 2, // Device supports On Network setup
@@ -37,13 +38,18 @@ typedef NS_ENUM(NSUInteger, MTRCommissioningFlow) {
 };
 
 typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
-    MTROptionalQRCodeInfoTypeUnknown,
+    MTROptionalQRCodeInfoTypeUnknown MTR_NEWLY_DEPRECATED("The type is never actually unknown"),
     MTROptionalQRCodeInfoTypeString,
-    MTROptionalQRCodeInfoTypeInt32
+    MTROptionalQRCodeInfoTypeInt32,
 };
 
+/**
+ * An optional information item present in the QR code the setup payload was
+ * initialized from.
+ */
 @interface MTROptionalQRCodeInfo : NSObject
-@property (nonatomic, copy) NSNumber * infoType;
+@property (nonatomic, assign) MTROptionalQRCodeInfoType type MTR_NEWLY_AVAILABLE;
+// The numeric value of the TLV tag for this information item.
 @property (nonatomic, copy) NSNumber * tag;
 // Exactly one of integerValue and stringValue will be non-nil, depending on the
 // the value of "infoType".
@@ -51,6 +57,10 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
 @property (nonatomic, copy, nullable) NSString * stringValue;
 @end
 
+/**
+ * A setup payload that can be created from a pairing code and serialized to a
+ * pairing code.
+ */
 @interface MTRSetupPayload : NSObject <NSSecureCoding>
 
 @property (nonatomic, copy) NSNumber * version;
@@ -58,15 +68,20 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
 @property (nonatomic, copy) NSNumber * productID;
 @property (nonatomic, assign) MTRCommissioningFlow commissioningFlow;
 /**
- * rendezvousInformation is nil when the discovery capabilities bitmask is
- * unknown.
- *
- * Otherwise its value is made up of the MTRDiscoveryCapabilities flags.
+ * The value of discoveryCapabilities is made up of the various
+ * MTRDiscoveryCapabilities flags.  If the discovery capabilities are not known,
+ * this will be set to MTRDiscoveryCapabilitiesUnknown.
  */
-@property (nonatomic, copy, nullable) NSNumber * rendezvousInformation;
+@property (nonatomic, assign) MTRDiscoveryCapabilities discoveryCapabilities MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * discriminator;
+/**
+ * If hasShortDiscriminator is true, the discriminator value contains just the
+ * high 4 bits of the full discriminator.  For example, if
+ * hasShortDiscriminator is true and discriminator is 0xA, then the full
+ * discriminator can be anything in the range 0xA00 t0 0xAFF.
+ */
 @property (nonatomic, assign) BOOL hasShortDiscriminator;
-@property (nonatomic, copy) NSNumber * setUpPINCode;
+@property (nonatomic, copy) NSNumber * setupPasscode MTR_NEWLY_AVAILABLE;
 
 @property (nonatomic, copy, nullable) NSString * serialNumber;
 - (nullable NSArray<MTROptionalQRCodeInfo *> *)getAllOptionalVendorData:(NSError * __autoreleasing *)error;
@@ -108,6 +123,19 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
  */
 - (NSString * _Nullable)qrCodeString:(NSError * __autoreleasing *)error
     API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+
+@end
+
+@interface MTROptionalQRCodeInfo (Deprecated)
+
+@property (nonatomic, copy) NSNumber * infoType MTR_NEWLY_DEPRECATED("Please use type");
+
+@end
+
+@interface MTRSetupPayload (Deprecated)
+
+@property (nonatomic, copy, nullable) NSNumber * rendezvousInformation MTR_NEWLY_DEPRECATED("Please use discoveryCapabilities");
+@property (nonatomic, copy) NSNumber * setUpPINCode MTR_NEWLY_DEPRECATED("Please use setupPasscode");
 
 @end
 

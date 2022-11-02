@@ -30,28 +30,28 @@ NS_ASSUME_NONNULL_BEGIN
  * Generate a root (self-signed) X.509 DER encoded certificate that has the
  * right fields to be a valid Matter root certificate.
  *
- * If issuerId is nil, a random issuer id is generated.  Otherwise the provided
+ * If issuerID is nil, a random issuer id is generated.  Otherwise the provided
  * issuer id is used.
  *
- * If fabricId is not nil, it will be included in the subject DN of the
+ * If fabricID is not nil, it will be included in the subject DN of the
  * certificate.  In this case it must be a valid Matter fabric id.
  *
  * On failure returns nil and if "error" is not null sets *error to the relevant
  * error.
  */
 + (nullable NSData *)generateRootCertificate:(id<MTRKeypair>)keypair
-                                    issuerId:(nullable NSNumber *)issuerId
-                                    fabricId:(nullable NSNumber *)fabricId
-                                       error:(NSError * __autoreleasing _Nullable * _Nullable)error;
+                                    issuerID:(nullable NSNumber *)issuerID
+                                    fabricID:(nullable NSNumber *)fabricID
+                                       error:(NSError * __autoreleasing _Nullable * _Nullable)error MTR_NEWLY_AVAILABLE;
 
 /**
  * Generate an intermediate X.509 DER encoded certificate that has the
  * right fields to be a valid Matter intermediate certificate.
  *
- * If issuerId is nil, a random issuer id is generated.  Otherwise the provided
+ * If issuerID is nil, a random issuer id is generated.  Otherwise the provided
  * issuer id is used.
  *
- * If fabricId is not nil, it will be included in the subject DN of the
+ * If fabricID is not nil, it will be included in the subject DN of the
  * certificate.  In this case it must be a valid Matter fabric id.
  *
  * On failure returns nil and if "error" is not null sets *error to the relevant
@@ -60,9 +60,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSData *)generateIntermediateCertificate:(id<MTRKeypair>)rootKeypair
                                      rootCertificate:(NSData *)rootCertificate
                                intermediatePublicKey:(SecKeyRef)intermediatePublicKey
-                                            issuerId:(nullable NSNumber *)issuerId
-                                            fabricId:(nullable NSNumber *)fabricId
-                                               error:(NSError * __autoreleasing _Nullable * _Nullable)error;
+                                            issuerID:(nullable NSNumber *)issuerID
+                                            fabricID:(nullable NSNumber *)fabricID
+                                               error:(NSError * __autoreleasing _Nullable * _Nullable)error MTR_NEWLY_AVAILABLE;
 
 /**
  * Generate an X.509 DER encoded certificate that has the
@@ -71,11 +71,11 @@ NS_ASSUME_NONNULL_BEGIN
  * signingKeypair and signingCertificate are the root or intermediate that is
  * signing the operational certificate.
  *
- * nodeId and fabricId are expected to be 64-bit unsigned integers.
+ * nodeID and fabricID are expected to be 64-bit unsigned integers.
  *
- * nodeId must be a valid Matter operational node id.
+ * nodeID must be a valid Matter operational node id.
  *
- * fabricId must be a valid Matter fabric id.
+ * fabricID must be a valid Matter fabric id.
  *
  * caseAuthenticatedTags may be nil to indicate no CASE Authenticated Tags
  * should be used.  If caseAuthenticatedTags is not nil, it must have length at
@@ -88,10 +88,10 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSData *)generateOperationalCertificate:(id<MTRKeypair>)signingKeypair
                                  signingCertificate:(NSData *)signingCertificate
                                operationalPublicKey:(SecKeyRef)operationalPublicKey
-                                           fabricId:(NSNumber *)fabricId
-                                             nodeId:(NSNumber *)nodeId
+                                           fabricID:(NSNumber *)fabricID
+                                             nodeID:(NSNumber *)nodeID
                               caseAuthenticatedTags:(NSArray<NSNumber *> * _Nullable)caseAuthenticatedTags
-                                              error:(NSError * __autoreleasing _Nullable * _Nullable)error;
+                                              error:(NSError * __autoreleasing _Nullable * _Nullable)error MTR_NEWLY_AVAILABLE;
 
 /**
  * Check whether the given keypair's public key matches the given certificate's
@@ -134,6 +134,36 @@ NS_ASSUME_NONNULL_BEGIN
  * represented in the Matter certificate format).
  */
 + (nullable NSData *)convertX509Certificate:(NSData *)x509Certificate;
+
+@end
+
+@interface MTRCertificates (Deprecated)
+
++ (nullable NSData *)generateRootCertificate:(id<MTRKeypair>)keypair
+                                    issuerId:(nullable NSNumber *)issuerId
+                                    fabricId:(nullable NSNumber *)fabricId
+                                       error:(NSError * __autoreleasing _Nullable * _Nullable)error
+    MTR_NEWLY_DEPRECATED("Please use generateRootCertificate:issuerId:fabricId:error:");
+
++ (nullable NSData *)generateIntermediateCertificate:(id<MTRKeypair>)rootKeypair
+                                     rootCertificate:(NSData *)rootCertificate
+                               intermediatePublicKey:(SecKeyRef)intermediatePublicKey
+                                            issuerId:(nullable NSNumber *)issuerId
+                                            fabricId:(nullable NSNumber *)fabricId
+                                               error:(NSError * __autoreleasing _Nullable * _Nullable)error
+    MTR_NEWLY_DEPRECATED(
+        "Please use generateIntermediateCertificate:rootCertificate:intermediatePublicKey:issuerID:fabricID:error:");
+
++ (nullable NSData *)generateOperationalCertificate:(id<MTRKeypair>)signingKeypair
+                                 signingCertificate:(NSData *)signingCertificate
+                               operationalPublicKey:(SecKeyRef)operationalPublicKey
+                                           fabricId:(NSNumber *)fabricId
+                                             nodeId:(NSNumber *)nodeId
+                              caseAuthenticatedTags:(NSArray<NSNumber *> * _Nullable)caseAuthenticatedTags
+                                              error:(NSError * __autoreleasing _Nullable * _Nullable)error
+    MTR_NEWLY_DEPRECATED(
+        "Plase use "
+        "generateOperationalCertificate:signingCertificate:operationalPublicKey:fabricID:nodeID:caseAuthenticatedTags:error:");
 
 @end
 
