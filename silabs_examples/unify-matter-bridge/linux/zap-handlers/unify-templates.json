@@ -1,0 +1,11 @@
+{
+    "name": "Unify Templates",
+    "version": "Unify-dotdot-v1",
+    "templates": [
+        {
+            "path": "ucl_dotdot_test.md.zapt",
+            "name": "Test UCL dotdot zap template",
+            "output": "ucl_dotdot_test.md"
+        }
+    ]
+}
