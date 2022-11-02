@@ -41,8 +41,8 @@
 #endif // OTA_ENABLED
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <NetworkCommissioningDriver.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <route_hook/bl_route_hook.h>
 #endif
 #include <PlatformManagerImpl.h>
@@ -52,9 +52,9 @@
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD
+#include <ThreadStackManagerImpl.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
-#include <ThreadStackManagerImpl.h>
 #include <utils_list.h>
 #endif
 
@@ -75,9 +75,9 @@
 extern "C" {
 #include "board.h"
 #include <bl_gpio.h>
+#include <easyflash.h>
 #include <hal_gpio.h>
 #include <hosal_gpio.h>
-#include <easyflash.h>
 }
 
 #include "AppTask.h"
@@ -89,7 +89,7 @@ chip::app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::BLWiFiDriver::GetInstance()));
 #endif
 
-#if defined(BL706_NIGHT_LIGHT) || defined (BL602_NIGHT_LIGHT)
+#if defined(BL706_NIGHT_LIGHT) || defined(BL602_NIGHT_LIGHT)
 ColorLEDWidget sLightLED;
 #else
 DimmableLEDWidget sLightLED;
@@ -101,7 +101,6 @@ Identify sIdentify = {
     AppTask::IdentifyStopHandler,
     EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LIGHT,
 };
-
 
 } // namespace
 
@@ -301,7 +300,8 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 #ifndef LED_BTN_RESET
     GetAppTask().mButtonPressedTime = chip::System::SystemClock().GetMonotonicMilliseconds64().count() + 1;
-    if (ConnectivityMgr().IsThreadProvisioned()) {
+    if (ConnectivityMgr().IsThreadProvisioned())
+    {
         GetAppTask().PostEvent(APP_EVENT_SYS_PROVISIONED);
     }
 #endif
@@ -378,7 +378,8 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
 
 #ifndef LED_BTN_RESET
-        if (ConnectivityMgr().IsThreadProvisioned()) {
+        if (ConnectivityMgr().IsThreadProvisioned())
+        {
             GetAppTask().PostEvent(APP_EVENT_SYS_PROVISIONED);
             break;
         }
@@ -393,10 +394,10 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
             GetAppTask().PostEvent(APP_EVENT_SYS_BLE_ADV);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-            GetAppTask().mIsConnected  = ConnectivityMgr().IsWiFiStationConnected();
+            GetAppTask().mIsConnected = ConnectivityMgr().IsWiFiStationConnected();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-            GetAppTask().mIsConnected  = ConnectivityMgr().IsThreadAttached();
+            GetAppTask().mIsConnected = ConnectivityMgr().IsThreadAttached();
 #endif
         }
         ChipLogProgress(NotSpecified, "BLE adv changed, connection number: %d\r\n", ConnectivityMgr().NumBLEConnections());
@@ -405,7 +406,8 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
     case DeviceEventType::kThreadStateChange:
 
         ChipLogProgress(NotSpecified, "Thread state changed, IsThreadAttached: %d\r\n", ConnectivityMgr().IsThreadAttached());
-        if (!GetAppTask().mIsConnected && ConnectivityMgr().IsThreadAttached()) {
+        if (!GetAppTask().mIsConnected && ConnectivityMgr().IsThreadAttached())
+        {
             GetAppTask().PostEvent(APP_EVENT_SYS_PROVISIONED);
             GetAppTask().mIsConnected = true;
         }
@@ -419,7 +421,8 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 
         chip::app::DnssdServer::Instance().StartServer();
         NetworkCommissioning::BLWiFiDriver::GetInstance().SaveConfiguration();
-        if (!GetAppTask().mIsConnected && ConnectivityMgr().IsWiFiStationConnected()) {
+        if (!GetAppTask().mIsConnected && ConnectivityMgr().IsWiFiStationConnected())
+        {
             GetAppTask().PostEvent(APP_EVENT_SYS_PROVISIONED);
             GetAppTask().mIsConnected = true;
         }
@@ -446,10 +449,10 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
     case DeviceEventType::kFailSafeTimerExpired:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-            GetAppTask().mIsConnected  = ConnectivityMgr().IsWiFiStationConnected();
+        GetAppTask().mIsConnected = ConnectivityMgr().IsWiFiStationConnected();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-            GetAppTask().mIsConnected  = ConnectivityMgr().IsThreadAttached();
+        GetAppTask().mIsConnected = ConnectivityMgr().IsThreadAttached();
 #endif
 
         break;
@@ -497,7 +500,7 @@ void AppTask::LightingUpdate(app_event_t event)
         }
         else
         {
-#if defined (BL706_NIGHT_LIGHT) || defined (BL602_NIGHT_LIGHT)
+#if defined(BL706_NIGHT_LIGHT) || defined(BL602_NIGHT_LIGHT)
             sLightLED.SetColor(v, hue, sat);
 #else
             sLightLED.SetLevel(v);
@@ -606,7 +609,7 @@ void AppTask::TimerEventHandler(app_event_t event)
         if (GetAppTask().mButtonPressedTime)
         {
             GetAppTask().mIsFactoryResetIndicat = true;
-#if defined (BL706_NIGHT_LIGHT) || defined (BL602_NIGHT_LIGHT)
+#if defined(BL706_NIGHT_LIGHT) || defined(BL602_NIGHT_LIGHT)
             sLightLED.SetColor(254, 0, 210);
 #ifndef LED_BTN_RESET
             uint32_t resetCnt               = 0;
@@ -651,7 +654,7 @@ void AppTask::TimerEventHandler(app_event_t event)
                 }
                 else
                 {
-#if ! (defined ( BL706_NIGHT_LIGHT ) || defined (BL602_NIGHT_LIGHT))
+#if !(defined(BL706_NIGHT_LIGHT) || defined(BL602_NIGHT_LIGHT))
                     sLightLED.Toggle();
 #endif
                 }
@@ -661,16 +664,17 @@ void AppTask::TimerEventHandler(app_event_t event)
 
 #ifdef BL706_NIGHT_LIGHT
 
-                if (GetAppTask().mButtonPressedTime) {
-                    uint32_t resetCnt               = 0;
+                if (GetAppTask().mButtonPressedTime)
+                {
+                    uint32_t resetCnt = 0;
 
                     if (chip::System::SystemClock().GetMonotonicMilliseconds64().count() - GetAppTask().mButtonPressedTime >
-                            APP_BUTTON_PRESS_LONG * 2)
+                        APP_BUTTON_PRESS_LONG * 2)
                     {
                         GetAppTask().mButtonPressedTime = 0;
                     }
                     else if (chip::System::SystemClock().GetMonotonicMilliseconds64().count() - GetAppTask().mButtonPressedTime >
-                            APP_BUTTON_PRESS_LONG) 
+                             APP_BUTTON_PRESS_LONG)
                     {
 
                         size_t saved_value_len = 0;

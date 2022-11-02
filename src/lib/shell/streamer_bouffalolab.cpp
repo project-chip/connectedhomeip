@@ -23,9 +23,9 @@
 #include <lib/shell/Engine.h>
 #include <lib/shell/streamer.h>
 
-#include <uart.h>
 #include <stdio.h>
 #include <string.h>
+#include <uart.h>
 
 namespace chip {
 namespace Shell {

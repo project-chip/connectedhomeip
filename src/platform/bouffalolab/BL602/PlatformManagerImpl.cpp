@@ -174,50 +174,50 @@ void OnWiFiPlatformEvent(input_event_t * event, void * private_data)
 
     switch (event->code)
     {
-        case CODE_WIFI_ON_INIT_DONE: {
-            wifi_mgmr_start_background(&conf);
-        }
-        break;
-        case CODE_WIFI_ON_MGMR_DONE: {
-        }
-        break;
-        case CODE_WIFI_ON_SCAN_DONE: {
-            chip::DeviceLayer::PlatformMgr().LockChipStack();
-            NetworkCommissioning::BLWiFiDriver::GetInstance().OnScanWiFiNetworkDone();
-            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-        }
-        break;
-        case CODE_WIFI_ON_DISCONNECT: {
-            log_info("[APP] [EVT] disconnect %lld, Reason: %s\r\n", aos_now_ms(), wifi_mgmr_status_code_str(event->value));
+    case CODE_WIFI_ON_INIT_DONE: {
+        wifi_mgmr_start_background(&conf);
+    }
+    break;
+    case CODE_WIFI_ON_MGMR_DONE: {
+    }
+    break;
+    case CODE_WIFI_ON_SCAN_DONE: {
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
+        NetworkCommissioning::BLWiFiDriver::GetInstance().OnScanWiFiNetworkDone();
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    }
+    break;
+    case CODE_WIFI_ON_DISCONNECT: {
+        log_info("[APP] [EVT] disconnect %lld, Reason: %s\r\n", aos_now_ms(), wifi_mgmr_status_code_str(event->value));
 
-            chip::DeviceLayer::PlatformMgr().LockChipStack();
-            WifiStaDisconect();
-            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-        }
-        break;
-        case CODE_WIFI_CMD_RECONNECT: {
-            log_info("[APP] [EVT] Reconnect %lld\r\n", aos_now_ms());
-        }
-        break;
-        case CODE_WIFI_ON_GOT_IP: {
-            log_info("[APP] [EVT] GOT IP %lld\r\n", aos_now_ms());
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
+        WifiStaDisconect();
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    }
+    break;
+    case CODE_WIFI_CMD_RECONNECT: {
+        log_info("[APP] [EVT] Reconnect %lld\r\n", aos_now_ms());
+    }
+    break;
+    case CODE_WIFI_ON_GOT_IP: {
+        log_info("[APP] [EVT] GOT IP %lld\r\n", aos_now_ms());
 
-            chip::DeviceLayer::PlatformMgr().LockChipStack();
-            WifiStaConnected();
-            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-        }
-        break;
-        case CODE_WIFI_ON_GOT_IP6: {
-            log_info("[APP] [EVT] GOT IP6 %lld\r\n", aos_now_ms());
-            chip::DeviceLayer::PlatformMgr().LockChipStack();
-            ConnectivityMgrImpl().OnIPv6AddressAvailable();
-            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-        }
-        break;
-        default: {
-            log_info("[APP] [EVT] Unknown code %u, %lld\r\n", event->code, aos_now_ms());
-            /*nothing*/
-        }
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
+        WifiStaConnected();
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    }
+    break;
+    case CODE_WIFI_ON_GOT_IP6: {
+        log_info("[APP] [EVT] GOT IP6 %lld\r\n", aos_now_ms());
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
+        ConnectivityMgrImpl().OnIPv6AddressAvailable();
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    }
+    break;
+    default: {
+        log_info("[APP] [EVT] Unknown code %u, %lld\r\n", event->code, aos_now_ms());
+        /*nothing*/
+    }
     }
 }
 

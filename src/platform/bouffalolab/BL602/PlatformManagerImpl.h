@@ -52,7 +52,7 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>;
 #endif
-    
+
 protected:
     void _RunEventLoop(void);
 

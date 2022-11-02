@@ -27,9 +27,9 @@
 
 #include "AppConfig.h"
 #include <AppTask.h>
+#include <easyflash.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
-#include <easyflash.h>
 
 #include <blog.h>
 extern "C" {
@@ -37,7 +37,7 @@ extern "C" {
 #ifdef BL702_ENABLE
 #include <bl702_glb.h>
 #include <bl702_hbn.h>
-#elif defined (BL602_ENABLE)
+#elif defined(BL602_ENABLE)
 #include <wifi_mgmr_ext.h>
 
 #endif
@@ -56,7 +56,6 @@ extern "C" {
 
 #include "board.h"
 }
-
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -79,7 +78,8 @@ void appError(int err)
 {
     ChipLogProgress(NotSpecified, "!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!", err);
     portDISABLE_INTERRUPTS();
-    while (1);
+    while (1)
+        ;
 }
 
 void appError(CHIP_ERROR error)
@@ -100,13 +100,15 @@ extern "C" unsigned int sleep(unsigned int seconds)
 extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
 {
     ChipLogProgress(NotSpecified, "Stack Overflow checked. Stack name %s", pcTaskName);
-    while (1);
+    while (1)
+        ;
 }
 
 extern "C" void vApplicationMallocFailedHook(void)
 {
     ChipLogProgress(NotSpecified, "Memory Allocate Failed. Current left size is %d bytes", xPortGetFreeHeapSize());
-    while (1);
+    while (1)
+        ;
 }
 
 extern "C" void vApplicationIdleHook(void)
@@ -175,7 +177,8 @@ extern "C" void vAssertCalled(void)
 
     taskDISABLE_INTERRUPTS();
     ChipLogProgress(NotSpecified, "vAssertCalled, ra= %p", ra);
-    while (1);
+    while (1)
+        ;
 }
 
 // ================================================================================
@@ -187,13 +190,12 @@ extern "C" size_t _heap_size; // @suppress("Type cannot be resolved")
 #ifdef BL602_ENABLE
 extern uint8_t _heap_wifi_start;
 extern uint8_t _heap_wifi_size; // @suppress("Type cannot be resolved")
-static HeapRegion_t xHeapRegions[] =
-{
-        { &_heap_start,  (unsigned int) &_heap_size}, //set on runtime
-        { &_heap_wifi_start, (unsigned int) &_heap_wifi_size },
-        { NULL, 0 } /* Terminates the array. */
+static HeapRegion_t xHeapRegions[] = {
+    { &_heap_start, (unsigned int) &_heap_size }, // set on runtime
+    { &_heap_wifi_start, (unsigned int) &_heap_wifi_size },
+    { NULL, 0 } /* Terminates the array. */
 };
-#elif defined( BL702_ENABLE )
+#elif defined(BL702_ENABLE)
 static constexpr HeapRegion_t xHeapRegions[] = {
     { &_heap_start, (size_t) &_heap_size }, // set on runtime
     { NULL, 0 }                             /* Terminates the array. */
@@ -303,12 +305,12 @@ extern "C" void app_init(void)
 
     /* board config is set after system is init*/
     hal_board_cfg(0);
-//    hosal_dma_init();
+    //    hosal_dma_init();
 
 #ifdef CFG_USE_PSRAM
     vPortDefineHeapRegionsPsram(xPsramHeapRegions);
-    ChipLogProgress(NotSpecified, "Heap %u@%p, %u@%p", (unsigned int) &_heap_size, &_heap_start, 
-        (unsigned int) &_heap3_size, &_heap3_start);
+    ChipLogProgress(NotSpecified, "Heap %u@%p, %u@%p", (unsigned int) &_heap_size, &_heap_start, (unsigned int) &_heap3_size,
+                    &_heap3_start);
 #else
     ChipLogProgress(NotSpecified, "Heap %u@%p", (unsigned int) &_heap_size, &_heap_start);
 #endif
