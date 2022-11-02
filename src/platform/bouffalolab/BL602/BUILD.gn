@@ -47,6 +47,8 @@ static_library("BL602") {
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
+    "wifi_mgmr_portable.c",
+    "wifi_mgmr_portable.h",
   ]
 
   deps = [
@@ -56,20 +58,6 @@ static_library("BL602") {
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
-  # defines = [
-  #   "CHIP_KVS_SECTOR_COUNT=1",
-  #   "CHIP_KVS_BASE_SECTOR_INDEX=0"
-  # ]
-
-  # Add pigweed KVS
-  deps += [
-    "$dir_pw_kvs:crc16",
-    "$dir_pw_log",
-  ]
-  public_deps += [
-    "$dir_pw_checksum",
-    "$dir_pw_kvs",
-  ]
   sources += [
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
