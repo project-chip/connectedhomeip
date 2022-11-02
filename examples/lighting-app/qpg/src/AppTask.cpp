@@ -626,15 +626,16 @@ void AppTask::UpdateClusterState(void)
 
 void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
 {
-    if (event->Type == DeviceEventType::kServiceProvisioningChange && event->ServiceProvisioningChange.IsServiceProvisioned)
+    if (event->Type == DeviceEventType::kServiceProvisioningChange)
     {
-        if (event->ServiceProvisioningChange.IsServiceProvisioned)
-        {
-            sIsThreadProvisioned = true;
-        }
-        else
-        {
-            sIsThreadProvisioned = false;
-        }
+        sIsThreadProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
     }
+    else if (event->Type == DeviceEventType::kThreadConnectivityChange)
+    {
+        sIsThreadEnabled = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
+    }
+    else
+    {
+        // we don't need to support more events for now
+    } 
 }
