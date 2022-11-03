@@ -191,13 +191,14 @@
 // Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
 #define emberAfOnOffSwitchConfigClusterFlush()
 #define emberAfOnOffSwitchConfigClusterDebugExec(x)                                                                                \
-    if (emberAfPrintEnabled(EMBER_AF_PRINT_ON_OFF_SWITCH_CONFIGURATION_CLUSTER))                                                          \
+    if (emberAfPrintEnabled(EMBER_AF_PRINT_ON_OFF_SWITCH_CONFIGURATION_CLUSTER))                                                   \
     {                                                                                                                              \
         x;                                                                                                                         \
     }
 #define emberAfOnOffSwitchConfigClusterPrintBuffer(buffer, len, withSpace)                                                         \
     emberAfPrintBuffer(EMBER_AF_PRINT_ON_OFF_SWITCH_CONFIGURATION_CLUSTER, (buffer), (len), (withSpace))
-#define emberAfOnOffSwitchConfigClusterPrintString(buffer) emberAfPrintString(EMBER_AF_PRINT_ON_OFF_SWITCH_CONFIGURATION_CLUSTER, (buffer))
+#define emberAfOnOffSwitchConfigClusterPrintString(buffer)                                                                         \
+    emberAfPrintString(EMBER_AF_PRINT_ON_OFF_SWITCH_CONFIGURATION_CLUSTER, (buffer))
 #else
 #define emberAfOnOffSwitchConfigClusterPrint(...)
 #define emberAfOnOffSwitchConfigClusterPrintln(...)
