@@ -17,9 +17,15 @@
 
 #import <Foundation/Foundation.h>
 
+MTR_NEWLY_DEPRECATED("ResponseHandler is not used")
 typedef void (^ResponseHandler)(id _Nullable value, NSError * _Nullable error);
+MTR_NEWLY_DEPRECATED("Please use MTRStatusCompletion instead")
 typedef void (^StatusCompletion)(NSError * _Nullable error);
+MTR_NEWLY_DEPRECATED("Please use MTRSubscriptionEstablishedHandler instead")
 typedef void (^SubscriptionEstablishedHandler)(void);
+
+typedef void (^MTRStatusCompletion)(NSError * _Nullable error);
+typedef void (^MTRSubscriptionEstablishedHandler)(void);
 
 @class MTRBaseDevice;
 

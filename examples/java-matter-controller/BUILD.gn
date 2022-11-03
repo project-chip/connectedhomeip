@@ -29,7 +29,20 @@ android_binary("java-matter-controller") {
     "${chip_root}/third_party/java_deps:annotation",
   ]
 
-  sources = [ "java/src/com/matter/controller/Main.java" ]
+  sources = [
+    "java/src/com/matter/controller/Main.java",
+    "java/src/com/matter/controller/Off.java",
+    "java/src/com/matter/controller/On.java",
+    "java/src/com/matter/controller/commands/common/Argument.java",
+    "java/src/com/matter/controller/commands/common/ArgumentType.java",
+    "java/src/com/matter/controller/commands/common/Command.java",
+    "java/src/com/matter/controller/commands/common/CredentialsIssuer.java",
+    "java/src/com/matter/controller/commands/common/IPAddress.java",
+    "java/src/com/matter/controller/commands/common/MatterCommand.java",
+    "java/src/com/matter/controller/config/PersistentStorage.java",
+    "java/src/com/matter/controller/config/PersistentStorageOpCertStore.java",
+    "java/src/com/matter/controller/config/PersistentStorageOperationalKeystore.java",
+  ]
 
   javac_flags = [ "-Xlint:deprecation" ]
 }

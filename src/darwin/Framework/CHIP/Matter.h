@@ -50,6 +50,7 @@
 #import <Matter/MTRNOCChainIssuer.h>
 #import <Matter/MTROTAHeaderParser.h>
 #import <Matter/MTROTAProviderDelegate.h>
+#import <Matter/MTROnboardingPayloadParser.h>
 #import <Matter/MTRPersistentStorageDelegate.h>
 #import <Matter/MTRQRCodeSetupPayloadParser.h>
 #import <Matter/MTRSetupPayload.h>

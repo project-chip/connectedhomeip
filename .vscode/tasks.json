@@ -429,6 +429,8 @@
                 "nrf-nrf5340-pump-controller",
                 "nrf-nrf5340-shell",
                 "qpg-qpg6100-lock",
+                "telink-tlsr9518adk80d-all-clusters",
+                "telink-tlsr9518adk80d-all-clusters-minimal",
                 "telink-tlsr9518adk80d-light",
                 "telink-tlsr9518adk80d-light-switch",
                 "telink-tlsr9518adk80d-ota-requestor",

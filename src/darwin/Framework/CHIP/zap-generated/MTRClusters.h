@@ -34,16 +34,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)identifyWithParams:(MTRIdentifyClusterIdentifyParams *)params
             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-         completionHandler:(StatusCompletion)completionHandler;
+                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)triggerEffectWithParams:(MTRIdentifyClusterTriggerEffectParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler;
+                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeIdentifyTimeWithParams:(MTRReadParams * _Nullable)params;
 - (void)writeAttributeIdentifyTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -69,14 +69,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterIdentify (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Groups
  *    Attributes and commands for group configuration and manipulation.
@@ -85,39 +77,39 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)addGroupWithParams:(MTRGroupsClusterAddGroupParams *)params
             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-         completionHandler:
-             (void (^)(MTRGroupsClusterAddGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+                completion:(void (^)(MTRGroupsClusterAddGroupResponseParams * _Nullable data, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
 - (void)viewGroupWithParams:(MTRGroupsClusterViewGroupParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-          completionHandler:
-              (void (^)(MTRGroupsClusterViewGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+                 completion:(void (^)(MTRGroupsClusterViewGroupResponseParams * _Nullable data,
+                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)getGroupMembershipWithParams:(MTRGroupsClusterGetGroupMembershipParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                   completionHandler:(void (^)(MTRGroupsClusterGetGroupMembershipResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler;
+                          completion:(void (^)(MTRGroupsClusterGetGroupMembershipResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)removeGroupWithParams:(MTRGroupsClusterRemoveGroupParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-            completionHandler:
-                (void (^)(MTRGroupsClusterRemoveGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+                   completion:(void (^)(MTRGroupsClusterRemoveGroupResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)removeAllGroupsWithParams:(MTRGroupsClusterRemoveAllGroupsParams * _Nullable)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                completionHandler:(StatusCompletion)completionHandler;
+                       completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)removeAllGroupsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                        completionHandler:(StatusCompletion)completionHandler;
+                               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)addGroupIfIdentifyingWithParams:(MTRGroupsClusterAddGroupIfIdentifyingParams *)params
                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                      completionHandler:(StatusCompletion)completionHandler;
+                             completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeNameSupportWithParams:(MTRReadParams * _Nullable)params;
 
@@ -136,14 +128,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterGroups (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Scenes
  *    Attributes and commands for scene configuration and manipulation.
@@ -152,57 +136,57 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)addSceneWithParams:(MTRScenesClusterAddSceneParams *)params
             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-         completionHandler:
-             (void (^)(MTRScenesClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+                completion:(void (^)(MTRScenesClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
 - (void)viewSceneWithParams:(MTRScenesClusterViewSceneParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-          completionHandler:
-              (void (^)(MTRScenesClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+                 completion:(void (^)(MTRScenesClusterViewSceneResponseParams * _Nullable data,
+                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)removeSceneWithParams:(MTRScenesClusterRemoveSceneParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-            completionHandler:
-                (void (^)(MTRScenesClusterRemoveSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+                   completion:(void (^)(MTRScenesClusterRemoveSceneResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)removeAllScenesWithParams:(MTRScenesClusterRemoveAllScenesParams *)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                completionHandler:(void (^)(MTRScenesClusterRemoveAllScenesResponseParams * _Nullable data,
-                                      NSError * _Nullable error))completionHandler;
+                       completion:(void (^)(MTRScenesClusterRemoveAllScenesResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)storeSceneWithParams:(MTRScenesClusterStoreSceneParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-           completionHandler:
-               (void (^)(MTRScenesClusterStoreSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+                  completion:(void (^)(MTRScenesClusterStoreSceneResponseParams * _Nullable data,
+                                 NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)recallSceneWithParams:(MTRScenesClusterRecallSceneParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler;
+                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)getSceneMembershipWithParams:(MTRScenesClusterGetSceneMembershipParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                   completionHandler:(void (^)(MTRScenesClusterGetSceneMembershipResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler;
+                          completion:(void (^)(MTRScenesClusterGetSceneMembershipResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)enhancedAddSceneWithParams:(MTRScenesClusterEnhancedAddSceneParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                 completionHandler:(void (^)(MTRScenesClusterEnhancedAddSceneResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completionHandler;
+                        completion:(void (^)(MTRScenesClusterEnhancedAddSceneResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)enhancedViewSceneWithParams:(MTRScenesClusterEnhancedViewSceneParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                  completionHandler:(void (^)(MTRScenesClusterEnhancedViewSceneResponseParams * _Nullable data,
-                                        NSError * _Nullable error))completionHandler;
+                         completion:(void (^)(MTRScenesClusterEnhancedViewSceneResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)copySceneWithParams:(MTRScenesClusterCopySceneParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-          completionHandler:
-              (void (^)(MTRScenesClusterCopySceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+                 completion:(void (^)(MTRScenesClusterCopySceneResponseParams * _Nullable data,
+                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeSceneCountWithParams:(MTRReadParams * _Nullable)params;
 
@@ -231,14 +215,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterScenes (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster On/Off
  *    Attributes and commands for switching devices between 'On' and 'Off' states.
@@ -247,44 +223,44 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)offWithParams:(MTROnOffClusterOffParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler;
+               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)offWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler;
+                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)onWithParams:(MTROnOffClusterOnParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler;
+               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)onWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-           completionHandler:(StatusCompletion)completionHandler;
+                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)toggleWithParams:(MTROnOffClusterToggleParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler;
+               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)toggleWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-               completionHandler:(StatusCompletion)completionHandler;
+                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)offWithEffectWithParams:(MTROnOffClusterOffWithEffectParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler;
+                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)onWithRecallGlobalSceneWithParams:(MTROnOffClusterOnWithRecallGlobalSceneParams * _Nullable)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                        completionHandler:(StatusCompletion)completionHandler;
+                               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)onWithRecallGlobalSceneWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                completionHandler:(StatusCompletion)completionHandler;
+                                       completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)onWithTimedOffWithParams:(MTROnOffClusterOnWithTimedOffParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-               completionHandler:(StatusCompletion)completionHandler;
+                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeOnOffWithParams:(MTRReadParams * _Nullable)params;
 
@@ -326,14 +302,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterOnOff (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster On/off Switch Configuration
  *    Attributes and commands for configuring On/Off switching devices.
@@ -342,7 +310,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeSwitchTypeWithParams:(MTRReadParams * _Nullable)params;
 
@@ -368,14 +336,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterOnOffSwitchConfiguration (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Level Control
  *    Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.'
@@ -384,44 +344,44 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)moveToLevelWithParams:(MTRLevelControlClusterMoveToLevelParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler;
+                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)moveWithParams:(MTRLevelControlClusterMoveParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler;
+               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)stepWithParams:(MTRLevelControlClusterStepParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler;
+               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)stopWithParams:(MTRLevelControlClusterStopParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler;
+               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)moveToLevelWithOnOffWithParams:(MTRLevelControlClusterMoveToLevelWithOnOffParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                     completionHandler:(StatusCompletion)completionHandler;
+                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)moveWithOnOffWithParams:(MTRLevelControlClusterMoveWithOnOffParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler;
+                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)stepWithOnOffWithParams:(MTRLevelControlClusterStepWithOnOffParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler;
+                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)stopWithOnOffWithParams:(MTRLevelControlClusterStopWithOnOffParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler;
+                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)moveToClosestFrequencyWithParams:(MTRLevelControlClusterMoveToClosestFrequencyParams *)params
                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                       completionHandler:(StatusCompletion)completionHandler;
+                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentLevelWithParams:(MTRReadParams * _Nullable)params;
 
@@ -501,14 +461,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterLevelControl (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Binary Input (Basic)
  *    An interface for reading the value of a binary measurement and accessing various characteristics of that measurement.
@@ -517,7 +469,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveTextWithParams:(MTRReadParams * _Nullable)params;
 - (void)writeAttributeActiveTextWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -582,14 +534,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterBinaryInputBasic (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Descriptor
  *    The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its
@@ -599,7 +543,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeDeviceListWithParams:(MTRReadParams * _Nullable)params;
 
@@ -624,14 +568,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterDescriptor (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Binding
  *    The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table.
@@ -640,7 +576,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeBindingWithParams:(MTRReadParams * _Nullable)params;
 - (void)writeAttributeBindingWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -664,14 +600,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterBinding (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Access Control
  *    The Access Control Cluster exposes a data model view of a
@@ -683,7 +611,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAclWithParams:(MTRReadParams * _Nullable)params;
 - (void)writeAttributeAclWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -720,14 +648,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterAccessControl (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Actions
  *    This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information.
@@ -736,56 +656,56 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)instantActionWithParams:(MTRActionsClusterInstantActionParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler;
+                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)instantActionWithTransitionWithParams:(MTRActionsClusterInstantActionWithTransitionParams *)params
                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                            completionHandler:(StatusCompletion)completionHandler;
+                                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)startActionWithParams:(MTRActionsClusterStartActionParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler;
+                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)startActionWithDurationWithParams:(MTRActionsClusterStartActionWithDurationParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                        completionHandler:(StatusCompletion)completionHandler;
+                               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)stopActionWithParams:(MTRActionsClusterStopActionParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-           completionHandler:(StatusCompletion)completionHandler;
+                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)pauseActionWithParams:(MTRActionsClusterPauseActionParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler;
+                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)pauseActionWithDurationWithParams:(MTRActionsClusterPauseActionWithDurationParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                        completionHandler:(StatusCompletion)completionHandler;
+                               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)resumeActionWithParams:(MTRActionsClusterResumeActionParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-             completionHandler:(StatusCompletion)completionHandler;
+                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)enableActionWithParams:(MTRActionsClusterEnableActionParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-             completionHandler:(StatusCompletion)completionHandler;
+                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)enableActionWithDurationWithParams:(MTRActionsClusterEnableActionWithDurationParams *)params
                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                         completionHandler:(StatusCompletion)completionHandler;
+                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)disableActionWithParams:(MTRActionsClusterDisableActionParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler;
+                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)disableActionWithDurationWithParams:(MTRActionsClusterDisableActionWithDurationParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                          completionHandler:(StatusCompletion)completionHandler;
+                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeActionListWithParams:(MTRReadParams * _Nullable)params;
 
@@ -808,14 +728,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterActions (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Basic
  *    This cluster provides attributes and events for determining basic information about Nodes, which supports both
@@ -826,15 +738,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)mfgSpecificPingWithParams:(MTRBasicClusterMfgSpecificPingParams * _Nullable)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                completionHandler:(StatusCompletion)completionHandler;
+                       completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)mfgSpecificPingWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                        completionHandler:(StatusCompletion)completionHandler;
+                               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeDataModelRevisionWithParams:(MTRReadParams * _Nullable)params;
 
@@ -906,14 +818,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterBasic (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster OTA Software Update Provider
  *    Provides an interface for providing OTA software updates
@@ -922,22 +826,22 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)queryImageWithParams:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-           completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
-                                 NSError * _Nullable error))completionHandler;
+                  completion:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                                 NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)applyUpdateRequestWithParams:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                   completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler;
+                          completion:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)notifyUpdateAppliedWithParams:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                    completionHandler:(StatusCompletion)completionHandler;
+                           completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params;
 
@@ -954,14 +858,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterOtaSoftwareUpdateProvider (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster OTA Software Update Requestor
  *    Provides an interface for downloading and applying OTA software updates
@@ -970,12 +866,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)announceOtaProviderWithParams:(MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                    completionHandler:(StatusCompletion)completionHandler;
+                           completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeDefaultOtaProvidersWithParams:(MTRReadParams * _Nullable)params;
 - (void)writeAttributeDefaultOtaProvidersWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -1005,14 +901,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterOtaSoftwareUpdateRequestor (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Localization Configuration
  *    Nodes should be expected to be deployed to any and all regions of the world. These global regions
@@ -1024,7 +912,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveLocaleWithParams:(MTRReadParams * _Nullable)params;
 - (void)writeAttributeActiveLocaleWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -1050,14 +938,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterLocalizationConfiguration (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Time Format Localization
  *    Nodes should be expected to be deployed to any and all regions of the world. These global regions
@@ -1069,7 +949,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeHourFormatWithParams:(MTRReadParams * _Nullable)params;
 - (void)writeAttributeHourFormatWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -1102,14 +982,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterTimeFormatLocalization (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Unit Localization
  *    Nodes should be expected to be deployed to any and all regions of the world. These global regions
@@ -1121,7 +993,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTemperatureUnitWithParams:(MTRReadParams * _Nullable)params;
 - (void)writeAttributeTemperatureUnitWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -1145,14 +1017,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterUnitLocalization (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Power Source Configuration
  *    This cluster is used to describe the configuration and capabilities of a Device's power system.
@@ -1161,7 +1025,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeSourcesWithParams:(MTRReadParams * _Nullable)params;
 
@@ -1180,14 +1044,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterPowerSourceConfiguration (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Power Source
  *    This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the
@@ -1197,7 +1053,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeStatusWithParams:(MTRReadParams * _Nullable)params;
 
@@ -1276,14 +1132,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterPowerSource (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster General Commissioning
  *    This cluster is used to manage global aspects of the Commissioning flow.
@@ -1292,29 +1140,30 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)armFailSafeWithParams:(MTRGeneralCommissioningClusterArmFailSafeParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-            completionHandler:(void (^)(MTRGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable data,
-                                  NSError * _Nullable error))completionHandler;
+                   completion:(void (^)(MTRGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)setRegulatoryConfigWithParams:(MTRGeneralCommissioningClusterSetRegulatoryConfigParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                    completionHandler:(void (^)(MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams * _Nullable data,
-                                          NSError * _Nullable error))completionHandler;
+                           completion:(void (^)(MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)commissioningCompleteWithParams:(MTRGeneralCommissioningClusterCommissioningCompleteParams * _Nullable)params
                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                      completionHandler:
-                          (void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
-                              NSError * _Nullable error))completionHandler;
+                             completion:
+                                 (void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)commissioningCompleteWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                              completionHandler:
-                                  (void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
-                                      NSError * _Nullable error))completionHandler;
+                                     completion:
+                                         (void (^)(
+                                             MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
+                                             NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeBreadcrumbWithParams:(MTRReadParams * _Nullable)params;
 - (void)writeAttributeBreadcrumbWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -1346,14 +1195,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterGeneralCommissioning (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Network Commissioning
  *    Functionality to configure, enable, disable network credentials and access on a Matter device.
@@ -1362,38 +1203,38 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)scanNetworksWithParams:(MTRNetworkCommissioningClusterScanNetworksParams * _Nullable)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-             completionHandler:(void (^)(MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completionHandler;
+                    completion:(void (^)(MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)addOrUpdateWiFiNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams *)params
                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                       completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
-                                             NSError * _Nullable error))completionHandler;
+                              completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                             NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)addOrUpdateThreadNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams *)params
                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                         completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
-                                               NSError * _Nullable error))completionHandler;
+                                completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)removeNetworkWithParams:(MTRNetworkCommissioningClusterRemoveNetworkParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-              completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completionHandler;
+                     completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)connectNetworkWithParams:(MTRNetworkCommissioningClusterConnectNetworkParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-               completionHandler:(void (^)(MTRNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler;
+                      completion:(void (^)(MTRNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)reorderNetworkWithParams:(MTRNetworkCommissioningClusterReorderNetworkParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-               completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler;
+                      completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxNetworksWithParams:(MTRReadParams * _Nullable)params;
 
@@ -1431,14 +1272,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterNetworkCommissioning (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Diagnostic Logs
  *    The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics.
@@ -1447,13 +1280,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)retrieveLogsRequestWithParams:(MTRDiagnosticLogsClusterRetrieveLogsRequestParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                    completionHandler:(void (^)(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data,
-                                          NSError * _Nullable error))completionHandler;
+                           completion:(void (^)(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params;
 
@@ -1470,14 +1303,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterDiagnosticLogs (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster General Diagnostics
  *    The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics
@@ -1487,12 +1312,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)testEventTriggerWithParams:(MTRGeneralDiagnosticsClusterTestEventTriggerParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                 completionHandler:(StatusCompletion)completionHandler;
+                        completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeNetworkInterfacesWithParams:(MTRReadParams * _Nullable)params;
 
@@ -1527,14 +1352,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterGeneralDiagnostics (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Software Diagnostics
  *    The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to
@@ -1544,15 +1361,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)resetWatermarksWithParams:(MTRSoftwareDiagnosticsClusterResetWatermarksParams * _Nullable)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                completionHandler:(StatusCompletion)completionHandler;
+                       completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)resetWatermarksWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                        completionHandler:(StatusCompletion)completionHandler;
+                               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeThreadMetricsWithParams:(MTRReadParams * _Nullable)params;
 
@@ -1577,14 +1394,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterSoftwareDiagnostics (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Thread Network Diagnostics
  *    The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node
@@ -1594,15 +1403,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)resetCountsWithParams:(MTRThreadNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler;
+                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completionHandler:(StatusCompletion)completionHandler;
+                           completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeChannelWithParams:(MTRReadParams * _Nullable)params;
 
@@ -1745,14 +1554,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterThreadNetworkDiagnostics (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster WiFi Network Diagnostics
  *    The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node
@@ -1762,15 +1563,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)resetCountsWithParams:(MTRWiFiNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler;
+                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completionHandler:(StatusCompletion)completionHandler;
+                           completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeBssidWithParams:(MTRReadParams * _Nullable)params;
 
@@ -1813,14 +1614,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterWiFiNetworkDiagnostics (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Ethernet Network Diagnostics
  *    The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a
@@ -1830,15 +1623,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)resetCountsWithParams:(MTREthernetNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler;
+                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completionHandler:(StatusCompletion)completionHandler;
+                           completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributePHYRateWithParams:(MTRReadParams * _Nullable)params;
 
@@ -1873,14 +1666,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterEthernetNetworkDiagnostics (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Bridged Device Basic
  *    This Cluster serves two purposes towards a Node communicating with a Bridge: indicate that the functionality on
@@ -1892,7 +1677,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeVendorNameWithParams:(MTRReadParams * _Nullable)params;
 
@@ -1944,14 +1729,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRClusterBridgedDeviceBasic (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Switch
  *    This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
@@ -1965,7 +1742,7 @@ light or a window shade.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfPositionsWithParams:(MTRReadParams * _Nullable)params;
 
@@ -1988,14 +1765,6 @@ light or a window shade.
 
 @end
 
-@interface MTRClusterSwitch (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster AdministratorCommissioning
  *    Commands to trigger a Node to allow a new Administrator to commission it.
@@ -2004,23 +1773,23 @@ light or a window shade.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)openCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenCommissioningWindowParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                        completionHandler:(StatusCompletion)completionHandler;
+                               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)openBasicCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams *)params
                                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                             completionHandler:(StatusCompletion)completionHandler;
+                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)revokeCommissioningWithParams:(MTRAdministratorCommissioningClusterRevokeCommissioningParams * _Nullable)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                    completionHandler:(StatusCompletion)completionHandler;
+                           completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)revokeCommissioningWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                            completionHandler:(StatusCompletion)completionHandler;
+                                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeWindowStatusWithParams:(MTRReadParams * _Nullable)params;
 
@@ -2043,14 +1812,6 @@ light or a window shade.
 
 @end
 
-@interface MTRClusterAdministratorCommissioning (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Operational Credentials
  *    This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated
@@ -2060,47 +1821,47 @@ light or a window shade.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)attestationRequestWithParams:(MTROperationalCredentialsClusterAttestationRequestParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                   completionHandler:(void (^)(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler;
+                          completion:(void (^)(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)certificateChainRequestWithParams:(MTROperationalCredentialsClusterCertificateChainRequestParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                        completionHandler:(void (^)(MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable data,
-                                              NSError * _Nullable error))completionHandler;
+                               completion:(void (^)(MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)CSRRequestWithParams:(MTROperationalCredentialsClusterCSRRequestParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-           completionHandler:(void (^)(MTROperationalCredentialsClusterCSRResponseParams * _Nullable data,
-                                 NSError * _Nullable error))completionHandler;
+                  completion:(void (^)(MTROperationalCredentialsClusterCSRResponseParams * _Nullable data,
+                                 NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)addNOCWithParams:(MTROperationalCredentialsClusterAddNOCParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
-                              NSError * _Nullable error))completionHandler;
+               completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)updateNOCWithParams:(MTROperationalCredentialsClusterUpdateNOCParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-          completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
-                                NSError * _Nullable error))completionHandler;
+                 completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)updateFabricLabelWithParams:(MTROperationalCredentialsClusterUpdateFabricLabelParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                  completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
-                                        NSError * _Nullable error))completionHandler;
+                         completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)removeFabricWithParams:(MTROperationalCredentialsClusterRemoveFabricParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-             completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completionHandler;
+                    completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)addTrustedRootCertificateWithParams:(MTROperationalCredentialsClusterAddTrustedRootCertificateParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                          completionHandler:(StatusCompletion)completionHandler;
+                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeNOCsWithParams:(MTRReadParams * _Nullable)params;
 
@@ -2129,14 +1890,6 @@ light or a window shade.
 
 @end
 
-@interface MTRClusterOperationalCredentials (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Group Key Management
  *    The Group Key Management Cluster is the mechanism by which group keys are managed.
@@ -2145,26 +1898,26 @@ light or a window shade.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)keySetWriteWithParams:(MTRGroupKeyManagementClusterKeySetWriteParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler;
+                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)keySetReadWithParams:(MTRGroupKeyManagementClusterKeySetReadParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-           completionHandler:(void (^)(MTRGroupKeyManagementClusterKeySetReadResponseParams * _Nullable data,
-                                 NSError * _Nullable error))completionHandler;
+                  completion:(void (^)(MTRGroupKeyManagementClusterKeySetReadResponseParams * _Nullable data,
+                                 NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)keySetRemoveWithParams:(MTRGroupKeyManagementClusterKeySetRemoveParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-             completionHandler:(StatusCompletion)completionHandler;
+                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)keySetReadAllIndicesWithParams:(MTRGroupKeyManagementClusterKeySetReadAllIndicesParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                     completionHandler:(void (^)(MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completionHandler;
+                            completion:(void (^)(MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGroupKeyMapWithParams:(MTRReadParams * _Nullable)params;
 - (void)writeAttributeGroupKeyMapWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -2194,14 +1947,6 @@ light or a window shade.
 
 @end
 
-@interface MTRClusterGroupKeyManagement (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Fixed Label
  *    The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
@@ -2211,7 +1956,7 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeLabelListWithParams:(MTRReadParams * _Nullable)params;
 
@@ -2230,14 +1975,6 @@ labels.
 
 @end
 
-@interface MTRClusterFixedLabel (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster User Label
  *    The User Label Cluster provides a feature to tag an endpoint with zero or more labels.
@@ -2246,7 +1983,7 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeLabelListWithParams:(MTRReadParams * _Nullable)params;
 - (void)writeAttributeLabelListWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -2270,14 +2007,6 @@ labels.
 
 @end
 
-@interface MTRClusterUserLabel (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Boolean State
  *    This cluster provides an interface to a boolean state called StateValue.
@@ -2286,7 +2015,7 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeStateValueWithParams:(MTRReadParams * _Nullable)params;
 
@@ -2305,14 +2034,6 @@ labels.
 
 @end
 
-@interface MTRClusterBooleanState (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Mode Select
  *    Attributes and commands for selecting a mode from a list of supported options.
@@ -2321,12 +2042,12 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)changeToModeWithParams:(MTRModeSelectClusterChangeToModeParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-             completionHandler:(StatusCompletion)completionHandler;
+                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params;
 
@@ -2365,14 +2086,6 @@ labels.
 
 @end
 
-@interface MTRClusterModeSelect (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Door Lock
  *    An interface to a generic way to secure a door
@@ -2381,86 +2094,86 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)lockDoorWithParams:(MTRDoorLockClusterLockDoorParams * _Nullable)params
             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-         completionHandler:(StatusCompletion)completionHandler;
+                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)unlockDoorWithParams:(MTRDoorLockClusterUnlockDoorParams * _Nullable)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-           completionHandler:(StatusCompletion)completionHandler;
+                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)unlockWithTimeoutWithParams:(MTRDoorLockClusterUnlockWithTimeoutParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                  completionHandler:(StatusCompletion)completionHandler;
+                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)setWeekDayScheduleWithParams:(MTRDoorLockClusterSetWeekDayScheduleParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler;
+                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)getWeekDayScheduleWithParams:(MTRDoorLockClusterGetWeekDayScheduleParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                   completionHandler:(void (^)(MTRDoorLockClusterGetWeekDayScheduleResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler;
+                          completion:(void (^)(MTRDoorLockClusterGetWeekDayScheduleResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)clearWeekDayScheduleWithParams:(MTRDoorLockClusterClearWeekDayScheduleParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                     completionHandler:(StatusCompletion)completionHandler;
+                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)setYearDayScheduleWithParams:(MTRDoorLockClusterSetYearDayScheduleParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler;
+                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)getYearDayScheduleWithParams:(MTRDoorLockClusterGetYearDayScheduleParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                   completionHandler:(void (^)(MTRDoorLockClusterGetYearDayScheduleResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler;
+                          completion:(void (^)(MTRDoorLockClusterGetYearDayScheduleResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)clearYearDayScheduleWithParams:(MTRDoorLockClusterClearYearDayScheduleParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                     completionHandler:(StatusCompletion)completionHandler;
+                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)setHolidayScheduleWithParams:(MTRDoorLockClusterSetHolidayScheduleParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler;
+                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)getHolidayScheduleWithParams:(MTRDoorLockClusterGetHolidayScheduleParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                   completionHandler:(void (^)(MTRDoorLockClusterGetHolidayScheduleResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler;
+                          completion:(void (^)(MTRDoorLockClusterGetHolidayScheduleResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)clearHolidayScheduleWithParams:(MTRDoorLockClusterClearHolidayScheduleParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                     completionHandler:(StatusCompletion)completionHandler;
+                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)setUserWithParams:(MTRDoorLockClusterSetUserParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler;
+               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)getUserWithParams:(MTRDoorLockClusterGetUserParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:
-            (void (^)(MTRDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+               completion:(void (^)(MTRDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
 - (void)clearUserWithParams:(MTRDoorLockClusterClearUserParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-          completionHandler:(StatusCompletion)completionHandler;
+                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)setCredentialWithParams:(MTRDoorLockClusterSetCredentialParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-              completionHandler:(void (^)(MTRDoorLockClusterSetCredentialResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completionHandler;
+                     completion:(void (^)(MTRDoorLockClusterSetCredentialResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)getCredentialStatusWithParams:(MTRDoorLockClusterGetCredentialStatusParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                    completionHandler:(void (^)(MTRDoorLockClusterGetCredentialStatusResponseParams * _Nullable data,
-                                          NSError * _Nullable error))completionHandler;
+                           completion:(void (^)(MTRDoorLockClusterGetCredentialStatusResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)clearCredentialWithParams:(MTRDoorLockClusterClearCredentialParams *)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                completionHandler:(StatusCompletion)completionHandler;
+                       completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeLockStateWithParams:(MTRReadParams * _Nullable)params;
 
@@ -2639,14 +2352,6 @@ labels.
 
 @end
 
-@interface MTRClusterDoorLock (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Window Covering
  *    Provides an interface for controlling and adjusting automatic window coverings.
@@ -2655,45 +2360,45 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)upOrOpenWithParams:(MTRWindowCoveringClusterUpOrOpenParams * _Nullable)params
             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-         completionHandler:(StatusCompletion)completionHandler;
+                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)upOrOpenWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                 completionHandler:(StatusCompletion)completionHandler;
+                        completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)downOrCloseWithParams:(MTRWindowCoveringClusterDownOrCloseParams * _Nullable)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler;
+                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)downOrCloseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completionHandler:(StatusCompletion)completionHandler;
+                           completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)stopMotionWithParams:(MTRWindowCoveringClusterStopMotionParams * _Nullable)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-           completionHandler:(StatusCompletion)completionHandler;
+                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)stopMotionWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler;
+                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)goToLiftValueWithParams:(MTRWindowCoveringClusterGoToLiftValueParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler;
+                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)goToLiftPercentageWithParams:(MTRWindowCoveringClusterGoToLiftPercentageParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler;
+                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)goToTiltValueWithParams:(MTRWindowCoveringClusterGoToTiltValueParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler;
+                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)goToTiltPercentageWithParams:(MTRWindowCoveringClusterGoToTiltPercentageParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler;
+                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTypeWithParams:(MTRReadParams * _Nullable)params;
 
@@ -2759,14 +2464,6 @@ labels.
 
 @end
 
-@interface MTRClusterWindowCovering (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Barrier Control
  *    This cluster provides control of a barrier (garage door).
@@ -2775,19 +2472,19 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)barrierControlGoToPercentWithParams:(MTRBarrierControlClusterBarrierControlGoToPercentParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                          completionHandler:(StatusCompletion)completionHandler;
+                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)barrierControlStopWithParams:(MTRBarrierControlClusterBarrierControlStopParams * _Nullable)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler;
+                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)barrierControlStopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                           completionHandler:(StatusCompletion)completionHandler;
+                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeBarrierMovingStateWithParams:(MTRReadParams * _Nullable)params;
 
@@ -2854,14 +2551,6 @@ labels.
 
 @end
 
-@interface MTRClusterBarrierControl (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Pump Configuration and Control
  *    An interface for configuring and controlling pumps.
@@ -2870,7 +2559,7 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxPressureWithParams:(MTRReadParams * _Nullable)params;
 
@@ -2953,14 +2642,6 @@ labels.
 
 @end
 
-@interface MTRClusterPumpConfigurationAndControl (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Thermostat
  *    An interface for configuring and controlling the functionality of a thermostat.
@@ -2969,28 +2650,28 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)setpointRaiseLowerWithParams:(MTRThermostatClusterSetpointRaiseLowerParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler;
+                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)setWeeklyScheduleWithParams:(MTRThermostatClusterSetWeeklyScheduleParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                  completionHandler:(StatusCompletion)completionHandler;
+                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)getWeeklyScheduleWithParams:(MTRThermostatClusterGetWeeklyScheduleParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                  completionHandler:(void (^)(MTRThermostatClusterGetWeeklyScheduleResponseParams * _Nullable data,
-                                        NSError * _Nullable error))completionHandler;
+                         completion:(void (^)(MTRThermostatClusterGetWeeklyScheduleResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)clearWeeklyScheduleWithParams:(MTRThermostatClusterClearWeeklyScheduleParams * _Nullable)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                    completionHandler:(StatusCompletion)completionHandler;
+                           completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)clearWeeklyScheduleWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                            completionHandler:(StatusCompletion)completionHandler;
+                                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeLocalTemperatureWithParams:(MTRReadParams * _Nullable)params;
 
@@ -3240,14 +2921,6 @@ labels.
 
 @end
 
-@interface MTRClusterThermostat (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Fan Control
  *    An interface for controlling a fan in a heating/cooling system.
@@ -3256,7 +2929,7 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFanModeWithParams:(MTRReadParams * _Nullable)params;
 - (void)writeAttributeFanModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -3325,14 +2998,6 @@ labels.
 
 @end
 
-@interface MTRClusterFanControl (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Thermostat User Interface Configuration
  *    An interface for configuring the user interface of a thermostat (which may be remote from the thermostat).
@@ -3341,7 +3006,7 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTemperatureDisplayModeWithParams:(MTRReadParams * _Nullable)params;
 - (void)writeAttributeTemperatureDisplayModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -3379,14 +3044,6 @@ labels.
 
 @end
 
-@interface MTRClusterThermostatUserInterfaceConfiguration (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Color Control
  *    Attributes and commands for controlling the color properties of a color-capable light.
@@ -3395,84 +3052,84 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)moveToHueWithParams:(MTRColorControlClusterMoveToHueParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-          completionHandler:(StatusCompletion)completionHandler;
+                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)moveHueWithParams:(MTRColorControlClusterMoveHueParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler;
+               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)stepHueWithParams:(MTRColorControlClusterStepHueParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler;
+               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)moveToSaturationWithParams:(MTRColorControlClusterMoveToSaturationParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                 completionHandler:(StatusCompletion)completionHandler;
+                        completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)moveSaturationWithParams:(MTRColorControlClusterMoveSaturationParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-               completionHandler:(StatusCompletion)completionHandler;
+                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)stepSaturationWithParams:(MTRColorControlClusterStepSaturationParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-               completionHandler:(StatusCompletion)completionHandler;
+                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)moveToHueAndSaturationWithParams:(MTRColorControlClusterMoveToHueAndSaturationParams *)params
                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                       completionHandler:(StatusCompletion)completionHandler;
+                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)moveToColorWithParams:(MTRColorControlClusterMoveToColorParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler;
+                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)moveColorWithParams:(MTRColorControlClusterMoveColorParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-          completionHandler:(StatusCompletion)completionHandler;
+                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)stepColorWithParams:(MTRColorControlClusterStepColorParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-          completionHandler:(StatusCompletion)completionHandler;
+                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)moveToColorTemperatureWithParams:(MTRColorControlClusterMoveToColorTemperatureParams *)params
                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                       completionHandler:(StatusCompletion)completionHandler;
+                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)enhancedMoveToHueWithParams:(MTRColorControlClusterEnhancedMoveToHueParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                  completionHandler:(StatusCompletion)completionHandler;
+                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)enhancedMoveHueWithParams:(MTRColorControlClusterEnhancedMoveHueParams *)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                completionHandler:(StatusCompletion)completionHandler;
+                       completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)enhancedStepHueWithParams:(MTRColorControlClusterEnhancedStepHueParams *)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                completionHandler:(StatusCompletion)completionHandler;
+                       completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)enhancedMoveToHueAndSaturationWithParams:(MTRColorControlClusterEnhancedMoveToHueAndSaturationParams *)params
                                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                               completionHandler:(StatusCompletion)completionHandler;
+                                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)colorLoopSetWithParams:(MTRColorControlClusterColorLoopSetParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-             completionHandler:(StatusCompletion)completionHandler;
+                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)stopMoveStepWithParams:(MTRColorControlClusterStopMoveStepParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-             completionHandler:(StatusCompletion)completionHandler;
+                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)moveColorTemperatureWithParams:(MTRColorControlClusterMoveColorTemperatureParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                     completionHandler:(StatusCompletion)completionHandler;
+                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)stepColorTemperatureWithParams:(MTRColorControlClusterStepColorTemperatureParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                     completionHandler:(StatusCompletion)completionHandler;
+                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentHueWithParams:(MTRReadParams * _Nullable)params;
 
@@ -3658,14 +3315,6 @@ labels.
 
 @end
 
-@interface MTRClusterColorControl (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Ballast Configuration
  *    Attributes and commands for configuring a lighting ballast.
@@ -3674,7 +3323,7 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributePhysicalMinLevelWithParams:(MTRReadParams * _Nullable)params;
 
@@ -3769,14 +3418,6 @@ labels.
 
 @end
 
-@interface MTRClusterBallastConfiguration (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Illuminance Measurement
  *    Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements.
@@ -3785,7 +3426,7 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params;
 
@@ -3812,14 +3453,6 @@ labels.
 
 @end
 
-@interface MTRClusterIlluminanceMeasurement (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Temperature Measurement
  *    Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements.
@@ -3828,7 +3461,7 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params;
 
@@ -3853,14 +3486,6 @@ labels.
 
 @end
 
-@interface MTRClusterTemperatureMeasurement (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Pressure Measurement
  *    Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements.
@@ -3869,7 +3494,7 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params;
 
@@ -3904,14 +3529,6 @@ labels.
 
 @end
 
-@interface MTRClusterPressureMeasurement (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Flow Measurement
  *    Attributes and commands for configuring the measurement of flow, and reporting flow measurements.
@@ -3920,7 +3537,7 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params;
 
@@ -3942,14 +3559,6 @@ labels.
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRClusterFlowMeasurement (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
 
 @end
 
@@ -3961,7 +3570,7 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params;
 
@@ -3986,14 +3595,6 @@ labels.
 
 @end
 
-@interface MTRClusterRelativeHumidityMeasurement (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Occupancy Sensing
  *    Attributes and commands for configuring occupancy sensing, and reporting occupancy status.
@@ -4002,7 +3603,7 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeOccupancyWithParams:(MTRReadParams * _Nullable)params;
 
@@ -4089,14 +3690,6 @@ labels.
 
 @end
 
-@interface MTRClusterOccupancySensing (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Wake on LAN
  *    This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol.
@@ -4105,7 +3698,7 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMACAddressWithParams:(MTRReadParams * _Nullable)params;
 
@@ -4124,14 +3717,6 @@ labels.
 
 @end
 
-@interface MTRClusterWakeOnLan (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Channel
  *    This cluster provides an interface for controlling the current Channel on a device.
@@ -4140,21 +3725,21 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)changeChannelWithParams:(MTRChannelClusterChangeChannelParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-              completionHandler:(void (^)(MTRChannelClusterChangeChannelResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completionHandler;
+                     completion:(void (^)(MTRChannelClusterChangeChannelResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)changeChannelByNumberWithParams:(MTRChannelClusterChangeChannelByNumberParams *)params
                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                      completionHandler:(StatusCompletion)completionHandler;
+                             completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)skipChannelWithParams:(MTRChannelClusterSkipChannelParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler;
+                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeChannelListWithParams:(MTRReadParams * _Nullable)params;
 
@@ -4177,14 +3762,6 @@ labels.
 
 @end
 
-@interface MTRClusterChannel (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Target Navigator
  *    This cluster provides an interface for UX navigation within a set of targets on a device or endpoint.
@@ -4193,13 +3770,13 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)navigateTargetWithParams:(MTRTargetNavigatorClusterNavigateTargetParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-               completionHandler:(void (^)(MTRTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler;
+                      completion:(void (^)(MTRTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTargetListWithParams:(MTRReadParams * _Nullable)params;
 
@@ -4220,14 +3797,6 @@ labels.
 
 @end
 
-@interface MTRClusterTargetNavigator (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Media Playback
  *    This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or
@@ -4237,95 +3806,95 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)playWithParams:(MTRMediaPlaybackClusterPlayParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:
-            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+               completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)playWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completionHandler;
+                    completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)pauseWithParams:(MTRMediaPlaybackClusterPauseParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:
-            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+               completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)pauseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-              completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completionHandler;
+                     completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)stopPlaybackWithParams:(MTRMediaPlaybackClusterStopPlaybackParams * _Nullable)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completionHandler;
+                    completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)stopPlaybackWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                     completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completionHandler;
+                            completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)startOverWithParams:(MTRMediaPlaybackClusterStartOverParams * _Nullable)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-          completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                NSError * _Nullable error))completionHandler;
+                 completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)startOverWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                  completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                        NSError * _Nullable error))completionHandler;
+                         completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)previousWithParams:(MTRMediaPlaybackClusterPreviousParams * _Nullable)params
             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-         completionHandler:
-             (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+                completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)previousWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                 completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completionHandler;
+                        completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)nextWithParams:(MTRMediaPlaybackClusterNextParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:
-            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+               completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)nextWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completionHandler;
+                    completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)rewindWithParams:(MTRMediaPlaybackClusterRewindParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:
-            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+               completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)rewindWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-               completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler;
+                      completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)fastForwardWithParams:(MTRMediaPlaybackClusterFastForwardParams * _Nullable)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-            completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                  NSError * _Nullable error))completionHandler;
+                   completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)fastForwardWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                          NSError * _Nullable error))completionHandler;
+                           completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)skipForwardWithParams:(MTRMediaPlaybackClusterSkipForwardParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-            completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                  NSError * _Nullable error))completionHandler;
+                   completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)skipBackwardWithParams:(MTRMediaPlaybackClusterSkipBackwardParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completionHandler;
+                    completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)seekWithParams:(MTRMediaPlaybackClusterSeekParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:
-            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+               completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentStateWithParams:(MTRReadParams * _Nullable)params;
 
@@ -4356,14 +3925,6 @@ labels.
 
 @end
 
-@interface MTRClusterMediaPlayback (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Media Input
  *    This cluster provides an interface for controlling the Input Selector on a media device such as a TV.
@@ -4372,30 +3933,30 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)selectInputWithParams:(MTRMediaInputClusterSelectInputParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler;
+                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)showInputStatusWithParams:(MTRMediaInputClusterShowInputStatusParams * _Nullable)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                completionHandler:(StatusCompletion)completionHandler;
+                       completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)showInputStatusWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                        completionHandler:(StatusCompletion)completionHandler;
+                               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)hideInputStatusWithParams:(MTRMediaInputClusterHideInputStatusParams * _Nullable)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                completionHandler:(StatusCompletion)completionHandler;
+                       completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)hideInputStatusWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                        completionHandler:(StatusCompletion)completionHandler;
+                               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)renameInputWithParams:(MTRMediaInputClusterRenameInputParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler;
+                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeInputListWithParams:(MTRReadParams * _Nullable)params;
 
@@ -4416,14 +3977,6 @@ labels.
 
 @end
 
-@interface MTRClusterMediaInput (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Low Power
  *    This cluster provides an interface for managing low power mode on a device.
@@ -4432,15 +3985,15 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)sleepWithParams:(MTRLowPowerClusterSleepParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler;
+               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)sleepWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler;
+                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params;
 
@@ -4454,14 +4007,6 @@ labels.
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-@interface MTRClusterLowPower (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
 
 @end
 
@@ -4473,13 +4018,13 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)sendKeyWithParams:(MTRKeypadInputClusterSendKeyParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:
-            (void (^)(MTRKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+               completion:(void (^)(MTRKeypadInputClusterSendKeyResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params;
 
@@ -4496,14 +4041,6 @@ labels.
 
 @end
 
-@interface MTRClusterKeypadInput (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Content Launcher
  *    This cluster provides an interface for launching content on a media player device such as a TV or Speaker.
@@ -4512,18 +4049,18 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)launchContentWithParams:(MTRContentLauncherClusterLaunchContentParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-              completionHandler:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completionHandler;
+                     completion:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)launchURLWithParams:(MTRContentLauncherClusterLaunchURLParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-          completionHandler:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
-                                NSError * _Nullable error))completionHandler;
+                 completion:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
+                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptHeaderWithParams:(MTRReadParams * _Nullable)params;
 
@@ -4549,14 +4086,6 @@ labels.
 
 @end
 
-@interface MTRClusterContentLauncher (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Audio Output
  *    This cluster provides an interface for controlling the Output on a media device such as a TV.
@@ -4565,16 +4094,16 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)selectOutputWithParams:(MTRAudioOutputClusterSelectOutputParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-             completionHandler:(StatusCompletion)completionHandler;
+                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)renameOutputWithParams:(MTRAudioOutputClusterRenameOutputParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-             completionHandler:(StatusCompletion)completionHandler;
+                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeOutputListWithParams:(MTRReadParams * _Nullable)params;
 
@@ -4595,14 +4124,6 @@ labels.
 
 @end
 
-@interface MTRClusterAudioOutput (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Application Launcher
  *    This cluster provides an interface for launching content on a media player device such as a TV or Speaker.
@@ -4611,23 +4132,23 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-          completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
-                                NSError * _Nullable error))completionHandler;
+                 completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
-                              NSError * _Nullable error))completionHandler;
+               completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
-                              NSError * _Nullable error))completionHandler;
+               completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeCatalogListWithParams:(MTRReadParams * _Nullable)params;
 
@@ -4653,14 +4174,6 @@ labels.
 
 @end
 
-@interface MTRClusterApplicationLauncher (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Application Basic
  *    This cluster provides information about an application running on a TV or media player device which is represented as an
@@ -4670,7 +4183,7 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeVendorNameWithParams:(MTRReadParams * _Nullable)params;
 
@@ -4703,14 +4216,6 @@ labels.
 
 @end
 
-@interface MTRClusterApplicationBasic (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Account Login
  *    This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App
@@ -4721,24 +4226,24 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)getSetupPINWithParams:(MTRAccountLoginClusterGetSetupPINParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-            completionHandler:(void (^)(MTRAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
-                                  NSError * _Nullable error))completionHandler;
+                   completion:(void (^)(MTRAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)loginWithParams:(MTRAccountLoginClusterLoginParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler;
+               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)logoutWithParams:(MTRAccountLoginClusterLogoutParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler;
+               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)logoutWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-               completionHandler:(StatusCompletion)completionHandler;
+                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params;
 
@@ -4755,14 +4260,6 @@ labels.
 
 @end
 
-@interface MTRClusterAccountLogin (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Electrical Measurement
  *    Attributes related to the electrical properties of a device. This cluster is used by power outlets and other devices that need
@@ -4772,19 +4269,19 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)getProfileInfoCommandWithParams:(MTRElectricalMeasurementClusterGetProfileInfoCommandParams * _Nullable)params
                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                      completionHandler:(StatusCompletion)completionHandler;
+                             completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)getProfileInfoCommandWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                              completionHandler:(StatusCompletion)completionHandler;
+                                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)getMeasurementProfileCommandWithParams:(MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams *)params
                                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                             completionHandler:(StatusCompletion)completionHandler;
+                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementTypeWithParams:(MTRReadParams * _Nullable)params;
 
@@ -5097,14 +4594,6 @@ labels.
 
 @end
 
-@interface MTRClusterElectricalMeasurement (Deprecated)
-
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
-
-@end
-
 /**
  * Cluster Test Cluster
  *    The Test Cluster is meant to validate the generated code
@@ -5113,139 +4602,140 @@ labels.
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                              endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 - (void)testWithParams:(MTRTestClusterClusterTestParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler;
+               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)testWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-             completionHandler:(StatusCompletion)completionHandler;
+                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)testNotHandledWithParams:(MTRTestClusterClusterTestNotHandledParams * _Nullable)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-               completionHandler:(StatusCompletion)completionHandler;
+                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)testNotHandledWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                       completionHandler:(StatusCompletion)completionHandler;
+                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)testSpecificWithParams:(MTRTestClusterClusterTestSpecificParams * _Nullable)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-             completionHandler:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completionHandler;
+                    completion:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)testSpecificWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                     completionHandler:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completionHandler;
+                            completion:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)testUnknownCommandWithParams:(MTRTestClusterClusterTestUnknownCommandParams * _Nullable)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler;
+                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)testUnknownCommandWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                           completionHandler:(StatusCompletion)completionHandler;
+                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)testAddArgumentsWithParams:(MTRTestClusterClusterTestAddArgumentsParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                 completionHandler:(void (^)(MTRTestClusterClusterTestAddArgumentsResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completionHandler;
+                        completion:(void (^)(MTRTestClusterClusterTestAddArgumentsResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)testSimpleArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleArgumentRequestParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                          completionHandler:(void (^)(MTRTestClusterClusterTestSimpleArgumentResponseParams * _Nullable data,
-                                                NSError * _Nullable error))completionHandler;
+                                 completion:(void (^)(MTRTestClusterClusterTestSimpleArgumentResponseParams * _Nullable data,
+                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)testStructArrayArgumentRequestWithParams:(MTRTestClusterClusterTestStructArrayArgumentRequestParams *)params
                                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                               completionHandler:
-                                   (void (^)(MTRTestClusterClusterTestStructArrayArgumentResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completionHandler;
+                                      completion:
+                                          (void (^)(MTRTestClusterClusterTestStructArrayArgumentResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)testStructArgumentRequestWithParams:(MTRTestClusterClusterTestStructArgumentRequestParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                          completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
-                                                NSError * _Nullable error))completionHandler;
+                                 completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)testNestedStructArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructArgumentRequestParams *)params
                                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                                completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
-                                                      NSError * _Nullable error))completionHandler;
+                                       completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                      NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)testListStructArgumentRequestWithParams:(MTRTestClusterClusterTestListStructArgumentRequestParams *)params
                                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                              completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
-                                                    NSError * _Nullable error))completionHandler;
+                                     completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                    NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)testListInt8UArgumentRequestWithParams:(MTRTestClusterClusterTestListInt8UArgumentRequestParams *)params
                                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                             completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
-                                                   NSError * _Nullable error))completionHandler;
+                                    completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)testNestedStructListArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructListArgumentRequestParams *)params
                                        expectedValues:
                                            (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                                    completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
-                                                          NSError * _Nullable error))completionHandler;
+                                           completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                          NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)testListNestedStructListArgumentRequestWithParams:
             (MTRTestClusterClusterTestListNestedStructListArgumentRequestParams *)params
                                            expectedValues:
                                                (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                                        completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
-                                                              NSError * _Nullable error))completionHandler;
+                                               completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)testListInt8UReverseRequestWithParams:(MTRTestClusterClusterTestListInt8UReverseRequestParams *)params
                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                            completionHandler:(void (^)(MTRTestClusterClusterTestListInt8UReverseResponseParams * _Nullable data,
-                                                  NSError * _Nullable error))completionHandler;
+                                   completion:(void (^)(MTRTestClusterClusterTestListInt8UReverseResponseParams * _Nullable data,
+                                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)testEnumsRequestWithParams:(MTRTestClusterClusterTestEnumsRequestParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                 completionHandler:(void (^)(MTRTestClusterClusterTestEnumsResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completionHandler;
+                        completion:(void (^)(MTRTestClusterClusterTestEnumsResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)testNullableOptionalRequestWithParams:(MTRTestClusterClusterTestNullableOptionalRequestParams * _Nullable)params
                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                            completionHandler:(void (^)(MTRTestClusterClusterTestNullableOptionalResponseParams * _Nullable data,
-                                                  NSError * _Nullable error))completionHandler;
-- (void)testComplexNullableOptionalRequestWithParams:(MTRTestClusterClusterTestComplexNullableOptionalRequestParams *)params
-                                      expectedValues:
-                                          (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
-                               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                                   completionHandler:
-                                       (void (^)(MTRTestClusterClusterTestComplexNullableOptionalResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completionHandler;
+                                   completion:(void (^)(MTRTestClusterClusterTestNullableOptionalResponseParams * _Nullable data,
+                                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+- (void)
+    testComplexNullableOptionalRequestWithParams:(MTRTestClusterClusterTestComplexNullableOptionalRequestParams *)params
+                                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                                      completion:
+                                          (void (^)(MTRTestClusterClusterTestComplexNullableOptionalResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)simpleStructEchoRequestWithParams:(MTRTestClusterClusterSimpleStructEchoRequestParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                        completionHandler:(void (^)(MTRTestClusterClusterSimpleStructResponseParams * _Nullable data,
-                                              NSError * _Nullable error))completionHandler;
+                               completion:(void (^)(MTRTestClusterClusterSimpleStructResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)timedInvokeRequestWithParams:(MTRTestClusterClusterTimedInvokeRequestParams * _Nullable)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler;
+                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)timedInvokeRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                           completionHandler:(StatusCompletion)completionHandler;
+                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)testSimpleOptionalArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
                                      expectedValues:
                                          (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                                  completionHandler:(StatusCompletion)completionHandler;
+                                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)testEmitTestEventRequestWithParams:(MTRTestClusterClusterTestEmitTestEventRequestParams *)params
                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                         completionHandler:(void (^)(MTRTestClusterClusterTestEmitTestEventResponseParams * _Nullable data,
-                                               NSError * _Nullable error))completionHandler;
-- (void)testEmitTestFabricScopedEventRequestWithParams:(MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams *)params
-                                        expectedValues:
-                                            (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
-                                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                                     completionHandler:
-                                         (void (^)(
-                                             MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
-                                             NSError * _Nullable error))completionHandler;
+                                completion:(void (^)(MTRTestClusterClusterTestEmitTestEventResponseParams * _Nullable data,
+                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+- (void)
+    testEmitTestFabricScopedEventRequestWithParams:(MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams *)params
+                                    expectedValues:
+                                        (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                                        completion:
+                                            (void (^)(
+                                                MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
+                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeBooleanWithParams:(MTRReadParams * _Nullable)params;
 - (void)writeAttributeBooleanWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -5839,12 +5329,1699 @@ labels.
 
 @end
 
+@interface MTRClusterIdentify (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)identifyWithParams:(MTRIdentifyClusterIdentifyParams *)params
+            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+         completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use identifyWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)triggerEffectWithParams:(MTRIdentifyClusterTriggerEffectParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use triggerEffectWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterGroups (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)addGroupWithParams:(MTRGroupsClusterAddGroupParams *)params
+            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+         completionHandler:
+             (void (^)(MTRGroupsClusterAddGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use addGroupWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)viewGroupWithParams:(MTRGroupsClusterViewGroupParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:
+              (void (^)(MTRGroupsClusterViewGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use viewGroupWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)getGroupMembershipWithParams:(MTRGroupsClusterGetGroupMembershipParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(void (^)(MTRGroupsClusterGetGroupMembershipResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use getGroupMembershipWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)removeGroupWithParams:(MTRGroupsClusterRemoveGroupParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:
+                (void (^)(MTRGroupsClusterRemoveGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use removeGroupWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)removeAllGroupsWithParams:(MTRGroupsClusterRemoveAllGroupsParams * _Nullable)params
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use removeAllGroupsWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)removeAllGroupsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use removeAllGroupsWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)addGroupIfIdentifyingWithParams:(MTRGroupsClusterAddGroupIfIdentifyingParams *)params
+                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                      completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use addGroupIfIdentifyingWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterScenes (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)addSceneWithParams:(MTRScenesClusterAddSceneParams *)params
+            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+         completionHandler:
+             (void (^)(MTRScenesClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use addSceneWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)viewSceneWithParams:(MTRScenesClusterViewSceneParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:
+              (void (^)(MTRScenesClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use viewSceneWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)removeSceneWithParams:(MTRScenesClusterRemoveSceneParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:
+                (void (^)(MTRScenesClusterRemoveSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use removeSceneWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)removeAllScenesWithParams:(MTRScenesClusterRemoveAllScenesParams *)params
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                completionHandler:(void (^)(MTRScenesClusterRemoveAllScenesResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use removeAllScenesWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)storeSceneWithParams:(MTRScenesClusterStoreSceneParams *)params
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+           completionHandler:
+               (void (^)(MTRScenesClusterStoreSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use storeSceneWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)recallSceneWithParams:(MTRScenesClusterRecallSceneParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use recallSceneWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)getSceneMembershipWithParams:(MTRScenesClusterGetSceneMembershipParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(void (^)(MTRScenesClusterGetSceneMembershipResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use getSceneMembershipWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)enhancedAddSceneWithParams:(MTRScenesClusterEnhancedAddSceneParams *)params
+                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                 completionHandler:(void (^)(MTRScenesClusterEnhancedAddSceneResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use enhancedAddSceneWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)enhancedViewSceneWithParams:(MTRScenesClusterEnhancedViewSceneParams *)params
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                  completionHandler:(void (^)(MTRScenesClusterEnhancedViewSceneResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use enhancedViewSceneWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)copySceneWithParams:(MTRScenesClusterCopySceneParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:
+              (void (^)(MTRScenesClusterCopySceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use copySceneWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterOnOff (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)offWithParams:(MTROnOffClusterOffParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use offWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)offWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use offWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)onWithParams:(MTROnOffClusterOnParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use onWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)onWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use onWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)toggleWithParams:(MTROnOffClusterToggleParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use toggleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)toggleWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use toggleWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)offWithEffectWithParams:(MTROnOffClusterOffWithEffectParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use offWithEffectWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)onWithRecallGlobalSceneWithParams:(MTROnOffClusterOnWithRecallGlobalSceneParams * _Nullable)params
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use onWithRecallGlobalSceneWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)onWithRecallGlobalSceneWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use onWithRecallGlobalSceneWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)onWithTimedOffWithParams:(MTROnOffClusterOnWithTimedOffParams *)params
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+               completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use onWithTimedOffWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterOnOffSwitchConfiguration (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterLevelControl (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)moveToLevelWithParams:(MTRLevelControlClusterMoveToLevelParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use moveToLevelWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)moveWithParams:(MTRLevelControlClusterMoveParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use moveWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)stepWithParams:(MTRLevelControlClusterStepParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use stepWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)stopWithParams:(MTRLevelControlClusterStopParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use stopWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)moveToLevelWithOnOffWithParams:(MTRLevelControlClusterMoveToLevelWithOnOffParams *)params
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                     completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use moveToLevelWithOnOffWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)moveWithOnOffWithParams:(MTRLevelControlClusterMoveWithOnOffParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use moveWithOnOffWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)stepWithOnOffWithParams:(MTRLevelControlClusterStepWithOnOffParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use stepWithOnOffWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)stopWithOnOffWithParams:(MTRLevelControlClusterStopWithOnOffParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use stopWithOnOffWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)moveToClosestFrequencyWithParams:(MTRLevelControlClusterMoveToClosestFrequencyParams *)params
+                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                       completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use moveToClosestFrequencyWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterBinaryInputBasic (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterDescriptor (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterBinding (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterAccessControl (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterActions (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)instantActionWithParams:(MTRActionsClusterInstantActionParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use instantActionWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)instantActionWithTransitionWithParams:(MTRActionsClusterInstantActionWithTransitionParams *)params
+                               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                            completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use instantActionWithTransitionWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)startActionWithParams:(MTRActionsClusterStartActionParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use startActionWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)startActionWithDurationWithParams:(MTRActionsClusterStartActionWithDurationParams *)params
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use startActionWithDurationWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)stopActionWithParams:(MTRActionsClusterStopActionParams *)params
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+           completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use stopActionWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)pauseActionWithParams:(MTRActionsClusterPauseActionParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use pauseActionWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)pauseActionWithDurationWithParams:(MTRActionsClusterPauseActionWithDurationParams *)params
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use pauseActionWithDurationWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)resumeActionWithParams:(MTRActionsClusterResumeActionParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use resumeActionWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)enableActionWithParams:(MTRActionsClusterEnableActionParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use enableActionWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)enableActionWithDurationWithParams:(MTRActionsClusterEnableActionWithDurationParams *)params
+                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                         completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use enableActionWithDurationWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)disableActionWithParams:(MTRActionsClusterDisableActionParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use disableActionWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)disableActionWithDurationWithParams:(MTRActionsClusterDisableActionWithDurationParams *)params
+                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                          completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use disableActionWithDurationWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterBasic (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)mfgSpecificPingWithParams:(MTRBasicClusterMfgSpecificPingParams * _Nullable)params
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use mfgSpecificPingWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)mfgSpecificPingWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use mfgSpecificPingWithExpectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterOtaSoftwareUpdateProvider (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)queryImageWithParams:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+           completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                                 NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use queryImageWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)applyUpdateRequestWithParams:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use applyUpdateRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)notifyUpdateAppliedWithParams:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use notifyUpdateAppliedWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterOtaSoftwareUpdateRequestor (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)announceOtaProviderWithParams:(MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use announceOtaProviderWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterLocalizationConfiguration (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterTimeFormatLocalization (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterUnitLocalization (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterPowerSourceConfiguration (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterPowerSource (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterGeneralCommissioning (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)armFailSafeWithParams:(MTRGeneralCommissioningClusterArmFailSafeParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(void (^)(MTRGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use armFailSafeWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)setRegulatoryConfigWithParams:(MTRGeneralCommissioningClusterSetRegulatoryConfigParams *)params
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completionHandler:(void (^)(MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use setRegulatoryConfigWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)commissioningCompleteWithParams:(MTRGeneralCommissioningClusterCommissioningCompleteParams * _Nullable)params
+                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                      completionHandler:
+                          (void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
+                              NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use commissioningCompleteWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)commissioningCompleteWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                              completionHandler:
+                                  (void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use commissioningCompleteWithExpectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterNetworkCommissioning (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)scanNetworksWithParams:(MTRNetworkCommissioningClusterScanNetworksParams * _Nullable)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(void (^)(MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use scanNetworksWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)addOrUpdateWiFiNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams *)params
+                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                       completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                             NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use addOrUpdateWiFiNetworkWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)addOrUpdateThreadNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams *)params
+                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                         completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                               NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use addOrUpdateThreadNetworkWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)removeNetworkWithParams:(MTRNetworkCommissioningClusterRemoveNetworkParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use removeNetworkWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)connectNetworkWithParams:(MTRNetworkCommissioningClusterConnectNetworkParams *)params
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+               completionHandler:(void (^)(MTRNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use connectNetworkWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)reorderNetworkWithParams:(MTRNetworkCommissioningClusterReorderNetworkParams *)params
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+               completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use reorderNetworkWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterDiagnosticLogs (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)retrieveLogsRequestWithParams:(MTRDiagnosticLogsClusterRetrieveLogsRequestParams *)params
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completionHandler:(void (^)(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use retrieveLogsRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterGeneralDiagnostics (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)testEventTriggerWithParams:(MTRGeneralDiagnosticsClusterTestEventTriggerParams *)params
+                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                 completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testEventTriggerWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterSoftwareDiagnostics (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)resetWatermarksWithParams:(MTRSoftwareDiagnosticsClusterResetWatermarksParams * _Nullable)params
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use resetWatermarksWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)resetWatermarksWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use resetWatermarksWithExpectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterThreadNetworkDiagnostics (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)resetCountsWithParams:(MTRThreadNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use resetCountsWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use resetCountsWithExpectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterWiFiNetworkDiagnostics (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)resetCountsWithParams:(MTRWiFiNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use resetCountsWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use resetCountsWithExpectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterEthernetNetworkDiagnostics (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)resetCountsWithParams:(MTREthernetNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use resetCountsWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use resetCountsWithExpectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterBridgedDeviceBasic (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterSwitch (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterAdministratorCommissioning (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)openCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenCommissioningWindowParams *)params
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use openCommissioningWindowWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)openBasicCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams *)params
+                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                             completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use openBasicCommissioningWindowWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)revokeCommissioningWithParams:(MTRAdministratorCommissioningClusterRevokeCommissioningParams * _Nullable)params
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use revokeCommissioningWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)revokeCommissioningWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                            completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use revokeCommissioningWithExpectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterOperationalCredentials (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)attestationRequestWithParams:(MTROperationalCredentialsClusterAttestationRequestParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(void (^)(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use attestationRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)certificateChainRequestWithParams:(MTROperationalCredentialsClusterCertificateChainRequestParams *)params
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                        completionHandler:(void (^)(MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use certificateChainRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)CSRRequestWithParams:(MTROperationalCredentialsClusterCSRRequestParams *)params
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+           completionHandler:(void (^)(MTROperationalCredentialsClusterCSRResponseParams * _Nullable data,
+                                 NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use CSRRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)addNOCWithParams:(MTROperationalCredentialsClusterAddNOCParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                              NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use addNOCWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)updateNOCWithParams:(MTROperationalCredentialsClusterUpdateNOCParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use updateNOCWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)updateFabricLabelWithParams:(MTROperationalCredentialsClusterUpdateFabricLabelParams *)params
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                  completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use updateFabricLabelWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)removeFabricWithParams:(MTROperationalCredentialsClusterRemoveFabricParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use removeFabricWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)addTrustedRootCertificateWithParams:(MTROperationalCredentialsClusterAddTrustedRootCertificateParams *)params
+                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                          completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use addTrustedRootCertificateWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterGroupKeyManagement (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)keySetWriteWithParams:(MTRGroupKeyManagementClusterKeySetWriteParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use keySetWriteWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)keySetReadWithParams:(MTRGroupKeyManagementClusterKeySetReadParams *)params
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+           completionHandler:(void (^)(MTRGroupKeyManagementClusterKeySetReadResponseParams * _Nullable data,
+                                 NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use keySetReadWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)keySetRemoveWithParams:(MTRGroupKeyManagementClusterKeySetRemoveParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use keySetRemoveWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)keySetReadAllIndicesWithParams:(MTRGroupKeyManagementClusterKeySetReadAllIndicesParams *)params
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                     completionHandler:(void (^)(MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use keySetReadAllIndicesWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterFixedLabel (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterUserLabel (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterBooleanState (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterModeSelect (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)changeToModeWithParams:(MTRModeSelectClusterChangeToModeParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use changeToModeWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterDoorLock (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)lockDoorWithParams:(MTRDoorLockClusterLockDoorParams * _Nullable)params
+            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+         completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use lockDoorWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)unlockDoorWithParams:(MTRDoorLockClusterUnlockDoorParams * _Nullable)params
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+           completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use unlockDoorWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)unlockWithTimeoutWithParams:(MTRDoorLockClusterUnlockWithTimeoutParams *)params
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                  completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use unlockWithTimeoutWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)setWeekDayScheduleWithParams:(MTRDoorLockClusterSetWeekDayScheduleParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use setWeekDayScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)getWeekDayScheduleWithParams:(MTRDoorLockClusterGetWeekDayScheduleParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(void (^)(MTRDoorLockClusterGetWeekDayScheduleResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use getWeekDayScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)clearWeekDayScheduleWithParams:(MTRDoorLockClusterClearWeekDayScheduleParams *)params
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                     completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use clearWeekDayScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)setYearDayScheduleWithParams:(MTRDoorLockClusterSetYearDayScheduleParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use setYearDayScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)getYearDayScheduleWithParams:(MTRDoorLockClusterGetYearDayScheduleParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(void (^)(MTRDoorLockClusterGetYearDayScheduleResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use getYearDayScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)clearYearDayScheduleWithParams:(MTRDoorLockClusterClearYearDayScheduleParams *)params
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                     completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use clearYearDayScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)setHolidayScheduleWithParams:(MTRDoorLockClusterSetHolidayScheduleParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use setHolidayScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)getHolidayScheduleWithParams:(MTRDoorLockClusterGetHolidayScheduleParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(void (^)(MTRDoorLockClusterGetHolidayScheduleResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use getHolidayScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)clearHolidayScheduleWithParams:(MTRDoorLockClusterClearHolidayScheduleParams *)params
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                     completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use clearHolidayScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)setUserWithParams:(MTRDoorLockClusterSetUserParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use setUserWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)getUserWithParams:(MTRDoorLockClusterGetUserParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:
+            (void (^)(MTRDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use getUserWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)clearUserWithParams:(MTRDoorLockClusterClearUserParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use clearUserWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)setCredentialWithParams:(MTRDoorLockClusterSetCredentialParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(void (^)(MTRDoorLockClusterSetCredentialResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use setCredentialWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)getCredentialStatusWithParams:(MTRDoorLockClusterGetCredentialStatusParams *)params
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completionHandler:(void (^)(MTRDoorLockClusterGetCredentialStatusResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use getCredentialStatusWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)clearCredentialWithParams:(MTRDoorLockClusterClearCredentialParams *)params
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use clearCredentialWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterWindowCovering (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)upOrOpenWithParams:(MTRWindowCoveringClusterUpOrOpenParams * _Nullable)params
+            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+         completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use upOrOpenWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)upOrOpenWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                 completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use upOrOpenWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)downOrCloseWithParams:(MTRWindowCoveringClusterDownOrCloseParams * _Nullable)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use downOrCloseWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)downOrCloseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use downOrCloseWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)stopMotionWithParams:(MTRWindowCoveringClusterStopMotionParams * _Nullable)params
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+           completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use stopMotionWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)stopMotionWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use stopMotionWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)goToLiftValueWithParams:(MTRWindowCoveringClusterGoToLiftValueParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use goToLiftValueWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)goToLiftPercentageWithParams:(MTRWindowCoveringClusterGoToLiftPercentageParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use goToLiftPercentageWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)goToTiltValueWithParams:(MTRWindowCoveringClusterGoToTiltValueParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use goToTiltValueWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)goToTiltPercentageWithParams:(MTRWindowCoveringClusterGoToTiltPercentageParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use goToTiltPercentageWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterBarrierControl (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)barrierControlGoToPercentWithParams:(MTRBarrierControlClusterBarrierControlGoToPercentParams *)params
+                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                          completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use barrierControlGoToPercentWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)barrierControlStopWithParams:(MTRBarrierControlClusterBarrierControlStopParams * _Nullable)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use barrierControlStopWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)barrierControlStopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                           completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use barrierControlStopWithExpectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterPumpConfigurationAndControl (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterThermostat (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)setpointRaiseLowerWithParams:(MTRThermostatClusterSetpointRaiseLowerParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use setpointRaiseLowerWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)setWeeklyScheduleWithParams:(MTRThermostatClusterSetWeeklyScheduleParams *)params
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                  completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use setWeeklyScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)getWeeklyScheduleWithParams:(MTRThermostatClusterGetWeeklyScheduleParams *)params
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                  completionHandler:(void (^)(MTRThermostatClusterGetWeeklyScheduleResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use getWeeklyScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)clearWeeklyScheduleWithParams:(MTRThermostatClusterClearWeeklyScheduleParams * _Nullable)params
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use clearWeeklyScheduleWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)clearWeeklyScheduleWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                            completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use clearWeeklyScheduleWithExpectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterFanControl (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterThermostatUserInterfaceConfiguration (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterColorControl (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)moveToHueWithParams:(MTRColorControlClusterMoveToHueParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use moveToHueWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)moveHueWithParams:(MTRColorControlClusterMoveHueParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use moveHueWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)stepHueWithParams:(MTRColorControlClusterStepHueParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use stepHueWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)moveToSaturationWithParams:(MTRColorControlClusterMoveToSaturationParams *)params
+                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                 completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use moveToSaturationWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)moveSaturationWithParams:(MTRColorControlClusterMoveSaturationParams *)params
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+               completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use moveSaturationWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)stepSaturationWithParams:(MTRColorControlClusterStepSaturationParams *)params
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+               completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use stepSaturationWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)moveToHueAndSaturationWithParams:(MTRColorControlClusterMoveToHueAndSaturationParams *)params
+                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                       completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use moveToHueAndSaturationWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)moveToColorWithParams:(MTRColorControlClusterMoveToColorParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use moveToColorWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)moveColorWithParams:(MTRColorControlClusterMoveColorParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use moveColorWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)stepColorWithParams:(MTRColorControlClusterStepColorParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use stepColorWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)moveToColorTemperatureWithParams:(MTRColorControlClusterMoveToColorTemperatureParams *)params
+                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                       completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use moveToColorTemperatureWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)enhancedMoveToHueWithParams:(MTRColorControlClusterEnhancedMoveToHueParams *)params
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                  completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use enhancedMoveToHueWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)enhancedMoveHueWithParams:(MTRColorControlClusterEnhancedMoveHueParams *)params
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use enhancedMoveHueWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)enhancedStepHueWithParams:(MTRColorControlClusterEnhancedStepHueParams *)params
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use enhancedStepHueWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)enhancedMoveToHueAndSaturationWithParams:(MTRColorControlClusterEnhancedMoveToHueAndSaturationParams *)params
+                                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                               completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use enhancedMoveToHueAndSaturationWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)colorLoopSetWithParams:(MTRColorControlClusterColorLoopSetParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use colorLoopSetWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)stopMoveStepWithParams:(MTRColorControlClusterStopMoveStepParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use stopMoveStepWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)moveColorTemperatureWithParams:(MTRColorControlClusterMoveColorTemperatureParams *)params
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                     completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use moveColorTemperatureWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)stepColorTemperatureWithParams:(MTRColorControlClusterStepColorTemperatureParams *)params
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                     completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use stepColorTemperatureWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterBallastConfiguration (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterIlluminanceMeasurement (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterTemperatureMeasurement (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterPressureMeasurement (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterFlowMeasurement (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterRelativeHumidityMeasurement (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterOccupancySensing (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterWakeOnLan (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterChannel (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)changeChannelWithParams:(MTRChannelClusterChangeChannelParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(void (^)(MTRChannelClusterChangeChannelResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use changeChannelWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)changeChannelByNumberWithParams:(MTRChannelClusterChangeChannelByNumberParams *)params
+                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                      completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use changeChannelByNumberWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)skipChannelWithParams:(MTRChannelClusterSkipChannelParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use skipChannelWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterTargetNavigator (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)navigateTargetWithParams:(MTRTargetNavigatorClusterNavigateTargetParams *)params
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+               completionHandler:(void (^)(MTRTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use navigateTargetWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterMediaPlayback (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)playWithParams:(MTRMediaPlaybackClusterPlayParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:
+            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use playWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)playWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use playWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)pauseWithParams:(MTRMediaPlaybackClusterPauseParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:
+            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use pauseWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)pauseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+              completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use pauseWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)stopPlaybackWithParams:(MTRMediaPlaybackClusterStopPlaybackParams * _Nullable)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use stopPlaybackWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)stopPlaybackWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                     completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use stopPlaybackWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)startOverWithParams:(MTRMediaPlaybackClusterStartOverParams * _Nullable)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:
+              (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use startOverWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)startOverWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                  completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use startOverWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)previousWithParams:(MTRMediaPlaybackClusterPreviousParams * _Nullable)params
+            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+         completionHandler:
+             (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use previousWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)previousWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                 completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use previousWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)nextWithParams:(MTRMediaPlaybackClusterNextParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:
+            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use nextWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)nextWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use nextWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)rewindWithParams:(MTRMediaPlaybackClusterRewindParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:
+            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use rewindWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)rewindWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use rewindWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)fastForwardWithParams:(MTRMediaPlaybackClusterFastForwardParams * _Nullable)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use fastForwardWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)fastForwardWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use fastForwardWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)skipForwardWithParams:(MTRMediaPlaybackClusterSkipForwardParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use skipForwardWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)skipBackwardWithParams:(MTRMediaPlaybackClusterSkipBackwardParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use skipBackwardWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)seekWithParams:(MTRMediaPlaybackClusterSeekParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:
+            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use seekWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterMediaInput (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)selectInputWithParams:(MTRMediaInputClusterSelectInputParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use selectInputWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)showInputStatusWithParams:(MTRMediaInputClusterShowInputStatusParams * _Nullable)params
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use showInputStatusWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)showInputStatusWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use showInputStatusWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)hideInputStatusWithParams:(MTRMediaInputClusterHideInputStatusParams * _Nullable)params
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use hideInputStatusWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)hideInputStatusWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use hideInputStatusWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)renameInputWithParams:(MTRMediaInputClusterRenameInputParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use renameInputWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterLowPower (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)sleepWithParams:(MTRLowPowerClusterSleepParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use sleepWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)sleepWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use sleepWithExpectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterKeypadInput (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)sendKeyWithParams:(MTRKeypadInputClusterSendKeyParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:
+            (void (^)(MTRKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use sendKeyWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterContentLauncher (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)launchContentWithParams:(MTRContentLauncherClusterLaunchContentParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use launchContentWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)launchURLWithParams:(MTRContentLauncherClusterLaunchURLParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:
+              (void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use launchURLWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterAudioOutput (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)selectOutputWithParams:(MTRAudioOutputClusterSelectOutputParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use selectOutputWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)renameOutputWithParams:(MTRAudioOutputClusterRenameOutputParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use renameOutputWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterApplicationLauncher (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                                NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use launchAppWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                              NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use stopAppWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                              NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use hideAppWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterApplicationBasic (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+@end
+
+@interface MTRClusterAccountLogin (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)getSetupPINWithParams:(MTRAccountLoginClusterGetSetupPINParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(void (^)(MTRAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use getSetupPINWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)loginWithParams:(MTRAccountLoginClusterLoginParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use loginWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)logoutWithParams:(MTRAccountLoginClusterLogoutParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use logoutWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)logoutWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use logoutWithExpectedValues:expectedValueIntervalMs:completion:");
+@end
+
+@interface MTRClusterElectricalMeasurement (Deprecated)
+
+- (nullable instancetype)initWithDevice:(MTRDevice *)device
+                               endpoint:(uint16_t)endpoint
+                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
+
+- (void)getProfileInfoCommandWithParams:(MTRElectricalMeasurementClusterGetProfileInfoCommandParams * _Nullable)params
+                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                      completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use getProfileInfoCommandWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)getProfileInfoCommandWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                              completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use getProfileInfoCommandWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)getMeasurementProfileCommandWithParams:(MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams *)params
+                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                             completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use getMeasurementProfileCommandWithParams:expectedValues:expectedValueIntervalMs:completion:");
+@end
+
 @interface MTRClusterTestCluster (Deprecated)
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                                endpoint:(uint16_t)endpoint
                                   queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
 
+- (void)testWithParams:(MTRTestClusterClusterTestParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)testWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+             completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)testNotHandledWithParams:(MTRTestClusterClusterTestNotHandledParams * _Nullable)params
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+               completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testNotHandledWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)testNotHandledWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                       completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testNotHandledWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)testSpecificWithParams:(MTRTestClusterClusterTestSpecificParams * _Nullable)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testSpecificWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)testSpecificWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                     completionHandler:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testSpecificWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)testUnknownCommandWithParams:(MTRTestClusterClusterTestUnknownCommandParams * _Nullable)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testUnknownCommandWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)testUnknownCommandWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                           completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testUnknownCommandWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)testAddArgumentsWithParams:(MTRTestClusterClusterTestAddArgumentsParams *)params
+                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                 completionHandler:(void (^)(MTRTestClusterClusterTestAddArgumentsResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testAddArgumentsWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)testSimpleArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleArgumentRequestParams *)params
+                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                          completionHandler:(void (^)(MTRTestClusterClusterTestSimpleArgumentResponseParams * _Nullable data,
+                                                NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testSimpleArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)testStructArrayArgumentRequestWithParams:(MTRTestClusterClusterTestStructArrayArgumentRequestParams *)params
+                                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                               completionHandler:
+                                   (void (^)(MTRTestClusterClusterTestStructArrayArgumentResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testStructArrayArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)testStructArgumentRequestWithParams:(MTRTestClusterClusterTestStructArgumentRequestParams *)params
+                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                          completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testStructArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)testNestedStructArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructArgumentRequestParams *)params
+                                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                                completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                      NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testNestedStructArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)testListStructArgumentRequestWithParams:(MTRTestClusterClusterTestListStructArgumentRequestParams *)params
+                                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                              completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                    NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testListStructArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)testListInt8UArgumentRequestWithParams:(MTRTestClusterClusterTestListInt8UArgumentRequestParams *)params
+                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                             completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                   NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testListInt8UArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)testNestedStructListArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructListArgumentRequestParams *)params
+                                       expectedValues:
+                                           (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                                    completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                          NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED(
+        "Please use testNestedStructListArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)testListNestedStructListArgumentRequestWithParams:
+            (MTRTestClusterClusterTestListNestedStructListArgumentRequestParams *)params
+                                           expectedValues:
+                                               (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                                        completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                              NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED(
+        "Please use testListNestedStructListArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)testListInt8UReverseRequestWithParams:(MTRTestClusterClusterTestListInt8UReverseRequestParams *)params
+                               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                            completionHandler:(void (^)(MTRTestClusterClusterTestListInt8UReverseResponseParams * _Nullable data,
+                                                  NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testListInt8UReverseRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)testEnumsRequestWithParams:(MTRTestClusterClusterTestEnumsRequestParams *)params
+                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                 completionHandler:(void (^)(MTRTestClusterClusterTestEnumsResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testEnumsRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)testNullableOptionalRequestWithParams:(MTRTestClusterClusterTestNullableOptionalRequestParams * _Nullable)params
+                               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                            completionHandler:(void (^)(MTRTestClusterClusterTestNullableOptionalResponseParams * _Nullable data,
+                                                  NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testNullableOptionalRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)testComplexNullableOptionalRequestWithParams:(MTRTestClusterClusterTestComplexNullableOptionalRequestParams *)params
+                                      expectedValues:
+                                          (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                                   completionHandler:
+                                       (void (^)(MTRTestClusterClusterTestComplexNullableOptionalResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED(
+        "Please use testComplexNullableOptionalRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)simpleStructEchoRequestWithParams:(MTRTestClusterClusterSimpleStructEchoRequestParams *)params
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                        completionHandler:(void (^)(MTRTestClusterClusterSimpleStructResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use simpleStructEchoRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)timedInvokeRequestWithParams:(MTRTestClusterClusterTimedInvokeRequestParams * _Nullable)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use timedInvokeRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)timedInvokeRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                           completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use timedInvokeRequestWithExpectedValues:expectedValueIntervalMs:completion:");
+- (void)testSimpleOptionalArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
+                                     expectedValues:
+                                         (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                                  completionHandler:(MTRStatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED(
+        "Please use testSimpleOptionalArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)testEmitTestEventRequestWithParams:(MTRTestClusterClusterTestEmitTestEventRequestParams *)params
+                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                         completionHandler:(void (^)(MTRTestClusterClusterTestEmitTestEventResponseParams * _Nullable data,
+                                               NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED("Please use testEmitTestEventRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void)testEmitTestFabricScopedEventRequestWithParams:(MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams *)params
+                                        expectedValues:
+                                            (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                                     completionHandler:
+                                         (void (^)(
+                                             MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
+                                             NSError * _Nullable error))completionHandler
+    MTR_NEWLY_DEPRECATED(
+        "Please use testEmitTestFabricScopedEventRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
 @end
 
 NS_ASSUME_NONNULL_END

@@ -174,7 +174,8 @@ private:
 #pragma mark Subscription and delegate handling
 
 // subscription intervals are in seconds
-#define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_DEFAULT (3600)
+#define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN (2)
+#define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX (60)
 
 - (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
 {
@@ -182,7 +183,7 @@ private:
 
     _weakDelegate = [MTRWeakReference weakReferenceWithObject:delegate];
     _delegateQueue = queue;
-    [self subscribeWithMinInterval:0 maxInterval:MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_DEFAULT];
+    [self setupSubscription];
 
     os_unfair_lock_unlock(&self->_lock);
 }
@@ -285,7 +286,7 @@ private:
     os_unfair_lock_unlock(&self->_lock);
 }
 
-- (void)subscribeWithMinInterval:(uint16_t)minInterval maxInterval:(uint16_t)maxInterval
+- (void)setupSubscription
 {
     // for now just subscribe once
     if (_subscriptionActive) {
@@ -295,90 +296,101 @@ private:
     _subscriptionActive = YES;
 
     [_deviceController getSessionForNode:_nodeID.unsignedLongLongValue
-                       completionHandler:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
-                           const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
-                           if (error != nil) {
-                               dispatch_async(self.queue, ^{
-                                   [self _handleSubscriptionError:error];
-                               });
-                               return;
-                           }
+                              completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
+                                  const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
+                                  if (error != nil) {
+                                      dispatch_async(self.queue, ^{
+                                          [self _handleSubscriptionError:error];
+                                      });
+                                      return;
+                                  }
 
-                           // Wildcard endpoint, cluster, attribute, event.
-                           auto attributePath = std::make_unique<AttributePathParams>();
-                           auto eventPath = std::make_unique<EventPathParams>();
-                           // We want to get event reports at the minInterval, not the maxInterval.
-                           eventPath->mIsUrgentEvent = true;
-                           ReadPrepareParams readParams(session.Value());
-                           readParams.mMinIntervalFloorSeconds = minInterval;
-                           readParams.mMaxIntervalCeilingSeconds = maxInterval;
-                           readParams.mpAttributePathParamsList = attributePath.get();
-                           readParams.mAttributePathParamsListSize = 1;
-                           readParams.mpEventPathParamsList = eventPath.get();
-                           readParams.mEventPathParamsListSize = 1;
-                           readParams.mKeepSubscriptions = true;
-                           attributePath.release();
-                           eventPath.release();
+                                  // Wildcard endpoint, cluster, attribute, event.
+                                  auto attributePath = std::make_unique<AttributePathParams>();
+                                  auto eventPath = std::make_unique<EventPathParams>();
+                                  // We want to get event reports at the minInterval, not the maxInterval.
+                                  eventPath->mIsUrgentEvent = true;
+                                  ReadPrepareParams readParams(session.Value());
 
-                           std::unique_ptr<SubscriptionCallback> callback;
-                           std::unique_ptr<ReadClient> readClient;
-                           std::unique_ptr<ClusterStateCache> attributeCache;
-                           callback = std::make_unique<SubscriptionCallback>(
-                               ^(NSArray * value) {
-                                   dispatch_async(self.queue, ^{
-                                       // OnAttributeData (after OnReportEnd)
-                                       [self _handleAttributeReport:value];
-                                   });
-                               },
-                               ^(NSArray * value) {
-                                   dispatch_async(self.queue, ^{
-                                       // OnEventReport (after OnReportEnd)
-                                       [self _handleEventReport:value];
-                                   });
-                               },
-                               ^(NSError * error) {
-                                   dispatch_async(self.queue, ^{
-                                       // OnError
-                                       [self _handleSubscriptionError:error];
-                                   });
-                               },
-                               ^(NSError * error, NSNumber * resubscriptionDelay) {
-                                   dispatch_async(self.queue, ^{
-                                       // OnResubscriptionNeeded
-                                       [self _handleResubscriptionNeeded];
-                                   });
-                               },
-                               ^(void) {
-                                   dispatch_async(self.queue, ^{
-                                       // OnSubscriptionEstablished
-                                       [self _handleSubscriptionEstablished];
-                                   });
-                               },
-                               ^(void) {
-                                   dispatch_async(self.queue, ^{
-                                       // OnDone
-                                       [self _handleSubscriptionReset];
-                                   });
-                               });
-                           readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
-                               callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+                                  readParams.mMinIntervalFloorSeconds = 0;
+                                  // Select a max interval based on the device's claimed idle sleep interval.
+                                  auto idleSleepInterval = std::chrono::duration_cast<System::Clock::Seconds32>(
+                                      session.Value()->GetRemoteMRPConfig().mIdleRetransTimeout);
+                                  if (idleSleepInterval.count() < MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN) {
+                                      idleSleepInterval = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN);
+                                  }
+                                  if (idleSleepInterval.count() > MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX) {
+                                      idleSleepInterval = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX);
+                                  }
+                                  readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>(idleSleepInterval.count());
 
-                           // SendAutoResubscribeRequest cleans up the params, even on failure.
-                           CHIP_ERROR err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+                                  readParams.mpAttributePathParamsList = attributePath.get();
+                                  readParams.mAttributePathParamsListSize = 1;
+                                  readParams.mpEventPathParamsList = eventPath.get();
+                                  readParams.mEventPathParamsListSize = 1;
+                                  readParams.mKeepSubscriptions = true;
+                                  attributePath.release();
+                                  eventPath.release();
 
-                           if (err != CHIP_NO_ERROR) {
-                               dispatch_async(self.queue, ^{
-                                   [self _handleSubscriptionError:[MTRError errorForCHIPErrorCode:err]];
-                               });
+                                  std::unique_ptr<SubscriptionCallback> callback;
+                                  std::unique_ptr<ReadClient> readClient;
+                                  std::unique_ptr<ClusterStateCache> attributeCache;
+                                  callback = std::make_unique<SubscriptionCallback>(
+                                      ^(NSArray * value) {
+                                          dispatch_async(self.queue, ^{
+                                              // OnAttributeData (after OnReportEnd)
+                                              [self _handleAttributeReport:value];
+                                          });
+                                      },
+                                      ^(NSArray * value) {
+                                          dispatch_async(self.queue, ^{
+                                              // OnEventReport (after OnReportEnd)
+                                              [self _handleEventReport:value];
+                                          });
+                                      },
+                                      ^(NSError * error) {
+                                          dispatch_async(self.queue, ^{
+                                              // OnError
+                                              [self _handleSubscriptionError:error];
+                                          });
+                                      },
+                                      ^(NSError * error, NSNumber * resubscriptionDelay) {
+                                          dispatch_async(self.queue, ^{
+                                              // OnResubscriptionNeeded
+                                              [self _handleResubscriptionNeeded];
+                                          });
+                                      },
+                                      ^(void) {
+                                          dispatch_async(self.queue, ^{
+                                              // OnSubscriptionEstablished
+                                              [self _handleSubscriptionEstablished];
+                                          });
+                                      },
+                                      ^(void) {
+                                          dispatch_async(self.queue, ^{
+                                              // OnDone
+                                              [self _handleSubscriptionReset];
+                                          });
+                                      });
+                                  readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
+                                      callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
 
-                               return;
-                           }
+                                  // SendAutoResubscribeRequest cleans up the params, even on failure.
+                                  CHIP_ERROR err = readClient->SendAutoResubscribeRequest(std::move(readParams));
 
-                           // Callback and ReadClient will be deleted when OnDone is called or an error is
-                           // encountered.
-                           callback->AdoptReadClient(std::move(readClient));
-                           callback.release();
-                       }];
+                                  if (err != CHIP_NO_ERROR) {
+                                      dispatch_async(self.queue, ^{
+                                          [self _handleSubscriptionError:[MTRError errorForCHIPErrorCode:err]];
+                                      });
+
+                                      return;
+                                  }
+
+                                  // Callback and ReadClient will be deleted when OnDone is called or an error is
+                                  // encountered.
+                                  callback->AdoptReadClient(std::move(readClient));
+                                  callback.release();
+                              }];
 }
 
 #pragma mark Device Interactions
@@ -397,7 +409,7 @@ private:
                               clusterID:clusterID
                             attributeID:attributeID
                                  params:params
-                            clientQueue:self.queue
+                                  queue:self.queue
                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                  if (values) {
                                      // Since the format is the same data-value dictionary, this looks like an attribute
@@ -440,12 +452,12 @@ private:
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [self newBaseDevice];
         [baseDevice
-            writeAttributeWithEndpointId:endpointID
-                               clusterId:clusterID
-                             attributeId:attributeID
+            writeAttributeWithEndpointID:endpointID
+                               clusterID:clusterID
+                             attributeID:attributeID
                                    value:value
                        timedWriteTimeout:timeout
-                             clientQueue:self.queue
+                                   queue:self.queue
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                   if (values) {
                                       [self _handleAttributeReport:values];
@@ -472,7 +484,7 @@ private:
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
-                        clientQueue:(dispatch_queue_t)clientQueue
+                              queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
 {
     if (timeout) {
@@ -487,14 +499,14 @@ private:
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [self newBaseDevice];
         [baseDevice
-            invokeCommandWithEndpointId:endpointID
-                              clusterId:clusterID
-                              commandId:commandID
+            invokeCommandWithEndpointID:endpointID
+                              clusterID:clusterID
+                              commandID:commandID
                           commandFields:commandFields
                      timedInvokeTimeout:timeout
-                            clientQueue:self.queue
+                                  queue:self.queue
                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                 dispatch_async(clientQueue, ^{
+                                 dispatch_async(queue, ^{
                                      completion(values, error);
                                  });
                                  [workItem endWork];
@@ -558,7 +570,7 @@ private:
         NSDictionary * cachedAttributeDataValue = _readCache[attributePath];
         if (cachedAttributeDataValue
             && ![self _attributeDataValue:attributeDataValue isEqualToDataValue:cachedAttributeDataValue]) {
-            [attributesToReport addObject:cachedAttributeDataValue];
+            [attributesToReport addObject:@{ MTRAttributePathKey : attributePath, MTRDataKey : cachedAttributeDataValue }];
         }
 
         _expectedValueCache[attributePath] = nil;
@@ -746,6 +758,27 @@ private:
 + (instancetype)deviceWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController
 {
     return [self deviceWithNodeID:@(nodeID) controller:deviceController];
+}
+
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
+                      commandFields:(id)commandFields
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
+                        clientQueue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion
+{
+    [self invokeCommandWithEndpointID:endpointID
+                            clusterID:clusterID
+                            commandID:commandID
+                        commandFields:commandFields
+                       expectedValues:expectedValues
+                expectedValueInterval:expectedValueInterval
+                   timedInvokeTimeout:timeout
+                                queue:queue
+                           completion:completion];
 }
 
 @end

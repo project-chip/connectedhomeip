@@ -75,6 +75,8 @@ exclude:
     - "examples/platform/nxp/k32w/k32w0/scripts/demo_generated_certs/**/*"
     - "integrations/cloudbuild/*.yaml" # uglier long command line content
     - "scripts/run_codegen_targets.sh" # shellharden breaks for loops over command outputs
+    - "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.h" # Too big?
+    - "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.mm" # Too big?
 
 
 changed_paths:
