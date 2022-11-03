@@ -80,7 +80,7 @@ Matter aims to build a universal IPv6-based communication protocol for smart hom
 
 
 
-The architecture is divided into layers to help separate the different responsibilities and introduce a  good level of encapsulation amongst the various pieces of the protocol stack. The vast majority of interactions flow through the stack captured in the following Figure:
+The architecture is divided into layers to help separate the different responsibilities and introduce a  good level of encapsulation among the various pieces of the protocol stack. The vast majority of interactions flow through the stack captured in the following Figure:
 
 
 ![Matter Stack Architecture](docs/images/Matter_Layered_Arch.png)
