@@ -86,7 +86,7 @@ public:
             {
                 uint16_t size = static_cast<uint16_t>(sizeof(buffer));
                 err           = mPersistentStorage->SyncGetKeyValue(
-                              DefaultStorageKeyAllocator::AccessControlAclEntry(fabric, index + 1).KeyName(), buffer, size);
+                    DefaultStorageKeyAllocator::AccessControlAclEntry(fabric, index + 1).KeyName(), buffer, size);
                 if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
                 {
                     break;
