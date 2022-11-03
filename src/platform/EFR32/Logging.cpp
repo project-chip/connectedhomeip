@@ -377,7 +377,7 @@ extern "C" void debugHardfault(uint32_t * sp)
     snprintf(formattedMsg, sizeof formattedMsg, "PSR         0x%08lx\n", psr);
     PrintLog(formattedMsg);
 
-    while (1)
+    while (true)
         ;
 }
 

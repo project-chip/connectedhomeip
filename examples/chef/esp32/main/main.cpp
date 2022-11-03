@@ -209,7 +209,7 @@ extern "C" void app_main(void)
     xTaskCreate(&chip_shell_task, "chip_shell", 8192, NULL, 5, NULL);
 #endif /* CONFIG_ENABLE_CHIP_SHELL */
 
-    while (1)
+    while (true)
     {
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }

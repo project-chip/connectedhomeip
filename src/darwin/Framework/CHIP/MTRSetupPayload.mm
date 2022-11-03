@@ -194,7 +194,7 @@
         // again.  The chance that this loop does not terminate in a reasonable
         // amount of time is astronomically low, assuming arc4random_uniform is not
         // broken.
-    } while (1);
+    } while (true);
 
     // Not reached.
     return @(chip::kSetupPINCodeUndefinedValue);

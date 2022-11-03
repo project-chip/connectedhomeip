@@ -754,7 +754,7 @@ void * bridge_polling_thread(void * context)
 {
     bool light1_added = true;
     bool light2_added = false;
-    while (1)
+    while (true)
     {
         if (kbhit())
         {

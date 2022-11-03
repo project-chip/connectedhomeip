@@ -115,7 +115,7 @@ int AppTask::StartAppTask()
     if (sAppEventQueue == NULL)
     {
         PLAT_LOG("Failed to allocate app event queue");
-        while (1)
+        while (true)
             ;
     }
 
@@ -124,7 +124,7 @@ int AppTask::StartAppTask()
         pdPASS)
     {
         PLAT_LOG("Failed to create app task");
-        while (1)
+        while (true)
             ;
     }
     return ret;
@@ -144,7 +144,7 @@ int AppTask::Init()
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("PlatformMgr().InitChipStack() failed");
-        while (1)
+        while (true)
             ;
     }
 
@@ -152,7 +152,7 @@ int AppTask::Init()
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ThreadStackMgr().InitThreadStack() failed");
-        while (1)
+        while (true)
             ;
     }
 
@@ -166,7 +166,7 @@ int AppTask::Init()
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
-        while (1)
+        while (true)
             ;
     }
 
@@ -174,7 +174,7 @@ int AppTask::Init()
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ThreadStackMgr().StartThreadTask() failed");
-        while (1)
+        while (true)
             ;
     }
 
@@ -238,7 +238,7 @@ int AppTask::Init()
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("CHIPDeviceManager::Init() failed: %s", ErrorStr(ret));
-        while (1)
+        while (true)
             ;
     }
 
@@ -251,7 +251,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     sAppTask.Init();
 
-    while (1)
+    while (true)
     {
         /* Task pend until we have stuff to do */
         if (xQueueReceive(sAppEventQueue, &event, portMAX_DELAY) == pdTRUE)

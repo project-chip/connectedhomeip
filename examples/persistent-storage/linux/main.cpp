@@ -41,7 +41,7 @@ int main(int argc, char * argv[])
     printf("chip-linux-persitent-storage-example starting\n");
     printf("=============================================\n");
 
-    while (1)
+    while (true)
     {
         printf("Running Tests:\n");
         chip::RunKvsTest();
