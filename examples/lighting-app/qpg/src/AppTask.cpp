@@ -585,25 +585,34 @@ void AppTask::UpdateClusterState(void)
 
 void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
 {
-    if (event->Type == DeviceEventType::kServiceProvisioningChange)
+    switch(event->Type)
     {
-        sIsThreadProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
-    }
-    else if (event->Type == DeviceEventType::kThreadConnectivityChange)
-    {
-        sIsThreadEnabled = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
-    }
-    else if (event->Type == DeviceEventType::kCHIPoBLEConnectionEstablished)
-    {
-        sHaveBLEConnections = true;
-    } 
-    else if (event->Type == DeviceEventType::kCHIPoBLEConnectionClosed)
-    {
-        sHaveBLEConnections = false;
-    } 
-    else
-    {
-        // we don't need to support any more event types for now so we silently ignore them
+        case DeviceEventType::kServiceProvisioningChange:
+        {
+            sIsThreadProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
+            break;
+        }
+
+        case DeviceEventType::kThreadConnectivityChange:
+        {
+            sIsThreadEnabled = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
+            break;
+        }
+
+        case DeviceEventType::kCHIPoBLEConnectionEstablished:
+        {
+            sHaveBLEConnections = true;
+            break;
+        }
+
+        case DeviceEventType::kCHIPoBLEConnectionClosed:
+        {
+            sHaveBLEConnections = false;
+            break;
+        }
+
+        default:
+        break;
     }
 
     // If system has "full connectivity", keep the LED On constantly.
