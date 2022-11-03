@@ -293,7 +293,7 @@ bool NodeDataIsEmpty(const DiscoveredNodeData & node)
     {
         return false;
     }
-    for (unsigned char id : node.commissionData.rotatingId)
+    for (uint8_t id : node.commissionData.rotatingId)
     {
         if (id != 0)
         {

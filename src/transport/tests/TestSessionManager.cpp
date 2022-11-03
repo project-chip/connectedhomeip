@@ -816,7 +816,7 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
                 ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex));
             NL_TEST_ASSERT(inSuite, handle.HasValue());
             auto potentialCollision = handle.Value()->AsSecureSession()->GetLocalSessionId();
-            for (unsigned short sessionId : sessionIds)
+            for (uint16_t sessionId : sessionIds)
             {
                 NL_TEST_ASSERT(inSuite, potentialCollision != sessionId);
             }

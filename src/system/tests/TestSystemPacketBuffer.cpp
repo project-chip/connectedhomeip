@@ -1817,7 +1817,7 @@ void PacketBufferTest::CheckHandleCloneData(nlTestSuite * inSuite, void * inCont
     NL_TEST_ASSERT(inSuite, test->mContext == theContext);
 
     uint8_t lPayload[2 * PacketBuffer::kMaxSizeWithoutReserve];
-    for (unsigned char & payload : lPayload)
+    for (uint8_t & payload : lPayload)
     {
         payload = static_cast<uint8_t>(random());
     }

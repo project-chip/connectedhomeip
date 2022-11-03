@@ -46,11 +46,11 @@ DLL_EXPORT OID ParseObjectID(const uint8_t * encodedOID, uint16_t encodedOIDLen)
         return kOID_NotSpecified;
     }
 
-    for (const auto & oid : sOIDTable)
+    for (const auto & tableEntry : sOIDTable)
     {
-        if (encodedOIDLen == oid.EncodedOIDLen && memcmp(encodedOID, oid.EncodedOID, encodedOIDLen) == 0)
+        if (encodedOIDLen == tableEntry.EncodedOIDLen && memcmp(encodedOID, tableEntry.EncodedOID, encodedOIDLen) == 0)
         {
-            return oid.EnumVal;
+            return tableEntry.EnumVal;
         }
     }
 
