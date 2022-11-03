@@ -1,19 +1,9 @@
 #!/usr/bin/env bash
 
 #
-# Copyright (c) 2022 Project CHIP Authors
+# SPDX-FileCopyrightText: (c) 2022 Project CHIP Authors
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# SPDX-License-Identifier: Apache-2.0
 #
 
 set -e
@@ -22,16 +12,16 @@ _install_lcov() {
     if ! lcov --version >/dev/null 2>&1; then
         echo "lcov not installed. Installing..."
         case "$(uname)" in
-            "Darwin")
-                brew install lcov
-                ;;
-            "Linux")
-                sudo apt-get update
-                sudo apt-get install -y lcov
-                ;;
-            *)
-                die
-                ;;
+        "Darwin")
+            brew install lcov
+            ;;
+        "Linux")
+            sudo apt-get update
+            sudo apt-get install -y lcov
+            ;;
+        *)
+            die
+            ;;
         esac
     fi
 }
@@ -77,30 +67,30 @@ file_name=${0##*/}
 
 for i in "$@"; do
     case $i in
-        -h | --help)
-            help
-            exit 1
-            ;;
-        -c=* | --code=*)
-            CODE="${i#*=}"
-            shift
-            ;;
-        -t=* | --tests=*)
-            TESTS="${i#*=}"
-            shift
-            ;;
-        -o=* | --output_root=*)
-            OUTPUT_ROOT="${i#*=}"
-            COVERAGE_ROOT="$OUTPUT_ROOT/coverage"
-            skip_gn=true
-            shift
-            ;;
-        *)
-            echo "Unknown Option \"$1\""
-            echo
-            help
-            exit 1
-            ;;
+    -h | --help)
+        help
+        exit 1
+        ;;
+    -c=* | --code=*)
+        CODE="${i#*=}"
+        shift
+        ;;
+    -t=* | --tests=*)
+        TESTS="${i#*=}"
+        shift
+        ;;
+    -o=* | --output_root=*)
+        OUTPUT_ROOT="${i#*=}"
+        COVERAGE_ROOT="$OUTPUT_ROOT/coverage"
+        skip_gn=true
+        shift
+        ;;
+    *)
+        echo "Unknown Option \"$1\""
+        echo
+        help
+        exit 1
+        ;;
     esac
 done
 
