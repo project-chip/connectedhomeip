@@ -24,9 +24,9 @@
 #include "LockManager.h"
 #include <platform/CHIPDeviceLayer.h>
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/ConcreteAttributePath.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -60,36 +60,31 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
 {
     EmberAfStatus status;
 
-    status = DoorLock::Attributes::LockType::Set
-                (endpoint, DlLockType::kDeadBolt);
+    status = DoorLock::Attributes::LockType::Set(endpoint, DlLockType::kDeadBolt);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to set LockType %x", status);
     }
 
-    status = DoorLock::Attributes::NumberOfTotalUsersSupported::Set
-                (endpoint, CONFIG_LOCK_NUM_USERS);
+    status = DoorLock::Attributes::NumberOfTotalUsersSupported::Set(endpoint, CONFIG_LOCK_NUM_USERS);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to set number of users %x", status);
     }
 
-    status = DoorLock::Attributes::NumberOfPINUsersSupported::Set
-                (endpoint, CONFIG_LOCK_NUM_USERS);
+    status = DoorLock::Attributes::NumberOfPINUsersSupported::Set(endpoint, CONFIG_LOCK_NUM_USERS);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to set number of PIN users %x", status);
     }
 
-    status = DoorLock::Attributes::NumberOfRFIDUsersSupported::Set
-                (endpoint, 0);
+    status = DoorLock::Attributes::NumberOfRFIDUsersSupported::Set(endpoint, 0);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to set number of RFID users %x", status);
     }
 
-    status = DoorLock::Attributes::NumberOfCredentialsSupportedPerUser::Set
-                (endpoint, CONFIG_LOCK_NUM_CREDENTIALS_PER_USER);
+    status = DoorLock::Attributes::NumberOfCredentialsSupportedPerUser::Set(endpoint, CONFIG_LOCK_NUM_CREDENTIALS_PER_USER);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to set number of credentials per user %x", status);
