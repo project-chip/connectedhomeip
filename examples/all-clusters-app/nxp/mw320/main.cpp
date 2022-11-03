@@ -1027,7 +1027,7 @@ void task_main(void * param)
         }
     }
 
-    while (1)
+    while (true)
     {
         /* wait for interface up */
         os_thread_sleep(os_msec_to_ticks(5000));
@@ -1131,7 +1131,7 @@ static void rst_args_lt(System::Layer * aSystemLayer, void * aAppState)
 
 void task_test_main(void * param)
 {
-    while (1)
+    while (true)
     {
         /* wait for interface up */
         os_thread_sleep(os_msec_to_ticks(500));

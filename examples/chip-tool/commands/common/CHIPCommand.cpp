@@ -48,8 +48,7 @@ const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore = null
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
 
 namespace {
-const CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath,
-                                          const chip::Credentials::AttestationTrustStore ** trustStore)
+CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const chip::Credentials::AttestationTrustStore ** trustStore)
 {
     if (paaTrustStorePath == nullptr)
     {

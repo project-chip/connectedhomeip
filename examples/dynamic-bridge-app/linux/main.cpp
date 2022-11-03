@@ -204,7 +204,7 @@ int AddDeviceEndpoint(Device * dev)
         {
             gDevices[index] = dev;
             EmberAfStatus ret;
-            while (1)
+            while (true)
             {
                 // Todo: Update this to schedule the work rather than use this lock
                 dev->SetEndpointId(gCurrentEndpointId);

@@ -167,7 +167,7 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
         {
             gDevices[index] = dev;
             EmberAfStatus ret;
-            while (1)
+            while (true)
             {
                 dev->SetEndpointId(gCurrentEndpointId);
                 ret =

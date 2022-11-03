@@ -38,7 +38,7 @@ extern "C" void app_main()
     ESP_LOGI(TAG, "=============================================");
 
     // Run tests
-    while (1)
+    while (true)
     {
         ESP_LOGI(TAG, "Running Tests:");
 
