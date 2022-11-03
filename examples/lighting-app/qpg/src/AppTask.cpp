@@ -585,8 +585,6 @@ void AppTask::UpdateClusterState(void)
 
 void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
 {
-    ChipLogProgress(NotSpecified, "MatterEventHandler: %x", event->Type);
-
     if (event->Type == DeviceEventType::kServiceProvisioningChange)
     {
         sIsThreadProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
