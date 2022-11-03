@@ -35,12 +35,12 @@ constexpr TLV::Tag SimpleSessionResumptionStorage::kResumptionIdTag;
 constexpr TLV::Tag SimpleSessionResumptionStorage::kSharedSecretTag;
 constexpr TLV::Tag SimpleSessionResumptionStorage::kCATTag;
 
-StorageKey SimpleSessionResumptionStorage::GetStorageKey(const ScopedNodeId & node)
+StorageKeyName SimpleSessionResumptionStorage::GetStorageKey(const ScopedNodeId & node)
 {
     return DefaultStorageKeyAllocator::FabricSession(node.GetFabricIndex(), node.GetNodeId());
 }
 
-StorageKey SimpleSessionResumptionStorage::GetStorageKey(ConstResumptionIdView resumptionId)
+StorageKeyName SimpleSessionResumptionStorage::GetStorageKey(ConstResumptionIdView resumptionId)
 {
     char resumptionIdBase64[BASE64_ENCODED_LEN(resumptionId.size()) + 1];
     auto len                = Base64Encode(resumptionId.data(), resumptionId.size(), resumptionIdBase64);
