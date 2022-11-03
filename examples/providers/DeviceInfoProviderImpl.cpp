@@ -145,13 +145,15 @@ CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t in
     ReturnErrorOnFailure(writer.PutString(kLabelValueTag, userLabel.value));
     ReturnErrorOnFailure(writer.EndContainer(outerType));
 
-    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::UserLabelIndexKey(endpoint, static_cast<uint32_t>(index)), buf,
-                                     static_cast<uint16_t>(writer.GetLengthWritten()));
+    return mStorage->SyncSetKeyValue(
+        DefaultStorageKeyAllocator::UserLabelIndexKey(endpoint, static_cast<uint32_t>(index)).KeyName(), buf,
+        static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
 CHIP_ERROR DeviceInfoProviderImpl::DeleteUserLabelAt(EndpointId endpoint, size_t index)
 {
-    return mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::UserLabelIndexKey(endpoint, static_cast<uint32_t>(index)));
+    return mStorage->SyncDeleteKeyValue(
+        DefaultStorageKeyAllocator::UserLabelIndexKey(endpoint, static_cast<uint32_t>(index)).KeyName());
 }
 
 DeviceInfoProvider::UserLabelIterator * DeviceInfoProviderImpl::IterateUserLabel(EndpointId endpoint)
@@ -180,7 +182,7 @@ bool DeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
     uint16_t len = static_cast<uint16_t>(sizeof(buf));
 
     err = mProvider.mStorage->SyncGetKeyValue(
-        DefaultStorageKeyAllocator::UserLabelIndexKey(mEndpoint, static_cast<uint32_t>(mIndex)), buf, len);
+        DefaultStorageKeyAllocator::UserLabelIndexKey(mEndpoint, static_cast<uint32_t>(mIndex)).KeyName(), buf, len);
     VerifyOrReturnError(err == CHIP_NO_ERROR, false);
 
     TLV::ContiguousBufferTLVReader reader;

@@ -260,7 +260,7 @@ CHIP_ERROR BindingTable::RemoveAt(Iterator & iter)
     if (error == CHIP_NO_ERROR)
     {
         // The remove is considered "submitted" once the change on prev node takes effect
-        if (mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::BindingTableEntry(iter.mIndex)) != CHIP_NO_ERROR)
+        if (mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::BindingTableEntry(iter.mIndex).KeyName()) != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Failed to remove binding table entry %u from storage", iter.mIndex);
         }

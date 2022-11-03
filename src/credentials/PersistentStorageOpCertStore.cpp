@@ -70,7 +70,7 @@ bool StorageHasCertificate(PersistentStorageDelegate * storage, FabricIndex fabr
     uint8_t placeHolderCertBuffer[kMaxCHIPCertLength];
 
     uint16_t keySize = sizeof(placeHolderCertBuffer);
-    CHIP_ERROR err   = storage->SyncGetKeyValue(storageKey, &placeHolderCertBuffer[0], keySize);
+    CHIP_ERROR err   = storage->SyncGetKeyValue(storageKey.KeyName(), &placeHolderCertBuffer[0], keySize);
 
     return (err == CHIP_NO_ERROR);
 }
@@ -85,7 +85,7 @@ CHIP_ERROR LoadCertFromStorage(PersistentStorageDelegate * storage, FabricIndex 
     }
 
     uint16_t keySize = static_cast<uint16_t>(outCert.size());
-    CHIP_ERROR err   = storage->SyncGetKeyValue(storageKey, outCert.data(), keySize);
+    CHIP_ERROR err   = storage->SyncGetKeyValue(storageKey.KeyName(), outCert.data(), keySize);
 
     // Not finding an ICAC means we don't have one, so adjust to meet the API contract, where
     // outCert.empty() will be true;
@@ -121,7 +121,7 @@ CHIP_ERROR SaveCertToStorage(PersistentStorageDelegate * storage, FabricIndex fa
     // If provided an empty ICAC, we delete the ICAC key previously used. If not there, it's OK
     if ((element == CertChainElement::kIcac) && (cert.empty()))
     {
-        CHIP_ERROR err = storage->SyncDeleteKeyValue(storageKey);
+        CHIP_ERROR err = storage->SyncDeleteKeyValue(storageKey.KeyName());
         if ((err == CHIP_NO_ERROR) || (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND))
         {
             return CHIP_NO_ERROR;
@@ -129,7 +129,7 @@ CHIP_ERROR SaveCertToStorage(PersistentStorageDelegate * storage, FabricIndex fa
         return err;
     }
 
-    return storage->SyncSetKeyValue(storageKey, cert.data(), static_cast<uint16_t>(cert.size()));
+    return storage->SyncSetKeyValue(storageKey.KeyName(), cert.data(), static_cast<uint16_t>(cert.size()));
 }
 
 CHIP_ERROR DeleteCertFromStorage(PersistentStorageDelegate * storage, FabricIndex fabricIndex, CertChainElement element)
@@ -139,7 +139,7 @@ CHIP_ERROR DeleteCertFromStorage(PersistentStorageDelegate * storage, FabricInde
     {
         return CHIP_ERROR_INTERNAL;
     }
-    return storage->SyncDeleteKeyValue(storageKey);
+    return storage->SyncDeleteKeyValue(storageKey.KeyName());
 }
 
 } // namespace
