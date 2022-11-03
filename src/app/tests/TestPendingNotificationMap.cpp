@@ -80,10 +80,10 @@ void TestAddRemove(nlTestSuite * aSuite, void * aContext)
     pendingMap.RemoveAllEntriesForNode(chip::ScopedNodeId());
     uint8_t expectedEntryIndecies[] = { 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
     iter                            = pendingMap.begin();
-    for (unsigned char expectedEntryIndecie : expectedEntryIndecies)
+    for (unsigned char ch : expectedEntryIndecies)
     {
         PendingNotificationEntry entry = *iter;
-        NL_TEST_ASSERT(aSuite, entry.mBindingEntryId == expectedEntryIndecie);
+        NL_TEST_ASSERT(aSuite, entry.mBindingEntryId == ch);
         ++iter;
     }
     NL_TEST_ASSERT(aSuite, iter == pendingMap.end());

@@ -42,9 +42,9 @@ bool Command::InitArguments(int argc, char ** argv)
     size_t argvExtraArgsCount = (size_t) argc;
     size_t mandatoryArgsCount = 0;
     size_t optionalArgsCount  = 0;
-    for (auto & mArg : mArgs)
+    for (auto & arg : mArgs)
     {
-        if (mArg.isOptional())
+        if (arg.isOptional())
         {
             optionalArgsCount++;
         }
@@ -55,7 +55,7 @@ bool Command::InitArguments(int argc, char ** argv)
         }
     }
 
-    VerifyOrExit((size_t)(argc) >= mandatoryArgsCount && (argvExtraArgsCount == 0 || (argvExtraArgsCount && optionalArgsCount)),
+    VerifyOrExit((size_t) (argc) >= mandatoryArgsCount && (argvExtraArgsCount == 0 || (argvExtraArgsCount && optionalArgsCount)),
                  ChipLogError(chipTool, "InitArgs: Wrong arguments number: %d instead of %u", argc,
                               static_cast<unsigned int>(mandatoryArgsCount)));
 
@@ -877,7 +877,7 @@ void ResetOptionalArg(const Argument & arg)
 
 void Command::ResetArguments()
 {
-    for (auto arg : mArgs)
+    for (const auto & arg : mArgs)
     {
         const ArgumentType type = arg.type;
         if (arg.isOptional())
