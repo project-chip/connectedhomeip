@@ -52,7 +52,7 @@ CHIP_ERROR LastKnownGoodTime::LoadLastKnownGoodChipEpochTime(System::Clock::Seco
     uint8_t buf[LastKnownGoodTimeTLVMaxSize()];
     uint16_t size = sizeof(buf);
     uint32_t seconds;
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::LastKnownGoodTimeKey(), buf, size));
+    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::LastKnownGoodTimeKey().KeyName(), buf, size));
     TLV::ContiguousBufferTLVReader reader;
     reader.Init(buf, size);
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
@@ -75,8 +75,8 @@ CHIP_ERROR LastKnownGoodTime::StoreLastKnownGoodChipEpochTime(System::Clock::Sec
     ReturnErrorOnFailure(writer.EndContainer(outerType));
     const auto length = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(length), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorOnFailure(
-        mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::LastKnownGoodTimeKey(), buf, static_cast<uint16_t>(length)));
+    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::LastKnownGoodTimeKey().KeyName(), buf,
+                                                   static_cast<uint16_t>(length)));
     return CHIP_NO_ERROR;
 }
 

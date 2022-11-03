@@ -96,7 +96,7 @@ bool ESP32DeviceInfoProvider::FixedLabelIteratorImpl::Next(FixedLabelType & outp
 CHIP_ERROR ESP32DeviceInfoProvider::SetUserLabelLength(EndpointId endpoint, size_t val)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::UserLabelLengthKey(endpoint), &val,
+    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::UserLabelLengthKey(endpoint).KeyName(), &val,
                                      static_cast<uint16_t>(sizeof(val)));
 }
 
@@ -104,7 +104,7 @@ CHIP_ERROR ESP32DeviceInfoProvider::GetUserLabelLength(EndpointId endpoint, size
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     uint16_t len = static_cast<uint16_t>(sizeof(val));
-    return mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::UserLabelLengthKey(endpoint), &val, len);
+    return mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::UserLabelLengthKey(endpoint).KeyName(), &val, len);
 }
 
 CHIP_ERROR ESP32DeviceInfoProvider::SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel)

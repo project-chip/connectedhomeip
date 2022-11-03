@@ -71,8 +71,8 @@ CHIP_ERROR SimpleSessionResumptionStorage::SaveIndex(const SessionIndex & index)
     const auto len = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    ReturnErrorOnFailure(
-        mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::SessionResumptionIndex(), buf.data(), static_cast<uint16_t>(len)));
+    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::SessionResumptionIndex().KeyName(), buf.data(),
+                                                   static_cast<uint16_t>(len)));
 
     return CHIP_NO_ERROR;
 }
@@ -82,7 +82,7 @@ CHIP_ERROR SimpleSessionResumptionStorage::LoadIndex(SessionIndex & index)
     std::array<uint8_t, MaxIndexSize()> buf;
     uint16_t len = static_cast<uint16_t>(buf.size());
 
-    if (mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::SessionResumptionIndex(), buf.data(), len) != CHIP_NO_ERROR)
+    if (mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::SessionResumptionIndex().KeyName(), buf.data(), len) != CHIP_NO_ERROR)
     {
         index.mSize = 0;
         return CHIP_NO_ERROR;

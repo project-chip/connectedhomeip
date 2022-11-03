@@ -44,8 +44,6 @@ public:
     bool IsUninitialized() const { return mKeyNameBuffer[0] == 0; }
     bool operator!() const { return IsUninitialized(); }
 
-    operator const char *() const { return mKeyNameBuffer; }
-
     static StorageKeyName FromConst(const char * value)
     {
         StorageKeyName result;
