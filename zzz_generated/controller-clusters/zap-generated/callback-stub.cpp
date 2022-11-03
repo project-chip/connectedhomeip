@@ -158,7 +158,7 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_ON_OFF_CLUSTER_ID:
         emberAfOnOffClusterInitCallback(endpoint);
         break;
-    case ZCL_ON_OFF_SWITCH_CONFIG_CLUSTER_ID:
+    case ZCL_ON_OFF_SWITCH_CONFIGURATION_CLUSTER_ID:
         emberAfOnOffSwitchConfigurationClusterInitCallback(endpoint);
         break;
     case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:

@@ -48,10 +48,11 @@
 #define CHIP_PRINTCLUSTER_ON_OFF_CLUSTER
 #endif
 
-#if defined(ZCL_USING_ON_OFF_SWITCH_CONFIG_CLUSTER_SERVER) || defined(ZCL_USING_ON_OFF_SWITCH_CONFIG_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIG_CLUSTER { ZCL_ON_OFF_SWITCH_CONFIG_CLUSTER_ID, "On/off Switch Configuration" },
+#if defined(ZCL_USING_ON_OFF_SWITCH_CONFIGURATION_CLUSTER_SERVER) || defined(ZCL_USING_ON_OFF_SWITCH_CONFIGURATION_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIGURATION_CLUSTER                                                                      \
+    { ZCL_ON_OFF_SWITCH_CONFIGURATION_CLUSTER_ID, "On/off Switch Configuration" },
 #else
-#define CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIG_CLUSTER
+#define CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIGURATION_CLUSTER
 #endif
 
 #if defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_CLIENT)
@@ -463,7 +464,7 @@
     CHIP_PRINTCLUSTER_GROUPS_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_SCENES_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_ON_OFF_CLUSTER                                                                                               \
-    CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIG_CLUSTER                                                                                 \
+    CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIGURATION_CLUSTER                                                                          \
     CHIP_PRINTCLUSTER_LEVEL_CONTROL_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_BINARY_INPUT_BASIC_CLUSTER                                                                                   \
     CHIP_PRINTCLUSTER_PWM_CLUSTER                                                                                                  \

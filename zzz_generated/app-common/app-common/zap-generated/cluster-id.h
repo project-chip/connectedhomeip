@@ -35,7 +35,7 @@ static constexpr chip::ClusterId ZCL_SCENES_CLUSTER_ID = 0x0005;
 static constexpr chip::ClusterId ZCL_ON_OFF_CLUSTER_ID = 0x0006;
 
 // Definitions for cluster: On/off Switch Configuration
-static constexpr chip::ClusterId ZCL_ON_OFF_SWITCH_CONFIG_CLUSTER_ID = 0x0007;
+static constexpr chip::ClusterId ZCL_ON_OFF_SWITCH_CONFIGURATION_CLUSTER_ID = 0x0007;
 
 // Definitions for cluster: Level Control
 static constexpr chip::ClusterId ZCL_LEVEL_CONTROL_CLUSTER_ID = 0x0008;
