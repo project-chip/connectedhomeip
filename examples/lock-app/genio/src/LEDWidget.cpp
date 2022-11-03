@@ -22,6 +22,9 @@
 
 #include "LEDWidget.h"
 
+#define MIN_LVL (1)
+#define MAX_LVL (254)
+
 void LEDWidget::TimerHandler(TimerHandle_t xTimer)
 {
     LEDWidget * led_widget = (LEDWidget *) pvTimerGetTimerID(xTimer);
@@ -45,7 +48,8 @@ void LEDWidget::Init(enum led_id led)
 {
     filogic_led_init();
 
-    mLed = led;
+    mLed   = led;
+    mLevel = MAX_LVL;
 
     mTimer = xTimerCreate(Name(),
                           1,             // == default timer period (mS)
@@ -82,9 +86,6 @@ void LEDWidget::Toggle(void)
 
 void LEDWidget::DoBlink(void)
 {
-    // turn off then turn on
-    Set(false);
-    Set(true);
     StartTimer(mOn);
 }
 
@@ -109,13 +110,18 @@ void LEDWidget::Set(bool state)
     // printf("%s %s\n", Name(), state ? "on" : "off");
 }
 
+bool LEDWidget::Get(void)
+{
+    return mState;
+}
+
 void LEDWidget::Blink(int on, int off)
 {
     if (mOn != on || mOff != off)
     {
         mOn  = on;
         mOff = off;
-        printf("%s blink: on %d off %d\n", Name(), mOn, mOff);
+        // printf("%s blink: on %d off %d\n", Name(), mOn, mOff);
         DoBlink();
     }
 }
@@ -125,19 +131,12 @@ void LEDWidget::Blink(int duration)
     Blink(duration, duration);
 }
 
-void LEDWidget::Color(enum led_color color)
+void LEDWidget::Color(RgbColor_t rgb)
 {
-    filogic_led_color_t _color = FILOGIC_LED_OFF;
-
-    switch (color)
-    {
-    case LED_RED:
-        _color = FILOGIC_LED_R;
-    case LED_GREEN:
-        _color = FILOGIC_LED_G;
-    case LED_BLUE:
-        _color = FILOGIC_LED_B;
-    }
+    filogic_led_color_t _color;
+    _color.r = rgb.r;
+    _color.g = rgb.g;
+    _color.b = rgb.b;
 
     switch (mLed)
     {
@@ -148,6 +147,69 @@ void LEDWidget::Color(enum led_color color)
         filogic_led_status_color(_color);
         break;
     }
+}
 
-    printf("%s color %d\n", Name(), color);
+void LEDWidget::SetLevel(uint8_t level)
+{
+    uint8_t fdim = 0;
+
+    if (level >= MIN_LVL && level <= MAX_LVL)
+    {
+        mLevel = level;
+    }
+    else
+    {
+        return;
+    }
+
+    fdim = (level - MIN_LVL) / ((MAX_LVL - MIN_LVL) / (filogic_led_get_max_dim_level() - filogic_led_get_min_dim_level()));
+
+    if (fdim > filogic_led_get_max_dim_level())
+    {
+        fdim = filogic_led_get_max_dim_level();
+    }
+
+    if (mLed == LED_LIGHT)
+    {
+        filogic_led_light_dim(fdim);
+    }
+    else if (mLed == LED_STATUS)
+    {
+        filogic_led_status_dim(fdim);
+    }
+    else
+    {
+        assert(0);
+    }
+}
+
+uint8_t LEDWidget::GetLevel(void)
+{
+    uint8_t dim = 0;
+    if (mLed == LED_LIGHT)
+    {
+        dim = filogic_led_light_get_cur_dim_level();
+    }
+    else if (mLed == LED_STATUS)
+    {
+        dim = filogic_led_status_get_cur_dim_level();
+    }
+    else
+    {
+        assert(0);
+    }
+
+    dim = dim * ((MAX_LVL - MIN_LVL) / (filogic_led_get_max_dim_level() - filogic_led_get_min_dim_level()));
+
+    return dim;
+}
+
+uint8_t LEDWidget::GetMaxLevel(void)
+{
+    return MAX_LVL;
+}
+
+uint8_t LEDWidget::GetMinLevel(void)
+{
+    return MIN_LVL;
 }
