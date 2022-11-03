@@ -41,7 +41,7 @@ public class Main {
 
       arguments.append("\n");
 
-      if ("read" == command.getName() && command.getAttribute().isPresent()) {
+      if ("read".equals(command.getName()) && command.getAttribute().isPresent()) {
         attributes.append("    " + command.getAttribute().get() + "\n");
       }
     }

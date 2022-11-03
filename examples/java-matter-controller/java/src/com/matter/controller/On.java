@@ -23,8 +23,8 @@ import com.matter.controller.commands.common.MatterCommand;
 import java.util.concurrent.atomic.AtomicLong;
 
 public final class On extends MatterCommand {
-  private AtomicLong mNodeId = new AtomicLong();
-  private AtomicLong mFabricId = new AtomicLong();
+  private final AtomicLong mNodeId = new AtomicLong();
+  private final AtomicLong mFabricId = new AtomicLong();
 
   public On(CredentialsIssuer credIssuerCmds) {
     super("on", credIssuerCmds);

@@ -26,31 +26,38 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.Nullable;
 
-public class Argument {
-  private String mName;
-  private ArgumentType mType;
-  private long mMin;
-  private long mMax;
-  private Object mValue;
-  private Optional<String> mDesc = Optional.empty();
+public final class Argument {
+  private final String mName;
+  private final ArgumentType mType;
+  private final long mMin;
+  private final long mMax;
+  private final Object mValue;
+  private final Optional<String> mDesc;
 
   public Argument(String name, IPAddress value) {
     this.mName = name;
     this.mType = ArgumentType.ADDRESS;
-    this.mValue = (Object) value;
+    this.mMin = 0;
+    this.mMax = 0;
+    this.mValue = value;
+    this.mDesc = Optional.empty();
   }
 
   public Argument(String name, StringBuffer value, @Nullable String desc) {
     this.mName = name;
     this.mType = ArgumentType.STRING;
-    this.mValue = (Object) value;
+    this.mMin = 0;
+    this.mMax = 0;
+    this.mValue = value;
     this.mDesc = Optional.ofNullable(desc);
   }
 
   public Argument(String name, AtomicBoolean value, @Nullable String desc) {
     this.mName = name;
     this.mType = ArgumentType.BOOL;
-    this.mValue = (Object) value;
+    this.mMin = 0;
+    this.mMax = 0;
+    this.mValue = value;
     this.mDesc = Optional.ofNullable(desc);
   }
 
@@ -59,7 +66,7 @@ public class Argument {
     this.mType = ArgumentType.NUMBER_INT16;
     this.mMin = min;
     this.mMax = max;
-    this.mValue = (Object) value;
+    this.mValue = value;
     this.mDesc = Optional.ofNullable(desc);
   }
 
@@ -68,7 +75,7 @@ public class Argument {
     this.mType = ArgumentType.NUMBER_INT32;
     this.mMin = min;
     this.mMax = max;
-    this.mValue = (Object) value;
+    this.mValue = value;
     this.mDesc = Optional.ofNullable(desc);
   }
 
@@ -77,7 +84,7 @@ public class Argument {
     this.mType = ArgumentType.NUMBER_INT64;
     this.mMin = min;
     this.mMax = max;
-    this.mValue = (Object) value;
+    this.mValue = value;
     this.mDesc = Optional.ofNullable(desc);
   }
 
