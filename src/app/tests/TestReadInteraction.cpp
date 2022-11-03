@@ -2213,10 +2213,10 @@ void TestReadInteraction::TestReadShutdown(nlTestSuite * apSuite, void * apConte
     //
     // Allocate a number of clients
     //
-    for (auto & pClient : pClients)
+    for (auto & client : pClients)
     {
-        pClient = Platform::New<app::ReadClient>(engine, &ctx.GetExchangeManager(), delegate,
-                                                 chip::app::ReadClient::InteractionType::Subscribe);
+        client = Platform::New<app::ReadClient>(engine, &ctx.GetExchangeManager(), delegate,
+                                                chip::app::ReadClient::InteractionType::Subscribe);
     }
 
     //

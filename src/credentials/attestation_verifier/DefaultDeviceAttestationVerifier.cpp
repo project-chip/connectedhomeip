@@ -645,11 +645,11 @@ CHIP_ERROR CsaCdKeysTrustStore::AddTrustedKey(const ByteSpan & derCertBytes)
 CHIP_ERROR CsaCdKeysTrustStore::LookupVerifyingKey(const ByteSpan & kid, Crypto::P256PublicKey & outPubKey) const
 {
     // First, search for the well known keys
-    for (auto & gCdSigningKey : gCdSigningKeys)
+    for (auto & CdSigningKey : gCdSigningKeys)
     {
-        if (kid.data_equal(gCdSigningKey.mKid))
+        if (kid.data_equal(CdSigningKey.mKid))
         {
-            outPubKey = gCdSigningKey.mPubkey;
+            outPubKey = CdSigningKey.mPubkey;
             return CHIP_NO_ERROR;
         }
     }

@@ -203,9 +203,11 @@ CHIP_ERROR BleTransportCapabilitiesRequestMessage::Decode(const PacketBufferHand
     VerifyOrReturnError(CAPABILITIES_MSG_CHECK_BYTE_1 == chip::Encoding::Read8(p), BLE_ERROR_INVALID_MESSAGE);
     VerifyOrReturnError(CAPABILITIES_MSG_CHECK_BYTE_2 == chip::Encoding::Read8(p), BLE_ERROR_INVALID_MESSAGE);
 
-    for (unsigned char & mSupportedProtocolVersion : msg.mSupportedProtocolVersions)
+    static_assert(kCapabilitiesRequestSupportedVersionsLength == sizeof(msg.mSupportedProtocolVersions),
+                  "Expected capability sizes and storage must match");
+    for (unsigned char & version : msg.mSupportedProtocolVersions)
     {
-        mSupportedProtocolVersion = chip::Encoding::Read8(p);
+        version = chip::Encoding::Read8(p);
     }
 
     msg.mMtu        = chip::Encoding::LittleEndian::Read16(p);

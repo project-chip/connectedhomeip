@@ -55,11 +55,11 @@ CHIP_ERROR ResponseSender::AddQueryResponder(QueryResponderBase * queryResponder
     // If already existing or we find a free slot, just use it
     // Note that dynamic memory implementations are never expected to be nullptr
     //
-    for (auto & mResponder : mResponders)
+    for (auto & responder : mResponders)
     {
-        if (mResponder == nullptr || mResponder == queryResponder)
+        if (responder == nullptr || responder == queryResponder)
         {
-            mResponder = queryResponder;
+            responder = queryResponder;
             return CHIP_NO_ERROR;
         }
     }
@@ -90,9 +90,9 @@ CHIP_ERROR ResponseSender::RemoveQueryResponder(QueryResponderBase * queryRespon
 
 bool ResponseSender::HasQueryResponders() const
 {
-    for (auto mResponder : mResponders)
+    for (auto responder : mResponders)
     {
-        if (mResponder != nullptr)
+        if (responder != nullptr)
         {
             return true;
         }
@@ -108,12 +108,12 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
     // Responder has a stateful 'additional replies required' that is used within the response
     // loop. 'no additionals required' is set at the start and additionals are marked as the query
     // reply is built.
-    for (auto & mResponder : mResponders)
+    for (auto & responder : mResponders)
     {
         {
-            if (mResponder != nullptr)
+            if (responder != nullptr)
             {
-                mResponder->ResetAdditionals();
+                responder->ResetAdditionals();
             }
         }
     }
@@ -135,18 +135,18 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
             //       broadcasts on one interface to throttle broadcasts on another interface.
             responseFilter.SetIncludeOnlyMulticastBeforeMS(kTimeNow - chip::System::Clock::Seconds32(1));
         }
-        for (auto & mResponder : mResponders)
+        for (auto & responder : mResponders)
         {
-            if (mResponder == nullptr)
+            if (responder == nullptr)
             {
                 continue;
             }
-            for (auto it = mResponder->begin(&responseFilter); it != mResponder->end(); it++)
+            for (auto it = responder->begin(&responseFilter); it != responder->end(); it++)
             {
                 it->responder->AddAllResponses(querySource, this, configuration);
                 ReturnErrorOnFailure(mSendState.GetError());
 
-                mResponder->MarkAdditionalRepliesFor(it);
+                responder->MarkAdditionalRepliesFor(it);
 
                 if (!mSendState.SendUnicast())
                 {
@@ -168,13 +168,13 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
         responseFilter
             .SetReplyFilter(&queryReplyFilter) //
             .SetIncludeAdditionalRepliesOnly(true);
-        for (auto & mResponder : mResponders)
+        for (auto & responder : mResponders)
         {
-            if (mResponder == nullptr)
+            if (responder == nullptr)
             {
                 continue;
             }
-            for (auto it = mResponder->begin(&responseFilter); it != mResponder->end(); it++)
+            for (auto it = responder->begin(&responseFilter); it != responder->end(); it++)
             {
                 it->responder->AddAllResponses(querySource, this, configuration);
                 ReturnErrorOnFailure(mSendState.GetError());

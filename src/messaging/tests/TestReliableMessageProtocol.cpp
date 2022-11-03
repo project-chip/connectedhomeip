@@ -1648,15 +1648,14 @@ void CheckGetBackoff(nlTestSuite * inSuite, void * inContext)
     // Run 3x iterations to thoroughly test random jitter always results in backoff within bounds.
     for (uint32_t j = 0; j < 3; j++)
     {
-        for (auto & i : theBackoffComplianceTestVector)
+        for (const auto & test : theBackoffComplianceTestVector)
         {
-            struct BackoffComplianceTestVector * test = &i;
-            System::Clock::Timeout backoff            = ReliableMessageMgr::GetBackoff(test->backoffBase, test->sendCount);
-            ChipLogProgress(Test, "Backoff base %" PRIu32 " # %d: %" PRIu32, test->backoffBase.count(), test->sendCount,
+            System::Clock::Timeout backoff = ReliableMessageMgr::GetBackoff(test.backoffBase, test.sendCount);
+            ChipLogProgress(Test, "Backoff base %" PRIu32 " # %d: %" PRIu32, test.backoffBase.count(), test.sendCount,
                             backoff.count());
 
-            NL_TEST_ASSERT(inSuite, backoff >= test->backoffMin);
-            NL_TEST_ASSERT(inSuite, backoff <= test->backoffMax);
+            NL_TEST_ASSERT(inSuite, backoff >= test.backoffMin);
+            NL_TEST_ASSERT(inSuite, backoff <= test.backoffMax);
         }
     }
 }

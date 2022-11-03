@@ -84,15 +84,15 @@ void TestDeriveGroupOperationalCredentials(nlTestSuite * apSuite, void * apConte
 {
     GroupOperationalCredentials opCreds;
 
-    for (auto & i : theGroupKeySetTestVector)
+    for (const auto & testVector : theGroupKeySetTestVector)
     {
-        const ByteSpan epochKey(i.epochKey, KEY_LENGTH);
+        const ByteSpan epochKey(testVector.epochKey, KEY_LENGTH);
         NL_TEST_ASSERT(apSuite,
                        CHIP_NO_ERROR == Crypto::DeriveGroupOperationalCredentials(epochKey, kCompressedFabricId1, opCreds));
 
-        NL_TEST_ASSERT(apSuite, opCreds.hash == i.groupKeys->hash);
-        NL_TEST_ASSERT(apSuite, 0 == memcmp(opCreds.encryption_key, i.groupKeys->encryption_key, KEY_LENGTH));
-        NL_TEST_ASSERT(apSuite, 0 == memcmp(opCreds.privacy_key, i.groupKeys->privacy_key, KEY_LENGTH));
+        NL_TEST_ASSERT(apSuite, opCreds.hash == testVector.groupKeys->hash);
+        NL_TEST_ASSERT(apSuite, 0 == memcmp(opCreds.encryption_key, testVector.groupKeys->encryption_key, KEY_LENGTH));
+        NL_TEST_ASSERT(apSuite, 0 == memcmp(opCreds.privacy_key, testVector.groupKeys->privacy_key, KEY_LENGTH));
     }
 }
 

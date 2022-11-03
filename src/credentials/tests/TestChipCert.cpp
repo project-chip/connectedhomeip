@@ -435,11 +435,11 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
         err                                    = certSet.Init(kMaxCertsPerTestCase);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        for (auto InputCert : testCase.InputCerts)
+        for (auto inputCert : testCase.InputCerts)
         {
-            if (InputCert.Type != TestCert::kNone)
+            if (inputCert.Type != TestCert::kNone)
             {
-                err = LoadTestCert(certSet, InputCert.Type, InputCert.LoadFlags, InputCert.DecodeFlags);
+                err = LoadTestCert(certSet, inputCert.Type, inputCert.LoadFlags, inputCert.DecodeFlags);
                 NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
             }
         }
@@ -1133,7 +1133,7 @@ static void TestChipCert_CertType(nlTestSuite * inSuite, void * inContext)
         {  TestCert::kNode02_02,       kCertType_Node            },
     };
     // clang-format on
-    for (auto testCase : sTestCases)
+    for (const auto & testCase : sTestCases)
     {
         uint8_t certType;
 
@@ -1179,7 +1179,7 @@ static void TestChipCert_CertId(nlTestSuite * inSuite, void * inContext)
         {  TestCert::kNode02_02,       0xDEDEDEDE00020002 },
     };
     // clang-format on
-    for (auto testCase : sTestCases)
+    for (const auto & testCase : sTestCases)
     {
         uint64_t chipId;
 

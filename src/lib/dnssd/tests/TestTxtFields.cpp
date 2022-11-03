@@ -293,9 +293,9 @@ bool NodeDataIsEmpty(const DiscoveredNodeData & node)
     {
         return false;
     }
-    for (unsigned char i : node.commissionData.rotatingId)
+    for (unsigned char id : node.commissionData.rotatingId)
     {
-        if (i != 0)
+        if (id != 0)
         {
             return false;
         }

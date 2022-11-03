@@ -430,7 +430,7 @@ class PayloadHeader
 {
 public:
     constexpr PayloadHeader() { SetProtocol(Protocols::NotSpecified); }
-    constexpr PayloadHeader(const PayloadHeader &) = default;
+    constexpr PayloadHeader(const PayloadHeader &)   = default;
     PayloadHeader & operator=(const PayloadHeader &) = default;
 
     /** Get the Session ID from this header. */
@@ -661,7 +661,7 @@ public:
     const uint8_t * GetTag() const { return &mTag[0]; }
 
     /** Set the message auth tag for this header. */
-    MessageAuthenticationCode & SetTag(PacketHeader * header, uint8_t * tag, size_t len)
+    MessageAuthenticationCode & SetTag(PacketHeader * header, const uint8_t * tag, size_t len)
     {
         const size_t tagLen = chip::Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
         if (tagLen > 0 && tagLen <= kMaxTagLen && len == tagLen)

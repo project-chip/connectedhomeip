@@ -616,9 +616,9 @@ ChipDN::~ChipDN() {}
 
 void ChipDN::Clear()
 {
-    for (auto & i : rdn)
+    for (auto & dn : rdn)
     {
-        i.Clear();
+        dn.Clear();
     }
 }
 
