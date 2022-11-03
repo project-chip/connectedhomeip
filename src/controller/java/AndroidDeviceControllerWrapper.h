@@ -33,6 +33,7 @@
 #include <platform/internal/DeviceNetworkInfo.h>
 
 #include "AndroidOperationalCredentialsIssuer.h"
+#include "AttestationTrustStoreBridge.h"
 #include "DeviceAttestationDelegateBridge.h"
 
 /**
@@ -150,8 +151,9 @@ public:
                 chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
                 AndroidOperationalCredentialsIssuerPtr opCredsIssuer, jobject keypairDelegate, jbyteArray rootCertificate,
                 jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey,
-                uint16_t listenPort, uint16_t controllerVendorId, uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi,
-                bool attemptNetworkScanThread, bool skipCommissioningComplete, CHIP_ERROR * errInfoOnFailure);
+                jobject paaCertsArrayList, jobject cdCertsArrayList, uint16_t listenPort, uint16_t controllerVendorId,
+                uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread,
+                bool skipCommissioningComplete, CHIP_ERROR * errInfoOnFailure);
 
     chip::Controller::AndroidOperationalCredentialsIssuer * GetAndroidOperationalCredentialsIssuer()
     {
@@ -205,6 +207,7 @@ private:
     chip::Credentials::PartialDACVerifier mPartialDACVerifier;
 
     DeviceAttestationDelegateBridge * mDeviceAttestationDelegateBridge = nullptr;
+    AttestationTrustStoreBridge * mAttestationTrustStoreBridge         = nullptr;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, AndroidOperationalCredentialsIssuerPtr opCredsIssuer) :
         mController(std::move(controller)), mOpCredsIssuer(std::move(opCredsIssuer))
