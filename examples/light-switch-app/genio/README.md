@@ -19,14 +19,14 @@ An example showing the use of CHIP on the MediaTek `Genio` MT793X.
 
 ## Introduction
 
-The `Genio` (MT793X) light switch example provides a baseline demonstration of a on-off
-light switch device, built using CHIP and the MediaTek `Genio` SDK. It can be
-controlled by a Chip controller over Wi-Fi network..
+The `Genio` (MT793X) light switch example provides a baseline demonstration of a
+on-off light switch device, built using CHIP and the MediaTek `Genio` SDK. It
+can be controlled by a Chip controller over Wi-Fi network..
 
-The `Genio` device can be commissioned over Bluetooth Low Energy where the device
-and the Chip controller will exchange security information with the Rendez-vous
-procedure. Network credentials are then provided to the `Genio` device which will
-then join the network.
+The `Genio` device can be commissioned over Bluetooth Low Energy where the
+device and the Chip controller will exchange security information with the
+Rendez-vous procedure. Network credentials are then provided to the `Genio`
+device which will then join the network.
 
 The light switch example is intended to serve both as a means to explore the
 workings of CHIP as well as a template for creating real products based on the
@@ -96,8 +96,8 @@ MediaTek platform.
     [CHIP
     Tool]](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/chip_tool_guide.md)
 
--   First of all, you have to commission with the light-switch-app (nodeID 1) and
-    the lighting-app (nodeID 2) with the CHIP tool by following commands.
+-   First of all, you have to commission with the light-switch-app (nodeID 1)
+    and the lighting-app (nodeID 2) with the CHIP tool by following commands.
 
     ```
       chip-tool pairing ble-wifi 1 my-ap myappassword 20202021 3840
@@ -105,9 +105,9 @@ MediaTek platform.
       chip-tool pairing ble-wifi 2 my-ap myappassword 20202021 3840
     ```
 
--   Next, you have to configure the ACL in the lighting-app device to allow access
-    from switch device and chip-tool, and binding the lighting-app device to the
-    light-switch-app device by following commands.
+-   Next, you have to configure the ACL in the lighting-app device to allow
+    access from switch device and chip-tool, and binding the lighting-app device
+    to the light-switch-app device by following commands.
 
     ```
       chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1], "targets": null }]' 2 0
@@ -116,8 +116,8 @@ MediaTek platform.
 
     ```
 
--   Once all setup successfully, you can control the lighting-app device through the
-    Matter Shell on the light-switch-app device.
+-   Once all setup successfully, you can control the lighting-app device through
+    the Matter Shell on the light-switch-app device.
 
     ```
        > switch onoff on
@@ -127,7 +127,6 @@ MediaTek platform.
 ### Notes
 
 -   Depending on your network settings your router might not provide native ipv6
- addresses to your devices (Border router / PC). If this is the case, you
- need to add a static ipv6 addresses on both device and then an ipv6 route to
- the border router on your PC
-
+    addresses to your devices (Border router / PC). If this is the case, you
+    need to add a static ipv6 addresses on both device and then an ipv6 route to
+    the border router on your PC

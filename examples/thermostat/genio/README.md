@@ -23,14 +23,14 @@ The `Genio` (MT793X) thermostat example provides a baseline demonstration of a
 thermostat device, built using CHIP and the MediaTek `Genio` SDK. It can be
 controlled by a Chip controller over Wi-Fi network..
 
-The `Genio` device can be commissioned over Bluetooth Low Energy where the device
-and the Chip controller will exchange security information with the Rendez-vous
-procedure. Network credentials are then provided to the `Genio` device which will
-then join the network.
+The `Genio` device can be commissioned over Bluetooth Low Energy where the
+device and the Chip controller will exchange security information with the
+Rendez-vous procedure. Network credentials are then provided to the `Genio`
+device which will then join the network.
 
-The thermostat example is intended to serve both as a means to explore the workings 
-of CHIP as well as a template for creating real products based on the MediaTek 
-platform.
+The thermostat example is intended to serve both as a means to explore the
+workings of CHIP as well as a template for creating real products based on the
+MediaTek platform.
 
 <a name="building"></a>
 
@@ -103,7 +103,6 @@ platform.
 ### Notes
 
 -   Depending on your network settings your router might not provide native ipv6
- addresses to your devices (Border router / PC). If this is the case, you
- need to add a static ipv6 addresses on both device and then an ipv6 route to
- the border router on your PC
-
+    addresses to your devices (Border router / PC). If this is the case, you
+    need to add a static ipv6 addresses on both device and then an ipv6 route to
+    the border router on your PC

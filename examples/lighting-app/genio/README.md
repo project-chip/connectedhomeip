@@ -117,6 +117,6 @@ MediaTek platform.
 ### Notes
 
 -   Depending on your network settings your router might not provide native ipv6
- addresses to your devices (Border router / PC). If this is the case, you
- need to add a static ipv6 addresses on both device and then an ipv6 route to
- the border router on your PC
+    addresses to your devices (Border router / PC). If this is the case, you
+    need to add a static ipv6 addresses on both device and then an ipv6 route to
+    the border router on your PC

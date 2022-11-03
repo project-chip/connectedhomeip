@@ -19,8 +19,8 @@ An example showing the use of CHIP on the MediaTek `Genio` MT793X.
 
 ## Introduction
 
-The `Genio` (MT793X) lock example provides a baseline demonstration of a
-door lock control device, built using CHIP and the MediaTek `Genio` SDK. It can be
+The `Genio` (MT793X) lock example provides a baseline demonstration of a door
+lock control device, built using CHIP and the MediaTek `Genio` SDK. It can be
 controlled by a Chip controller over Wi-Fi network.
 
 The `Genio` device can be commissioned over Bluetooth Low Energy where the
