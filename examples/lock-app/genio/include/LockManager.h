@@ -22,6 +22,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "AppConfig.h"
 #include "AppEvent.h"
 
 #include "FreeRTOS.h"
@@ -49,9 +50,10 @@ struct HolidayScheduleInfo
 
 namespace MT793XDoorLock {
 namespace ResourceRanges {
+
 // Used to size arrays
-static constexpr uint16_t kMaxUsers                  = 10;
-static constexpr uint8_t kMaxCredentialsPerUser      = 10;
+static constexpr uint16_t kMaxUsers                  = CONFIG_LOCK_NUM_USERS;
+static constexpr uint8_t kMaxCredentialsPerUser      = CONFIG_LOCK_NUM_CREDENTIALS_PER_USER;
 static constexpr uint8_t kMaxWeekdaySchedulesPerUser = 10;
 static constexpr uint8_t kMaxYeardaySchedulesPerUser = 10;
 static constexpr uint8_t kMaxHolidaySchedules        = 10;

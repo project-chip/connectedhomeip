@@ -26,11 +26,13 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/ConcreteAttributePath.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip::app::Clusters;
 using namespace ::chip::DeviceLayer::Internal;
+using namespace ::chip::app::Clusters::DoorLock;
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
@@ -54,7 +56,54 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  * @param endpoint   Ver.: always
  *
  */
-void emberAfDoorLockClusterInitCallback(EndpointId endpoint) {}
+void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
+{
+    EmberAfStatus status;
+
+    status = DoorLock::Attributes::LockType::Set
+                (endpoint, DlLockType::kDeadBolt);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(Zcl, "Failed to set LockType %x", status);
+    }
+
+    status = DoorLock::Attributes::NumberOfTotalUsersSupported::Set
+                (endpoint, CONFIG_LOCK_NUM_USERS);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(Zcl, "Failed to set number of users %x", status);
+    }
+
+    status = DoorLock::Attributes::NumberOfPINUsersSupported::Set
+                (endpoint, CONFIG_LOCK_NUM_USERS);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(Zcl, "Failed to set number of PIN users %x", status);
+    }
+
+    status = DoorLock::Attributes::NumberOfRFIDUsersSupported::Set
+                (endpoint, 0);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(Zcl, "Failed to set number of RFID users %x", status);
+    }
+
+    status = DoorLock::Attributes::NumberOfCredentialsSupportedPerUser::Set
+                (endpoint, CONFIG_LOCK_NUM_CREDENTIALS_PER_USER);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(Zcl, "Failed to set number of credentials per user %x", status);
+    }
+
+    // Note: Due to current logic of credential, do not enable PIN and RFID
+    // at the same time.
+    // Set FeatureMap to (kUsersManagement|kPINCredentials)
+    status = DoorLock::Attributes::FeatureMap::Set(endpoint, 0x101);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(Zcl, "Failed to set number of credentials per user %x", status);
+    }
+}
 
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
 {

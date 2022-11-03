@@ -25,7 +25,13 @@
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.
-#define ACTUATOR_MOVEMENT_PERIOS_MS 10
+#define ACTUATOR_MOVEMENT_PERIOS_MS (10)
+
+// Maximum number of users supported by lock
+#define CONFIG_LOCK_NUM_USERS (5)
+
+// Maximum number of credentials per user supported by lock
+#define CONFIG_LOCK_NUM_CREDENTIALS_PER_USER (2)
 
 // Genio Logging
 #ifdef __cplusplus
@@ -40,7 +46,7 @@ void appError(int err);
 
 #ifdef __cplusplus
 }
+#endif
 
 #include <lib/core/CHIPError.h>
 void appError(CHIP_ERROR error);
-#endif
