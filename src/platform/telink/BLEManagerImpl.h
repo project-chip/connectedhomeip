@@ -107,7 +107,7 @@ private:
     CHIPoBLEServiceMode mServiceMode;
     BitFlags<Flags> mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
-    uint16_t mNumConnections;
+    uint16_t mGAPConns;
     bool mSubscribedConns[kMaxConnections];
     uint8_t mAdvDataBuf[kMaxAdvertisementDataSetSize];
     uint8_t mScanRespDataBuf[kMaxAdvertisementDataSetSize];
@@ -143,6 +143,8 @@ private:
 
     /* Callbacks from BLE stack*/
     static void DriveBLEState(intptr_t arg);
+
+    static void HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param);
 
     /* Handlers for stack events */
     static void CancelBleAdvTimeoutTimer(void);
