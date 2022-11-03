@@ -40,7 +40,7 @@ struct PersistentData
 {
     virtual ~PersistentData() = default;
 
-    virtual CHIP_ERROR UpdateKey(StorageKey & key)              = 0;
+    virtual CHIP_ERROR UpdateKey(StorageKeyName & key)              = 0;
     virtual CHIP_ERROR Serialize(TLV::TLVWriter & writer) const = 0;
     virtual CHIP_ERROR Deserialize(TLV::TLVReader & reader)     = 0;
     virtual void Clear()                                        = 0;
@@ -50,7 +50,7 @@ struct PersistentData
         VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
 
         uint8_t buffer[kMaxSerializedSize] = { 0 };
-        StorageKey key                     = StorageKey::Uninitialized();
+        StorageKeyName key                     = StorageKeyName::Uninitialized();
         ReturnErrorOnFailure(UpdateKey(key));
 
         // Serialize the data
@@ -67,7 +67,7 @@ struct PersistentData
         VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
 
         uint8_t buffer[kMaxSerializedSize] = { 0 };
-        StorageKey key                     = StorageKey::Uninitialized();
+        StorageKeyName key                     = StorageKeyName::Uninitialized();
 
         // Set data to defaults
         Clear();
@@ -89,7 +89,7 @@ struct PersistentData
     {
         VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
 
-        StorageKey key = StorageKey::Uninitialized();
+        StorageKeyName key = StorageKeyName::Uninitialized();
         ReturnErrorOnFailure(UpdateKey(key));
 
         return storage->SyncDeleteKeyValue(key);
@@ -121,7 +121,7 @@ struct FabricList : public PersistentData<kPersistentBufferMax>
     FabricList() = default;
     FabricList(chip::FabricIndex first) : first_fabric(first), fabric_count(1) {}
 
-    CHIP_ERROR UpdateKey(StorageKey & key) override
+    CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
         key = DefaultStorageKeyAllocator::GroupFabricList();
         return CHIP_NO_ERROR;
@@ -185,7 +185,7 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
     FabricData() = default;
     FabricData(chip::FabricIndex fabric) : fabric_index(fabric) {}
 
-    CHIP_ERROR UpdateKey(StorageKey & key) override
+    CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
         key = DefaultStorageKeyAllocator::FabricGroups(fabric_index);
@@ -383,7 +383,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistentData<kPersiste
     GroupData(chip::FabricIndex fabric) : fabric_index(fabric) {}
     GroupData(chip::FabricIndex fabric, chip::GroupId group) : GroupInfo(group, nullptr), fabric_index(fabric) {}
 
-    CHIP_ERROR UpdateKey(StorageKey & key) override
+    CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
         key = DefaultStorageKeyAllocator::FabricGroup(fabric_index, group_id);
@@ -507,7 +507,7 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
         GroupKey(group, keyset), LinkedData(link_id), fabric_index(fabric)
     {}
 
-    CHIP_ERROR UpdateKey(StorageKey & key) override
+    CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
         key = DefaultStorageKeyAllocator::FabricGroupKey(fabric_index, id);
@@ -627,7 +627,7 @@ struct EndpointData : GroupDataProvider::GroupEndpoint, PersistentData<kPersiste
         fabric_index(fabric)
     {}
 
-    CHIP_ERROR UpdateKey(StorageKey & key) override
+    CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
         key = DefaultStorageKeyAllocator::FabricGroupEndpoint(fabric_index, group_id, endpoint_id);
@@ -720,7 +720,7 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
         fabric_index(fabric), keyset_id(id), policy(policy_id), keys_count(num_keys)
     {}
 
-    CHIP_ERROR UpdateKey(StorageKey & key) override
+    CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
         VerifyOrReturnError(kInvalidKeysetId != keyset_id, CHIP_ERROR_INVALID_KEY_ID);

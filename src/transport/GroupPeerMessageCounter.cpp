@@ -326,7 +326,7 @@ CHIP_ERROR GroupOutgoingCounters::IncrementCounter(bool isControl)
     uint16_t size  = static_cast<uint16_t>(sizeof(uint32_t));
     uint32_t value = 0;
 
-    StorageKey key = StorageKey::Uninitialized();
+    StorageKeyName key = StorageKeyName::Uninitialized();
 
     if (isControl)
     {

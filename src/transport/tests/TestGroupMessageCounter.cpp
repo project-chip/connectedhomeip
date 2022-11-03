@@ -45,7 +45,7 @@ public:
     {
         uint32_t temp = 0;
 
-        StorageKey key = StorageKey::Uninitialized();
+        StorageKeyName key = StorageKeyName::Uninitialized();
 
         if (isControl)
         {

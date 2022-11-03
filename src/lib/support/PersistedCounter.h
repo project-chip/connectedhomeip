@@ -60,7 +60,7 @@ template <typename T>
 class PersistedCounter : public MonotonicallyIncreasingCounter<T>
 {
 public:
-    PersistedCounter() : mKey(StorageKey::Uninitialized()) {}
+    PersistedCounter() : mKey(StorageKeyName::Uninitialized()) {}
     ~PersistedCounter() override {}
 
     /**
@@ -76,7 +76,7 @@ public:
      *          CHIP_ERROR_INVALID_INTEGER_VALUE if aEpoch is 0.
      *          CHIP_NO_ERROR otherwise
      */
-    CHIP_ERROR Init(PersistentStorageDelegate * aStorage, StorageKey aKey, T aEpoch)
+    CHIP_ERROR Init(PersistentStorageDelegate * aStorage, StorageKeyName aKey, T aEpoch)
     {
         VerifyOrReturnError(aStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(aKey != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -211,7 +211,7 @@ private:
     }
 
     PersistentStorageDelegate * mStorage = nullptr; // start value is stored here
-    StorageKey mKey;
+    StorageKeyName mKey;
     T mEpoch     = 0; // epoch modulus value
     T mNextEpoch = 0; // next epoch start
 };
