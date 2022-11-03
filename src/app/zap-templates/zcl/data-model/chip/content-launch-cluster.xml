@@ -20,7 +20,7 @@ limitations under the License.
     <domain>Media</domain>
     <name>Content Launcher</name>
     <code>0x050a</code>
-    <define>CONTENT_LAUNCH_CLUSTER</define>
+    <define>CONTENT_LAUNCHER_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>

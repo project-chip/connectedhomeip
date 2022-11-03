@@ -13460,7 +13460,7 @@
           "name": "Content Launcher",
           "code": 1290,
           "mfgCode": null,
-          "define": "CONTENT_LAUNCH_CLUSTER",
+          "define": "CONTENT_LAUNCHER_CLUSTER",
           "side": "client",
           "enabled": 0,
           "commands": [
@@ -13504,7 +13504,7 @@
           "name": "Content Launcher",
           "code": 1290,
           "mfgCode": null,
-          "define": "CONTENT_LAUNCH_CLUSTER",
+          "define": "CONTENT_LAUNCHER_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
