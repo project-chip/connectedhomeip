@@ -22,8 +22,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * This protocol is used by the Matter framework to read and write storage.
  *
- * All storage methods will be called on a single internal work queue (so the
- * implementation does not need to worry about reads and writes racing).
+ * The Matter framework may call storage methods from arbitrary threads, but
+ * will not call storage methods concurrently.
  */
 MTR_NEWLY_AVAILABLE
 @protocol MTRStorage <NSObject>
