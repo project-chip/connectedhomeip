@@ -321,12 +321,13 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     SuccessOrExit(err);
 
     jmethodID getPaaCerts;
-    err =
-        chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getPaaCerts", "()java/util/ArrayList", &getPaaCerts);
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getPaaCerts", "()Ljava/util/ArrayList;",
+                                                        &getPaaCerts);
     SuccessOrExit(err);
 
     jmethodID getCdCerts;
-    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getCdCerts", "()java/util/ArrayList", &getCdCerts);
+    err =
+        chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getCdCerts", "()Ljava/util/ArrayList;", &getCdCerts);
     SuccessOrExit(err);
 
     {

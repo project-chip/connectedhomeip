@@ -105,6 +105,14 @@ public final class ControllerParams {
     return ipk;
   }
 
+  public ArrayList<byte[]> getPaaCerts() {
+    return paaCerts;
+  }
+
+  public ArrayList<byte[]> getCdCerts() {
+    return cdCerts;
+  }
+
   public long getAdminSubject() {
     return adminSubject;
   }
