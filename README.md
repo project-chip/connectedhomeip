@@ -179,21 +179,28 @@ Instructions about how to build Matter can be found [here](./docs/README.md).
 
 # Directory Structure
 
-| The Matter repository is structured as follows:       | File/Folder                                                  | Content       |
-| ----------------------------------------------------- | ------------------------------------------------------------ | ------------- |
-| build                                                 | Build system support content and built output directories    |               |
-| build_overrides                                       | Build system parameter customization for different platforms |
-| config                                                | Project configurations                                       |               | credentials | Development and test |
-| credentials                                           |                                                              | docs          | Documentation, including guides  |  | examples | Example |
-| firmware applications that demonstrate use of Matter  |                                                              | integrations  | 3rd |
-| Party integrations                                    |                                                              | scripts       | Scripts needed to work with the Matter |
-| repository                                            |                                                              | src           | Implementation of Matter  |  | third_party | 3rd party code |
-| used by Matter                                        |                                                              | zzz_generated | zap generated template code - Revolving |
-| around cluster information                            |                                                              | BUILD.gn      | Build file for the gn build system  |
-| CODE_OF_CONDUCT.md                                    | Code of conduct for Matter and contribution to it            |               |
-| CONTRIBUTING.md                                       | Guidelines for contributing to Matter                        |               | LICENSE | Matter |
-| license file                                          |                                                              | REVIEWERS.md  | PR reviewers  |  | gn_build.sh | Build script |
-| for specific projects such as Android, EFR32, etc.    |                                                              | README.md     | This File |
+The Matter repository is structured as follows:
+
+| File/Folder        | Content                                                            |
+| ------------------ | ------------------------------------------------------------------ |
+| build              | Build system support content and built output directories          |
+| build_overrides    | Build system parameter customization for different platforms       |
+| config             | Project configurations                                             |
+| credentials        | Development and test credentials                                   |
+| docs               | Documentation, including guides                                    |
+| examples           | Example firmware applications that demonstrate use of Matter       |
+| integrations       | 3rd Party integrations                                             |
+| scripts            | Scripts needed to work with the Matter repository                  |
+| src                | Implementation of Matter                                           |
+| third_party        | 3rd party code used by Matter                                      |
+| zzz_generated      | zap generated template code - Revolving around cluster information |
+| BUILD.gn           | Build file for the gn build system                                 |
+| CODE_OF_CONDUCT.md | Code of conduct for Matter and contribution to it                  |
+| CONTRIBUTING.md    | Guidelines for contributing to Matter                              |
+| LICENSE            | Matter license file                                                |
+| REVIEWERS.md       | PR reviewers                                                       |
+| gn_build.sh        | Build script for specific projects such as Android, EFR32, etc.    |
+| README.md          | This File                                                          |
 
 # License
 
