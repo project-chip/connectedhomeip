@@ -583,6 +583,32 @@ void AppTask::UpdateClusterState(void)
     }
 }
 
+void AppTask::UpdateLEDs(void)
+{
+    // If system has "full connectivity", keep the LED On constantly.
+    //
+    // If thread and service provisioned, but not attached to the thread network
+    // yet OR no connectivity to the service OR subscriptions are not fully
+    // established THEN blink the LED Off for a short period of time.
+    //
+    // If the system has ble connection(s) uptill the stage above, THEN blink
+    // the LEDs at an even rate of 100ms.
+    //
+    // Otherwise, blink the LED ON for a very short time.
+    if (sIsThreadProvisioned && sIsThreadEnabled)
+    {
+        qvIO_LedBlink(SYSTEM_STATE_LED, 950, 50);
+    }
+    else if (sHaveBLEConnections)
+    {
+        qvIO_LedBlink(SYSTEM_STATE_LED, 100, 100);
+    }
+    else
+    {
+        qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
+    }
+}
+
 void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
 {
     switch(event->Type)
@@ -615,26 +641,5 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
         break;
     }
 
-    // If system has "full connectivity", keep the LED On constantly.
-    //
-    // If thread and service provisioned, but not attached to the thread network
-    // yet OR no connectivity to the service OR subscriptions are not fully
-    // established THEN blink the LED Off for a short period of time.
-    //
-    // If the system has ble connection(s) uptill the stage above, THEN blink
-    // the LEDs at an even rate of 100ms.
-    //
-    // Otherwise, blink the LED ON for a very short time.
-    if (sIsThreadProvisioned && sIsThreadEnabled)
-    {
-        qvIO_LedBlink(SYSTEM_STATE_LED, 950, 50);
-    }
-    else if (sHaveBLEConnections)
-    {
-        qvIO_LedBlink(SYSTEM_STATE_LED, 100, 100);
-    }
-    else
-    {
-        qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
-    }
+    UpdateLEDs();
 }
