@@ -115,7 +115,7 @@ public:
     static StorageKeyName FabricSession(FabricIndex fabric, NodeId nodeId)
     {
         return StorageKeyName::Formatted("f/%x/s/%08" PRIX32 "%08" PRIX32, fabric, static_cast<uint32_t>(nodeId >> 32),
-                                     static_cast<uint32_t>(nodeId));
+                                         static_cast<uint32_t>(nodeId));
     }
 
     static StorageKeyName SessionResumptionIndex() { return StorageKeyName::FromConst("g/sri"); }

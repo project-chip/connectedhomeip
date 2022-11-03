@@ -40,7 +40,7 @@ struct PersistentData
 {
     virtual ~PersistentData() = default;
 
-    virtual CHIP_ERROR UpdateKey(StorageKeyName & key)              = 0;
+    virtual CHIP_ERROR UpdateKey(StorageKeyName & key)          = 0;
     virtual CHIP_ERROR Serialize(TLV::TLVWriter & writer) const = 0;
     virtual CHIP_ERROR Deserialize(TLV::TLVReader & reader)     = 0;
     virtual void Clear()                                        = 0;
@@ -50,7 +50,7 @@ struct PersistentData
         VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
 
         uint8_t buffer[kMaxSerializedSize] = { 0 };
-        StorageKeyName key                     = StorageKeyName::Uninitialized();
+        StorageKeyName key                 = StorageKeyName::Uninitialized();
         ReturnErrorOnFailure(UpdateKey(key));
 
         // Serialize the data
@@ -67,7 +67,7 @@ struct PersistentData
         VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
 
         uint8_t buffer[kMaxSerializedSize] = { 0 };
-        StorageKeyName key                     = StorageKeyName::Uninitialized();
+        StorageKeyName key                 = StorageKeyName::Uninitialized();
 
         // Set data to defaults
         Clear();
