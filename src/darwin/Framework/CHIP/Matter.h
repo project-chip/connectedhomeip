@@ -51,8 +51,8 @@
 #import <Matter/MTROTAHeader.h>
 #import <Matter/MTROTAProviderDelegate.h>
 #import <Matter/MTROnboardingPayloadParser.h>
-#import <Matter/MTRPersistentStorageDelegate.h>
 #import <Matter/MTRQRCodeSetupPayloadParser.h>
 #import <Matter/MTRSetupPayload.h>
+#import <Matter/MTRStorage.h>
 #import <Matter/MTRStructsObjc.h>
 #import <Matter/MTRThreadOperationalDataset.h>
