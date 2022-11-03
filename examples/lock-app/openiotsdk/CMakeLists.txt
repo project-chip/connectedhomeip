@@ -27,6 +27,7 @@ set(APP_TARGET chip-openiotsdk-lock-app-example_ns)
 
 set(TFM_SUPPORT YES)
 set(TFM_NS_APP_VERSION "0.0.1")
+set(CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS YES)
 
 # Toolchain files need to exist before first call to project
 include(toolchain)

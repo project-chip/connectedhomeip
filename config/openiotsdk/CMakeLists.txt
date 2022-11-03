@@ -200,6 +200,7 @@ chip_gn_arg_bool  ("chip_detail_logging"                  CONFIG_CHIP_DETAIL_LOG
 chip_gn_arg_bool  ("chip_progress_logging"                CONFIG_CHIP_PROGRESS_LOGGING)
 chip_gn_arg_bool  ("chip_automation_logging"              CONFIG_CHIP_AUTOMATION_LOGGING)
 chip_gn_arg_bool  ("chip_error_logging"                   CONFIG_CHIP_ERROR_LOGGING)
+chip_gn_arg_bool  ("chip_openiotsdk_use_psa_ps"           CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS)
 if (TARGET cmsis-rtos-api)
     chip_gn_arg_string("target_os"                        "cmsis-rtos")
 endif()
@@ -251,6 +252,7 @@ target_link_libraries(openiotsdk-chip INTERFACE -Wl,--start-group ${CHIP_LIBRARI
 target_link_libraries(openiotsdk-chip INTERFACE
     $<$<TARGET_EXISTS:mcu-driver-hal>:mcu-driver-hal>
     $<$<TARGET_EXISTS:mcu-driver-bootstrap>:mcu-driver-bootstrap>
+    $<$<TARGET_EXISTS:tfm-ns-interface>:tfm-ns-interface>
     $<$<TARGET_EXISTS:tfm-ns-interface-cmsis-rtos>:tfm-ns-interface-cmsis-rtos>
     $<$<TARGET_EXISTS:mdh-reference-platforms-for-arm>:mdh-reference-platforms-for-arm>
     $<$<TARGET_EXISTS:mbedtls>:mbedtls>
@@ -275,7 +277,10 @@ target_link_libraries(openiotsdk-chip INTERFACE
 # Additional openiotsdk-chip target configuration
 # ==============================================================================
 if(TFM_SUPPORT)
-    add_dependencies(openiotsdk-chip trusted-firmware-m-build)
+    add_dependencies(openiotsdk-chip tfm-ns-interface)
+    if(CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS)
+        add_dependencies(chip-gn tfm-ns-interface)
+    endif()
     target_compile_definitions(openiotsdk-chip INTERFACE
         TFM_SUPPORT
     )
