@@ -21,13 +21,13 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRCluster{{asUpperCamelCase name}} : MTRCluster
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpointID:(NSNumber *)endpointID
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+                             endpointID:(NSNumber *)endpointID
+                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 {{#chip_cluster_commands}}
-- (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=.}})completionHandler;
+- (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion MTR_NEWLY_AVAILABLE;
 {{#unless (hasArguments)}}
-- (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=.}})completionHandler;
+- (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion MTR_NEWLY_AVAILABLE;
 {{/unless}}
 {{/chip_cluster_commands}}
 
@@ -56,6 +56,12 @@ NS_ASSUME_NONNULL_BEGIN
                                endpoint:(uint16_t)endpoint
                                   queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
 
+{{#chip_cluster_commands}}
+- (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=.}})completionHandler MTR_NEWLY_DEPRECATED("Please use {{asLowerCamelCase name}}WithParams:expectedValues:expectedValueIntervalMs:completion:");
+{{#unless (hasArguments)}}
+- (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=.}})completionHandler MTR_NEWLY_DEPRECATED("Please use {{asLowerCamelCase name}}WithExpectedValues:expectedValueIntervalMs:completion:");
+{{/unless}}
+{{/chip_cluster_commands}}
 @end
 
 {{/chip_client_clusters}}

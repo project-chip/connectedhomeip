@@ -58,7 +58,7 @@ using chip::SessionHandle;
 - (void)identifyWithParams:(MTRIdentifyClusterIdentifyParams *)params
             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-         completionHandler:(StatusCompletion)completionHandler
+                completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -73,7 +73,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -108,7 +108,7 @@ using chip::SessionHandle;
 - (void)triggerEffectWithParams:(MTRIdentifyClusterTriggerEffectParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler
+                     completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -123,7 +123,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -242,6 +242,26 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)identifyWithParams:(MTRIdentifyClusterIdentifyParams *)params
+            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+         completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self identifyWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)triggerEffectWithParams:(MTRIdentifyClusterTriggerEffectParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self triggerEffectWithParams:params
+                   expectedValues:expectedDataValueDictionaries
+            expectedValueInterval:expectedValueIntervalMs
+                       completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterGroups
@@ -262,8 +282,7 @@ using chip::SessionHandle;
 - (void)addGroupWithParams:(MTRGroupsClusterAddGroupParams *)params
             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-         completionHandler:
-             (void (^)(MTRGroupsClusterAddGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+                completion:(void (^)(MTRGroupsClusterAddGroupResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -275,7 +294,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRGroupsClusterAddGroupResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRGroupsClusterAddGroupResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -309,8 +328,8 @@ using chip::SessionHandle;
 - (void)viewGroupWithParams:(MTRGroupsClusterViewGroupParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-          completionHandler:
-              (void (^)(MTRGroupsClusterViewGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+                 completion:
+                     (void (^)(MTRGroupsClusterViewGroupResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -322,7 +341,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRGroupsClusterViewGroupResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRGroupsClusterViewGroupResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -355,8 +374,8 @@ using chip::SessionHandle;
 - (void)getGroupMembershipWithParams:(MTRGroupsClusterGetGroupMembershipParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                   completionHandler:(void (^)(MTRGroupsClusterGetGroupMembershipResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler
+                          completion:(void (^)(MTRGroupsClusterGetGroupMembershipResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -368,7 +387,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRGroupsClusterGetGroupMembershipResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRGroupsClusterGetGroupMembershipResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -422,8 +441,8 @@ using chip::SessionHandle;
 - (void)removeGroupWithParams:(MTRGroupsClusterRemoveGroupParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:
-                (void (^)(MTRGroupsClusterRemoveGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+                   completion:
+                       (void (^)(MTRGroupsClusterRemoveGroupResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -435,7 +454,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRGroupsClusterRemoveGroupResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRGroupsClusterRemoveGroupResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -467,17 +486,17 @@ using chip::SessionHandle;
 
 - (void)removeAllGroupsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                        completionHandler:(StatusCompletion)completionHandler
+                               completion:(MTRStatusCompletion)completion
 {
     [self removeAllGroupsWithParams:nil
                      expectedValues:expectedValues
               expectedValueInterval:expectedValueIntervalMs
-                  completionHandler:completionHandler];
+                         completion:completion];
 }
 - (void)removeAllGroupsWithParams:(MTRGroupsClusterRemoveAllGroupsParams * _Nullable)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                completionHandler:(StatusCompletion)completionHandler
+                       completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -492,7 +511,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -526,7 +545,7 @@ using chip::SessionHandle;
 - (void)addGroupIfIdentifyingWithParams:(MTRGroupsClusterAddGroupIfIdentifyingParams *)params
                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                      completionHandler:(StatusCompletion)completionHandler
+                             completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -541,7 +560,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -631,6 +650,78 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)addGroupWithParams:(MTRGroupsClusterAddGroupParams *)params
+            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+         completionHandler:
+             (void (^)(MTRGroupsClusterAddGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self addGroupWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)viewGroupWithParams:(MTRGroupsClusterViewGroupParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:
+              (void (^)(MTRGroupsClusterViewGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self viewGroupWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)getGroupMembershipWithParams:(MTRGroupsClusterGetGroupMembershipParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(void (^)(MTRGroupsClusterGetGroupMembershipResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler
+{
+    [self getGroupMembershipWithParams:params
+                        expectedValues:expectedDataValueDictionaries
+                 expectedValueInterval:expectedValueIntervalMs
+                            completion:completionHandler];
+}
+- (void)removeGroupWithParams:(MTRGroupsClusterRemoveGroupParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:
+                (void (^)(MTRGroupsClusterRemoveGroupResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self removeGroupWithParams:params
+                 expectedValues:expectedDataValueDictionaries
+          expectedValueInterval:expectedValueIntervalMs
+                     completion:completionHandler];
+}
+- (void)removeAllGroupsWithParams:(MTRGroupsClusterRemoveAllGroupsParams * _Nullable)params
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self removeAllGroupsWithParams:params
+                     expectedValues:expectedDataValueDictionaries
+              expectedValueInterval:expectedValueIntervalMs
+                         completion:completionHandler];
+}
+- (void)removeAllGroupsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self removeAllGroupsWithExpectedValues:expectedValues
+                      expectedValueInterval:expectedValueIntervalMs
+                                 completion:completionHandler];
+}
+- (void)addGroupIfIdentifyingWithParams:(MTRGroupsClusterAddGroupIfIdentifyingParams *)params
+                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                      completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self addGroupIfIdentifyingWithParams:params
+                           expectedValues:expectedDataValueDictionaries
+                    expectedValueInterval:expectedValueIntervalMs
+                               completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterScenes
@@ -651,8 +742,7 @@ using chip::SessionHandle;
 - (void)addSceneWithParams:(MTRScenesClusterAddSceneParams *)params
             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-         completionHandler:
-             (void (^)(MTRScenesClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+                completion:(void (^)(MTRScenesClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -664,7 +754,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRScenesClusterAddSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRScenesClusterAddSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -774,8 +864,8 @@ using chip::SessionHandle;
 - (void)viewSceneWithParams:(MTRScenesClusterViewSceneParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-          completionHandler:
-              (void (^)(MTRScenesClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+                 completion:
+                     (void (^)(MTRScenesClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -787,7 +877,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRScenesClusterViewSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRScenesClusterViewSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -821,8 +911,8 @@ using chip::SessionHandle;
 - (void)removeSceneWithParams:(MTRScenesClusterRemoveSceneParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:
-                (void (^)(MTRScenesClusterRemoveSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+                   completion:
+                       (void (^)(MTRScenesClusterRemoveSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -834,7 +924,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRScenesClusterRemoveSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRScenesClusterRemoveSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -868,8 +958,8 @@ using chip::SessionHandle;
 - (void)removeAllScenesWithParams:(MTRScenesClusterRemoveAllScenesParams *)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                completionHandler:(void (^)(MTRScenesClusterRemoveAllScenesResponseParams * _Nullable data,
-                                      NSError * _Nullable error))completionHandler
+                       completion:(void (^)(MTRScenesClusterRemoveAllScenesResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -881,7 +971,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRScenesClusterRemoveAllScenesResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRScenesClusterRemoveAllScenesResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -914,8 +1004,8 @@ using chip::SessionHandle;
 - (void)storeSceneWithParams:(MTRScenesClusterStoreSceneParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-           completionHandler:
-               (void (^)(MTRScenesClusterStoreSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+                  completion:
+                      (void (^)(MTRScenesClusterStoreSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -927,7 +1017,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRScenesClusterStoreSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRScenesClusterStoreSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -961,7 +1051,7 @@ using chip::SessionHandle;
 - (void)recallSceneWithParams:(MTRScenesClusterRecallSceneParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler
+                   completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -976,7 +1066,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -1021,8 +1111,8 @@ using chip::SessionHandle;
 - (void)getSceneMembershipWithParams:(MTRScenesClusterGetSceneMembershipParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                   completionHandler:(void (^)(MTRScenesClusterGetSceneMembershipResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler
+                          completion:(void (^)(MTRScenesClusterGetSceneMembershipResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -1034,7 +1124,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRScenesClusterGetSceneMembershipResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRScenesClusterGetSceneMembershipResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -1067,8 +1157,8 @@ using chip::SessionHandle;
 - (void)enhancedAddSceneWithParams:(MTRScenesClusterEnhancedAddSceneParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                 completionHandler:(void (^)(MTRScenesClusterEnhancedAddSceneResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completionHandler
+                        completion:(void (^)(MTRScenesClusterEnhancedAddSceneResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -1080,7 +1170,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRScenesClusterEnhancedAddSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRScenesClusterEnhancedAddSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -1190,8 +1280,8 @@ using chip::SessionHandle;
 - (void)enhancedViewSceneWithParams:(MTRScenesClusterEnhancedViewSceneParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                  completionHandler:(void (^)(MTRScenesClusterEnhancedViewSceneResponseParams * _Nullable data,
-                                        NSError * _Nullable error))completionHandler
+                         completion:(void (^)(MTRScenesClusterEnhancedViewSceneResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -1203,7 +1293,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRScenesClusterEnhancedViewSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRScenesClusterEnhancedViewSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -1237,8 +1327,8 @@ using chip::SessionHandle;
 - (void)copySceneWithParams:(MTRScenesClusterCopySceneParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-          completionHandler:
-              (void (^)(MTRScenesClusterCopySceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+                 completion:
+                     (void (^)(MTRScenesClusterCopySceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -1250,7 +1340,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRScenesClusterCopySceneResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRScenesClusterCopySceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -1381,6 +1471,115 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)addSceneWithParams:(MTRScenesClusterAddSceneParams *)params
+            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+         completionHandler:
+             (void (^)(MTRScenesClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self addSceneWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)viewSceneWithParams:(MTRScenesClusterViewSceneParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:
+              (void (^)(MTRScenesClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self viewSceneWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)removeSceneWithParams:(MTRScenesClusterRemoveSceneParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:
+                (void (^)(MTRScenesClusterRemoveSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self removeSceneWithParams:params
+                 expectedValues:expectedDataValueDictionaries
+          expectedValueInterval:expectedValueIntervalMs
+                     completion:completionHandler];
+}
+- (void)removeAllScenesWithParams:(MTRScenesClusterRemoveAllScenesParams *)params
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                completionHandler:(void (^)(MTRScenesClusterRemoveAllScenesResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completionHandler
+{
+    [self removeAllScenesWithParams:params
+                     expectedValues:expectedDataValueDictionaries
+              expectedValueInterval:expectedValueIntervalMs
+                         completion:completionHandler];
+}
+- (void)storeSceneWithParams:(MTRScenesClusterStoreSceneParams *)params
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+           completionHandler:
+               (void (^)(MTRScenesClusterStoreSceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self storeSceneWithParams:params
+                expectedValues:expectedDataValueDictionaries
+         expectedValueInterval:expectedValueIntervalMs
+                    completion:completionHandler];
+}
+- (void)recallSceneWithParams:(MTRScenesClusterRecallSceneParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self recallSceneWithParams:params
+                 expectedValues:expectedDataValueDictionaries
+          expectedValueInterval:expectedValueIntervalMs
+                     completion:completionHandler];
+}
+- (void)getSceneMembershipWithParams:(MTRScenesClusterGetSceneMembershipParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(void (^)(MTRScenesClusterGetSceneMembershipResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler
+{
+    [self getSceneMembershipWithParams:params
+                        expectedValues:expectedDataValueDictionaries
+                 expectedValueInterval:expectedValueIntervalMs
+                            completion:completionHandler];
+}
+- (void)enhancedAddSceneWithParams:(MTRScenesClusterEnhancedAddSceneParams *)params
+                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                 completionHandler:(void (^)(MTRScenesClusterEnhancedAddSceneResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completionHandler
+{
+    [self enhancedAddSceneWithParams:params
+                      expectedValues:expectedDataValueDictionaries
+               expectedValueInterval:expectedValueIntervalMs
+                          completion:completionHandler];
+}
+- (void)enhancedViewSceneWithParams:(MTRScenesClusterEnhancedViewSceneParams *)params
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                  completionHandler:(void (^)(MTRScenesClusterEnhancedViewSceneResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completionHandler
+{
+    [self enhancedViewSceneWithParams:params
+                       expectedValues:expectedDataValueDictionaries
+                expectedValueInterval:expectedValueIntervalMs
+                           completion:completionHandler];
+}
+- (void)copySceneWithParams:(MTRScenesClusterCopySceneParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:
+              (void (^)(MTRScenesClusterCopySceneResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self copySceneWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterOnOff
@@ -1400,17 +1599,14 @@ using chip::SessionHandle;
 
 - (void)offWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler
+                   completion:(MTRStatusCompletion)completion
 {
-    [self offWithParams:nil
-               expectedValues:expectedValues
-        expectedValueInterval:expectedValueIntervalMs
-            completionHandler:completionHandler];
+    [self offWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
 - (void)offWithParams:(MTROnOffClusterOffParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler
+               completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -1425,7 +1621,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -1458,17 +1654,14 @@ using chip::SessionHandle;
 
 - (void)onWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-           completionHandler:(StatusCompletion)completionHandler
+                  completion:(MTRStatusCompletion)completion
 {
-    [self onWithParams:nil
-               expectedValues:expectedValues
-        expectedValueInterval:expectedValueIntervalMs
-            completionHandler:completionHandler];
+    [self onWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
 - (void)onWithParams:(MTROnOffClusterOnParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler
+               completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -1483,7 +1676,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -1516,17 +1709,14 @@ using chip::SessionHandle;
 
 - (void)toggleWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-               completionHandler:(StatusCompletion)completionHandler
+                      completion:(MTRStatusCompletion)completion
 {
-    [self toggleWithParams:nil
-               expectedValues:expectedValues
-        expectedValueInterval:expectedValueIntervalMs
-            completionHandler:completionHandler];
+    [self toggleWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
 - (void)toggleWithParams:(MTROnOffClusterToggleParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler
+               completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -1541,7 +1731,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -1575,7 +1765,7 @@ using chip::SessionHandle;
 - (void)offWithEffectWithParams:(MTROnOffClusterOffWithEffectParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler
+                     completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -1590,7 +1780,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -1627,17 +1817,17 @@ using chip::SessionHandle;
 
 - (void)onWithRecallGlobalSceneWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                completionHandler:(StatusCompletion)completionHandler
+                                       completion:(MTRStatusCompletion)completion
 {
     [self onWithRecallGlobalSceneWithParams:nil
                              expectedValues:expectedValues
                       expectedValueInterval:expectedValueIntervalMs
-                          completionHandler:completionHandler];
+                                 completion:completion];
 }
 - (void)onWithRecallGlobalSceneWithParams:(MTROnOffClusterOnWithRecallGlobalSceneParams * _Nullable)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                        completionHandler:(StatusCompletion)completionHandler
+                               completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -1652,7 +1842,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -1686,7 +1876,7 @@ using chip::SessionHandle;
 - (void)onWithTimedOffWithParams:(MTROnOffClusterOnWithTimedOffParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-               completionHandler:(StatusCompletion)completionHandler
+                      completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -1701,7 +1891,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -1882,6 +2072,92 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)offWithParams:(MTROnOffClusterOffParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self offWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)offWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self offWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
+- (void)onWithParams:(MTROnOffClusterOnParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self onWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)onWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+           completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self onWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
+- (void)toggleWithParams:(MTROnOffClusterToggleParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self toggleWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)toggleWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self toggleWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
+- (void)offWithEffectWithParams:(MTROnOffClusterOffWithEffectParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self offWithEffectWithParams:params
+                   expectedValues:expectedDataValueDictionaries
+            expectedValueInterval:expectedValueIntervalMs
+                       completion:completionHandler];
+}
+- (void)onWithRecallGlobalSceneWithParams:(MTROnOffClusterOnWithRecallGlobalSceneParams * _Nullable)params
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self onWithRecallGlobalSceneWithParams:params
+                             expectedValues:expectedDataValueDictionaries
+                      expectedValueInterval:expectedValueIntervalMs
+                                 completion:completionHandler];
+}
+- (void)onWithRecallGlobalSceneWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self onWithRecallGlobalSceneWithExpectedValues:expectedValues
+                              expectedValueInterval:expectedValueIntervalMs
+                                         completion:completionHandler];
+}
+- (void)onWithTimedOffWithParams:(MTROnOffClusterOnWithTimedOffParams *)params
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+               completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self onWithTimedOffWithParams:params
+                    expectedValues:expectedDataValueDictionaries
+             expectedValueInterval:expectedValueIntervalMs
+                        completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterOnOffSwitchConfiguration
@@ -2003,7 +2279,7 @@ using chip::SessionHandle;
 - (void)moveToLevelWithParams:(MTRLevelControlClusterMoveToLevelParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler
+                   completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -2018,7 +2294,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -2061,7 +2337,7 @@ using chip::SessionHandle;
 - (void)moveWithParams:(MTRLevelControlClusterMoveParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler
+               completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -2076,7 +2352,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -2120,7 +2396,7 @@ using chip::SessionHandle;
 - (void)stepWithParams:(MTRLevelControlClusterStepParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler
+               completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -2135,7 +2411,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -2180,7 +2456,7 @@ using chip::SessionHandle;
 - (void)stopWithParams:(MTRLevelControlClusterStopParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler
+               completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -2195,7 +2471,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -2231,7 +2507,7 @@ using chip::SessionHandle;
 - (void)moveToLevelWithOnOffWithParams:(MTRLevelControlClusterMoveToLevelWithOnOffParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                     completionHandler:(StatusCompletion)completionHandler
+                            completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -2246,7 +2522,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -2289,7 +2565,7 @@ using chip::SessionHandle;
 - (void)moveWithOnOffWithParams:(MTRLevelControlClusterMoveWithOnOffParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler
+                     completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -2304,7 +2580,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -2348,7 +2624,7 @@ using chip::SessionHandle;
 - (void)stepWithOnOffWithParams:(MTRLevelControlClusterStepWithOnOffParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler
+                     completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -2363,7 +2639,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -2408,7 +2684,7 @@ using chip::SessionHandle;
 - (void)stopWithOnOffWithParams:(MTRLevelControlClusterStopWithOnOffParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler
+                     completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -2423,7 +2699,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -2459,7 +2735,7 @@ using chip::SessionHandle;
 - (void)moveToClosestFrequencyWithParams:(MTRLevelControlClusterMoveToClosestFrequencyParams *)params
                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                       completionHandler:(StatusCompletion)completionHandler
+                              completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -2474,7 +2750,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -2800,6 +3076,96 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)moveToLevelWithParams:(MTRLevelControlClusterMoveToLevelParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self moveToLevelWithParams:params
+                 expectedValues:expectedDataValueDictionaries
+          expectedValueInterval:expectedValueIntervalMs
+                     completion:completionHandler];
+}
+- (void)moveWithParams:(MTRLevelControlClusterMoveParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self moveWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)stepWithParams:(MTRLevelControlClusterStepParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self stepWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)stopWithParams:(MTRLevelControlClusterStopParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self stopWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)moveToLevelWithOnOffWithParams:(MTRLevelControlClusterMoveToLevelWithOnOffParams *)params
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                     completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self moveToLevelWithOnOffWithParams:params
+                          expectedValues:expectedDataValueDictionaries
+                   expectedValueInterval:expectedValueIntervalMs
+                              completion:completionHandler];
+}
+- (void)moveWithOnOffWithParams:(MTRLevelControlClusterMoveWithOnOffParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self moveWithOnOffWithParams:params
+                   expectedValues:expectedDataValueDictionaries
+            expectedValueInterval:expectedValueIntervalMs
+                       completion:completionHandler];
+}
+- (void)stepWithOnOffWithParams:(MTRLevelControlClusterStepWithOnOffParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self stepWithOnOffWithParams:params
+                   expectedValues:expectedDataValueDictionaries
+            expectedValueInterval:expectedValueIntervalMs
+                       completion:completionHandler];
+}
+- (void)stopWithOnOffWithParams:(MTRLevelControlClusterStopWithOnOffParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self stopWithOnOffWithParams:params
+                   expectedValues:expectedDataValueDictionaries
+            expectedValueInterval:expectedValueIntervalMs
+                       completion:completionHandler];
+}
+- (void)moveToClosestFrequencyWithParams:(MTRLevelControlClusterMoveToClosestFrequencyParams *)params
+                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                       completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self moveToClosestFrequencyWithParams:params
+                            expectedValues:expectedDataValueDictionaries
+                     expectedValueInterval:expectedValueIntervalMs
+                                completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterBinaryInputBasic
@@ -3407,7 +3773,7 @@ using chip::SessionHandle;
 - (void)instantActionWithParams:(MTRActionsClusterInstantActionParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler
+                     completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -3422,7 +3788,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -3461,7 +3827,7 @@ using chip::SessionHandle;
 - (void)instantActionWithTransitionWithParams:(MTRActionsClusterInstantActionWithTransitionParams *)params
                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                            completionHandler:(StatusCompletion)completionHandler
+                                   completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -3476,7 +3842,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -3516,7 +3882,7 @@ using chip::SessionHandle;
 - (void)startActionWithParams:(MTRActionsClusterStartActionParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler
+                   completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -3531,7 +3897,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -3570,7 +3936,7 @@ using chip::SessionHandle;
 - (void)startActionWithDurationWithParams:(MTRActionsClusterStartActionWithDurationParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                        completionHandler:(StatusCompletion)completionHandler
+                               completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -3585,7 +3951,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -3625,7 +3991,7 @@ using chip::SessionHandle;
 - (void)stopActionWithParams:(MTRActionsClusterStopActionParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-           completionHandler:(StatusCompletion)completionHandler
+                  completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -3640,7 +4006,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -3679,7 +4045,7 @@ using chip::SessionHandle;
 - (void)pauseActionWithParams:(MTRActionsClusterPauseActionParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler
+                   completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -3694,7 +4060,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -3733,7 +4099,7 @@ using chip::SessionHandle;
 - (void)pauseActionWithDurationWithParams:(MTRActionsClusterPauseActionWithDurationParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                        completionHandler:(StatusCompletion)completionHandler
+                               completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -3748,7 +4114,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -3788,7 +4154,7 @@ using chip::SessionHandle;
 - (void)resumeActionWithParams:(MTRActionsClusterResumeActionParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-             completionHandler:(StatusCompletion)completionHandler
+                    completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -3803,7 +4169,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -3842,7 +4208,7 @@ using chip::SessionHandle;
 - (void)enableActionWithParams:(MTRActionsClusterEnableActionParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-             completionHandler:(StatusCompletion)completionHandler
+                    completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -3857,7 +4223,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -3896,7 +4262,7 @@ using chip::SessionHandle;
 - (void)enableActionWithDurationWithParams:(MTRActionsClusterEnableActionWithDurationParams *)params
                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                         completionHandler:(StatusCompletion)completionHandler
+                                completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -3911,7 +4277,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -3951,7 +4317,7 @@ using chip::SessionHandle;
 - (void)disableActionWithParams:(MTRActionsClusterDisableActionParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler
+                     completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -3966,7 +4332,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -4005,7 +4371,7 @@ using chip::SessionHandle;
 - (void)disableActionWithDurationWithParams:(MTRActionsClusterDisableActionWithDurationParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                          completionHandler:(StatusCompletion)completionHandler
+                                 completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -4020,7 +4386,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -4130,6 +4496,126 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)instantActionWithParams:(MTRActionsClusterInstantActionParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self instantActionWithParams:params
+                   expectedValues:expectedDataValueDictionaries
+            expectedValueInterval:expectedValueIntervalMs
+                       completion:completionHandler];
+}
+- (void)instantActionWithTransitionWithParams:(MTRActionsClusterInstantActionWithTransitionParams *)params
+                               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                            completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self instantActionWithTransitionWithParams:params
+                                 expectedValues:expectedDataValueDictionaries
+                          expectedValueInterval:expectedValueIntervalMs
+                                     completion:completionHandler];
+}
+- (void)startActionWithParams:(MTRActionsClusterStartActionParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self startActionWithParams:params
+                 expectedValues:expectedDataValueDictionaries
+          expectedValueInterval:expectedValueIntervalMs
+                     completion:completionHandler];
+}
+- (void)startActionWithDurationWithParams:(MTRActionsClusterStartActionWithDurationParams *)params
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self startActionWithDurationWithParams:params
+                             expectedValues:expectedDataValueDictionaries
+                      expectedValueInterval:expectedValueIntervalMs
+                                 completion:completionHandler];
+}
+- (void)stopActionWithParams:(MTRActionsClusterStopActionParams *)params
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+           completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self stopActionWithParams:params
+                expectedValues:expectedDataValueDictionaries
+         expectedValueInterval:expectedValueIntervalMs
+                    completion:completionHandler];
+}
+- (void)pauseActionWithParams:(MTRActionsClusterPauseActionParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self pauseActionWithParams:params
+                 expectedValues:expectedDataValueDictionaries
+          expectedValueInterval:expectedValueIntervalMs
+                     completion:completionHandler];
+}
+- (void)pauseActionWithDurationWithParams:(MTRActionsClusterPauseActionWithDurationParams *)params
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self pauseActionWithDurationWithParams:params
+                             expectedValues:expectedDataValueDictionaries
+                      expectedValueInterval:expectedValueIntervalMs
+                                 completion:completionHandler];
+}
+- (void)resumeActionWithParams:(MTRActionsClusterResumeActionParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self resumeActionWithParams:params
+                  expectedValues:expectedDataValueDictionaries
+           expectedValueInterval:expectedValueIntervalMs
+                      completion:completionHandler];
+}
+- (void)enableActionWithParams:(MTRActionsClusterEnableActionParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self enableActionWithParams:params
+                  expectedValues:expectedDataValueDictionaries
+           expectedValueInterval:expectedValueIntervalMs
+                      completion:completionHandler];
+}
+- (void)enableActionWithDurationWithParams:(MTRActionsClusterEnableActionWithDurationParams *)params
+                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                         completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self enableActionWithDurationWithParams:params
+                              expectedValues:expectedDataValueDictionaries
+                       expectedValueInterval:expectedValueIntervalMs
+                                  completion:completionHandler];
+}
+- (void)disableActionWithParams:(MTRActionsClusterDisableActionParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self disableActionWithParams:params
+                   expectedValues:expectedDataValueDictionaries
+            expectedValueInterval:expectedValueIntervalMs
+                       completion:completionHandler];
+}
+- (void)disableActionWithDurationWithParams:(MTRActionsClusterDisableActionWithDurationParams *)params
+                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                          completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self disableActionWithDurationWithParams:params
+                               expectedValues:expectedDataValueDictionaries
+                        expectedValueInterval:expectedValueIntervalMs
+                                   completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterBasic
@@ -4149,17 +4635,17 @@ using chip::SessionHandle;
 
 - (void)mfgSpecificPingWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                        completionHandler:(StatusCompletion)completionHandler
+                               completion:(MTRStatusCompletion)completion
 {
     [self mfgSpecificPingWithParams:nil
                      expectedValues:expectedValues
               expectedValueInterval:expectedValueIntervalMs
-                  completionHandler:completionHandler];
+                         completion:completion];
 }
 - (void)mfgSpecificPingWithParams:(MTRBasicClusterMfgSpecificPingParams * _Nullable)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                completionHandler:(StatusCompletion)completionHandler
+                       completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -4174,7 +4660,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -4471,6 +4957,24 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)mfgSpecificPingWithParams:(MTRBasicClusterMfgSpecificPingParams * _Nullable)params
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self mfgSpecificPingWithParams:params
+                     expectedValues:expectedDataValueDictionaries
+              expectedValueInterval:expectedValueIntervalMs
+                         completion:completionHandler];
+}
+- (void)mfgSpecificPingWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self mfgSpecificPingWithExpectedValues:expectedValues
+                      expectedValueInterval:expectedValueIntervalMs
+                                 completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterOtaSoftwareUpdateProvider
@@ -4491,8 +4995,8 @@ using chip::SessionHandle;
 - (void)queryImageWithParams:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-           completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
-                                 NSError * _Nullable error))completionHandler
+                  completion:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                                 NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -4504,7 +5008,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -4579,8 +5083,8 @@ using chip::SessionHandle;
 - (void)applyUpdateRequestWithParams:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                   completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler
+                          completion:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -4592,7 +5096,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -4626,7 +5130,7 @@ using chip::SessionHandle;
 - (void)notifyUpdateAppliedWithParams:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completionHandler:(StatusCompletion)completionHandler
+                           completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -4641,7 +5145,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -4723,6 +5227,38 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)queryImageWithParams:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+           completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                                 NSError * _Nullable error))completionHandler
+{
+    [self queryImageWithParams:params
+                expectedValues:expectedDataValueDictionaries
+         expectedValueInterval:expectedValueIntervalMs
+                    completion:completionHandler];
+}
+- (void)applyUpdateRequestWithParams:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler
+{
+    [self applyUpdateRequestWithParams:params
+                        expectedValues:expectedDataValueDictionaries
+                 expectedValueInterval:expectedValueIntervalMs
+                            completion:completionHandler];
+}
+- (void)notifyUpdateAppliedWithParams:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self notifyUpdateAppliedWithParams:params
+                         expectedValues:expectedDataValueDictionaries
+                  expectedValueInterval:expectedValueIntervalMs
+                             completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterOtaSoftwareUpdateRequestor
@@ -4743,7 +5279,7 @@ using chip::SessionHandle;
 - (void)announceOtaProviderWithParams:(MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completionHandler:(StatusCompletion)completionHandler
+                           completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -4758,7 +5294,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -4899,6 +5435,16 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)announceOtaProviderWithParams:(MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self announceOtaProviderWithParams:params
+                         expectedValues:expectedDataValueDictionaries
+                  expectedValueInterval:expectedValueIntervalMs
+                             completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterLocalizationConfiguration
@@ -5629,8 +6175,8 @@ using chip::SessionHandle;
 - (void)armFailSafeWithParams:(MTRGeneralCommissioningClusterArmFailSafeParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(void (^)(MTRGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable data,
-                                  NSError * _Nullable error))completionHandler
+                   completion:(void (^)(MTRGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -5642,7 +6188,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -5676,8 +6222,8 @@ using chip::SessionHandle;
 - (void)setRegulatoryConfigWithParams:(MTRGeneralCommissioningClusterSetRegulatoryConfigParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completionHandler:(void (^)(MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams * _Nullable data,
-                                          NSError * _Nullable error))completionHandler
+                           completion:(void (^)(MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -5689,8 +6235,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(self.callbackQueue, baseDevice,
-            completionHandler,
+        new MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -5726,21 +6271,22 @@ using chip::SessionHandle;
 
 - (void)commissioningCompleteWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                              completionHandler:
-                                  (void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
-                                      NSError * _Nullable error))completionHandler
+                                     completion:
+                                         (void (^)(
+                                             MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
+                                             NSError * _Nullable error))completion
 {
     [self commissioningCompleteWithParams:nil
                            expectedValues:expectedValues
                     expectedValueInterval:expectedValueIntervalMs
-                        completionHandler:completionHandler];
+                               completion:completion];
 }
 - (void)commissioningCompleteWithParams:(MTRGeneralCommissioningClusterCommissioningCompleteParams * _Nullable)params
                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                      completionHandler:
-                          (void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
-                              NSError * _Nullable error))completionHandler
+                             completion:
+                                 (void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -5752,8 +6298,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(self.callbackQueue, baseDevice,
-            completionHandler,
+        new MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -5891,6 +6436,50 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)armFailSafeWithParams:(MTRGeneralCommissioningClusterArmFailSafeParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(void (^)(MTRGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completionHandler
+{
+    [self armFailSafeWithParams:params
+                 expectedValues:expectedDataValueDictionaries
+          expectedValueInterval:expectedValueIntervalMs
+                     completion:completionHandler];
+}
+- (void)setRegulatoryConfigWithParams:(MTRGeneralCommissioningClusterSetRegulatoryConfigParams *)params
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completionHandler:(void (^)(MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completionHandler
+{
+    [self setRegulatoryConfigWithParams:params
+                         expectedValues:expectedDataValueDictionaries
+                  expectedValueInterval:expectedValueIntervalMs
+                             completion:completionHandler];
+}
+- (void)commissioningCompleteWithParams:(MTRGeneralCommissioningClusterCommissioningCompleteParams * _Nullable)params
+                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                      completionHandler:
+                          (void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
+                              NSError * _Nullable error))completionHandler
+{
+    [self commissioningCompleteWithParams:params
+                           expectedValues:expectedDataValueDictionaries
+                    expectedValueInterval:expectedValueIntervalMs
+                               completion:completionHandler];
+}
+- (void)commissioningCompleteWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                              completionHandler:
+                                  (void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completionHandler
+{
+    [self commissioningCompleteWithExpectedValues:expectedValues
+                            expectedValueInterval:expectedValueIntervalMs
+                                       completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterNetworkCommissioning
@@ -5911,8 +6500,8 @@ using chip::SessionHandle;
 - (void)scanNetworksWithParams:(MTRNetworkCommissioningClusterScanNetworksParams * _Nullable)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-             completionHandler:(void (^)(MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completionHandler
+                    completion:(void (^)(MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -5924,7 +6513,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -5971,8 +6560,8 @@ using chip::SessionHandle;
 - (void)addOrUpdateWiFiNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams *)params
                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                       completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
-                                             NSError * _Nullable error))completionHandler
+                              completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                             NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -5984,7 +6573,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -6022,8 +6611,8 @@ using chip::SessionHandle;
 - (void)addOrUpdateThreadNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams *)params
                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                         completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
-                                               NSError * _Nullable error))completionHandler
+                                completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                               NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -6035,7 +6624,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -6072,8 +6661,8 @@ using chip::SessionHandle;
 - (void)removeNetworkWithParams:(MTRNetworkCommissioningClusterRemoveNetworkParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-              completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completionHandler
+                     completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -6085,7 +6674,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -6122,8 +6711,8 @@ using chip::SessionHandle;
 - (void)connectNetworkWithParams:(MTRNetworkCommissioningClusterConnectNetworkParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-               completionHandler:(void (^)(MTRNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler
+                      completion:(void (^)(MTRNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -6135,7 +6724,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -6172,8 +6761,8 @@ using chip::SessionHandle;
 - (void)reorderNetworkWithParams:(MTRNetworkCommissioningClusterReorderNetworkParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-               completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler
+                      completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -6185,7 +6774,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -6352,6 +6941,72 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)scanNetworksWithParams:(MTRNetworkCommissioningClusterScanNetworksParams * _Nullable)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(void (^)(MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completionHandler
+{
+    [self scanNetworksWithParams:params
+                  expectedValues:expectedDataValueDictionaries
+           expectedValueInterval:expectedValueIntervalMs
+                      completion:completionHandler];
+}
+- (void)addOrUpdateWiFiNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams *)params
+                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                       completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                             NSError * _Nullable error))completionHandler
+{
+    [self addOrUpdateWiFiNetworkWithParams:params
+                            expectedValues:expectedDataValueDictionaries
+                     expectedValueInterval:expectedValueIntervalMs
+                                completion:completionHandler];
+}
+- (void)addOrUpdateThreadNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams *)params
+                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                         completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                               NSError * _Nullable error))completionHandler
+{
+    [self addOrUpdateThreadNetworkWithParams:params
+                              expectedValues:expectedDataValueDictionaries
+                       expectedValueInterval:expectedValueIntervalMs
+                                  completion:completionHandler];
+}
+- (void)removeNetworkWithParams:(MTRNetworkCommissioningClusterRemoveNetworkParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completionHandler
+{
+    [self removeNetworkWithParams:params
+                   expectedValues:expectedDataValueDictionaries
+            expectedValueInterval:expectedValueIntervalMs
+                       completion:completionHandler];
+}
+- (void)connectNetworkWithParams:(MTRNetworkCommissioningClusterConnectNetworkParams *)params
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+               completionHandler:(void (^)(MTRNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completionHandler
+{
+    [self connectNetworkWithParams:params
+                    expectedValues:expectedDataValueDictionaries
+             expectedValueInterval:expectedValueIntervalMs
+                        completion:completionHandler];
+}
+- (void)reorderNetworkWithParams:(MTRNetworkCommissioningClusterReorderNetworkParams *)params
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+               completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completionHandler
+{
+    [self reorderNetworkWithParams:params
+                    expectedValues:expectedDataValueDictionaries
+             expectedValueInterval:expectedValueIntervalMs
+                        completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterDiagnosticLogs
@@ -6372,8 +7027,8 @@ using chip::SessionHandle;
 - (void)retrieveLogsRequestWithParams:(MTRDiagnosticLogsClusterRetrieveLogsRequestParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completionHandler:(void (^)(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data,
-                                          NSError * _Nullable error))completionHandler
+                           completion:(void (^)(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -6385,7 +7040,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -6467,6 +7122,17 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)retrieveLogsRequestWithParams:(MTRDiagnosticLogsClusterRetrieveLogsRequestParams *)params
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completionHandler:(void (^)(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completionHandler
+{
+    [self retrieveLogsRequestWithParams:params
+                         expectedValues:expectedDataValueDictionaries
+                  expectedValueInterval:expectedValueIntervalMs
+                             completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterGeneralDiagnostics
@@ -6487,7 +7153,7 @@ using chip::SessionHandle;
 - (void)testEventTriggerWithParams:(MTRGeneralDiagnosticsClusterTestEventTriggerParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                 completionHandler:(StatusCompletion)completionHandler
+                        completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -6502,7 +7168,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -6656,6 +7322,16 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)testEventTriggerWithParams:(MTRGeneralDiagnosticsClusterTestEventTriggerParams *)params
+                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                 completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self testEventTriggerWithParams:params
+                      expectedValues:expectedDataValueDictionaries
+               expectedValueInterval:expectedValueIntervalMs
+                          completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterSoftwareDiagnostics
@@ -6675,17 +7351,17 @@ using chip::SessionHandle;
 
 - (void)resetWatermarksWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                        completionHandler:(StatusCompletion)completionHandler
+                               completion:(MTRStatusCompletion)completion
 {
     [self resetWatermarksWithParams:nil
                      expectedValues:expectedValues
               expectedValueInterval:expectedValueIntervalMs
-                  completionHandler:completionHandler];
+                         completion:completion];
 }
 - (void)resetWatermarksWithParams:(MTRSoftwareDiagnosticsClusterResetWatermarksParams * _Nullable)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                completionHandler:(StatusCompletion)completionHandler
+                       completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -6700,7 +7376,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -6812,6 +7488,24 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)resetWatermarksWithParams:(MTRSoftwareDiagnosticsClusterResetWatermarksParams * _Nullable)params
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self resetWatermarksWithParams:params
+                     expectedValues:expectedDataValueDictionaries
+              expectedValueInterval:expectedValueIntervalMs
+                         completion:completionHandler];
+}
+- (void)resetWatermarksWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self resetWatermarksWithExpectedValues:expectedValues
+                      expectedValueInterval:expectedValueIntervalMs
+                                 completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterThreadNetworkDiagnostics
@@ -6831,17 +7525,17 @@ using chip::SessionHandle;
 
 - (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completionHandler:(StatusCompletion)completionHandler
+                           completion:(MTRStatusCompletion)completion
 {
     [self resetCountsWithParams:nil
                  expectedValues:expectedValues
           expectedValueInterval:expectedValueIntervalMs
-              completionHandler:completionHandler];
+                     completion:completion];
 }
 - (void)resetCountsWithParams:(MTRThreadNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler
+                   completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -6856,7 +7550,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -7441,6 +8135,22 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)resetCountsWithParams:(MTRThreadNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self resetCountsWithParams:params
+                 expectedValues:expectedDataValueDictionaries
+          expectedValueInterval:expectedValueIntervalMs
+                     completion:completionHandler];
+}
+- (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self resetCountsWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterWiFiNetworkDiagnostics
@@ -7460,17 +8170,17 @@ using chip::SessionHandle;
 
 - (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completionHandler:(StatusCompletion)completionHandler
+                           completion:(MTRStatusCompletion)completion
 {
     [self resetCountsWithParams:nil
                  expectedValues:expectedValues
           expectedValueInterval:expectedValueIntervalMs
-              completionHandler:completionHandler];
+                     completion:completion];
 }
 - (void)resetCountsWithParams:(MTRWiFiNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler
+                   completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -7485,7 +8195,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -7669,6 +8379,22 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)resetCountsWithParams:(MTRWiFiNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self resetCountsWithParams:params
+                 expectedValues:expectedDataValueDictionaries
+          expectedValueInterval:expectedValueIntervalMs
+                     completion:completionHandler];
+}
+- (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self resetCountsWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterEthernetNetworkDiagnostics
@@ -7688,17 +8414,17 @@ using chip::SessionHandle;
 
 - (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completionHandler:(StatusCompletion)completionHandler
+                           completion:(MTRStatusCompletion)completion
 {
     [self resetCountsWithParams:nil
                  expectedValues:expectedValues
           expectedValueInterval:expectedValueIntervalMs
-              completionHandler:completionHandler];
+                     completion:completion];
 }
 - (void)resetCountsWithParams:(MTREthernetNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler
+                   completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -7713,7 +8439,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -7865,6 +8591,22 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)resetCountsWithParams:(MTREthernetNetworkDiagnosticsClusterResetCountsParams * _Nullable)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self resetCountsWithParams:params
+                 expectedValues:expectedDataValueDictionaries
+          expectedValueInterval:expectedValueIntervalMs
+                     completion:completionHandler];
+}
+- (void)resetCountsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self resetCountsWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterBridgedDeviceBasic
@@ -8180,7 +8922,7 @@ using chip::SessionHandle;
 - (void)openCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenCommissioningWindowParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                        completionHandler:(StatusCompletion)completionHandler
+                               completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -8195,7 +8937,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -8237,7 +8979,7 @@ using chip::SessionHandle;
 - (void)openBasicCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams *)params
                                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                             completionHandler:(StatusCompletion)completionHandler
+                                    completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -8252,7 +8994,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -8289,17 +9031,17 @@ using chip::SessionHandle;
 
 - (void)revokeCommissioningWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                            completionHandler:(StatusCompletion)completionHandler
+                                   completion:(MTRStatusCompletion)completion
 {
     [self revokeCommissioningWithParams:nil
                          expectedValues:expectedValues
                   expectedValueInterval:expectedValueIntervalMs
-                      completionHandler:completionHandler];
+                             completion:completion];
 }
 - (void)revokeCommissioningWithParams:(MTRAdministratorCommissioningClusterRevokeCommissioningParams * _Nullable)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completionHandler:(StatusCompletion)completionHandler
+                           completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -8314,7 +9056,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -8421,6 +9163,44 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)openCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenCommissioningWindowParams *)params
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self openCommissioningWindowWithParams:params
+                             expectedValues:expectedDataValueDictionaries
+                      expectedValueInterval:expectedValueIntervalMs
+                                 completion:completionHandler];
+}
+- (void)openBasicCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams *)params
+                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                             completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self openBasicCommissioningWindowWithParams:params
+                                  expectedValues:expectedDataValueDictionaries
+                           expectedValueInterval:expectedValueIntervalMs
+                                      completion:completionHandler];
+}
+- (void)revokeCommissioningWithParams:(MTRAdministratorCommissioningClusterRevokeCommissioningParams * _Nullable)params
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self revokeCommissioningWithParams:params
+                         expectedValues:expectedDataValueDictionaries
+                  expectedValueInterval:expectedValueIntervalMs
+                             completion:completionHandler];
+}
+- (void)revokeCommissioningWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                            completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self revokeCommissioningWithExpectedValues:expectedValues
+                          expectedValueInterval:expectedValueIntervalMs
+                                     completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterOperationalCredentials
@@ -8441,8 +9221,8 @@ using chip::SessionHandle;
 - (void)attestationRequestWithParams:(MTROperationalCredentialsClusterAttestationRequestParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                   completionHandler:(void (^)(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler
+                          completion:(void (^)(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -8454,7 +9234,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTROperationalCredentialsClusterAttestationResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTROperationalCredentialsClusterAttestationResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -8487,8 +9267,8 @@ using chip::SessionHandle;
 - (void)certificateChainRequestWithParams:(MTROperationalCredentialsClusterCertificateChainRequestParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                        completionHandler:(void (^)(MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable data,
-                                              NSError * _Nullable error))completionHandler
+                               completion:(void (^)(MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -8500,8 +9280,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge(self.callbackQueue, baseDevice,
-            completionHandler,
+        new MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -8535,8 +9314,8 @@ using chip::SessionHandle;
 - (void)CSRRequestWithParams:(MTROperationalCredentialsClusterCSRRequestParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-           completionHandler:(void (^)(MTROperationalCredentialsClusterCSRResponseParams * _Nullable data,
-                                 NSError * _Nullable error))completionHandler
+                  completion:(void (^)(MTROperationalCredentialsClusterCSRResponseParams * _Nullable data,
+                                 NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -8548,7 +9327,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTROperationalCredentialsClusterCSRResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTROperationalCredentialsClusterCSRResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -8585,8 +9364,8 @@ using chip::SessionHandle;
 - (void)addNOCWithParams:(MTROperationalCredentialsClusterAddNOCParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
-                              NSError * _Nullable error))completionHandler
+               completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -8598,7 +9377,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -8639,8 +9418,8 @@ using chip::SessionHandle;
 - (void)updateNOCWithParams:(MTROperationalCredentialsClusterUpdateNOCParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-          completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
-                                NSError * _Nullable error))completionHandler
+                 completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -8652,7 +9431,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -8689,8 +9468,8 @@ using chip::SessionHandle;
 - (void)updateFabricLabelWithParams:(MTROperationalCredentialsClusterUpdateFabricLabelParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                  completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
-                                        NSError * _Nullable error))completionHandler
+                         completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -8702,7 +9481,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -8735,8 +9514,8 @@ using chip::SessionHandle;
 - (void)removeFabricWithParams:(MTROperationalCredentialsClusterRemoveFabricParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-             completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completionHandler
+                    completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -8748,7 +9527,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -8781,7 +9560,7 @@ using chip::SessionHandle;
 - (void)addTrustedRootCertificateWithParams:(MTROperationalCredentialsClusterAddTrustedRootCertificateParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                          completionHandler:(StatusCompletion)completionHandler
+                                 completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -8796,7 +9575,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -8925,6 +9704,93 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)attestationRequestWithParams:(MTROperationalCredentialsClusterAttestationRequestParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(void (^)(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler
+{
+    [self attestationRequestWithParams:params
+                        expectedValues:expectedDataValueDictionaries
+                 expectedValueInterval:expectedValueIntervalMs
+                            completion:completionHandler];
+}
+- (void)certificateChainRequestWithParams:(MTROperationalCredentialsClusterCertificateChainRequestParams *)params
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                        completionHandler:(void (^)(MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completionHandler
+{
+    [self certificateChainRequestWithParams:params
+                             expectedValues:expectedDataValueDictionaries
+                      expectedValueInterval:expectedValueIntervalMs
+                                 completion:completionHandler];
+}
+- (void)CSRRequestWithParams:(MTROperationalCredentialsClusterCSRRequestParams *)params
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+           completionHandler:(void (^)(MTROperationalCredentialsClusterCSRResponseParams * _Nullable data,
+                                 NSError * _Nullable error))completionHandler
+{
+    [self CSRRequestWithParams:params
+                expectedValues:expectedDataValueDictionaries
+         expectedValueInterval:expectedValueIntervalMs
+                    completion:completionHandler];
+}
+- (void)addNOCWithParams:(MTROperationalCredentialsClusterAddNOCParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                              NSError * _Nullable error))completionHandler
+{
+    [self addNOCWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)updateNOCWithParams:(MTROperationalCredentialsClusterUpdateNOCParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                NSError * _Nullable error))completionHandler
+{
+    [self updateNOCWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)updateFabricLabelWithParams:(MTROperationalCredentialsClusterUpdateFabricLabelParams *)params
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                  completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completionHandler
+{
+    [self updateFabricLabelWithParams:params
+                       expectedValues:expectedDataValueDictionaries
+                expectedValueInterval:expectedValueIntervalMs
+                           completion:completionHandler];
+}
+- (void)removeFabricWithParams:(MTROperationalCredentialsClusterRemoveFabricParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completionHandler
+{
+    [self removeFabricWithParams:params
+                  expectedValues:expectedDataValueDictionaries
+           expectedValueInterval:expectedValueIntervalMs
+                      completion:completionHandler];
+}
+- (void)addTrustedRootCertificateWithParams:(MTROperationalCredentialsClusterAddTrustedRootCertificateParams *)params
+                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                          completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self addTrustedRootCertificateWithParams:params
+                               expectedValues:expectedDataValueDictionaries
+                        expectedValueInterval:expectedValueIntervalMs
+                                   completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterGroupKeyManagement
@@ -8945,7 +9811,7 @@ using chip::SessionHandle;
 - (void)keySetWriteWithParams:(MTRGroupKeyManagementClusterKeySetWriteParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler
+                   completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -8960,7 +9826,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -9034,8 +9900,8 @@ using chip::SessionHandle;
 - (void)keySetReadWithParams:(MTRGroupKeyManagementClusterKeySetReadParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-           completionHandler:(void (^)(MTRGroupKeyManagementClusterKeySetReadResponseParams * _Nullable data,
-                                 NSError * _Nullable error))completionHandler
+                  completion:(void (^)(MTRGroupKeyManagementClusterKeySetReadResponseParams * _Nullable data,
+                                 NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -9047,7 +9913,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -9080,7 +9946,7 @@ using chip::SessionHandle;
 - (void)keySetRemoveWithParams:(MTRGroupKeyManagementClusterKeySetRemoveParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-             completionHandler:(StatusCompletion)completionHandler
+                    completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -9095,7 +9961,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -9130,8 +9996,8 @@ using chip::SessionHandle;
 - (void)keySetReadAllIndicesWithParams:(MTRGroupKeyManagementClusterKeySetReadAllIndicesParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                     completionHandler:(void (^)(MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completionHandler
+                            completion:(void (^)(MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -9143,8 +10009,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge(self.callbackQueue, baseDevice,
-            completionHandler,
+        new MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -9296,6 +10161,48 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)keySetWriteWithParams:(MTRGroupKeyManagementClusterKeySetWriteParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self keySetWriteWithParams:params
+                 expectedValues:expectedDataValueDictionaries
+          expectedValueInterval:expectedValueIntervalMs
+                     completion:completionHandler];
+}
+- (void)keySetReadWithParams:(MTRGroupKeyManagementClusterKeySetReadParams *)params
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+           completionHandler:(void (^)(MTRGroupKeyManagementClusterKeySetReadResponseParams * _Nullable data,
+                                 NSError * _Nullable error))completionHandler
+{
+    [self keySetReadWithParams:params
+                expectedValues:expectedDataValueDictionaries
+         expectedValueInterval:expectedValueIntervalMs
+                    completion:completionHandler];
+}
+- (void)keySetRemoveWithParams:(MTRGroupKeyManagementClusterKeySetRemoveParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self keySetRemoveWithParams:params
+                  expectedValues:expectedDataValueDictionaries
+           expectedValueInterval:expectedValueIntervalMs
+                      completion:completionHandler];
+}
+- (void)keySetReadAllIndicesWithParams:(MTRGroupKeyManagementClusterKeySetReadAllIndicesParams *)params
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                     completionHandler:(void (^)(MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completionHandler
+{
+    [self keySetReadAllIndicesWithParams:params
+                          expectedValues:expectedDataValueDictionaries
+                   expectedValueInterval:expectedValueIntervalMs
+                              completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterFixedLabel
@@ -9557,7 +10464,7 @@ using chip::SessionHandle;
 - (void)changeToModeWithParams:(MTRModeSelectClusterChangeToModeParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-             completionHandler:(StatusCompletion)completionHandler
+                    completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -9572,7 +10479,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -9739,6 +10646,16 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)changeToModeWithParams:(MTRModeSelectClusterChangeToModeParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self changeToModeWithParams:params
+                  expectedValues:expectedDataValueDictionaries
+           expectedValueInterval:expectedValueIntervalMs
+                      completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterDoorLock
@@ -9759,7 +10676,7 @@ using chip::SessionHandle;
 - (void)lockDoorWithParams:(MTRDoorLockClusterLockDoorParams * _Nullable)params
             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-         completionHandler:(StatusCompletion)completionHandler
+                completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -9774,7 +10691,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -9817,7 +10734,7 @@ using chip::SessionHandle;
 - (void)unlockDoorWithParams:(MTRDoorLockClusterUnlockDoorParams * _Nullable)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-           completionHandler:(StatusCompletion)completionHandler
+                  completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -9832,7 +10749,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -9875,7 +10792,7 @@ using chip::SessionHandle;
 - (void)unlockWithTimeoutWithParams:(MTRDoorLockClusterUnlockWithTimeoutParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                  completionHandler:(StatusCompletion)completionHandler
+                         completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -9890,7 +10807,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -9932,7 +10849,7 @@ using chip::SessionHandle;
 - (void)setWeekDayScheduleWithParams:(MTRDoorLockClusterSetWeekDayScheduleParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler
+                          completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -9947,7 +10864,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -9989,8 +10906,8 @@ using chip::SessionHandle;
 - (void)getWeekDayScheduleWithParams:(MTRDoorLockClusterGetWeekDayScheduleParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                   completionHandler:(void (^)(MTRDoorLockClusterGetWeekDayScheduleResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler
+                          completion:(void (^)(MTRDoorLockClusterGetWeekDayScheduleResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -10002,7 +10919,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -10036,7 +10953,7 @@ using chip::SessionHandle;
 - (void)clearWeekDayScheduleWithParams:(MTRDoorLockClusterClearWeekDayScheduleParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                     completionHandler:(StatusCompletion)completionHandler
+                            completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -10051,7 +10968,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -10087,7 +11004,7 @@ using chip::SessionHandle;
 - (void)setYearDayScheduleWithParams:(MTRDoorLockClusterSetYearDayScheduleParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler
+                          completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -10102,7 +11019,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -10140,8 +11057,8 @@ using chip::SessionHandle;
 - (void)getYearDayScheduleWithParams:(MTRDoorLockClusterGetYearDayScheduleParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                   completionHandler:(void (^)(MTRDoorLockClusterGetYearDayScheduleResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler
+                          completion:(void (^)(MTRDoorLockClusterGetYearDayScheduleResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -10153,7 +11070,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -10187,7 +11104,7 @@ using chip::SessionHandle;
 - (void)clearYearDayScheduleWithParams:(MTRDoorLockClusterClearYearDayScheduleParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                     completionHandler:(StatusCompletion)completionHandler
+                            completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -10202,7 +11119,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -10238,7 +11155,7 @@ using chip::SessionHandle;
 - (void)setHolidayScheduleWithParams:(MTRDoorLockClusterSetHolidayScheduleParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler
+                          completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -10253,7 +11170,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -10292,8 +11209,8 @@ using chip::SessionHandle;
 - (void)getHolidayScheduleWithParams:(MTRDoorLockClusterGetHolidayScheduleParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                   completionHandler:(void (^)(MTRDoorLockClusterGetHolidayScheduleResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler
+                          completion:(void (^)(MTRDoorLockClusterGetHolidayScheduleResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -10305,7 +11222,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -10338,7 +11255,7 @@ using chip::SessionHandle;
 - (void)clearHolidayScheduleWithParams:(MTRDoorLockClusterClearHolidayScheduleParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                     completionHandler:(StatusCompletion)completionHandler
+                            completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -10353,7 +11270,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -10388,7 +11305,7 @@ using chip::SessionHandle;
 - (void)setUserWithParams:(MTRDoorLockClusterSetUserParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler
+               completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -10403,7 +11320,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -10476,8 +11393,7 @@ using chip::SessionHandle;
 - (void)getUserWithParams:(MTRDoorLockClusterGetUserParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:
-            (void (^)(MTRDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+               completion:(void (^)(MTRDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -10489,7 +11405,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRDoorLockClusterGetUserResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRDoorLockClusterGetUserResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -10522,7 +11438,7 @@ using chip::SessionHandle;
 - (void)clearUserWithParams:(MTRDoorLockClusterClearUserParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-          completionHandler:(StatusCompletion)completionHandler
+                 completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -10537,7 +11453,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -10575,8 +11491,8 @@ using chip::SessionHandle;
 - (void)setCredentialWithParams:(MTRDoorLockClusterSetCredentialParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-              completionHandler:(void (^)(MTRDoorLockClusterSetCredentialResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completionHandler
+                     completion:(void (^)(MTRDoorLockClusterSetCredentialResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -10588,7 +11504,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRDoorLockClusterSetCredentialResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRDoorLockClusterSetCredentialResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -10650,8 +11566,8 @@ using chip::SessionHandle;
 - (void)getCredentialStatusWithParams:(MTRDoorLockClusterGetCredentialStatusParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completionHandler:(void (^)(MTRDoorLockClusterGetCredentialStatusResponseParams * _Nullable data,
-                                          NSError * _Nullable error))completionHandler
+                           completion:(void (^)(MTRDoorLockClusterGetCredentialStatusResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -10663,7 +11579,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -10699,7 +11615,7 @@ using chip::SessionHandle;
 - (void)clearCredentialWithParams:(MTRDoorLockClusterClearCredentialParams *)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                completionHandler:(StatusCompletion)completionHandler
+                       completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -10714,7 +11630,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -11449,6 +12365,192 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)lockDoorWithParams:(MTRDoorLockClusterLockDoorParams * _Nullable)params
+            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+         completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self lockDoorWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)unlockDoorWithParams:(MTRDoorLockClusterUnlockDoorParams * _Nullable)params
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+           completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self unlockDoorWithParams:params
+                expectedValues:expectedDataValueDictionaries
+         expectedValueInterval:expectedValueIntervalMs
+                    completion:completionHandler];
+}
+- (void)unlockWithTimeoutWithParams:(MTRDoorLockClusterUnlockWithTimeoutParams *)params
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                  completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self unlockWithTimeoutWithParams:params
+                       expectedValues:expectedDataValueDictionaries
+                expectedValueInterval:expectedValueIntervalMs
+                           completion:completionHandler];
+}
+- (void)setWeekDayScheduleWithParams:(MTRDoorLockClusterSetWeekDayScheduleParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self setWeekDayScheduleWithParams:params
+                        expectedValues:expectedDataValueDictionaries
+                 expectedValueInterval:expectedValueIntervalMs
+                            completion:completionHandler];
+}
+- (void)getWeekDayScheduleWithParams:(MTRDoorLockClusterGetWeekDayScheduleParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(void (^)(MTRDoorLockClusterGetWeekDayScheduleResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler
+{
+    [self getWeekDayScheduleWithParams:params
+                        expectedValues:expectedDataValueDictionaries
+                 expectedValueInterval:expectedValueIntervalMs
+                            completion:completionHandler];
+}
+- (void)clearWeekDayScheduleWithParams:(MTRDoorLockClusterClearWeekDayScheduleParams *)params
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                     completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self clearWeekDayScheduleWithParams:params
+                          expectedValues:expectedDataValueDictionaries
+                   expectedValueInterval:expectedValueIntervalMs
+                              completion:completionHandler];
+}
+- (void)setYearDayScheduleWithParams:(MTRDoorLockClusterSetYearDayScheduleParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self setYearDayScheduleWithParams:params
+                        expectedValues:expectedDataValueDictionaries
+                 expectedValueInterval:expectedValueIntervalMs
+                            completion:completionHandler];
+}
+- (void)getYearDayScheduleWithParams:(MTRDoorLockClusterGetYearDayScheduleParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(void (^)(MTRDoorLockClusterGetYearDayScheduleResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler
+{
+    [self getYearDayScheduleWithParams:params
+                        expectedValues:expectedDataValueDictionaries
+                 expectedValueInterval:expectedValueIntervalMs
+                            completion:completionHandler];
+}
+- (void)clearYearDayScheduleWithParams:(MTRDoorLockClusterClearYearDayScheduleParams *)params
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                     completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self clearYearDayScheduleWithParams:params
+                          expectedValues:expectedDataValueDictionaries
+                   expectedValueInterval:expectedValueIntervalMs
+                              completion:completionHandler];
+}
+- (void)setHolidayScheduleWithParams:(MTRDoorLockClusterSetHolidayScheduleParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self setHolidayScheduleWithParams:params
+                        expectedValues:expectedDataValueDictionaries
+                 expectedValueInterval:expectedValueIntervalMs
+                            completion:completionHandler];
+}
+- (void)getHolidayScheduleWithParams:(MTRDoorLockClusterGetHolidayScheduleParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(void (^)(MTRDoorLockClusterGetHolidayScheduleResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler
+{
+    [self getHolidayScheduleWithParams:params
+                        expectedValues:expectedDataValueDictionaries
+                 expectedValueInterval:expectedValueIntervalMs
+                            completion:completionHandler];
+}
+- (void)clearHolidayScheduleWithParams:(MTRDoorLockClusterClearHolidayScheduleParams *)params
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                     completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self clearHolidayScheduleWithParams:params
+                          expectedValues:expectedDataValueDictionaries
+                   expectedValueInterval:expectedValueIntervalMs
+                              completion:completionHandler];
+}
+- (void)setUserWithParams:(MTRDoorLockClusterSetUserParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self setUserWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)getUserWithParams:(MTRDoorLockClusterGetUserParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:
+            (void (^)(MTRDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self getUserWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)clearUserWithParams:(MTRDoorLockClusterClearUserParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self clearUserWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)setCredentialWithParams:(MTRDoorLockClusterSetCredentialParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(void (^)(MTRDoorLockClusterSetCredentialResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completionHandler
+{
+    [self setCredentialWithParams:params
+                   expectedValues:expectedDataValueDictionaries
+            expectedValueInterval:expectedValueIntervalMs
+                       completion:completionHandler];
+}
+- (void)getCredentialStatusWithParams:(MTRDoorLockClusterGetCredentialStatusParams *)params
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completionHandler:(void (^)(MTRDoorLockClusterGetCredentialStatusResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completionHandler
+{
+    [self getCredentialStatusWithParams:params
+                         expectedValues:expectedDataValueDictionaries
+                  expectedValueInterval:expectedValueIntervalMs
+                             completion:completionHandler];
+}
+- (void)clearCredentialWithParams:(MTRDoorLockClusterClearCredentialParams *)params
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self clearCredentialWithParams:params
+                     expectedValues:expectedDataValueDictionaries
+              expectedValueInterval:expectedValueIntervalMs
+                         completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterWindowCovering
@@ -11468,17 +12570,14 @@ using chip::SessionHandle;
 
 - (void)upOrOpenWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                 completionHandler:(StatusCompletion)completionHandler
+                        completion:(MTRStatusCompletion)completion
 {
-    [self upOrOpenWithParams:nil
-               expectedValues:expectedValues
-        expectedValueInterval:expectedValueIntervalMs
-            completionHandler:completionHandler];
+    [self upOrOpenWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
 - (void)upOrOpenWithParams:(MTRWindowCoveringClusterUpOrOpenParams * _Nullable)params
             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-         completionHandler:(StatusCompletion)completionHandler
+                completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -11493,7 +12592,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -11526,17 +12625,17 @@ using chip::SessionHandle;
 
 - (void)downOrCloseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completionHandler:(StatusCompletion)completionHandler
+                           completion:(MTRStatusCompletion)completion
 {
     [self downOrCloseWithParams:nil
                  expectedValues:expectedValues
           expectedValueInterval:expectedValueIntervalMs
-              completionHandler:completionHandler];
+                     completion:completion];
 }
 - (void)downOrCloseWithParams:(MTRWindowCoveringClusterDownOrCloseParams * _Nullable)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler
+                   completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -11551,7 +12650,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -11584,17 +12683,17 @@ using chip::SessionHandle;
 
 - (void)stopMotionWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler
+                          completion:(MTRStatusCompletion)completion
 {
     [self stopMotionWithParams:nil
                 expectedValues:expectedValues
          expectedValueInterval:expectedValueIntervalMs
-             completionHandler:completionHandler];
+                    completion:completion];
 }
 - (void)stopMotionWithParams:(MTRWindowCoveringClusterStopMotionParams * _Nullable)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-           completionHandler:(StatusCompletion)completionHandler
+                  completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -11609,7 +12708,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -11643,7 +12742,7 @@ using chip::SessionHandle;
 - (void)goToLiftValueWithParams:(MTRWindowCoveringClusterGoToLiftValueParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler
+                     completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -11658,7 +12757,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -11693,7 +12792,7 @@ using chip::SessionHandle;
 - (void)goToLiftPercentageWithParams:(MTRWindowCoveringClusterGoToLiftPercentageParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler
+                          completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -11708,7 +12807,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -11743,7 +12842,7 @@ using chip::SessionHandle;
 - (void)goToTiltValueWithParams:(MTRWindowCoveringClusterGoToTiltValueParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler
+                     completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -11758,7 +12857,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -11793,7 +12892,7 @@ using chip::SessionHandle;
 - (void)goToTiltPercentageWithParams:(MTRWindowCoveringClusterGoToTiltPercentageParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler
+                          completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -11808,7 +12907,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -12084,6 +13183,94 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)upOrOpenWithParams:(MTRWindowCoveringClusterUpOrOpenParams * _Nullable)params
+            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+         completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self upOrOpenWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)upOrOpenWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                 completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self upOrOpenWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
+- (void)downOrCloseWithParams:(MTRWindowCoveringClusterDownOrCloseParams * _Nullable)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self downOrCloseWithParams:params
+                 expectedValues:expectedDataValueDictionaries
+          expectedValueInterval:expectedValueIntervalMs
+                     completion:completionHandler];
+}
+- (void)downOrCloseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self downOrCloseWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
+- (void)stopMotionWithParams:(MTRWindowCoveringClusterStopMotionParams * _Nullable)params
+              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+           completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self stopMotionWithParams:params
+                expectedValues:expectedDataValueDictionaries
+         expectedValueInterval:expectedValueIntervalMs
+                    completion:completionHandler];
+}
+- (void)stopMotionWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self stopMotionWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
+- (void)goToLiftValueWithParams:(MTRWindowCoveringClusterGoToLiftValueParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self goToLiftValueWithParams:params
+                   expectedValues:expectedDataValueDictionaries
+            expectedValueInterval:expectedValueIntervalMs
+                       completion:completionHandler];
+}
+- (void)goToLiftPercentageWithParams:(MTRWindowCoveringClusterGoToLiftPercentageParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self goToLiftPercentageWithParams:params
+                        expectedValues:expectedDataValueDictionaries
+                 expectedValueInterval:expectedValueIntervalMs
+                            completion:completionHandler];
+}
+- (void)goToTiltValueWithParams:(MTRWindowCoveringClusterGoToTiltValueParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self goToTiltValueWithParams:params
+                   expectedValues:expectedDataValueDictionaries
+            expectedValueInterval:expectedValueIntervalMs
+                       completion:completionHandler];
+}
+- (void)goToTiltPercentageWithParams:(MTRWindowCoveringClusterGoToTiltPercentageParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self goToTiltPercentageWithParams:params
+                        expectedValues:expectedDataValueDictionaries
+                 expectedValueInterval:expectedValueIntervalMs
+                            completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterBarrierControl
@@ -12104,7 +13291,7 @@ using chip::SessionHandle;
 - (void)barrierControlGoToPercentWithParams:(MTRBarrierControlClusterBarrierControlGoToPercentParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                          completionHandler:(StatusCompletion)completionHandler
+                                 completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -12119,7 +13306,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -12153,17 +13340,17 @@ using chip::SessionHandle;
 
 - (void)barrierControlStopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                           completionHandler:(StatusCompletion)completionHandler
+                                  completion:(MTRStatusCompletion)completion
 {
     [self barrierControlStopWithParams:nil
                         expectedValues:expectedValues
                  expectedValueInterval:expectedValueIntervalMs
-                     completionHandler:completionHandler];
+                            completion:completion];
 }
 - (void)barrierControlStopWithParams:(MTRBarrierControlClusterBarrierControlStopParams * _Nullable)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler
+                          completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -12178,7 +13365,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -12456,6 +13643,34 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)barrierControlGoToPercentWithParams:(MTRBarrierControlClusterBarrierControlGoToPercentParams *)params
+                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                          completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self barrierControlGoToPercentWithParams:params
+                               expectedValues:expectedDataValueDictionaries
+                        expectedValueInterval:expectedValueIntervalMs
+                                   completion:completionHandler];
+}
+- (void)barrierControlStopWithParams:(MTRBarrierControlClusterBarrierControlStopParams * _Nullable)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self barrierControlStopWithParams:params
+                        expectedValues:expectedDataValueDictionaries
+                 expectedValueInterval:expectedValueIntervalMs
+                            completion:completionHandler];
+}
+- (void)barrierControlStopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                           completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self barrierControlStopWithExpectedValues:expectedValues
+                         expectedValueInterval:expectedValueIntervalMs
+                                    completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterPumpConfigurationAndControl
@@ -12804,7 +14019,7 @@ using chip::SessionHandle;
 - (void)setpointRaiseLowerWithParams:(MTRThermostatClusterSetpointRaiseLowerParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler
+                          completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -12819,7 +14034,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -12855,7 +14070,7 @@ using chip::SessionHandle;
 - (void)setWeeklyScheduleWithParams:(MTRThermostatClusterSetWeeklyScheduleParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                  completionHandler:(StatusCompletion)completionHandler
+                         completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -12870,7 +14085,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -12943,8 +14158,8 @@ using chip::SessionHandle;
 - (void)getWeeklyScheduleWithParams:(MTRThermostatClusterGetWeeklyScheduleParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                  completionHandler:(void (^)(MTRThermostatClusterGetWeeklyScheduleResponseParams * _Nullable data,
-                                        NSError * _Nullable error))completionHandler
+                         completion:(void (^)(MTRThermostatClusterGetWeeklyScheduleResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -12956,7 +14171,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -12991,17 +14206,17 @@ using chip::SessionHandle;
 
 - (void)clearWeeklyScheduleWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                            completionHandler:(StatusCompletion)completionHandler
+                                   completion:(MTRStatusCompletion)completion
 {
     [self clearWeeklyScheduleWithParams:nil
                          expectedValues:expectedValues
                   expectedValueInterval:expectedValueIntervalMs
-                      completionHandler:completionHandler];
+                             completion:completion];
 }
 - (void)clearWeeklyScheduleWithParams:(MTRThermostatClusterClearWeeklyScheduleParams * _Nullable)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completionHandler:(StatusCompletion)completionHandler
+                           completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -13016,7 +14231,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -14021,6 +15236,55 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)setpointRaiseLowerWithParams:(MTRThermostatClusterSetpointRaiseLowerParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self setpointRaiseLowerWithParams:params
+                        expectedValues:expectedDataValueDictionaries
+                 expectedValueInterval:expectedValueIntervalMs
+                            completion:completionHandler];
+}
+- (void)setWeeklyScheduleWithParams:(MTRThermostatClusterSetWeeklyScheduleParams *)params
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                  completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self setWeeklyScheduleWithParams:params
+                       expectedValues:expectedDataValueDictionaries
+                expectedValueInterval:expectedValueIntervalMs
+                           completion:completionHandler];
+}
+- (void)getWeeklyScheduleWithParams:(MTRThermostatClusterGetWeeklyScheduleParams *)params
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                  completionHandler:(void (^)(MTRThermostatClusterGetWeeklyScheduleResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completionHandler
+{
+    [self getWeeklyScheduleWithParams:params
+                       expectedValues:expectedDataValueDictionaries
+                expectedValueInterval:expectedValueIntervalMs
+                           completion:completionHandler];
+}
+- (void)clearWeeklyScheduleWithParams:(MTRThermostatClusterClearWeeklyScheduleParams * _Nullable)params
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self clearWeeklyScheduleWithParams:params
+                         expectedValues:expectedDataValueDictionaries
+                  expectedValueInterval:expectedValueIntervalMs
+                             completion:completionHandler];
+}
+- (void)clearWeeklyScheduleWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                            completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self clearWeeklyScheduleWithExpectedValues:expectedValues
+                          expectedValueInterval:expectedValueIntervalMs
+                                     completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterFanControl
@@ -14463,7 +15727,7 @@ using chip::SessionHandle;
 - (void)moveToHueWithParams:(MTRColorControlClusterMoveToHueParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-          completionHandler:(StatusCompletion)completionHandler
+                 completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -14478,7 +15742,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -14518,7 +15782,7 @@ using chip::SessionHandle;
 - (void)moveHueWithParams:(MTRColorControlClusterMoveHueParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler
+               completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -14533,7 +15797,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -14572,7 +15836,7 @@ using chip::SessionHandle;
 - (void)stepHueWithParams:(MTRColorControlClusterStepHueParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler
+               completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -14587,7 +15851,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -14627,7 +15891,7 @@ using chip::SessionHandle;
 - (void)moveToSaturationWithParams:(MTRColorControlClusterMoveToSaturationParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                 completionHandler:(StatusCompletion)completionHandler
+                        completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -14642,7 +15906,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -14680,7 +15944,7 @@ using chip::SessionHandle;
 - (void)moveSaturationWithParams:(MTRColorControlClusterMoveSaturationParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-               completionHandler:(StatusCompletion)completionHandler
+                      completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -14695,7 +15959,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -14734,7 +15998,7 @@ using chip::SessionHandle;
 - (void)stepSaturationWithParams:(MTRColorControlClusterStepSaturationParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-               completionHandler:(StatusCompletion)completionHandler
+                      completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -14749,7 +16013,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -14789,7 +16053,7 @@ using chip::SessionHandle;
 - (void)moveToHueAndSaturationWithParams:(MTRColorControlClusterMoveToHueAndSaturationParams *)params
                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                       completionHandler:(StatusCompletion)completionHandler
+                              completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -14804,7 +16068,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -14843,7 +16107,7 @@ using chip::SessionHandle;
 - (void)moveToColorWithParams:(MTRColorControlClusterMoveToColorParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler
+                   completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -14858,7 +16122,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -14897,7 +16161,7 @@ using chip::SessionHandle;
 - (void)moveColorWithParams:(MTRColorControlClusterMoveColorParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-          completionHandler:(StatusCompletion)completionHandler
+                 completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -14912,7 +16176,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -14950,7 +16214,7 @@ using chip::SessionHandle;
 - (void)stepColorWithParams:(MTRColorControlClusterStepColorParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-          completionHandler:(StatusCompletion)completionHandler
+                 completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -14965,7 +16229,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -15004,7 +16268,7 @@ using chip::SessionHandle;
 - (void)moveToColorTemperatureWithParams:(MTRColorControlClusterMoveToColorTemperatureParams *)params
                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                       completionHandler:(StatusCompletion)completionHandler
+                              completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -15019,7 +16283,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -15057,7 +16321,7 @@ using chip::SessionHandle;
 - (void)enhancedMoveToHueWithParams:(MTRColorControlClusterEnhancedMoveToHueParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                  completionHandler:(StatusCompletion)completionHandler
+                         completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -15072,7 +16336,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -15112,7 +16376,7 @@ using chip::SessionHandle;
 - (void)enhancedMoveHueWithParams:(MTRColorControlClusterEnhancedMoveHueParams *)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                completionHandler:(StatusCompletion)completionHandler
+                       completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -15127,7 +16391,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -15166,7 +16430,7 @@ using chip::SessionHandle;
 - (void)enhancedStepHueWithParams:(MTRColorControlClusterEnhancedStepHueParams *)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                completionHandler:(StatusCompletion)completionHandler
+                       completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -15181,7 +16445,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -15221,7 +16485,7 @@ using chip::SessionHandle;
 - (void)enhancedMoveToHueAndSaturationWithParams:(MTRColorControlClusterEnhancedMoveToHueAndSaturationParams *)params
                                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                               completionHandler:(StatusCompletion)completionHandler
+                                      completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -15236,7 +16500,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -15275,7 +16539,7 @@ using chip::SessionHandle;
 - (void)colorLoopSetWithParams:(MTRColorControlClusterColorLoopSetParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-             completionHandler:(StatusCompletion)completionHandler
+                    completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -15290,7 +16554,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -15333,7 +16597,7 @@ using chip::SessionHandle;
 - (void)stopMoveStepWithParams:(MTRColorControlClusterStopMoveStepParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-             completionHandler:(StatusCompletion)completionHandler
+                    completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -15348,7 +16612,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -15384,7 +16648,7 @@ using chip::SessionHandle;
 - (void)moveColorTemperatureWithParams:(MTRColorControlClusterMoveColorTemperatureParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                     completionHandler:(StatusCompletion)completionHandler
+                            completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -15399,7 +16663,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -15440,7 +16704,7 @@ using chip::SessionHandle;
 - (void)stepColorTemperatureWithParams:(MTRColorControlClusterStepColorTemperatureParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                     completionHandler:(StatusCompletion)completionHandler
+                            completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -15455,7 +16719,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -16208,6 +17472,196 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)moveToHueWithParams:(MTRColorControlClusterMoveToHueParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self moveToHueWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)moveHueWithParams:(MTRColorControlClusterMoveHueParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self moveHueWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)stepHueWithParams:(MTRColorControlClusterStepHueParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self stepHueWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)moveToSaturationWithParams:(MTRColorControlClusterMoveToSaturationParams *)params
+                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                 completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self moveToSaturationWithParams:params
+                      expectedValues:expectedDataValueDictionaries
+               expectedValueInterval:expectedValueIntervalMs
+                          completion:completionHandler];
+}
+- (void)moveSaturationWithParams:(MTRColorControlClusterMoveSaturationParams *)params
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+               completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self moveSaturationWithParams:params
+                    expectedValues:expectedDataValueDictionaries
+             expectedValueInterval:expectedValueIntervalMs
+                        completion:completionHandler];
+}
+- (void)stepSaturationWithParams:(MTRColorControlClusterStepSaturationParams *)params
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+               completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self stepSaturationWithParams:params
+                    expectedValues:expectedDataValueDictionaries
+             expectedValueInterval:expectedValueIntervalMs
+                        completion:completionHandler];
+}
+- (void)moveToHueAndSaturationWithParams:(MTRColorControlClusterMoveToHueAndSaturationParams *)params
+                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                       completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self moveToHueAndSaturationWithParams:params
+                            expectedValues:expectedDataValueDictionaries
+                     expectedValueInterval:expectedValueIntervalMs
+                                completion:completionHandler];
+}
+- (void)moveToColorWithParams:(MTRColorControlClusterMoveToColorParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self moveToColorWithParams:params
+                 expectedValues:expectedDataValueDictionaries
+          expectedValueInterval:expectedValueIntervalMs
+                     completion:completionHandler];
+}
+- (void)moveColorWithParams:(MTRColorControlClusterMoveColorParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self moveColorWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)stepColorWithParams:(MTRColorControlClusterStepColorParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self stepColorWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)moveToColorTemperatureWithParams:(MTRColorControlClusterMoveToColorTemperatureParams *)params
+                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                       completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self moveToColorTemperatureWithParams:params
+                            expectedValues:expectedDataValueDictionaries
+                     expectedValueInterval:expectedValueIntervalMs
+                                completion:completionHandler];
+}
+- (void)enhancedMoveToHueWithParams:(MTRColorControlClusterEnhancedMoveToHueParams *)params
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                  completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self enhancedMoveToHueWithParams:params
+                       expectedValues:expectedDataValueDictionaries
+                expectedValueInterval:expectedValueIntervalMs
+                           completion:completionHandler];
+}
+- (void)enhancedMoveHueWithParams:(MTRColorControlClusterEnhancedMoveHueParams *)params
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self enhancedMoveHueWithParams:params
+                     expectedValues:expectedDataValueDictionaries
+              expectedValueInterval:expectedValueIntervalMs
+                         completion:completionHandler];
+}
+- (void)enhancedStepHueWithParams:(MTRColorControlClusterEnhancedStepHueParams *)params
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self enhancedStepHueWithParams:params
+                     expectedValues:expectedDataValueDictionaries
+              expectedValueInterval:expectedValueIntervalMs
+                         completion:completionHandler];
+}
+- (void)enhancedMoveToHueAndSaturationWithParams:(MTRColorControlClusterEnhancedMoveToHueAndSaturationParams *)params
+                                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                               completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self enhancedMoveToHueAndSaturationWithParams:params
+                                    expectedValues:expectedDataValueDictionaries
+                             expectedValueInterval:expectedValueIntervalMs
+                                        completion:completionHandler];
+}
+- (void)colorLoopSetWithParams:(MTRColorControlClusterColorLoopSetParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self colorLoopSetWithParams:params
+                  expectedValues:expectedDataValueDictionaries
+           expectedValueInterval:expectedValueIntervalMs
+                      completion:completionHandler];
+}
+- (void)stopMoveStepWithParams:(MTRColorControlClusterStopMoveStepParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self stopMoveStepWithParams:params
+                  expectedValues:expectedDataValueDictionaries
+           expectedValueInterval:expectedValueIntervalMs
+                      completion:completionHandler];
+}
+- (void)moveColorTemperatureWithParams:(MTRColorControlClusterMoveColorTemperatureParams *)params
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                     completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self moveColorTemperatureWithParams:params
+                          expectedValues:expectedDataValueDictionaries
+                   expectedValueInterval:expectedValueIntervalMs
+                              completion:completionHandler];
+}
+- (void)stepColorTemperatureWithParams:(MTRColorControlClusterStepColorTemperatureParams *)params
+                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                     completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self stepColorTemperatureWithParams:params
+                          expectedValues:expectedDataValueDictionaries
+                   expectedValueInterval:expectedValueIntervalMs
+                              completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterBallastConfiguration
@@ -17567,8 +19021,8 @@ using chip::SessionHandle;
 - (void)changeChannelWithParams:(MTRChannelClusterChangeChannelParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-              completionHandler:(void (^)(MTRChannelClusterChangeChannelResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completionHandler
+                     completion:(void (^)(MTRChannelClusterChangeChannelResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -17580,7 +19034,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRChannelClusterChangeChannelResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRChannelClusterChangeChannelResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -17613,7 +19067,7 @@ using chip::SessionHandle;
 - (void)changeChannelByNumberWithParams:(MTRChannelClusterChangeChannelByNumberParams *)params
                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                      completionHandler:(StatusCompletion)completionHandler
+                             completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -17628,7 +19082,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -17664,7 +19118,7 @@ using chip::SessionHandle;
 - (void)skipChannelWithParams:(MTRChannelClusterSkipChannelParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler
+                   completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -17679,7 +19133,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -17784,6 +19238,37 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)changeChannelWithParams:(MTRChannelClusterChangeChannelParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(void (^)(MTRChannelClusterChangeChannelResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completionHandler
+{
+    [self changeChannelWithParams:params
+                   expectedValues:expectedDataValueDictionaries
+            expectedValueInterval:expectedValueIntervalMs
+                       completion:completionHandler];
+}
+- (void)changeChannelByNumberWithParams:(MTRChannelClusterChangeChannelByNumberParams *)params
+                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                      completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self changeChannelByNumberWithParams:params
+                           expectedValues:expectedDataValueDictionaries
+                    expectedValueInterval:expectedValueIntervalMs
+                               completion:completionHandler];
+}
+- (void)skipChannelWithParams:(MTRChannelClusterSkipChannelParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self skipChannelWithParams:params
+                 expectedValues:expectedDataValueDictionaries
+          expectedValueInterval:expectedValueIntervalMs
+                     completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterTargetNavigator
@@ -17804,8 +19289,8 @@ using chip::SessionHandle;
 - (void)navigateTargetWithParams:(MTRTargetNavigatorClusterNavigateTargetParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-               completionHandler:(void (^)(MTRTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler
+                      completion:(void (^)(MTRTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -17817,7 +19302,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -17916,6 +19401,17 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)navigateTargetWithParams:(MTRTargetNavigatorClusterNavigateTargetParams *)params
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+               completionHandler:(void (^)(MTRTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completionHandler
+{
+    [self navigateTargetWithParams:params
+                    expectedValues:expectedDataValueDictionaries
+             expectedValueInterval:expectedValueIntervalMs
+                        completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterMediaPlayback
@@ -17935,19 +19431,16 @@ using chip::SessionHandle;
 
 - (void)playWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completionHandler
+                    completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completion
 {
-    [self playWithParams:nil
-               expectedValues:expectedValues
-        expectedValueInterval:expectedValueIntervalMs
-            completionHandler:completionHandler];
+    [self playWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
 - (void)playWithParams:(MTRMediaPlaybackClusterPlayParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:
-            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+               completion:
+                   (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -17959,7 +19452,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -17990,19 +19483,16 @@ using chip::SessionHandle;
 
 - (void)pauseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-              completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completionHandler
+                     completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completion
 {
-    [self pauseWithParams:nil
-               expectedValues:expectedValues
-        expectedValueInterval:expectedValueIntervalMs
-            completionHandler:completionHandler];
+    [self pauseWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
 - (void)pauseWithParams:(MTRMediaPlaybackClusterPauseParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:
-            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+               completion:
+                   (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -18014,7 +19504,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -18045,19 +19535,19 @@ using chip::SessionHandle;
 
 - (void)stopPlaybackWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                     completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completionHandler
+                            completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completion
 {
     [self stopPlaybackWithParams:nil
                   expectedValues:expectedValues
            expectedValueInterval:expectedValueIntervalMs
-               completionHandler:completionHandler];
+                      completion:completion];
 }
 - (void)stopPlaybackWithParams:(MTRMediaPlaybackClusterStopPlaybackParams * _Nullable)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completionHandler
+                    completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -18069,7 +19559,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -18100,19 +19590,19 @@ using chip::SessionHandle;
 
 - (void)startOverWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                  completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                        NSError * _Nullable error))completionHandler
+                         completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completion
 {
     [self startOverWithParams:nil
                expectedValues:expectedValues
         expectedValueInterval:expectedValueIntervalMs
-            completionHandler:completionHandler];
+                   completion:completion];
 }
 - (void)startOverWithParams:(MTRMediaPlaybackClusterStartOverParams * _Nullable)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-          completionHandler:
-              (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+                 completion:
+                     (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -18124,7 +19614,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -18155,19 +19645,16 @@ using chip::SessionHandle;
 
 - (void)previousWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                 completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completionHandler
+                        completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completion
 {
-    [self previousWithParams:nil
-               expectedValues:expectedValues
-        expectedValueInterval:expectedValueIntervalMs
-            completionHandler:completionHandler];
+    [self previousWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
 - (void)previousWithParams:(MTRMediaPlaybackClusterPreviousParams * _Nullable)params
             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-         completionHandler:
-             (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+                completion:
+                    (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -18179,7 +19666,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -18210,19 +19697,16 @@ using chip::SessionHandle;
 
 - (void)nextWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completionHandler
+                    completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completion
 {
-    [self nextWithParams:nil
-               expectedValues:expectedValues
-        expectedValueInterval:expectedValueIntervalMs
-            completionHandler:completionHandler];
+    [self nextWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
 - (void)nextWithParams:(MTRMediaPlaybackClusterNextParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:
-            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+               completion:
+                   (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -18234,7 +19718,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -18265,19 +19749,16 @@ using chip::SessionHandle;
 
 - (void)rewindWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-               completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler
+                      completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completion
 {
-    [self rewindWithParams:nil
-               expectedValues:expectedValues
-        expectedValueInterval:expectedValueIntervalMs
-            completionHandler:completionHandler];
+    [self rewindWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
 - (void)rewindWithParams:(MTRMediaPlaybackClusterRewindParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:
-            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+               completion:
+                   (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -18289,7 +19770,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -18320,19 +19801,19 @@ using chip::SessionHandle;
 
 - (void)fastForwardWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                          NSError * _Nullable error))completionHandler
+                           completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completion
 {
     [self fastForwardWithParams:nil
                  expectedValues:expectedValues
           expectedValueInterval:expectedValueIntervalMs
-              completionHandler:completionHandler];
+                     completion:completion];
 }
 - (void)fastForwardWithParams:(MTRMediaPlaybackClusterFastForwardParams * _Nullable)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                  NSError * _Nullable error))completionHandler
+                   completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -18344,7 +19825,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -18376,8 +19857,8 @@ using chip::SessionHandle;
 - (void)skipForwardWithParams:(MTRMediaPlaybackClusterSkipForwardParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                  NSError * _Nullable error))completionHandler
+                   completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -18389,7 +19870,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -18422,8 +19903,8 @@ using chip::SessionHandle;
 - (void)skipBackwardWithParams:(MTRMediaPlaybackClusterSkipBackwardParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completionHandler
+                    completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -18435,7 +19916,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -18468,8 +19949,8 @@ using chip::SessionHandle;
 - (void)seekWithParams:(MTRMediaPlaybackClusterSeekParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:
-            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+               completion:
+                   (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -18481,7 +19962,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -18616,6 +20097,183 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)playWithParams:(MTRMediaPlaybackClusterPlayParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:
+            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self playWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)playWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completionHandler
+{
+    [self playWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
+- (void)pauseWithParams:(MTRMediaPlaybackClusterPauseParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:
+            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self pauseWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)pauseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+              completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completionHandler
+{
+    [self pauseWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
+- (void)stopPlaybackWithParams:(MTRMediaPlaybackClusterStopPlaybackParams * _Nullable)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completionHandler
+{
+    [self stopPlaybackWithParams:params
+                  expectedValues:expectedDataValueDictionaries
+           expectedValueInterval:expectedValueIntervalMs
+                      completion:completionHandler];
+}
+- (void)stopPlaybackWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                     completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completionHandler
+{
+    [self stopPlaybackWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
+- (void)startOverWithParams:(MTRMediaPlaybackClusterStartOverParams * _Nullable)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:
+              (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self startOverWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)startOverWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                  completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completionHandler
+{
+    [self startOverWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
+- (void)previousWithParams:(MTRMediaPlaybackClusterPreviousParams * _Nullable)params
+            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+         completionHandler:
+             (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self previousWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)previousWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                 completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completionHandler
+{
+    [self previousWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
+- (void)nextWithParams:(MTRMediaPlaybackClusterNextParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:
+            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self nextWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)nextWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completionHandler
+{
+    [self nextWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
+- (void)rewindWithParams:(MTRMediaPlaybackClusterRewindParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:
+            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self rewindWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)rewindWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completionHandler
+{
+    [self rewindWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
+- (void)fastForwardWithParams:(MTRMediaPlaybackClusterFastForwardParams * _Nullable)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completionHandler
+{
+    [self fastForwardWithParams:params
+                 expectedValues:expectedDataValueDictionaries
+          expectedValueInterval:expectedValueIntervalMs
+                     completion:completionHandler];
+}
+- (void)fastForwardWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completionHandler
+{
+    [self fastForwardWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
+- (void)skipForwardWithParams:(MTRMediaPlaybackClusterSkipForwardParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completionHandler
+{
+    [self skipForwardWithParams:params
+                 expectedValues:expectedDataValueDictionaries
+          expectedValueInterval:expectedValueIntervalMs
+                     completion:completionHandler];
+}
+- (void)skipBackwardWithParams:(MTRMediaPlaybackClusterSkipBackwardParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completionHandler
+{
+    [self skipBackwardWithParams:params
+                  expectedValues:expectedDataValueDictionaries
+           expectedValueInterval:expectedValueIntervalMs
+                      completion:completionHandler];
+}
+- (void)seekWithParams:(MTRMediaPlaybackClusterSeekParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:
+            (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self seekWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterMediaInput
@@ -18636,7 +20294,7 @@ using chip::SessionHandle;
 - (void)selectInputWithParams:(MTRMediaInputClusterSelectInputParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler
+                   completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -18651,7 +20309,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -18685,17 +20343,17 @@ using chip::SessionHandle;
 
 - (void)showInputStatusWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                        completionHandler:(StatusCompletion)completionHandler
+                               completion:(MTRStatusCompletion)completion
 {
     [self showInputStatusWithParams:nil
                      expectedValues:expectedValues
               expectedValueInterval:expectedValueIntervalMs
-                  completionHandler:completionHandler];
+                         completion:completion];
 }
 - (void)showInputStatusWithParams:(MTRMediaInputClusterShowInputStatusParams * _Nullable)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                completionHandler:(StatusCompletion)completionHandler
+                       completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -18710,7 +20368,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -18743,17 +20401,17 @@ using chip::SessionHandle;
 
 - (void)hideInputStatusWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                        completionHandler:(StatusCompletion)completionHandler
+                               completion:(MTRStatusCompletion)completion
 {
     [self hideInputStatusWithParams:nil
                      expectedValues:expectedValues
               expectedValueInterval:expectedValueIntervalMs
-                  completionHandler:completionHandler];
+                         completion:completion];
 }
 - (void)hideInputStatusWithParams:(MTRMediaInputClusterHideInputStatusParams * _Nullable)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                completionHandler:(StatusCompletion)completionHandler
+                       completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -18768,7 +20426,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -18802,7 +20460,7 @@ using chip::SessionHandle;
 - (void)renameInputWithParams:(MTRMediaInputClusterRenameInputParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(StatusCompletion)completionHandler
+                   completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -18817,7 +20475,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -18915,6 +20573,62 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)selectInputWithParams:(MTRMediaInputClusterSelectInputParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self selectInputWithParams:params
+                 expectedValues:expectedDataValueDictionaries
+          expectedValueInterval:expectedValueIntervalMs
+                     completion:completionHandler];
+}
+- (void)showInputStatusWithParams:(MTRMediaInputClusterShowInputStatusParams * _Nullable)params
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self showInputStatusWithParams:params
+                     expectedValues:expectedDataValueDictionaries
+              expectedValueInterval:expectedValueIntervalMs
+                         completion:completionHandler];
+}
+- (void)showInputStatusWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self showInputStatusWithExpectedValues:expectedValues
+                      expectedValueInterval:expectedValueIntervalMs
+                                 completion:completionHandler];
+}
+- (void)hideInputStatusWithParams:(MTRMediaInputClusterHideInputStatusParams * _Nullable)params
+                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self hideInputStatusWithParams:params
+                     expectedValues:expectedDataValueDictionaries
+              expectedValueInterval:expectedValueIntervalMs
+                         completion:completionHandler];
+}
+- (void)hideInputStatusWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self hideInputStatusWithExpectedValues:expectedValues
+                      expectedValueInterval:expectedValueIntervalMs
+                                 completion:completionHandler];
+}
+- (void)renameInputWithParams:(MTRMediaInputClusterRenameInputParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self renameInputWithParams:params
+                 expectedValues:expectedDataValueDictionaries
+          expectedValueInterval:expectedValueIntervalMs
+                     completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterLowPower
@@ -18934,17 +20648,14 @@ using chip::SessionHandle;
 
 - (void)sleepWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-              completionHandler:(StatusCompletion)completionHandler
+                     completion:(MTRStatusCompletion)completion
 {
-    [self sleepWithParams:nil
-               expectedValues:expectedValues
-        expectedValueInterval:expectedValueIntervalMs
-            completionHandler:completionHandler];
+    [self sleepWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
 - (void)sleepWithParams:(MTRLowPowerClusterSleepParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler
+               completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -18959,7 +20670,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -19039,6 +20750,22 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)sleepWithParams:(MTRLowPowerClusterSleepParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self sleepWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)sleepWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+              completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self sleepWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterKeypadInput
@@ -19059,8 +20786,8 @@ using chip::SessionHandle;
 - (void)sendKeyWithParams:(MTRKeypadInputClusterSendKeyParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:
-            (void (^)(MTRKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+               completion:
+                   (void (^)(MTRKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -19072,7 +20799,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRKeypadInputClusterSendKeyResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRKeypadInputClusterSendKeyResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -19151,6 +20878,17 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)sendKeyWithParams:(MTRKeypadInputClusterSendKeyParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:
+            (void (^)(MTRKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self sendKeyWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterContentLauncher
@@ -19171,8 +20909,8 @@ using chip::SessionHandle;
 - (void)launchContentWithParams:(MTRContentLauncherClusterLaunchContentParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-              completionHandler:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completionHandler
+                     completion:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -19184,7 +20922,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRContentLauncherClusterLaunchResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRContentLauncherClusterLaunchResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -19274,8 +21012,8 @@ using chip::SessionHandle;
 - (void)launchURLWithParams:(MTRContentLauncherClusterLaunchURLParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-          completionHandler:
-              (void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+                 completion:
+                     (void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -19287,7 +21025,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRContentLauncherClusterLaunchResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRContentLauncherClusterLaunchResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -19501,6 +21239,28 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)launchContentWithParams:(MTRContentLauncherClusterLaunchContentParams *)params
+                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+              completionHandler:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completionHandler
+{
+    [self launchContentWithParams:params
+                   expectedValues:expectedDataValueDictionaries
+            expectedValueInterval:expectedValueIntervalMs
+                       completion:completionHandler];
+}
+- (void)launchURLWithParams:(MTRContentLauncherClusterLaunchURLParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:
+              (void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self launchURLWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterAudioOutput
@@ -19521,7 +21281,7 @@ using chip::SessionHandle;
 - (void)selectOutputWithParams:(MTRAudioOutputClusterSelectOutputParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-             completionHandler:(StatusCompletion)completionHandler
+                    completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -19536,7 +21296,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -19571,7 +21331,7 @@ using chip::SessionHandle;
 - (void)renameOutputWithParams:(MTRAudioOutputClusterRenameOutputParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-             completionHandler:(StatusCompletion)completionHandler
+                    completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -19586,7 +21346,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -19684,6 +21444,26 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)selectOutputWithParams:(MTRAudioOutputClusterSelectOutputParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self selectOutputWithParams:params
+                  expectedValues:expectedDataValueDictionaries
+           expectedValueInterval:expectedValueIntervalMs
+                      completion:completionHandler];
+}
+- (void)renameOutputWithParams:(MTRAudioOutputClusterRenameOutputParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self renameOutputWithParams:params
+                  expectedValues:expectedDataValueDictionaries
+           expectedValueInterval:expectedValueIntervalMs
+                      completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterApplicationLauncher
@@ -19704,8 +21484,8 @@ using chip::SessionHandle;
 - (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-          completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
-                                NSError * _Nullable error))completionHandler
+                 completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                                NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -19717,7 +21497,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -19755,8 +21535,8 @@ using chip::SessionHandle;
 - (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
-                              NSError * _Nullable error))completionHandler
+               completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -19768,7 +21548,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -19802,8 +21582,8 @@ using chip::SessionHandle;
 - (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
-                              NSError * _Nullable error))completionHandler
+               completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -19815,7 +21595,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -19930,6 +21710,39 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams *)params
+             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+          completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                                NSError * _Nullable error))completionHandler
+{
+    [self launchAppWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                              NSError * _Nullable error))completionHandler
+{
+    [self stopAppWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                              NSError * _Nullable error))completionHandler
+{
+    [self hideAppWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterApplicationBasic
@@ -20080,8 +21893,8 @@ using chip::SessionHandle;
 - (void)getSetupPINWithParams:(MTRAccountLoginClusterGetSetupPINParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-            completionHandler:(void (^)(MTRAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
-                                  NSError * _Nullable error))completionHandler
+                   completion:(void (^)(MTRAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -20093,7 +21906,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRAccountLoginClusterGetSetupPINResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRAccountLoginClusterGetSetupPINResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -20129,7 +21942,7 @@ using chip::SessionHandle;
 - (void)loginWithParams:(MTRAccountLoginClusterLoginParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler
+               completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -20144,7 +21957,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -20182,17 +21995,14 @@ using chip::SessionHandle;
 
 - (void)logoutWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-               completionHandler:(StatusCompletion)completionHandler
+                      completion:(MTRStatusCompletion)completion
 {
-    [self logoutWithParams:nil
-               expectedValues:expectedValues
-        expectedValueInterval:expectedValueIntervalMs
-            completionHandler:completionHandler];
+    [self logoutWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
 - (void)logoutWithParams:(MTRAccountLoginClusterLogoutParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler
+               completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -20207,7 +22017,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -20290,6 +22100,43 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)getSetupPINWithParams:(MTRAccountLoginClusterGetSetupPINParams *)params
+               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+            completionHandler:(void (^)(MTRAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completionHandler
+{
+    [self getSetupPINWithParams:params
+                 expectedValues:expectedDataValueDictionaries
+          expectedValueInterval:expectedValueIntervalMs
+                     completion:completionHandler];
+}
+- (void)loginWithParams:(MTRAccountLoginClusterLoginParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self loginWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)logoutWithParams:(MTRAccountLoginClusterLogoutParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self logoutWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)logoutWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self logoutWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterElectricalMeasurement
@@ -20309,17 +22156,17 @@ using chip::SessionHandle;
 
 - (void)getProfileInfoCommandWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                              completionHandler:(StatusCompletion)completionHandler
+                                     completion:(MTRStatusCompletion)completion
 {
     [self getProfileInfoCommandWithParams:nil
                            expectedValues:expectedValues
                     expectedValueInterval:expectedValueIntervalMs
-                        completionHandler:completionHandler];
+                               completion:completion];
 }
 - (void)getProfileInfoCommandWithParams:(MTRElectricalMeasurementClusterGetProfileInfoCommandParams * _Nullable)params
                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                      completionHandler:(StatusCompletion)completionHandler
+                             completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -20334,7 +22181,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -20368,7 +22215,7 @@ using chip::SessionHandle;
 - (void)getMeasurementProfileCommandWithParams:(MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams *)params
                                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                             completionHandler:(StatusCompletion)completionHandler
+                                    completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -20383,7 +22230,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -21654,6 +23501,34 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)getProfileInfoCommandWithParams:(MTRElectricalMeasurementClusterGetProfileInfoCommandParams * _Nullable)params
+                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                      completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self getProfileInfoCommandWithParams:params
+                           expectedValues:expectedDataValueDictionaries
+                    expectedValueInterval:expectedValueIntervalMs
+                               completion:completionHandler];
+}
+- (void)getProfileInfoCommandWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                              completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self getProfileInfoCommandWithExpectedValues:expectedValues
+                            expectedValueInterval:expectedValueIntervalMs
+                                       completion:completionHandler];
+}
+- (void)getMeasurementProfileCommandWithParams:(MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams *)params
+                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                             completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self getMeasurementProfileCommandWithParams:params
+                                  expectedValues:expectedDataValueDictionaries
+                           expectedValueInterval:expectedValueIntervalMs
+                                      completion:completionHandler];
+}
 @end
 
 @implementation MTRClusterTestCluster
@@ -21673,17 +23548,14 @@ using chip::SessionHandle;
 
 - (void)testWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-             completionHandler:(StatusCompletion)completionHandler
+                    completion:(MTRStatusCompletion)completion
 {
-    [self testWithParams:nil
-               expectedValues:expectedValues
-        expectedValueInterval:expectedValueIntervalMs
-            completionHandler:completionHandler];
+    [self testWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
 - (void)testWithParams:(MTRTestClusterClusterTestParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-        completionHandler:(StatusCompletion)completionHandler
+               completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -21698,7 +23570,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -21731,17 +23603,17 @@ using chip::SessionHandle;
 
 - (void)testNotHandledWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                       completionHandler:(StatusCompletion)completionHandler
+                              completion:(MTRStatusCompletion)completion
 {
     [self testNotHandledWithParams:nil
                     expectedValues:expectedValues
              expectedValueInterval:expectedValueIntervalMs
-                 completionHandler:completionHandler];
+                        completion:completion];
 }
 - (void)testNotHandledWithParams:(MTRTestClusterClusterTestNotHandledParams * _Nullable)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-               completionHandler:(StatusCompletion)completionHandler
+                      completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -21756,7 +23628,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -21789,19 +23661,19 @@ using chip::SessionHandle;
 
 - (void)testSpecificWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                     completionHandler:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completionHandler
+                            completion:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completion
 {
     [self testSpecificWithParams:nil
                   expectedValues:expectedValues
            expectedValueInterval:expectedValueIntervalMs
-               completionHandler:completionHandler];
+                      completion:completion];
 }
 - (void)testSpecificWithParams:(MTRTestClusterClusterTestSpecificParams * _Nullable)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-             completionHandler:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completionHandler
+                    completion:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -21813,7 +23685,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestSpecificResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRTestClusterClusterTestSpecificResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -21844,17 +23716,17 @@ using chip::SessionHandle;
 
 - (void)testUnknownCommandWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                           completionHandler:(StatusCompletion)completionHandler
+                                  completion:(MTRStatusCompletion)completion
 {
     [self testUnknownCommandWithParams:nil
                         expectedValues:expectedValues
                  expectedValueInterval:expectedValueIntervalMs
-                     completionHandler:completionHandler];
+                            completion:completion];
 }
 - (void)testUnknownCommandWithParams:(MTRTestClusterClusterTestUnknownCommandParams * _Nullable)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler
+                          completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -21869,7 +23741,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -21903,8 +23775,8 @@ using chip::SessionHandle;
 - (void)testAddArgumentsWithParams:(MTRTestClusterClusterTestAddArgumentsParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                 completionHandler:(void (^)(MTRTestClusterClusterTestAddArgumentsResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completionHandler
+                        completion:(void (^)(MTRTestClusterClusterTestAddArgumentsResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -21916,7 +23788,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestAddArgumentsResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRTestClusterClusterTestAddArgumentsResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -21950,8 +23822,8 @@ using chip::SessionHandle;
 - (void)testSimpleArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleArgumentRequestParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                          completionHandler:(void (^)(MTRTestClusterClusterTestSimpleArgumentResponseParams * _Nullable data,
-                                                NSError * _Nullable error))completionHandler
+                                 completion:(void (^)(MTRTestClusterClusterTestSimpleArgumentResponseParams * _Nullable data,
+                                                NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -21963,7 +23835,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestSimpleArgumentResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRTestClusterClusterTestSimpleArgumentResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -21996,9 +23868,9 @@ using chip::SessionHandle;
 - (void)testStructArrayArgumentRequestWithParams:(MTRTestClusterClusterTestStructArrayArgumentRequestParams *)params
                                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                               completionHandler:
-                                   (void (^)(MTRTestClusterClusterTestStructArrayArgumentResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completionHandler
+                                      completion:
+                                          (void (^)(MTRTestClusterClusterTestStructArrayArgumentResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -22010,7 +23882,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestStructArrayArgumentResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRTestClusterClusterTestStructArrayArgumentResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -22254,8 +24126,8 @@ using chip::SessionHandle;
 - (void)testStructArgumentRequestWithParams:(MTRTestClusterClusterTestStructArgumentRequestParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                          completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
-                                                NSError * _Nullable error))completionHandler
+                                 completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -22267,7 +24139,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -22307,8 +24179,8 @@ using chip::SessionHandle;
 - (void)testNestedStructArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructArgumentRequestParams *)params
                                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
-                                                      NSError * _Nullable error))completionHandler
+                                       completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                      NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -22320,7 +24192,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -22364,8 +24236,8 @@ using chip::SessionHandle;
 - (void)testListStructArgumentRequestWithParams:(MTRTestClusterClusterTestListStructArgumentRequestParams *)params
                                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                              completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
-                                                    NSError * _Nullable error))completionHandler
+                                     completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                    NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -22377,7 +24249,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -22440,8 +24312,8 @@ using chip::SessionHandle;
 - (void)testListInt8UArgumentRequestWithParams:(MTRTestClusterClusterTestListInt8UArgumentRequestParams *)params
                                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                             completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
-                                                   NSError * _Nullable error))completionHandler
+                                    completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                   NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -22453,7 +24325,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -22507,8 +24379,8 @@ using chip::SessionHandle;
 - (void)testNestedStructListArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructListArgumentRequestParams *)params
                                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                    completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
-                                                          NSError * _Nullable error))completionHandler
+                                           completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                          NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -22520,7 +24392,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -22662,8 +24534,8 @@ using chip::SessionHandle;
             (MTRTestClusterClusterTestListNestedStructListArgumentRequestParams *)params
                                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                        completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
-                                                              NSError * _Nullable error))completionHandler
+                                               completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                              NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -22675,7 +24547,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -22841,8 +24713,8 @@ using chip::SessionHandle;
 - (void)testListInt8UReverseRequestWithParams:(MTRTestClusterClusterTestListInt8UReverseRequestParams *)params
                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                            completionHandler:(void (^)(MTRTestClusterClusterTestListInt8UReverseResponseParams * _Nullable data,
-                                                  NSError * _Nullable error))completionHandler
+                                   completion:(void (^)(MTRTestClusterClusterTestListInt8UReverseResponseParams * _Nullable data,
+                                                  NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -22854,7 +24726,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestListInt8UReverseResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRTestClusterClusterTestListInt8UReverseResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -22908,8 +24780,8 @@ using chip::SessionHandle;
 - (void)testEnumsRequestWithParams:(MTRTestClusterClusterTestEnumsRequestParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                 completionHandler:(void (^)(MTRTestClusterClusterTestEnumsResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completionHandler
+                        completion:(void (^)(MTRTestClusterClusterTestEnumsResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -22921,7 +24793,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestEnumsResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRTestClusterClusterTestEnumsResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -22955,8 +24827,8 @@ using chip::SessionHandle;
 - (void)testNullableOptionalRequestWithParams:(MTRTestClusterClusterTestNullableOptionalRequestParams * _Nullable)params
                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                            completionHandler:(void (^)(MTRTestClusterClusterTestNullableOptionalResponseParams * _Nullable data,
-                                                  NSError * _Nullable error))completionHandler
+                                   completion:(void (^)(MTRTestClusterClusterTestNullableOptionalResponseParams * _Nullable data,
+                                                  NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -22968,7 +24840,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestNullableOptionalResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRTestClusterClusterTestNullableOptionalResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -23011,9 +24883,10 @@ using chip::SessionHandle;
 - (void)testComplexNullableOptionalRequestWithParams:(MTRTestClusterClusterTestComplexNullableOptionalRequestParams *)params
                                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                   completionHandler:
-                                       (void (^)(MTRTestClusterClusterTestComplexNullableOptionalResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completionHandler
+                                          completion:
+                                              (void (^)(
+                                                  MTRTestClusterClusterTestComplexNullableOptionalResponseParams * _Nullable data,
+                                                  NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -23025,8 +24898,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge(self.callbackQueue, baseDevice,
-            completionHandler,
+        new MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -23229,8 +25101,8 @@ using chip::SessionHandle;
 - (void)simpleStructEchoRequestWithParams:(MTRTestClusterClusterSimpleStructEchoRequestParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                        completionHandler:(void (^)(MTRTestClusterClusterSimpleStructResponseParams * _Nullable data,
-                                              NSError * _Nullable error))completionHandler
+                               completion:(void (^)(MTRTestClusterClusterSimpleStructResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -23242,7 +25114,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterSimpleStructResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRTestClusterClusterSimpleStructResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -23281,17 +25153,17 @@ using chip::SessionHandle;
 
 - (void)timedInvokeRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                           completionHandler:(StatusCompletion)completionHandler
+                                  completion:(MTRStatusCompletion)completion
 {
     [self timedInvokeRequestWithParams:nil
                         expectedValues:expectedValues
                  expectedValueInterval:expectedValueIntervalMs
-                     completionHandler:completionHandler];
+                            completion:completion];
 }
 - (void)timedInvokeRequestWithParams:(MTRTestClusterClusterTimedInvokeRequestParams * _Nullable)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                   completionHandler:(StatusCompletion)completionHandler
+                          completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -23306,7 +25178,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -23343,7 +25215,7 @@ using chip::SessionHandle;
 - (void)testSimpleOptionalArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
                                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                  completionHandler:(StatusCompletion)completionHandler
+                                         completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -23358,7 +25230,7 @@ using chip::SessionHandle;
         new MTRCommandSuccessCallbackBridge(
             self.callbackQueue, baseDevice,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completionHandler(error);
+                completion(error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
@@ -23398,8 +25270,8 @@ using chip::SessionHandle;
 - (void)testEmitTestEventRequestWithParams:(MTRTestClusterClusterTestEmitTestEventRequestParams *)params
                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                         completionHandler:(void (^)(MTRTestClusterClusterTestEmitTestEventResponseParams * _Nullable data,
-                                               NSError * _Nullable error))completionHandler
+                                completion:(void (^)(MTRTestClusterClusterTestEmitTestEventResponseParams * _Nullable data,
+                                               NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -23411,7 +25283,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestEmitTestEventResponseCallbackBridge(self.callbackQueue, baseDevice, completionHandler,
+        new MTRTestClusterClusterTestEmitTestEventResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -23443,13 +25315,14 @@ using chip::SessionHandle;
     }
 }
 
-- (void)testEmitTestFabricScopedEventRequestWithParams:(MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams *)params
-                                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
-                                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                     completionHandler:
-                                         (void (^)(
-                                             MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
-                                             NSError * _Nullable error))completionHandler
+- (void)
+    testEmitTestFabricScopedEventRequestWithParams:(MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams *)params
+                                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                        completion:
+                                            (void (^)(
+                                                MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
+                                                NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -23461,8 +25334,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestEmitTestFabricScopedEventResponseCallbackBridge(self.callbackQueue, baseDevice,
-            completionHandler,
+        new MTRTestClusterClusterTestEmitTestFabricScopedEventResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -25772,6 +27644,290 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (void)testWithParams:(MTRTestClusterClusterTestParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+        completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self testWithParams:params
+               expectedValues:expectedDataValueDictionaries
+        expectedValueInterval:expectedValueIntervalMs
+                   completion:completionHandler];
+}
+- (void)testWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+             completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self testWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
+- (void)testNotHandledWithParams:(MTRTestClusterClusterTestNotHandledParams * _Nullable)params
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+               completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self testNotHandledWithParams:params
+                    expectedValues:expectedDataValueDictionaries
+             expectedValueInterval:expectedValueIntervalMs
+                        completion:completionHandler];
+}
+- (void)testNotHandledWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                       completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self testNotHandledWithExpectedValues:expectedValues
+                     expectedValueInterval:expectedValueIntervalMs
+                                completion:completionHandler];
+}
+- (void)testSpecificWithParams:(MTRTestClusterClusterTestSpecificParams * _Nullable)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+             completionHandler:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completionHandler
+{
+    [self testSpecificWithParams:params
+                  expectedValues:expectedDataValueDictionaries
+           expectedValueInterval:expectedValueIntervalMs
+                      completion:completionHandler];
+}
+- (void)testSpecificWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                     completionHandler:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completionHandler
+{
+    [self testSpecificWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+}
+- (void)testUnknownCommandWithParams:(MTRTestClusterClusterTestUnknownCommandParams * _Nullable)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self testUnknownCommandWithParams:params
+                        expectedValues:expectedDataValueDictionaries
+                 expectedValueInterval:expectedValueIntervalMs
+                            completion:completionHandler];
+}
+- (void)testUnknownCommandWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                           completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self testUnknownCommandWithExpectedValues:expectedValues
+                         expectedValueInterval:expectedValueIntervalMs
+                                    completion:completionHandler];
+}
+- (void)testAddArgumentsWithParams:(MTRTestClusterClusterTestAddArgumentsParams *)params
+                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                 completionHandler:(void (^)(MTRTestClusterClusterTestAddArgumentsResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completionHandler
+{
+    [self testAddArgumentsWithParams:params
+                      expectedValues:expectedDataValueDictionaries
+               expectedValueInterval:expectedValueIntervalMs
+                          completion:completionHandler];
+}
+- (void)testSimpleArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleArgumentRequestParams *)params
+                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                          completionHandler:(void (^)(MTRTestClusterClusterTestSimpleArgumentResponseParams * _Nullable data,
+                                                NSError * _Nullable error))completionHandler
+{
+    [self testSimpleArgumentRequestWithParams:params
+                               expectedValues:expectedDataValueDictionaries
+                        expectedValueInterval:expectedValueIntervalMs
+                                   completion:completionHandler];
+}
+- (void)testStructArrayArgumentRequestWithParams:(MTRTestClusterClusterTestStructArrayArgumentRequestParams *)params
+                                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                               completionHandler:
+                                   (void (^)(MTRTestClusterClusterTestStructArrayArgumentResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completionHandler
+{
+    [self testStructArrayArgumentRequestWithParams:params
+                                    expectedValues:expectedDataValueDictionaries
+                             expectedValueInterval:expectedValueIntervalMs
+                                        completion:completionHandler];
+}
+- (void)testStructArgumentRequestWithParams:(MTRTestClusterClusterTestStructArgumentRequestParams *)params
+                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                          completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                NSError * _Nullable error))completionHandler
+{
+    [self testStructArgumentRequestWithParams:params
+                               expectedValues:expectedDataValueDictionaries
+                        expectedValueInterval:expectedValueIntervalMs
+                                   completion:completionHandler];
+}
+- (void)testNestedStructArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructArgumentRequestParams *)params
+                                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                                completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                      NSError * _Nullable error))completionHandler
+{
+    [self testNestedStructArgumentRequestWithParams:params
+                                     expectedValues:expectedDataValueDictionaries
+                              expectedValueInterval:expectedValueIntervalMs
+                                         completion:completionHandler];
+}
+- (void)testListStructArgumentRequestWithParams:(MTRTestClusterClusterTestListStructArgumentRequestParams *)params
+                                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                              completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                    NSError * _Nullable error))completionHandler
+{
+    [self testListStructArgumentRequestWithParams:params
+                                   expectedValues:expectedDataValueDictionaries
+                            expectedValueInterval:expectedValueIntervalMs
+                                       completion:completionHandler];
+}
+- (void)testListInt8UArgumentRequestWithParams:(MTRTestClusterClusterTestListInt8UArgumentRequestParams *)params
+                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                             completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                   NSError * _Nullable error))completionHandler
+{
+    [self testListInt8UArgumentRequestWithParams:params
+                                  expectedValues:expectedDataValueDictionaries
+                           expectedValueInterval:expectedValueIntervalMs
+                                      completion:completionHandler];
+}
+- (void)testNestedStructListArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructListArgumentRequestParams *)params
+                                       expectedValues:
+                                           (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                                    completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                          NSError * _Nullable error))completionHandler
+{
+    [self testNestedStructListArgumentRequestWithParams:params
+                                         expectedValues:expectedDataValueDictionaries
+                                  expectedValueInterval:expectedValueIntervalMs
+                                             completion:completionHandler];
+}
+- (void)testListNestedStructListArgumentRequestWithParams:
+            (MTRTestClusterClusterTestListNestedStructListArgumentRequestParams *)params
+                                           expectedValues:
+                                               (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                                        completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                              NSError * _Nullable error))completionHandler
+{
+    [self testListNestedStructListArgumentRequestWithParams:params
+                                             expectedValues:expectedDataValueDictionaries
+                                      expectedValueInterval:expectedValueIntervalMs
+                                                 completion:completionHandler];
+}
+- (void)testListInt8UReverseRequestWithParams:(MTRTestClusterClusterTestListInt8UReverseRequestParams *)params
+                               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                            completionHandler:(void (^)(MTRTestClusterClusterTestListInt8UReverseResponseParams * _Nullable data,
+                                                  NSError * _Nullable error))completionHandler
+{
+    [self testListInt8UReverseRequestWithParams:params
+                                 expectedValues:expectedDataValueDictionaries
+                          expectedValueInterval:expectedValueIntervalMs
+                                     completion:completionHandler];
+}
+- (void)testEnumsRequestWithParams:(MTRTestClusterClusterTestEnumsRequestParams *)params
+                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                 completionHandler:(void (^)(MTRTestClusterClusterTestEnumsResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completionHandler
+{
+    [self testEnumsRequestWithParams:params
+                      expectedValues:expectedDataValueDictionaries
+               expectedValueInterval:expectedValueIntervalMs
+                          completion:completionHandler];
+}
+- (void)testNullableOptionalRequestWithParams:(MTRTestClusterClusterTestNullableOptionalRequestParams * _Nullable)params
+                               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                            completionHandler:(void (^)(MTRTestClusterClusterTestNullableOptionalResponseParams * _Nullable data,
+                                                  NSError * _Nullable error))completionHandler
+{
+    [self testNullableOptionalRequestWithParams:params
+                                 expectedValues:expectedDataValueDictionaries
+                          expectedValueInterval:expectedValueIntervalMs
+                                     completion:completionHandler];
+}
+- (void)testComplexNullableOptionalRequestWithParams:(MTRTestClusterClusterTestComplexNullableOptionalRequestParams *)params
+                                      expectedValues:
+                                          (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                                   completionHandler:
+                                       (void (^)(MTRTestClusterClusterTestComplexNullableOptionalResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completionHandler
+{
+    [self testComplexNullableOptionalRequestWithParams:params
+                                        expectedValues:expectedDataValueDictionaries
+                                 expectedValueInterval:expectedValueIntervalMs
+                                            completion:completionHandler];
+}
+- (void)simpleStructEchoRequestWithParams:(MTRTestClusterClusterSimpleStructEchoRequestParams *)params
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                        completionHandler:(void (^)(MTRTestClusterClusterSimpleStructResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completionHandler
+{
+    [self simpleStructEchoRequestWithParams:params
+                             expectedValues:expectedDataValueDictionaries
+                      expectedValueInterval:expectedValueIntervalMs
+                                 completion:completionHandler];
+}
+- (void)timedInvokeRequestWithParams:(MTRTestClusterClusterTimedInvokeRequestParams * _Nullable)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                   completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self timedInvokeRequestWithParams:params
+                        expectedValues:expectedDataValueDictionaries
+                 expectedValueInterval:expectedValueIntervalMs
+                            completion:completionHandler];
+}
+- (void)timedInvokeRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                           completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self timedInvokeRequestWithExpectedValues:expectedValues
+                         expectedValueInterval:expectedValueIntervalMs
+                                    completion:completionHandler];
+}
+- (void)testSimpleOptionalArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
+                                     expectedValues:
+                                         (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                                  completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self testSimpleOptionalArgumentRequestWithParams:params
+                                       expectedValues:expectedDataValueDictionaries
+                                expectedValueInterval:expectedValueIntervalMs
+                                           completion:completionHandler];
+}
+- (void)testEmitTestEventRequestWithParams:(MTRTestClusterClusterTestEmitTestEventRequestParams *)params
+                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                         completionHandler:(void (^)(MTRTestClusterClusterTestEmitTestEventResponseParams * _Nullable data,
+                                               NSError * _Nullable error))completionHandler
+{
+    [self testEmitTestEventRequestWithParams:params
+                              expectedValues:expectedDataValueDictionaries
+                       expectedValueInterval:expectedValueIntervalMs
+                                  completion:completionHandler];
+}
+- (void)testEmitTestFabricScopedEventRequestWithParams:(MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams *)params
+                                        expectedValues:
+                                            (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                                     completionHandler:
+                                         (void (^)(
+                                             MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
+                                             NSError * _Nullable error))completionHandler
+{
+    [self testEmitTestFabricScopedEventRequestWithParams:params
+                                          expectedValues:expectedDataValueDictionaries
+                                   expectedValueInterval:expectedValueIntervalMs
+                                              completion:completionHandler];
+}
 @end
 
 // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)

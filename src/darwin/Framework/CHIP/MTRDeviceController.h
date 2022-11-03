@@ -129,7 +129,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 - (nullable MTRBaseDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error;
 - (BOOL)getBaseDevice:(uint64_t)deviceID
                 queue:(dispatch_queue_t)queue
-    completionHandler:(MTRDeviceConnectionCallback)completionHandler;
+           completion:(MTRDeviceConnectionCallback)completion MTR_NEWLY_AVAILABLE;
 
 - (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error;
 - (nullable NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
@@ -200,6 +200,11 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 
 - (nullable NSData *)fetchAttestationChallengeForDeviceId:(uint64_t)deviceId
     MTR_NEWLY_DEPRECATED("Please use fetchAttestationChallengeForDeviceID");
+
+- (BOOL)getBaseDevice:(uint64_t)deviceID
+                queue:(dispatch_queue_t)queue
+    completionHandler:(MTRDeviceConnectionCallback)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use [MTRBaseDevice deviceWithNodeID:controller:]");
 
 @end
 
