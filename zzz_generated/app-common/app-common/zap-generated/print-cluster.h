@@ -410,10 +410,10 @@
 #define CHIP_PRINTCLUSTER_KEYPAD_INPUT_CLUSTER
 #endif
 
-#if defined(ZCL_USING_CONTENT_LAUNCH_CLUSTER_SERVER) || defined(ZCL_USING_CONTENT_LAUNCH_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER { ZCL_CONTENT_LAUNCH_CLUSTER_ID, "Content Launcher" },
+#if defined(ZCL_USING_CONTENT_LAUNCHER_CLUSTER_SERVER) || defined(ZCL_USING_CONTENT_LAUNCHER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_CONTENT_LAUNCHER_CLUSTER { ZCL_CONTENT_LAUNCHER_CLUSTER_ID, "Content Launcher" },
 #else
-#define CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER
+#define CHIP_PRINTCLUSTER_CONTENT_LAUNCHER_CLUSTER
 #endif
 
 #if defined(ZCL_USING_AUDIO_OUTPUT_CLUSTER_SERVER) || defined(ZCL_USING_AUDIO_OUTPUT_CLUSTER_CLIENT)
@@ -522,7 +522,7 @@
     CHIP_PRINTCLUSTER_MEDIA_INPUT_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_LOW_POWER_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_KEYPAD_INPUT_CLUSTER                                                                                         \
-    CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER                                                                                       \
+    CHIP_PRINTCLUSTER_CONTENT_LAUNCHER_CLUSTER                                                                                     \
     CHIP_PRINTCLUSTER_AUDIO_OUTPUT_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_APPLICATION_LAUNCHER_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER                                                                                    \
