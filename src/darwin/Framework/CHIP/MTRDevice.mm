@@ -418,7 +418,7 @@ private:
                                              }
 
                                              // TODO: better retry logic
-                                             if (retryCount < 2) {
+                                             if (error && (retryCount < 2)) {
                                                  [workItem retryWork];
                                              } else {
                                                  [workItem endWork];
