@@ -632,5 +632,10 @@ void SetAccessControl(AccessControl & accessControl)
     globalAccessControl = &accessControl;
 }
 
+void ResetAccessControlToDefault()
+{
+    globalAccessControl = &defaultAccessControl;
+}
+
 } // namespace Access
 } // namespace chip
