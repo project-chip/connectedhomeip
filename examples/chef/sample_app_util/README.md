@@ -162,7 +162,7 @@ The following conventions are used:
     same as the order they are read from the zap file.
 
 As an example, take a look at
-sample_zap_file_hashmeta.yaml](test_files/sample_zap_file_hashmeta.yaml)
+[sample_zap_file_hashmeta.yaml](test_files/sample_zap_file_hashmeta.yaml)
 
 ## Utility Usage
 
