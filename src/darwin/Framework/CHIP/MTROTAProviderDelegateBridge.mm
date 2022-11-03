@@ -155,11 +155,20 @@ private:
 
         auto strongDelegate = mDelegate;
         dispatch_async(mWorkQueue, ^{
-            [strongDelegate handleBDXTransferSessionBeginForNodeID:nodeId
-                                                        controller:controller
-                                                    fileDesignator:fileDesignator
-                                                            offset:offset
-                                                 completionHandler:completionHandler];
+            if ([strongDelegate respondsToSelector:@selector
+                                (handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:)]) {
+                [strongDelegate handleBDXTransferSessionBeginForNodeID:nodeId
+                                                            controller:controller
+                                                        fileDesignator:fileDesignator
+                                                                offset:offset
+                                                            completion:completionHandler];
+            } else {
+                [strongDelegate handleBDXTransferSessionBeginForNodeID:nodeId
+                                                            controller:controller
+                                                        fileDesignator:fileDesignator
+                                                                offset:offset
+                                                     completionHandler:completionHandler];
+            }
         });
 
         return CHIP_NO_ERROR;
@@ -233,12 +242,22 @@ private:
 
         auto strongDelegate = mDelegate;
         dispatch_async(mWorkQueue, ^{
-            [strongDelegate handleBDXQueryForNodeID:nodeId
-                                         controller:controller
-                                          blockSize:blockSize
-                                         blockIndex:blockIndex
-                                        bytesToSkip:bytesToSkip
-                                  completionHandler:completionHandler];
+            if ([strongDelegate respondsToSelector:@selector
+                                (handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completion:)]) {
+                [strongDelegate handleBDXQueryForNodeID:nodeId
+                                             controller:controller
+                                              blockSize:blockSize
+                                             blockIndex:blockIndex
+                                            bytesToSkip:bytesToSkip
+                                             completion:completionHandler];
+            } else {
+                [strongDelegate handleBDXQueryForNodeID:nodeId
+                                             controller:controller
+                                              blockSize:blockSize
+                                             blockIndex:blockIndex
+                                            bytesToSkip:bytesToSkip
+                                      completionHandler:completionHandler];
+            }
         });
 
         return CHIP_NO_ERROR;
@@ -506,10 +525,17 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
 
     auto strongDelegate = mDelegate;
     dispatch_async(mWorkQueue, ^{
-        [strongDelegate handleQueryImageForNodeID:@(nodeId)
-                                       controller:controller
-                                           params:commandParams
-                                completionHandler:completionHandler];
+        if ([strongDelegate respondsToSelector:@selector(handleQueryImageForNodeID:controller:params:completion:)]) {
+            [strongDelegate handleQueryImageForNodeID:@(nodeId)
+                                           controller:controller
+                                               params:commandParams
+                                           completion:completionHandler];
+        } else {
+            [strongDelegate handleQueryImageForNodeID:@(nodeId)
+                                           controller:controller
+                                               params:commandParams
+                                    completionHandler:completionHandler];
+        }
     });
 }
 
@@ -547,10 +573,17 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * com
 
     auto strongDelegate = mDelegate;
     dispatch_async(mWorkQueue, ^{
-        [strongDelegate handleApplyUpdateRequestForNodeID:@(nodeId)
-                                               controller:controller
-                                                   params:commandParams
-                                        completionHandler:completionHandler];
+        if ([strongDelegate respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completion:)]) {
+            [strongDelegate handleApplyUpdateRequestForNodeID:@(nodeId)
+                                                   controller:controller
+                                                       params:commandParams
+                                                   completion:completionHandler];
+        } else {
+            [strongDelegate handleApplyUpdateRequestForNodeID:@(nodeId)
+                                                   controller:controller
+                                                       params:commandParams
+                                            completionHandler:completionHandler];
+        }
     });
 }
 
@@ -582,10 +615,17 @@ void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * co
 
     auto strongDelegate = mDelegate;
     dispatch_async(mWorkQueue, ^{
-        [strongDelegate handleNotifyUpdateAppliedForNodeID:@(nodeId)
-                                                controller:controller
-                                                    params:commandParams
-                                         completionHandler:completionHandler];
+        if ([strongDelegate respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:controller:params:completion:)]) {
+            [strongDelegate handleNotifyUpdateAppliedForNodeID:@(nodeId)
+                                                    controller:controller
+                                                        params:commandParams
+                                                    completion:completionHandler];
+        } else {
+            [strongDelegate handleNotifyUpdateAppliedForNodeID:@(nodeId)
+                                                    controller:controller
+                                                        params:commandParams
+                                             completionHandler:completionHandler];
+        }
     });
 }
 

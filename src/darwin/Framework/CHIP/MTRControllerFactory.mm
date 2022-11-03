@@ -210,6 +210,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
     DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
 
+    __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
     dispatch_sync(_chipWorkQueue, ^{
         if ([self isRunning]) {
             return;
@@ -224,6 +225,49 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         }
 
         if (startupParams.otaProviderDelegate) {
+            if (![startupParams.otaProviderDelegate respondsToSelector:@selector(handleQueryImageForNodeID:
+                                                                                                controller:params:completion:)]
+                && ![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleQueryImageForNodeID:controller:params:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleQueryImageForNodeID");
+                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
+                return;
+            }
+            if (![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completion:)]
+                && ![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleApplyUpdateRequestForNodeID");
+                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
+                return;
+            }
+            if (![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:controller:params:completion:)]
+                && ![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:controller:params:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleNotifyUpdateAppliedForNodeID");
+                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
+                return;
+            }
+            if (![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleBDXTransferSessionBeginForNodeID:
+                                                                             controller:fileDesignator:offset:completion:)]
+                && ![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector
+                    (handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleBDXTransferSessionBeginForNodeID");
+                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
+                return;
+            }
+            if (![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completion:)]
+                && ![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleBDXQueryForNodeID:
+                                                              controller:blockSize:blockIndex:bytesToSkip:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleBDXQueryForNodeID");
+                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
+                return;
+            }
             _otaProviderDelegateBridge = new MTROTAProviderDelegateBridge(startupParams.otaProviderDelegate);
             if (_otaProviderDelegateBridge == nil) {
                 MTR_LOG_ERROR("Error: %@", kErrorOtaProviderInit);
@@ -238,7 +282,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
             return;
         }
 
-        CHIP_ERROR errorCode = _keystore->Init(_persistentStorageDelegateBridge);
+        errorCode = _keystore->Init(_persistentStorageDelegateBridge);
         if (errorCode != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Error: %@", kErrorKeystoreInit);
             return;

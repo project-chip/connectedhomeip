@@ -48,14 +48,14 @@ constexpr uint8_t kUpdateTokenLen = 32;
 - (void)handleQueryImageForNodeID:(NSNumber * _Nonnull)nodeID
                        controller:(MTRDeviceController * _Nonnull)controller
                            params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams * _Nonnull)params
-                completionHandler:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
-                                      NSError * _Nullable error))completionHandler
+                       completion:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completion
 {
     auto isBDXProtocolSupported =
         [params.protocolsSupported containsObject:@(MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXSynchronous)];
     if (!isBDXProtocolSupported) {
         _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported);
-        completionHandler(_selectedCandidate, nil);
+        completion(_selectedCandidate, nil);
         return;
     }
 
@@ -63,7 +63,7 @@ constexpr uint8_t kUpdateTokenLen = 32;
     if (!hasCandidate) {
         NSLog(@"Unable to select OTA Image.");
         _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable);
-        completionHandler(_selectedCandidate, nil);
+        completion(_selectedCandidate, nil);
         return;
     }
 
@@ -75,15 +75,15 @@ constexpr uint8_t kUpdateTokenLen = 32;
         _selectedCandidate.userConsentNeeded = _userConsentNeeded;
         NSLog(@"User Consent Needed: %@", _selectedCandidate.userConsentNeeded);
     }
-    completionHandler(_selectedCandidate, nil);
+    completion(_selectedCandidate, nil);
 }
 
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber * _Nonnull)nodeID
                                controller:(MTRDeviceController * _Nonnull)controller
                                    params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams * _Nonnull)params
-                        completionHandler:
-                            (void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
-                                NSError * _Nullable error))completionHandler
+                               completion:
+                                   (void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completion
 {
     MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * applyUpdateResponseParams =
         [[MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
@@ -95,22 +95,22 @@ constexpr uint8_t kUpdateTokenLen = 32;
         applyUpdateResponseParams.timedInvokeTimeoutMs = _timedInvokeTimeoutMs;
     }
 
-    completionHandler(applyUpdateResponseParams, nil);
+    completion(applyUpdateResponseParams, nil);
 }
 
 - (void)handleNotifyUpdateAppliedForNodeID:(NSNumber * _Nonnull)nodeID
                                 controller:(MTRDeviceController * _Nonnull)controller
                                     params:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * _Nonnull)params
-                         completionHandler:(StatusCompletion _Nonnull)completionHandler
+                                completion:(MTRStatusCompletion _Nonnull)completion
 {
-    completionHandler(nil);
+    completion(nil);
 }
 
 - (void)handleBDXTransferSessionBeginForNodeID:(NSNumber * _Nonnull)nodeID
                                     controller:(MTRDeviceController * _Nonnull)controller
                                 fileDesignator:(NSString * _Nonnull)fileDesignator
                                         offset:(NSNumber * _Nonnull)offset
-                             completionHandler:(void (^)(NSError * error))completionHandler
+                                    completion:(void (^)(NSError * error))completion
 {
     NSLog(@"BDX TransferSession begin with %@ (offset: %@)", fileDesignator, offset);
 
@@ -120,7 +120,7 @@ constexpr uint8_t kUpdateTokenLen = 32;
         auto error = [[NSError alloc] initWithDomain:@"OTAProviderDomain"
                                                 code:MTRErrorCodeGeneralError
                                             userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(errorString, nil) }];
-        completionHandler(error);
+        completion(error);
         return;
     }
 
@@ -131,7 +131,7 @@ constexpr uint8_t kUpdateTokenLen = 32;
         auto error = [[NSError alloc] initWithDomain:@"OTAProviderDomain"
                                                 code:MTRErrorCodeGeneralError
                                             userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(errorString, nil) }];
-        completionHandler(error);
+        completion(error);
         return;
     }
 
@@ -141,14 +141,14 @@ constexpr uint8_t kUpdateTokenLen = 32;
         auto error = [[NSError alloc] initWithDomain:@"OTAProviderDomain"
                                                 code:MTRErrorCodeGeneralError
                                             userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(errorString, nil) }];
-        completionHandler(error);
+        completion(error);
         return;
     }
 
     _mFileHandle = handle;
     _mFileOffset = offset;
     _mFileEndOffset = @(endOffset);
-    completionHandler(nil);
+    completion(nil);
 }
 
 - (void)handleBDXTransferSessionEndForNodeID:(NSNumber * _Nonnull)nodeID
@@ -166,7 +166,7 @@ constexpr uint8_t kUpdateTokenLen = 32;
                       blockSize:(NSNumber * _Nonnull)blockSize
                      blockIndex:(NSNumber * _Nonnull)blockIndex
                     bytesToSkip:(NSNumber * _Nonnull)bytesToSkip
-              completionHandler:(void (^)(NSData * _Nullable data, BOOL isEOF))completionHandler
+                     completion:(void (^)(NSData * _Nullable data, BOOL isEOF))completion
 {
     NSLog(@"BDX Query received blockSize: %@, blockIndex: %@", blockSize, blockIndex);
 
@@ -176,19 +176,19 @@ constexpr uint8_t kUpdateTokenLen = 32;
     [_mFileHandle seekToOffset:offset error:&error];
     if (error != nil) {
         NSLog(@"Error seeking to offset %@", @(offset));
-        completionHandler(nil, NO);
+        completion(nil, NO);
         return;
     }
 
     NSData * data = [_mFileHandle readDataUpToLength:[blockSize unsignedLongValue] error:&error];
     if (error != nil) {
         NSLog(@"Error reading file %@", _mFileHandle);
-        completionHandler(nil, NO);
+        completion(nil, NO);
         return;
     }
 
     BOOL isEOF = offset + [blockSize unsignedLongValue] >= [_mFileEndOffset unsignedLongLongValue];
-    completionHandler(data, isEOF);
+    completion(data, isEOF);
 }
 
 - (void)SetOTAFilePath:(const char *)path
