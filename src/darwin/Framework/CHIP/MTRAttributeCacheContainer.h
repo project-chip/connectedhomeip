@@ -32,15 +32,15 @@ NS_ASSUME_NONNULL_BEGIN
  * @param endpointID  endpoint ID of the attribute
  * @param clusterID  cluster ID of the attribute
  * @param attributeID  attribute ID of the attribute
- * @param clientQueue  client queue to dispatch the completion handler through
+ * @param queue  client queue to dispatch the completion handler through
  * @param completion  block to receive the result.
  *                   "values" received by the block will have the same format of object as the one received by completion block
- *                   of MTRBaseDevice readAttributeWithEndpointID:clusterID:attributeID:clientQueue:completion method.
+ *                   of MTRBaseDevice readAttributeWithEndpointID:clusterID:attributeID:queue:completion method.
  */
 - (void)readAttributeWithEndpointID:(NSNumber * _Nullable)endpointID
                           clusterID:(NSNumber * _Nullable)clusterID
                         attributeID:(NSNumber * _Nullable)attributeID
-                        clientQueue:(dispatch_queue_t)clientQueue
+                              queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
 
 @end
@@ -52,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
                         attributeId:(NSNumber * _Nullable)attributeId
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion
-    MTR_NEWLY_DEPRECATED("Please use readAttributeWithEndpointID:clusterID:attributeID:clientQueue:completion:");
+    MTR_NEWLY_DEPRECATED("Please use readAttributeWithEndpointID:clusterID:attributeID:queue:completion:");
 
 @end
 

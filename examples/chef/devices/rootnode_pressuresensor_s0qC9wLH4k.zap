@@ -1,5 +1,5 @@
 {
-  "featureLevel": 81,
+  "featureLevel": 82,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -1638,7 +1638,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -2886,7 +2886,7 @@
           "mfgCode": null,
           "define": "THREAD_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "channel",
@@ -3972,7 +3972,7 @@
           "mfgCode": null,
           "define": "WIFI_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "bssid",
@@ -4258,7 +4258,7 @@
           "mfgCode": null,
           "define": "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "PHYRate",
@@ -6248,5 +6248,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 773
     }
-  ]
+  ],
+  "log": []
 }

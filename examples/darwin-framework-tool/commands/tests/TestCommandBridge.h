@@ -168,15 +168,15 @@ public:
 
         [controller getBaseDevice:value.nodeId
                             queue:mCallbackQueue
-                completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                    if (error != nil) {
-                        SetCommandExitStatus(error);
-                        return;
-                    }
+                       completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
+                           if (error != nil) {
+                               SetCommandExitStatus(error);
+                               return;
+                           }
 
-                    mConnectedDevices[identity] = device;
-                    NextTest();
-                }];
+                           mConnectedDevices[identity] = device;
+                           NextTest();
+                       }];
         return CHIP_NO_ERROR;
     }
 

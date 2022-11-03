@@ -1170,13 +1170,13 @@ class MTROctetStringAttributeCallbackSubscriptionBridge : public MTROctetStringA
 public:
     MTROctetStringAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
                                                       ResponseHandler handler, MTRActionBlock action,
-                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROctetStringAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROctetStringAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                      MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                      MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROctetStringAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1184,7 +1184,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableOctetStringAttributeCallbackBridge : public MTRCallbackBridge<NullableOctetStringAttributeCallback>
@@ -1212,14 +1212,14 @@ public:
     MTRNullableOctetStringAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                               MTRDeviceController * controller, ResponseHandler handler,
                                                               MTRActionBlock action,
-                                                              SubscriptionEstablishedHandler establishedHandler) :
+                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOctetStringAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableOctetStringAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                               ResponseHandler handler, MTRActionBlock action,
-                                                              SubscriptionEstablishedHandler establishedHandler) :
+                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOctetStringAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1227,7 +1227,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRCharStringAttributeCallbackBridge : public MTRCallbackBridge<CharStringAttributeCallback>
@@ -1253,13 +1253,13 @@ class MTRCharStringAttributeCallbackSubscriptionBridge : public MTRCharStringAtt
 public:
     MTRCharStringAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
                                                      ResponseHandler handler, MTRActionBlock action,
-                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRCharStringAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRCharStringAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                     MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                     MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRCharStringAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1267,7 +1267,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableCharStringAttributeCallbackBridge : public MTRCallbackBridge<NullableCharStringAttributeCallback>
@@ -1295,14 +1295,14 @@ public:
     MTRNullableCharStringAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                              MTRDeviceController * controller, ResponseHandler handler,
                                                              MTRActionBlock action,
-                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableCharStringAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableCharStringAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                              ResponseHandler handler, MTRActionBlock action,
-                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableCharStringAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1310,7 +1310,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBooleanAttributeCallbackBridge : public MTRCallbackBridge<BooleanAttributeCallback>
@@ -1336,13 +1336,13 @@ class MTRBooleanAttributeCallbackSubscriptionBridge : public MTRBooleanAttribute
 public:
     MTRBooleanAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
                                                   ResponseHandler handler, MTRActionBlock action,
-                                                  SubscriptionEstablishedHandler establishedHandler) :
+                                                  MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBooleanAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRBooleanAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                  MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                  MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBooleanAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1350,7 +1350,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableBooleanAttributeCallbackBridge : public MTRCallbackBridge<NullableBooleanAttributeCallback>
@@ -1377,14 +1377,14 @@ public:
     MTRNullableBooleanAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                           MTRActionBlock action,
-                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableBooleanAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableBooleanAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
                                                           MTRActionBlock action,
-                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableBooleanAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1392,7 +1392,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRInt8uAttributeCallbackBridge : public MTRCallbackBridge<Int8uAttributeCallback>
@@ -1418,13 +1418,13 @@ class MTRInt8uAttributeCallbackSubscriptionBridge : public MTRInt8uAttributeCall
 public:
     MTRInt8uAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
                                                 ResponseHandler handler, MTRActionBlock action,
-                                                SubscriptionEstablishedHandler establishedHandler) :
+                                                MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRInt8uAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRInt8uAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRInt8uAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1432,7 +1432,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableInt8uAttributeCallbackBridge : public MTRCallbackBridge<NullableInt8uAttributeCallback>
@@ -1458,13 +1458,15 @@ class MTRNullableInt8uAttributeCallbackSubscriptionBridge : public MTRNullableIn
 public:
     MTRNullableInt8uAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                         MTRDeviceController * controller, ResponseHandler handler,
-                                                        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                        MTRActionBlock action,
+                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableInt8uAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableInt8uAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                        MTRActionBlock action,
+                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableInt8uAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1472,7 +1474,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRInt8sAttributeCallbackBridge : public MTRCallbackBridge<Int8sAttributeCallback>
@@ -1498,13 +1500,13 @@ class MTRInt8sAttributeCallbackSubscriptionBridge : public MTRInt8sAttributeCall
 public:
     MTRInt8sAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
                                                 ResponseHandler handler, MTRActionBlock action,
-                                                SubscriptionEstablishedHandler establishedHandler) :
+                                                MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRInt8sAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRInt8sAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRInt8sAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1512,7 +1514,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableInt8sAttributeCallbackBridge : public MTRCallbackBridge<NullableInt8sAttributeCallback>
@@ -1538,13 +1540,15 @@ class MTRNullableInt8sAttributeCallbackSubscriptionBridge : public MTRNullableIn
 public:
     MTRNullableInt8sAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                         MTRDeviceController * controller, ResponseHandler handler,
-                                                        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                        MTRActionBlock action,
+                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableInt8sAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableInt8sAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                        MTRActionBlock action,
+                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableInt8sAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1552,7 +1556,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRInt16uAttributeCallbackBridge : public MTRCallbackBridge<Int16uAttributeCallback>
@@ -1578,13 +1582,13 @@ class MTRInt16uAttributeCallbackSubscriptionBridge : public MTRInt16uAttributeCa
 public:
     MTRInt16uAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
                                                  ResponseHandler handler, MTRActionBlock action,
-                                                 SubscriptionEstablishedHandler establishedHandler) :
+                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRInt16uAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRInt16uAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                 MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                 MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRInt16uAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1592,7 +1596,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableInt16uAttributeCallbackBridge : public MTRCallbackBridge<NullableInt16uAttributeCallback>
@@ -1618,13 +1622,15 @@ class MTRNullableInt16uAttributeCallbackSubscriptionBridge : public MTRNullableI
 public:
     MTRNullableInt16uAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                          MTRDeviceController * controller, ResponseHandler handler,
-                                                         MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                         MTRActionBlock action,
+                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableInt16uAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableInt16uAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                         MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                         MTRActionBlock action,
+                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableInt16uAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1632,7 +1638,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRInt16sAttributeCallbackBridge : public MTRCallbackBridge<Int16sAttributeCallback>
@@ -1658,13 +1664,13 @@ class MTRInt16sAttributeCallbackSubscriptionBridge : public MTRInt16sAttributeCa
 public:
     MTRInt16sAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
                                                  ResponseHandler handler, MTRActionBlock action,
-                                                 SubscriptionEstablishedHandler establishedHandler) :
+                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRInt16sAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRInt16sAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                 MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                 MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRInt16sAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1672,7 +1678,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableInt16sAttributeCallbackBridge : public MTRCallbackBridge<NullableInt16sAttributeCallback>
@@ -1698,13 +1704,15 @@ class MTRNullableInt16sAttributeCallbackSubscriptionBridge : public MTRNullableI
 public:
     MTRNullableInt16sAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                          MTRDeviceController * controller, ResponseHandler handler,
-                                                         MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                         MTRActionBlock action,
+                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableInt16sAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableInt16sAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                         MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                         MTRActionBlock action,
+                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableInt16sAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1712,7 +1720,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRInt32uAttributeCallbackBridge : public MTRCallbackBridge<Int32uAttributeCallback>
@@ -1738,13 +1746,13 @@ class MTRInt32uAttributeCallbackSubscriptionBridge : public MTRInt32uAttributeCa
 public:
     MTRInt32uAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
                                                  ResponseHandler handler, MTRActionBlock action,
-                                                 SubscriptionEstablishedHandler establishedHandler) :
+                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRInt32uAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRInt32uAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                 MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                 MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRInt32uAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1752,7 +1760,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableInt32uAttributeCallbackBridge : public MTRCallbackBridge<NullableInt32uAttributeCallback>
@@ -1778,13 +1786,15 @@ class MTRNullableInt32uAttributeCallbackSubscriptionBridge : public MTRNullableI
 public:
     MTRNullableInt32uAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                          MTRDeviceController * controller, ResponseHandler handler,
-                                                         MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                         MTRActionBlock action,
+                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableInt32uAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableInt32uAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                         MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                         MTRActionBlock action,
+                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableInt32uAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1792,7 +1802,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRInt32sAttributeCallbackBridge : public MTRCallbackBridge<Int32sAttributeCallback>
@@ -1818,13 +1828,13 @@ class MTRInt32sAttributeCallbackSubscriptionBridge : public MTRInt32sAttributeCa
 public:
     MTRInt32sAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
                                                  ResponseHandler handler, MTRActionBlock action,
-                                                 SubscriptionEstablishedHandler establishedHandler) :
+                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRInt32sAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRInt32sAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                 MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                 MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRInt32sAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1832,7 +1842,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableInt32sAttributeCallbackBridge : public MTRCallbackBridge<NullableInt32sAttributeCallback>
@@ -1858,13 +1868,15 @@ class MTRNullableInt32sAttributeCallbackSubscriptionBridge : public MTRNullableI
 public:
     MTRNullableInt32sAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                          MTRDeviceController * controller, ResponseHandler handler,
-                                                         MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                         MTRActionBlock action,
+                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableInt32sAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableInt32sAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                         MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                         MTRActionBlock action,
+                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableInt32sAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1872,7 +1884,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRInt64uAttributeCallbackBridge : public MTRCallbackBridge<Int64uAttributeCallback>
@@ -1898,13 +1910,13 @@ class MTRInt64uAttributeCallbackSubscriptionBridge : public MTRInt64uAttributeCa
 public:
     MTRInt64uAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
                                                  ResponseHandler handler, MTRActionBlock action,
-                                                 SubscriptionEstablishedHandler establishedHandler) :
+                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRInt64uAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRInt64uAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                 MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                 MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRInt64uAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1912,7 +1924,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableInt64uAttributeCallbackBridge : public MTRCallbackBridge<NullableInt64uAttributeCallback>
@@ -1938,13 +1950,15 @@ class MTRNullableInt64uAttributeCallbackSubscriptionBridge : public MTRNullableI
 public:
     MTRNullableInt64uAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                          MTRDeviceController * controller, ResponseHandler handler,
-                                                         MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                         MTRActionBlock action,
+                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableInt64uAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableInt64uAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                         MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                         MTRActionBlock action,
+                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableInt64uAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1952,7 +1966,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRInt64sAttributeCallbackBridge : public MTRCallbackBridge<Int64sAttributeCallback>
@@ -1978,13 +1992,13 @@ class MTRInt64sAttributeCallbackSubscriptionBridge : public MTRInt64sAttributeCa
 public:
     MTRInt64sAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
                                                  ResponseHandler handler, MTRActionBlock action,
-                                                 SubscriptionEstablishedHandler establishedHandler) :
+                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRInt64sAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRInt64sAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                 MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                 MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRInt64sAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -1992,7 +2006,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableInt64sAttributeCallbackBridge : public MTRCallbackBridge<NullableInt64sAttributeCallback>
@@ -2018,13 +2032,15 @@ class MTRNullableInt64sAttributeCallbackSubscriptionBridge : public MTRNullableI
 public:
     MTRNullableInt64sAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                          MTRDeviceController * controller, ResponseHandler handler,
-                                                         MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                         MTRActionBlock action,
+                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableInt64sAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableInt64sAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                         MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                         MTRActionBlock action,
+                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableInt64sAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2032,7 +2048,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRFloatAttributeCallbackBridge : public MTRCallbackBridge<FloatAttributeCallback>
@@ -2058,13 +2074,13 @@ class MTRFloatAttributeCallbackSubscriptionBridge : public MTRFloatAttributeCall
 public:
     MTRFloatAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
                                                 ResponseHandler handler, MTRActionBlock action,
-                                                SubscriptionEstablishedHandler establishedHandler) :
+                                                MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFloatAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRFloatAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFloatAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2072,7 +2088,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableFloatAttributeCallbackBridge : public MTRCallbackBridge<NullableFloatAttributeCallback>
@@ -2098,13 +2114,15 @@ class MTRNullableFloatAttributeCallbackSubscriptionBridge : public MTRNullableFl
 public:
     MTRNullableFloatAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                         MTRDeviceController * controller, ResponseHandler handler,
-                                                        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                        MTRActionBlock action,
+                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableFloatAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableFloatAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                        MTRActionBlock action,
+                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableFloatAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2112,7 +2130,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoubleAttributeCallbackBridge : public MTRCallbackBridge<DoubleAttributeCallback>
@@ -2138,13 +2156,13 @@ class MTRDoubleAttributeCallbackSubscriptionBridge : public MTRDoubleAttributeCa
 public:
     MTRDoubleAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
                                                  ResponseHandler handler, MTRActionBlock action,
-                                                 SubscriptionEstablishedHandler establishedHandler) :
+                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoubleAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoubleAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                 MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                 MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoubleAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2152,7 +2170,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoubleAttributeCallbackBridge : public MTRCallbackBridge<NullableDoubleAttributeCallback>
@@ -2178,13 +2196,15 @@ class MTRNullableDoubleAttributeCallbackSubscriptionBridge : public MTRNullableD
 public:
     MTRNullableDoubleAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                          MTRDeviceController * controller, ResponseHandler handler,
-                                                         MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                         MTRActionBlock action,
+                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoubleAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableDoubleAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                         MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                         MTRActionBlock action,
+                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoubleAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2192,7 +2212,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRVendorIdAttributeCallbackBridge : public MTRCallbackBridge<VendorIdAttributeCallback>
@@ -2218,13 +2238,13 @@ class MTRVendorIdAttributeCallbackSubscriptionBridge : public MTRVendorIdAttribu
 public:
     MTRVendorIdAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
                                                    ResponseHandler handler, MTRActionBlock action,
-                                                   SubscriptionEstablishedHandler establishedHandler) :
+                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRVendorIdAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRVendorIdAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                   MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+                                                   MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRVendorIdAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2232,7 +2252,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableVendorIdAttributeCallbackBridge : public MTRCallbackBridge<NullableVendorIdAttributeCallback>
@@ -2259,14 +2279,14 @@ public:
     MTRNullableVendorIdAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                            MTRDeviceController * controller, ResponseHandler handler,
                                                            MTRActionBlock action,
-                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableVendorIdAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableVendorIdAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
                                                            MTRActionBlock action,
-                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableVendorIdAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2274,7 +2294,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRIdentifyGeneratedCommandListListAttributeCallbackBridge
@@ -2307,14 +2327,14 @@ public:
     MTRIdentifyGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                            MTRDeviceController * controller,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIdentifyGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRIdentifyGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIdentifyGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2322,7 +2342,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRIdentifyAcceptedCommandListListAttributeCallbackBridge
@@ -2355,14 +2375,14 @@ public:
     MTRIdentifyAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIdentifyAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRIdentifyAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIdentifyAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2370,7 +2390,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRIdentifyAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<IdentifyAttributeListListAttributeCallback>
@@ -2399,14 +2419,14 @@ public:
     MTRIdentifyAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                     MTRDeviceController * controller, ResponseHandler handler,
                                                                     MTRActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
+                                                                    MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIdentifyAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRIdentifyAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                     ResponseHandler handler, MTRActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
+                                                                    MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIdentifyAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2414,7 +2434,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGroupsGeneratedCommandListListAttributeCallbackBridge
@@ -2447,14 +2467,14 @@ public:
     MTRGroupsGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                          MTRDeviceController * controller, ResponseHandler handler,
                                                                          MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGroupsGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGroupsGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGroupsGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2462,7 +2482,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGroupsAcceptedCommandListListAttributeCallbackBridge
@@ -2493,14 +2513,14 @@ public:
     MTRGroupsAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                         MTRDeviceController * controller, ResponseHandler handler,
                                                                         MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGroupsAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGroupsAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                         ResponseHandler handler, MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGroupsAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2508,7 +2528,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGroupsAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<GroupsAttributeListListAttributeCallback>
@@ -2536,14 +2556,14 @@ public:
     MTRGroupsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                   MTRDeviceController * controller, ResponseHandler handler,
                                                                   MTRActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
+                                                                  MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGroupsAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGroupsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                   ResponseHandler handler, MTRActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
+                                                                  MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGroupsAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2551,7 +2571,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRScenesGeneratedCommandListListAttributeCallbackBridge
@@ -2584,14 +2604,14 @@ public:
     MTRScenesGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                          MTRDeviceController * controller, ResponseHandler handler,
                                                                          MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRScenesGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRScenesGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRScenesGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2599,7 +2619,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRScenesAcceptedCommandListListAttributeCallbackBridge
@@ -2630,14 +2650,14 @@ public:
     MTRScenesAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                         MTRDeviceController * controller, ResponseHandler handler,
                                                                         MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRScenesAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRScenesAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                         ResponseHandler handler, MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRScenesAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2645,7 +2665,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRScenesAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<ScenesAttributeListListAttributeCallback>
@@ -2673,14 +2693,14 @@ public:
     MTRScenesAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                   MTRDeviceController * controller, ResponseHandler handler,
                                                                   MTRActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
+                                                                  MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRScenesAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRScenesAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                   ResponseHandler handler, MTRActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
+                                                                  MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRScenesAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2688,7 +2708,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROnOffGeneratedCommandListListAttributeCallbackBridge
@@ -2719,14 +2739,14 @@ public:
     MTROnOffGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                         MTRDeviceController * controller, ResponseHandler handler,
                                                                         MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROnOffGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                         ResponseHandler handler, MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2734,7 +2754,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROnOffAcceptedCommandListListAttributeCallbackBridge
@@ -2765,14 +2785,14 @@ public:
     MTROnOffAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                        MTRDeviceController * controller, ResponseHandler handler,
                                                                        MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROnOffAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                        ResponseHandler handler, MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2780,7 +2800,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROnOffAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<OnOffAttributeListListAttributeCallback>
@@ -2808,14 +2828,14 @@ public:
     MTROnOffAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                  MTRDeviceController * controller, ResponseHandler handler,
                                                                  MTRActionBlock action,
-                                                                 SubscriptionEstablishedHandler establishedHandler) :
+                                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROnOffAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                  ResponseHandler handler, MTRActionBlock action,
-                                                                 SubscriptionEstablishedHandler establishedHandler) :
+                                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2823,7 +2843,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge
@@ -2857,7 +2877,7 @@ class MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackSubscr
 public:
     MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                    true),
         mEstablishedHandler(establishedHandler)
@@ -2865,7 +2885,7 @@ public:
 
     MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2873,7 +2893,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge
@@ -2907,14 +2927,14 @@ class MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackSubscri
 public:
     MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2922,7 +2942,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROnOffSwitchConfigurationAttributeListListAttributeCallbackBridge
@@ -2955,14 +2975,14 @@ class MTROnOffSwitchConfigurationAttributeListListAttributeCallbackSubscriptionB
 public:
     MTROnOffSwitchConfigurationAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffSwitchConfigurationAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROnOffSwitchConfigurationAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffSwitchConfigurationAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -2970,7 +2990,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRLevelControlGeneratedCommandListListAttributeCallbackBridge
@@ -3000,17 +3020,16 @@ class MTRLevelControlGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public MTRLevelControlGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRLevelControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRLevelControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLevelControlGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRLevelControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRLevelControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLevelControlGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3018,7 +3037,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRLevelControlAcceptedCommandListListAttributeCallbackBridge
@@ -3048,17 +3067,16 @@ class MTRLevelControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public MTRLevelControlAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRLevelControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRLevelControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLevelControlAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRLevelControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRLevelControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLevelControlAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3066,7 +3084,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRLevelControlAttributeListListAttributeCallbackBridge
@@ -3097,14 +3115,14 @@ public:
     MTRLevelControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                         MTRDeviceController * controller, ResponseHandler handler,
                                                                         MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLevelControlAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRLevelControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                         ResponseHandler handler, MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLevelControlAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3112,7 +3130,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackBridge
@@ -3145,14 +3163,14 @@ class MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackSubscriptionBr
 public:
     MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3160,7 +3178,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackBridge
@@ -3193,14 +3211,14 @@ class MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackSubscriptionBri
 public:
     MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3208,7 +3226,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBinaryInputBasicAttributeListListAttributeCallbackBridge
@@ -3241,14 +3259,14 @@ public:
     MTRBinaryInputBasicAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBinaryInputBasicAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRBinaryInputBasicAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBinaryInputBasicAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3256,7 +3274,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDescriptorDeviceTypeListListAttributeCallbackBridge
@@ -3290,14 +3308,14 @@ public:
     MTRDescriptorDeviceTypeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                        MTRDeviceController * controller, ResponseHandler handler,
                                                                        MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDescriptorDeviceTypeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDescriptorDeviceTypeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                        ResponseHandler handler, MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDescriptorDeviceTypeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3305,7 +3323,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDescriptorServerListListAttributeCallbackBridge : public MTRCallbackBridge<DescriptorServerListListAttributeCallback>
@@ -3334,14 +3352,14 @@ public:
     MTRDescriptorServerListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                    MTRDeviceController * controller, ResponseHandler handler,
                                                                    MTRActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
+                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDescriptorServerListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDescriptorServerListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                    ResponseHandler handler, MTRActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
+                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDescriptorServerListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3349,7 +3367,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDescriptorClientListListAttributeCallbackBridge : public MTRCallbackBridge<DescriptorClientListListAttributeCallback>
@@ -3378,14 +3396,14 @@ public:
     MTRDescriptorClientListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                    MTRDeviceController * controller, ResponseHandler handler,
                                                                    MTRActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
+                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDescriptorClientListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDescriptorClientListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                    ResponseHandler handler, MTRActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
+                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDescriptorClientListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3393,7 +3411,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDescriptorPartsListListAttributeCallbackBridge : public MTRCallbackBridge<DescriptorPartsListListAttributeCallback>
@@ -3421,14 +3439,14 @@ public:
     MTRDescriptorPartsListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                   MTRDeviceController * controller, ResponseHandler handler,
                                                                   MTRActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
+                                                                  MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDescriptorPartsListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDescriptorPartsListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                   ResponseHandler handler, MTRActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
+                                                                  MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDescriptorPartsListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3436,7 +3454,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDescriptorGeneratedCommandListListAttributeCallbackBridge
@@ -3469,14 +3487,14 @@ public:
     MTRDescriptorGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDescriptorGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDescriptorGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDescriptorGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3484,7 +3502,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDescriptorAcceptedCommandListListAttributeCallbackBridge
@@ -3517,14 +3535,14 @@ public:
     MTRDescriptorAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDescriptorAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDescriptorAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDescriptorAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3532,7 +3550,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDescriptorAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<DescriptorAttributeListListAttributeCallback>
@@ -3562,14 +3580,14 @@ public:
     MTRDescriptorAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                       MTRDeviceController * controller, ResponseHandler handler,
                                                                       MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDescriptorAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDescriptorAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                       ResponseHandler handler, MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDescriptorAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3577,7 +3595,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBindingBindingListAttributeCallbackBridge : public MTRCallbackBridge<BindingBindingListAttributeCallback>
@@ -3607,14 +3625,14 @@ public:
     MTRBindingBindingListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                              MTRDeviceController * controller, ResponseHandler handler,
                                                              MTRActionBlock action,
-                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBindingBindingListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRBindingBindingListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                              ResponseHandler handler, MTRActionBlock action,
-                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBindingBindingListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3622,7 +3640,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBindingGeneratedCommandListListAttributeCallbackBridge
@@ -3655,14 +3673,14 @@ public:
     MTRBindingGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBindingGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRBindingGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBindingGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3670,7 +3688,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBindingAcceptedCommandListListAttributeCallbackBridge
@@ -3703,14 +3721,14 @@ public:
     MTRBindingAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                          MTRDeviceController * controller, ResponseHandler handler,
                                                                          MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBindingAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRBindingAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBindingAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3718,7 +3736,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBindingAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<BindingAttributeListListAttributeCallback>
@@ -3747,14 +3765,14 @@ public:
     MTRBindingAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                    MTRDeviceController * controller, ResponseHandler handler,
                                                                    MTRActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
+                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBindingAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRBindingAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                    ResponseHandler handler, MTRActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
+                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBindingAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3762,7 +3780,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAccessControlAclListAttributeCallbackBridge : public MTRCallbackBridge<AccessControlAclListAttributeCallback>
@@ -3793,14 +3811,14 @@ public:
     MTRAccessControlAclListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                MTRDeviceController * controller, ResponseHandler handler,
                                                                MTRActionBlock action,
-                                                               SubscriptionEstablishedHandler establishedHandler) :
+                                                               MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccessControlAclListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRAccessControlAclListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                ResponseHandler handler, MTRActionBlock action,
-                                                               SubscriptionEstablishedHandler establishedHandler) :
+                                                               MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccessControlAclListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3808,7 +3826,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAccessControlExtensionListAttributeCallbackBridge : public MTRCallbackBridge<AccessControlExtensionListAttributeCallback>
@@ -3840,14 +3858,14 @@ public:
     MTRAccessControlExtensionListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                      MTRDeviceController * controller, ResponseHandler handler,
                                                                      MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccessControlExtensionListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRAccessControlExtensionListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                      ResponseHandler handler, MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccessControlExtensionListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3855,7 +3873,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAccessControlGeneratedCommandListListAttributeCallbackBridge
@@ -3885,17 +3903,16 @@ class MTRAccessControlGeneratedCommandListListAttributeCallbackSubscriptionBridg
     : public MTRAccessControlGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRAccessControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRAccessControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccessControlGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRAccessControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRAccessControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccessControlGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3903,7 +3920,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAccessControlAcceptedCommandListListAttributeCallbackBridge
@@ -3933,17 +3950,16 @@ class MTRAccessControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public MTRAccessControlAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRAccessControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRAccessControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccessControlAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRAccessControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRAccessControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccessControlAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3951,7 +3967,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAccessControlAttributeListListAttributeCallbackBridge
@@ -3984,14 +4000,14 @@ public:
     MTRAccessControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                          MTRDeviceController * controller, ResponseHandler handler,
                                                                          MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccessControlAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRAccessControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccessControlAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -3999,7 +4015,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRActionsActionListListAttributeCallbackBridge : public MTRCallbackBridge<ActionsActionListListAttributeCallback>
@@ -4029,14 +4045,14 @@ public:
     MTRActionsActionListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                 MTRDeviceController * controller, ResponseHandler handler,
                                                                 MTRActionBlock action,
-                                                                SubscriptionEstablishedHandler establishedHandler) :
+                                                                MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRActionsActionListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRActionsActionListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                 ResponseHandler handler, MTRActionBlock action,
-                                                                SubscriptionEstablishedHandler establishedHandler) :
+                                                                MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRActionsActionListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4044,7 +4060,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRActionsEndpointListsListAttributeCallbackBridge : public MTRCallbackBridge<ActionsEndpointListsListAttributeCallback>
@@ -4076,14 +4092,14 @@ public:
     MTRActionsEndpointListsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                    MTRDeviceController * controller, ResponseHandler handler,
                                                                    MTRActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
+                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRActionsEndpointListsListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRActionsEndpointListsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                    ResponseHandler handler, MTRActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
+                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRActionsEndpointListsListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4091,7 +4107,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRActionsGeneratedCommandListListAttributeCallbackBridge
@@ -4124,14 +4140,14 @@ public:
     MTRActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRActionsGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRActionsGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4139,7 +4155,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRActionsAcceptedCommandListListAttributeCallbackBridge
@@ -4172,14 +4188,14 @@ public:
     MTRActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                          MTRDeviceController * controller, ResponseHandler handler,
                                                                          MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRActionsAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRActionsAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4187,7 +4203,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRActionsAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<ActionsAttributeListListAttributeCallback>
@@ -4216,14 +4232,14 @@ public:
     MTRActionsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                    MTRDeviceController * controller, ResponseHandler handler,
                                                                    MTRActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
+                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRActionsAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRActionsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                    ResponseHandler handler, MTRActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
+                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRActionsAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4231,7 +4247,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBasicCapabilityMinimaStructAttributeCallbackBridge : public MTRCallbackBridge<BasicCapabilityMinimaStructAttributeCallback>
@@ -4262,14 +4278,14 @@ public:
     MTRBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                       MTRDeviceController * controller, ResponseHandler handler,
                                                                       MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBasicCapabilityMinimaStructAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                       ResponseHandler handler, MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBasicCapabilityMinimaStructAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4277,7 +4293,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBasicGeneratedCommandListListAttributeCallbackBridge
@@ -4308,14 +4324,14 @@ public:
     MTRBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                         MTRDeviceController * controller, ResponseHandler handler,
                                                                         MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBasicGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                         ResponseHandler handler, MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBasicGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4323,7 +4339,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBasicAcceptedCommandListListAttributeCallbackBridge
@@ -4354,14 +4370,14 @@ public:
     MTRBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                        MTRDeviceController * controller, ResponseHandler handler,
                                                                        MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBasicAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                        ResponseHandler handler, MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBasicAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4369,7 +4385,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBasicAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<BasicAttributeListListAttributeCallback>
@@ -4397,14 +4413,14 @@ public:
     MTRBasicAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                  MTRDeviceController * controller, ResponseHandler handler,
                                                                  MTRActionBlock action,
-                                                                 SubscriptionEstablishedHandler establishedHandler) :
+                                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBasicAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRBasicAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                  ResponseHandler handler, MTRActionBlock action,
-                                                                 SubscriptionEstablishedHandler establishedHandler) :
+                                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBasicAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4412,7 +4428,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackBridge
@@ -4447,7 +4463,7 @@ class MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackSubsc
 public:
     MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                     true),
         mEstablishedHandler(establishedHandler)
@@ -4455,7 +4471,7 @@ public:
 
     MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4463,7 +4479,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackBridge
@@ -4497,7 +4513,7 @@ class MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackSubscr
 public:
     MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                    true),
         mEstablishedHandler(establishedHandler)
@@ -4505,7 +4521,7 @@ public:
 
     MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4513,7 +4529,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge
@@ -4546,14 +4562,14 @@ class MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackSubscription
 public:
     MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4561,7 +4577,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge
@@ -4598,7 +4614,7 @@ class MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubsc
 public:
     MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                     true),
         mEstablishedHandler(establishedHandler)
@@ -4606,7 +4622,7 @@ public:
 
     MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4614,7 +4630,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackBridge
@@ -4649,7 +4665,7 @@ class MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackSubs
 public:
     MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                      true),
         mEstablishedHandler(establishedHandler)
@@ -4657,7 +4673,7 @@ public:
 
     MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4665,7 +4681,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackBridge
@@ -4700,7 +4716,7 @@ class MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackSubsc
 public:
     MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                     true),
         mEstablishedHandler(establishedHandler)
@@ -4708,7 +4724,7 @@ public:
 
     MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4716,7 +4732,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackBridge
@@ -4749,14 +4765,14 @@ class MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackSubscriptio
 public:
     MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4764,7 +4780,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge
@@ -4798,14 +4814,14 @@ class MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackSubscript
 public:
     MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4813,7 +4829,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge
@@ -4848,7 +4864,7 @@ class MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackSubsc
 public:
     MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                     true),
         mEstablishedHandler(establishedHandler)
@@ -4856,7 +4872,7 @@ public:
 
     MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4864,7 +4880,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge
@@ -4898,7 +4914,7 @@ class MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackSubscr
 public:
     MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                    true),
         mEstablishedHandler(establishedHandler)
@@ -4906,7 +4922,7 @@ public:
 
     MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4914,7 +4930,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRLocalizationConfigurationAttributeListListAttributeCallbackBridge
@@ -4947,14 +4963,14 @@ class MTRLocalizationConfigurationAttributeListListAttributeCallbackSubscription
 public:
     MTRLocalizationConfigurationAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLocalizationConfigurationAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRLocalizationConfigurationAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLocalizationConfigurationAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -4962,7 +4978,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge
@@ -4998,7 +5014,7 @@ class MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscr
 public:
     MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                    true),
         mEstablishedHandler(establishedHandler)
@@ -5006,7 +5022,7 @@ public:
 
     MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5014,7 +5030,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge
@@ -5048,14 +5064,14 @@ class MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackSubscrip
 public:
     MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5063,7 +5079,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge
@@ -5097,14 +5113,14 @@ class MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackSubscript
 public:
     MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5112,7 +5128,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTimeFormatLocalizationAttributeListListAttributeCallbackBridge
@@ -5145,14 +5161,14 @@ class MTRTimeFormatLocalizationAttributeListListAttributeCallbackSubscriptionBri
 public:
     MTRTimeFormatLocalizationAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTimeFormatLocalizationAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTimeFormatLocalizationAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTimeFormatLocalizationAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5160,7 +5176,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRUnitLocalizationGeneratedCommandListListAttributeCallbackBridge
@@ -5193,14 +5209,14 @@ class MTRUnitLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBr
 public:
     MTRUnitLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRUnitLocalizationGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRUnitLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRUnitLocalizationGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5208,7 +5224,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRUnitLocalizationAcceptedCommandListListAttributeCallbackBridge
@@ -5241,14 +5257,14 @@ class MTRUnitLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBri
 public:
     MTRUnitLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRUnitLocalizationAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRUnitLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRUnitLocalizationAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5256,7 +5272,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRUnitLocalizationAttributeListListAttributeCallbackBridge
@@ -5289,14 +5305,14 @@ public:
     MTRUnitLocalizationAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRUnitLocalizationAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRUnitLocalizationAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRUnitLocalizationAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5304,7 +5320,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPowerSourceConfigurationSourcesListAttributeCallbackBridge
@@ -5334,17 +5350,16 @@ class MTRPowerSourceConfigurationSourcesListAttributeCallbackSubscriptionBridge
     : public MTRPowerSourceConfigurationSourcesListAttributeCallbackBridge
 {
 public:
-    MTRPowerSourceConfigurationSourcesListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRPowerSourceConfigurationSourcesListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceConfigurationSourcesListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRPowerSourceConfigurationSourcesListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRPowerSourceConfigurationSourcesListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceConfigurationSourcesListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5352,7 +5367,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge
@@ -5386,7 +5401,7 @@ class MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackSubscr
 public:
     MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                    true),
         mEstablishedHandler(establishedHandler)
@@ -5394,7 +5409,7 @@ public:
 
     MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5402,7 +5417,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge
@@ -5436,14 +5451,14 @@ class MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackSubscri
 public:
     MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5451,7 +5466,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPowerSourceConfigurationAttributeListListAttributeCallbackBridge
@@ -5484,14 +5499,14 @@ class MTRPowerSourceConfigurationAttributeListListAttributeCallbackSubscriptionB
 public:
     MTRPowerSourceConfigurationAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceConfigurationAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRPowerSourceConfigurationAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceConfigurationAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5499,7 +5514,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPowerSourceActiveWiredFaultsListAttributeCallbackBridge
@@ -5533,14 +5548,14 @@ public:
     MTRPowerSourceActiveWiredFaultsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                            MTRDeviceController * controller,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceActiveWiredFaultsListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRPowerSourceActiveWiredFaultsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceActiveWiredFaultsListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5548,7 +5563,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPowerSourceActiveBatFaultsListAttributeCallbackBridge
@@ -5582,14 +5597,14 @@ public:
     MTRPowerSourceActiveBatFaultsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                          MTRDeviceController * controller, ResponseHandler handler,
                                                                          MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceActiveBatFaultsListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRPowerSourceActiveBatFaultsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceActiveBatFaultsListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5597,7 +5612,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackBridge
@@ -5628,17 +5643,16 @@ class MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackSubscriptionBridge
     : public MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackBridge
 {
 public:
-    MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5646,7 +5660,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPowerSourceGeneratedCommandListListAttributeCallbackBridge
@@ -5676,17 +5690,16 @@ class MTRPowerSourceGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public MTRPowerSourceGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRPowerSourceGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRPowerSourceGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRPowerSourceGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRPowerSourceGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5694,7 +5707,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPowerSourceAcceptedCommandListListAttributeCallbackBridge
@@ -5727,14 +5740,14 @@ public:
     MTRPowerSourceAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRPowerSourceAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5742,7 +5755,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPowerSourceAttributeListListAttributeCallbackBridge
@@ -5773,14 +5786,14 @@ public:
     MTRPowerSourceAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                        MTRDeviceController * controller, ResponseHandler handler,
                                                                        MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRPowerSourceAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                        ResponseHandler handler, MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5788,7 +5801,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge
@@ -5824,7 +5837,7 @@ class MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackSubscr
 public:
     MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                    true),
         mEstablishedHandler(establishedHandler)
@@ -5832,7 +5845,7 @@ public:
 
     MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5840,7 +5853,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge
@@ -5874,14 +5887,14 @@ class MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackSubscripti
 public:
     MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5889,7 +5902,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge
@@ -5922,14 +5935,14 @@ class MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackSubscriptio
 public:
     MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5937,7 +5950,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGeneralCommissioningAttributeListListAttributeCallbackBridge
@@ -5967,17 +5980,16 @@ class MTRGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridg
     : public MTRGeneralCommissioningAttributeListListAttributeCallbackBridge
 {
 public:
-    MTRGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralCommissioningAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralCommissioningAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -5985,7 +5997,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNetworkCommissioningNetworksListAttributeCallbackBridge
@@ -6021,14 +6033,14 @@ public:
     MTRNetworkCommissioningNetworksListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                            MTRDeviceController * controller,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNetworkCommissioningNetworksListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNetworkCommissioningNetworksListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNetworkCommissioningNetworksListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6036,7 +6048,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge
@@ -6070,14 +6082,14 @@ class MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackSubscripti
 public:
     MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6085,7 +6097,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge
@@ -6118,14 +6130,14 @@ class MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackSubscriptio
 public:
     MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6133,7 +6145,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNetworkCommissioningAttributeListListAttributeCallbackBridge
@@ -6163,17 +6175,16 @@ class MTRNetworkCommissioningAttributeListListAttributeCallbackSubscriptionBridg
     : public MTRNetworkCommissioningAttributeListListAttributeCallbackBridge
 {
 public:
-    MTRNetworkCommissioningAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRNetworkCommissioningAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNetworkCommissioningAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRNetworkCommissioningAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRNetworkCommissioningAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNetworkCommissioningAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6181,7 +6192,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge
@@ -6214,14 +6225,14 @@ class MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackSubscriptionBrid
 public:
     MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6229,7 +6240,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge
@@ -6259,17 +6270,16 @@ class MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackSubscriptionBridg
     : public MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6277,7 +6287,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDiagnosticLogsAttributeListListAttributeCallbackBridge
@@ -6310,14 +6320,14 @@ public:
     MTRDiagnosticLogsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDiagnosticLogsAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDiagnosticLogsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDiagnosticLogsAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6325,7 +6335,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge
@@ -6360,14 +6370,14 @@ class MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackSubscriptionBri
 public:
     MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6375,7 +6385,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge
@@ -6408,14 +6418,14 @@ class MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackSubscription
 public:
     MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6423,7 +6433,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge
@@ -6456,14 +6466,14 @@ class MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackSubscriptionBri
 public:
     MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6471,7 +6481,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge
@@ -6504,14 +6514,14 @@ class MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackSubscriptionB
 public:
     MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6519,7 +6529,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge
@@ -6552,14 +6562,14 @@ class MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackSubscription
 public:
     MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6567,7 +6577,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge
@@ -6600,14 +6610,14 @@ class MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionB
 public:
     MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6615,7 +6625,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGeneralDiagnosticsAttributeListListAttributeCallbackBridge
@@ -6645,17 +6655,16 @@ class MTRGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge
     : public MTRGeneralDiagnosticsAttributeListListAttributeCallbackBridge
 {
 public:
-    MTRGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6663,7 +6672,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge
@@ -6696,17 +6705,16 @@ class MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackSubscriptionBridge
     : public MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge
 {
 public:
-    MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6714,7 +6722,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge
@@ -6747,14 +6755,14 @@ class MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptio
 public:
     MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6762,7 +6770,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge
@@ -6795,14 +6803,14 @@ class MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackSubscription
 public:
     MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6810,7 +6818,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRSoftwareDiagnosticsAttributeListListAttributeCallbackBridge
@@ -6840,17 +6848,16 @@ class MTRSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge
     : public MTRSoftwareDiagnosticsAttributeListListAttributeCallbackBridge
 {
 public:
-    MTRSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRSoftwareDiagnosticsAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRSoftwareDiagnosticsAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6858,7 +6865,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge
@@ -6894,14 +6901,14 @@ class MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackSubscript
 public:
     MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6909,7 +6916,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge
@@ -6944,14 +6951,14 @@ class MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscription
 public:
     MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -6959,7 +6966,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge
@@ -6995,14 +7002,14 @@ class MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscripti
 public:
     MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7010,7 +7017,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge
@@ -7047,7 +7054,7 @@ class MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCall
 public:
     MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                              action, true),
         mEstablishedHandler(establishedHandler)
@@ -7055,7 +7062,7 @@ public:
 
     MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7063,7 +7070,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge
@@ -7100,7 +7107,7 @@ class MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackSub
 public:
     MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                       true),
         mEstablishedHandler(establishedHandler)
@@ -7108,7 +7115,7 @@ public:
 
     MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7116,7 +7123,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge
@@ -7150,7 +7157,7 @@ class MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscr
 public:
     MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                    true),
         mEstablishedHandler(establishedHandler)
@@ -7158,7 +7165,7 @@ public:
 
     MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7166,7 +7173,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
@@ -7200,14 +7207,14 @@ class MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscri
 public:
     MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7215,7 +7222,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge
@@ -7248,14 +7255,14 @@ class MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionB
 public:
     MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7263,7 +7270,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge
@@ -7297,14 +7304,14 @@ class MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscrip
 public:
     MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7312,7 +7319,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
@@ -7346,14 +7353,14 @@ class MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscript
 public:
     MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7361,7 +7368,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge
@@ -7394,14 +7401,14 @@ class MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBri
 public:
     MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7409,7 +7416,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge
@@ -7444,7 +7451,7 @@ class MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubs
 public:
     MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                      true),
         mEstablishedHandler(establishedHandler)
@@ -7452,7 +7459,7 @@ public:
 
     MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7460,7 +7467,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
@@ -7495,7 +7502,7 @@ class MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubsc
 public:
     MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                     true),
         mEstablishedHandler(establishedHandler)
@@ -7503,7 +7510,7 @@ public:
 
     MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7511,7 +7518,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge
@@ -7544,14 +7551,14 @@ class MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptio
 public:
     MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7559,7 +7566,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge
@@ -7592,14 +7599,14 @@ class MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackSubscription
 public:
     MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7607,7 +7614,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge
@@ -7640,14 +7647,14 @@ class MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackSubscriptionB
 public:
     MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7655,7 +7662,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge
@@ -7685,17 +7692,16 @@ class MTRBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge
     : public MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge
 {
 public:
-    MTRBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7703,7 +7709,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRSwitchGeneratedCommandListListAttributeCallbackBridge
@@ -7736,14 +7742,14 @@ public:
     MTRSwitchGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                          MTRDeviceController * controller, ResponseHandler handler,
                                                                          MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRSwitchGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRSwitchGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRSwitchGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7751,7 +7757,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRSwitchAcceptedCommandListListAttributeCallbackBridge
@@ -7782,14 +7788,14 @@ public:
     MTRSwitchAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                         MTRDeviceController * controller, ResponseHandler handler,
                                                                         MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRSwitchAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRSwitchAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                         ResponseHandler handler, MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRSwitchAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7797,7 +7803,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRSwitchAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<SwitchAttributeListListAttributeCallback>
@@ -7825,14 +7831,14 @@ public:
     MTRSwitchAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                   MTRDeviceController * controller, ResponseHandler handler,
                                                                   MTRActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
+                                                                  MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRSwitchAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRSwitchAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                   ResponseHandler handler, MTRActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
+                                                                  MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRSwitchAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7840,7 +7846,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge
@@ -7875,7 +7881,7 @@ class MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackSubs
 public:
     MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                      true),
         mEstablishedHandler(establishedHandler)
@@ -7883,7 +7889,7 @@ public:
 
     MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7891,7 +7897,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge
@@ -7926,7 +7932,7 @@ class MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackSubsc
 public:
     MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                     true),
         mEstablishedHandler(establishedHandler)
@@ -7934,7 +7940,7 @@ public:
 
     MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7942,7 +7948,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAdministratorCommissioningAttributeListListAttributeCallbackBridge
@@ -7975,14 +7981,14 @@ class MTRAdministratorCommissioningAttributeListListAttributeCallbackSubscriptio
 public:
     MTRAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAdministratorCommissioningAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAdministratorCommissioningAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -7990,7 +7996,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROperationalCredentialsNOCsListAttributeCallbackBridge
@@ -8026,14 +8032,14 @@ public:
     MTROperationalCredentialsNOCsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                          MTRDeviceController * controller, ResponseHandler handler,
                                                                          MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROperationalCredentialsNOCsListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROperationalCredentialsNOCsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROperationalCredentialsNOCsListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8041,7 +8047,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROperationalCredentialsFabricsListAttributeCallbackBridge
@@ -8076,14 +8082,14 @@ public:
     MTROperationalCredentialsFabricsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROperationalCredentialsFabricsListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROperationalCredentialsFabricsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROperationalCredentialsFabricsListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8091,7 +8097,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge
@@ -8126,7 +8132,7 @@ class MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackSubsc
 public:
     MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                     true),
         mEstablishedHandler(establishedHandler)
@@ -8134,7 +8140,7 @@ public:
 
     MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8142,7 +8148,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROperationalCredentialsGeneratedCommandListListAttributeCallbackBridge
@@ -8176,14 +8182,14 @@ class MTROperationalCredentialsGeneratedCommandListListAttributeCallbackSubscrip
 public:
     MTROperationalCredentialsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROperationalCredentialsGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROperationalCredentialsGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROperationalCredentialsGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8191,7 +8197,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROperationalCredentialsAcceptedCommandListListAttributeCallbackBridge
@@ -8225,14 +8231,14 @@ class MTROperationalCredentialsAcceptedCommandListListAttributeCallbackSubscript
 public:
     MTROperationalCredentialsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROperationalCredentialsAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROperationalCredentialsAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROperationalCredentialsAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8240,7 +8246,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROperationalCredentialsAttributeListListAttributeCallbackBridge
@@ -8273,14 +8279,14 @@ class MTROperationalCredentialsAttributeListListAttributeCallbackSubscriptionBri
 public:
     MTROperationalCredentialsAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROperationalCredentialsAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROperationalCredentialsAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROperationalCredentialsAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8288,7 +8294,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGroupKeyManagementGroupKeyMapListAttributeCallbackBridge
@@ -8323,14 +8329,14 @@ public:
     MTRGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGroupKeyManagementGroupKeyMapListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGroupKeyManagementGroupKeyMapListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8338,7 +8344,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGroupKeyManagementGroupTableListAttributeCallbackBridge
@@ -8373,14 +8379,14 @@ public:
     MTRGroupKeyManagementGroupTableListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                            MTRDeviceController * controller,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGroupKeyManagementGroupTableListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGroupKeyManagementGroupTableListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGroupKeyManagementGroupTableListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8388,7 +8394,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge
@@ -8421,14 +8427,14 @@ class MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackSubscription
 public:
     MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8436,7 +8442,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge
@@ -8469,14 +8475,14 @@ class MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackSubscriptionB
 public:
     MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8484,7 +8490,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGroupKeyManagementAttributeListListAttributeCallbackBridge
@@ -8514,17 +8520,16 @@ class MTRGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge
     : public MTRGroupKeyManagementAttributeListListAttributeCallbackBridge
 {
 public:
-    MTRGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGroupKeyManagementAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGroupKeyManagementAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8532,7 +8537,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRFixedLabelLabelListListAttributeCallbackBridge : public MTRCallbackBridge<FixedLabelLabelListListAttributeCallback>
@@ -8562,14 +8567,14 @@ public:
     MTRFixedLabelLabelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                   MTRDeviceController * controller, ResponseHandler handler,
                                                                   MTRActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
+                                                                  MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFixedLabelLabelListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRFixedLabelLabelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                   ResponseHandler handler, MTRActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
+                                                                  MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFixedLabelLabelListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8577,7 +8582,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRFixedLabelGeneratedCommandListListAttributeCallbackBridge
@@ -8610,14 +8615,14 @@ public:
     MTRFixedLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFixedLabelGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRFixedLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFixedLabelGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8625,7 +8630,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRFixedLabelAcceptedCommandListListAttributeCallbackBridge
@@ -8658,14 +8663,14 @@ public:
     MTRFixedLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFixedLabelAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRFixedLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFixedLabelAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8673,7 +8678,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRFixedLabelAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<FixedLabelAttributeListListAttributeCallback>
@@ -8703,14 +8708,14 @@ public:
     MTRFixedLabelAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                       MTRDeviceController * controller, ResponseHandler handler,
                                                                       MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFixedLabelAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRFixedLabelAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                       ResponseHandler handler, MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFixedLabelAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8718,7 +8723,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRUserLabelLabelListListAttributeCallbackBridge : public MTRCallbackBridge<UserLabelLabelListListAttributeCallback>
@@ -8748,14 +8753,14 @@ public:
     MTRUserLabelLabelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                  MTRDeviceController * controller, ResponseHandler handler,
                                                                  MTRActionBlock action,
-                                                                 SubscriptionEstablishedHandler establishedHandler) :
+                                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRUserLabelLabelListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRUserLabelLabelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                  ResponseHandler handler, MTRActionBlock action,
-                                                                 SubscriptionEstablishedHandler establishedHandler) :
+                                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRUserLabelLabelListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8763,7 +8768,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRUserLabelGeneratedCommandListListAttributeCallbackBridge
@@ -8796,14 +8801,14 @@ public:
     MTRUserLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRUserLabelGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRUserLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRUserLabelGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8811,7 +8816,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRUserLabelAcceptedCommandListListAttributeCallbackBridge
@@ -8844,14 +8849,14 @@ public:
     MTRUserLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                            MTRDeviceController * controller,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRUserLabelAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRUserLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRUserLabelAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8859,7 +8864,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRUserLabelAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<UserLabelAttributeListListAttributeCallback>
@@ -8888,14 +8893,14 @@ public:
     MTRUserLabelAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                      MTRDeviceController * controller, ResponseHandler handler,
                                                                      MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRUserLabelAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRUserLabelAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                      ResponseHandler handler, MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRUserLabelAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8903,7 +8908,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBooleanStateGeneratedCommandListListAttributeCallbackBridge
@@ -8933,17 +8938,16 @@ class MTRBooleanStateGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public MTRBooleanStateGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRBooleanStateGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRBooleanStateGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBooleanStateGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRBooleanStateGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRBooleanStateGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBooleanStateGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8951,7 +8955,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBooleanStateAcceptedCommandListListAttributeCallbackBridge
@@ -8981,17 +8985,16 @@ class MTRBooleanStateAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public MTRBooleanStateAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRBooleanStateAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRBooleanStateAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBooleanStateAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRBooleanStateAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRBooleanStateAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBooleanStateAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -8999,7 +9002,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBooleanStateAttributeListListAttributeCallbackBridge
@@ -9030,14 +9033,14 @@ public:
     MTRBooleanStateAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                         MTRDeviceController * controller, ResponseHandler handler,
                                                                         MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBooleanStateAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRBooleanStateAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                         ResponseHandler handler, MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBooleanStateAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9045,7 +9048,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRModeSelectSupportedModesListAttributeCallbackBridge
@@ -9079,14 +9082,14 @@ public:
     MTRModeSelectSupportedModesListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                        MTRDeviceController * controller, ResponseHandler handler,
                                                                        MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRModeSelectSupportedModesListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRModeSelectSupportedModesListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                        ResponseHandler handler, MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRModeSelectSupportedModesListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9094,7 +9097,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRModeSelectGeneratedCommandListListAttributeCallbackBridge
@@ -9127,14 +9130,14 @@ public:
     MTRModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRModeSelectGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRModeSelectGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9142,7 +9145,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRModeSelectAcceptedCommandListListAttributeCallbackBridge
@@ -9175,14 +9178,14 @@ public:
     MTRModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRModeSelectAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRModeSelectAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9190,7 +9193,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRModeSelectAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<ModeSelectAttributeListListAttributeCallback>
@@ -9220,14 +9223,14 @@ public:
     MTRModeSelectAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                       MTRDeviceController * controller, ResponseHandler handler,
                                                                       MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRModeSelectAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRModeSelectAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                       ResponseHandler handler, MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRModeSelectAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9235,7 +9238,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockCredentialRulesSupportAttributeCallbackBridge
@@ -9268,14 +9271,14 @@ public:
     MTRDoorLockCredentialRulesSupportAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                          MTRDeviceController * controller, ResponseHandler handler,
                                                                          MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockCredentialRulesSupportAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockCredentialRulesSupportAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockCredentialRulesSupportAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9283,7 +9286,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockSupportedOperatingModesAttributeCallbackBridge
@@ -9316,14 +9319,14 @@ public:
     MTRDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockSupportedOperatingModesAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockSupportedOperatingModesAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9331,7 +9334,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockDefaultConfigurationRegisterAttributeCallbackBridge
@@ -9361,17 +9364,16 @@ class MTRDoorLockDefaultConfigurationRegisterAttributeCallbackSubscriptionBridge
     : public MTRDoorLockDefaultConfigurationRegisterAttributeCallbackBridge
 {
 public:
-    MTRDoorLockDefaultConfigurationRegisterAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRDoorLockDefaultConfigurationRegisterAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockDefaultConfigurationRegisterAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRDoorLockDefaultConfigurationRegisterAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRDoorLockDefaultConfigurationRegisterAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockDefaultConfigurationRegisterAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9379,7 +9381,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockLocalProgrammingFeaturesAttributeCallbackBridge
@@ -9412,14 +9414,14 @@ public:
     MTRDoorLockLocalProgrammingFeaturesAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                            MTRDeviceController * controller,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockLocalProgrammingFeaturesAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockLocalProgrammingFeaturesAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockLocalProgrammingFeaturesAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9427,7 +9429,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockGeneratedCommandListListAttributeCallbackBridge
@@ -9460,14 +9462,14 @@ public:
     MTRDoorLockGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                            MTRDeviceController * controller,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9475,7 +9477,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockAcceptedCommandListListAttributeCallbackBridge
@@ -9508,14 +9510,14 @@ public:
     MTRDoorLockAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9523,7 +9525,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<DoorLockAttributeListListAttributeCallback>
@@ -9552,14 +9554,14 @@ public:
     MTRDoorLockAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                     MTRDeviceController * controller, ResponseHandler handler,
                                                                     MTRActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
+                                                                    MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                     ResponseHandler handler, MTRActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
+                                                                    MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9567,7 +9569,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRWindowCoveringConfigStatusAttributeCallbackBridge : public MTRCallbackBridge<WindowCoveringConfigStatusAttributeCallback>
@@ -9596,14 +9598,14 @@ public:
     MTRWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                      MTRDeviceController * controller, ResponseHandler handler,
                                                                      MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWindowCoveringConfigStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                      ResponseHandler handler, MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWindowCoveringConfigStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9611,7 +9613,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRWindowCoveringOperationalStatusAttributeCallbackBridge
@@ -9644,14 +9646,14 @@ public:
     MTRWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWindowCoveringOperationalStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWindowCoveringOperationalStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9659,7 +9661,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRWindowCoveringModeAttributeCallbackBridge : public MTRCallbackBridge<WindowCoveringModeAttributeCallback>
@@ -9687,14 +9689,14 @@ public:
     MTRWindowCoveringModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                              MTRDeviceController * controller, ResponseHandler handler,
                                                              MTRActionBlock action,
-                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWindowCoveringModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRWindowCoveringModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                              ResponseHandler handler, MTRActionBlock action,
-                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWindowCoveringModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9702,7 +9704,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRWindowCoveringSafetyStatusAttributeCallbackBridge : public MTRCallbackBridge<WindowCoveringSafetyStatusAttributeCallback>
@@ -9731,14 +9733,14 @@ public:
     MTRWindowCoveringSafetyStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                      MTRDeviceController * controller, ResponseHandler handler,
                                                                      MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWindowCoveringSafetyStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRWindowCoveringSafetyStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                      ResponseHandler handler, MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWindowCoveringSafetyStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9746,7 +9748,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRWindowCoveringGeneratedCommandListListAttributeCallbackBridge
@@ -9779,14 +9781,14 @@ class MTRWindowCoveringGeneratedCommandListListAttributeCallbackSubscriptionBrid
 public:
     MTRWindowCoveringGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWindowCoveringGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRWindowCoveringGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWindowCoveringGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9794,7 +9796,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRWindowCoveringAcceptedCommandListListAttributeCallbackBridge
@@ -9824,17 +9826,16 @@ class MTRWindowCoveringAcceptedCommandListListAttributeCallbackSubscriptionBridg
     : public MTRWindowCoveringAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRWindowCoveringAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRWindowCoveringAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWindowCoveringAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRWindowCoveringAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRWindowCoveringAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWindowCoveringAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9842,7 +9843,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRWindowCoveringAttributeListListAttributeCallbackBridge
@@ -9875,14 +9876,14 @@ public:
     MTRWindowCoveringAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWindowCoveringAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRWindowCoveringAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWindowCoveringAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9890,7 +9891,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBarrierControlGeneratedCommandListListAttributeCallbackBridge
@@ -9923,14 +9924,14 @@ class MTRBarrierControlGeneratedCommandListListAttributeCallbackSubscriptionBrid
 public:
     MTRBarrierControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBarrierControlGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRBarrierControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBarrierControlGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9938,7 +9939,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBarrierControlAcceptedCommandListListAttributeCallbackBridge
@@ -9968,17 +9969,16 @@ class MTRBarrierControlAcceptedCommandListListAttributeCallbackSubscriptionBridg
     : public MTRBarrierControlAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRBarrierControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRBarrierControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBarrierControlAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRBarrierControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRBarrierControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBarrierControlAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -9986,7 +9986,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBarrierControlAttributeListListAttributeCallbackBridge
@@ -10019,14 +10019,14 @@ public:
     MTRBarrierControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBarrierControlAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRBarrierControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBarrierControlAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -10034,7 +10034,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPumpConfigurationAndControlPumpStatusAttributeCallbackBridge
@@ -10064,17 +10064,16 @@ class MTRPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridg
     : public MTRPumpConfigurationAndControlPumpStatusAttributeCallbackBridge
 {
 public:
-    MTRPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPumpConfigurationAndControlPumpStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPumpConfigurationAndControlPumpStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -10082,7 +10081,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBridge
@@ -10117,7 +10116,7 @@ class MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackSub
 public:
     MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                       true),
         mEstablishedHandler(establishedHandler)
@@ -10125,7 +10124,7 @@ public:
 
     MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -10133,7 +10132,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackBridge
@@ -10168,7 +10167,7 @@ class MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackSubs
 public:
     MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                      true),
         mEstablishedHandler(establishedHandler)
@@ -10176,7 +10175,7 @@ public:
 
     MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -10184,7 +10183,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPumpConfigurationAndControlAttributeListListAttributeCallbackBridge
@@ -10218,14 +10217,14 @@ class MTRPumpConfigurationAndControlAttributeListListAttributeCallbackSubscripti
 public:
     MTRPumpConfigurationAndControlAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPumpConfigurationAndControlAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRPumpConfigurationAndControlAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPumpConfigurationAndControlAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -10233,7 +10232,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThermostatGeneratedCommandListListAttributeCallbackBridge
@@ -10266,14 +10265,14 @@ public:
     MTRThermostatGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRThermostatGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -10281,7 +10280,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThermostatAcceptedCommandListListAttributeCallbackBridge
@@ -10314,14 +10313,14 @@ public:
     MTRThermostatAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRThermostatAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -10329,7 +10328,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThermostatAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<ThermostatAttributeListListAttributeCallback>
@@ -10359,14 +10358,14 @@ public:
     MTRThermostatAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                       MTRDeviceController * controller, ResponseHandler handler,
                                                                       MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRThermostatAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                       ResponseHandler handler, MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -10374,7 +10373,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRFanControlGeneratedCommandListListAttributeCallbackBridge
@@ -10407,14 +10406,14 @@ public:
     MTRFanControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFanControlGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRFanControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFanControlGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -10422,7 +10421,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRFanControlAcceptedCommandListListAttributeCallbackBridge
@@ -10455,14 +10454,14 @@ public:
     MTRFanControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFanControlAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRFanControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFanControlAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -10470,7 +10469,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRFanControlAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<FanControlAttributeListListAttributeCallback>
@@ -10500,14 +10499,14 @@ public:
     MTRFanControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                       MTRDeviceController * controller, ResponseHandler handler,
                                                                       MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFanControlAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRFanControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                       ResponseHandler handler, MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFanControlAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -10515,7 +10514,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge
@@ -10549,7 +10548,7 @@ class MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCa
 public:
     MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                                action, true),
         mEstablishedHandler(establishedHandler)
@@ -10557,7 +10556,7 @@ public:
 
     MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action,
                                                                                                true),
         mEstablishedHandler(establishedHandler)
@@ -10566,7 +10565,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge
@@ -10600,7 +10599,7 @@ class MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCal
 public:
     MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                               action, true),
         mEstablishedHandler(establishedHandler)
@@ -10608,7 +10607,7 @@ public:
 
     MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -10616,7 +10615,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge
@@ -10651,7 +10650,7 @@ class MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackS
 public:
     MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                         true),
         mEstablishedHandler(establishedHandler)
@@ -10659,7 +10658,7 @@ public:
 
     MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -10667,7 +10666,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRColorControlGeneratedCommandListListAttributeCallbackBridge
@@ -10697,17 +10696,16 @@ class MTRColorControlGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public MTRColorControlGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRColorControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRColorControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRColorControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRColorControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -10715,7 +10713,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRColorControlAcceptedCommandListListAttributeCallbackBridge
@@ -10745,17 +10743,16 @@ class MTRColorControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public MTRColorControlAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRColorControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRColorControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRColorControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRColorControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -10763,7 +10760,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRColorControlAttributeListListAttributeCallbackBridge
@@ -10794,14 +10791,14 @@ public:
     MTRColorControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                         MTRDeviceController * controller, ResponseHandler handler,
                                                                         MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRColorControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                         ResponseHandler handler, MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -10809,7 +10806,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge
@@ -10843,14 +10840,14 @@ class MTRBallastConfigurationGeneratedCommandListListAttributeCallbackSubscripti
 public:
     MTRBallastConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRBallastConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -10858,7 +10855,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge
@@ -10891,14 +10888,14 @@ class MTRBallastConfigurationAcceptedCommandListListAttributeCallbackSubscriptio
 public:
     MTRBallastConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRBallastConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -10906,7 +10903,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRBallastConfigurationAttributeListListAttributeCallbackBridge
@@ -10936,17 +10933,16 @@ class MTRBallastConfigurationAttributeListListAttributeCallbackSubscriptionBridg
     : public MTRBallastConfigurationAttributeListListAttributeCallbackBridge
 {
 public:
-    MTRBallastConfigurationAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRBallastConfigurationAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBallastConfigurationAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRBallastConfigurationAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRBallastConfigurationAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRBallastConfigurationAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -10954,7 +10950,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge
@@ -10988,14 +10984,14 @@ class MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackSubscrip
 public:
     MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11003,7 +10999,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge
@@ -11037,14 +11033,14 @@ class MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackSubscript
 public:
     MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11052,7 +11048,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRIlluminanceMeasurementAttributeListListAttributeCallbackBridge
@@ -11085,14 +11081,14 @@ class MTRIlluminanceMeasurementAttributeListListAttributeCallbackSubscriptionBri
 public:
     MTRIlluminanceMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIlluminanceMeasurementAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRIlluminanceMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIlluminanceMeasurementAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11100,7 +11096,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge
@@ -11134,14 +11130,14 @@ class MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackSubscrip
 public:
     MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11149,7 +11145,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge
@@ -11183,14 +11179,14 @@ class MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackSubscript
 public:
     MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11198,7 +11194,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTemperatureMeasurementAttributeListListAttributeCallbackBridge
@@ -11231,14 +11227,14 @@ class MTRTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBri
 public:
     MTRTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTemperatureMeasurementAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTemperatureMeasurementAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11246,7 +11242,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPressureMeasurementGeneratedCommandListListAttributeCallbackBridge
@@ -11279,14 +11275,14 @@ class MTRPressureMeasurementGeneratedCommandListListAttributeCallbackSubscriptio
 public:
     MTRPressureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPressureMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRPressureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPressureMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11294,7 +11290,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPressureMeasurementAcceptedCommandListListAttributeCallbackBridge
@@ -11327,14 +11323,14 @@ class MTRPressureMeasurementAcceptedCommandListListAttributeCallbackSubscription
 public:
     MTRPressureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPressureMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRPressureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPressureMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11342,7 +11338,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPressureMeasurementAttributeListListAttributeCallbackBridge
@@ -11372,17 +11368,16 @@ class MTRPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge
     : public MTRPressureMeasurementAttributeListListAttributeCallbackBridge
 {
 public:
-    MTRPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPressureMeasurementAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPressureMeasurementAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11390,7 +11385,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRFlowMeasurementGeneratedCommandListListAttributeCallbackBridge
@@ -11423,14 +11418,14 @@ class MTRFlowMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBri
 public:
     MTRFlowMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFlowMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRFlowMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFlowMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11438,7 +11433,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRFlowMeasurementAcceptedCommandListListAttributeCallbackBridge
@@ -11471,14 +11466,14 @@ class MTRFlowMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBrid
 public:
     MTRFlowMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFlowMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRFlowMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFlowMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11486,7 +11481,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRFlowMeasurementAttributeListListAttributeCallbackBridge
@@ -11519,14 +11514,14 @@ public:
     MTRFlowMeasurementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                            MTRDeviceController * controller,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFlowMeasurementAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRFlowMeasurementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFlowMeasurementAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11534,7 +11529,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBridge
@@ -11569,7 +11564,7 @@ class MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackSub
 public:
     MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                       true),
         mEstablishedHandler(establishedHandler)
@@ -11577,7 +11572,7 @@ public:
 
     MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11585,7 +11580,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackBridge
@@ -11620,7 +11615,7 @@ class MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackSubs
 public:
     MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                      true),
         mEstablishedHandler(establishedHandler)
@@ -11628,7 +11623,7 @@ public:
 
     MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11636,7 +11631,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackBridge
@@ -11670,14 +11665,14 @@ class MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackSubscripti
 public:
     MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11685,7 +11680,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROccupancySensingGeneratedCommandListListAttributeCallbackBridge
@@ -11718,14 +11713,14 @@ class MTROccupancySensingGeneratedCommandListListAttributeCallbackSubscriptionBr
 public:
     MTROccupancySensingGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROccupancySensingGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROccupancySensingGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROccupancySensingGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11733,7 +11728,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROccupancySensingAcceptedCommandListListAttributeCallbackBridge
@@ -11766,14 +11761,14 @@ class MTROccupancySensingAcceptedCommandListListAttributeCallbackSubscriptionBri
 public:
     MTROccupancySensingAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROccupancySensingAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROccupancySensingAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROccupancySensingAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11781,7 +11776,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROccupancySensingAttributeListListAttributeCallbackBridge
@@ -11814,14 +11809,14 @@ public:
     MTROccupancySensingAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROccupancySensingAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROccupancySensingAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROccupancySensingAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11829,7 +11824,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRWakeOnLanGeneratedCommandListListAttributeCallbackBridge
@@ -11862,14 +11857,14 @@ public:
     MTRWakeOnLanGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWakeOnLanGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRWakeOnLanGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWakeOnLanGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11877,7 +11872,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRWakeOnLanAcceptedCommandListListAttributeCallbackBridge
@@ -11910,14 +11905,14 @@ public:
     MTRWakeOnLanAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                            MTRDeviceController * controller,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWakeOnLanAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRWakeOnLanAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWakeOnLanAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11925,7 +11920,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRWakeOnLanAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<WakeOnLanAttributeListListAttributeCallback>
@@ -11954,14 +11949,14 @@ public:
     MTRWakeOnLanAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                      MTRDeviceController * controller, ResponseHandler handler,
                                                                      MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWakeOnLanAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRWakeOnLanAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                      ResponseHandler handler, MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWakeOnLanAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -11969,7 +11964,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRChannelChannelListListAttributeCallbackBridge : public MTRCallbackBridge<ChannelChannelListListAttributeCallback>
@@ -11999,14 +11994,14 @@ public:
     MTRChannelChannelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                  MTRDeviceController * controller, ResponseHandler handler,
                                                                  MTRActionBlock action,
-                                                                 SubscriptionEstablishedHandler establishedHandler) :
+                                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRChannelChannelListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRChannelChannelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                  ResponseHandler handler, MTRActionBlock action,
-                                                                 SubscriptionEstablishedHandler establishedHandler) :
+                                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRChannelChannelListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12014,7 +12009,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRChannelLineupStructAttributeCallbackBridge : public MTRCallbackBridge<ChannelLineupStructAttributeCallback>
@@ -12044,14 +12039,14 @@ public:
     MTRChannelLineupStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                               MTRDeviceController * controller, ResponseHandler handler,
                                                               MTRActionBlock action,
-                                                              SubscriptionEstablishedHandler establishedHandler) :
+                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRChannelLineupStructAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRChannelLineupStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                               ResponseHandler handler, MTRActionBlock action,
-                                                              SubscriptionEstablishedHandler establishedHandler) :
+                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRChannelLineupStructAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12059,7 +12054,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRChannelCurrentChannelStructAttributeCallbackBridge : public MTRCallbackBridge<ChannelCurrentChannelStructAttributeCallback>
@@ -12091,14 +12086,14 @@ public:
     MTRChannelCurrentChannelStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                       MTRDeviceController * controller, ResponseHandler handler,
                                                                       MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRChannelCurrentChannelStructAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRChannelCurrentChannelStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                       ResponseHandler handler, MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRChannelCurrentChannelStructAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12106,7 +12101,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRChannelGeneratedCommandListListAttributeCallbackBridge
@@ -12139,14 +12134,14 @@ public:
     MTRChannelGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRChannelGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRChannelGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRChannelGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12154,7 +12149,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRChannelAcceptedCommandListListAttributeCallbackBridge
@@ -12187,14 +12182,14 @@ public:
     MTRChannelAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                          MTRDeviceController * controller, ResponseHandler handler,
                                                                          MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRChannelAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRChannelAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRChannelAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12202,7 +12197,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRChannelAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<ChannelAttributeListListAttributeCallback>
@@ -12231,14 +12226,14 @@ public:
     MTRChannelAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                    MTRDeviceController * controller, ResponseHandler handler,
                                                                    MTRActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
+                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRChannelAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRChannelAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                    ResponseHandler handler, MTRActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
+                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRChannelAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12246,7 +12241,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTargetNavigatorTargetListListAttributeCallbackBridge
@@ -12280,14 +12275,14 @@ public:
     MTRTargetNavigatorTargetListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                         MTRDeviceController * controller, ResponseHandler handler,
                                                                         MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTargetNavigatorTargetListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTargetNavigatorTargetListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                         ResponseHandler handler, MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTargetNavigatorTargetListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12295,7 +12290,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTargetNavigatorGeneratedCommandListListAttributeCallbackBridge
@@ -12328,14 +12323,14 @@ class MTRTargetNavigatorGeneratedCommandListListAttributeCallbackSubscriptionBri
 public:
     MTRTargetNavigatorGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTargetNavigatorGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTargetNavigatorGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTargetNavigatorGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12343,7 +12338,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTargetNavigatorAcceptedCommandListListAttributeCallbackBridge
@@ -12376,14 +12371,14 @@ class MTRTargetNavigatorAcceptedCommandListListAttributeCallbackSubscriptionBrid
 public:
     MTRTargetNavigatorAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTargetNavigatorAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTargetNavigatorAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTargetNavigatorAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12391,7 +12386,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTargetNavigatorAttributeListListAttributeCallbackBridge
@@ -12424,14 +12419,14 @@ public:
     MTRTargetNavigatorAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                            MTRDeviceController * controller,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTargetNavigatorAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTargetNavigatorAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTargetNavigatorAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12439,7 +12434,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRMediaPlaybackSampledPositionStructAttributeCallbackBridge
@@ -12474,14 +12469,14 @@ public:
     MTRMediaPlaybackSampledPositionStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaPlaybackSampledPositionStructAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRMediaPlaybackSampledPositionStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaPlaybackSampledPositionStructAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12489,7 +12484,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRMediaPlaybackGeneratedCommandListListAttributeCallbackBridge
@@ -12519,17 +12514,16 @@ class MTRMediaPlaybackGeneratedCommandListListAttributeCallbackSubscriptionBridg
     : public MTRMediaPlaybackGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRMediaPlaybackGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRMediaPlaybackGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaPlaybackGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRMediaPlaybackGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRMediaPlaybackGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaPlaybackGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12537,7 +12531,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRMediaPlaybackAcceptedCommandListListAttributeCallbackBridge
@@ -12567,17 +12561,16 @@ class MTRMediaPlaybackAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public MTRMediaPlaybackAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRMediaPlaybackAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRMediaPlaybackAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaPlaybackAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRMediaPlaybackAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRMediaPlaybackAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaPlaybackAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12585,7 +12578,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRMediaPlaybackAttributeListListAttributeCallbackBridge
@@ -12618,14 +12611,14 @@ public:
     MTRMediaPlaybackAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                          MTRDeviceController * controller, ResponseHandler handler,
                                                                          MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaPlaybackAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRMediaPlaybackAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaPlaybackAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12633,7 +12626,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRMediaInputInputListListAttributeCallbackBridge : public MTRCallbackBridge<MediaInputInputListListAttributeCallback>
@@ -12663,14 +12656,14 @@ public:
     MTRMediaInputInputListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                   MTRDeviceController * controller, ResponseHandler handler,
                                                                   MTRActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
+                                                                  MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaInputInputListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRMediaInputInputListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                   ResponseHandler handler, MTRActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
+                                                                  MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaInputInputListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12678,7 +12671,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRMediaInputGeneratedCommandListListAttributeCallbackBridge
@@ -12711,14 +12704,14 @@ public:
     MTRMediaInputGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaInputGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRMediaInputGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaInputGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12726,7 +12719,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRMediaInputAcceptedCommandListListAttributeCallbackBridge
@@ -12759,14 +12752,14 @@ public:
     MTRMediaInputAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaInputAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRMediaInputAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaInputAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12774,7 +12767,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRMediaInputAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<MediaInputAttributeListListAttributeCallback>
@@ -12804,14 +12797,14 @@ public:
     MTRMediaInputAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                       MTRDeviceController * controller, ResponseHandler handler,
                                                                       MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaInputAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRMediaInputAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                       ResponseHandler handler, MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaInputAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12819,7 +12812,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRLowPowerGeneratedCommandListListAttributeCallbackBridge
@@ -12852,14 +12845,14 @@ public:
     MTRLowPowerGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                            MTRDeviceController * controller,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLowPowerGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRLowPowerGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLowPowerGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12867,7 +12860,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRLowPowerAcceptedCommandListListAttributeCallbackBridge
@@ -12900,14 +12893,14 @@ public:
     MTRLowPowerAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLowPowerAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRLowPowerAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLowPowerAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12915,7 +12908,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRLowPowerAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<LowPowerAttributeListListAttributeCallback>
@@ -12944,14 +12937,14 @@ public:
     MTRLowPowerAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                     MTRDeviceController * controller, ResponseHandler handler,
                                                                     MTRActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
+                                                                    MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLowPowerAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRLowPowerAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                     ResponseHandler handler, MTRActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
+                                                                    MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLowPowerAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -12959,7 +12952,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRKeypadInputGeneratedCommandListListAttributeCallbackBridge
@@ -12989,17 +12982,16 @@ class MTRKeypadInputGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public MTRKeypadInputGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRKeypadInputGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRKeypadInputGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRKeypadInputGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRKeypadInputGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRKeypadInputGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRKeypadInputGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13007,7 +12999,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRKeypadInputAcceptedCommandListListAttributeCallbackBridge
@@ -13040,14 +13032,14 @@ public:
     MTRKeypadInputAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRKeypadInputAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRKeypadInputAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRKeypadInputAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13055,7 +13047,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRKeypadInputAttributeListListAttributeCallbackBridge
@@ -13086,14 +13078,14 @@ public:
     MTRKeypadInputAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                        MTRDeviceController * controller, ResponseHandler handler,
                                                                        MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRKeypadInputAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRKeypadInputAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                        ResponseHandler handler, MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRKeypadInputAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13101,7 +13093,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRContentLauncherAcceptHeaderListAttributeCallbackBridge
@@ -13134,14 +13126,14 @@ public:
     MTRContentLauncherAcceptHeaderListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRContentLauncherAcceptHeaderListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRContentLauncherAcceptHeaderListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRContentLauncherAcceptHeaderListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13149,7 +13141,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRContentLauncherGeneratedCommandListListAttributeCallbackBridge
@@ -13182,14 +13174,14 @@ class MTRContentLauncherGeneratedCommandListListAttributeCallbackSubscriptionBri
 public:
     MTRContentLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRContentLauncherGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRContentLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRContentLauncherGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13197,7 +13189,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRContentLauncherAcceptedCommandListListAttributeCallbackBridge
@@ -13230,14 +13222,14 @@ class MTRContentLauncherAcceptedCommandListListAttributeCallbackSubscriptionBrid
 public:
     MTRContentLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRContentLauncherAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRContentLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRContentLauncherAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13245,7 +13237,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRContentLauncherAttributeListListAttributeCallbackBridge
@@ -13278,14 +13270,14 @@ public:
     MTRContentLauncherAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                            MTRDeviceController * controller,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRContentLauncherAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRContentLauncherAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRContentLauncherAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13293,7 +13285,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAudioOutputOutputListListAttributeCallbackBridge : public MTRCallbackBridge<AudioOutputOutputListListAttributeCallback>
@@ -13324,14 +13316,14 @@ public:
     MTRAudioOutputOutputListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                     MTRDeviceController * controller, ResponseHandler handler,
                                                                     MTRActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
+                                                                    MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAudioOutputOutputListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRAudioOutputOutputListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                     ResponseHandler handler, MTRActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
+                                                                    MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAudioOutputOutputListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13339,7 +13331,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAudioOutputGeneratedCommandListListAttributeCallbackBridge
@@ -13369,17 +13361,16 @@ class MTRAudioOutputGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public MTRAudioOutputGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRAudioOutputGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRAudioOutputGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAudioOutputGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRAudioOutputGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRAudioOutputGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAudioOutputGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13387,7 +13378,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAudioOutputAcceptedCommandListListAttributeCallbackBridge
@@ -13420,14 +13411,14 @@ public:
     MTRAudioOutputAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAudioOutputAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRAudioOutputAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAudioOutputAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13435,7 +13426,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAudioOutputAttributeListListAttributeCallbackBridge
@@ -13466,14 +13457,14 @@ public:
     MTRAudioOutputAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                        MTRDeviceController * controller, ResponseHandler handler,
                                                                        MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAudioOutputAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRAudioOutputAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                        ResponseHandler handler, MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAudioOutputAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13481,7 +13472,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRApplicationLauncherCatalogListListAttributeCallbackBridge
@@ -13514,14 +13505,14 @@ public:
     MTRApplicationLauncherCatalogListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationLauncherCatalogListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRApplicationLauncherCatalogListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationLauncherCatalogListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13529,7 +13520,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge
@@ -13562,17 +13553,16 @@ class MTRApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge
     : public MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge
 {
 public:
-    MTRApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13580,7 +13570,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRApplicationLauncherGeneratedCommandListListAttributeCallbackBridge
@@ -13613,14 +13603,14 @@ class MTRApplicationLauncherGeneratedCommandListListAttributeCallbackSubscriptio
 public:
     MTRApplicationLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationLauncherGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRApplicationLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationLauncherGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13628,7 +13618,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRApplicationLauncherAcceptedCommandListListAttributeCallbackBridge
@@ -13661,14 +13651,14 @@ class MTRApplicationLauncherAcceptedCommandListListAttributeCallbackSubscription
 public:
     MTRApplicationLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationLauncherAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRApplicationLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationLauncherAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13676,7 +13666,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRApplicationLauncherAttributeListListAttributeCallbackBridge
@@ -13706,17 +13696,16 @@ class MTRApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge
     : public MTRApplicationLauncherAttributeListListAttributeCallbackBridge
 {
 public:
-    MTRApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationLauncherAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationLauncherAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13724,7 +13713,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRApplicationBasicApplicationStructAttributeCallbackBridge
@@ -13759,14 +13748,14 @@ public:
     MTRApplicationBasicApplicationStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationBasicApplicationStructAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRApplicationBasicApplicationStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationBasicApplicationStructAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13774,7 +13763,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRApplicationBasicAllowedVendorListListAttributeCallbackBridge
@@ -13804,17 +13793,16 @@ class MTRApplicationBasicAllowedVendorListListAttributeCallbackSubscriptionBridg
     : public MTRApplicationBasicAllowedVendorListListAttributeCallbackBridge
 {
 public:
-    MTRApplicationBasicAllowedVendorListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRApplicationBasicAllowedVendorListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationBasicAllowedVendorListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRApplicationBasicAllowedVendorListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRApplicationBasicAllowedVendorListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationBasicAllowedVendorListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13822,7 +13810,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRApplicationBasicGeneratedCommandListListAttributeCallbackBridge
@@ -13855,14 +13843,14 @@ class MTRApplicationBasicGeneratedCommandListListAttributeCallbackSubscriptionBr
 public:
     MTRApplicationBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationBasicGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRApplicationBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationBasicGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13870,7 +13858,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRApplicationBasicAcceptedCommandListListAttributeCallbackBridge
@@ -13903,14 +13891,14 @@ class MTRApplicationBasicAcceptedCommandListListAttributeCallbackSubscriptionBri
 public:
     MTRApplicationBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationBasicAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRApplicationBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationBasicAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13918,7 +13906,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRApplicationBasicAttributeListListAttributeCallbackBridge
@@ -13951,14 +13939,14 @@ public:
     MTRApplicationBasicAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationBasicAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRApplicationBasicAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationBasicAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -13966,7 +13954,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAccountLoginGeneratedCommandListListAttributeCallbackBridge
@@ -13996,17 +13984,16 @@ class MTRAccountLoginGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public MTRAccountLoginGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRAccountLoginGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRAccountLoginGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccountLoginGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRAccountLoginGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRAccountLoginGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccountLoginGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14014,7 +14001,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAccountLoginAcceptedCommandListListAttributeCallbackBridge
@@ -14044,17 +14031,16 @@ class MTRAccountLoginAcceptedCommandListListAttributeCallbackSubscriptionBridge
     : public MTRAccountLoginAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRAccountLoginAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRAccountLoginAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccountLoginAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRAccountLoginAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRAccountLoginAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccountLoginAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14062,7 +14048,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAccountLoginAttributeListListAttributeCallbackBridge
@@ -14093,14 +14079,14 @@ public:
     MTRAccountLoginAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                         MTRDeviceController * controller, ResponseHandler handler,
                                                                         MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccountLoginAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRAccountLoginAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                         ResponseHandler handler, MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccountLoginAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14108,7 +14094,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge
@@ -14142,14 +14128,14 @@ class MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackSubscript
 public:
     MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14157,7 +14143,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge
@@ -14191,14 +14177,14 @@ class MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackSubscripti
 public:
     MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14206,7 +14192,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRElectricalMeasurementAttributeListListAttributeCallbackBridge
@@ -14239,14 +14225,14 @@ class MTRElectricalMeasurementAttributeListListAttributeCallbackSubscriptionBrid
 public:
     MTRElectricalMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRElectricalMeasurementAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRElectricalMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRElectricalMeasurementAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14254,7 +14240,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterBitmap8AttributeCallbackBridge : public MTRCallbackBridge<TestClusterBitmap8AttributeCallback>
@@ -14282,14 +14268,14 @@ public:
     MTRTestClusterBitmap8AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                              MTRDeviceController * controller, ResponseHandler handler,
                                                              MTRActionBlock action,
-                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterBitmap8AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTestClusterBitmap8AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                              ResponseHandler handler, MTRActionBlock action,
-                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterBitmap8AttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14297,7 +14283,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterBitmap16AttributeCallbackBridge : public MTRCallbackBridge<TestClusterBitmap16AttributeCallback>
@@ -14325,14 +14311,14 @@ public:
     MTRTestClusterBitmap16AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                               MTRDeviceController * controller, ResponseHandler handler,
                                                               MTRActionBlock action,
-                                                              SubscriptionEstablishedHandler establishedHandler) :
+                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterBitmap16AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTestClusterBitmap16AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                               ResponseHandler handler, MTRActionBlock action,
-                                                              SubscriptionEstablishedHandler establishedHandler) :
+                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterBitmap16AttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14340,7 +14326,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterBitmap32AttributeCallbackBridge : public MTRCallbackBridge<TestClusterBitmap32AttributeCallback>
@@ -14368,14 +14354,14 @@ public:
     MTRTestClusterBitmap32AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                               MTRDeviceController * controller, ResponseHandler handler,
                                                               MTRActionBlock action,
-                                                              SubscriptionEstablishedHandler establishedHandler) :
+                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterBitmap32AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTestClusterBitmap32AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                               ResponseHandler handler, MTRActionBlock action,
-                                                              SubscriptionEstablishedHandler establishedHandler) :
+                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterBitmap32AttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14383,7 +14369,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterBitmap64AttributeCallbackBridge : public MTRCallbackBridge<TestClusterBitmap64AttributeCallback>
@@ -14411,14 +14397,14 @@ public:
     MTRTestClusterBitmap64AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                               MTRDeviceController * controller, ResponseHandler handler,
                                                               MTRActionBlock action,
-                                                              SubscriptionEstablishedHandler establishedHandler) :
+                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterBitmap64AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTestClusterBitmap64AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                               ResponseHandler handler, MTRActionBlock action,
-                                                              SubscriptionEstablishedHandler establishedHandler) :
+                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterBitmap64AttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14426,7 +14412,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterListInt8uListAttributeCallbackBridge : public MTRCallbackBridge<TestClusterListInt8uListAttributeCallback>
@@ -14455,14 +14441,14 @@ public:
     MTRTestClusterListInt8uListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                    MTRDeviceController * controller, ResponseHandler handler,
                                                                    MTRActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
+                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterListInt8uListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTestClusterListInt8uListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                    ResponseHandler handler, MTRActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
+                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterListInt8uListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14470,7 +14456,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterListOctetStringListAttributeCallbackBridge
@@ -14503,14 +14489,14 @@ public:
     MTRTestClusterListOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                          MTRDeviceController * controller, ResponseHandler handler,
                                                                          MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterListOctetStringListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTestClusterListOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterListOctetStringListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14518,7 +14504,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterListStructOctetStringListAttributeCallbackBridge
@@ -14551,17 +14537,16 @@ class MTRTestClusterListStructOctetStringListAttributeCallbackSubscriptionBridge
     : public MTRTestClusterListStructOctetStringListAttributeCallbackBridge
 {
 public:
-    MTRTestClusterListStructOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRTestClusterListStructOctetStringListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterListStructOctetStringListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRTestClusterListStructOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRTestClusterListStructOctetStringListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterListStructOctetStringListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14569,7 +14554,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge
@@ -14605,14 +14590,14 @@ class MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackSubscrip
 public:
     MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14620,7 +14605,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterStructAttrStructAttributeCallbackBridge : public MTRCallbackBridge<TestClusterStructAttrStructAttributeCallback>
@@ -14650,14 +14635,14 @@ public:
     MTRTestClusterStructAttrStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                       MTRDeviceController * controller, ResponseHandler handler,
                                                                       MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterStructAttrStructAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTestClusterStructAttrStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                       ResponseHandler handler, MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterStructAttrStructAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14665,7 +14650,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterListLongOctetStringListAttributeCallbackBridge
@@ -14698,14 +14683,14 @@ public:
     MTRTestClusterListLongOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterListLongOctetStringListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTestClusterListLongOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterListLongOctetStringListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14713,7 +14698,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterListFabricScopedListAttributeCallbackBridge
@@ -14749,14 +14734,14 @@ public:
     MTRTestClusterListFabricScopedListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterListFabricScopedListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTestClusterListFabricScopedListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterListFabricScopedListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14764,7 +14749,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterNullableBitmap8AttributeCallbackBridge : public MTRCallbackBridge<TestClusterNullableBitmap8AttributeCallback>
@@ -14795,14 +14780,14 @@ public:
     MTRTestClusterNullableBitmap8AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                      MTRDeviceController * controller, ResponseHandler handler,
                                                                      MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterNullableBitmap8AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTestClusterNullableBitmap8AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                      ResponseHandler handler, MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterNullableBitmap8AttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14810,7 +14795,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterNullableBitmap16AttributeCallbackBridge : public MTRCallbackBridge<TestClusterNullableBitmap16AttributeCallback>
@@ -14842,14 +14827,14 @@ public:
     MTRTestClusterNullableBitmap16AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                       MTRDeviceController * controller, ResponseHandler handler,
                                                                       MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterNullableBitmap16AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTestClusterNullableBitmap16AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                       ResponseHandler handler, MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterNullableBitmap16AttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14857,7 +14842,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterNullableBitmap32AttributeCallbackBridge : public MTRCallbackBridge<TestClusterNullableBitmap32AttributeCallback>
@@ -14889,14 +14874,14 @@ public:
     MTRTestClusterNullableBitmap32AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                       MTRDeviceController * controller, ResponseHandler handler,
                                                                       MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterNullableBitmap32AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTestClusterNullableBitmap32AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                       ResponseHandler handler, MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterNullableBitmap32AttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14904,7 +14889,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterNullableBitmap64AttributeCallbackBridge : public MTRCallbackBridge<TestClusterNullableBitmap64AttributeCallback>
@@ -14936,14 +14921,14 @@ public:
     MTRTestClusterNullableBitmap64AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                       MTRDeviceController * controller, ResponseHandler handler,
                                                                       MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterNullableBitmap64AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTestClusterNullableBitmap64AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                       ResponseHandler handler, MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterNullableBitmap64AttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -14951,7 +14936,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterNullableStructStructAttributeCallbackBridge
@@ -14986,14 +14971,14 @@ public:
     MTRTestClusterNullableStructStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterNullableStructStructAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTestClusterNullableStructStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterNullableStructStructAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -15001,7 +14986,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterGeneratedCommandListListAttributeCallbackBridge
@@ -15031,17 +15016,16 @@ class MTRTestClusterGeneratedCommandListListAttributeCallbackSubscriptionBridge
     : public MTRTestClusterGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRTestClusterGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRTestClusterGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRTestClusterGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRTestClusterGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -15049,7 +15033,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterAcceptedCommandListListAttributeCallbackBridge
@@ -15082,14 +15066,14 @@ public:
     MTRTestClusterAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTestClusterAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -15097,7 +15081,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterAttributeListListAttributeCallbackBridge
@@ -15128,14 +15112,14 @@ public:
     MTRTestClusterAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                        MTRDeviceController * controller, ResponseHandler handler,
                                                                        MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTestClusterAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                        ResponseHandler handler, MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -15143,7 +15127,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGroupsClusterAddGroupResponseCallbackBridge : public MTRCallbackBridge<GroupsClusterAddGroupResponseCallbackType>
@@ -16446,14 +16430,14 @@ class MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBri
 public:
     MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -16461,7 +16445,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge
@@ -16496,14 +16480,14 @@ class MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscri
 public:
     MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -16511,7 +16495,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge
@@ -16541,17 +16525,16 @@ class MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge
     : public MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge
 {
 public:
-    MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -16559,7 +16542,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge
@@ -16594,14 +16577,14 @@ class MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscripti
 public:
     MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -16609,7 +16592,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge
@@ -16639,17 +16622,16 @@ class MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge
     : public MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge
 {
 public:
-    MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -16657,7 +16639,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge
@@ -16691,14 +16673,14 @@ class MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptio
 public:
     MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -16706,7 +16688,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge
@@ -16739,14 +16721,14 @@ class MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptio
 public:
     MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -16754,7 +16736,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge
@@ -16791,7 +16773,7 @@ class MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSub
 public:
     MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                       true),
         mEstablishedHandler(establishedHandler)
@@ -16799,7 +16781,7 @@ public:
 
     MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -16807,7 +16789,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge
@@ -16840,14 +16822,14 @@ class MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBr
 public:
     MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -16855,7 +16837,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge
@@ -16890,7 +16872,7 @@ class MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscr
 public:
     MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                    true),
         mEstablishedHandler(establishedHandler)
@@ -16898,7 +16880,7 @@ public:
 
     MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -16906,7 +16888,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROnOffClusterOnOffEffectIdentifierAttributeCallbackBridge
@@ -16939,14 +16921,14 @@ public:
     MTROnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffClusterOnOffEffectIdentifierAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffClusterOnOffEffectIdentifierAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -16954,7 +16936,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge
@@ -16988,14 +16970,14 @@ class MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionB
 public:
     MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17003,7 +16985,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROnOffClusterOnOffStartUpOnOffAttributeCallbackBridge
@@ -17034,14 +17016,14 @@ public:
     MTROnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                         MTRDeviceController * controller, ResponseHandler handler,
                                                                         MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffClusterOnOffStartUpOnOffAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                         ResponseHandler handler, MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROnOffClusterOnOffStartUpOnOffAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17049,7 +17031,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge
@@ -17080,17 +17062,16 @@ class MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridg
     : public MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge
 {
 public:
-    MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17098,7 +17079,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRLevelControlClusterMoveModeAttributeCallbackBridge : public MTRCallbackBridge<LevelControlClusterMoveModeAttributeCallback>
@@ -17128,14 +17109,14 @@ public:
     MTRLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                       MTRDeviceController * controller, ResponseHandler handler,
                                                                       MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLevelControlClusterMoveModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                       ResponseHandler handler, MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLevelControlClusterMoveModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17143,7 +17124,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableLevelControlClusterMoveModeAttributeCallbackBridge
@@ -17174,17 +17155,16 @@ class MTRNullableLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge
     : public MTRNullableLevelControlClusterMoveModeAttributeCallbackBridge
 {
 public:
-    MTRNullableLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableLevelControlClusterMoveModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRNullableLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableLevelControlClusterMoveModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17192,7 +17172,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRLevelControlClusterStepModeAttributeCallbackBridge : public MTRCallbackBridge<LevelControlClusterStepModeAttributeCallback>
@@ -17222,14 +17202,14 @@ public:
     MTRLevelControlClusterStepModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                       MTRDeviceController * controller, ResponseHandler handler,
                                                                       MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLevelControlClusterStepModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRLevelControlClusterStepModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                       ResponseHandler handler, MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRLevelControlClusterStepModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17237,7 +17217,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableLevelControlClusterStepModeAttributeCallbackBridge
@@ -17268,17 +17248,16 @@ class MTRNullableLevelControlClusterStepModeAttributeCallbackSubscriptionBridge
     : public MTRNullableLevelControlClusterStepModeAttributeCallbackBridge
 {
 public:
-    MTRNullableLevelControlClusterStepModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableLevelControlClusterStepModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableLevelControlClusterStepModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRNullableLevelControlClusterStepModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableLevelControlClusterStepModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableLevelControlClusterStepModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17286,7 +17265,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAccessControlClusterAuthModeAttributeCallbackBridge
@@ -17317,14 +17296,14 @@ public:
     MTRAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                        MTRDeviceController * controller, ResponseHandler handler,
                                                                        MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccessControlClusterAuthModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                        ResponseHandler handler, MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccessControlClusterAuthModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17332,7 +17311,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge
@@ -17363,17 +17342,16 @@ class MTRNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge
     : public MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge
 {
 public:
-    MTRNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17381,7 +17359,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAccessControlClusterChangeTypeEnumAttributeCallbackBridge
@@ -17414,14 +17392,14 @@ public:
     MTRAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccessControlClusterChangeTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccessControlClusterChangeTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17429,7 +17407,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge
@@ -17463,14 +17441,14 @@ class MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscription
 public:
     MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17478,7 +17456,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAccessControlClusterPrivilegeAttributeCallbackBridge
@@ -17509,14 +17487,14 @@ public:
     MTRAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                         MTRDeviceController * controller, ResponseHandler handler,
                                                                         MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccessControlClusterPrivilegeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                         ResponseHandler handler, MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAccessControlClusterPrivilegeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17524,7 +17502,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge
@@ -17555,17 +17533,16 @@ class MTRNullableAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridg
     : public MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge
 {
 public:
-    MTRNullableAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRNullableAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17573,7 +17550,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRActionsClusterActionErrorEnumAttributeCallbackBridge
@@ -17604,14 +17581,14 @@ public:
     MTRActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                         MTRDeviceController * controller, ResponseHandler handler,
                                                                         MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRActionsClusterActionErrorEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                         ResponseHandler handler, MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRActionsClusterActionErrorEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17619,7 +17596,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge
@@ -17650,17 +17627,16 @@ class MTRNullableActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridg
     : public MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRNullableActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17668,7 +17644,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRActionsClusterActionStateEnumAttributeCallbackBridge
@@ -17699,14 +17675,14 @@ public:
     MTRActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                         MTRDeviceController * controller, ResponseHandler handler,
                                                                         MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRActionsClusterActionStateEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                         ResponseHandler handler, MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRActionsClusterActionStateEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17714,7 +17690,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge
@@ -17745,17 +17721,16 @@ class MTRNullableActionsClusterActionStateEnumAttributeCallbackSubscriptionBridg
     : public MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRNullableActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17763,7 +17738,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRActionsClusterActionTypeEnumAttributeCallbackBridge
@@ -17794,14 +17769,14 @@ public:
     MTRActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                        MTRDeviceController * controller, ResponseHandler handler,
                                                                        MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRActionsClusterActionTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                        ResponseHandler handler, MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRActionsClusterActionTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17809,7 +17784,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge
@@ -17840,17 +17815,16 @@ class MTRNullableActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge
     : public MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRNullableActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17858,7 +17832,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRActionsClusterEndpointListTypeEnumAttributeCallbackBridge
@@ -17891,14 +17865,14 @@ public:
     MTRActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRActionsClusterEndpointListTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRActionsClusterEndpointListTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17906,7 +17880,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackBridge
@@ -17940,14 +17914,14 @@ class MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackSubscription
 public:
     MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -17955,7 +17929,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge
@@ -17990,7 +17964,7 @@ class MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSu
 public:
     MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                        true),
         mEstablishedHandler(establishedHandler)
@@ -17998,7 +17972,7 @@ public:
 
     MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -18006,7 +17980,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge
@@ -18042,7 +18016,7 @@ class MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCa
 public:
     MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                                action, true),
         mEstablishedHandler(establishedHandler)
@@ -18050,7 +18024,7 @@ public:
 
     MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge(queue, device, handler, action,
                                                                                                true),
         mEstablishedHandler(establishedHandler)
@@ -18059,7 +18033,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge
@@ -18094,7 +18068,7 @@ class MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSub
 public:
     MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                       true),
         mEstablishedHandler(establishedHandler)
@@ -18102,7 +18076,7 @@ public:
 
     MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -18110,7 +18084,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge
@@ -18146,7 +18120,7 @@ class MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCal
 public:
     MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                               action, true),
         mEstablishedHandler(establishedHandler)
@@ -18154,7 +18128,7 @@ public:
 
     MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -18162,7 +18136,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge
@@ -18196,14 +18170,14 @@ class MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscrip
 public:
     MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -18211,7 +18185,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge
@@ -18249,7 +18223,7 @@ class MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback
 public:
     MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                          true),
         mEstablishedHandler(establishedHandler)
@@ -18257,7 +18231,7 @@ public:
 
     MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -18265,7 +18239,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge
@@ -18301,7 +18275,7 @@ class MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback
 public:
     MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                          true),
         mEstablishedHandler(establishedHandler)
@@ -18309,7 +18283,7 @@ public:
 
     MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -18317,7 +18291,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge
@@ -18353,7 +18327,7 @@ class MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttribute
 public:
     MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                                  action, true),
         mEstablishedHandler(establishedHandler)
@@ -18361,7 +18335,7 @@ public:
 
     MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge(queue, device, handler, action,
                                                                                                  true),
         mEstablishedHandler(establishedHandler)
@@ -18370,7 +18344,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge
@@ -18405,7 +18379,7 @@ class MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSu
 public:
     MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                        true),
         mEstablishedHandler(establishedHandler)
@@ -18413,7 +18387,7 @@ public:
 
     MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -18421,7 +18395,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge
@@ -18457,7 +18431,7 @@ class MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCa
 public:
     MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                                action, true),
         mEstablishedHandler(establishedHandler)
@@ -18465,7 +18439,7 @@ public:
 
     MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge(queue, device, handler, action,
                                                                                                true),
         mEstablishedHandler(establishedHandler)
@@ -18474,7 +18448,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge
@@ -18509,7 +18483,7 @@ class MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSub
 public:
     MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                       true),
         mEstablishedHandler(establishedHandler)
@@ -18517,7 +18491,7 @@ public:
 
     MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -18525,7 +18499,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge
@@ -18561,7 +18535,7 @@ class MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCal
 public:
     MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                               action, true),
         mEstablishedHandler(establishedHandler)
@@ -18569,7 +18543,7 @@ public:
 
     MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -18577,7 +18551,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge
@@ -18610,14 +18584,14 @@ class MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionB
 public:
     MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -18625,7 +18599,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge
@@ -18662,7 +18636,7 @@ class MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubsc
 public:
     MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                     true),
         mEstablishedHandler(establishedHandler)
@@ -18670,7 +18644,7 @@ public:
 
     MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -18678,7 +18652,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge
@@ -18711,14 +18685,14 @@ class MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBri
 public:
     MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -18726,7 +18700,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge
@@ -18761,14 +18735,14 @@ class MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscri
 public:
     MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -18776,7 +18750,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge
@@ -18809,14 +18783,14 @@ public:
     MTRUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -18824,7 +18798,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge
@@ -18858,14 +18832,14 @@ class MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBri
 public:
     MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -18873,7 +18847,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPowerSourceClusterBatChargeFaultAttributeCallbackBridge
@@ -18906,14 +18880,14 @@ public:
     MTRPowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                            MTRDeviceController * controller,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceClusterBatChargeFaultAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRPowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceClusterBatChargeFaultAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -18921,7 +18895,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackBridge
@@ -18955,14 +18929,14 @@ class MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBr
 public:
     MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -18970,7 +18944,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPowerSourceClusterBatChargeLevelAttributeCallbackBridge
@@ -19003,14 +18977,14 @@ public:
     MTRPowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                            MTRDeviceController * controller,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceClusterBatChargeLevelAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRPowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceClusterBatChargeLevelAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -19018,7 +18992,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge
@@ -19052,14 +19026,14 @@ class MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBr
 public:
     MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -19067,7 +19041,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPowerSourceClusterBatChargeStateAttributeCallbackBridge
@@ -19100,14 +19074,14 @@ public:
     MTRPowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                            MTRDeviceController * controller,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceClusterBatChargeStateAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRPowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceClusterBatChargeStateAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -19115,7 +19089,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge
@@ -19149,14 +19123,14 @@ class MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBr
 public:
     MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -19164,7 +19138,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPowerSourceClusterBatFaultAttributeCallbackBridge : public MTRCallbackBridge<PowerSourceClusterBatFaultAttributeCallback>
@@ -19193,14 +19167,14 @@ public:
     MTRPowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                      MTRDeviceController * controller, ResponseHandler handler,
                                                                      MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceClusterBatFaultAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRPowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                      ResponseHandler handler, MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceClusterBatFaultAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -19208,7 +19182,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullablePowerSourceClusterBatFaultAttributeCallbackBridge
@@ -19242,14 +19216,14 @@ public:
     MTRNullablePowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePowerSourceClusterBatFaultAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullablePowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePowerSourceClusterBatFaultAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -19257,7 +19231,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPowerSourceClusterBatReplaceabilityAttributeCallbackBridge
@@ -19287,17 +19261,16 @@ class MTRPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge
     : public MTRPowerSourceClusterBatReplaceabilityAttributeCallbackBridge
 {
 public:
-    MTRPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceClusterBatReplaceabilityAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceClusterBatReplaceabilityAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -19305,7 +19278,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge
@@ -19339,14 +19312,14 @@ class MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptio
 public:
     MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -19354,7 +19327,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPowerSourceClusterPowerSourceStatusAttributeCallbackBridge
@@ -19384,17 +19357,16 @@ class MTRPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge
     : public MTRPowerSourceClusterPowerSourceStatusAttributeCallbackBridge
 {
 public:
-    MTRPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceClusterPowerSourceStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceClusterPowerSourceStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -19402,7 +19374,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge
@@ -19436,14 +19408,14 @@ class MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptio
 public:
     MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -19451,7 +19423,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge
@@ -19484,14 +19456,14 @@ public:
     MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -19499,7 +19471,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge
@@ -19533,14 +19505,14 @@ class MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackSubscription
 public:
     MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -19548,7 +19520,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPowerSourceClusterWiredFaultAttributeCallbackBridge
@@ -19579,14 +19551,14 @@ public:
     MTRPowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                        MTRDeviceController * controller, ResponseHandler handler,
                                                                        MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceClusterWiredFaultAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRPowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                        ResponseHandler handler, MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPowerSourceClusterWiredFaultAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -19594,7 +19566,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullablePowerSourceClusterWiredFaultAttributeCallbackBridge
@@ -19625,17 +19597,16 @@ class MTRNullablePowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge
     : public MTRNullablePowerSourceClusterWiredFaultAttributeCallbackBridge
 {
 public:
-    MTRNullablePowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullablePowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePowerSourceClusterWiredFaultAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRNullablePowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullablePowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePowerSourceClusterWiredFaultAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -19643,7 +19614,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge
@@ -19677,14 +19648,14 @@ class MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscript
 public:
     MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -19692,7 +19663,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge
@@ -19729,7 +19700,7 @@ class MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackS
 public:
     MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                         true),
         mEstablishedHandler(establishedHandler)
@@ -19737,7 +19708,7 @@ public:
 
     MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -19745,7 +19716,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge
@@ -19780,7 +19751,7 @@ class MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubsc
 public:
     MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                     true),
         mEstablishedHandler(establishedHandler)
@@ -19788,7 +19759,7 @@ public:
 
     MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -19796,7 +19767,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge
@@ -19834,7 +19805,7 @@ class MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallb
 public:
     MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                             action, true),
         mEstablishedHandler(establishedHandler)
@@ -19842,7 +19813,7 @@ public:
 
     MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -19850,7 +19821,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge
@@ -19885,7 +19856,7 @@ class MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackS
 public:
     MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                         true),
         mEstablishedHandler(establishedHandler)
@@ -19893,7 +19864,7 @@ public:
 
     MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -19901,7 +19872,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge
@@ -19937,7 +19908,7 @@ class MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeC
 public:
     MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                                 action, true),
         mEstablishedHandler(establishedHandler)
@@ -19945,7 +19916,7 @@ public:
 
     MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge(queue, device, handler, action,
                                                                                                 true),
         mEstablishedHandler(establishedHandler)
@@ -19954,7 +19925,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge
@@ -19984,17 +19955,16 @@ class MTRNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge
     : public MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge
 {
 public:
-    MTRNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20002,7 +19972,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge
@@ -20036,14 +20006,14 @@ class MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptio
 public:
     MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20051,7 +20021,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDiagnosticLogsClusterLogsIntentAttributeCallbackBridge
@@ -20084,14 +20054,14 @@ public:
     MTRDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDiagnosticLogsClusterLogsIntentAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDiagnosticLogsClusterLogsIntentAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20099,7 +20069,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackBridge
@@ -20133,14 +20103,14 @@ class MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBri
 public:
     MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20148,7 +20118,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDiagnosticLogsClusterLogsStatusAttributeCallbackBridge
@@ -20181,14 +20151,14 @@ public:
     MTRDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDiagnosticLogsClusterLogsStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDiagnosticLogsClusterLogsStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20196,7 +20166,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackBridge
@@ -20230,14 +20200,14 @@ class MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBri
 public:
     MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20245,7 +20215,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge
@@ -20278,14 +20248,14 @@ class MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionB
 public:
     MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20293,7 +20263,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge
@@ -20330,7 +20300,7 @@ class MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubsc
 public:
     MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                     true),
         mEstablishedHandler(establishedHandler)
@@ -20338,7 +20308,7 @@ public:
 
     MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20346,7 +20316,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge
@@ -20379,14 +20349,14 @@ class MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBri
 public:
     MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20394,7 +20364,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge
@@ -20429,14 +20399,14 @@ class MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscri
 public:
     MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20444,7 +20414,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge
@@ -20477,14 +20447,14 @@ class MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscription
 public:
     MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20492,7 +20462,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge
@@ -20529,7 +20499,7 @@ class MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubs
 public:
     MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                      true),
         mEstablishedHandler(establishedHandler)
@@ -20537,7 +20507,7 @@ public:
 
     MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20545,7 +20515,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge
@@ -20578,14 +20548,14 @@ class MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBrid
 public:
     MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20593,7 +20563,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge
@@ -20628,14 +20598,14 @@ class MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscrip
 public:
     MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20643,7 +20613,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge
@@ -20676,14 +20646,14 @@ class MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionB
 public:
     MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20691,7 +20661,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge
@@ -20728,7 +20698,7 @@ class MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubsc
 public:
     MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                     true),
         mEstablishedHandler(establishedHandler)
@@ -20736,7 +20706,7 @@ public:
 
     MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20744,7 +20714,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge
@@ -20777,14 +20747,14 @@ class MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBri
 public:
     MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20792,7 +20762,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge
@@ -20827,14 +20797,14 @@ class MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscri
 public:
     MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20842,7 +20812,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge
@@ -20875,14 +20845,14 @@ class MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptio
 public:
     MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20890,7 +20860,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge
@@ -20927,7 +20897,7 @@ class MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSub
 public:
     MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                       true),
         mEstablishedHandler(establishedHandler)
@@ -20935,7 +20905,7 @@ public:
 
     MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20943,7 +20913,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge
@@ -20976,14 +20946,14 @@ class MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscription
 public:
     MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -20991,7 +20961,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge
@@ -21028,7 +20998,7 @@ class MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubs
 public:
     MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                      true),
         mEstablishedHandler(establishedHandler)
@@ -21036,7 +21006,7 @@ public:
 
     MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -21044,7 +21014,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge
@@ -21079,7 +21049,7 @@ class MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackS
 public:
     MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                         true),
         mEstablishedHandler(establishedHandler)
@@ -21087,7 +21057,7 @@ public:
 
     MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -21095,7 +21065,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge
@@ -21131,7 +21101,7 @@ class MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeC
 public:
     MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                                 action, true),
         mEstablishedHandler(establishedHandler)
@@ -21139,7 +21109,7 @@ public:
 
     MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge(queue, device, handler, action,
                                                                                                 true),
         mEstablishedHandler(establishedHandler)
@@ -21148,7 +21118,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge
@@ -21183,7 +21153,7 @@ class MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSu
 public:
     MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                        true),
         mEstablishedHandler(establishedHandler)
@@ -21191,7 +21161,7 @@ public:
 
     MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -21199,7 +21169,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge
@@ -21235,7 +21205,7 @@ class MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCa
 public:
     MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                                action, true),
         mEstablishedHandler(establishedHandler)
@@ -21243,7 +21213,7 @@ public:
 
     MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge(queue, device, handler, action,
                                                                                                true),
         mEstablishedHandler(establishedHandler)
@@ -21252,7 +21222,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge
@@ -21285,14 +21255,14 @@ class MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionB
 public:
     MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -21300,7 +21270,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge
@@ -21337,7 +21307,7 @@ class MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubsc
 public:
     MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                     true),
         mEstablishedHandler(establishedHandler)
@@ -21345,7 +21315,7 @@ public:
 
     MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -21353,7 +21323,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge
@@ -21388,7 +21358,7 @@ class MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubsc
 public:
     MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                     true),
         mEstablishedHandler(establishedHandler)
@@ -21396,7 +21366,7 @@ public:
 
     MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -21404,7 +21374,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge
@@ -21442,7 +21412,7 @@ class MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallb
 public:
     MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                             action, true),
         mEstablishedHandler(establishedHandler)
@@ -21450,7 +21420,7 @@ public:
 
     MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -21458,7 +21428,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge
@@ -21492,14 +21462,14 @@ class MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscripti
 public:
     MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -21507,7 +21477,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge
@@ -21544,7 +21514,7 @@ class MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSu
 public:
     MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                        true),
         mEstablishedHandler(establishedHandler)
@@ -21552,7 +21522,7 @@ public:
 
     MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -21560,7 +21530,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge
@@ -21594,14 +21564,14 @@ class MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscripti
 public:
     MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -21609,7 +21579,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge
@@ -21646,7 +21616,7 @@ class MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSu
 public:
     MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                        true),
         mEstablishedHandler(establishedHandler)
@@ -21654,7 +21624,7 @@ public:
 
     MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -21662,7 +21632,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge
@@ -21695,14 +21665,14 @@ class MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionB
 public:
     MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -21710,7 +21680,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge
@@ -21747,7 +21717,7 @@ class MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackSubsc
 public:
     MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                     true),
         mEstablishedHandler(establishedHandler)
@@ -21755,7 +21725,7 @@ public:
 
     MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -21763,7 +21733,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge
@@ -21796,14 +21766,14 @@ class MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBr
 public:
     MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -21811,7 +21781,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge
@@ -21846,7 +21816,7 @@ class MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscr
 public:
     MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                    true),
         mEstablishedHandler(establishedHandler)
@@ -21854,7 +21824,7 @@ public:
 
     MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -21862,7 +21832,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge
@@ -21896,7 +21866,7 @@ class MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCall
 public:
     MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                              action, true),
         mEstablishedHandler(establishedHandler)
@@ -21904,7 +21874,7 @@ public:
 
     MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -21912,7 +21882,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge
@@ -21948,7 +21918,7 @@ class MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttri
 public:
     MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge(queue, nodeID, controller,
                                                                                                      handler, action, true),
         mEstablishedHandler(establishedHandler)
@@ -21956,7 +21926,7 @@ public:
 
     MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge(queue, device, handler, action,
                                                                                                      true),
         mEstablishedHandler(establishedHandler)
@@ -21965,7 +21935,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge
@@ -21998,14 +21968,14 @@ class MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptio
 public:
     MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22013,7 +21983,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge
@@ -22050,7 +22020,7 @@ class MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackSub
 public:
     MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                       true),
         mEstablishedHandler(establishedHandler)
@@ -22058,7 +22028,7 @@ public:
 
     MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22066,7 +22036,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge
@@ -22101,7 +22071,7 @@ class MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubs
 public:
     MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                      true),
         mEstablishedHandler(establishedHandler)
@@ -22109,7 +22079,7 @@ public:
 
     MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22117,7 +22087,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge
@@ -22153,7 +22123,7 @@ class MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCall
 public:
     MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                              action, true),
         mEstablishedHandler(establishedHandler)
@@ -22161,7 +22131,7 @@ public:
 
     MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22169,7 +22139,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge
@@ -22203,14 +22173,14 @@ class MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscri
 public:
     MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22218,7 +22188,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge
@@ -22256,7 +22226,7 @@ class MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbac
 public:
     MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                           action, true),
         mEstablishedHandler(establishedHandler)
@@ -22264,7 +22234,7 @@ public:
 
     MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22272,7 +22242,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterDlAlarmCodeAttributeCallback>
@@ -22301,14 +22271,14 @@ public:
     MTRDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                      MTRDeviceController * controller, ResponseHandler handler,
                                                                      MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                      ResponseHandler handler, MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22316,7 +22286,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge
@@ -22350,14 +22320,14 @@ public:
     MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22365,7 +22335,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDlCredentialRuleAttributeCallbackBridge
@@ -22398,14 +22368,14 @@ public:
     MTRDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlCredentialRuleAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlCredentialRuleAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22413,7 +22383,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge
@@ -22447,14 +22417,14 @@ class MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBri
 public:
     MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22462,7 +22432,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDlCredentialTypeAttributeCallbackBridge
@@ -22495,14 +22465,14 @@ public:
     MTRDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlCredentialTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlCredentialTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22510,7 +22480,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge
@@ -22544,14 +22514,14 @@ class MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBri
 public:
     MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22559,7 +22529,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDlDataOperationTypeAttributeCallbackBridge
@@ -22592,14 +22562,14 @@ public:
     MTRDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlDataOperationTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlDataOperationTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22607,7 +22577,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge
@@ -22641,14 +22611,14 @@ class MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackSubscription
 public:
     MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22656,7 +22626,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDlDoorStateAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterDlDoorStateAttributeCallback>
@@ -22685,14 +22655,14 @@ public:
     MTRDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                      MTRDeviceController * controller, ResponseHandler handler,
                                                                      MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlDoorStateAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                      ResponseHandler handler, MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlDoorStateAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22700,7 +22670,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDlDoorStateAttributeCallbackBridge
@@ -22734,14 +22704,14 @@ public:
     MTRNullableDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlDoorStateAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlDoorStateAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22749,7 +22719,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDlLockDataTypeAttributeCallbackBridge
@@ -22780,14 +22750,14 @@ public:
     MTRDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                         MTRDeviceController * controller, ResponseHandler handler,
                                                                         MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlLockDataTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                         ResponseHandler handler, MTRActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlLockDataTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22795,7 +22765,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge
@@ -22826,17 +22796,16 @@ class MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridg
     : public MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge
 {
 public:
-    MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22844,7 +22813,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDlLockOperationTypeAttributeCallbackBridge
@@ -22877,14 +22846,14 @@ public:
     MTRDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlLockOperationTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlLockOperationTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22892,7 +22861,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge
@@ -22926,14 +22895,14 @@ class MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackSubscription
 public:
     MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22941,7 +22910,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDlLockStateAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterDlLockStateAttributeCallback>
@@ -22970,14 +22939,14 @@ public:
     MTRDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                      MTRDeviceController * controller, ResponseHandler handler,
                                                                      MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlLockStateAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                      ResponseHandler handler, MTRActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlLockStateAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -22985,7 +22954,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDlLockStateAttributeCallbackBridge
@@ -23019,14 +22988,14 @@ public:
     MTRNullableDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlLockStateAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlLockStateAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23034,7 +23003,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDlLockTypeAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterDlLockTypeAttributeCallback>
@@ -23063,14 +23032,14 @@ public:
     MTRDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                     MTRDeviceController * controller, ResponseHandler handler,
                                                                     MTRActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
+                                                                    MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlLockTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                     ResponseHandler handler, MTRActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
+                                                                    MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlLockTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23078,7 +23047,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDlLockTypeAttributeCallbackBridge
@@ -23112,14 +23081,14 @@ public:
     MTRNullableDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlLockTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlLockTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23127,7 +23096,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDlOperatingModeAttributeCallbackBridge
@@ -23160,14 +23129,14 @@ public:
     MTRDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                          MTRDeviceController * controller, ResponseHandler handler,
                                                                          MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlOperatingModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlOperatingModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23175,7 +23144,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge
@@ -23209,14 +23178,14 @@ class MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBrid
 public:
     MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23224,7 +23193,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDlOperationErrorAttributeCallbackBridge
@@ -23257,14 +23226,14 @@ public:
     MTRDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlOperationErrorAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlOperationErrorAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23272,7 +23241,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge
@@ -23306,14 +23275,14 @@ class MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBri
 public:
     MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23321,7 +23290,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDlOperationSourceAttributeCallbackBridge
@@ -23354,14 +23323,14 @@ public:
     MTRDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                            MTRDeviceController * controller,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlOperationSourceAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlOperationSourceAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23369,7 +23338,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge
@@ -23403,14 +23372,14 @@ class MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBr
 public:
     MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23418,7 +23387,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDlStatusAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterDlStatusAttributeCallback>
@@ -23446,14 +23415,14 @@ public:
     MTRDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                   MTRDeviceController * controller, ResponseHandler handler,
                                                                   MTRActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
+                                                                  MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                   ResponseHandler handler, MTRActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
+                                                                  MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23461,7 +23430,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDlStatusAttributeCallbackBridge
@@ -23494,14 +23463,14 @@ public:
     MTRNullableDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23509,7 +23478,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDlUserStatusAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterDlUserStatusAttributeCallback>
@@ -23539,14 +23508,14 @@ public:
     MTRDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                       MTRDeviceController * controller, ResponseHandler handler,
                                                                       MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlUserStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                       ResponseHandler handler, MTRActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlUserStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23554,7 +23523,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge
@@ -23585,17 +23554,16 @@ class MTRNullableDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge
     : public MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge
 {
 public:
-    MTRNullableDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRNullableDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23603,7 +23571,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDlUserTypeAttributeCallbackBridge : public MTRCallbackBridge<DoorLockClusterDlUserTypeAttributeCallback>
@@ -23632,14 +23600,14 @@ public:
     MTRDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                     MTRDeviceController * controller, ResponseHandler handler,
                                                                     MTRActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
+                                                                    MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlUserTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                     ResponseHandler handler, MTRActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
+                                                                    MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDlUserTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23647,7 +23615,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDlUserTypeAttributeCallbackBridge
@@ -23681,14 +23649,14 @@ public:
     MTRNullableDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlUserTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDlUserTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23696,7 +23664,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge
@@ -23729,14 +23697,14 @@ class MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionB
 public:
     MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23744,7 +23712,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge
@@ -23781,7 +23749,7 @@ class MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubsc
 public:
     MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                     true),
         mEstablishedHandler(establishedHandler)
@@ -23789,7 +23757,7 @@ public:
 
     MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23797,7 +23765,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge
@@ -23830,14 +23798,14 @@ class MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptio
 public:
     MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23845,7 +23813,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge
@@ -23882,7 +23850,7 @@ class MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSub
 public:
     MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                       true),
         mEstablishedHandler(establishedHandler)
@@ -23890,7 +23858,7 @@ public:
 
     MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23898,7 +23866,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge
@@ -23931,14 +23899,14 @@ class MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBri
 public:
     MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23946,7 +23914,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge
@@ -23981,14 +23949,14 @@ class MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscri
 public:
     MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -23996,7 +23964,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDoorLockUserStatusAttributeCallbackBridge
@@ -24029,14 +23997,14 @@ public:
     MTRDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDoorLockUserStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDoorLockUserStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24044,7 +24012,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge
@@ -24078,14 +24046,14 @@ class MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionB
 public:
     MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24093,7 +24061,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRDoorLockClusterDoorLockUserTypeAttributeCallbackBridge
@@ -24126,14 +24094,14 @@ public:
     MTRDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDoorLockUserTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRDoorLockClusterDoorLockUserTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24141,7 +24109,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge
@@ -24175,14 +24143,14 @@ class MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBri
 public:
     MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24190,7 +24158,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRWindowCoveringClusterEndProductTypeAttributeCallbackBridge
@@ -24220,17 +24188,16 @@ class MTRWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge
     : public MTRWindowCoveringClusterEndProductTypeAttributeCallbackBridge
 {
 public:
-    MTRWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWindowCoveringClusterEndProductTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWindowCoveringClusterEndProductTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24238,7 +24205,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackBridge
@@ -24272,14 +24239,14 @@ class MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptio
 public:
     MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24287,7 +24254,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRWindowCoveringClusterTypeAttributeCallbackBridge : public MTRCallbackBridge<WindowCoveringClusterTypeAttributeCallback>
@@ -24316,14 +24283,14 @@ public:
     MTRWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                     MTRDeviceController * controller, ResponseHandler handler,
                                                                     MTRActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
+                                                                    MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWindowCoveringClusterTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                     ResponseHandler handler, MTRActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
+                                                                    MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRWindowCoveringClusterTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24331,7 +24298,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableWindowCoveringClusterTypeAttributeCallbackBridge
@@ -24365,14 +24332,14 @@ public:
     MTRNullableWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                             MTRDeviceController * controller,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableWindowCoveringClusterTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                             ResponseHandler handler, MTRActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableWindowCoveringClusterTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24380,7 +24347,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge
@@ -24415,7 +24382,7 @@ class MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubsc
 public:
     MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                     true),
         mEstablishedHandler(establishedHandler)
@@ -24423,7 +24390,7 @@ public:
 
     MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24431,7 +24398,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge
@@ -24469,7 +24436,7 @@ class MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallb
 public:
     MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                             action, true),
         mEstablishedHandler(establishedHandler)
@@ -24477,7 +24444,7 @@ public:
 
     MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24485,7 +24452,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge
@@ -24520,7 +24487,7 @@ class MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSub
 public:
     MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                       true),
         mEstablishedHandler(establishedHandler)
@@ -24528,7 +24495,7 @@ public:
 
     MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24536,7 +24503,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge
@@ -24572,7 +24539,7 @@ class MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCal
 public:
     MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                               action, true),
         mEstablishedHandler(establishedHandler)
@@ -24580,7 +24547,7 @@ public:
 
     MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24588,7 +24555,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThermostatClusterSetpointAdjustModeAttributeCallbackBridge
@@ -24618,17 +24585,16 @@ class MTRThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge
     : public MTRThermostatClusterSetpointAdjustModeAttributeCallbackBridge
 {
 public:
-    MTRThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatClusterSetpointAdjustModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatClusterSetpointAdjustModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24636,7 +24602,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackBridge
@@ -24670,14 +24636,14 @@ class MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptio
 public:
     MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24685,7 +24651,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThermostatClusterThermostatControlSequenceAttributeCallbackBridge
@@ -24718,14 +24684,14 @@ class MTRThermostatClusterThermostatControlSequenceAttributeCallbackSubscription
 public:
     MTRThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatClusterThermostatControlSequenceAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatClusterThermostatControlSequenceAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24733,7 +24699,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackBridge
@@ -24770,7 +24736,7 @@ class MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackSubs
 public:
     MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                      true),
         mEstablishedHandler(establishedHandler)
@@ -24778,7 +24744,7 @@ public:
 
     MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24786,7 +24752,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThermostatClusterThermostatRunningModeAttributeCallbackBridge
@@ -24819,14 +24785,14 @@ class MTRThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBrid
 public:
     MTRThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatClusterThermostatRunningModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatClusterThermostatRunningModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24834,7 +24800,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackBridge
@@ -24869,14 +24835,14 @@ class MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackSubscrip
 public:
     MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24884,7 +24850,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge
@@ -24914,17 +24880,16 @@ class MTRThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridg
     : public MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge
 {
 public:
-    MTRThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24932,7 +24897,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge
@@ -24967,14 +24932,14 @@ class MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscript
 public:
     MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -24982,7 +24947,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRFanControlClusterFanModeSequenceTypeAttributeCallbackBridge
@@ -25012,17 +24977,16 @@ class MTRFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge
     : public MTRFanControlClusterFanModeSequenceTypeAttributeCallbackBridge
 {
 public:
-    MTRFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFanControlClusterFanModeSequenceTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFanControlClusterFanModeSequenceTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25030,7 +24994,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge
@@ -25065,14 +25029,14 @@ class MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackSubscripti
 public:
     MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25080,7 +25044,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRFanControlClusterFanModeTypeAttributeCallbackBridge
@@ -25111,14 +25075,14 @@ public:
     MTRFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                        MTRDeviceController * controller, ResponseHandler handler,
                                                                        MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFanControlClusterFanModeTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                        ResponseHandler handler, MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFanControlClusterFanModeTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25126,7 +25090,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableFanControlClusterFanModeTypeAttributeCallbackBridge
@@ -25157,17 +25121,16 @@ class MTRNullableFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge
     : public MTRNullableFanControlClusterFanModeTypeAttributeCallbackBridge
 {
 public:
-    MTRNullableFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableFanControlClusterFanModeTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRNullableFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableFanControlClusterFanModeTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25175,7 +25138,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRColorControlClusterColorLoopActionAttributeCallbackBridge
@@ -25208,14 +25171,14 @@ public:
     MTRColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                              MTRDeviceController * controller,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlClusterColorLoopActionAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlClusterColorLoopActionAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25223,7 +25186,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableColorControlClusterColorLoopActionAttributeCallbackBridge
@@ -25257,14 +25220,14 @@ class MTRNullableColorControlClusterColorLoopActionAttributeCallbackSubscription
 public:
     MTRNullableColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableColorControlClusterColorLoopActionAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableColorControlClusterColorLoopActionAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25272,7 +25235,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRColorControlClusterColorLoopDirectionAttributeCallbackBridge
@@ -25302,17 +25265,16 @@ class MTRColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridg
     : public MTRColorControlClusterColorLoopDirectionAttributeCallbackBridge
 {
 public:
-    MTRColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlClusterColorLoopDirectionAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlClusterColorLoopDirectionAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25320,7 +25282,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackBridge
@@ -25355,14 +25317,14 @@ class MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackSubscript
 public:
     MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25370,7 +25332,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRColorControlClusterColorModeAttributeCallbackBridge
@@ -25401,14 +25363,14 @@ public:
     MTRColorControlClusterColorModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                        MTRDeviceController * controller, ResponseHandler handler,
                                                                        MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlClusterColorModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRColorControlClusterColorModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                        ResponseHandler handler, MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlClusterColorModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25416,7 +25378,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableColorControlClusterColorModeAttributeCallbackBridge
@@ -25447,17 +25409,16 @@ class MTRNullableColorControlClusterColorModeAttributeCallbackSubscriptionBridge
     : public MTRNullableColorControlClusterColorModeAttributeCallbackBridge
 {
 public:
-    MTRNullableColorControlClusterColorModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableColorControlClusterColorModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableColorControlClusterColorModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRNullableColorControlClusterColorModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableColorControlClusterColorModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableColorControlClusterColorModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25465,7 +25426,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRColorControlClusterHueDirectionAttributeCallbackBridge
@@ -25498,14 +25459,14 @@ public:
     MTRColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlClusterHueDirectionAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlClusterHueDirectionAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25513,7 +25474,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableColorControlClusterHueDirectionAttributeCallbackBridge
@@ -25547,14 +25508,14 @@ class MTRNullableColorControlClusterHueDirectionAttributeCallbackSubscriptionBri
 public:
     MTRNullableColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableColorControlClusterHueDirectionAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableColorControlClusterHueDirectionAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25562,7 +25523,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRColorControlClusterHueMoveModeAttributeCallbackBridge
@@ -25595,14 +25556,14 @@ public:
     MTRColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                          MTRDeviceController * controller, ResponseHandler handler,
                                                                          MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlClusterHueMoveModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlClusterHueMoveModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25610,7 +25571,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableColorControlClusterHueMoveModeAttributeCallbackBridge
@@ -25644,14 +25605,14 @@ class MTRNullableColorControlClusterHueMoveModeAttributeCallbackSubscriptionBrid
 public:
     MTRNullableColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableColorControlClusterHueMoveModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableColorControlClusterHueMoveModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25659,7 +25620,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRColorControlClusterHueStepModeAttributeCallbackBridge
@@ -25692,14 +25653,14 @@ public:
     MTRColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                          MTRDeviceController * controller, ResponseHandler handler,
                                                                          MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlClusterHueStepModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlClusterHueStepModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25707,7 +25668,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableColorControlClusterHueStepModeAttributeCallbackBridge
@@ -25741,14 +25702,14 @@ class MTRNullableColorControlClusterHueStepModeAttributeCallbackSubscriptionBrid
 public:
     MTRNullableColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableColorControlClusterHueStepModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableColorControlClusterHueStepModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25756,7 +25717,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRColorControlClusterSaturationMoveModeAttributeCallbackBridge
@@ -25786,17 +25747,16 @@ class MTRColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridg
     : public MTRColorControlClusterSaturationMoveModeAttributeCallbackBridge
 {
 public:
-    MTRColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlClusterSaturationMoveModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlClusterSaturationMoveModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25804,7 +25764,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackBridge
@@ -25839,14 +25799,14 @@ class MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackSubscript
 public:
     MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25854,7 +25814,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRColorControlClusterSaturationStepModeAttributeCallbackBridge
@@ -25884,17 +25844,16 @@ class MTRColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridg
     : public MTRColorControlClusterSaturationStepModeAttributeCallbackBridge
 {
 public:
-    MTRColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlClusterSaturationStepModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlClusterSaturationStepModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25902,7 +25861,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableColorControlClusterSaturationStepModeAttributeCallbackBridge
@@ -25937,14 +25896,14 @@ class MTRNullableColorControlClusterSaturationStepModeAttributeCallbackSubscript
 public:
     MTRNullableColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableColorControlClusterSaturationStepModeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableColorControlClusterSaturationStepModeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -25952,7 +25911,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge
@@ -25986,14 +25945,14 @@ class MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscripti
 public:
     MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26001,7 +25960,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge
@@ -26038,7 +25997,7 @@ class MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSu
 public:
     MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                        true),
         mEstablishedHandler(establishedHandler)
@@ -26046,7 +26005,7 @@ public:
 
     MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26054,7 +26013,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRChannelClusterChannelStatusEnumAttributeCallbackBridge
@@ -26087,14 +26046,14 @@ public:
     MTRChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                                           MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRChannelClusterChannelStatusEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                           ResponseHandler handler, MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRChannelClusterChannelStatusEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26102,7 +26061,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableChannelClusterChannelStatusEnumAttributeCallbackBridge
@@ -26136,14 +26095,14 @@ class MTRNullableChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBri
 public:
     MTRNullableChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableChannelClusterChannelStatusEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableChannelClusterChannelStatusEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26151,7 +26110,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRChannelClusterLineupInfoTypeEnumAttributeCallbackBridge
@@ -26184,14 +26143,14 @@ public:
     MTRChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                            MTRDeviceController * controller,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRChannelClusterLineupInfoTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRChannelClusterLineupInfoTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26199,7 +26158,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackBridge
@@ -26233,14 +26192,14 @@ class MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBr
 public:
     MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26248,7 +26207,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge
@@ -26282,14 +26241,14 @@ class MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscri
 public:
     MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26297,7 +26256,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge
@@ -26335,7 +26294,7 @@ class MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbac
 public:
     MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                           action, true),
         mEstablishedHandler(establishedHandler)
@@ -26343,7 +26302,7 @@ public:
 
     MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26351,7 +26310,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge
@@ -26384,14 +26343,14 @@ class MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptio
 public:
     MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26399,7 +26358,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge
@@ -26436,7 +26395,7 @@ class MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSub
 public:
     MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                       true),
         mEstablishedHandler(establishedHandler)
@@ -26444,7 +26403,7 @@ public:
 
     MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26452,7 +26411,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge
@@ -26482,17 +26441,16 @@ class MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridg
     : public MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge
 {
 public:
-    MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                                MTRDeviceController * controller,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
+    MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26500,7 +26458,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge
@@ -26535,14 +26493,14 @@ class MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscript
 public:
     MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26550,7 +26508,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRMediaInputClusterInputTypeEnumAttributeCallbackBridge
@@ -26583,14 +26541,14 @@ public:
     MTRMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                          MTRDeviceController * controller, ResponseHandler handler,
                                                                          MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaInputClusterInputTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRMediaInputClusterInputTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26598,7 +26556,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackBridge
@@ -26632,14 +26590,14 @@ class MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBrid
 public:
     MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26647,7 +26605,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRKeypadInputClusterCecKeyCodeAttributeCallbackBridge
@@ -26678,14 +26636,14 @@ public:
     MTRKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                        MTRDeviceController * controller, ResponseHandler handler,
                                                                        MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRKeypadInputClusterCecKeyCodeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                        ResponseHandler handler, MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRKeypadInputClusterCecKeyCodeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26693,7 +26651,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackBridge
@@ -26724,17 +26682,16 @@ class MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge
     : public MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackBridge
 {
 public:
-    MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26742,7 +26699,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge
@@ -26775,14 +26732,14 @@ class MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBri
 public:
     MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26790,7 +26747,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge
@@ -26825,14 +26782,14 @@ class MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscri
 public:
     MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26840,7 +26797,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge
@@ -26874,14 +26831,14 @@ class MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscript
 public:
     MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26889,7 +26846,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge
@@ -26926,7 +26883,7 @@ class MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackS
 public:
     MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                         true),
         mEstablishedHandler(establishedHandler)
@@ -26934,7 +26891,7 @@ public:
 
     MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26942,7 +26899,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRContentLauncherClusterMetricTypeEnumAttributeCallbackBridge
@@ -26972,17 +26929,16 @@ class MTRContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge
     : public MTRContentLauncherClusterMetricTypeEnumAttributeCallbackBridge
 {
 public:
-    MTRContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRContentLauncherClusterMetricTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRContentLauncherClusterMetricTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -26990,7 +26946,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackBridge
@@ -27025,14 +26981,14 @@ class MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackSubscripti
 public:
     MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -27040,7 +26996,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRContentLauncherClusterParameterEnumAttributeCallbackBridge
@@ -27070,17 +27026,16 @@ class MTRContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge
     : public MTRContentLauncherClusterParameterEnumAttributeCallbackBridge
 {
 public:
-    MTRContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                              MTRDeviceController * controller,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRContentLauncherClusterParameterEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                              ResponseHandler handler, MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
+    MTRContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRContentLauncherClusterParameterEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -27088,7 +27043,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableContentLauncherClusterParameterEnumAttributeCallbackBridge
@@ -27122,14 +27077,14 @@ class MTRNullableContentLauncherClusterParameterEnumAttributeCallbackSubscriptio
 public:
     MTRNullableContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableContentLauncherClusterParameterEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableContentLauncherClusterParameterEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -27137,7 +27092,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRAudioOutputClusterOutputTypeEnumAttributeCallbackBridge
@@ -27170,14 +27125,14 @@ public:
     MTRAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                            MTRDeviceController * controller,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAudioOutputClusterOutputTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                            ResponseHandler handler, MTRActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRAudioOutputClusterOutputTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -27185,7 +27140,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackBridge
@@ -27219,14 +27174,14 @@ class MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBr
 public:
     MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -27234,7 +27189,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge
@@ -27270,7 +27225,7 @@ class MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbac
 public:
     MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge(queue, nodeID, controller, handler,
                                                                                           action, true),
         mEstablishedHandler(establishedHandler)
@@ -27278,7 +27233,7 @@ public:
 
     MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -27286,7 +27241,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge
@@ -27322,7 +27277,7 @@ class MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttribut
 public:
     MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge(queue, nodeID, controller,
                                                                                                   handler, action, true),
         mEstablishedHandler(establishedHandler)
@@ -27330,7 +27285,7 @@ public:
 
     MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge(queue, device, handler, action,
                                                                                                   true),
         mEstablishedHandler(establishedHandler)
@@ -27339,7 +27294,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge
@@ -27373,14 +27328,14 @@ class MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscripti
 public:
     MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -27388,7 +27343,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge
@@ -27425,7 +27380,7 @@ class MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackSu
 public:
     MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action,
                                                                                        true),
         mEstablishedHandler(establishedHandler)
@@ -27433,7 +27388,7 @@ public:
 
     MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -27441,7 +27396,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRTestClusterClusterSimpleEnumAttributeCallbackBridge
@@ -27472,14 +27427,14 @@ public:
     MTRTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                        MTRDeviceController * controller, ResponseHandler handler,
                                                                        MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterClusterSimpleEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                        ResponseHandler handler, MTRActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRTestClusterClusterSimpleEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -27487,7 +27442,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableTestClusterClusterSimpleEnumAttributeCallbackBridge
@@ -27518,17 +27473,16 @@ class MTRNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge
     : public MTRNullableTestClusterClusterSimpleEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                               MTRDeviceController * controller,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableTestClusterClusterSimpleEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                               ResponseHandler handler, MTRActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
+    MTRNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableTestClusterClusterSimpleEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -27536,7 +27490,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge
@@ -27569,14 +27523,14 @@ public:
     MTRFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                          MTRDeviceController * controller, ResponseHandler handler,
                                                                          MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                          ResponseHandler handler, MTRActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -27584,7 +27538,7 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
 class MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge
@@ -27618,14 +27572,14 @@ class MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBrid
 public:
     MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
-        MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
     MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
+        MTRSubscriptionEstablishedHandler establishedHandler) :
         MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
@@ -27633,5 +27587,5 @@ public:
     static void OnSubscriptionEstablished(void * context);
 
 private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };

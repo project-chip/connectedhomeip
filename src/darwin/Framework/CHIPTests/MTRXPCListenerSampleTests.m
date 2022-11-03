@@ -173,24 +173,25 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
     (void) controller;
     __auto_type sharedController = sController;
     if (sharedController) {
-        [sharedController getBaseDevice:nodeId
-                                  queue:dispatch_get_main_queue()
-                      completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                          if (error) {
-                              NSLog(@"Failed to get connected device");
-                              completion(nil, error);
-                          } else {
-                              [device readAttributeWithEndpointId:endpointId
-                                                        clusterId:clusterId
-                                                      attributeId:attributeId
-                                                           params:[MTRDeviceController decodeXPCReadParams:params]
-                                                      clientQueue:dispatch_get_main_queue()
-                                                       completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
-                                                           NSError * _Nullable error) {
-                                                           completion([MTRDeviceController encodeXPCResponseValues:values], error);
-                                                       }];
-                          }
-                      }];
+        [sharedController
+            getBaseDevice:nodeId
+                    queue:dispatch_get_main_queue()
+               completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
+                   if (error) {
+                       NSLog(@"Failed to get connected device");
+                       completion(nil, error);
+                   } else {
+                       [device readAttributeWithEndpointId:endpointId
+                                                 clusterId:clusterId
+                                               attributeId:attributeId
+                                                    params:[MTRDeviceController decodeXPCReadParams:params]
+                                               clientQueue:dispatch_get_main_queue()
+                                                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
+                                                    NSError * _Nullable error) {
+                                                    completion([MTRDeviceController encodeXPCResponseValues:values], error);
+                                                }];
+                   }
+               }];
     } else {
         NSLog(@"Failed to get shared controller");
         completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
@@ -209,26 +210,27 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
     (void) controller;
     __auto_type sharedController = sController;
     if (sharedController) {
-        [sharedController getBaseDevice:nodeId
-                                  queue:dispatch_get_main_queue()
-                      completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                          if (error) {
-                              NSLog(@"Failed to get connected device");
-                              completion(nil, error);
-                          } else {
+        [sharedController
+            getBaseDevice:nodeId
+                    queue:dispatch_get_main_queue()
+               completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
+                   if (error) {
+                       NSLog(@"Failed to get connected device");
+                       completion(nil, error);
+                   } else {
 
-                              [device writeAttributeWithEndpointId:endpointId
-                                                         clusterId:clusterId
-                                                       attributeId:attributeId
-                                                             value:value
-                                                 timedWriteTimeout:timeoutMs
-                                                       clientQueue:dispatch_get_main_queue()
-                                                        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
-                                                            NSError * _Nullable error) {
-                                                            completion([MTRDeviceController encodeXPCResponseValues:values], error);
-                                                        }];
-                          }
-                      }];
+                       [device writeAttributeWithEndpointId:endpointId
+                                                  clusterId:clusterId
+                                                attributeId:attributeId
+                                                      value:value
+                                          timedWriteTimeout:timeoutMs
+                                                clientQueue:dispatch_get_main_queue()
+                                                 completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
+                                                     NSError * _Nullable error) {
+                                                     completion([MTRDeviceController encodeXPCResponseValues:values], error);
+                                                 }];
+                   }
+               }];
     } else {
         NSLog(@"Failed to get shared controller");
         completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
@@ -247,25 +249,26 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
     (void) controller;
     __auto_type sharedController = sController;
     if (sharedController) {
-        [sharedController getBaseDevice:nodeId
-                                  queue:dispatch_get_main_queue()
-                      completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                          if (error) {
-                              NSLog(@"Failed to get connected device");
-                              completion(nil, error);
-                          } else {
-                              [device invokeCommandWithEndpointId:endpointId
-                                                        clusterId:clusterId
-                                                        commandId:commandId
-                                                    commandFields:fields
-                                               timedInvokeTimeout:nil
-                                                      clientQueue:dispatch_get_main_queue()
-                                                       completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
-                                                           NSError * _Nullable error) {
-                                                           completion([MTRDeviceController encodeXPCResponseValues:values], error);
-                                                       }];
-                          }
-                      }];
+        [sharedController
+            getBaseDevice:nodeId
+                    queue:dispatch_get_main_queue()
+               completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
+                   if (error) {
+                       NSLog(@"Failed to get connected device");
+                       completion(nil, error);
+                   } else {
+                       [device invokeCommandWithEndpointId:endpointId
+                                                 clusterId:clusterId
+                                                 commandId:commandId
+                                             commandFields:fields
+                                        timedInvokeTimeout:nil
+                                               clientQueue:dispatch_get_main_queue()
+                                                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
+                                                    NSError * _Nullable error) {
+                                                    completion([MTRDeviceController encodeXPCResponseValues:values], error);
+                                                }];
+                   }
+               }];
     } else {
         NSLog(@"Failed to get shared controller");
         completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
@@ -284,39 +287,40 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
 {
     __auto_type sharedController = sController;
     if (sharedController) {
-        [sharedController getBaseDevice:nodeId
-                                  queue:dispatch_get_main_queue()
-                      completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                          if (error) {
-                              NSLog(@"Failed to get connected device");
-                              establishedHandler();
-                              // Send an error report so that the client knows of the failure
-                              [self.clientProxy handleReportWithController:controller
-                                                                    nodeId:nodeId
-                                                                    values:nil
-                                                                     error:[NSError errorWithDomain:MTRErrorDomain
-                                                                                               code:MTRErrorCodeGeneralError
-                                                                                           userInfo:nil]];
-                          } else {
-                              [device subscribeAttributeWithEndpointId:endpointId
-                                                             clusterId:clusterId
-                                                           attributeId:attributeId
-                                                           minInterval:minInterval
-                                                           maxInterval:maxInterval
-                                                                params:[MTRDeviceController decodeXPCSubscribeParams:params]
-                                                           clientQueue:dispatch_get_main_queue()
-                                                         reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
-                                                             NSError * _Nullable error) {
-                                                             [self.clientProxy
-                                                                 handleReportWithController:controller
-                                                                                     nodeId:nodeId
-                                                                                     values:[MTRDeviceController
-                                                                                                encodeXPCResponseValues:values]
-                                                                                      error:error];
-                                                         }
-                                               subscriptionEstablished:establishedHandler];
-                          }
-                      }];
+        [sharedController
+            getBaseDevice:nodeId
+                    queue:dispatch_get_main_queue()
+               completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
+                   if (error) {
+                       NSLog(@"Failed to get connected device");
+                       establishedHandler();
+                       // Send an error report so that the client knows of the failure
+                       [self.clientProxy handleReportWithController:controller
+                                                             nodeId:nodeId
+                                                             values:nil
+                                                              error:[NSError errorWithDomain:MTRErrorDomain
+                                                                                        code:MTRErrorCodeGeneralError
+                                                                                    userInfo:nil]];
+                   } else {
+                       [device subscribeAttributeWithEndpointId:endpointId
+                                                      clusterId:clusterId
+                                                    attributeId:attributeId
+                                                    minInterval:minInterval
+                                                    maxInterval:maxInterval
+                                                         params:[MTRDeviceController decodeXPCSubscribeParams:params]
+                                                    clientQueue:dispatch_get_main_queue()
+                                                  reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
+                                                      NSError * _Nullable error) {
+                                                      [self.clientProxy
+                                                          handleReportWithController:controller
+                                                                              nodeId:nodeId
+                                                                              values:[MTRDeviceController
+                                                                                         encodeXPCResponseValues:values]
+                                                                               error:error];
+                                                  }
+                                        subscriptionEstablished:establishedHandler];
+                   }
+               }];
     } else {
         NSLog(@"Failed to get shared controller");
         establishedHandler();
@@ -336,13 +340,14 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
     if (sharedController) {
         [sharedController getBaseDevice:nodeId
                                   queue:dispatch_get_main_queue()
-                      completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                          if (error) {
-                              NSLog(@"Failed to get connected device");
-                          } else {
-                              [device deregisterReportHandlersWithClientQueue:dispatch_get_main_queue() completion:completion];
-                          }
-                      }];
+                             completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
+                                 if (error) {
+                                     NSLog(@"Failed to get connected device");
+                                 } else {
+                                     [device deregisterReportHandlersWithClientQueue:dispatch_get_main_queue()
+                                                                          completion:completion];
+                                 }
+                             }];
     } else {
         NSLog(@"Failed to get shared controller");
         completion();
@@ -355,7 +360,7 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
                     maxInterval:(NSNumber *)maxInterval
                          params:(NSDictionary<NSString *, id> * _Nullable)params
                     shouldCache:(BOOL)shouldCache
-                     completion:(StatusCompletion)completion
+                     completion:(MTRStatusCompletion)completion
 {
     __auto_type sharedController = sController;
     if (sharedController) {
@@ -421,7 +426,7 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
             readAttributeWithEndpointID:endpointId
                               clusterID:clusterId
                             attributeID:attributeId
-                            clientQueue:dispatch_get_main_queue()
+                                  queue:dispatch_get_main_queue()
                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                  completion([MTRDeviceController encodeXPCResponseValues:values], error);
                              }];
@@ -557,12 +562,12 @@ static MTRBaseDevice * GetConnectedDevice(void)
     __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
     [controller getBaseDevice:kDeviceId
                         queue:dispatch_get_main_queue()
-            completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                XCTAssertEqual(error.code, 0);
-                sDevice = device;
-                [connectionExpectation fulfill];
-                connectionExpectation = nil;
-            }];
+                   completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
+                       XCTAssertEqual(error.code, 0);
+                       sDevice = device;
+                       [connectionExpectation fulfill];
+                       connectionExpectation = nil;
+                   }];
     [self waitForExpectationsWithTimeout:kCASESetupTimeoutInSeconds handler:nil];
 
     mSampleListener = [[MTRXPCListenerSample alloc] init];
@@ -601,10 +606,10 @@ static MTRBaseDevice * GetConnectedDevice(void)
                }];
     [remoteController getBaseDevice:kDeviceId
                               queue:queue
-                  completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                      mConnectedDevice = device;
-                      [expectation fulfill];
-                  }];
+                         completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
+                             mConnectedDevice = device;
+                             [expectation fulfill];
+                         }];
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
     mDeviceController = remoteController;
 }
@@ -633,7 +638,7 @@ static MTRBaseDevice * GetConnectedDevice(void)
                               clusterID:@29
                             attributeID:@0
                                  params:nil
-                            clientQueue:queue
+                                  queue:queue
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"read attribute: DeviceType values: %@, error: %@", values, error);
 
@@ -676,7 +681,7 @@ static MTRBaseDevice * GetConnectedDevice(void)
                              attributeID:@17
                                    value:writeValue
                        timedWriteTimeout:nil
-                             clientQueue:queue
+                                   queue:queue
                               completion:^(id _Nullable values, NSError * _Nullable error) {
                                   NSLog(@"write attribute: Brightness values: %@, error: %@", values, error);
 
@@ -724,7 +729,7 @@ static MTRBaseDevice * GetConnectedDevice(void)
                               commandID:@4
                           commandFields:fields
                      timedInvokeTimeout:nil
-                            clientQueue:queue
+                                  queue:queue
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"invoke command: MoveToLevelWithOnOff values: %@, error: %@", values, error);
 
@@ -768,7 +773,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         minInterval:@2
         maxInterval:@10
         params:nil
-        clientQueue:queue
+        queue:queue
         reportHandler:^(id _Nullable values, NSError * _Nullable error) {
             NSLog(@"report attribute: OnOff values: %@, error: %@", values, error);
 
@@ -811,7 +816,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               commandID:@1
                           commandFields:fields
                      timedInvokeTimeout:nil
-                            clientQueue:queue
+                                  queue:queue
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
@@ -835,10 +840,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 
     XCTestExpectation * clearExpectation = [self expectationWithDescription:@"report handlers deregistered"];
-    [device deregisterReportHandlersWithClientQueue:queue
-                                         completion:^{
-                                             [clearExpectation fulfill];
-                                         }];
+    [device deregisterReportHandlersWithQueue:queue
+                                   completion:^{
+                                       [clearExpectation fulfill];
+                                   }];
     [self waitForExpectations:@[ clearExpectation ] timeout:kTimeoutInSeconds];
 }
 
@@ -857,7 +862,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               clusterID:@10000
                             attributeID:@0
                                  params:nil
-                            clientQueue:queue
+                                  queue:queue
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"read attribute: DeviceType values: %@, error: %@", values, error);
 
@@ -891,7 +896,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                              attributeID:@10000
                                    value:writeValue
                        timedWriteTimeout:nil
-                             clientQueue:queue
+                                   queue:queue
                               completion:^(id _Nullable values, NSError * _Nullable error) {
                                   NSLog(@"write attribute: Brightness values: %@, error: %@", values, error);
 
@@ -933,7 +938,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                             @"UnsignedInteger", @"type",
                                             [NSNumber numberWithUnsignedInteger:10], @"value", nil], @"value", nil],
                                           nil], @"value", nil];
-    [device invokeCommandWithEndpointID:@1 clusterID:@8 commandID:@40000 commandFields:fields clientQueue:queue
+    [device invokeCommandWithEndpointID:@1 clusterID:@8 commandID:@40000 commandFields:fields queue:queue
             timedInvokeTimeout:nil
            completion:^(id _Nullable values, NSError * _Nullable error) {
                NSLog(@"invoke command: MoveToLevelWithOnOff values: %@, error: %@", values, error);
@@ -982,7 +987,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         minInterval:@2
         maxInterval:@10
         params:params
-        clientQueue:queue
+        queue:queue
         reportHandler:^(id _Nullable values, NSError * _Nullable error) {
             NSLog(@"report attribute: OnOff values: %@, error: %@", values, error);
 
@@ -1019,7 +1024,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               clusterID:@29
                             attributeID:@0
                                  params:readParams
-                            clientQueue:queue
+                                  queue:queue
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"read attribute: DeviceType values: %@, error: %@", values, error);
 
@@ -1054,10 +1059,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     XCTestExpectation * clearExpectation = [self expectationWithDescription:@"report handlers deregistered"];
-    [device deregisterReportHandlersWithClientQueue:queue
-                                         completion:^{
-                                             [clearExpectation fulfill];
-                                         }];
+    [device deregisterReportHandlersWithQueue:queue
+                                   completion:^{
+                                       [clearExpectation fulfill];
+                                   }];
     [self waitForExpectations:@[ clearExpectation ] timeout:kTimeoutInSeconds];
 
     __block void (^firstReportHandler)(id _Nullable values, NSError * _Nullable error) = nil;
@@ -1071,7 +1076,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         minInterval:@2
         maxInterval:@10
         params:nil
-        clientQueue:queue
+        queue:queue
         reportHandler:^(id _Nullable values, NSError * _Nullable error) {
             NSLog(@"report attribute: OnOff values: %@, error: %@", values, error);
             XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
@@ -1097,7 +1102,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         minInterval:@2
         maxInterval:@10
         params:nil
-        clientQueue:queue
+        queue:queue
         reportHandler:^(id _Nullable values, NSError * _Nullable error) {
             NSLog(@"2nd subscriber report attribute: CurrentLevel values: %@, error: %@", values, error);
             XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
@@ -1123,7 +1128,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               commandID:@0
                           commandFields:@{ @"type" : @"Structure", @"value" : @[] }
                      timedInvokeTimeout:nil
-                            clientQueue:queue
+                                  queue:queue
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
@@ -1192,7 +1197,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               commandID:@1
                           commandFields:fields
                      timedInvokeTimeout:nil
-                            clientQueue:queue
+                                  queue:queue
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
@@ -1216,10 +1221,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ reportExpectation, secondReportExpectation ] timeout:kTimeoutInSeconds];
 
     clearExpectation = [self expectationWithDescription:@"report handlers deregistered"];
-    [device deregisterReportHandlersWithClientQueue:queue
-                                         completion:^{
-                                             [clearExpectation fulfill];
-                                         }];
+    [device deregisterReportHandlersWithQueue:queue
+                                   completion:^{
+                                       [clearExpectation fulfill];
+                                   }];
     [self waitForExpectations:@[ clearExpectation ] timeout:kTimeoutInSeconds];
 }
 
@@ -1233,10 +1238,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     XCTestExpectation * clearExpectation = [self expectationWithDescription:@"report handlers deregistered"];
-    [device deregisterReportHandlersWithClientQueue:queue
-                                         completion:^{
-                                             [clearExpectation fulfill];
-                                         }];
+    [device deregisterReportHandlersWithQueue:queue
+                                   completion:^{
+                                       [clearExpectation fulfill];
+                                   }];
     [self waitForExpectations:@[ clearExpectation ] timeout:kTimeoutInSeconds];
 
     __block void (^firstReportHandler)(id _Nullable values, NSError * _Nullable error) = nil;
@@ -1250,7 +1255,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         minInterval:@2
         maxInterval:@10
         params:nil
-        clientQueue:queue
+        queue:queue
         reportHandler:^(id _Nullable values, NSError * _Nullable error) {
             NSLog(@"report attribute: OnOff values: %@, error: %@", values, error);
             XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
@@ -1278,7 +1283,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         minInterval:@2
         maxInterval:@10
         params:myParams
-        clientQueue:queue
+        queue:queue
         reportHandler:^(id _Nullable values, NSError * _Nullable error) {
             NSLog(@"2nd subscriber report attribute: CurrentLevel values: %@, error: %@", values, error);
             XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
@@ -1304,7 +1309,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               commandID:@0
                           commandFields:@{ @"type" : @"Structure", @"value" : @[] }
                      timedInvokeTimeout:nil
-                            clientQueue:queue
+                                  queue:queue
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
@@ -1373,7 +1378,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               commandID:@1
                           commandFields:fields
                      timedInvokeTimeout:nil
-                            clientQueue:queue
+                                  queue:queue
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
@@ -1397,17 +1402,17 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ reportExpectation, secondReportExpectation ] timeout:kTimeoutInSeconds];
 
     clearExpectation = [self expectationWithDescription:@"report handlers deregistered"];
-    [device deregisterReportHandlersWithClientQueue:queue
-                                         completion:^{
-                                             [clearExpectation fulfill];
-                                         }];
+    [device deregisterReportHandlersWithQueue:queue
+                                   completion:^{
+                                       [clearExpectation fulfill];
+                                   }];
     [self waitForExpectations:@[ clearExpectation ] timeout:kTimeoutInSeconds];
 
     clearExpectation = [self expectationWithDescription:@"report handlers deregistered"];
-    [device deregisterReportHandlersWithClientQueue:queue
-                                         completion:^{
-                                             [clearExpectation fulfill];
-                                         }];
+    [device deregisterReportHandlersWithQueue:queue
+                                   completion:^{
+                                       [clearExpectation fulfill];
+                                   }];
     [self waitForExpectations:@[ clearExpectation ] timeout:kTimeoutInSeconds];
 }
 
@@ -1421,10 +1426,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     XCTestExpectation * clearExpectation = [self expectationWithDescription:@"report handlers deregistered"];
-    [device deregisterReportHandlersWithClientQueue:queue
-                                         completion:^{
-                                             [clearExpectation fulfill];
-                                         }];
+    [device deregisterReportHandlersWithQueue:queue
+                                   completion:^{
+                                       [clearExpectation fulfill];
+                                   }];
     [self waitForExpectations:@[ clearExpectation ] timeout:kTimeoutInSeconds];
 
     __block void (^firstReportHandler)(id _Nullable values, NSError * _Nullable error) = nil;
@@ -1438,7 +1443,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         minInterval:@2
         maxInterval:@10
         params:nil
-        clientQueue:queue
+        queue:queue
         reportHandler:^(id _Nullable values, NSError * _Nullable error) {
             NSLog(@"report attribute: OnOff values: %@, error: %@", values, error);
             XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
@@ -1466,7 +1471,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         minInterval:@2
         maxInterval:@10
         params:myParams
-        clientQueue:queue
+        queue:queue
         reportHandler:^(id _Nullable values, NSError * _Nullable error) {
             NSLog(@"2nd subscriber report attribute: CurrentLevel values: %@, error: %@", values, error);
             XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
@@ -1492,7 +1497,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               commandID:@0
                           commandFields:@{ @"type" : @"Structure", @"value" : @[] }
                      timedInvokeTimeout:nil
-                            clientQueue:queue
+                                  queue:queue
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
@@ -1559,7 +1564,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               commandID:@1
                           commandFields:fields
                      timedInvokeTimeout:nil
-                            clientQueue:queue
+                                  queue:queue
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
@@ -1583,10 +1588,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ reportExpectation, secondReportExpectation ] timeout:kTimeoutInSeconds];
 
     clearExpectation = [self expectationWithDescription:@"report handlers deregistered"];
-    [device deregisterReportHandlersWithClientQueue:queue
-                                         completion:^{
-                                             [clearExpectation fulfill];
-                                         }];
+    [device deregisterReportHandlersWithQueue:queue
+                                   completion:^{
+                                       [clearExpectation fulfill];
+                                   }];
     [self waitForExpectations:@[ clearExpectation ] timeout:kTimeoutInSeconds];
 }
 
@@ -1608,7 +1613,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                              attributeID:@17
                                    value:writeValue
                        timedWriteTimeout:nil
-                             clientQueue:queue
+                                   queue:queue
                               completion:^(id _Nullable values, NSError * _Nullable error) {
                                   NSLog(@"write attribute: Brightness values: %@, error: %@", values, error);
 
@@ -1640,7 +1645,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                              attributeID:@17
                                    value:writeValue
                        timedWriteTimeout:@1000
-                             clientQueue:queue
+                                   queue:queue
                               completion:^(id _Nullable values, NSError * _Nullable error) {
                                   NSLog(@"Timed-write attribute: Brightness values: %@, error: %@", values, error);
 
@@ -1673,7 +1678,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             minInterval:@2
             maxInterval:@10
             params:nil
-            clientQueue:queue
+            queue:queue
            reportHandler:^(id _Nullable value, NSError * _Nullable error) {
                NSLog(@"report attribute: Brightness values: %@, error: %@", value, error);
 
@@ -1714,7 +1719,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               clusterID:@8
                             attributeID:@17
                                  params:nil
-                            clientQueue:queue
+                                  queue:queue
                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"read attribute: LevelControl Brightness values: %@, error: %@", values, error);
                                  XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
@@ -1754,7 +1759,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               commandID:@4
                           commandFields:fields
                      timedInvokeTimeout:@1000
-                            clientQueue:queue
+                                  queue:queue
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"invoke command: MoveToLevelWithOnOff values: %@, error: %@", values, error);
 
@@ -1823,7 +1828,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               commandID:@0
                           commandFields:fields
                      timedInvokeTimeout:nil
-                            clientQueue:queue
+                                  queue:queue
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"invoked command: On values: %@, error: %@", values, error);
 
@@ -1854,7 +1859,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               commandID:@1
                           commandFields:fields
                      timedInvokeTimeout:nil
-                            clientQueue:queue
+                                  queue:queue
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"invoked command: On values: %@, error: %@", values, error);
 
@@ -1884,7 +1889,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         readAttributeWithEndpointID:@1
                           clusterID:@6
                         attributeID:@0
-                        clientQueue:queue
+                              queue:queue
                          completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                              NSLog(@"Cached attribute read: %@, error: %@", values, error);
                              XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
