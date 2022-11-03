@@ -16,20 +16,14 @@
  *
  */
 
-package com.matter.controller;
+package com.matter.controller.commands.discover;
 
 import com.matter.controller.commands.common.CredentialsIssuer;
 import com.matter.controller.commands.common.MatterCommand;
-import java.util.concurrent.atomic.AtomicLong;
 
-public final class On extends MatterCommand {
-  private final AtomicLong mNodeId = new AtomicLong();
-  private final AtomicLong mFabricId = new AtomicLong();
-
-  public On(CredentialsIssuer credIssuerCmds) {
-    super("on", credIssuerCmds);
-    addArgument("nodeid", 0, Long.MAX_VALUE, mNodeId, null);
-    addArgument("fabricid", 0, Long.MAX_VALUE, mFabricId, null);
+public final class DiscoverCommissionablesCommand extends MatterCommand {
+  public DiscoverCommissionablesCommand(CredentialsIssuer credsIssuer) {
+    super("commissionables", credsIssuer);
   }
 
   @Override
