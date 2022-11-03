@@ -175,18 +175,6 @@
 /* Configuration option variables defined below */
 
 /**
- *  @def CHIP_SYSTEM_CONFIG_NO_LOCKING
- *
- *  @brief
- *      Disable the use of locking within the system layer.
- *
- *      Unless you are simulating an LwIP-based system on a Unix-style host, this value should be left at its default.
- */
-#ifndef CHIP_SYSTEM_CONFIG_NO_LOCKING
-#define CHIP_SYSTEM_CONFIG_NO_LOCKING 0
-#endif /* CHIP_SYSTEM_CONFIG_NO_LOCKING */
-
-/**
  *  @def CHIP_SYSTEM_CONFIG_POSIX_LOCKING
  *
  *  @brief
