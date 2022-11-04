@@ -1173,9 +1173,9 @@ class BaseTestHelper:
         try:
             cluster = self.devCtrl.GetClusterHandler()
             clusterInfo = cluster.GetClusterInfoById(0xFFF1FC05)  # TestCluster
-            if clusterInfo["clusterName"] != "TestCluster":
+            if clusterInfo["clusterName"] != "Test":
                 raise Exception(
-                    f"Wrong cluster info clusterName: {clusterInfo['clusterName']} expected TestCluster")
+                    f"Wrong cluster info clusterName: {clusterInfo['clusterName']} expected 'Test'")
         except Exception as ex:
             self.logger.exception(f"Failed to finish API test: {ex}")
             return False
