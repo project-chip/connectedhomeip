@@ -446,7 +446,7 @@ private:
 
             //  Remove ACL extension entry for the given fabricIndex.
             auto & storage = mServer->GetPersistentStorage();
-            aclErr         = storage.SyncDeleteKeyValue(DefaultStorageKeyAllocator::AccessControlExtensionEntry(fabricIndex));
+            aclErr = storage.SyncDeleteKeyValue(DefaultStorageKeyAllocator::AccessControlExtensionEntry(fabricIndex).KeyName());
 
             if (aclErr != CHIP_NO_ERROR && aclErr != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
             {

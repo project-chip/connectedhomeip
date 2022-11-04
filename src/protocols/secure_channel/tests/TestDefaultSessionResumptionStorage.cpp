@@ -256,14 +256,15 @@ void TestInPlaceSave(nlTestSuite * inSuite, void * inContext)
     for (const auto & node : nodes)
     {
         uint16_t size = 0;
-        auto rv       = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(node), nullptr, size);
+        auto rv       = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(node).KeyName(), nullptr, size);
         NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     }
     // Verify no link table persistent storage entries were leaked.
     for (auto & vector : vectors)
     {
         uint16_t size = 0;
-        auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(vector.resumptionId), nullptr, size);
+        auto rv       = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(vector.resumptionId).KeyName(),
+                                          nullptr, size);
         NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     }
 }
@@ -320,12 +321,13 @@ void TestDelete(nlTestSuite * inSuite, void * inContext)
     {
         uint16_t size = 0;
         {
-            auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(vector.node), nullptr, size);
+            auto rv =
+                storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(vector.node).KeyName(), nullptr, size);
             NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         }
         {
-            auto rv =
-                storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(vector.resumptionId), nullptr, size);
+            auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(vector.resumptionId).KeyName(),
+                                              nullptr, size);
             NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         }
     }
@@ -404,12 +406,13 @@ void TestDeleteAll(nlTestSuite * inSuite, void * inContext)
         {
             uint16_t size = 0;
             {
-                auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(node.node), nullptr, size);
+                auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(node.node).KeyName(), nullptr,
+                                                  size);
                 NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
             }
             {
-                auto rv =
-                    storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(node.resumptionId), nullptr, size);
+                auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(node.resumptionId).KeyName(),
+                                                  nullptr, size);
                 NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
             }
         }

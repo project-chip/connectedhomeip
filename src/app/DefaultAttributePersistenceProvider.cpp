@@ -35,8 +35,8 @@ CHIP_ERROR DefaultAttributePersistenceProvider::WriteValue(const ConcreteAttribu
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
     return mStorage->SyncSetKeyValue(
-        DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId), aValue.data(),
-        static_cast<uint16_t>(aValue.size()));
+        DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId).KeyName(),
+        aValue.data(), static_cast<uint16_t>(aValue.size()));
 }
 
 CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath,
@@ -46,7 +46,8 @@ CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttribut
 
     uint16_t size = static_cast<uint16_t>(min(aValue.size(), static_cast<size_t>(UINT16_MAX)));
     ReturnErrorOnFailure(mStorage->SyncGetKeyValue(
-        DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId), aValue.data(), size));
+        DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId).KeyName(),
+        aValue.data(), size));
     EmberAfAttributeType type = aMetadata->attributeType;
     if (emberAfIsStringAttributeType(type))
     {
