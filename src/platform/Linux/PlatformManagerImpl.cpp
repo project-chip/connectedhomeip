@@ -33,7 +33,8 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
-#include <mutex>
+#include <condition_variable>
+#include <thread>
 
 #include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Events.h>
@@ -56,12 +57,47 @@ PlatformManagerImpl PlatformManagerImpl::sInstance;
 namespace {
 
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+
+class CallbackIndirection
+{
+public:
+    CallbackIndirection(GSourceFunc callback, void * userData) : mCallback(callback), mUserData(userData) {}
+
+    void Wait()
+    {
+        g_mutex_lock(&mDoneMtx);
+        while (!mDone)
+            g_cond_wait(&mDoneCond, &mDoneMtx);
+        g_mutex_unlock(&mDoneMtx);
+    }
+
+    static gboolean Callback(CallbackIndirection * self)
+    {
+        auto result = self->mCallback(self->mUserData);
+
+        g_mutex_lock(&self->mDoneMtx);
+        self->mDone = true;
+        g_mutex_unlock(&self->mDoneMtx);
+
+        g_cond_signal(&self->mDoneCond);
+        return result;
+    }
+
+private:
+    GMutex mDoneMtx{};
+    GCond mDoneCond{};
+    bool mDone = false;
+    GSourceFunc mCallback;
+    void * mUserData;
+};
+
 void * GLibMainLoopThread(void * loop)
 {
     g_main_loop_run(static_cast<GMainLoop *>(loop));
     return nullptr;
 }
-#endif
+
+#endif // CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
@@ -193,12 +229,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     mGLibMainLoop       = g_main_loop_new(nullptr, FALSE);
     mGLibMainLoopThread = g_thread_new("gmain-matter", GLibMainLoopThread, mGLibMainLoop);
 
-    {
-        std::unique_lock<std::mutex> lock(mGLibMainLoopCallbackIndirectionMutex);
-        CallbackIndirection startedInd([](void *) { return G_SOURCE_REMOVE; }, nullptr);
-        g_idle_add(G_SOURCE_FUNC(&CallbackIndirection::Callback), &startedInd);
-        startedInd.Wait(lock);
-    }
+    CallbackIndirection startedInd([](void *) { return G_SOURCE_REMOVE; }, nullptr);
+    g_idle_add(G_SOURCE_FUNC(&CallbackIndirection::Callback), &startedInd);
+    startedInd.Wait();
 
 #endif
 
@@ -253,34 +286,7 @@ void PlatformManagerImpl::_Shutdown()
 #endif
 }
 
-#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
-
-void PlatformManagerImpl::CallbackIndirection::Wait(std::unique_lock<std::mutex> & lock)
-{
-    mDoneCond.wait(lock, [this]() { return mDone; });
-}
-
-gboolean PlatformManagerImpl::CallbackIndirection::Callback(CallbackIndirection * self)
-{
-    // We can not access "self" before acquiring the lock, because TSAN will complain that
-    // there is a race condition between the thread that created the object and the thread
-    // that is executing the callback.
-    std::unique_lock<std::mutex> lock(PlatformMgrImpl().mGLibMainLoopCallbackIndirectionMutex);
-
-    auto callback = self->mCallback;
-    auto userData = self->mUserData;
-
-    lock.unlock();
-    auto result = callback(userData);
-    lock.lock();
-
-    self->mDone = true;
-    self->mDoneCond.notify_all();
-
-    return result;
-}
-
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 CHIP_ERROR PlatformManagerImpl::RunOnGLibMainLoopThread(GSourceFunc callback, void * userData, bool wait)
 {
 
@@ -290,19 +296,16 @@ CHIP_ERROR PlatformManagerImpl::RunOnGLibMainLoopThread(GSourceFunc callback, vo
 
     if (wait)
     {
-        std::unique_lock<std::mutex> lock(mGLibMainLoopCallbackIndirectionMutex);
         CallbackIndirection indirection(callback, userData);
         g_main_context_invoke(context, G_SOURCE_FUNC(&CallbackIndirection::Callback), &indirection);
-        indirection.Wait(lock);
+        indirection.Wait();
         return CHIP_NO_ERROR;
     }
 
     g_main_context_invoke(context, callback, userData);
     return CHIP_NO_ERROR;
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
-#endif // CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip
