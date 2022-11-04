@@ -103,16 +103,17 @@
 #define CHIP_PRINTCLUSTER_BASIC_CLUSTER
 #endif
 
-#if defined(ZCL_USING_OTA_PROVIDER_CLUSTER_SERVER) || defined(ZCL_USING_OTA_PROVIDER_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_OTA_PROVIDER_CLUSTER { ZCL_OTA_PROVIDER_CLUSTER_ID, "OTA Software Update Provider" },
+#if defined(ZCL_USING_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER) || defined(ZCL_USING_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER                                                                     \
+    { ZCL_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_ID, "OTA Software Update Provider" },
 #else
-#define CHIP_PRINTCLUSTER_OTA_PROVIDER_CLUSTER
+#define CHIP_PRINTCLUSTER_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER
 #endif
 
-#if defined(ZCL_USING_OTA_REQUESTOR_CLUSTER_SERVER) || defined(ZCL_USING_OTA_REQUESTOR_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER { ZCL_OTA_REQUESTOR_CLUSTER_ID, "OTA Software Update Requestor" },
+#if defined(ZCL_USING_OTA_SOFTWARE_UPDATE_REQUESTOR_SERVER) || defined(ZCL_USING_OTA_SOFTWARE_UPDATE_REQUESTOR_CLIENT)
+#define CHIP_PRINTCLUSTER_OTA_SOFTWARE_UPDATE_REQUESTOR { ZCL_OTA_SOFTWARE_UPDATE_REQUESTOR_ID, "OTA Software Update Requestor" },
 #else
-#define CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER
+#define CHIP_PRINTCLUSTER_OTA_SOFTWARE_UPDATE_REQUESTOR
 #endif
 
 #if defined(ZCL_USING_LOCALIZATION_CONFIGURATION_CLUSTER_SERVER) || defined(ZCL_USING_LOCALIZATION_CONFIGURATION_CLUSTER_CLIENT)
@@ -476,8 +477,8 @@
     CHIP_PRINTCLUSTER_ACCESS_CONTROL_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_ACTIONS_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_BASIC_CLUSTER                                                                                                \
-    CHIP_PRINTCLUSTER_OTA_PROVIDER_CLUSTER                                                                                         \
-    CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER                                                                                        \
+    CHIP_PRINTCLUSTER_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER                                                                         \
+    CHIP_PRINTCLUSTER_OTA_SOFTWARE_UPDATE_REQUESTOR                                                                                \
     CHIP_PRINTCLUSTER_LOCALIZATION_CONFIGURATION_CLUSTER                                                                           \
     CHIP_PRINTCLUSTER_TIME_FORMAT_LOCALIZATION_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_UNIT_LOCALIZATION_CLUSTER                                                                                    \
