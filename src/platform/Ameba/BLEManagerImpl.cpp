@@ -567,8 +567,8 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(IsSubscribed(conId), err = CHIP_ERROR_INVALID_ARGUMENT);
-    server_send_data(conId, bt_matter_adapter_service_id, BT_MATTER_ADAPTER_SERVICE_CHAR_NOTIFY_CCCD_INDEX - 1, data->Start(),
-                     data->DataLength(), GATT_PDU_TYPE_NOTIFICATION);
+    server_send_data(conId, bt_matter_adapter_service_id, BT_MATTER_ADAPTER_SERVICE_CHAR_INDICATE_CCCD_INDEX - 1, data->Start(),
+                     data->DataLength(), GATT_PDU_TYPE_INDICATION);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -922,7 +922,7 @@ CHIP_ERROR BLEManagerImpl::gatt_svr_chr_access(void * param, T_SERVER_ID service
             switch (pp_data->msg_data.notification_indification_index)
             {
             case SIMP_NOTIFY_INDICATE_V3_ENABLE: {
-                sInstance.HandleTXCharCCCDWrite(conn_id, 0, 1);
+                sInstance.HandleTXCharCCCDWrite(conn_id, 1, 0);
             }
             break;
 

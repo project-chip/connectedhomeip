@@ -1,1 +1,1 @@
-0.5.99 Version bump reason: fix IMX SDK root in vscode dockerfile
+0.6.03 Version bump reason: [Ameba] Replace C2 notify with indicate as required by Matter spec
