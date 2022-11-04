@@ -155,7 +155,7 @@ static constexpr chip::ClusterId ZCL_WINDOW_COVERING_CLUSTER_ID = 0x0102;
 static constexpr chip::ClusterId ZCL_BARRIER_CONTROL_CLUSTER_ID = 0x0103;
 
 // Definitions for cluster: Pump Configuration and Control
-static constexpr chip::ClusterId ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID = 0x0200;
+static constexpr chip::ClusterId ZCL_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_ID = 0x0200;
 
 // Definitions for cluster: Thermostat
 static constexpr chip::ClusterId ZCL_THERMOSTAT_CLUSTER_ID = 0x0201;
@@ -164,7 +164,7 @@ static constexpr chip::ClusterId ZCL_THERMOSTAT_CLUSTER_ID = 0x0201;
 static constexpr chip::ClusterId ZCL_FAN_CONTROL_CLUSTER_ID = 0x0202;
 
 // Definitions for cluster: Thermostat User Interface Configuration
-static constexpr chip::ClusterId ZCL_THERMOSTAT_UI_CONFIG_CLUSTER_ID = 0x0204;
+static constexpr chip::ClusterId ZCL_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_ID = 0x0204;
 
 // Definitions for cluster: Color Control
 static constexpr chip::ClusterId ZCL_COLOR_CONTROL_CLUSTER_ID = 0x0300;
@@ -176,7 +176,7 @@ static constexpr chip::ClusterId ZCL_BALLAST_CONFIGURATION_CLUSTER_ID = 0x0301;
 static constexpr chip::ClusterId ZCL_ILLUMINANCE_MEASUREMENT_CLUSTER_ID = 0x0400;
 
 // Definitions for cluster: Temperature Measurement
-static constexpr chip::ClusterId ZCL_TEMP_MEASUREMENT_CLUSTER_ID = 0x0402;
+static constexpr chip::ClusterId ZCL_TEMPERATURE_MEASUREMENT_CLUSTER_ID = 0x0402;
 
 // Definitions for cluster: Pressure Measurement
 static constexpr chip::ClusterId ZCL_PRESSURE_MEASUREMENT_CLUSTER_ID = 0x0403;

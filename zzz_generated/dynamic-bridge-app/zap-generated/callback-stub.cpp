@@ -86,7 +86,7 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_SWITCH_CLUSTER_ID:
         emberAfSwitchClusterInitCallback(endpoint);
         break;
-    case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
+    case ZCL_TEMPERATURE_MEASUREMENT_CLUSTER_ID:
         emberAfTemperatureMeasurementClusterInitCallback(endpoint);
         break;
     case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:

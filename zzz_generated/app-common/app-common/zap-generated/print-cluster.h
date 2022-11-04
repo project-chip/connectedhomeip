@@ -294,10 +294,12 @@
 #define CHIP_PRINTCLUSTER_BARRIER_CONTROL_CLUSTER
 #endif
 
-#if defined(ZCL_USING_PUMP_CONFIG_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_PUMP_CONFIG_CONTROL_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_PUMP_CONFIG_CONTROL_CLUSTER { ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID, "Pump Configuration and Control" },
+#if defined(ZCL_USING_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER) ||                                                            \
+    defined(ZCL_USING_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER                                                                   \
+    { ZCL_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_ID, "Pump Configuration and Control" },
 #else
-#define CHIP_PRINTCLUSTER_PUMP_CONFIG_CONTROL_CLUSTER
+#define CHIP_PRINTCLUSTER_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER
 #endif
 
 #if defined(ZCL_USING_THERMOSTAT_CLUSTER_SERVER) || defined(ZCL_USING_THERMOSTAT_CLUSTER_CLIENT)
@@ -312,11 +314,12 @@
 #define CHIP_PRINTCLUSTER_FAN_CONTROL_CLUSTER
 #endif
 
-#if defined(ZCL_USING_THERMOSTAT_UI_CONFIG_CLUSTER_SERVER) || defined(ZCL_USING_THERMOSTAT_UI_CONFIG_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_THERMOSTAT_UI_CONFIG_CLUSTER                                                                             \
-    { ZCL_THERMOSTAT_UI_CONFIG_CLUSTER_ID, "Thermostat User Interface Configuration" },
+#if defined(ZCL_USING_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_SERVER) ||                                                   \
+    defined(ZCL_USING_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER                                                          \
+    { ZCL_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_ID, "Thermostat User Interface Configuration" },
 #else
-#define CHIP_PRINTCLUSTER_THERMOSTAT_UI_CONFIG_CLUSTER
+#define CHIP_PRINTCLUSTER_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER
 #endif
 
 #if defined(ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_COLOR_CONTROL_CLUSTER_CLIENT)
@@ -337,10 +340,10 @@
 #define CHIP_PRINTCLUSTER_ILLUMINANCE_MEASUREMENT_CLUSTER
 #endif
 
-#if defined(ZCL_USING_TEMP_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_TEMP_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_TEMP_MEASUREMENT_CLUSTER { ZCL_TEMP_MEASUREMENT_CLUSTER_ID, "Temperature Measurement" },
+#if defined(ZCL_USING_TEMPERATURE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_TEMPERATURE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TEMPERATURE_MEASUREMENT_CLUSTER { ZCL_TEMPERATURE_MEASUREMENT_CLUSTER_ID, "Temperature Measurement" },
 #else
-#define CHIP_PRINTCLUSTER_TEMP_MEASUREMENT_CLUSTER
+#define CHIP_PRINTCLUSTER_TEMPERATURE_MEASUREMENT_CLUSTER
 #endif
 
 #if defined(ZCL_USING_PRESSURE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_PRESSURE_MEASUREMENT_CLUSTER_CLIENT)
@@ -504,14 +507,14 @@
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BARRIER_CONTROL_CLUSTER                                                                                      \
-    CHIP_PRINTCLUSTER_PUMP_CONFIG_CONTROL_CLUSTER                                                                                  \
+    CHIP_PRINTCLUSTER_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER                                                                       \
     CHIP_PRINTCLUSTER_THERMOSTAT_CLUSTER                                                                                           \
     CHIP_PRINTCLUSTER_FAN_CONTROL_CLUSTER                                                                                          \
-    CHIP_PRINTCLUSTER_THERMOSTAT_UI_CONFIG_CLUSTER                                                                                 \
+    CHIP_PRINTCLUSTER_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER                                                              \
     CHIP_PRINTCLUSTER_COLOR_CONTROL_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_BALLAST_CONFIGURATION_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_ILLUMINANCE_MEASUREMENT_CLUSTER                                                                              \
-    CHIP_PRINTCLUSTER_TEMP_MEASUREMENT_CLUSTER                                                                                     \
+    CHIP_PRINTCLUSTER_TEMPERATURE_MEASUREMENT_CLUSTER                                                                              \
     CHIP_PRINTCLUSTER_PRESSURE_MEASUREMENT_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_FLOW_MEASUREMENT_CLUSTER                                                                                     \
     CHIP_PRINTCLUSTER_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER                                                                        \

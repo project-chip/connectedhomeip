@@ -51,7 +51,7 @@ using namespace ::chip;
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRWriteParams alloc] init];
     other.timedWriteTimeout = self.timedWriteTimeout;
@@ -70,7 +70,7 @@ using namespace ::chip;
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRReadParams alloc] init];
     other.fabricFiltered = self.fabricFiltered;
@@ -89,7 +89,7 @@ using namespace ::chip;
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRSubscribeParams alloc] init];
     other.fabricFiltered = self.fabricFiltered;

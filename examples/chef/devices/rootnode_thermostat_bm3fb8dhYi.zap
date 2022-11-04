@@ -7334,7 +7334,7 @@
           "name": "Thermostat User Interface Configuration",
           "code": 516,
           "mfgCode": null,
-          "define": "THERMOSTAT_UI_CONFIG_CLUSTER",
+          "define": "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER",
           "side": "client",
           "enabled": 0
         },
@@ -7342,7 +7342,7 @@
           "name": "Thermostat User Interface Configuration",
           "code": 516,
           "mfgCode": null,
-          "define": "THERMOSTAT_UI_CONFIG_CLUSTER",
+          "define": "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER",
           "side": "server",
           "enabled": 1,
           "attributes": [
@@ -7480,7 +7480,7 @@
           "name": "Temperature Measurement",
           "code": 1026,
           "mfgCode": null,
-          "define": "TEMP_MEASUREMENT_CLUSTER",
+          "define": "TEMPERATURE_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -7522,7 +7522,7 @@
           "name": "Temperature Measurement",
           "code": 1026,
           "mfgCode": null,
-          "define": "TEMP_MEASUREMENT_CLUSTER",
+          "define": "TEMPERATURE_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0
         },

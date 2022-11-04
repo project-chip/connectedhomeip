@@ -22,26 +22,34 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MTRDeviceAttestationDelegate;
 
 /**
- * The class definition for the CHIPCommissioningParameters
- *
+ * Information that can be provided to commissionWithNodeID to commision devices.
  */
 @interface MTRCommissioningParameters : NSObject
 
 /**
- *  The CSRNonce
+ * The nonce to use when requesting a CSR for the node's operational
+ * certificate.
+ *
+ * If nil, a random nonce will be generated automatically.
+ *
+ * If not nil, must be 32 bytes of data.
  */
-@property (nonatomic, copy, nullable) NSData * CSRNonce;
+@property (nonatomic, copy, nullable) NSData * csrNonce MTR_NEWLY_AVAILABLE;
 /**
- *  The AttestationNonce
+ * The nonce to use when requesting attestation information from the device.
+ *
+ * If nil, a random nonce will be generated automatically.
+ *
+ * If not nil, must be 32 bytes of data.
  */
 @property (nonatomic, copy, nullable) NSData * attestationNonce;
 /**
- *  The Wi-Fi SSID, if available.
+ * The Wi-Fi SSID, if available.
  */
 @property (nonatomic, copy, nullable) NSData * wifiSSID;
 /**
- *  The Wi-Fi Credentials.  Allowed to be nil or 0-length data for an open
- *  network, as long as wifiSSID is not nil.
+ * The Wi-Fi Credentials.  Allowed to be nil or 0-length data for an open
+ * network, as long as wifiSSID is not nil.
  */
 @property (nonatomic, copy, nullable) NSData * wifiCredentials;
 /**
@@ -49,13 +57,27 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable) NSData * threadOperationalDataset;
 /**
- *  The Device Attestation status delegate
+ * An optional delegate that can be notified upon completion of device
+ * attestation.  See documentation for MTRDeviceAttestationDelegate for
+ * details.
  */
 @property (nonatomic, strong, nullable) id<MTRDeviceAttestationDelegate> deviceAttestationDelegate;
 /**
- *  The timeout in secs to set for fail-safe when attestation fails
+ * The timeout, in seconds, to set for the fail-safe when calling into the
+ * deviceAttestationDelegate and waiting for it to respond.
+ *
+ * If nil, the fail-safe will not be extended before calling into the
+ * deviceAttestationDelegate.
+
  */
-@property (nonatomic, copy, nullable) NSNumber * failSafeExpiryTimeoutSecs;
+@property (nonatomic, copy, nullable) NSNumber * failSafeExpiryTimeout MTR_NEWLY_AVAILABLE;
+
+@end
+
+@interface MTRCommissioningParameters (Deprecated)
+
+@property (nonatomic, copy, nullable) NSData * CSRNonce MTR_NEWLY_DEPRECATED("Please use csrNonce");
+@property (nonatomic, copy, nullable) NSNumber * failSafeExpiryTimeoutSecs MTR_NEWLY_DEPRECATED("Plase use failSafeExpiryTimeout");
 
 @end
 
