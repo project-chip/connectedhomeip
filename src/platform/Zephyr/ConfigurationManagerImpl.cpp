@@ -32,6 +32,11 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
+#include <zephyr/fs/nvs.h>
+#include <zephyr/settings/settings.h>
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -168,14 +173,30 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
     ChipLogProgress(DeviceLayer, "Performing factory reset");
+
+#ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
+    void * storage = nullptr;
+    int status     = settings_storage_get(&storage);
+
+    if (status == 0)
+    {
+        status = nvs_clear(static_cast<nvs_fs *>(storage));
+    }
+
+    if (status)
+    {
+        ChipLogError(DeviceLayer, "Factory reset failed: %d", status);
+    }
+#else
     const CHIP_ERROR err = PersistedStorage::KeyValueStoreMgrImpl().DoFactoryReset();
 
     if (err != CHIP_NO_ERROR)
+    {
         ChipLogError(DeviceLayer, "Factory reset failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    ThreadStackMgr().ErasePersistentInfo();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    ConnectivityMgr().ErasePersistentInfo();
+#endif
 
     PlatformMgr().Shutdown();
 }
