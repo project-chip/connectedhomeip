@@ -209,10 +209,10 @@ CHIP_ERROR RunWiFiIPChangeListener()
     }
 
     GIOChannel * ch = g_io_channel_unix_new(sock);
-    g_io_add_watch_full(ch, G_PRIORITY_DEFAULT, G_IO_IN, WiFiIPChangeListener, nullptr, nullptr);
-
     g_io_channel_set_close_on_unref(ch, TRUE);
     g_io_channel_set_encoding(ch, nullptr, nullptr);
+
+    g_io_add_watch_full(ch, G_PRIORITY_DEFAULT, G_IO_IN, WiFiIPChangeListener, nullptr, nullptr);
     g_io_channel_unref(ch);
 
     return CHIP_NO_ERROR;
