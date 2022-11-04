@@ -173,7 +173,7 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_PRESSURE_MEASUREMENT_CLUSTER_ID:
         emberAfPressureMeasurementClusterInitCallback(endpoint);
         break;
-    case ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID:
+    case ZCL_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_ID:
         emberAfPumpConfigurationAndControlClusterInitCallback(endpoint);
         break;
     case ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID:
@@ -191,7 +191,7 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_TARGET_NAVIGATOR_CLUSTER_ID:
         emberAfTargetNavigatorClusterInitCallback(endpoint);
         break;
-    case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
+    case ZCL_TEMPERATURE_MEASUREMENT_CLUSTER_ID:
         emberAfTemperatureMeasurementClusterInitCallback(endpoint);
         break;
     case ZCL_TEST_CLUSTER_ID:
