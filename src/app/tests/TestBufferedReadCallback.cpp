@@ -319,8 +319,8 @@ void DataSeriesGenerator::Generate()
             ChipLogProgress(DataManagement, "\t -- Generating A");
 
             Clusters::Test::Attributes::Int8u::TypeInfo::Type value = index;
-            path.mAttributeId                                              = Clusters::Test::Attributes::Int8u::Id;
-            path.mListOp                                                   = ConcreteDataAttributePath::ListOperation::NotList;
+            path.mAttributeId                                       = Clusters::Test::Attributes::Int8u::Id;
+            path.mListOp                                            = ConcreteDataAttributePath::ListOperation::NotList;
             NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
             break;
         }
@@ -329,8 +329,8 @@ void DataSeriesGenerator::Generate()
             ChipLogProgress(DataManagement, "\t -- Generating B");
 
             Clusters::Test::Attributes::Int32u::TypeInfo::Type value = index;
-            path.mAttributeId                                               = Clusters::Test::Attributes::Int32u::Id;
-            path.mListOp                                                    = ConcreteDataAttributePath::ListOperation::NotList;
+            path.mAttributeId                                        = Clusters::Test::Attributes::Int32u::Id;
+            path.mListOp                                             = ConcreteDataAttributePath::ListOperation::NotList;
             NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
             break;
         }
