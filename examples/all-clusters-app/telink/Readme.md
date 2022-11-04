@@ -1,9 +1,8 @@
-# Matter Telink Lighting Example Application
+# Matter Telink All Clusters Example Application
 
-The Telink Lighting Example demonstrates how to remotely control a white
-dimmable light bulb. It uses buttons to test changing the lighting and device
-states and LEDs to show the state of these changes. You can use this example as
-a reference for creating your own application.
+The Telink All Clusters Example Application implements various ZCL clusters
+populated on three endpoints. You can use this example as a reference for
+creating your own application.
 
 ![Telink B91 EVK](http://wiki.telink-semi.cn/wiki/assets/Hardware/B91_Generic_Starter_Kit_Hardware_Guide/connection_chart.png)
 
@@ -61,7 +60,7 @@ The following buttons are available on **tlsr9518adk80d** board:
 | Name     | Function               | Description                                                                                            |
 | :------- | :--------------------- | :----------------------------------------------------------------------------------------------------- |
 | Button 1 | Factory reset          | Perform factory reset to forget currently commissioned Thread network and back to uncommissioned state |
-| Button 2 | Lighting control       | Manually triggers the lighting state                                                                   |
+| Button 2 | Not used               | Not used                                                                                               |
 | Button 3 | Thread start           | Commission thread with static credentials and enables the Thread on device                             |
 | Button 4 | Open commission window | The button is opening commissioning window to perform commissioning over BLE                           |
 
@@ -75,8 +74,6 @@ following states:
 | Blinks with short pulses    | Device is not commissioned to Thread, Thread is disabled                     |
 | Blinls with frequent pulses | Device is commissioned, Thread enabled. Device trying to JOIN thread network |
 | Blinks with whde pulses     | Device commissioned and joined to thread network as CHILD                    |
-
-**Blue** LED shows current state of lightbulb
 
 ### CHIP tool commands
 
@@ -94,69 +91,6 @@ following states:
     ```
     ./chip-tool pairing ble-thread 1234 hex:0e080000000000010000000300000f35060004001fffe0020811111111222222220708fd61f77bd3df233e051000112233445566778899aabbccddeeff030e4f70656e54687265616444656d6f010212340410445f2b5ca6f2a93a55ce570a70efeecb0c0402a0fff8 20202021 3840
     ```
-
-3. Switch on the light:
-
-    ```
-    ${CHIP_TOOL_DIR}/chip-tool onoff on 1
-    ```
-
-    here:
-
-    - **onoff** is name of cluster
-    - **on** command to the cluster
-    - **1** ID of endpoint
-
-4. Switch off the light:
-
-    ```
-    ${CHIP_TOOL_DIR}/chip-tool onoff off 1
-    ```
-
-    here:
-
-    - **onoff** is name of cluster
-    - **off** command to the cluster
-    - **1** ID of endpoint
-
-5. Read the light state:
-
-    ```
-    ${CHIP_TOOL_DIR}/chip-tool onoff read on-off 1
-    ```
-
-    here:
-
-    - **onoff** is name of cluster
-    - **read** command to the cluster
-    - **on-off** attribute to read
-    - **1** ID of endpoint
-
-6. Change brightness of light:
-
-    ```
-    ${CHIP_TOOL_DIR}/chip-tool levelcontrol move-to-level 32 0 0 0 1
-    ```
-
-    here:
-
-    - **levelcontrol** is name of cluster
-    - **move-to-level** command to the cluster
-    - **32** brightness value
-    - **0** transition time
-    - **0** option mask
-    - **0** option override
-    - **1** ID of endpoint
-
-7. Read brightness level:
-    ```
-    ./chip-tool levelcontrol read current-level 1
-    ```
-    here:
-    - **levelcontrol** is name of cluster
-    - **read** command to the cluster
-    - **current-level** attribute to read
-    - **1** ID of endpoint
 
 ### OTA with Linux OTA Provider
 

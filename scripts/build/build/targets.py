@@ -686,6 +686,10 @@ for generator in target_generators:
         ALL.append(target)
 
 # Simple targets added one by one
+ALL.append(Target('telink-tlsr9518adk80d-all-clusters', TelinkBuilder,
+                  board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.ALL_CLUSTERS))
+ALL.append(Target('telink-tlsr9518adk80d-all-clusters-minimal', TelinkBuilder,
+                  board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.ALL_CLUSTERS_MINIMAL))
 ALL.append(Target('telink-tlsr9518adk80d-light', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.LIGHT))
 ALL.append(Target('telink-tlsr9518adk80d-light-switch', TelinkBuilder,

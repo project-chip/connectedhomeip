@@ -22,6 +22,7 @@
 #include "AppEvent.h"
 #include "ButtonManager.h"
 #include "LEDWidget.h"
+#include "binding-handler.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 
@@ -38,21 +39,12 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
-#include <platform/CHIPDeviceLayer.h>
-
-#include <lib/support/ErrorStr.h>
-#include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <setup_payload/SetupPayload.h>
-#include <system/SystemClock.h>
-
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include "OTAUtil.h"
 #endif
 
 #include <zephyr/logging/log.h>
 #include <zephyr/zephyr.h>
-
-#include <algorithm>
 
 LOG_MODULE_DECLARE(app);
 
@@ -110,7 +102,7 @@ Identify sIdentify = {
 
 } // namespace
 
-using namespace chip;
+using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
@@ -139,11 +131,6 @@ CHIP_ERROR AppTask::Init()
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 
-    // We only have network commissioning on endpoint 0.
-    // Set up a valid Network Commissioning cluster on endpoint 0 is done in
-    // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp
-    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
-
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
@@ -154,7 +141,21 @@ CHIP_ERROR AppTask::Init()
     InitBasicOTARequestor();
 #endif
 
+    // We only have network commissioning on endpoint 0.
+    // Set up a valid Network Commissioning cluster on endpoint 0 is done in
+    // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp
+    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
+
     ConfigurationMgr().LogDeviceConfig();
+
+    // Configure Bindings
+    ret = InitBindingHandlers();
+    if (ret != CHIP_NO_ERROR)
+    {
+        LOG_ERR("InitBindingHandlers() failed");
+        return ret;
+    }
+
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
     // Add CHIP event handler and start CHIP thread.
@@ -162,7 +163,7 @@ CHIP_ERROR AppTask::Init()
     // between the main and the CHIP threads.
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
-    ret = ConnectivityMgr().SetBLEDeviceName("TelinkOTAReq");
+    ret = ConnectivityMgr().SetBLEDeviceName("TelinkApp");
     if (ret != CHIP_NO_ERROR)
     {
         LOG_ERR("Fail to set BLE device name");
@@ -320,12 +321,10 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
     }
 }
 
-void AppTask::ActionInitiated(AppTask::Action_t aAction, int32_t aActor) {}
-
-void AppTask::ActionCompleted(AppTask::Action_t aAction, int32_t aActor) {}
-
 void AppTask::PostEvent(AppEvent * aEvent)
 {
+    if (!aEvent)
+        return;
     if (k_msgq_put(&sAppEventQueue, aEvent, K_NO_WAIT) != 0)
     {
         LOG_INF("Failed to post event to app task event queue");
@@ -334,6 +333,8 @@ void AppTask::PostEvent(AppEvent * aEvent)
 
 void AppTask::DispatchEvent(AppEvent * aEvent)
 {
+    if (!aEvent)
+        return;
     if (aEvent->Handler)
     {
         aEvent->Handler(aEvent);
