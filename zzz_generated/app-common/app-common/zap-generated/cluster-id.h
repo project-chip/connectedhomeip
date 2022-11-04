@@ -164,7 +164,7 @@ static constexpr chip::ClusterId ZCL_THERMOSTAT_CLUSTER_ID = 0x0201;
 static constexpr chip::ClusterId ZCL_FAN_CONTROL_CLUSTER_ID = 0x0202;
 
 // Definitions for cluster: Thermostat User Interface Configuration
-static constexpr chip::ClusterId ZCL_THERMOSTAT_UI_CONFIG_CLUSTER_ID = 0x0204;
+static constexpr chip::ClusterId ZCL_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_ID = 0x0204;
 
 // Definitions for cluster: Color Control
 static constexpr chip::ClusterId ZCL_COLOR_CONTROL_CLUSTER_ID = 0x0300;
