@@ -10746,7 +10746,7 @@
           "name": "Pump Configuration and Control",
           "code": 512,
           "mfgCode": null,
-          "define": "PUMP_CONFIG_CONTROL_CLUSTER",
+          "define": "PUMP_CONFIGURATION_AND_CONTROL_CLUSTER",
           "side": "client",
           "enabled": 0,
           "attributes": [
@@ -10772,7 +10772,7 @@
           "name": "Pump Configuration and Control",
           "code": 512,
           "mfgCode": null,
-          "define": "PUMP_CONFIG_CONTROL_CLUSTER",
+          "define": "PUMP_CONFIGURATION_AND_CONTROL_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
