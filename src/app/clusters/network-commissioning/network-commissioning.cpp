@@ -31,6 +31,7 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <trace/trace.h>
+#include <vector>
 
 using namespace chip;
 using namespace chip::app;
@@ -528,7 +529,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
     TLV::TLVWriter * writer;
     TLV::TLVType listContainerType;
     ThreadScanResponse scanResponse;
-    size_t networksEncoded = 0;
+    std::vector<ThreadScanResponse> scanResponses;
     uint8_t extendedAddressBuffer[Thread::kSizeExtendedPanId];
 
     SuccessOrExit(err = commandHandle->PrepareCommand(
@@ -546,18 +547,51 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
         err = writer->StartContainer(TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kThreadScanResults)),
                                      TLV::TLVType::kTLVType_Array, listContainerType));
 
-    for (; networks != nullptr && networks->Next(scanResponse) && networksEncoded < kMaxNetworksInScanResponse; networksEncoded++)
+    for (; networks != nullptr && networks->Next(scanResponse);)
+    {
+        bool isDuplicated = false;
+
+        for (size_t i = 0; i < scanResponses.size(); i++)
+        {
+            if ((scanResponses[i].panId == scanResponse.panId) && (scanResponses[i].extendedPanId == scanResponse.extendedPanId))
+            {
+                isDuplicated = true;
+                if (scanResponses[i].rssi < scanResponse.rssi)
+                {
+                    scanResponses[i].rssi = scanResponse.rssi;
+                }
+                break;
+            }
+        }
+
+        if (isDuplicated)
+        {
+            continue;
+        }
+
+        scanResponses.push_back(scanResponse);
+
+        if (scanResponses.size() > kMaxNetworksInScanResponse)
+        {
+            std::sort(scanResponses.begin(), scanResponses.end(),
+                      [](const ThreadScanResponse & a, const ThreadScanResponse & b) -> bool { return a.rssi > b.rssi; });
+            scanResponses.pop_back();
+        }
+    }
+
+    for (size_t i = 0; i < scanResponses.size(); i++)
     {
         Structs::ThreadInterfaceScanResult::Type result;
-        Encoding::BigEndian::Put64(extendedAddressBuffer, scanResponse.extendedAddress);
-        result.panId           = scanResponse.panId;
-        result.extendedPanId   = scanResponse.extendedPanId;
-        result.networkName     = CharSpan(scanResponse.networkName, scanResponse.networkNameLen);
-        result.channel         = scanResponse.channel;
-        result.version         = scanResponse.version;
+        Encoding::BigEndian::Put64(extendedAddressBuffer, scanResponses[i].extendedAddress);
+        result.panId           = scanResponses[i].panId;
+        result.extendedPanId   = scanResponses[i].extendedPanId;
+        result.networkName     = CharSpan(scanResponses[i].networkName, scanResponses[i].networkNameLen);
+        result.channel         = scanResponses[i].channel;
+        result.version         = scanResponses[i].version;
         result.extendedAddress = ByteSpan(extendedAddressBuffer);
-        result.rssi            = scanResponse.rssi;
-        result.lqi             = scanResponse.lqi;
+        result.rssi            = scanResponses[i].rssi;
+        result.lqi             = scanResponses[i].lqi;
+
         SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag(), result));
     }
 
