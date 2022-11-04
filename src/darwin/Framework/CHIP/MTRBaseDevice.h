@@ -165,9 +165,7 @@ extern NSString * const MTRArrayValueType;
  * attempts fail.
  */
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                minInterval:(NSNumber *)minInterval
-                maxInterval:(NSNumber *)maxInterval
-                     params:(MTRSubscribeParams * _Nullable)params
+                     params:(MTRSubscribeParams *)params
     attributeCacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
      attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
          eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
@@ -258,8 +256,6 @@ extern NSString * const MTRArrayValueType;
 - (void)subscribeToAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
                                   clusterID:(NSNumber * _Nullable)clusterID
                                 attributeID:(NSNumber * _Nullable)attributeID
-                                minInterval:(NSNumber *)minInterval
-                                maxInterval:(NSNumber *)maxInterval
                                      params:(MTRSubscribeParams * _Nullable)params
                                       queue:(dispatch_queue_t)queue
                               reportHandler:(MTRDeviceResponseHandler)reportHandler
@@ -439,7 +435,7 @@ MTR_NEWLY_AVAILABLE
                            reportHandler:(MTRDeviceResponseHandler)reportHandler
                  subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
     MTR_NEWLY_DEPRECATED("Please use "
-                         "subscribeToAttributesWithEndpointID:clusterID:attributeID:params:minInterval:maxInterval:queue:"
+                         "subscribeToAttributesWithEndpointID:clusterID:attributeID:params:queue:"
                          "reportHandler:subscriptionEstablished:");
 
 - (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)queue
