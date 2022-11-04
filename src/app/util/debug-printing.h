@@ -809,19 +809,19 @@
 #endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ILLUM_LEVEL_SENSING_CLUSTER)
 
 // Printing macros for cluster: Temperature Measurement
-#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_TEMP_MEASUREMENT_CLUSTER)
-#define emberAfTempMeasurementClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_TEMP_MEASUREMENT_CLUSTER, __VA_ARGS__)
-#define emberAfTempMeasurementClusterPrintln(...) emberAfPrintln(EMBER_AF_PRINT_TEMP_MEASUREMENT_CLUSTER, __VA_ARGS__)
+#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_TEMPERATURE_MEASUREMENT_CLUSTER)
+#define emberAfTempMeasurementClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_TEMPERATURE_MEASUREMENT_CLUSTER, __VA_ARGS__)
+#define emberAfTempMeasurementClusterPrintln(...) emberAfPrintln(EMBER_AF_PRINT_TEMPERATURE_MEASUREMENT_CLUSTER, __VA_ARGS__)
 // Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
 #define emberAfTempMeasurementClusterFlush()
 #define emberAfTempMeasurementClusterDebugExec(x)                                                                                  \
-    if (emberAfPrintEnabled(EMBER_AF_PRINT_TEMP_MEASUREMENT_CLUSTER))                                                              \
+    if (emberAfPrintEnabled(EMBER_AF_PRINT_TEMPERATURE_MEASUREMENT_CLUSTER))                                                              \
     {                                                                                                                              \
         x;                                                                                                                         \
     }
 #define emberAfTempMeasurementClusterPrintBuffer(buffer, len, withSpace)                                                           \
-    emberAfPrintBuffer(EMBER_AF_PRINT_TEMP_MEASUREMENT_CLUSTER, (buffer), (len), (withSpace))
-#define emberAfTempMeasurementClusterPrintString(buffer) emberAfPrintString(EMBER_AF_PRINT_TEMP_MEASUREMENT_CLUSTER, (buffer))
+    emberAfPrintBuffer(EMBER_AF_PRINT_TEMPERATURE_MEASUREMENT_CLUSTER, (buffer), (len), (withSpace))
+#define emberAfTempMeasurementClusterPrintString(buffer) emberAfPrintString(EMBER_AF_PRINT_TEMPERATURE_MEASUREMENT_CLUSTER, (buffer))
 #else
 #define emberAfTempMeasurementClusterPrint(...)
 #define emberAfTempMeasurementClusterPrintln(...)
@@ -829,7 +829,7 @@
 #define emberAfTempMeasurementClusterDebugExec(x)
 #define emberAfTempMeasurementClusterPrintBuffer(buffer, len, withSpace)
 #define emberAfTempMeasurementClusterPrintString(buffer)
-#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_TEMP_MEASUREMENT_CLUSTER)
+#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_TEMPERATURE_MEASUREMENT_CLUSTER)
 
 // Printing macros for cluster: Pressure Measurement
 #if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_PRESSURE_MEASUREMENT_CLUSTER)
