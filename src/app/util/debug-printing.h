@@ -694,20 +694,22 @@
 #endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_DEHUMID_CONTROL_CLUSTER)
 
 // Printing macros for cluster: Thermostat User Interface Configuration
-#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_THERMOSTAT_UI_CONFIG_CLUSTER)
-#define emberAfThermostatUiConfigClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_THERMOSTAT_UI_CONFIG_CLUSTER, __VA_ARGS__)
-#define emberAfThermostatUiConfigClusterPrintln(...) emberAfPrintln(EMBER_AF_PRINT_THERMOSTAT_UI_CONFIG_CLUSTER, __VA_ARGS__)
+#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER)
+#define emberAfThermostatUiConfigClusterPrint(...)                                                                                 \
+    emberAfPrint(EMBER_AF_PRINT_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER, __VA_ARGS__)
+#define emberAfThermostatUiConfigClusterPrintln(...)                                                                               \
+    emberAfPrintln(EMBER_AF_PRINT_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER, __VA_ARGS__)
 // Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
 #define emberAfThermostatUiConfigClusterFlush()
 #define emberAfThermostatUiConfigClusterDebugExec(x)                                                                               \
-    if (emberAfPrintEnabled(EMBER_AF_PRINT_THERMOSTAT_UI_CONFIG_CLUSTER))                                                          \
+    if (emberAfPrintEnabled(EMBER_AF_PRINT_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER))                                       \
     {                                                                                                                              \
         x;                                                                                                                         \
     }
 #define emberAfThermostatUiConfigClusterPrintBuffer(buffer, len, withSpace)                                                        \
-    emberAfPrintBuffer(EMBER_AF_PRINT_THERMOSTAT_UI_CONFIG_CLUSTER, (buffer), (len), (withSpace))
+    emberAfPrintBuffer(EMBER_AF_PRINT_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER, (buffer), (len), (withSpace))
 #define emberAfThermostatUiConfigClusterPrintString(buffer)                                                                        \
-    emberAfPrintString(EMBER_AF_PRINT_THERMOSTAT_UI_CONFIG_CLUSTER, (buffer))
+    emberAfPrintString(EMBER_AF_PRINT_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER, (buffer))
 #else
 #define emberAfThermostatUiConfigClusterPrint(...)
 #define emberAfThermostatUiConfigClusterPrintln(...)
@@ -715,7 +717,7 @@
 #define emberAfThermostatUiConfigClusterDebugExec(x)
 #define emberAfThermostatUiConfigClusterPrintBuffer(buffer, len, withSpace)
 #define emberAfThermostatUiConfigClusterPrintString(buffer)
-#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_THERMOSTAT_UI_CONFIG_CLUSTER)
+#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER)
 
 // Printing macros for cluster: Color Control
 #if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_COLOR_CONTROL_CLUSTER)
