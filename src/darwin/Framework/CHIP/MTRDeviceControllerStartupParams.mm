@@ -49,9 +49,9 @@ using namespace chip;
 }
 
 - (instancetype)initWithOperationalKeypair:(id<MTRKeypair>)operationalKeypair
-                    operationalCertificate:(MTRCertificateDERBytes *)operationalCertificate
-                   intermediateCertificate:(MTRCertificateDERBytes * _Nullable)intermediateCertificate
-                           rootCertificate:(MTRCertificateDERBytes *)rootCertificate
+                    operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
+                   intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
+                           rootCertificate:(MTRCertificateDERBytes)rootCertificate
                                        ipk:(NSData *)ipk
 {
     if (!(self = [super init])) {

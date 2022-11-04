@@ -176,21 +176,27 @@ extern NSString * const MTRArrayValueType;
     resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduled MTR_NEWLY_AVAILABLE;
 
 /**
- * Reads the given attribute path from the device.
+ * Reads attributes from the device.
  *
- * nil values for endpointID, clusterID, attributeID indicate wildcards
+ * Nil values for endpointID, clusterID, attributeID indicate wildcards
  * (e.g. nil attributeID means "read all the attributes from the endpoint(s) and
  * cluster(s) that match endpointID/clusterID").
+ *
+ * If all of endpointID, clusterID, attributeID are non-nil, a single
+ * attribute will be read.
+ *
+ * If all of endpointID, clusterID, attributeID are nil, all attributes on the
+ * device will be read.
  *
  * A non-nil attributeID along with a nil clusterID will only succeed if the
  * attribute ID is for a global attribute that applies to all clusters.
  */
-- (void)readAttributePathWithEndpointID:(NSNumber * _Nullable)endpointID
-                              clusterID:(NSNumber * _Nullable)clusterID
-                            attributeID:(NSNumber * _Nullable)attributeID
-                                 params:(MTRReadParams * _Nullable)params
-                                  queue:(dispatch_queue_t)queue
-                             completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
+- (void)readAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
+                           clusterID:(NSNumber * _Nullable)clusterID
+                         attributeID:(NSNumber * _Nullable)attributeID
+                              params:(MTRReadParams * _Nullable)params
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
 
 /**
  * Write to attribute in a designated attribute path
@@ -234,24 +240,30 @@ extern NSString * const MTRArrayValueType;
                          completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
 
 /**
- * Subscribes to the given attribute path on the device.
+ * Subscribes to the specified attributes on the device.
  *
- * nil values for endpointID, clusterID, attributeID indicate wildcards
- * (e.g. nil attributeID means "read all the attributes from the endpoint(s) and
- * cluster(s) that match endpointID/clusterID").
+ * Nil values for endpointID, clusterID, attributeID indicate wildcards
+ * (e.g. nil attributeID means "subscribe to all the attributes from the
+ * endpoint(s) and cluster(s) that match endpointID/clusterID").
+ *
+ * If all of endpointID, clusterID, attributeID are non-nil, a single attribute
+ * will be subscribed to.
+ *
+ * If all of endpointID, clusterID, attributeID are nil, all attributes on the
+ * device will be subscribed to.
  *
  * A non-nil attributeID along with a nil clusterID will only succeed if the
  * attribute ID is for a global attribute that applies to all clusters.
  */
-- (void)subscribeAttributePathWithEndpointID:(NSNumber * _Nullable)endpointID
-                                   clusterID:(NSNumber * _Nullable)clusterID
-                                 attributeID:(NSNumber * _Nullable)attributeID
-                                 minInterval:(NSNumber *)minInterval
-                                 maxInterval:(NSNumber *)maxInterval
-                                      params:(MTRSubscribeParams * _Nullable)params
-                                       queue:(dispatch_queue_t)queue
-                               reportHandler:(MTRDeviceResponseHandler)reportHandler
-                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+- (void)subscribeToAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
+                                  clusterID:(NSNumber * _Nullable)clusterID
+                                attributeID:(NSNumber * _Nullable)attributeID
+                                minInterval:(NSNumber *)minInterval
+                                maxInterval:(NSNumber *)maxInterval
+                                     params:(MTRSubscribeParams * _Nullable)params
+                                      queue:(dispatch_queue_t)queue
+                              reportHandler:(MTRDeviceResponseHandler)reportHandler
+                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
     MTR_NEWLY_AVAILABLE;
 
 /**
@@ -374,7 +386,7 @@ extern NSString * const MTRArrayValueType;
                              params:(MTRReadParams * _Nullable)params
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion
-    MTR_NEWLY_DEPRECATED("Please use readAttributePathWithEndpointID:clusterID:attributeID:params:queue:completion:");
+    MTR_NEWLY_DEPRECATED("Please use readAttributesWithEndpointID:clusterID:attributeID:params:queue:completion:");
 
 - (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
                            clusterId:(NSNumber *)clusterId
@@ -405,7 +417,7 @@ extern NSString * const MTRArrayValueType;
                            reportHandler:(MTRDeviceResponseHandler)reportHandler
                  subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
     MTR_NEWLY_DEPRECATED("Please use "
-                         "subscribeAttributePathWithEndpointID:clusterID:attributeID:params:minInterval:maxInterval:queue:"
+                         "subscribeToAttributesWithEndpointID:clusterID:attributeID:params:minInterval:maxInterval:queue:"
                          "reportHandler:subscriptionEstablished:");
 
 - (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)queue

@@ -774,12 +774,12 @@ private:
     Platform::UniquePtr<app::ReadClient> mReadClient;
 };
 
-- (void)readAttributePathWithEndpointID:(NSNumber * _Nullable)endpointID
-                              clusterID:(NSNumber * _Nullable)clusterID
-                            attributeID:(NSNumber * _Nullable)attributeID
-                                 params:(MTRReadParams * _Nullable)params
-                                  queue:(dispatch_queue_t)queue
-                             completion:(MTRDeviceResponseHandler)completion
+- (void)readAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
+                           clusterID:(NSNumber * _Nullable)clusterID
+                         attributeID:(NSNumber * _Nullable)attributeID
+                              params:(MTRReadParams * _Nullable)params
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
 {
     endpointID = (endpointID == nil) ? nil : [endpointID copy];
     clusterID = (clusterID == nil) ? nil : [clusterID copy];
@@ -1117,15 +1117,15 @@ exit:
         });
 }
 
-- (void)subscribeAttributePathWithEndpointID:(NSNumber * _Nullable)endpointID
-                                   clusterID:(NSNumber * _Nullable)clusterID
-                                 attributeID:(NSNumber * _Nullable)attributeID
-                                 minInterval:(NSNumber *)minInterval
-                                 maxInterval:(NSNumber *)maxInterval
-                                      params:(MTRSubscribeParams * _Nullable)params
-                                       queue:(dispatch_queue_t)queue
-                               reportHandler:(MTRDeviceResponseHandler)reportHandler
-                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler)subscriptionEstablished
+- (void)subscribeToAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
+                                  clusterID:(NSNumber * _Nullable)clusterID
+                                attributeID:(NSNumber * _Nullable)attributeID
+                                minInterval:(NSNumber *)minInterval
+                                maxInterval:(NSNumber *)maxInterval
+                                     params:(MTRSubscribeParams * _Nullable)params
+                                      queue:(dispatch_queue_t)queue
+                              reportHandler:(MTRDeviceResponseHandler)reportHandler
+                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler)subscriptionEstablished
 {
     if (self.isPASEDevice) {
         // We don't support subscriptions over PASE.
@@ -1488,12 +1488,12 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion
 {
-    [self readAttributePathWithEndpointID:endpointId
-                                clusterID:clusterId
-                              attributeID:attributeId
-                                   params:params
-                                    queue:clientQueue
-                               completion:completion];
+    [self readAttributesWithEndpointID:endpointId
+                             clusterID:clusterId
+                           attributeID:attributeId
+                                params:params
+                                 queue:clientQueue
+                            completion:completion];
 }
 
 - (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
@@ -1540,15 +1540,15 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                            reportHandler:(MTRDeviceResponseHandler)reportHandler
                  subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
 {
-    [self subscribeAttributePathWithEndpointID:endpointId
-                                     clusterID:clusterId
-                                   attributeID:attributeId
-                                   minInterval:minInterval
-                                   maxInterval:maxInterval
-                                        params:params
-                                         queue:clientQueue
-                                 reportHandler:reportHandler
-                       subscriptionEstablished:subscriptionEstablishedHandler];
+    [self subscribeToAttributesWithEndpointID:endpointId
+                                    clusterID:clusterId
+                                  attributeID:attributeId
+                                  minInterval:minInterval
+                                  maxInterval:maxInterval
+                                       params:params
+                                        queue:clientQueue
+                                reportHandler:reportHandler
+                      subscriptionEstablished:subscriptionEstablishedHandler];
 }
 
 - (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion

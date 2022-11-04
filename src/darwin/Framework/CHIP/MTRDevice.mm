@@ -404,26 +404,26 @@ private:
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [self newBaseDevice];
 
-        [baseDevice readAttributePathWithEndpointID:endpointID
-                                          clusterID:clusterID
-                                        attributeID:attributeID
-                                             params:params
-                                              queue:self.queue
-                                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
-                                             NSError * _Nullable error) {
-                                             if (values) {
-                                                 // Since the format is the same data-value dictionary, this looks like an attribute
-                                                 // report
-                                                 [self _handleAttributeReport:values];
-                                             }
+        [baseDevice
+            readAttributesWithEndpointID:endpointID
+                               clusterID:clusterID
+                             attributeID:attributeID
+                                  params:params
+                                   queue:self.queue
+                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                  if (values) {
+                                      // Since the format is the same data-value dictionary, this looks like an attribute
+                                      // report
+                                      [self _handleAttributeReport:values];
+                                  }
 
-                                             // TODO: better retry logic
-                                             if (error && (retryCount < 2)) {
-                                                 [workItem retryWork];
-                                             } else {
-                                                 [workItem endWork];
-                                             }
-                                         }];
+                                  // TODO: better retry logic
+                                  if (error && (retryCount < 2)) {
+                                      [workItem retryWork];
+                                  } else {
+                                      [workItem endWork];
+                                  }
+                              }];
     };
     workItem.readyHandler = readyHandler;
     [_asyncCallbackWorkQueue enqueueWorkItem:workItem];

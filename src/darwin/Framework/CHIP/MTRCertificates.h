@@ -20,8 +20,8 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NSData MTRCertificateDERBytes;
-typedef NSData MTRCertificateTLVBytes;
+typedef NSData * MTRCertificateDERBytes;
+typedef NSData * MTRCertificateTLVBytes;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -42,10 +42,10 @@ NS_ASSUME_NONNULL_BEGIN
  * On failure returns nil and if "error" is not null sets *error to the relevant
  * error.
  */
-+ (MTRCertificateDERBytes * _Nullable)createRootCertificate:(id<MTRKeypair>)keypair
-                                                   issuerID:(NSNumber * _Nullable)issuerID
-                                                   fabricID:(NSNumber * _Nullable)fabricID
-                                                      error:(NSError * __autoreleasing _Nullable * _Nullable)error
++ (MTRCertificateDERBytes _Nullable)createRootCertificate:(id<MTRKeypair>)keypair
+                                                 issuerID:(NSNumber * _Nullable)issuerID
+                                                 fabricID:(NSNumber * _Nullable)fabricID
+                                                    error:(NSError * __autoreleasing _Nullable * _Nullable)error
     MTR_NEWLY_AVAILABLE;
 
 /**
@@ -61,12 +61,12 @@ NS_ASSUME_NONNULL_BEGIN
  * On failure returns nil and if "error" is not null sets *error to the relevant
  * error.
  */
-+ (MTRCertificateDERBytes * _Nullable)createIntermediateCertificate:(id<MTRKeypair>)rootKeypair
-                                                    rootCertificate:(MTRCertificateDERBytes *)rootCertificate
-                                              intermediatePublicKey:(SecKeyRef)intermediatePublicKey
-                                                           issuerID:(NSNumber * _Nullable)issuerID
-                                                           fabricID:(NSNumber * _Nullable)fabricID
-                                                              error:(NSError * __autoreleasing _Nullable * _Nullable)error
++ (MTRCertificateDERBytes _Nullable)createIntermediateCertificate:(id<MTRKeypair>)rootKeypair
+                                                  rootCertificate:(MTRCertificateDERBytes)rootCertificate
+                                            intermediatePublicKey:(SecKeyRef)intermediatePublicKey
+                                                         issuerID:(NSNumber * _Nullable)issuerID
+                                                         fabricID:(NSNumber * _Nullable)fabricID
+                                                            error:(NSError * __autoreleasing _Nullable * _Nullable)error
     MTR_NEWLY_AVAILABLE;
 
 /**
@@ -90,13 +90,13 @@ NS_ASSUME_NONNULL_BEGIN
  * On failure returns nil and if "error" is not null sets *error to the relevant
  * error.
  */
-+ (MTRCertificateDERBytes * _Nullable)createOperationalCertificate:(id<MTRKeypair>)signingKeypair
-                                                signingCertificate:(MTRCertificateDERBytes *)signingCertificate
-                                              operationalPublicKey:(SecKeyRef)operationalPublicKey
-                                                          fabricID:(NSNumber *)fabricID
-                                                            nodeID:(NSNumber *)nodeID
-                                             caseAuthenticatedTags:(NSArray<NSNumber *> * _Nullable)caseAuthenticatedTags
-                                                             error:(NSError * __autoreleasing _Nullable * _Nullable)error
++ (MTRCertificateDERBytes _Nullable)createOperationalCertificate:(id<MTRKeypair>)signingKeypair
+                                              signingCertificate:(MTRCertificateDERBytes)signingCertificate
+                                            operationalPublicKey:(SecKeyRef)operationalPublicKey
+                                                        fabricID:(NSNumber *)fabricID
+                                                          nodeID:(NSNumber *)nodeID
+                                           caseAuthenticatedTags:(NSArray<NSNumber *> * _Nullable)caseAuthenticatedTags
+                                                           error:(NSError * __autoreleasing _Nullable * _Nullable)error
     MTR_NEWLY_AVAILABLE;
 
 /**
@@ -113,7 +113,7 @@ NS_ASSUME_NONNULL_BEGIN
  * of having the same public key and the same subject DN.  Returns NO if public
  * keys or subject DNs cannot be extracted from the certificates.
  */
-+ (BOOL)isCertificate:(MTRCertificateDERBytes *)certificate1 equalTo:(MTRCertificateDERBytes *)certificate2;
++ (BOOL)isCertificate:(MTRCertificateDERBytes)certificate1 equalTo:(MTRCertificateDERBytes)certificate2;
 
 /**
  * Generate a PKCS#10 certificate signing request from a MTRKeypair.  This can
@@ -139,7 +139,7 @@ NS_ASSUME_NONNULL_BEGIN
  * as a DER encoded X.509 certificate, or if the certificate cannot be
  * represented in the Matter certificate format).
  */
-+ (MTRCertificateTLVBytes * _Nullable)convertX509Certificate:(MTRCertificateDERBytes *)x509Certificate;
++ (MTRCertificateTLVBytes _Nullable)convertX509Certificate:(MTRCertificateDERBytes)x509Certificate;
 
 @end
 

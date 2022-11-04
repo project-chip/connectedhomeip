@@ -31,10 +31,10 @@ using namespace chip::Credentials;
 
 @implementation MTRCertificates
 
-+ (MTRCertificateDERBytes * _Nullable)createRootCertificate:(id<MTRKeypair>)keypair
-                                                   issuerID:(NSNumber * _Nullable)issuerID
-                                                   fabricID:(NSNumber * _Nullable)fabricID
-                                                      error:(NSError * __autoreleasing *)error
++ (MTRCertificateDERBytes _Nullable)createRootCertificate:(id<MTRKeypair>)keypair
+                                                 issuerID:(NSNumber * _Nullable)issuerID
+                                                 fabricID:(NSNumber * _Nullable)fabricID
+                                                    error:(NSError * __autoreleasing *)error
 {
     NSLog(@"Generating root certificate");
 
@@ -53,12 +53,12 @@ using namespace chip::Credentials;
     return rootCert;
 }
 
-+ (MTRCertificateDERBytes * _Nullable)createIntermediateCertificate:(id<MTRKeypair>)rootKeypair
-                                                    rootCertificate:(MTRCertificateDERBytes *)rootCertificate
-                                              intermediatePublicKey:(SecKeyRef)intermediatePublicKey
-                                                           issuerID:(NSNumber * _Nullable)issuerID
-                                                           fabricID:(NSNumber * _Nullable)fabricID
-                                                              error:(NSError * __autoreleasing *)error
++ (MTRCertificateDERBytes _Nullable)createIntermediateCertificate:(id<MTRKeypair>)rootKeypair
+                                                  rootCertificate:(MTRCertificateDERBytes)rootCertificate
+                                            intermediatePublicKey:(SecKeyRef)intermediatePublicKey
+                                                         issuerID:(NSNumber * _Nullable)issuerID
+                                                         fabricID:(NSNumber * _Nullable)fabricID
+                                                            error:(NSError * __autoreleasing *)error
 {
     NSLog(@"Generating intermediate certificate");
 
@@ -78,13 +78,13 @@ using namespace chip::Credentials;
     return intermediate;
 }
 
-+ (MTRCertificateDERBytes * _Nullable)createOperationalCertificate:(id<MTRKeypair>)signingKeypair
-                                                signingCertificate:(MTRCertificateDERBytes *)signingCertificate
-                                              operationalPublicKey:(SecKeyRef)operationalPublicKey
-                                                          fabricID:(NSNumber *)fabricID
-                                                            nodeID:(NSNumber *)nodeID
-                                             caseAuthenticatedTags:(NSArray<NSNumber *> * _Nullable)caseAuthenticatedTags
-                                                             error:(NSError * __autoreleasing _Nullable * _Nullable)error
++ (MTRCertificateDERBytes _Nullable)createOperationalCertificate:(id<MTRKeypair>)signingKeypair
+                                              signingCertificate:(MTRCertificateDERBytes)signingCertificate
+                                            operationalPublicKey:(SecKeyRef)operationalPublicKey
+                                                        fabricID:(NSNumber *)fabricID
+                                                          nodeID:(NSNumber *)nodeID
+                                           caseAuthenticatedTags:(NSArray<NSNumber *> * _Nullable)caseAuthenticatedTags
+                                                           error:(NSError * __autoreleasing _Nullable * _Nullable)error
 {
     NSLog(@"Generating operational certificate");
 
@@ -127,7 +127,7 @@ using namespace chip::Credentials;
     return certKeySpan.data_equal(keypairKeySpan);
 }
 
-+ (BOOL)isCertificate:(MTRCertificateDERBytes *)certificate1 equalTo:(MTRCertificateDERBytes *)certificate2
++ (BOOL)isCertificate:(MTRCertificateDERBytes)certificate1 equalTo:(MTRCertificateDERBytes)certificate2
 {
     [MTRMemory ensureInit];
 
@@ -197,7 +197,7 @@ using namespace chip::Credentials;
     return nil;
 }
 
-+ (MTRCertificateTLVBytes * _Nullable)convertX509Certificate:(MTRCertificateDERBytes *)x509Certificate
++ (MTRCertificateTLVBytes _Nullable)convertX509Certificate:(MTRCertificateDERBytes)x509Certificate
 {
 
     chip::ByteSpan x509CertBytes = AsByteSpan(x509Certificate);

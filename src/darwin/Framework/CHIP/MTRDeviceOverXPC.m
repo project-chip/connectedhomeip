@@ -91,12 +91,12 @@ NS_ASSUME_NONNULL_BEGIN
         }];
 }
 
-- (void)readAttributePathWithEndpointID:(NSNumber * _Nullable)endpointID
-                              clusterID:(NSNumber * _Nullable)clusterID
-                            attributeID:(NSNumber * _Nullable)attributeID
-                                 params:(MTRReadParams * _Nullable)params
-                                  queue:(dispatch_queue_t)queue
-                             completion:(MTRDeviceResponseHandler)completion
+- (void)readAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
+                           clusterID:(NSNumber * _Nullable)clusterID
+                         attributeID:(NSNumber * _Nullable)attributeID
+                              params:(MTRReadParams * _Nullable)params
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
 {
     MTR_LOG_DEBUG("Reading attribute ...");
     [_xpcConnection
@@ -203,15 +203,15 @@ NS_ASSUME_NONNULL_BEGIN
         }];
 }
 
-- (void)subscribeAttributePathWithEndpointID:(NSNumber * _Nullable)endpointID
-                                   clusterID:(NSNumber * _Nullable)clusterID
-                                 attributeID:(NSNumber * _Nullable)attributeID
-                                 minInterval:(NSNumber *)minInterval
-                                 maxInterval:(NSNumber *)maxInterval
-                                      params:(MTRSubscribeParams * _Nullable)params
-                                       queue:(dispatch_queue_t)queue
-                               reportHandler:(MTRDeviceResponseHandler)reportHandler
-                     subscriptionEstablished:(void (^_Nullable)(void))subscriptionEstablishedHandler
+- (void)subscribeToAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
+                                  clusterID:(NSNumber * _Nullable)clusterID
+                                attributeID:(NSNumber * _Nullable)attributeID
+                                minInterval:(NSNumber *)minInterval
+                                maxInterval:(NSNumber *)maxInterval
+                                     params:(MTRSubscribeParams * _Nullable)params
+                                      queue:(dispatch_queue_t)queue
+                              reportHandler:(MTRDeviceResponseHandler)reportHandler
+                    subscriptionEstablished:(void (^_Nullable)(void))subscriptionEstablishedHandler
 {
     MTR_LOG_DEBUG("Subscribing attribute ...");
     [_xpcConnection getProxyHandleWithCompletion:^(

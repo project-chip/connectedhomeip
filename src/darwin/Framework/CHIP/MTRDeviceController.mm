@@ -734,7 +734,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     return AsData(serializedBytes);
 }
 
-- (NSData * _Nullable)fetchAttestationChallengeForDeviceID:(NSNumber *)deviceID
+- (NSData * _Nullable)attestationChallengeForDeviceID:(NSNumber *)deviceID
 {
     VerifyOrReturnValue([self checkIsRunning], nil);
 
@@ -983,7 +983,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
 
 - (nullable NSData *)fetchAttestationChallengeForDeviceId:(uint64_t)deviceId
 {
-    return [self fetchAttestationChallengeForDeviceID:@(deviceId)];
+    return [self attestationChallengeForDeviceID:@(deviceId)];
 }
 
 - (BOOL)getBaseDevice:(uint64_t)deviceID queue:(dispatch_queue_t)queue completionHandler:(MTRDeviceConnectionCallback)completion
