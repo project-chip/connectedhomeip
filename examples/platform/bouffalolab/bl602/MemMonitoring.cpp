@@ -55,7 +55,7 @@ void MemMonitoring::HeapMonitoring(void * pvParameter)
     TaskHandle_t bleLinkTaskHandle     = xTaskGetHandle(BLE_LINK_TASK_NAME);
     TaskHandle_t bleEventTaskHandle    = xTaskGetHandle(CHIP_DEVICE_CONFIG_BLE_APP_TASK_NAME);
 
-    while (1)
+    while (true)
     {
         appTaskValue        = uxTaskGetStackHighWaterMark(appTaskHandle);
         bleEventTaskValue   = uxTaskGetStackHighWaterMark(bleEventTaskHandle);

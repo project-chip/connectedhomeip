@@ -683,7 +683,7 @@ void SetAccessControl(AccessControl & accessControl);
  *
  * Calls to this function must be synchronized externally.
  */
-void ResetAccessControl();
+void ResetAccessControlToDefault();
 
 } // namespace Access
 } // namespace chip

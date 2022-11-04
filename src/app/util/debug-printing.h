@@ -185,19 +185,20 @@
 #endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ON_OFF_CLUSTER)
 
 // Printing macros for cluster: On/off Switch Configuration
-#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ON_OFF_SWITCH_CONFIG_CLUSTER)
-#define emberAfOnOffSwitchConfigClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_ON_OFF_SWITCH_CONFIG_CLUSTER, __VA_ARGS__)
-#define emberAfOnOffSwitchConfigClusterPrintln(...) emberAfPrintln(EMBER_AF_PRINT_ON_OFF_SWITCH_CONFIG_CLUSTER, __VA_ARGS__)
+#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ON_OFF_SWITCH_CONFIGURATION_CLUSTER)
+#define emberAfOnOffSwitchConfigClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_ON_OFF_SWITCH_CONFIGURATION_CLUSTER, __VA_ARGS__)
+#define emberAfOnOffSwitchConfigClusterPrintln(...) emberAfPrintln(EMBER_AF_PRINT_ON_OFF_SWITCH_CONFIGURATION_CLUSTER, __VA_ARGS__)
 // Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
 #define emberAfOnOffSwitchConfigClusterFlush()
 #define emberAfOnOffSwitchConfigClusterDebugExec(x)                                                                                \
-    if (emberAfPrintEnabled(EMBER_AF_PRINT_ON_OFF_SWITCH_CONFIG_CLUSTER))                                                          \
+    if (emberAfPrintEnabled(EMBER_AF_PRINT_ON_OFF_SWITCH_CONFIGURATION_CLUSTER))                                                   \
     {                                                                                                                              \
         x;                                                                                                                         \
     }
 #define emberAfOnOffSwitchConfigClusterPrintBuffer(buffer, len, withSpace)                                                         \
-    emberAfPrintBuffer(EMBER_AF_PRINT_ON_OFF_SWITCH_CONFIG_CLUSTER, (buffer), (len), (withSpace))
-#define emberAfOnOffSwitchConfigClusterPrintString(buffer) emberAfPrintString(EMBER_AF_PRINT_ON_OFF_SWITCH_CONFIG_CLUSTER, (buffer))
+    emberAfPrintBuffer(EMBER_AF_PRINT_ON_OFF_SWITCH_CONFIGURATION_CLUSTER, (buffer), (len), (withSpace))
+#define emberAfOnOffSwitchConfigClusterPrintString(buffer)                                                                         \
+    emberAfPrintString(EMBER_AF_PRINT_ON_OFF_SWITCH_CONFIGURATION_CLUSTER, (buffer))
 #else
 #define emberAfOnOffSwitchConfigClusterPrint(...)
 #define emberAfOnOffSwitchConfigClusterPrintln(...)
@@ -205,7 +206,7 @@
 #define emberAfOnOffSwitchConfigClusterDebugExec(x)
 #define emberAfOnOffSwitchConfigClusterPrintBuffer(buffer, len, withSpace)
 #define emberAfOnOffSwitchConfigClusterPrintString(buffer)
-#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ON_OFF_SWITCH_CONFIG_CLUSTER)
+#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ON_OFF_SWITCH_CONFIGURATION_CLUSTER)
 
 // Printing macros for cluster: Level Control
 #if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_LEVEL_CONTROL_CLUSTER)

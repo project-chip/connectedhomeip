@@ -45,17 +45,17 @@ public:
     {
         uint32_t temp = 0;
 
-        DefaultStorageKeyAllocator key;
+        StorageKeyName key = StorageKeyName::Uninitialized();
 
         if (isControl)
         {
             mGroupControlCounter = value;
-            key.GroupControlCounter();
+            key                  = DefaultStorageKeyAllocator::GroupControlCounter();
         }
         else
         {
             mGroupDataCounter = value;
-            key.GroupDataCounter();
+            key               = DefaultStorageKeyAllocator::GroupDataCounter();
         }
 
         if (mStorage == nullptr)
@@ -65,7 +65,7 @@ public:
 
         // Always Update storage for Test purposes
         temp = value + GROUP_MSG_COUNTER_MIN_INCREMENT;
-        mStorage->SyncSetKeyValue(key.KeyName(), &temp, sizeof(uint32_t));
+        mStorage->SyncSetKeyValue(key, &temp, sizeof(uint32_t));
     }
 };
 

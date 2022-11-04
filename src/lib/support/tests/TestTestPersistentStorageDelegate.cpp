@@ -39,7 +39,7 @@ bool SetMatches(const std::set<T> & set, const std::array<T, N> expectedContents
         return false;
     }
 
-    for (auto item : expectedContents)
+    for (const auto & item : expectedContents)
     {
         if (set.find(item) == set.cend())
         {

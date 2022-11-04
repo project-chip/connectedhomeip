@@ -52,7 +52,7 @@ uint32_t heapSize = TOTAL_ICALL_HEAP_SIZE;
 // ================================================================================
 extern "C" void vApplicationStackOverflowHook(void)
 {
-    while (1)
+    while (true)
     {
         ;
     }
@@ -85,13 +85,13 @@ int main(void)
     {
         // can't log until the kernel is started
         // PLAT_LOG("GetAppTask().StartAppTask() failed");
-        while (1)
+        while (true)
             ;
     }
 
     vTaskStartScheduler();
 
     // Should never get here.
-    while (1)
+    while (true)
         ;
 }

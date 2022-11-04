@@ -92,7 +92,7 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::ReadPHYRate(AttributeValueEncoder & aEn
 CHIP_ERROR EthernetDiagosticsAttrAccess::ReadFullDuplex(AttributeValueEncoder & aEncoder)
 {
     Attributes::FullDuplex::TypeInfo::Type fullDuplex;
-    bool value = 0;
+    bool value = false;
 
     if (DeviceLayer::GetDiagnosticDataProvider().GetEthFullDuplex(value) == CHIP_NO_ERROR)
     {
@@ -110,7 +110,7 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::ReadFullDuplex(AttributeValueEncoder & 
 CHIP_ERROR EthernetDiagosticsAttrAccess::ReadCarrierDetect(AttributeValueEncoder & aEncoder)
 {
     Attributes::CarrierDetect::TypeInfo::Type carrierDetect;
-    bool value = 0;
+    bool value = false;
 
     if (DeviceLayer::GetDiagnosticDataProvider().GetEthCarrierDetect(value) == CHIP_NO_ERROR)
     {

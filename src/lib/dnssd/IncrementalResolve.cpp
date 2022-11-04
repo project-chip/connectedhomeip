@@ -32,7 +32,7 @@ using namespace mdns::Minimal::Logging;
 
 namespace {
 
-const ByteSpan GetSpan(const mdns::Minimal::BytesRange & range)
+ByteSpan GetSpan(const mdns::Minimal::BytesRange & range)
 {
     return ByteSpan(range.Start(), range.Size());
 }

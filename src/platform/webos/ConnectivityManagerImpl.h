@@ -121,7 +121,6 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 
 public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    CHIP_ERROR ProvisionWiFiNetwork(const char * ssid, const char * key);
     void
     SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
     {

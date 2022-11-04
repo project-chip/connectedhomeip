@@ -48,10 +48,11 @@
 #define CHIP_PRINTCLUSTER_ON_OFF_CLUSTER
 #endif
 
-#if defined(ZCL_USING_ON_OFF_SWITCH_CONFIG_CLUSTER_SERVER) || defined(ZCL_USING_ON_OFF_SWITCH_CONFIG_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIG_CLUSTER { ZCL_ON_OFF_SWITCH_CONFIG_CLUSTER_ID, "On/off Switch Configuration" },
+#if defined(ZCL_USING_ON_OFF_SWITCH_CONFIGURATION_CLUSTER_SERVER) || defined(ZCL_USING_ON_OFF_SWITCH_CONFIGURATION_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIGURATION_CLUSTER                                                                      \
+    { ZCL_ON_OFF_SWITCH_CONFIGURATION_CLUSTER_ID, "On/off Switch Configuration" },
 #else
-#define CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIG_CLUSTER
+#define CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIGURATION_CLUSTER
 #endif
 
 #if defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_CLIENT)
@@ -410,10 +411,10 @@
 #define CHIP_PRINTCLUSTER_KEYPAD_INPUT_CLUSTER
 #endif
 
-#if defined(ZCL_USING_CONTENT_LAUNCH_CLUSTER_SERVER) || defined(ZCL_USING_CONTENT_LAUNCH_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER { ZCL_CONTENT_LAUNCH_CLUSTER_ID, "Content Launcher" },
+#if defined(ZCL_USING_CONTENT_LAUNCHER_CLUSTER_SERVER) || defined(ZCL_USING_CONTENT_LAUNCHER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_CONTENT_LAUNCHER_CLUSTER { ZCL_CONTENT_LAUNCHER_CLUSTER_ID, "Content Launcher" },
 #else
-#define CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER
+#define CHIP_PRINTCLUSTER_CONTENT_LAUNCHER_CLUSTER
 #endif
 
 #if defined(ZCL_USING_AUDIO_OUTPUT_CLUSTER_SERVER) || defined(ZCL_USING_AUDIO_OUTPUT_CLUSTER_CLIENT)
@@ -463,7 +464,7 @@
     CHIP_PRINTCLUSTER_GROUPS_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_SCENES_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_ON_OFF_CLUSTER                                                                                               \
-    CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIG_CLUSTER                                                                                 \
+    CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIGURATION_CLUSTER                                                                          \
     CHIP_PRINTCLUSTER_LEVEL_CONTROL_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_BINARY_INPUT_BASIC_CLUSTER                                                                                   \
     CHIP_PRINTCLUSTER_PWM_CLUSTER                                                                                                  \
@@ -522,7 +523,7 @@
     CHIP_PRINTCLUSTER_MEDIA_INPUT_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_LOW_POWER_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_KEYPAD_INPUT_CLUSTER                                                                                         \
-    CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER                                                                                       \
+    CHIP_PRINTCLUSTER_CONTENT_LAUNCHER_CLUSTER                                                                                     \
     CHIP_PRINTCLUSTER_AUDIO_OUTPUT_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_APPLICATION_LAUNCHER_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER                                                                                    \

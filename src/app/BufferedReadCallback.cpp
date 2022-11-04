@@ -65,9 +65,9 @@ CHIP_ERROR BufferedReadCallback::GenerateListTLV(TLV::ScopedBufferTLVReader & aR
     // To avoid that, a single contiguous buffer is the best likely approach for now.
     //
     uint32_t totalBufSize = 0;
-    for (size_t i = 0; i < mBufferedList.size(); i++)
+    for (const auto & packetBuffer : mBufferedList)
     {
-        totalBufSize += mBufferedList[i]->TotalLength();
+        totalBufSize += packetBuffer->TotalLength();
     }
 
     //
