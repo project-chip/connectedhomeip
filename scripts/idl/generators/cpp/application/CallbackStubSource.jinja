@@ -10,11 +10,11 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
-    {%- for cluster in clusters | serverClustersOnly | sort(attribute='name') %}
-     case ZCL_{{cluster.name | constcase}}_CLUSTER_ID :
+  {%- for cluster in clusters | serverClustersOnly | sort(attribute='name') %}
+    case ZCL_{{cluster.name | constcase}}_CLUSTER_ID:
         emberAf{{cluster.name}}ClusterInitCallback(endpoint);
         break;
-    {%- endfor %}
+  {%- endfor %}
     default:
         // Unrecognized cluster ID
         break;
