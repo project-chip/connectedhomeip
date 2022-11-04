@@ -62,10 +62,10 @@ static constexpr chip::ClusterId ZCL_ACTIONS_CLUSTER_ID = 0x0025;
 static constexpr chip::ClusterId ZCL_BASIC_CLUSTER_ID = 0x0028;
 
 // Definitions for cluster: OTA Software Update Provider
-static constexpr chip::ClusterId ZCL_OTA_PROVIDER_CLUSTER_ID = 0x0029;
+static constexpr chip::ClusterId ZCL_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_ID = 0x0029;
 
 // Definitions for cluster: OTA Software Update Requestor
-static constexpr chip::ClusterId ZCL_OTA_REQUESTOR_CLUSTER_ID = 0x002A;
+static constexpr chip::ClusterId ZCL_OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_ID = 0x002A;
 
 // Definitions for cluster: Localization Configuration
 static constexpr chip::ClusterId ZCL_LOCALIZATION_CONFIGURATION_CLUSTER_ID = 0x002B;

@@ -80,8 +80,8 @@ CHIP_ERROR StoreOperationalKey(FabricIndex fabricIndex, PersistentStorageDelegat
 
     const auto opKeyLength = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(opKeyLength), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorOnFailure(
-        storage->SyncSetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex), buf, static_cast<uint16_t>(opKeyLength)));
+    ReturnErrorOnFailure(storage->SyncSetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex).KeyName(), buf,
+                                                  static_cast<uint16_t>(opKeyLength)));
 
     return CHIP_NO_ERROR;
 }
@@ -111,8 +111,9 @@ CHIP_ERROR SignWithStoredOpKey(FabricIndex fabricIndex, PersistentStorageDelegat
         Crypto::CapacityBoundBuffer<OpKeyTLVMaxSize()> buf;
 
         // Load up the operational key structure from storage
-        uint16_t size  = static_cast<uint16_t>(buf.Capacity());
-        CHIP_ERROR err = storage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex), buf.Bytes(), size);
+        uint16_t size = static_cast<uint16_t>(buf.Capacity());
+        CHIP_ERROR err =
+            storage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex).KeyName(), buf.Bytes(), size);
         if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
             err = CHIP_ERROR_INVALID_FABRIC_INDEX;
@@ -180,7 +181,8 @@ bool PersistentStorageOperationalKeystore::HasOpKeypairForFabric(FabricIndex fab
     Crypto::CapacityBoundBuffer<OpKeyTLVMaxSize()> buf;
 
     uint16_t keySize = static_cast<uint16_t>(buf.Capacity());
-    CHIP_ERROR err   = mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex), buf.Bytes(), keySize);
+    CHIP_ERROR err =
+        mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex).KeyName(), buf.Bytes(), keySize);
 
     return (err == CHIP_NO_ERROR);
 }
@@ -260,7 +262,7 @@ CHIP_ERROR PersistentStorageOperationalKeystore::RemoveOpKeypairForFabric(Fabric
         RevertPendingKeypair();
     }
 
-    CHIP_ERROR err = mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex));
+    CHIP_ERROR err = mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex).KeyName());
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         err = CHIP_ERROR_INVALID_FABRIC_INDEX;

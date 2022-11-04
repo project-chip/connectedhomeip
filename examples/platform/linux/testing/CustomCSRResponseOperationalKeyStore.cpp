@@ -71,7 +71,8 @@ CHIP_ERROR CustomCSRResponseOperationalKeyStore::ReuseOpKeypair(FabricIndex fabr
 
         // In order to retrieve a keypair that has already been registered, assume the device
         // as already been commissioned and fabric index 1 is the registered fabric.
-        CHIP_ERROR err = mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(1 /* fabricIndex */), buf.Bytes(), size);
+        CHIP_ERROR err =
+            mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(1 /* fabricIndex */).KeyName(), buf.Bytes(), size);
         if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
             err = CHIP_ERROR_INVALID_FABRIC_INDEX;

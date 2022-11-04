@@ -53,6 +53,42 @@ CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetProductName(char *
 }
 
 template <class ConfigClass>
+CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetPartNumber(char * buf, size_t bufSize)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetProductURL(char * buf, size_t bufSize)
+{
+#if CHIP_DEVICE_LAYER_TARGET_ESP32
+    CHIP_ERROR err = mGenericConfigManager.ReadConfigValueStr(ConfigClass::kConfigKey_ProductURL, buf, bufSize, bufSize);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    return err;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetProductLabel(char * buf, size_t bufSize)
+{
+#if CHIP_DEVICE_LAYER_TARGET_ESP32
+    CHIP_ERROR err = mGenericConfigManager.ReadConfigValueStr(ConfigClass::kConfigKey_ProductLabel, buf, bufSize, bufSize);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    return err;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
+}
+
+template <class ConfigClass>
 CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetSerialNumber(char * buf, size_t bufSize)
 {
     ChipError err       = CHIP_NO_ERROR;

@@ -71,8 +71,8 @@ CHIP_ERROR SimpleSessionResumptionStorage::SaveIndex(const SessionIndex & index)
     const auto len = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    ReturnErrorOnFailure(
-        mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::SessionResumptionIndex(), buf.data(), static_cast<uint16_t>(len)));
+    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::SessionResumptionIndex().KeyName(), buf.data(),
+                                                   static_cast<uint16_t>(len)));
 
     return CHIP_NO_ERROR;
 }
@@ -82,7 +82,7 @@ CHIP_ERROR SimpleSessionResumptionStorage::LoadIndex(SessionIndex & index)
     std::array<uint8_t, MaxIndexSize()> buf;
     uint16_t len = static_cast<uint16_t>(buf.size());
 
-    if (mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::SessionResumptionIndex(), buf.data(), len) != CHIP_NO_ERROR)
+    if (mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::SessionResumptionIndex().KeyName(), buf.data(), len) != CHIP_NO_ERROR)
     {
         index.mSize = 0;
         return CHIP_NO_ERROR;
@@ -149,7 +149,7 @@ CHIP_ERROR SimpleSessionResumptionStorage::SaveLink(ConstResumptionIdView resump
     const auto len = writer.GetLengthWritten();
     VerifyOrDie(CanCastTo<uint16_t>(len));
 
-    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(GetStorageKey(resumptionId), buf.data(), static_cast<uint16_t>(len)));
+    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(GetStorageKey(resumptionId).KeyName(), buf.data(), static_cast<uint16_t>(len)));
     return CHIP_NO_ERROR;
 }
 
@@ -158,7 +158,7 @@ CHIP_ERROR SimpleSessionResumptionStorage::LoadLink(ConstResumptionIdView resump
     std::array<uint8_t, MaxScopedNodeIdSize()> buf;
     uint16_t len = static_cast<uint16_t>(buf.size());
 
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(GetStorageKey(resumptionId), buf.data(), len));
+    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(GetStorageKey(resumptionId).KeyName(), buf.data(), len));
 
     TLV::ContiguousBufferTLVReader reader;
     reader.Init(buf.data(), len);
@@ -185,7 +185,7 @@ CHIP_ERROR SimpleSessionResumptionStorage::LoadLink(ConstResumptionIdView resump
 
 CHIP_ERROR SimpleSessionResumptionStorage::DeleteLink(ConstResumptionIdView resumptionId)
 {
-    ReturnErrorOnFailure(mStorage->SyncDeleteKeyValue(GetStorageKey(resumptionId)));
+    ReturnErrorOnFailure(mStorage->SyncDeleteKeyValue(GetStorageKey(resumptionId).KeyName()));
     return CHIP_NO_ERROR;
 }
 
@@ -213,7 +213,7 @@ CHIP_ERROR SimpleSessionResumptionStorage::SaveState(const ScopedNodeId & node, 
     const auto len = writer.GetLengthWritten();
     VerifyOrDie(CanCastTo<uint16_t>(len));
 
-    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(GetStorageKey(node), buf.data(), static_cast<uint16_t>(len)));
+    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(GetStorageKey(node).KeyName(), buf.data(), static_cast<uint16_t>(len)));
     return CHIP_NO_ERROR;
 }
 
@@ -223,7 +223,7 @@ CHIP_ERROR SimpleSessionResumptionStorage::LoadState(const ScopedNodeId & node, 
     std::array<uint8_t, MaxStateSize()> buf;
     uint16_t len = static_cast<uint16_t>(buf.size());
 
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(GetStorageKey(node), buf.data(), len));
+    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(GetStorageKey(node).KeyName(), buf.data(), len));
 
     TLV::ContiguousBufferTLVReader reader;
     reader.Init(buf.data(), len);
@@ -261,7 +261,7 @@ CHIP_ERROR SimpleSessionResumptionStorage::LoadState(const ScopedNodeId & node, 
 
 CHIP_ERROR SimpleSessionResumptionStorage::DeleteState(const ScopedNodeId & node)
 {
-    ReturnErrorOnFailure(mStorage->SyncDeleteKeyValue(GetStorageKey(node)));
+    ReturnErrorOnFailure(mStorage->SyncDeleteKeyValue(GetStorageKey(node).KeyName()));
     return CHIP_NO_ERROR;
 }
 

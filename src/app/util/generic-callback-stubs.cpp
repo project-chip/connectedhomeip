@@ -41,22 +41,6 @@ bool __attribute__((weak)) emberAfAttributeWriteAccessCallback(EndpointId endpoi
     return true;
 }
 
-bool __attribute__((weak)) emberAfDefaultResponseCallback(ClusterId clusterId, CommandId commandId, EmberAfStatus status)
-{
-    return false;
-}
-
-bool __attribute__((weak)) emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberStatus * status)
-{
-    return false;
-}
-
-bool __attribute__((weak)) emberAfMessageSentCallback(const MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                      uint16_t msgLen, uint8_t * message, EmberStatus status)
-{
-    return false;
-}
-
 EmberAfStatus __attribute__((weak))
 emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
                                      uint8_t * buffer, uint16_t maxReadLength)
@@ -69,12 +53,6 @@ emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, 
                                       uint8_t * buffer)
 {
     return EMBER_ZCL_STATUS_FAILURE;
-}
-
-bool __attribute__((weak))
-emberAfGetEndpointInfoCallback(EndpointId endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo)
-{
-    return false;
 }
 
 void __attribute__((weak)) emberAfRegistrationAbortCallback() {}
