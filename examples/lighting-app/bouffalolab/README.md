@@ -112,20 +112,20 @@ and BL706 develop board `XT-ZB6-DevKit`.
 
         -   `bl602-iot-matter-v1` without additional build options
 
-            ```shel
+            ```shell
             ./out/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0
             ```
 
         -   `xt-zb6-devkit` without additional build options
 
-            ```shel
+            ```shell
             ./out/bouffalolab-xt-zb6-devkit-light-115200/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0
             ```
 
         -   To wipe out flash and download image, please append `--erase` to the
             above command.
 
-            ```shel
+            ```shell
             ./out/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0 --erase
             ./out/bouffalolab-xt-zb6-devkit-light-115200/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0 --erase
             ```
