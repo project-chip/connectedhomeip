@@ -1,10 +1,10 @@
-#CHIP `Genio` Lock Example
+#Matter `Genio` Lock Example
 
-An example showing the use of CHIP on the MediaTek `Genio` MT793X.
+An example showing the use of Matter on the MediaTek `Genio` MT793X.
 
 <hr>
 
--   [CHIP Genio Lock Example](#chip-genio-lock-example)
+-   [Matter Genio Lock Example](#chip-genio-lock-example)
     -   [Introduction](#introduction)
     -   [Building](#building)
         -   [Note](#note)
@@ -20,7 +20,7 @@ An example showing the use of CHIP on the MediaTek `Genio` MT793X.
 ## Introduction
 
 The `Genio` (MT793X) lock example provides a baseline demonstration of a door
-lock control device, built using CHIP and the MediaTek `Genio` SDK. It can be
+lock control device, built using Matter and the MediaTek `Genio` SDK. It can be
 controlled by a Chip controller over Wi-Fi network.
 
 The `Genio` device can be commissioned over Bluetooth Low Energy where the
@@ -29,7 +29,7 @@ Rendez-vous procedure. Network credentials are then provided to the `Genio`
 device which will then join the network.
 
 The lighting example is intended to serve both as a means to explore the
-workings of CHIP as well as a template for creating real products based on the
+workings of Matter as well as a template for creating real products based on the
 MediaTek platform.
 
 <a name="building"></a>
