@@ -602,17 +602,19 @@
 // Printing macros for cluster: Pump Configuration and Control
 #if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER)
 #define emberAfPumpConfigControlClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER, __VA_ARGS__)
-#define emberAfPumpConfigControlClusterPrintln(...) emberAfPrintln(EMBER_AF_PRINT_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER, __VA_ARGS__)
+#define emberAfPumpConfigControlClusterPrintln(...)                                                                                \
+    emberAfPrintln(EMBER_AF_PRINT_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER, __VA_ARGS__)
 // Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
 #define emberAfPumpConfigControlClusterFlush()
 #define emberAfPumpConfigControlClusterDebugExec(x)                                                                                \
-    if (emberAfPrintEnabled(EMBER_AF_PRINT_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER))                                                           \
+    if (emberAfPrintEnabled(EMBER_AF_PRINT_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER))                                                \
     {                                                                                                                              \
         x;                                                                                                                         \
     }
 #define emberAfPumpConfigControlClusterPrintBuffer(buffer, len, withSpace)                                                         \
     emberAfPrintBuffer(EMBER_AF_PRINT_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER, (buffer), (len), (withSpace))
-#define emberAfPumpConfigControlClusterPrintString(buffer) emberAfPrintString(EMBER_AF_PRINT_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER, (buffer))
+#define emberAfPumpConfigControlClusterPrintString(buffer)                                                                         \
+    emberAfPrintString(EMBER_AF_PRINT_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER, (buffer))
 #else
 #define emberAfPumpConfigControlClusterPrint(...)
 #define emberAfPumpConfigControlClusterPrintln(...)
@@ -815,13 +817,14 @@
 // Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
 #define emberAfTempMeasurementClusterFlush()
 #define emberAfTempMeasurementClusterDebugExec(x)                                                                                  \
-    if (emberAfPrintEnabled(EMBER_AF_PRINT_TEMPERATURE_MEASUREMENT_CLUSTER))                                                              \
+    if (emberAfPrintEnabled(EMBER_AF_PRINT_TEMPERATURE_MEASUREMENT_CLUSTER))                                                       \
     {                                                                                                                              \
         x;                                                                                                                         \
     }
 #define emberAfTempMeasurementClusterPrintBuffer(buffer, len, withSpace)                                                           \
     emberAfPrintBuffer(EMBER_AF_PRINT_TEMPERATURE_MEASUREMENT_CLUSTER, (buffer), (len), (withSpace))
-#define emberAfTempMeasurementClusterPrintString(buffer) emberAfPrintString(EMBER_AF_PRINT_TEMPERATURE_MEASUREMENT_CLUSTER, (buffer))
+#define emberAfTempMeasurementClusterPrintString(buffer)                                                                           \
+    emberAfPrintString(EMBER_AF_PRINT_TEMPERATURE_MEASUREMENT_CLUSTER, (buffer))
 #else
 #define emberAfTempMeasurementClusterPrint(...)
 #define emberAfTempMeasurementClusterPrintln(...)
