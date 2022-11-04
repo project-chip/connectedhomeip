@@ -166,9 +166,9 @@ void CHIPCommand::MaybeTearDownStack()
     // since the CHIP thread and event queue have been stopped, preventing any thread
     // races.
     //
-    for (auto it = mCommissioners.begin(); it != mCommissioners.end(); it++)
+    for (auto & commissioner : mCommissioners)
     {
-        ShutdownCommissioner(it->first);
+        ShutdownCommissioner(commissioner.first);
     }
 
     StopTracing();

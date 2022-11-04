@@ -271,9 +271,9 @@ int PacketBufferTest::TerminateTest(TestContext * context)
 {
     const bool context_ok = (context == mContext);
     // Clear the configurations' bufffer handles.
-    for (size_t i = 0; i < configurations.size(); ++i)
+    for (auto & configuration : configurations)
     {
-        configurations[i].handle = nullptr;
+        configuration.handle = nullptr;
     }
     const bool handles_ok = ResetHandles();
     return (context_ok && handles_ok) ? SUCCESS : FAILURE;
@@ -1817,9 +1817,9 @@ void PacketBufferTest::CheckHandleCloneData(nlTestSuite * inSuite, void * inCont
     NL_TEST_ASSERT(inSuite, test->mContext == theContext);
 
     uint8_t lPayload[2 * PacketBuffer::kMaxSizeWithoutReserve];
-    for (size_t i = 0; i < sizeof(lPayload); ++i)
+    for (uint8_t & payload : lPayload)
     {
-        lPayload[i] = static_cast<uint8_t>(random());
+        payload = static_cast<uint8_t>(random());
     }
 
     for (auto & config_1 : test->configurations)
