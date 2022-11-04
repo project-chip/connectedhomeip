@@ -97,6 +97,9 @@ void BLEManagerImpl::_Shutdown()
 {
     // ensure scan resources are cleared (e.g. timeout timers)
     mDeviceScanner.reset();
+    // Release BLE connection resources (unregister from BlueZ).
+    ShutdownBluezBleLayer(mpEndpoint);
+    mFlags.Clear(Flags::kBluezBLELayerInitialized);
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
@@ -348,7 +351,10 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
     VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX),
                  ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid characteristic ID"));
 
-    result = BluezSubscribeCharacteristic(conId);
+    VerifyOrExit(BluezSubscribeCharacteristic(conId) == CHIP_NO_ERROR,
+                 ChipLogError(DeviceLayer, "BluezSubscribeCharacteristic() failed"));
+    result = true;
+
 exit:
     return result;
 }
@@ -362,21 +368,38 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
     VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX),
                  ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() called with invalid characteristic ID"));
 
-    result = BluezUnsubscribeCharacteristic(conId);
+    VerifyOrExit(BluezUnsubscribeCharacteristic(conId) == CHIP_NO_ERROR,
+                 ChipLogError(DeviceLayer, "BluezUnsubscribeCharacteristic() failed"));
+    result = true;
+
 exit:
     return result;
 }
 
 bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
+    bool result = false;
+
     ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (con %p)", conId);
-    return CloseBluezConnection(conId);
+
+    VerifyOrExit(CloseBluezConnection(conId) == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "CloseBluezConnection() failed"));
+    result = true;
+
+exit:
+    return result;
 }
 
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
                                     chip::System::PacketBufferHandle pBuf)
 {
-    return SendBluezIndication(conId, std::move(pBuf));
+    bool result = false;
+
+    VerifyOrExit(SendBluezIndication(conId, std::move(pBuf)) == CHIP_NO_ERROR,
+                 ChipLogError(DeviceLayer, "SendBluezIndication() failed"));
+    result = true;
+
+exit:
+    return result;
 }
 
 bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
@@ -389,7 +412,10 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
     VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_RX),
                  ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid characteristic ID"));
 
-    result = BluezSendWriteRequest(conId, std::move(pBuf));
+    VerifyOrExit(BluezSendWriteRequest(conId, std::move(pBuf)) == CHIP_NO_ERROR,
+                 ChipLogError(DeviceLayer, "BluezSendWriteRequest() failed"));
+    result = true;
+
 exit:
     return result;
 }
