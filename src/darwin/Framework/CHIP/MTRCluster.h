@@ -61,8 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
  * from the sever to the client (for the status response and actual write
  * request) within the timeout window.
  *
- * This value is specified in milliseconds
- *
+ * This value is specified in milliseconds.
  */
 @property (nonatomic, copy, nullable) NSNumber * timedWriteTimeout;
 
@@ -73,9 +72,6 @@ NS_ASSUME_NONNULL_BEGIN
  * the cluster matches the provided data version.
  */
 @property (nonatomic, copy, nullable) NSNumber * dataVersion;
-
-- (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
 
 @end
 
@@ -98,9 +94,6 @@ NS_ASSUME_NONNULL_BEGIN
  * non-fabric-sensitive data for the given attribute path.
  */
 @property (nonatomic, copy, nullable) NSNumber * fabricFiltered;
-
-- (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
 
 @end
 
@@ -138,7 +131,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSNumber * autoResubscribe;
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 
 @end
 

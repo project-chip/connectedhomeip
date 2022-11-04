@@ -56,22 +56,22 @@ public:
         MTRReadParams * params = [[MTRReadParams alloc] init];
         params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
         [device
-            readAttributeWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
-                              clusterID:[NSNumber numberWithUnsignedInteger:mClusterId]
-                            attributeID:[NSNumber numberWithUnsignedInteger:mAttributeId]
-                                 params:params
-                                  queue:callbackQueue
-                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                 if (error != nil) {
-                                     LogNSError("Error reading attribute", error);
-                                 }
-                                 if (values) {
-                                     for (id item in values) {
-                                         NSLog(@"Response Item: %@", [item description]);
-                                     }
-                                 }
-                                 SetCommandExitStatus(error);
-                             }];
+            readAttributesWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
+                               clusterID:[NSNumber numberWithUnsignedInteger:mClusterId]
+                             attributeID:[NSNumber numberWithUnsignedInteger:mAttributeId]
+                                  params:params
+                                   queue:callbackQueue
+                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                  if (error != nil) {
+                                      LogNSError("Error reading attribute", error);
+                                  }
+                                  if (values) {
+                                      for (id item in values) {
+                                          NSLog(@"Response Item: %@", [item description]);
+                                      }
+                                  }
+                                  SetCommandExitStatus(error);
+                              }];
         return CHIP_NO_ERROR;
     }
 
@@ -129,7 +129,7 @@ public:
             = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
         params.autoResubscribe = mAutoResubscribe.HasValue() ? [NSNumber numberWithBool:mAutoResubscribe.Value()] : nil;
 
-        [device subscribeAttributeWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
+        [device subscribeToAttributesWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
             clusterID:[NSNumber numberWithUnsignedInteger:mClusterId]
             attributeID:[NSNumber numberWithUnsignedInteger:mAttributeId]
             minInterval:[NSNumber numberWithUnsignedInteger:mMinInterval]

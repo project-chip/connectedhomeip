@@ -376,20 +376,20 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                                     XCTAssertNotNil(device);
                                     XCTAssertNil(error);
                                     NSLog(@"Device acquired. Reading...");
-                                    [device readAttributeWithEndpointID:myEndpointId
-                                                              clusterID:myClusterId
-                                                            attributeID:myAttributeId
-                                                                 params:nil
-                                                                  queue:dispatch_get_main_queue()
-                                                             completion:^(id _Nullable value, NSError * _Nullable error) {
-                                                                 NSLog(@"Read value: %@", value);
-                                                                 XCTAssertNotNil(value);
-                                                                 XCTAssertNil(error);
-                                                                 XCTAssertTrue([myValues isEqual:value]);
-                                                                 [responseExpectation fulfill];
-                                                                 self.xpcDisconnectExpectation =
-                                                                     [self expectationWithDescription:@"XPC Disconnected"];
-                                                             }];
+                                    [device readAttributesWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId
+                                                                  params:nil
+                                                                   queue:dispatch_get_main_queue()
+                                                              completion:^(id _Nullable value, NSError * _Nullable error) {
+                                                                  NSLog(@"Read value: %@", value);
+                                                                  XCTAssertNotNil(value);
+                                                                  XCTAssertNil(error);
+                                                                  XCTAssertTrue([myValues isEqual:value]);
+                                                                  [responseExpectation fulfill];
+                                                                  self.xpcDisconnectExpectation =
+                                                                      [self expectationWithDescription:@"XPC Disconnected"];
+                                                              }];
                                 }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, responseExpectation, nil] timeout:kTimeoutInSeconds];
@@ -438,20 +438,20 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                                     XCTAssertNotNil(device);
                                     XCTAssertNil(error);
                                     NSLog(@"Device acquired. Reading...");
-                                    [device readAttributeWithEndpointID:myEndpointId
-                                                              clusterID:myClusterId
-                                                            attributeID:myAttributeId
-                                                                 params:myParams
-                                                                  queue:dispatch_get_main_queue()
-                                                             completion:^(id _Nullable value, NSError * _Nullable error) {
-                                                                 NSLog(@"Read value: %@", value);
-                                                                 XCTAssertNotNil(value);
-                                                                 XCTAssertNil(error);
-                                                                 XCTAssertTrue([myValues isEqual:value]);
-                                                                 [responseExpectation fulfill];
-                                                                 self.xpcDisconnectExpectation =
-                                                                     [self expectationWithDescription:@"XPC Disconnected"];
-                                                             }];
+                                    [device readAttributesWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId
+                                                                  params:myParams
+                                                                   queue:dispatch_get_main_queue()
+                                                              completion:^(id _Nullable value, NSError * _Nullable error) {
+                                                                  NSLog(@"Read value: %@", value);
+                                                                  XCTAssertNotNil(value);
+                                                                  XCTAssertNil(error);
+                                                                  XCTAssertTrue([myValues isEqual:value]);
+                                                                  [responseExpectation fulfill];
+                                                                  self.xpcDisconnectExpectation =
+                                                                      [self expectationWithDescription:@"XPC Disconnected"];
+                                                              }];
                                 }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, responseExpectation, nil] timeout:kTimeoutInSeconds];
@@ -491,19 +491,19 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                                     XCTAssertNotNil(device);
                                     XCTAssertNil(error);
                                     NSLog(@"Device acquired. Reading...");
-                                    [device readAttributeWithEndpointID:myEndpointId
-                                                              clusterID:myClusterId
-                                                            attributeID:myAttributeId
-                                                                 params:nil
-                                                                  queue:dispatch_get_main_queue()
-                                                             completion:^(id _Nullable value, NSError * _Nullable error) {
-                                                                 NSLog(@"Read value: %@", value);
-                                                                 XCTAssertNil(value);
-                                                                 XCTAssertNotNil(error);
-                                                                 [responseExpectation fulfill];
-                                                                 self.xpcDisconnectExpectation =
-                                                                     [self expectationWithDescription:@"XPC Disconnected"];
-                                                             }];
+                                    [device readAttributesWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId
+                                                                  params:nil
+                                                                   queue:dispatch_get_main_queue()
+                                                              completion:^(id _Nullable value, NSError * _Nullable error) {
+                                                                  NSLog(@"Read value: %@", value);
+                                                                  XCTAssertNil(value);
+                                                                  XCTAssertNotNil(error);
+                                                                  [responseExpectation fulfill];
+                                                                  self.xpcDisconnectExpectation =
+                                                                      [self expectationWithDescription:@"XPC Disconnected"];
+                                                              }];
                                 }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, responseExpectation, nil] timeout:kTimeoutInSeconds];
@@ -917,7 +917,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                XCTAssertNotNil(device);
                XCTAssertNil(error);
                NSLog(@"Device acquired. Subscribing...");
-               [device subscribeAttributeWithEndpointID:myEndpointId
+               [device subscribeToAttributesWithEndpointID:myEndpointId
                    clusterID:myClusterId
                    attributeID:myAttributeId
                    minInterval:myMinInterval
@@ -1037,7 +1037,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                XCTAssertNotNil(device);
                XCTAssertNil(error);
                NSLog(@"Device acquired. Subscribing...");
-               [device subscribeAttributeWithEndpointID:myEndpointId
+               [device subscribeToAttributesWithEndpointID:myEndpointId
                    clusterID:myClusterId
                    attributeID:myAttributeId
                    minInterval:myMinInterval
@@ -1152,7 +1152,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                XCTAssertNotNil(device);
                XCTAssertNil(error);
                NSLog(@"Device acquired. Subscribing...");
-               [device subscribeAttributeWithEndpointID:myEndpointId
+               [device subscribeToAttributesWithEndpointID:myEndpointId
                    clusterID:myClusterId
                    attributeID:myAttributeId
                    minInterval:myMinInterval
@@ -1266,7 +1266,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                XCTAssertNotNil(device);
                XCTAssertNil(error);
                NSLog(@"Device acquired. Subscribing...");
-               [device subscribeAttributeWithEndpointID:myEndpointId
+               [device subscribeToAttributesWithEndpointID:myEndpointId
                    clusterID:myClusterId
                    attributeID:myAttributeId
                    minInterval:myMinInterval
@@ -1382,7 +1382,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                XCTAssertNotNil(device);
                XCTAssertNil(error);
                NSLog(@"Device acquired. Subscribing...");
-               [device subscribeAttributeWithEndpointID:myEndpointId
+               [device subscribeToAttributesWithEndpointID:myEndpointId
                    clusterID:myClusterId
                    attributeID:myAttributeId
                    minInterval:myMinInterval
@@ -1498,7 +1498,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                XCTAssertNotNil(device);
                XCTAssertNil(error);
                NSLog(@"Device acquired. Subscribing...");
-               [device subscribeAttributeWithEndpointID:myEndpointId
+               [device subscribeToAttributesWithEndpointID:myEndpointId
                    clusterID:myClusterId
                    attributeID:myAttributeId
                    minInterval:myMinInterval
@@ -1614,7 +1614,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                XCTAssertNotNil(device);
                XCTAssertNil(error);
                NSLog(@"Device acquired. Subscribing...");
-               [device subscribeAttributeWithEndpointID:myEndpointId
+               [device subscribeToAttributesWithEndpointID:myEndpointId
                    clusterID:myClusterId
                    attributeID:myAttributeId
                    minInterval:myMinInterval
@@ -1729,7 +1729,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                XCTAssertNotNil(device);
                XCTAssertNil(error);
                NSLog(@"Device acquired. Subscribing...");
-               [device subscribeAttributeWithEndpointID:nil
+               [device subscribeToAttributesWithEndpointID:nil
                    clusterID:myClusterId
                    attributeID:myAttributeId
                    minInterval:myMinInterval
@@ -1844,7 +1844,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                XCTAssertNotNil(device);
                XCTAssertNil(error);
                NSLog(@"Device acquired. Subscribing...");
-               [device subscribeAttributeWithEndpointID:myEndpointId
+               [device subscribeToAttributesWithEndpointID:myEndpointId
                    clusterID:nil
                    attributeID:myAttributeId
                    minInterval:myMinInterval
@@ -1959,7 +1959,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                XCTAssertNotNil(device);
                XCTAssertNil(error);
                NSLog(@"Device acquired. Subscribing...");
-               [device subscribeAttributeWithEndpointID:myEndpointId
+               [device subscribeToAttributesWithEndpointID:myEndpointId
                    clusterID:myClusterId
                    attributeID:nil
                    minInterval:myMinInterval
@@ -2085,7 +2085,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                    XCTAssertNotNil(device);
                    XCTAssertNil(error);
                    NSLog(@"Device acquired. Subscribing...");
-                   [device subscribeAttributeWithEndpointID:myEndpointId
+                   [device subscribeToAttributesWithEndpointID:myEndpointId
                        clusterID:myClusterId
                        attributeID:myAttributeId
                        minInterval:myMinInterval
@@ -2549,17 +2549,17 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                                     XCTAssertNotNil(device);
                                     XCTAssertNil(error);
                                     NSLog(@"Device acquired. Reading...");
-                                    [device readAttributeWithEndpointID:myEndpointId
-                                                              clusterID:myClusterId
-                                                            attributeID:myAttributeId
-                                                                 params:nil
-                                                                  queue:dispatch_get_main_queue()
-                                                             completion:^(id _Nullable value, NSError * _Nullable error) {
-                                                                 NSLog(@"Read value: %@", value);
-                                                                 XCTAssertNil(value);
-                                                                 XCTAssertNotNil(error);
-                                                                 [responseExpectation fulfill];
-                                                             }];
+                                    [device readAttributesWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId
+                                                                  params:nil
+                                                                   queue:dispatch_get_main_queue()
+                                                              completion:^(id _Nullable value, NSError * _Nullable error) {
+                                                                  NSLog(@"Read value: %@", value);
+                                                                  XCTAssertNil(value);
+                                                                  XCTAssertNotNil(error);
+                                                                  [responseExpectation fulfill];
+                                                              }];
                                 }];
 
     [self waitForExpectations:@[ responseExpectation ] timeout:kTimeoutInSeconds];

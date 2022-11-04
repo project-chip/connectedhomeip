@@ -80,18 +80,18 @@ extern size_t const MTRSizeThreadPANID MTR_NEWLY_AVAILABLE;
  *              returned.  In particular, it's expected to be a 16-bit unsigned
  *              integer stored as 2 bytes in host order.
  */
-- (nullable instancetype)initWithNetworkName:(NSString *)networkName
-                               extendedPANID:(NSData *)extendedPANID
-                                   masterKey:(NSData *)masterKey
-                                        PSKc:(NSData *)PSKc
-                               channelNumber:(NSNumber *)channelNumber
-                                       panID:(NSData *)panID MTR_NEWLY_AVAILABLE;
+- (instancetype _Nullable)initWithNetworkName:(NSString *)networkName
+                                extendedPANID:(NSData *)extendedPANID
+                                    masterKey:(NSData *)masterKey
+                                         PSKc:(NSData *)PSKc
+                                channelNumber:(NSNumber *)channelNumber
+                                        panID:(NSData *)panID MTR_NEWLY_AVAILABLE;
 
 /**
  * Create a Thread Operational Dataset object with a RCP formatted active operational dataset.
  * This initializer will return nil if the input data cannot be parsed correctly
  */
-- (nullable instancetype)initWithData:(NSData *)data;
+- (instancetype _Nullable)initWithData:(NSData *)data;
 
 /**
  * Get the underlying data that represents the Thread Active Operational Dataset

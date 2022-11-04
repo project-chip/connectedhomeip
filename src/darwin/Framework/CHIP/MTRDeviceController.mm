@@ -472,8 +472,8 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
         VerifyOrReturn([self checkIsRunning:error]);
 
         chip::Controller::CommissioningParameters params;
-        if (commissioningParams.CSRNonce) {
-            params.SetCSRNonce(AsByteSpan(commissioningParams.CSRNonce));
+        if (commissioningParams.csrNonce) {
+            params.SetCSRNonce(AsByteSpan(commissioningParams.csrNonce));
         }
         if (commissioningParams.attestationNonce) {
             params.SetAttestationNonce(AsByteSpan(commissioningParams.attestationNonce));
@@ -494,9 +494,9 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
             [self clearDeviceAttestationDelegateBridge];
 
             chip::Optional<uint16_t> timeoutSecs;
-            if (commissioningParams.failSafeExpiryTimeoutSecs) {
+            if (commissioningParams.failSafeExpiryTimeout) {
                 timeoutSecs
-                    = chip::MakeOptional(static_cast<uint16_t>([commissioningParams.failSafeExpiryTimeoutSecs unsignedIntValue]));
+                    = chip::MakeOptional(static_cast<uint16_t>([commissioningParams.failSafeExpiryTimeout unsignedIntValue]));
             }
             BOOL shouldWaitAfterDeviceAttestation = NO;
             if ([commissioningParams.deviceAttestationDelegate
@@ -734,7 +734,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     return AsData(serializedBytes);
 }
 
-- (nullable NSData *)fetchAttestationChallengeForDeviceID:(uint64_t)deviceID
+- (NSData * _Nullable)attestationChallengeForDeviceID:(NSNumber *)deviceID
 {
     VerifyOrReturnValue([self checkIsRunning], nil);
 
@@ -743,7 +743,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
         VerifyOrReturn([self checkIsRunning]);
 
         chip::CommissioneeDeviceProxy * deviceProxy;
-        auto errorCode = self.cppCommissioner->GetDeviceBeingCommissioned(deviceID, &deviceProxy);
+        auto errorCode = self.cppCommissioner->GetDeviceBeingCommissioned([deviceID unsignedLongLongValue], &deviceProxy);
         auto success = ![self checkForError:errorCode logMsg:kErrorGetCommissionee error:nil];
         VerifyOrReturn(success);
 
@@ -983,7 +983,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
 
 - (nullable NSData *)fetchAttestationChallengeForDeviceId:(uint64_t)deviceId
 {
-    return [self fetchAttestationChallengeForDeviceID:deviceId];
+    return [self attestationChallengeForDeviceID:@(deviceId)];
 }
 
 - (BOOL)getBaseDevice:(uint64_t)deviceID queue:(dispatch_queue_t)queue completionHandler:(MTRDeviceConnectionCallback)completion
