@@ -10,9 +10,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
-  {%- for cluster in clusters | serverClustersOnly | sort(attribute='name') %}
-    case ZCL_{{cluster.name | constcase}}_CLUSTER_ID:
-        emberAf{{cluster.name}}ClusterInitCallback(endpoint);
+  {%- for name in clusters | sort(attribute='name') | map(attribute='name') | unique %}
+    case ZCL_{{name | constcase}}_CLUSTER_ID:
+        emberAf{{name}}ClusterInitCallback(endpoint);
         break;
   {%- endfor %}
     default:
@@ -21,8 +21,8 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     }
 }
 
-{%- for cluster in clusters | serverClustersOnly | sort(attribute='name') %}
-void __attribute__((weak)) emberAf{{cluster.name}}ClusterInitCallback(EndpointId endpoint)
+{%- for name in clusters | sort(attribute='name') | map(attribute='name') | unique %}
+void __attribute__((weak)) emberAf{{name}}ClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
