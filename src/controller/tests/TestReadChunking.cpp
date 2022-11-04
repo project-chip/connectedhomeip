@@ -45,6 +45,7 @@
 
 using TestContext = chip::Test::AppContext;
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
@@ -88,7 +89,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(0x00000001, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE(0x
     DECLARE_DYNAMIC_ATTRIBUTE(0x00000005, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
-DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(Clusters::Test::Id, testClusterAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 
@@ -97,7 +98,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute, ARRAY, 1, 0), DECLARE_DYNAMIC_ATTR
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint3Clusters)
-DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint3, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(Clusters::Test::Id, testClusterAttrsOnEndpoint3, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint3, testEndpoint3Clusters);
 
@@ -105,7 +106,7 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint4)
 DECLARE_DYNAMIC_ATTRIBUTE(0x00000001, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint4Clusters)
-DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint4, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(Clusters::Test::Id, testClusterAttrsOnEndpoint4, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint4, testEndpoint4Clusters);
 
@@ -115,7 +116,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(0x00000001, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE(0x
     DECLARE_DYNAMIC_ATTRIBUTE(0x00000003, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint5Clusters)
-DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint5, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(Clusters::Test::Id, testClusterAttrsOnEndpoint5, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint5, testEndpoint5Clusters);
 
@@ -211,7 +212,7 @@ public:
     {
         app::AttributePathParams path;
         path.mEndpointId  = kTestEndpointId5;
-        path.mClusterId   = TestCluster::Id;
+        path.mClusterId   = Clusters::Test::Id;
         path.mAttributeId = attr;
         app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
     }
@@ -245,7 +246,7 @@ class TestAttrAccess : public app::AttributeAccessInterface
 {
 public:
     // Register for the Test Cluster cluster on all endpoints.
-    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), TestCluster::Id)
+    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::Test::Id)
     {
         registerAttributeAccessOverride(this);
     }
@@ -319,7 +320,7 @@ void TestMutableReadCallback::OnAttributeData(const app::ConcreteDataAttributePa
                                               const app::StatusIB & aStatus)
 {
     VerifyOrReturn(apData != nullptr);
-    NL_TEST_ASSERT(gSuite, aPath.mClusterId == TestCluster::Id);
+    NL_TEST_ASSERT(gSuite, aPath.mClusterId == Clusters::Test::Id);
 
     mAttributeCount++;
     if (aPath.mAttributeId <= 5)
@@ -372,7 +373,7 @@ void TestReadChunking::TestChunking(nlTestSuite * apSuite, void * apContext)
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
-    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id);
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::Test::Id);
     app::ReadPrepareParams readParams(sessionHandle);
 
     readParams.mpAttributePathParamsList    = &attributePath;
@@ -437,7 +438,7 @@ void TestReadChunking::TestListChunking(nlTestSuite * apSuite, void * apContext)
     DataVersion dataVersionStorage[ArraySize(testEndpoint3Clusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, Span<DataVersion>(dataVersionStorage));
 
-    app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::TestCluster::Id, kTestListAttribute);
+    app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::Test::Id, kTestListAttribute);
     app::ReadPrepareParams readParams(sessionHandle);
 
     readParams.mpAttributePathParamsList    = &attributePath;
@@ -503,7 +504,7 @@ void TestReadChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
     DataVersion dataVersionStorage[ArraySize(testEndpoint3Clusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, Span<DataVersion>(dataVersionStorage));
 
-    app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::TestCluster::Id, kTestBadAttribute);
+    app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::Test::Id, kTestBadAttribute);
     app::ReadPrepareParams readParams(sessionHandle);
 
     readParams.mpAttributePathParamsList    = &attributePath;
@@ -648,7 +649,7 @@ auto TouchAttrOp(AttributeIdWithEndpointId attr)
     return [=]() {
         app::AttributePathParams path;
         path.mEndpointId  = attr.first;
-        path.mClusterId   = TestCluster::Id;
+        path.mClusterId   = Clusters::Test::Id;
         path.mAttributeId = attr.second;
         gIterationCount++;
         app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
@@ -804,7 +805,7 @@ void TestReadChunking::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * a
                     &readCallback,
                     Instruction{ .chunksize      = 2,
                                  .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 2), WriteAttrOp(AttrOnEp5<Attr2>, 2),
-                                               WriteAttrOp(AttrOnEp5<Attr3>, 2) },
+                                                     WriteAttrOp(AttrOnEp5<Attr3>, 2) },
                                  .expectedValues = { { AttrOnEp5<Attr1>, 2 }, { AttrOnEp5<Attr2>, 2 }, { AttrOnEp5<Attr3>, 3 } },
                                  .attributesWithSameDataVersion = { { AttrOnEp5<Attr1>, AttrOnEp5<Attr2>, AttrOnEp5<Attr3> } } });
             }
@@ -842,9 +843,9 @@ void TestReadChunking::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * a
         app::AttributePathParams attributePath[3];
         app::ReadPrepareParams readParams(sessionHandle);
 
-        attributePath[0] = app::AttributePathParams(kTestEndpointId5, TestCluster::Id, Attr1);
-        attributePath[1] = app::AttributePathParams(kTestEndpointId5, TestCluster::Id, Attr2);
-        attributePath[2] = app::AttributePathParams(kTestEndpointId5, TestCluster::Id, Attr3);
+        attributePath[0] = app::AttributePathParams(kTestEndpointId5, Clusters::Test::Id, Attr1);
+        attributePath[1] = app::AttributePathParams(kTestEndpointId5, Clusters::Test::Id, Attr2);
+        attributePath[2] = app::AttributePathParams(kTestEndpointId5, Clusters::Test::Id, Attr3);
 
         readParams.mpAttributePathParamsList    = attributePath;
         readParams.mAttributePathParamsListSize = 3;
@@ -870,7 +871,7 @@ void TestReadChunking::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * a
             DoTest(&readCallback,
                    Instruction{ .chunksize      = 1,
                                 .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 3), WriteAttrOp(AttrOnEp5<Attr2>, 3),
-                                              WriteAttrOp(AttrOnEp5<Attr3>, 3) },
+                                                    WriteAttrOp(AttrOnEp5<Attr3>, 3) },
                                 .expectedValues = { { AttrOnEp5<Attr1>, 3 }, { AttrOnEp5<Attr2>, 3 }, { AttrOnEp5<Attr3>, 3 } } });
 
             // The attribute failed to catch last report will be picked by this report.

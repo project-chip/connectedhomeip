@@ -36,6 +36,7 @@
 using TestContext = chip::Test::AppContext;
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::Protocols;
 
@@ -43,20 +44,20 @@ namespace {
 
 constexpr EndpointId kTestEndpointId        = 1;
 constexpr DataVersion kDataVersion          = 5;
-constexpr AttributeId kPerpetualAttributeid = Test::MockAttributeId(1);
-constexpr ClusterId kPerpetualClusterId     = Test::MockClusterId(2);
+constexpr AttributeId kPerpetualAttributeid = chip::Test::MockAttributeId(1);
+constexpr ClusterId kPerpetualClusterId     = chip::Test::MockClusterId(2);
 bool expectedAttribute1                     = true;
 int16_t expectedAttribute2                  = 42;
 uint64_t expectedAttribute3                 = 0xdeadbeef0000cafe;
 uint8_t expectedAttribute4[256]             = {
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
 };
 
 enum ResponseDirective
@@ -74,7 +75,7 @@ enum ResponseDirective
 
 ResponseDirective responseDirective;
 
-// Number of reads of TestCluster::Attributes::Int16u that we have observed.
+// Number of reads of Clusters::Test::Attributes::Int16u that we have observed.
 // Every read will increment this count by 1 and return the new value.
 uint16_t totalReadCount = 0;
 
@@ -86,14 +87,14 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
-    if (aPath.mEndpointId >= Test::kMockEndpointMin)
+    if (aPath.mEndpointId >= chip::Test::kMockEndpointMin)
     {
-        return Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
+        return chip::Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
     }
 
     if (responseDirective == kSendManyDataResponses || responseDirective == kSendManyDataResponsesWrongPath)
     {
-        if (aPath.mClusterId != Clusters::TestCluster::Id || aPath.mAttributeId != Clusters::TestCluster::Attributes::Boolean::Id)
+        if (aPath.mClusterId != Clusters::Test::Id || aPath.mAttributeId != Clusters::Test::Attributes::Boolean::Id)
         {
             return CHIP_ERROR_INCORRECT_STATE;
         }
@@ -116,8 +117,8 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
 
     if (responseDirective == kSendDataResponse)
     {
-        if (aPath.mClusterId == app::Clusters::TestCluster::Id &&
-            aPath.mAttributeId == app::Clusters::TestCluster::Attributes::ListFabricScoped::Id)
+        if (aPath.mClusterId == app::Clusters::Test::Id &&
+            aPath.mAttributeId == app::Clusters::Test::Attributes::ListFabricScoped::Id)
         {
             AttributeValueEncoder::AttributeEncodeState state =
                 (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
@@ -125,7 +126,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
                                                kDataVersion /* data version */, aIsFabricFiltered, state);
 
             return valueEncoder.EncodeList([aSubjectDescriptor](const auto & encoder) -> CHIP_ERROR {
-                app::Clusters::TestCluster::Structs::TestFabricScoped::Type val;
+                app::Clusters::Test::Structs::TestFabricScoped::Type val;
                 val.fabricIndex = aSubjectDescriptor.fabricIndex;
                 ReturnErrorOnFailure(encoder.Encode(val));
                 val.fabricIndex = (val.fabricIndex == 1) ? 2 : 1;
@@ -133,8 +134,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
                 return CHIP_NO_ERROR;
             });
         }
-        if (aPath.mClusterId == app::Clusters::TestCluster::Id &&
-            aPath.mAttributeId == app::Clusters::TestCluster::Attributes::Int16u::Id)
+        if (aPath.mClusterId == app::Clusters::Test::Id && aPath.mAttributeId == app::Clusters::Test::Attributes::Int16u::Id)
         {
             AttributeValueEncoder::AttributeEncodeState state =
                 (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
@@ -144,7 +144,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
             return valueEncoder.Encode(++totalReadCount);
         }
         if (aPath.mClusterId == kPerpetualClusterId ||
-            (aPath.mClusterId == app::Clusters::TestCluster::Id && aPath.mAttributeId == kPerpetualAttributeid))
+            (aPath.mClusterId == app::Clusters::Test::Id && aPath.mAttributeId == kPerpetualAttributeid))
         {
             AttributeValueEncoder::AttributeEncodeState state = AttributeValueEncoder::AttributeEncodeState();
             AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor.fabricIndex, aPath,
@@ -171,8 +171,8 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
         ReturnErrorOnFailure(aAttributeReports.GetError());
         AttributeDataIB::Builder & attributeData = attributeReport.CreateAttributeData();
         ReturnErrorOnFailure(attributeReport.GetError());
-        TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
-        TestCluster::Structs::TestListStructOctet::Type valueBuf[4];
+        Clusters::Test::Attributes::ListStructOctetString::TypeInfo::Type value;
+        Clusters::Test::Structs::TestListStructOctet::Type valueBuf[4];
 
         value = valueBuf;
 
@@ -406,8 +406,8 @@ void TestReadInteraction::TestReadAttributeResponse(nlTestSuite * apSuite, void 
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
-                                                                                        kTestEndpointId, onSuccessCb, onFailureCb);
+    Controller::ReadAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 
@@ -429,8 +429,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     chip::app::EventPathParams eventPathParams[100];
     for (auto & eventPathParam : eventPathParams)
     {
-        eventPathParam.mEndpointId = Test::kMockEndpoint3;
-        eventPathParam.mClusterId  = Test::MockClusterId(2);
+        eventPathParam.mEndpointId = chip::Test::kMockEndpoint3;
+        eventPathParam.mClusterId  = chip::Test::MockClusterId(2);
         eventPathParam.mEventId    = 0;
     }
 
@@ -453,16 +453,16 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams1[3];
-        attributePathParams1[0].mEndpointId  = Test::kMockEndpoint2;
-        attributePathParams1[0].mClusterId   = Test::MockClusterId(3);
-        attributePathParams1[0].mAttributeId = Test::MockAttributeId(1);
+        attributePathParams1[0].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams1[0].mClusterId   = chip::Test::MockClusterId(3);
+        attributePathParams1[0].mAttributeId = chip::Test::MockAttributeId(1);
 
         attributePathParams1[1].mEndpointId  = kInvalidEndpointId;
-        attributePathParams1[1].mClusterId   = Test::MockClusterId(3);
-        attributePathParams1[1].mAttributeId = Test::MockAttributeId(1);
+        attributePathParams1[1].mClusterId   = chip::Test::MockClusterId(3);
+        attributePathParams1[1].mAttributeId = chip::Test::MockAttributeId(1);
 
-        attributePathParams1[2].mEndpointId  = Test::kMockEndpoint2;
-        attributePathParams1[2].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[2].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams1[2].mClusterId   = chip::Test::MockClusterId(3);
         attributePathParams1[2].mAttributeId = kInvalidAttributeId;
 
         readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
@@ -474,7 +474,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version1.HasValue());
         delegate.mNumAttributeResponse = 0;
@@ -488,17 +488,17 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams1[3];
-        attributePathParams1[0].mEndpointId  = Test::kMockEndpoint2;
-        attributePathParams1[0].mClusterId   = Test::MockClusterId(3);
-        attributePathParams1[0].mAttributeId = Test::MockAttributeId(1);
+        attributePathParams1[0].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams1[0].mClusterId   = chip::Test::MockClusterId(3);
+        attributePathParams1[0].mAttributeId = chip::Test::MockAttributeId(1);
 
-        attributePathParams1[1].mEndpointId  = Test::kMockEndpoint2;
-        attributePathParams1[1].mClusterId   = Test::MockClusterId(3);
-        attributePathParams1[1].mAttributeId = Test::MockAttributeId(2);
+        attributePathParams1[1].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = chip::Test::MockClusterId(3);
+        attributePathParams1[1].mAttributeId = chip::Test::MockAttributeId(2);
 
-        attributePathParams1[2].mEndpointId  = Test::kMockEndpoint3;
-        attributePathParams1[2].mClusterId   = Test::MockClusterId(2);
-        attributePathParams1[2].mAttributeId = Test::MockAttributeId(2);
+        attributePathParams1[2].mEndpointId  = chip::Test::kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = chip::Test::MockClusterId(2);
+        attributePathParams1[2].mAttributeId = chip::Test::MockAttributeId(2);
 
         readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
         readPrepareParams.mAttributePathParamsListSize = 3;
@@ -509,16 +509,17 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 3);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version1.HasValue());
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint3, Test::MockClusterId(2));
+        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(1));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             bool receivedAttribute1;
@@ -527,7 +528,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -536,7 +538,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -557,16 +560,16 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams1[3];
         attributePathParams1[0].mEndpointId  = kInvalidEndpointId;
-        attributePathParams1[0].mClusterId   = Test::MockClusterId(2);
-        attributePathParams1[0].mAttributeId = Test::MockAttributeId(2);
+        attributePathParams1[0].mClusterId   = chip::Test::MockClusterId(2);
+        attributePathParams1[0].mAttributeId = chip::Test::MockAttributeId(2);
 
-        attributePathParams1[1].mEndpointId  = Test::kMockEndpoint2;
-        attributePathParams1[1].mClusterId   = Test::MockClusterId(2);
-        attributePathParams1[1].mAttributeId = Test::MockAttributeId(2);
+        attributePathParams1[1].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = chip::Test::MockClusterId(2);
+        attributePathParams1[1].mAttributeId = chip::Test::MockAttributeId(2);
 
-        attributePathParams1[2].mEndpointId  = Test::kMockEndpoint3;
-        attributePathParams1[2].mClusterId   = Test::MockClusterId(2);
-        attributePathParams1[2].mAttributeId = Test::MockAttributeId(2);
+        attributePathParams1[2].mEndpointId  = chip::Test::kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = chip::Test::MockClusterId(2);
+        attributePathParams1[2].mAttributeId = chip::Test::MockAttributeId(2);
 
         readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
         readPrepareParams.mAttributePathParamsListSize = 3;
@@ -577,22 +580,24 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version1.HasValue());
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint3, Test::MockClusterId(2));
+        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint1, Test::MockClusterId(2), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint1, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) != CHIP_NO_ERROR);
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(2), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -601,7 +606,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -619,13 +625,13 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams2[2];
-        attributePathParams2[0].mEndpointId  = Test::kMockEndpoint2;
-        attributePathParams2[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams2[0].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = chip::Test::MockClusterId(3);
         attributePathParams2[0].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams2[1].mEndpointId            = Test::kMockEndpoint3;
-        attributePathParams2[1].mClusterId             = Test::MockClusterId(2);
-        attributePathParams2[1].mAttributeId           = Test::MockAttributeId(2);
+        attributePathParams2[1].mEndpointId            = chip::Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = chip::Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = chip::Test::MockAttributeId(2);
         readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
         readPrepareParams.mAttributePathParamsListSize = 2;
         err                                            = readClient.SendRequest(readPrepareParams);
@@ -636,16 +642,17 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 0));
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint3, Test::MockClusterId(2));
+        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(1));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             bool receivedAttribute1;
@@ -654,7 +661,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -663,7 +671,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(3));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(3));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
@@ -672,7 +681,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -690,17 +700,17 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams1[3];
-        attributePathParams1[0].mEndpointId  = Test::kMockEndpoint2;
-        attributePathParams1[0].mClusterId   = Test::MockClusterId(3);
-        attributePathParams1[0].mAttributeId = Test::MockAttributeId(1);
+        attributePathParams1[0].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams1[0].mClusterId   = chip::Test::MockClusterId(3);
+        attributePathParams1[0].mAttributeId = chip::Test::MockAttributeId(1);
 
-        attributePathParams1[1].mEndpointId  = Test::kMockEndpoint2;
-        attributePathParams1[1].mClusterId   = Test::MockClusterId(3);
-        attributePathParams1[1].mAttributeId = Test::MockAttributeId(2);
+        attributePathParams1[1].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = chip::Test::MockClusterId(3);
+        attributePathParams1[1].mAttributeId = chip::Test::MockAttributeId(2);
 
-        attributePathParams1[2].mEndpointId  = Test::kMockEndpoint3;
-        attributePathParams1[2].mClusterId   = Test::MockClusterId(2);
-        attributePathParams1[2].mAttributeId = Test::MockAttributeId(2);
+        attributePathParams1[2].mEndpointId  = chip::Test::kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = chip::Test::MockClusterId(2);
+        attributePathParams1[2].mAttributeId = chip::Test::MockAttributeId(2);
 
         readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
         readPrepareParams.mAttributePathParamsListSize = 3;
@@ -711,16 +721,17 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 0));
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint3, Test::MockClusterId(2));
+        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(1));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             bool receivedAttribute1;
@@ -729,7 +740,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -738,7 +750,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -756,13 +769,13 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams2[2];
-        attributePathParams2[0].mEndpointId  = Test::kMockEndpoint2;
-        attributePathParams2[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams2[0].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = chip::Test::MockClusterId(3);
         attributePathParams2[0].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams2[1].mEndpointId            = Test::kMockEndpoint3;
-        attributePathParams2[1].mClusterId             = Test::MockClusterId(2);
-        attributePathParams2[1].mAttributeId           = Test::MockAttributeId(2);
+        attributePathParams2[1].mEndpointId            = chip::Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = chip::Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = chip::Test::MockAttributeId(2);
         readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
         readPrepareParams.mAttributePathParamsListSize = 2;
         err                                            = readClient.SendRequest(readPrepareParams);
@@ -772,16 +785,17 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 0));
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint3, Test::MockClusterId(2));
+        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(1));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             bool receivedAttribute1;
@@ -790,7 +804,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -799,7 +814,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(3));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(3));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
@@ -808,7 +824,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -818,7 +835,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         delegate.mNumAttributeResponse = 0;
     }
 
-    Test::BumpVersion();
+    chip::Test::BumpVersion();
 
     // Read of E2C3A1, E2C3A2 and E3C2A2. It would use the stored data versions in the cache since our subsequent read's C1A*
     // path intersects with previous cached data version, server's version is changed. Expect E2C3A1, E2C3A2 and E3C2A2 attribute in
@@ -829,17 +846,17 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams1[3];
-        attributePathParams1[0].mEndpointId  = Test::kMockEndpoint2;
-        attributePathParams1[0].mClusterId   = Test::MockClusterId(3);
-        attributePathParams1[0].mAttributeId = Test::MockAttributeId(1);
+        attributePathParams1[0].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams1[0].mClusterId   = chip::Test::MockClusterId(3);
+        attributePathParams1[0].mAttributeId = chip::Test::MockAttributeId(1);
 
-        attributePathParams1[1].mEndpointId  = Test::kMockEndpoint2;
-        attributePathParams1[1].mClusterId   = Test::MockClusterId(3);
-        attributePathParams1[1].mAttributeId = Test::MockAttributeId(2);
+        attributePathParams1[1].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = chip::Test::MockClusterId(3);
+        attributePathParams1[1].mAttributeId = chip::Test::MockAttributeId(2);
 
-        attributePathParams1[2].mEndpointId  = Test::kMockEndpoint3;
-        attributePathParams1[2].mClusterId   = Test::MockClusterId(2);
-        attributePathParams1[2].mAttributeId = Test::MockAttributeId(2);
+        attributePathParams1[2].mEndpointId  = chip::Test::kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = chip::Test::MockClusterId(2);
+        attributePathParams1[2].mAttributeId = chip::Test::MockAttributeId(2);
 
         readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
         readPrepareParams.mAttributePathParamsListSize = 3;
@@ -850,16 +867,17 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 3);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version1.HasValue());
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint3, Test::MockClusterId(2));
+        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(1));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             bool receivedAttribute1;
@@ -868,7 +886,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -877,7 +896,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -895,17 +915,17 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams1[3];
-        attributePathParams1[0].mEndpointId  = Test::kMockEndpoint2;
-        attributePathParams1[0].mClusterId   = Test::MockClusterId(3);
-        attributePathParams1[0].mAttributeId = Test::MockAttributeId(1);
+        attributePathParams1[0].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams1[0].mClusterId   = chip::Test::MockClusterId(3);
+        attributePathParams1[0].mAttributeId = chip::Test::MockAttributeId(1);
 
-        attributePathParams1[1].mEndpointId  = Test::kMockEndpoint2;
-        attributePathParams1[1].mClusterId   = Test::MockClusterId(3);
-        attributePathParams1[1].mAttributeId = Test::MockAttributeId(2);
+        attributePathParams1[1].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = chip::Test::MockClusterId(3);
+        attributePathParams1[1].mAttributeId = chip::Test::MockAttributeId(2);
 
-        attributePathParams1[2].mEndpointId  = Test::kMockEndpoint3;
-        attributePathParams1[2].mClusterId   = Test::MockClusterId(2);
-        attributePathParams1[2].mAttributeId = Test::MockAttributeId(2);
+        attributePathParams1[2].mEndpointId  = chip::Test::kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = chip::Test::MockClusterId(2);
+        attributePathParams1[2].mAttributeId = chip::Test::MockAttributeId(2);
 
         readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
         readPrepareParams.mAttributePathParamsListSize = 3;
@@ -916,16 +936,17 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 3);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version1.HasValue());
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint3, Test::MockClusterId(2));
+        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(1));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             bool receivedAttribute1;
@@ -934,7 +955,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -943,7 +965,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -961,13 +984,13 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams2[2];
-        attributePathParams2[0].mEndpointId  = Test::kMockEndpoint2;
-        attributePathParams2[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams2[0].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = chip::Test::MockClusterId(3);
         attributePathParams2[0].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams2[1].mEndpointId            = Test::kMockEndpoint3;
-        attributePathParams2[1].mClusterId             = Test::MockClusterId(2);
-        attributePathParams2[1].mAttributeId           = Test::MockAttributeId(2);
+        attributePathParams2[1].mEndpointId            = chip::Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = chip::Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = chip::Test::MockAttributeId(2);
         readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
         readPrepareParams.mAttributePathParamsListSize = 2;
         err                                            = readClient.SendRequest(readPrepareParams);
@@ -977,16 +1000,17 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 1));
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint3, Test::MockClusterId(2));
+        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(1));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             bool receivedAttribute1;
@@ -995,7 +1019,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -1004,7 +1029,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(3));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(3));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
@@ -1013,7 +1039,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -1032,13 +1059,13 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams2[2];
-        attributePathParams2[0].mEndpointId  = Test::kMockEndpoint2;
-        attributePathParams2[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams2[0].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = chip::Test::MockClusterId(3);
         attributePathParams2[0].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams2[1].mEndpointId            = Test::kMockEndpoint3;
-        attributePathParams2[1].mClusterId             = Test::MockClusterId(2);
-        attributePathParams2[1].mAttributeId           = Test::MockAttributeId(2);
+        attributePathParams2[1].mEndpointId            = chip::Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = chip::Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = chip::Test::MockAttributeId(2);
         readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
         readPrepareParams.mAttributePathParamsListSize = 2;
 
@@ -1052,16 +1079,17 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 1));
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint3, Test::MockClusterId(2));
+        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(1));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             bool receivedAttribute1;
@@ -1070,7 +1098,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -1079,7 +1108,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(3));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(3));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
@@ -1088,7 +1118,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -1100,7 +1131,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         readPrepareParams.mEventPathParamsListSize = 0;
     }
 
-    Test::BumpVersion();
+    chip::Test::BumpVersion();
 
     // Read of E1C2A* and E2C3A* and E2C2A*, it would use C1 cached version to construct DataVersionFilter, but version has
     // changed in server. Expect E1C2A* and C2C3A* and E2C2A* attributes in report, and cache their versions
@@ -1111,16 +1142,16 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
 
         chip::app::AttributePathParams attributePathParams3[3];
-        attributePathParams3[0].mEndpointId  = Test::kMockEndpoint1;
-        attributePathParams3[0].mClusterId   = Test::MockClusterId(2);
+        attributePathParams3[0].mEndpointId  = chip::Test::kMockEndpoint1;
+        attributePathParams3[0].mClusterId   = chip::Test::MockClusterId(2);
         attributePathParams3[0].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams3[1].mEndpointId  = Test::kMockEndpoint2;
-        attributePathParams3[1].mClusterId   = Test::MockClusterId(3);
+        attributePathParams3[1].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams3[1].mClusterId   = chip::Test::MockClusterId(3);
         attributePathParams3[1].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams3[2].mEndpointId            = Test::kMockEndpoint2;
-        attributePathParams3[2].mClusterId             = Test::MockClusterId(2);
+        attributePathParams3[2].mEndpointId            = chip::Test::kMockEndpoint2;
+        attributePathParams3[2].mClusterId             = chip::Test::MockClusterId(2);
         attributePathParams3[2].mAttributeId           = kInvalidAttributeId;
         readPrepareParams.mpAttributePathParamsList    = attributePathParams3;
         readPrepareParams.mAttributePathParamsListSize = 3;
@@ -1133,20 +1164,21 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 12);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 2));
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint2, Test::MockClusterId(2));
+        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(2));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version2.HasValue() && (version2.Value() == 2));
         Optional<DataVersion> version3;
-        app::ConcreteClusterPath clusterPath3(Test::kMockEndpoint1, Test::MockClusterId(2));
+        app::ConcreteClusterPath clusterPath3(chip::Test::kMockEndpoint1, chip::Test::MockClusterId(2));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath3, version3) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version3.HasValue() && (version3.Value() == 2));
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint1, Test::MockClusterId(2), Test::MockAttributeId(1));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint1, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(1));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             bool receivedAttribute1;
@@ -1155,7 +1187,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(1));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             bool receivedAttribute1;
@@ -1164,7 +1197,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -1173,7 +1207,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(3));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(3));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
@@ -1182,7 +1217,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(2), Test::MockAttributeId(1));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(1));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             bool receivedAttribute1;
@@ -1190,7 +1226,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
             NL_TEST_ASSERT(apSuite, receivedAttribute1 == expectedAttribute1);
         }
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(2), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -1212,16 +1249,16 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
 
         chip::app::AttributePathParams attributePathParams3[3];
-        attributePathParams3[0].mEndpointId  = Test::kMockEndpoint1;
-        attributePathParams3[0].mClusterId   = Test::MockClusterId(2);
+        attributePathParams3[0].mEndpointId  = chip::Test::kMockEndpoint1;
+        attributePathParams3[0].mClusterId   = chip::Test::MockClusterId(2);
         attributePathParams3[0].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams3[1].mEndpointId  = Test::kMockEndpoint2;
-        attributePathParams3[1].mClusterId   = Test::MockClusterId(3);
+        attributePathParams3[1].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams3[1].mClusterId   = chip::Test::MockClusterId(3);
         attributePathParams3[1].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams3[2].mEndpointId            = Test::kMockEndpoint2;
-        attributePathParams3[2].mClusterId             = Test::MockClusterId(2);
+        attributePathParams3[2].mEndpointId            = chip::Test::kMockEndpoint2;
+        attributePathParams3[2].mClusterId             = chip::Test::MockClusterId(2);
         attributePathParams3[2].mAttributeId           = kInvalidAttributeId;
         readPrepareParams.mpAttributePathParamsList    = attributePathParams3;
         readPrepareParams.mAttributePathParamsListSize = 3;
@@ -1234,20 +1271,21 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 7);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 2));
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint2, Test::MockClusterId(2));
+        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(2));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version2.HasValue() && (version2.Value() == 2));
         Optional<DataVersion> version3;
-        app::ConcreteClusterPath clusterPath3(Test::kMockEndpoint1, Test::MockClusterId(2));
+        app::ConcreteClusterPath clusterPath3(chip::Test::kMockEndpoint1, chip::Test::MockClusterId(2));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath3, version3) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version3.HasValue() && (version3.Value() == 2));
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint1, Test::MockClusterId(2), Test::MockAttributeId(1));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint1, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(1));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             bool receivedAttribute1;
@@ -1256,7 +1294,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(1));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             bool receivedAttribute1;
@@ -1265,7 +1304,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -1274,7 +1314,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(3));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(3));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
@@ -1283,7 +1324,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(2), Test::MockAttributeId(1));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(1));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             bool receivedAttribute1;
@@ -1292,7 +1334,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(2), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -1312,8 +1355,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams1[1];
-        attributePathParams1[0].mEndpointId = Test::kMockEndpoint3;
-        attributePathParams1[0].mClusterId  = Test::MockClusterId(2);
+        attributePathParams1[0].mEndpointId = chip::Test::kMockEndpoint3;
+        attributePathParams1[0].mClusterId  = chip::Test::MockClusterId(2);
 
         readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
         readPrepareParams.mAttributePathParamsListSize = 1;
@@ -1324,13 +1367,14 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath(Test::kMockEndpoint3, Test::MockClusterId(2));
+        app::ConcreteClusterPath clusterPath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
 
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version1.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(1));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(1));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             bool receivedAttribute1;
@@ -1339,7 +1383,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(2));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             int16_t receivedAttribute2;
@@ -1348,7 +1393,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(3));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(3));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
@@ -1357,7 +1403,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         }
 
         {
-            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(4));
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(4));
             TLV::TLVReader reader;
             NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
             uint8_t receivedAttribute4[256];
@@ -1393,8 +1440,8 @@ void TestReadInteraction::TestReadEventResponse(nlTestSuite * apSuite, void * ap
 
     auto onDoneCb = [&onDoneCbInvoked](app::ReadClient * apReadClient) { onDoneCbInvoked = true; };
 
-    Controller::ReadEvent<TestCluster::Events::TestEvent::DecodableType>(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId,
-                                                                         onSuccessCb, onFailureCb, onDoneCb);
+    Controller::ReadEvent<Clusters::Test::Events::TestEvent::DecodableType>(&ctx.GetExchangeManager(), sessionHandle,
+                                                                            kTestEndpointId, onSuccessCb, onFailureCb, onDoneCb);
 
     ctx.DrainAndServiceIO();
 
@@ -1427,8 +1474,8 @@ void TestReadInteraction::TestReadAttributeError(nlTestSuite * apSuite, void * a
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
-                                                                                        kTestEndpointId, onSuccessCb, onFailureCb);
+    Controller::ReadAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 
@@ -1459,8 +1506,8 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
-                                                                                        kTestEndpointId, onSuccessCb, onFailureCb);
+    Controller::ReadAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
 
     ctx.ExpireSessionAliceToBob();
 
@@ -1544,7 +1591,7 @@ void TestReadInteraction::TestResubscribeAttributeTimeout(nlTestSuite * apSuite,
     TestContext & ctx  = *static_cast<TestContext *>(apContext);
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
-    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kResponsive);
+    ctx.SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
 
     {
         TestResubscriptionCallback callback;
@@ -1560,8 +1607,8 @@ void TestReadInteraction::TestResubscribeAttributeTimeout(nlTestSuite * apSuite,
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
         attributePathParams[0].mEndpointId             = kTestEndpointId;
-        attributePathParams[0].mClusterId              = app::Clusters::TestCluster::Id;
-        attributePathParams[0].mAttributeId            = app::Clusters::TestCluster::Attributes::Boolean::Id;
+        attributePathParams[0].mClusterId              = app::Clusters::Test::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::Test::Attributes::Boolean::Id;
 
         readPrepareParams.mMaxIntervalCeilingSeconds = 1;
 
@@ -1582,7 +1629,7 @@ void TestReadInteraction::TestResubscribeAttributeTimeout(nlTestSuite * apSuite,
         //
         // 1.5s should cover the liveness timeout in the client of 1s max interval + 50ms ACK timeout.
         //
-        ctx.GetLoopback().mNumMessagesToDrop = Test::LoopbackTransport::kUnlimitedMessageCount;
+        ctx.GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
         ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1500),
                                         [&]() { return callback.mOnResubscriptionsAttempted > 0; });
 
@@ -1606,7 +1653,7 @@ void TestReadInteraction::TestResubscribeAttributeTimeout(nlTestSuite * apSuite,
         NL_TEST_ASSERT(apSuite, callback.mOnDone == 0);
     }
 
-    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kDefault);
+    ctx.SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
 
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -1621,7 +1668,7 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
     TestContext & ctx  = *static_cast<TestContext *>(apContext);
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
-    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kResponsive);
+    ctx.SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
 
     {
         TestResubscriptionCallback callback;
@@ -1636,8 +1683,8 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
         attributePathParams[0].mEndpointId             = kTestEndpointId;
-        attributePathParams[0].mClusterId              = app::Clusters::TestCluster::Id;
-        attributePathParams[0].mAttributeId            = app::Clusters::TestCluster::Attributes::Boolean::Id;
+        attributePathParams[0].mClusterId              = app::Clusters::Test::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::Test::Attributes::Boolean::Id;
 
         //
         // Request a max interval that's very small to reduce time to discovering a liveness failure.
@@ -1657,7 +1704,7 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
         //
         // Request we drop all further messages.
         //
-        ctx.GetLoopback().mNumMessagesToDrop = Test::LoopbackTransport::kUnlimitedMessageCount;
+        ctx.GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
 
         //
         // Drive IO until we get an error on the subscription, which should be caused
@@ -1673,7 +1720,7 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
         NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 0);
     }
 
-    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kDefault);
+    ctx.SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
 
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -1722,7 +1769,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
     for (size_t i = 0; i < (app::InteractionModelEngine::kReadHandlerPoolSize + 1); i++)
     {
         NL_TEST_ASSERT(apSuite,
-                       Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                       Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
                            &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 20,
                            onSubscriptionEstablishedCb, nullptr, false, true) == CHIP_NO_ERROR);
     }
@@ -1744,7 +1791,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
     NL_TEST_ASSERT(apSuite, gTestReadInteraction.mNumActiveSubscriptions == 0);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 
-    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kDefault);
+    ctx.SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
     app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
 }
 
@@ -1786,7 +1833,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionAppRejection(nlTestSuite *
     gTestReadInteraction.mEmitSubscriptionError = true;
 
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
                        onSubscriptionEstablishedCb, nullptr, false, true) == CHIP_NO_ERROR);
 
@@ -1859,7 +1906,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest1(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = false;
 
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 5, 5,
                        onSubscriptionEstablishedCb, nullptr, true) == CHIP_NO_ERROR);
 
@@ -1934,7 +1981,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest2(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = false;
 
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
                        onSubscriptionEstablishedCb, nullptr, true) == CHIP_NO_ERROR);
 
@@ -2009,7 +2056,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest3(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = true;
     gTestReadInteraction.mMaxInterval                = 3000;
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
                        onSubscriptionEstablishedCb, nullptr, true) == CHIP_NO_ERROR);
 
@@ -2075,7 +2122,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest4(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = true;
     gTestReadInteraction.mMaxInterval                = 3700;
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
                        onSubscriptionEstablishedCb, nullptr, true) == CHIP_NO_ERROR);
 
@@ -2149,7 +2196,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest5(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = false;
 
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 4000,
                        onSubscriptionEstablishedCb, nullptr, true) == CHIP_NO_ERROR);
 
@@ -2224,7 +2271,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest6(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = true;
     gTestReadInteraction.mMaxInterval                = 3000;
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 4000,
                        onSubscriptionEstablishedCb, nullptr, true) == CHIP_NO_ERROR);
 
@@ -2298,7 +2345,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest7(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = true;
     gTestReadInteraction.mMaxInterval                = 3700;
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 4000,
                        onSubscriptionEstablishedCb, nullptr, true) == CHIP_NO_ERROR);
 
@@ -2363,7 +2410,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest8(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = true;
     gTestReadInteraction.mMaxInterval                = 4100;
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 4000,
                        onSubscriptionEstablishedCb, nullptr, true) == CHIP_NO_ERROR);
 
@@ -2427,7 +2474,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest9(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = false;
 
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 5, 4,
                        onSubscriptionEstablishedCb, nullptr, true) == CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -2532,7 +2579,7 @@ void TestReadInteraction::SubscribeThenReadHelper(nlTestSuite * apSuite, TestCon
     for (size_t i = 0; i < aSubscribeCount; ++i)
     {
         NL_TEST_ASSERT(apSuite,
-                       Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                       Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
                            &aCtx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
                            onSubscriptionEstablishedCb, nullptr, false, true) == CHIP_NO_ERROR);
     }
@@ -2574,7 +2621,7 @@ void TestReadInteraction::MultipleReadHelperInternal(nlTestSuite * apSuite, Test
         };
 
         NL_TEST_ASSERT(apSuite,
-                       Controller::ReadAttribute<TestCluster::Attributes::Int16u::TypeInfo>(
+                       Controller::ReadAttribute<Clusters::Test::Attributes::Int16u::TypeInfo>(
                            &aCtx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb) == CHIP_NO_ERROR);
     }
 }
@@ -2631,7 +2678,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
     for (size_t i = 0; i < (app::InteractionModelEngine::kReadHandlerPoolSize + 1); i++)
     {
         NL_TEST_ASSERT(apSuite,
-                       Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                       Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
                            &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
                            onSubscriptionEstablishedCb, nullptr, false, true, dataVersion) == CHIP_NO_ERROR);
     }
@@ -2682,7 +2729,7 @@ void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads(nlTest
     app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
 
     NL_TEST_ASSERT(apSuite,
-                   Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::ReadAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb) == CHIP_NO_ERROR);
 
     ctx.DrainAndServiceIO();
@@ -2733,7 +2780,7 @@ void TestReadInteraction::TestReadFabricScopedWithoutFabricFilter(nlTestSuite * 
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<TestCluster::Attributes::ListFabricScoped::TypeInfo>(
+    Controller::ReadAttribute<Clusters::Test::Attributes::ListFabricScoped::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, false /* fabric filtered */);
 
     ctx.DrainAndServiceIO();
@@ -2789,7 +2836,7 @@ void TestReadInteraction::TestReadFabricScopedWithFabricFilter(nlTestSuite * apS
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<TestCluster::Attributes::ListFabricScoped::TypeInfo>(
+    Controller::ReadAttribute<Clusters::Test::Attributes::ListFabricScoped::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, true /* fabric filtered */);
 
     ctx.DrainAndServiceIO();
@@ -2901,7 +2948,7 @@ void TestReadInteraction::TestSubscribeAttributeDeniedNotExistPath(nlTestSuite *
     TestContext & ctx  = *static_cast<TestContext *>(apContext);
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
-    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kResponsive);
+    ctx.SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
 
     {
         SubscriptionPathQuotaHelpers::TestReadCallback callback;
@@ -2913,8 +2960,8 @@ void TestReadInteraction::TestSubscribeAttributeDeniedNotExistPath(nlTestSuite *
         app::AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
-        attributePathParams[0].mClusterId              = app::Clusters::TestCluster::Id;
-        attributePathParams[0].mAttributeId            = app::Clusters::TestCluster::Attributes::ListStructOctetString::Id;
+        attributePathParams[0].mClusterId              = app::Clusters::Test::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::Test::Attributes::ListStructOctetString::Id;
 
         //
         // Request a max interval that's very small to reduce time to discovering a liveness failure.
@@ -2931,7 +2978,7 @@ void TestReadInteraction::TestSubscribeAttributeDeniedNotExistPath(nlTestSuite *
         NL_TEST_ASSERT(apSuite, callback.mOnDone == 1);
     }
 
-    ctx.SetMRPMode(Test::MessagingContext::MRPMode::kDefault);
+    ctx.SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
 
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -2958,10 +3005,10 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     std::vector<std::unique_ptr<app::ReadClient>> readClients;
 
     EstablishReadOrSubscriptions(apSuite, ctx.GetSessionAliceToBob(), 1, 1,
-                                 app::AttributePathParams(kTestEndpointId, TestCluster::Id, kPerpetualAttributeid),
+                                 app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, kPerpetualAttributeid),
                                  app::ReadClient::InteractionType::Read, &perpetualReadCallback, readClients);
     EstablishReadOrSubscriptions(apSuite, ctx.GetSessionBobToAlice(), 1, 1,
-                                 app::AttributePathParams(kTestEndpointId, TestCluster::Id, kPerpetualAttributeid),
+                                 app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, kPerpetualAttributeid),
                                  app::ReadClient::InteractionType::Read, &perpetualReadCallback, readClients);
     ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
         return app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read) == 2;
@@ -2980,15 +3027,15 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     // of the minimum later below.
     //
     // Subscription A
-    EstablishReadOrSubscriptions(apSuite, ctx.GetSessionBobToAlice(), 1,
-                                 app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1,
-                                 app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
-                                 app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
+    EstablishReadOrSubscriptions(
+        apSuite, ctx.GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1,
+        app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+        app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
     // Subscription B
-    EstablishReadOrSubscriptions(apSuite, ctx.GetSessionBobToAlice(), kExpectedParallelSubs,
-                                 app::InteractionModelEngine::kMinSupportedPathsPerSubscription,
-                                 app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
-                                 app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
+    EstablishReadOrSubscriptions(
+        apSuite, ctx.GetSessionBobToAlice(), kExpectedParallelSubs, app::InteractionModelEngine::kMinSupportedPathsPerSubscription,
+        app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+        app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
 
     // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
     // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
@@ -3020,7 +3067,7 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
         std::vector<std::unique_ptr<app::ReadClient>> outReadClient;
         EstablishReadOrSubscriptions(
             apSuite, ctx.GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1,
-            app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+            app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
             app::ReadClient::InteractionType::Subscribe, &callback, outReadClient);
 
         ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return callback.mOnError == 1; });
@@ -3035,7 +3082,7 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     {
         EstablishReadOrSubscriptions(
             apSuite, ctx.GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription,
-            app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+            app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
             app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
 
         readCallback.ClearCounters();
@@ -3058,8 +3105,8 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     {
         app::AttributePathParams path;
         path.mEndpointId  = kTestEndpointId;
-        path.mClusterId   = TestCluster::Id;
-        path.mAttributeId = TestCluster::Attributes::Int16u::Id;
+        path.mClusterId   = Clusters::Test::Id;
+        path.mAttributeId = Clusters::Test::Attributes::Int16u::Id;
         app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
     }
     readCallback.ClearCounters();
@@ -3091,7 +3138,7 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
         EstablishReadOrSubscriptions(
             apSuite, ctx.GetSessionAliceToBob(), app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric,
             app::InteractionModelEngine::kMinSupportedPathsPerSubscription,
-            app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+            app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
             app::ReadClient::InteractionType::Subscribe, &readCallbackFabric2, readClients);
 
         // Run until we have established the subscriptions.
@@ -3117,8 +3164,8 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     {
         app::AttributePathParams path;
         path.mEndpointId  = kTestEndpointId;
-        path.mClusterId   = TestCluster::Id;
-        path.mAttributeId = TestCluster::Attributes::Int16u::Id;
+        path.mClusterId   = Clusters::Test::Id;
+        path.mAttributeId = Clusters::Test::Attributes::Int16u::Id;
         app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
     }
     readCallback.ClearCounters();
@@ -3183,10 +3230,10 @@ void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * 
     app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(kExpectedParallelPaths);
 
     // This should just use all availbale resources.
-    EstablishReadOrSubscriptions(apSuite, ctx.GetSessionBobToAlice(), kExpectedParallelSubs,
-                                 app::InteractionModelEngine::kMinSupportedPathsPerSubscription,
-                                 app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
-                                 app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
+    EstablishReadOrSubscriptions(
+        apSuite, ctx.GetSessionBobToAlice(), kExpectedParallelSubs, app::InteractionModelEngine::kMinSupportedPathsPerSubscription,
+        app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+        app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
 
     ctx.DrainAndServiceIO();
 
@@ -3205,7 +3252,7 @@ void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * 
         std::vector<std::unique_ptr<app::ReadClient>> outReadClient;
         EstablishReadOrSubscriptions(
             apSuite, ctx.GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1,
-            app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+            app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
             app::ReadClient::InteractionType::Subscribe, &callback, outReadClient);
 
         ctx.DrainAndServiceIO();
@@ -3219,7 +3266,7 @@ void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * 
     {
         EstablishReadOrSubscriptions(
             apSuite, ctx.GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription,
-            app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+            app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
             app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
         readCallback.ClearCounters();
 
@@ -3236,8 +3283,8 @@ void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * 
     {
         app::AttributePathParams path;
         path.mEndpointId  = kTestEndpointId;
-        path.mClusterId   = TestCluster::Id;
-        path.mAttributeId = TestCluster::Attributes::Int16u::Id;
+        path.mClusterId   = Clusters::Test::Id;
+        path.mAttributeId = Clusters::Test::Attributes::Int16u::Id;
         app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
     }
     readCallback.ClearCounters();
@@ -3341,7 +3388,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
-                app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3384,7 +3431,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
-                app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3425,7 +3472,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
-                app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3476,7 +3523,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionAliceToBob(), 1, 1,
-                app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3525,7 +3572,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3581,7 +3628,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3637,7 +3684,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3688,7 +3735,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3742,7 +3789,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3800,7 +3847,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionCharlieToDavid(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3855,7 +3902,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionCharlieToDavid(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3911,7 +3958,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionCharlieToDavid(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3958,7 +4005,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionCharlieToDavid(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -4003,7 +4050,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
@@ -4049,7 +4096,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionBobToAlice(), 1, 1,
-                app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
@@ -4100,7 +4147,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionBobToAlice(), 1, 1,
-                app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
@@ -4154,7 +4201,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
             // We have to evict one read transaction on PASE session and one read transaction on Alice's fabric.
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
@@ -4216,7 +4263,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
             // To handle this read request, we must evict both read transactions from the PASE session.
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
@@ -4374,8 +4421,8 @@ void TestReadInteraction::TestReadAttribute_ManyDataValues(nlTestSuite * apSuite
     // not safe to do so.
     auto onFailureCb = [&failureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
-    Controller::ReadAttribute<TestCluster::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId,
-                                                                          onSuccessCb, onFailureCb);
+    Controller::ReadAttribute<Clusters::Test::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
+                                                                             kTestEndpointId, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 
@@ -4408,8 +4455,8 @@ void TestReadInteraction::TestReadAttribute_ManyDataValuesWrongPath(nlTestSuite 
     // not safe to do so.
     auto onFailureCb = [&failureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
-    Controller::ReadAttribute<TestCluster::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId,
-                                                                          onSuccessCb, onFailureCb);
+    Controller::ReadAttribute<Clusters::Test::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
+                                                                             kTestEndpointId, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 
@@ -4442,8 +4489,8 @@ void TestReadInteraction::TestReadAttribute_ManyErrors(nlTestSuite * apSuite, vo
     // not safe to do so.
     auto onFailureCb = [&failureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
-    Controller::ReadAttribute<TestCluster::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId,
-                                                                          onSuccessCb, onFailureCb);
+    Controller::ReadAttribute<Clusters::Test::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
+                                                                             kTestEndpointId, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 
@@ -4466,7 +4513,7 @@ void TestReadInteraction::TestReadHandler_KeepSubscriptionTest(nlTestSuite * apS
 
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     TestReadCallback readCallback;
-    app::AttributePathParams pathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id);
+    app::AttributePathParams pathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id);
 
     app::ReadPrepareParams readParam(ctx.GetSessionAliceToBob());
     readParam.mpAttributePathParamsList    = &pathParams;

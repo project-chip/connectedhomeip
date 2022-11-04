@@ -156,7 +156,7 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
                       "   \"value\" : null\n"
                       "}\n");
 
-    Clusters::TestCluster::Structs::SimpleStruct::Type structVal;
+    Clusters::Test::Structs::SimpleStruct::Type structVal;
     structVal.a = 20;
     structVal.b = true;
     structVal.d = byteBuf;
@@ -188,8 +188,8 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
                       "   \"value\" : [ 1, 2, 3, 4 ]\n"
                       "}\n");
 
-    Clusters::TestCluster::Structs::SimpleStruct::Type structListData[2] = { structVal, structVal };
-    DataModel::List<Clusters::TestCluster::Structs::SimpleStruct::Type> structList;
+    Clusters::Test::Structs::SimpleStruct::Type structListData[2] = { structVal, structVal };
+    DataModel::List<Clusters::Test::Structs::SimpleStruct::Type> structList;
 
     structList = structListData;
 
