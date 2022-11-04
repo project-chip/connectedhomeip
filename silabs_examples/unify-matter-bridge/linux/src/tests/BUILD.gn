@@ -21,10 +21,11 @@ chip_test_suite("tests") {
   output_name = "unifyMatterBridgeTests"
 
   test_sources = [
+    "TestClusterInteractor.cpp",
     "TestExample.cpp",
     "TestDeviceMapper.cpp",
-    "TestOnOffCommandsHandler.cpp",
     "TestNodeStateMonitor.cpp",
+    "TestOnOffCommandsHandler.cpp",
     "TestTemperatureMeasurement.cpp",
   ]
 
