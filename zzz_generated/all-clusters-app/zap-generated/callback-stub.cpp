@@ -71,7 +71,7 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_COLOR_CONTROL_CLUSTER_ID:
         emberAfColorControlClusterInitCallback(endpoint);
         break;
-    case ZCL_CONTENT_LAUNCH_CLUSTER_ID:
+    case ZCL_CONTENT_LAUNCHER_CLUSTER_ID:
         emberAfContentLauncherClusterInitCallback(endpoint);
         break;
     case ZCL_DESCRIPTOR_CLUSTER_ID:
@@ -155,7 +155,7 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_ON_OFF_CLUSTER_ID:
         emberAfOnOffClusterInitCallback(endpoint);
         break;
-    case ZCL_ON_OFF_SWITCH_CONFIG_CLUSTER_ID:
+    case ZCL_ON_OFF_SWITCH_CONFIGURATION_CLUSTER_ID:
         emberAfOnOffSwitchConfigurationClusterInitCallback(endpoint);
         break;
     case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:

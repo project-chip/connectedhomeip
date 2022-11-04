@@ -62,7 +62,7 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_CHANNEL_CLUSTER_ID:
         emberAfChannelClusterInitCallback(endpoint);
         break;
-    case ZCL_CONTENT_LAUNCH_CLUSTER_ID:
+    case ZCL_CONTENT_LAUNCHER_CLUSTER_ID:
         emberAfContentLauncherClusterInitCallback(endpoint);
         break;
     case ZCL_DESCRIPTOR_CLUSTER_ID:
