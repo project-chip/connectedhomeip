@@ -1724,7 +1724,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
         NL_TEST_ASSERT(apSuite,
                        Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
                            &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 20,
-                           onSubscriptionEstablishedCb, nullptr, false, true, NullOptional,
+                           onSubscriptionEstablishedCb, nullptr, false, true, NullOptional, nullptr,
                            System::Clock::Milliseconds32(20000)) == CHIP_NO_ERROR);
     }
 
@@ -2634,7 +2634,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
         NL_TEST_ASSERT(apSuite,
                        Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
                            &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                           onSubscriptionEstablishedCb, nullptr, false, true, dataVersion,
+                           onSubscriptionEstablishedCb, nullptr, false, true, dataVersion, nullptr,
                            System::Clock::Milliseconds32(30000)) == CHIP_NO_ERROR);
     }
 

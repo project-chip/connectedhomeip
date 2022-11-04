@@ -163,7 +163,7 @@ CHIP_ERROR SubscribeAttribute(
         nullptr,
     bool fabricFiltered = true, bool keepPreviousSubscriptions = false, const Optional<DataVersion> & aDataVersion = NullOptional,
     typename detail::SubscriptionOnDoneCallback onDoneCb = nullptr,
-    System::Clock::Timeout aInteractionTimeout = System::Clock::kZero)
+    System::Clock::Timeout aInteractionTimeout           = System::Clock::kZero)
 {
     detail::ReportAttributeParams<DecodableAttributeType> params(sessionHandle);
     params.mOnReportCb                  = onReportCb;
@@ -201,7 +201,7 @@ CHIP_ERROR SubscribeAttribute(
         onResubscriptionAttemptCb = nullptr,
     bool fabricFiltered = true, bool keepPreviousSubscriptions = false, const Optional<DataVersion> & aDataVersion = NullOptional,
     typename detail::SubscriptionOnDoneCallback onDoneCb = nullptr,
-    System::Clock::Timeout aInteractionTimeout = System::Clock::kZero)
+    System::Clock::Timeout aInteractionTimeout           = System::Clock::kZero)
 {
     return SubscribeAttribute<typename AttributeTypeInfo::DecodableType>(
         exchangeMgr, sessionHandle, endpointId, AttributeTypeInfo::GetClusterId(), AttributeTypeInfo::GetAttributeId(), onReportCb,
