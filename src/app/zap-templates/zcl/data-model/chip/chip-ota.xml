@@ -118,7 +118,7 @@ limitations under the License.
         <domain>CHIP</domain>
         <description>Provides an interface for downloading and applying OTA software updates</description>
         <code>0x002a</code>
-        <define>OTA_SOFTWARE_UPDATE_REQUESTOR</define>
+        <define>OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER</define>
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>
         <attribute side="server" code="0x0000" define="DEFAULT_OTA_PROVIDERS" type="ARRAY" entryType="ProviderLocation" writable="true" optional="false">DefaultOtaProviders</attribute>
