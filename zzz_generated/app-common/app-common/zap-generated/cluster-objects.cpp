@@ -18554,7 +18554,7 @@ namespace Events {
 } // namespace Events
 
 } // namespace ElectricalMeasurement
-namespace TestCluster {
+namespace Test {
 namespace Structs {
 namespace SimpleStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
@@ -20885,7 +20885,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TestFabricScopedEvent.
 } // namespace Events
 
-} // namespace TestCluster
+} // namespace Test
 namespace FaultInjection {
 
 namespace Commands {
@@ -21067,10 +21067,10 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
-    case Clusters::TestCluster::Id: {
+    case Clusters::Test::Id: {
         switch (aCommand)
         {
-        case Clusters::TestCluster::Commands::TimedInvokeRequest::Id:
+        case Clusters::Test::Commands::TimedInvokeRequest::Id:
             return true;
         default:
             return false;
@@ -21401,7 +21401,7 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
-    case Clusters::TestCluster::Id: {
+    case Clusters::Test::Id: {
         switch (aCommand)
         {
         default:

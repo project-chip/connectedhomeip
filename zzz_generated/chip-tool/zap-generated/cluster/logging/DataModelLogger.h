@@ -56,7 +56,7 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::TestCluster::Structs::DoubleNestedStructList::DecodableType & value);
+                           const chip::app::Clusters::Test::Structs::DoubleNestedStructList::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::TimeSynchronization::Structs::DstOffsetType::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -86,15 +86,15 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::TestCluster::Structs::NestedStruct::DecodableType & value);
+                           const chip::app::Clusters::Test::Structs::NestedStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::TestCluster::Structs::NestedStructList::DecodableType & value);
+                           const chip::app::Clusters::Test::Structs::NestedStructList::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType & value);
+                           const chip::app::Clusters::Test::Structs::NullablesAndOptionalsStruct::DecodableType & value);
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType & value);
@@ -113,7 +113,7 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ModeSelect::Structs::SemanticTag::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType & value);
+                           const chip::app::Clusters::Test::Structs::SimpleStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ContentLauncher::Structs::StyleInformation::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -123,9 +123,9 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType & value);
+                           const chip::app::Clusters::Test::Structs::TestFabricScoped::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType & value);
+                           const chip::app::Clusters::Test::Structs::TestListStructOctet::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Thermostat::Structs::ThermostatScheduleTransition::DecodableType & value);
 static CHIP_ERROR
@@ -261,9 +261,9 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::PumpConfigurationAndControl::Events::TurbineOperation::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType & value);
+                           const chip::app::Clusters::Test::Events::TestEvent::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::TestCluster::Events::TestFabricScopedEvent::DecodableType & value);
+                           const chip::app::Clusters::Test::Events::TestFabricScopedEvent::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType & value);
@@ -363,29 +363,26 @@ static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType & value);
+                           const chip::app::Clusters::Test::Commands::TestSpecificResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType & value);
+                           const chip::app::Clusters::Test::Commands::TestAddArgumentsResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::TestCluster::Commands::TestSimpleArgumentResponse::DecodableType & value);
-static CHIP_ERROR
-LogValue(const char * label, size_t indent,
-         const chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType & value);
+                           const chip::app::Clusters::Test::Commands::TestSimpleArgumentResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType & value);
+                           const chip::app::Clusters::Test::Commands::TestStructArrayArgumentResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType & value);
+                           const chip::app::Clusters::Test::Commands::TestListInt8UReverseResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType & value);
-static CHIP_ERROR
-LogValue(const char * label, size_t indent,
-         const chip::app::Clusters::TestCluster::Commands::TestComplexNullableOptionalResponse::DecodableType & value);
+                           const chip::app::Clusters::Test::Commands::TestEnumsResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType & value);
+                           const chip::app::Clusters::Test::Commands::TestNullableOptionalResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType & value);
+                           const chip::app::Clusters::Test::Commands::TestComplexNullableOptionalResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType & value);
-static CHIP_ERROR
-LogValue(const char * label, size_t indent,
-         const chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & value);
+                           const chip::app::Clusters::Test::Commands::BooleanResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Test::Commands::SimpleStructResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Test::Commands::TestEmitTestEventResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::Test::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & value);

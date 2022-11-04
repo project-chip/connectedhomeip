@@ -597,13 +597,13 @@ void emberAfAccountLoginClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfElectricalMeasurementClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Test Cluster Cluster Init
+/** @brief Test Cluster Init
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfTestClusterClusterInitCallback(chip::EndpointId endpoint);
+void emberAfTestClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Fault Injection Cluster Init
  *
@@ -7267,34 +7267,34 @@ void emberAfElectricalMeasurementClusterServerTickCallback(chip::EndpointId endp
 void emberAfElectricalMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// Test Cluster Cluster
+// Test Cluster
 //
 
-/** @brief Test Cluster Cluster Server Init
+/** @brief Test Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfTestClusterClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfTestClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief Test Cluster Cluster Client Init
+/** @brief Test Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfTestClusterClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfTestClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief Test Cluster Cluster Server Attribute Changed
+/** @brief Test Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-void MatterTestClusterClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterTestClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief Test Cluster Cluster Server Message Sent
+/** @brief Test Cluster Server Message Sent
  *
  * Server Message Sent
  *
@@ -7304,10 +7304,10 @@ void MatterTestClusterClusterServerAttributeChangedCallback(const chip::app::Con
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfTestClusterClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                        uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfTestClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                                 uint16_t msgLen, uint8_t * message, EmberStatus status);
 
-/** @brief Test Cluster Cluster Client Message Sent
+/** @brief Test Cluster Client Message Sent
  *
  * Client Message Sent
  *
@@ -7317,10 +7317,10 @@ void emberAfTestClusterClusterServerMessageSentCallback(const chip::MessageSendD
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfTestClusterClusterClientMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                        uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfTestClusterClientMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                                 uint16_t msgLen, uint8_t * message, EmberStatus status);
 
-/** @brief Test Cluster Cluster Server Pre Attribute Changed
+/** @brief Test Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -7330,10 +7330,10 @@ void emberAfTestClusterClusterClientMessageSentCallback(const chip::MessageSendD
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterTestClusterClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+MatterTestClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                   EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Test Cluster Cluster Client Pre Attribute Changed
+/** @brief Test Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -7343,24 +7343,24 @@ MatterTestClusterClusterServerPreAttributeChangedCallback(const chip::app::Concr
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterTestClusterClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+MatterTestClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                   EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Test Cluster Cluster Server Tick
+/** @brief Test Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfTestClusterClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfTestClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief Test Cluster Cluster Client Tick
+/** @brief Test Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfTestClusterClusterClientTickCallback(chip::EndpointId endpoint);
+void emberAfTestClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Fault Injection Cluster
@@ -8707,212 +8707,211 @@ bool emberAfElectricalMeasurementClusterGetMeasurementProfileCommandCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileCommand::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster Test Command callback (from client)
+ * @brief Test Cluster Test Command callback (from client)
  */
-bool emberAfTestClusterClusterTestCallback(chip::app::CommandHandler * commandObj,
-                                           const chip::app::ConcreteCommandPath & commandPath,
-                                           const chip::app::Clusters::TestCluster::Commands::Test::DecodableType & commandData);
+bool emberAfTestClusterTestCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                    const chip::app::Clusters::Test::Commands::Test::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestSpecificResponse Command callback (from server)
+ * @brief Test Cluster TestSpecificResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterTestSpecificResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                           uint8_t returnValue);
+bool emberAfTestClusterTestSpecificResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                    uint8_t returnValue);
 /**
- * @brief Test Cluster Cluster TestNotHandled Command callback (from client)
+ * @brief Test Cluster TestNotHandled Command callback (from client)
  */
-bool emberAfTestClusterClusterTestNotHandledCallback(
+bool emberAfTestClusterTestNotHandledCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestNotHandled::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::TestNotHandled::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestAddArgumentsResponse Command callback (from server)
+ * @brief Test Cluster TestAddArgumentsResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterTestAddArgumentsResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                               uint8_t returnValue);
+bool emberAfTestClusterTestAddArgumentsResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                        uint8_t returnValue);
 /**
- * @brief Test Cluster Cluster TestSpecific Command callback (from client)
+ * @brief Test Cluster TestSpecific Command callback (from client)
  */
-bool emberAfTestClusterClusterTestSpecificCallback(
+bool emberAfTestClusterTestSpecificCallback(chip::app::CommandHandler * commandObj,
+                                            const chip::app::ConcreteCommandPath & commandPath,
+                                            const chip::app::Clusters::Test::Commands::TestSpecific::DecodableType & commandData);
+/**
+ * @brief Test Cluster TestSimpleArgumentResponse Command callback (from server)
+ */
+bool emberAfTestClusterTestSimpleArgumentResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                          bool returnValue);
+/**
+ * @brief Test Cluster TestUnknownCommand Command callback (from client)
+ */
+bool emberAfTestClusterTestUnknownCommandCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestSpecific::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::TestUnknownCommand::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestSimpleArgumentResponse Command callback (from server)
+ * @brief Test Cluster TestStructArrayArgumentResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterTestSimpleArgumentResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                 bool returnValue);
+bool emberAfTestClusterTestStructArrayArgumentResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                               /* TYPE WARNING: array array defaults to */ uint8_t * arg1,
+                                                               /* TYPE WARNING: array array defaults to */ uint8_t * arg2,
+                                                               /* TYPE WARNING: array array defaults to */ uint8_t * arg3,
+                                                               /* TYPE WARNING: array array defaults to */ uint8_t * arg4,
+                                                               uint8_t arg5, bool arg6);
 /**
- * @brief Test Cluster Cluster TestUnknownCommand Command callback (from client)
+ * @brief Test Cluster TestAddArguments Command callback (from client)
  */
-bool emberAfTestClusterClusterTestUnknownCommandCallback(
+bool emberAfTestClusterTestAddArgumentsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::TestAddArguments::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestStructArrayArgumentResponse Command callback (from server)
+ * @brief Test Cluster TestListInt8UReverseResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterTestStructArrayArgumentResponseCallback(
-    chip::EndpointId endpoint, chip::app::CommandSender * commandObj, /* TYPE WARNING: array array defaults to */ uint8_t * arg1,
-    /* TYPE WARNING: array array defaults to */ uint8_t * arg2, /* TYPE WARNING: array array defaults to */ uint8_t * arg3,
-    /* TYPE WARNING: array array defaults to */ uint8_t * arg4, uint8_t arg5, bool arg6);
+bool emberAfTestClusterTestListInt8UReverseResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                            /* TYPE WARNING: array array defaults to */ uint8_t * arg1);
 /**
- * @brief Test Cluster Cluster TestAddArguments Command callback (from client)
+ * @brief Test Cluster TestSimpleArgumentRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestAddArgumentsCallback(
+bool emberAfTestClusterTestSimpleArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestAddArguments::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::TestSimpleArgumentRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestListInt8UReverseResponse Command callback (from server)
+ * @brief Test Cluster TestEnumsResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterTestListInt8UReverseResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                   /* TYPE WARNING: array array defaults to */ uint8_t * arg1);
+bool emberAfTestClusterTestEnumsResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                 chip::VendorId arg1, uint8_t arg2);
 /**
- * @brief Test Cluster Cluster TestSimpleArgumentRequest Command callback (from client)
+ * @brief Test Cluster TestStructArrayArgumentRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestSimpleArgumentRequestCallback(
+bool emberAfTestClusterTestStructArrayArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestSimpleArgumentRequest::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::TestStructArrayArgumentRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestEnumsResponse Command callback (from server)
+ * @brief Test Cluster TestNullableOptionalResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterTestEnumsResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                        chip::VendorId arg1, uint8_t arg2);
+bool emberAfTestClusterTestNullableOptionalResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                            bool wasPresent, bool wasNull, uint8_t value, uint8_t originalValue);
 /**
- * @brief Test Cluster Cluster TestStructArrayArgumentRequest Command callback (from client)
+ * @brief Test Cluster TestStructArgumentRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestStructArrayArgumentRequestCallback(
+bool emberAfTestClusterTestStructArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentRequest::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::TestStructArgumentRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestNullableOptionalResponse Command callback (from server)
+ * @brief Test Cluster TestComplexNullableOptionalResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterTestNullableOptionalResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                   bool wasPresent, bool wasNull, uint8_t value,
-                                                                   uint8_t originalValue);
-/**
- * @brief Test Cluster Cluster TestStructArgumentRequest Command callback (from client)
- */
-bool emberAfTestClusterClusterTestStructArgumentRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::DecodableType & commandData);
-/**
- * @brief Test Cluster Cluster TestComplexNullableOptionalResponse Command callback (from server)
- */
-bool emberAfTestClusterClusterTestComplexNullableOptionalResponseCallback(
+bool emberAfTestClusterTestComplexNullableOptionalResponseCallback(
     chip::EndpointId endpoint, chip::app::CommandSender * commandObj, bool NullableIntWasNull, uint16_t NullableIntValue,
     bool OptionalIntWasPresent, uint16_t OptionalIntValue, bool NullableOptionalIntWasPresent, bool NullableOptionalIntWasNull,
     uint16_t NullableOptionalIntValue, bool NullableStringWasNull, chip::CharSpan NullableStringValue,
     bool OptionalStringWasPresent, chip::CharSpan OptionalStringValue, bool NullableOptionalStringWasPresent,
     bool NullableOptionalStringWasNull, chip::CharSpan NullableOptionalStringValue, bool NullableStructWasNull,
-    chip::Optional<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> NullableStructValue,
+    chip::Optional<chip::app::Clusters::Test::Structs::SimpleStruct::DecodableType> NullableStructValue,
     bool OptionalStructWasPresent,
-    chip::Optional<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> OptionalStructValue,
+    chip::Optional<chip::app::Clusters::Test::Structs::SimpleStruct::DecodableType> OptionalStructValue,
     bool NullableOptionalStructWasPresent, bool NullableOptionalStructWasNull,
-    chip::Optional<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> NullableOptionalStructValue,
+    chip::Optional<chip::app::Clusters::Test::Structs::SimpleStruct::DecodableType> NullableOptionalStructValue,
     bool NullableListWasNull, /* TYPE WARNING: array array defaults to */ uint8_t * NullableListValue, bool OptionalListWasPresent,
     /* TYPE WARNING: array array defaults to */ uint8_t * OptionalListValue, bool NullableOptionalListWasPresent,
     bool NullableOptionalListWasNull, /* TYPE WARNING: array array defaults to */ uint8_t * NullableOptionalListValue);
 /**
- * @brief Test Cluster Cluster TestNestedStructArgumentRequest Command callback (from client)
+ * @brief Test Cluster TestNestedStructArgumentRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestNestedStructArgumentRequestCallback(
+bool emberAfTestClusterTestNestedStructArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::TestNestedStructArgumentRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster BooleanResponse Command callback (from server)
+ * @brief Test Cluster BooleanResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterBooleanResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, bool value);
+bool emberAfTestClusterBooleanResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, bool value);
 /**
- * @brief Test Cluster Cluster TestListStructArgumentRequest Command callback (from client)
+ * @brief Test Cluster TestListStructArgumentRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestListStructArgumentRequestCallback(
+bool emberAfTestClusterTestListStructArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::TestListStructArgumentRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster SimpleStructResponse Command callback (from server)
+ * @brief Test Cluster SimpleStructResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterSimpleStructResponseCallback(
-    chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-    chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType arg1);
+bool emberAfTestClusterSimpleStructResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                    chip::app::Clusters::Test::Structs::SimpleStruct::DecodableType arg1);
 /**
- * @brief Test Cluster Cluster TestListInt8UArgumentRequest Command callback (from client)
+ * @brief Test Cluster TestListInt8UArgumentRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestListInt8UArgumentRequestCallback(
+bool emberAfTestClusterTestListInt8UArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::TestListInt8UArgumentRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestEmitTestEventResponse Command callback (from server)
+ * @brief Test Cluster TestEmitTestEventResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterTestEmitTestEventResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                uint64_t value);
+bool emberAfTestClusterTestEmitTestEventResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                         uint64_t value);
 /**
- * @brief Test Cluster Cluster TestNestedStructListArgumentRequest Command callback (from client)
+ * @brief Test Cluster TestNestedStructListArgumentRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestNestedStructListArgumentRequestCallback(
+bool emberAfTestClusterTestNestedStructListArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::TestNestedStructListArgumentRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestEmitTestFabricScopedEventResponse Command callback (from server)
+ * @brief Test Cluster TestEmitTestFabricScopedEventResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterTestEmitTestFabricScopedEventResponseCallback(chip::EndpointId endpoint,
-                                                                            chip::app::CommandSender * commandObj, uint64_t value);
+bool emberAfTestClusterTestEmitTestFabricScopedEventResponseCallback(chip::EndpointId endpoint,
+                                                                     chip::app::CommandSender * commandObj, uint64_t value);
 /**
- * @brief Test Cluster Cluster TestListNestedStructListArgumentRequest Command callback (from client)
+ * @brief Test Cluster TestListNestedStructListArgumentRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestListNestedStructListArgumentRequestCallback(
+bool emberAfTestClusterTestListNestedStructListArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestListNestedStructListArgumentRequest::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::TestListNestedStructListArgumentRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestListInt8UReverseRequest Command callback (from client)
+ * @brief Test Cluster TestListInt8UReverseRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
+bool emberAfTestClusterTestListInt8UReverseRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::TestListInt8UReverseRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestEnumsRequest Command callback (from client)
+ * @brief Test Cluster TestEnumsRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestEnumsRequestCallback(
+bool emberAfTestClusterTestEnumsRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::TestEnumsRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestNullableOptionalRequest Command callback (from client)
+ * @brief Test Cluster TestNullableOptionalRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestNullableOptionalRequestCallback(
+bool emberAfTestClusterTestNullableOptionalRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::TestNullableOptionalRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestComplexNullableOptionalRequest Command callback (from client)
+ * @brief Test Cluster TestComplexNullableOptionalRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestComplexNullableOptionalRequestCallback(
+bool emberAfTestClusterTestComplexNullableOptionalRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestComplexNullableOptionalRequest::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::TestComplexNullableOptionalRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster SimpleStructEchoRequest Command callback (from client)
+ * @brief Test Cluster SimpleStructEchoRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterSimpleStructEchoRequestCallback(
+bool emberAfTestClusterSimpleStructEchoRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::SimpleStructEchoRequest::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::SimpleStructEchoRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TimedInvokeRequest Command callback (from client)
+ * @brief Test Cluster TimedInvokeRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTimedInvokeRequestCallback(
+bool emberAfTestClusterTimedInvokeRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TimedInvokeRequest::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::TimedInvokeRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestSimpleOptionalArgumentRequest Command callback (from client)
+ * @brief Test Cluster TestSimpleOptionalArgumentRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestSimpleOptionalArgumentRequestCallback(
+bool emberAfTestClusterTestSimpleOptionalArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestSimpleOptionalArgumentRequest::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::TestSimpleOptionalArgumentRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestEmitTestEventRequest Command callback (from client)
+ * @brief Test Cluster TestEmitTestEventRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
+bool emberAfTestClusterTestEmitTestEventRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::TestEmitTestEventRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestEmitTestFabricScopedEventRequest Command callback (from client)
+ * @brief Test Cluster TestEmitTestFabricScopedEventRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(
+bool emberAfTestClusterTestEmitTestFabricScopedEventRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventRequest::DecodableType & commandData);
+    const chip::app::Clusters::Test::Commands::TestEmitTestFabricScopedEventRequest::DecodableType & commandData);
 /**
  * @brief Fault Injection Cluster FailAtFault Command callback (from client)
  */

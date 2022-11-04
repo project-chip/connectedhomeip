@@ -400,7 +400,7 @@
 #define EMBER_AF_PLUGIN_ACCOUNT_LOGIN_SERVER
 #define EMBER_AF_PLUGIN_ACCOUNT_LOGIN
 
-// Use this macro to check if the server side of the Test Cluster cluster is included
+// Use this macro to check if the server side of the Test cluster is included
 #define ZCL_USING_TEST_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_TEST_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_TEST_CLUSTER
+#define EMBER_AF_PLUGIN_TEST_SERVER
+#define EMBER_AF_PLUGIN_TEST

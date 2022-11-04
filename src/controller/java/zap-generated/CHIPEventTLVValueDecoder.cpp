@@ -3255,8 +3255,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::TestCluster::Id: {
-        using namespace app::Clusters::TestCluster;
+    case app::Clusters::Test::Id: {
+        using namespace app::Clusters::Test;
         switch (aPath.mEventId)
         {
         case Events::TestEvent::Id: {
@@ -3325,11 +3325,11 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 value_arg4_hClassName.c_str(), value_arg4_hCtorSignature.c_str(), cppValue.arg4.h, value_arg4_h);
 
             jclass simpleStructStructClass_0;
-            err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass_0);
+            err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$TestClusterSimpleStruct",
+                                                                 simpleStructStructClass_0);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterSimpleStruct");
+                ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterSimpleStruct");
                 return nullptr;
             }
             jmethodID simpleStructStructCtor_0 =
@@ -3338,7 +3338,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                  "Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
             if (simpleStructStructCtor_0 == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterSimpleStruct constructor");
+                ChipLogError(Zcl, "Could not find ChipStructs$TestClusterSimpleStruct constructor");
                 return nullptr;
             }
 
@@ -3394,10 +3394,10 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
                 jclass simpleStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$TestClusterSimpleStruct", simpleStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterSimpleStruct");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterSimpleStruct");
                     return nullptr;
                 }
                 jmethodID simpleStructStructCtor_1 =
@@ -3406,7 +3406,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                      "Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
                 if (simpleStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterSimpleStruct constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$TestClusterSimpleStruct constructor");
                     return nullptr;
                 }
 
@@ -3433,19 +3433,19 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jclass testEventStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$TestClusterClusterTestEventEvent", testEventStructClass);
+                env, "chip/devicecontroller/ChipEventStructs$TestClusterTestEventEvent", testEventStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$TestClusterClusterTestEventEvent");
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$TestClusterTestEventEvent");
                 return nullptr;
             }
             jmethodID testEventStructCtor =
                 env->GetMethodID(testEventStructClass, "<init>",
                                  "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Boolean;Lchip/devicecontroller/"
-                                 "ChipStructs$TestClusterClusterSimpleStruct;Ljava/util/ArrayList;Ljava/util/ArrayList;)V");
+                                 "ChipStructs$TestClusterSimpleStruct;Ljava/util/ArrayList;Ljava/util/ArrayList;)V");
             if (testEventStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipEventStructs$TestClusterClusterTestEventEvent constructor");
+                ChipLogError(Zcl, "Could not find ChipEventStructs$TestClusterTestEventEvent constructor");
                 return nullptr;
             }
 
@@ -3470,18 +3470,18 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jclass testFabricScopedEventStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$TestClusterClusterTestFabricScopedEventEvent",
+                env, "chip/devicecontroller/ChipEventStructs$TestClusterTestFabricScopedEventEvent",
                 testFabricScopedEventStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$TestClusterClusterTestFabricScopedEventEvent");
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$TestClusterTestFabricScopedEventEvent");
                 return nullptr;
             }
             jmethodID testFabricScopedEventStructCtor =
                 env->GetMethodID(testFabricScopedEventStructClass, "<init>", "(Ljava/lang/Integer;)V");
             if (testFabricScopedEventStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipEventStructs$TestClusterClusterTestFabricScopedEventEvent constructor");
+                ChipLogError(Zcl, "Could not find ChipEventStructs$TestClusterTestFabricScopedEventEvent constructor");
                 return nullptr;
             }
 

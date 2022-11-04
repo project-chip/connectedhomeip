@@ -622,13 +622,13 @@ public:
     ~ElectricalMeasurementCluster() {}
 };
 
-class DLL_EXPORT TestClusterCluster : public ClusterBase
+class DLL_EXPORT TestCluster : public ClusterBase
 {
 public:
-    TestClusterCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::TestCluster::Id, endpoint)
+    TestCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::Test::Id, endpoint)
     {}
-    ~TestClusterCluster() {}
+    ~TestCluster() {}
 };
 
 } // namespace Controller

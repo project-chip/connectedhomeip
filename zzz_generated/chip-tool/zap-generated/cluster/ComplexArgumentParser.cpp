@@ -550,7 +550,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::DoorLock::Structs::DlC
     ComplexArgumentParser::Finalize(request.credentialIndex);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::TestCluster::Structs::DoubleNestedStructList::Type & request,
+                                        chip::app::Clusters::Test::Structs::DoubleNestedStructList::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -564,7 +564,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::TestCluster::Structs::DoubleNestedStructList::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Test::Structs::DoubleNestedStructList::Type & request)
 {
     ComplexArgumentParser::Finalize(request.a);
 }
@@ -1122,7 +1122,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ThreadNetworkDiagnosti
     ComplexArgumentParser::Finalize(request.fullNetworkData);
     ComplexArgumentParser::Finalize(request.isChild);
 }
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::TestCluster::Structs::NestedStruct::Type & request,
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Test::Structs::NestedStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1144,14 +1144,13 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::TestCluster::Structs::NestedStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Test::Structs::NestedStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.a);
     ComplexArgumentParser::Finalize(request.b);
     ComplexArgumentParser::Finalize(request.c);
 }
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::TestCluster::Structs::NestedStructList::Type & request,
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Test::Structs::NestedStructList::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1189,7 +1188,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::TestCluster::Structs::NestedStructList::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Test::Structs::NestedStructList::Type & request)
 {
     ComplexArgumentParser::Finalize(request.a);
     ComplexArgumentParser::Finalize(request.b);
@@ -1290,7 +1289,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::GeneralDiagnostics::St
     ComplexArgumentParser::Finalize(request.type);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type & request,
+                                        chip::app::Clusters::Test::Structs::NullablesAndOptionalsStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1372,7 +1371,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Test::Structs::NullablesAndOptionalsStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.nullableInt);
     ComplexArgumentParser::Finalize(request.optionalInt);
@@ -1715,7 +1714,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ModeSelect::Structs::S
     ComplexArgumentParser::Finalize(request.mfgCode);
     ComplexArgumentParser::Finalize(request.value);
 }
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type & request,
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Test::Structs::SimpleStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1757,7 +1756,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Test::Structs::SimpleStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.a);
     ComplexArgumentParser::Finalize(request.b);
@@ -1902,8 +1901,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Binding::Structs::Targ
     ComplexArgumentParser::Finalize(request.cluster);
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type & request,
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Test::Structs::TestFabricScoped::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1964,7 +1962,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Test::Structs::TestFabricScoped::Type & request)
 {
     ComplexArgumentParser::Finalize(request.fabricSensitiveInt8u);
     ComplexArgumentParser::Finalize(request.optionalFabricSensitiveInt8u);
@@ -1975,8 +1973,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::TestCluster::Structs::
     ComplexArgumentParser::Finalize(request.fabricSensitiveInt8uList);
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type & request,
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Test::Structs::TestListStructOctet::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1996,7 +1993,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Test::Structs::TestListStructOctet::Type & request)
 {
     ComplexArgumentParser::Finalize(request.member1);
     ComplexArgumentParser::Finalize(request.member2);

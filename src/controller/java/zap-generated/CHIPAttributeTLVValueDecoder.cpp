@@ -17089,8 +17089,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         }
         break;
     }
-    case app::Clusters::TestCluster::Id: {
-        using namespace app::Clusters::TestCluster;
+    case app::Clusters::Test::Id: {
+        using namespace app::Clusters::Test;
         switch (aPath.mAttributeId)
         {
         case Attributes::Boolean::Id: {
@@ -17561,18 +17561,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 jclass testListStructOctetStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$TestClusterClusterTestListStructOctet",
-                    testListStructOctetStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$TestClusterTestListStructOctet", testListStructOctetStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterTestListStructOctet");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterTestListStructOctet");
                     return nullptr;
                 }
                 jmethodID testListStructOctetStructCtor_1 =
                     env->GetMethodID(testListStructOctetStructClass_1, "<init>", "(Ljava/lang/Long;[B)V");
                 if (testListStructOctetStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterTestListStructOctet constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$TestClusterTestListStructOctet constructor");
                     return nullptr;
                 }
 
@@ -17837,10 +17836,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     jclass simpleStructStructClass_3;
                     err = chip::JniReferences::GetInstance().GetClassRef(
-                        env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass_3);
+                        env, "chip/devicecontroller/ChipStructs$TestClusterSimpleStruct", simpleStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
                     {
-                        ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterSimpleStruct");
+                        ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterSimpleStruct");
                         return nullptr;
                     }
                     jmethodID simpleStructStructCtor_3 =
@@ -17849,7 +17848,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                          "Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
                     if (simpleStructStructCtor_3 == nullptr)
                     {
-                        ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterSimpleStruct constructor");
+                        ChipLogError(Zcl, "Could not find ChipStructs$TestClusterSimpleStruct constructor");
                         return nullptr;
                     }
 
@@ -17922,10 +17921,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     jclass simpleStructStructClass_3;
                     err = chip::JniReferences::GetInstance().GetClassRef(
-                        env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass_3);
+                        env, "chip/devicecontroller/ChipStructs$TestClusterSimpleStruct", simpleStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
                     {
-                        ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterSimpleStruct");
+                        ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterSimpleStruct");
                         return nullptr;
                     }
                     jmethodID simpleStructStructCtor_3 =
@@ -17934,7 +17933,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                          "Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
                     if (simpleStructStructCtor_3 == nullptr)
                     {
-                        ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterSimpleStruct constructor");
+                        ChipLogError(Zcl, "Could not find ChipStructs$TestClusterSimpleStruct constructor");
                         return nullptr;
                     }
 
@@ -18022,10 +18021,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                         jclass simpleStructStructClass_4;
                         err = chip::JniReferences::GetInstance().GetClassRef(
-                            env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass_4);
+                            env, "chip/devicecontroller/ChipStructs$TestClusterSimpleStruct", simpleStructStructClass_4);
                         if (err != CHIP_NO_ERROR)
                         {
-                            ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterSimpleStruct");
+                            ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterSimpleStruct");
                             return nullptr;
                         }
                         jmethodID simpleStructStructCtor_4 =
@@ -18034,7 +18033,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                              "lang/Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
                         if (simpleStructStructCtor_4 == nullptr)
                         {
-                            ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterSimpleStruct constructor");
+                            ChipLogError(Zcl, "Could not find ChipStructs$TestClusterSimpleStruct constructor");
                             return nullptr;
                         }
 
@@ -18136,21 +18135,21 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 jclass nullablesAndOptionalsStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$TestClusterClusterNullablesAndOptionalsStruct",
+                    env, "chip/devicecontroller/ChipStructs$TestClusterNullablesAndOptionalsStruct",
                     nullablesAndOptionalsStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterNullablesAndOptionalsStruct");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterNullablesAndOptionalsStruct");
                     return nullptr;
                 }
                 jmethodID nullablesAndOptionalsStructStructCtor_1 = env->GetMethodID(
                     nullablesAndOptionalsStructStructClass_1, "<init>",
                     "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/String;Ljava/util/Optional;Ljava/util/"
-                    "Optional;Lchip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct;Ljava/util/Optional;Ljava/util/"
+                    "Optional;Lchip/devicecontroller/ChipStructs$TestClusterSimpleStruct;Ljava/util/Optional;Ljava/util/"
                     "Optional;Ljava/util/ArrayList;Ljava/util/Optional;Ljava/util/Optional;)V");
                 if (nullablesAndOptionalsStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterNullablesAndOptionalsStruct constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$TestClusterNullablesAndOptionalsStruct constructor");
                     return nullptr;
                 }
 
@@ -18227,11 +18226,11 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                          cppValue.h, value_h);
 
             jclass simpleStructStructClass_0;
-            err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass_0);
+            err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$TestClusterSimpleStruct",
+                                                                 simpleStructStructClass_0);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterSimpleStruct");
+                ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterSimpleStruct");
                 return nullptr;
             }
             jmethodID simpleStructStructCtor_0 =
@@ -18240,7 +18239,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                  "Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
             if (simpleStructStructCtor_0 == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterSimpleStruct constructor");
+                ChipLogError(Zcl, "Could not find ChipStructs$TestClusterSimpleStruct constructor");
                 return nullptr;
             }
 
@@ -18470,10 +18469,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 jclass simpleStructStructClass_2;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass_2);
+                    env, "chip/devicecontroller/ChipStructs$TestClusterSimpleStruct", simpleStructStructClass_2);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterSimpleStruct");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterSimpleStruct");
                     return nullptr;
                 }
                 jmethodID simpleStructStructCtor_2 =
@@ -18482,7 +18481,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                      "Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
                 if (simpleStructStructCtor_2 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterSimpleStruct constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$TestClusterSimpleStruct constructor");
                     return nullptr;
                 }
 
@@ -18515,19 +18514,19 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 jclass testFabricScopedStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$TestClusterClusterTestFabricScoped", testFabricScopedStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$TestClusterTestFabricScoped", testFabricScopedStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterTestFabricScoped");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterTestFabricScoped");
                     return nullptr;
                 }
                 jmethodID testFabricScopedStructCtor_1 = env->GetMethodID(
                     testFabricScopedStructClass_1, "<init>",
                     "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/lang/Integer;Ljava/util/Optional;Ljava/lang/String;Lchip/"
-                    "devicecontroller/ChipStructs$TestClusterClusterSimpleStruct;Ljava/util/ArrayList;Ljava/lang/Integer;)V");
+                    "devicecontroller/ChipStructs$TestClusterSimpleStruct;Ljava/util/ArrayList;Ljava/lang/Integer;)V");
                 if (testFabricScopedStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterTestFabricScoped constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$TestClusterTestFabricScoped constructor");
                     return nullptr;
                 }
 
@@ -19268,10 +19267,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 jclass simpleStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct", simpleStructStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$TestClusterSimpleStruct", simpleStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterClusterSimpleStruct");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterSimpleStruct");
                     return nullptr;
                 }
                 jmethodID simpleStructStructCtor_1 =
@@ -19280,7 +19279,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                      "Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
                 if (simpleStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$TestClusterClusterSimpleStruct constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$TestClusterSimpleStruct constructor");
                     return nullptr;
                 }
 

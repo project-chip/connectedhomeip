@@ -102,7 +102,7 @@
 | ApplicationBasic                                                    | 0x050D |
 | AccountLogin                                                        | 0x050E |
 | ElectricalMeasurement                                               | 0x0B04 |
-| TestCluster                                                         | 0xFFF1FC05|
+| Test                                                                | 0xFFF1FC05|
 | FaultInjection                                                      | 0xFFF1FC06|
 \*----------------------------------------------------------------------------*/
 
@@ -7297,7 +7297,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster TestCluster                                                 | 0xFFF1FC05|
+| Cluster Test                                                        | 0xFFF1FC05|
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Test                                                              |   0x00 |
@@ -7420,10 +7420,10 @@ private:
 /*
  * Command Test
  */
-class TestClusterTest : public ClusterCommand
+class TestTest : public ClusterCommand
 {
 public:
-    TestClusterTest(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("test", credsIssuerConfig)
+    TestTest(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("test", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
@@ -7443,16 +7443,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::Test::Type mRequest;
+    chip::app::Clusters::Test::Commands::Test::Type mRequest;
 };
 
 /*
  * Command TestNotHandled
  */
-class TestClusterTestNotHandled : public ClusterCommand
+class TestTestNotHandled : public ClusterCommand
 {
 public:
-    TestClusterTestNotHandled(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("test-not-handled", credsIssuerConfig)
+    TestTestNotHandled(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("test-not-handled", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
@@ -7472,16 +7472,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type mRequest;
+    chip::app::Clusters::Test::Commands::TestNotHandled::Type mRequest;
 };
 
 /*
  * Command TestSpecific
  */
-class TestClusterTestSpecific : public ClusterCommand
+class TestTestSpecific : public ClusterCommand
 {
 public:
-    TestClusterTestSpecific(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("test-specific", credsIssuerConfig)
+    TestTestSpecific(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("test-specific", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
@@ -7501,17 +7501,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TestSpecific::Type mRequest;
+    chip::app::Clusters::Test::Commands::TestSpecific::Type mRequest;
 };
 
 /*
  * Command TestUnknownCommand
  */
-class TestClusterTestUnknownCommand : public ClusterCommand
+class TestTestUnknownCommand : public ClusterCommand
 {
 public:
-    TestClusterTestUnknownCommand(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-unknown-command", credsIssuerConfig)
+    TestTestUnknownCommand(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("test-unknown-command", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
@@ -7531,17 +7530,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::Type mRequest;
+    chip::app::Clusters::Test::Commands::TestUnknownCommand::Type mRequest;
 };
 
 /*
  * Command TestAddArguments
  */
-class TestClusterTestAddArguments : public ClusterCommand
+class TestTestAddArguments : public ClusterCommand
 {
 public:
-    TestClusterTestAddArguments(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-add-arguments", credsIssuerConfig)
+    TestTestAddArguments(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("test-add-arguments", credsIssuerConfig)
     {
         AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
         AddArgument("Arg2", 0, UINT8_MAX, &mRequest.arg2);
@@ -7563,16 +7561,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type mRequest;
+    chip::app::Clusters::Test::Commands::TestAddArguments::Type mRequest;
 };
 
 /*
  * Command TestSimpleArgumentRequest
  */
-class TestClusterTestSimpleArgumentRequest : public ClusterCommand
+class TestTestSimpleArgumentRequest : public ClusterCommand
 {
 public:
-    TestClusterTestSimpleArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    TestTestSimpleArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("test-simple-argument-request", credsIssuerConfig)
     {
         AddArgument("Arg1", 0, 1, &mRequest.arg1);
@@ -7594,16 +7592,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TestSimpleArgumentRequest::Type mRequest;
+    chip::app::Clusters::Test::Commands::TestSimpleArgumentRequest::Type mRequest;
 };
 
 /*
  * Command TestStructArrayArgumentRequest
  */
-class TestClusterTestStructArrayArgumentRequest : public ClusterCommand
+class TestTestStructArrayArgumentRequest : public ClusterCommand
 {
 public:
-    TestClusterTestStructArrayArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    TestTestStructArrayArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("test-struct-array-argument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1),
         mComplex_Arg2(&mRequest.arg2), mComplex_Arg3(&mRequest.arg3), mComplex_Arg4(&mRequest.arg4)
     {
@@ -7631,22 +7629,21 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentRequest::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::NestedStructList::Type>>
+    chip::app::Clusters::Test::Commands::TestStructArrayArgumentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Test::Structs::NestedStructList::Type>>
         mComplex_Arg1;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>>
-        mComplex_Arg2;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>> mComplex_Arg3;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Test::Structs::SimpleStruct::Type>> mComplex_Arg2;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Test::SimpleEnum>> mComplex_Arg3;
     TypedComplexArgument<chip::app::DataModel::List<const bool>> mComplex_Arg4;
 };
 
 /*
  * Command TestStructArgumentRequest
  */
-class TestClusterTestStructArgumentRequest : public ClusterCommand
+class TestTestStructArgumentRequest : public ClusterCommand
 {
 public:
-    TestClusterTestStructArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    TestTestStructArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("test-struct-argument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
     {
         AddArgument("Arg1", &mComplex_Arg1);
@@ -7668,17 +7665,17 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type> mComplex_Arg1;
+    chip::app::Clusters::Test::Commands::TestStructArgumentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::Test::Structs::SimpleStruct::Type> mComplex_Arg1;
 };
 
 /*
  * Command TestNestedStructArgumentRequest
  */
-class TestClusterTestNestedStructArgumentRequest : public ClusterCommand
+class TestTestNestedStructArgumentRequest : public ClusterCommand
 {
 public:
-    TestClusterTestNestedStructArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    TestTestNestedStructArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("test-nested-struct-argument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
     {
         AddArgument("Arg1", &mComplex_Arg1);
@@ -7700,17 +7697,17 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::NestedStruct::Type> mComplex_Arg1;
+    chip::app::Clusters::Test::Commands::TestNestedStructArgumentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::Test::Structs::NestedStruct::Type> mComplex_Arg1;
 };
 
 /*
  * Command TestListStructArgumentRequest
  */
-class TestClusterTestListStructArgumentRequest : public ClusterCommand
+class TestTestListStructArgumentRequest : public ClusterCommand
 {
 public:
-    TestClusterTestListStructArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    TestTestListStructArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("test-list-struct-argument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
     {
         AddArgument("Arg1", &mComplex_Arg1);
@@ -7732,18 +7729,17 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>>
-        mComplex_Arg1;
+    chip::app::Clusters::Test::Commands::TestListStructArgumentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Test::Structs::SimpleStruct::Type>> mComplex_Arg1;
 };
 
 /*
  * Command TestListInt8UArgumentRequest
  */
-class TestClusterTestListInt8UArgumentRequest : public ClusterCommand
+class TestTestListInt8UArgumentRequest : public ClusterCommand
 {
 public:
-    TestClusterTestListInt8UArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    TestTestListInt8UArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("test-list-int8uargument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
     {
         AddArgument("Arg1", &mComplex_Arg1);
@@ -7765,17 +7761,17 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type mRequest;
+    chip::app::Clusters::Test::Commands::TestListInt8UArgumentRequest::Type mRequest;
     TypedComplexArgument<chip::app::DataModel::List<const uint8_t>> mComplex_Arg1;
 };
 
 /*
  * Command TestNestedStructListArgumentRequest
  */
-class TestClusterTestNestedStructListArgumentRequest : public ClusterCommand
+class TestTestNestedStructListArgumentRequest : public ClusterCommand
 {
 public:
-    TestClusterTestNestedStructListArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    TestTestNestedStructListArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("test-nested-struct-list-argument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
     {
         AddArgument("Arg1", &mComplex_Arg1);
@@ -7797,17 +7793,17 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::NestedStructList::Type> mComplex_Arg1;
+    chip::app::Clusters::Test::Commands::TestNestedStructListArgumentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::Test::Structs::NestedStructList::Type> mComplex_Arg1;
 };
 
 /*
  * Command TestListNestedStructListArgumentRequest
  */
-class TestClusterTestListNestedStructListArgumentRequest : public ClusterCommand
+class TestTestListNestedStructListArgumentRequest : public ClusterCommand
 {
 public:
-    TestClusterTestListNestedStructListArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    TestTestListNestedStructListArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("test-list-nested-struct-list-argument-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
     {
         AddArgument("Arg1", &mComplex_Arg1);
@@ -7829,18 +7825,18 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TestListNestedStructListArgumentRequest::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::NestedStructList::Type>>
+    chip::app::Clusters::Test::Commands::TestListNestedStructListArgumentRequest::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Test::Structs::NestedStructList::Type>>
         mComplex_Arg1;
 };
 
 /*
  * Command TestListInt8UReverseRequest
  */
-class TestClusterTestListInt8UReverseRequest : public ClusterCommand
+class TestTestListInt8UReverseRequest : public ClusterCommand
 {
 public:
-    TestClusterTestListInt8UReverseRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    TestTestListInt8UReverseRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("test-list-int8ureverse-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
     {
         AddArgument("Arg1", &mComplex_Arg1);
@@ -7862,18 +7858,17 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type mRequest;
+    chip::app::Clusters::Test::Commands::TestListInt8UReverseRequest::Type mRequest;
     TypedComplexArgument<chip::app::DataModel::List<const uint8_t>> mComplex_Arg1;
 };
 
 /*
  * Command TestEnumsRequest
  */
-class TestClusterTestEnumsRequest : public ClusterCommand
+class TestTestEnumsRequest : public ClusterCommand
 {
 public:
-    TestClusterTestEnumsRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("test-enums-request", credsIssuerConfig)
+    TestTestEnumsRequest(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("test-enums-request", credsIssuerConfig)
     {
         AddArgument("Arg1", 0, UINT16_MAX, &mRequest.arg1);
         AddArgument("Arg2", 0, UINT8_MAX, &mRequest.arg2);
@@ -7895,16 +7890,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type mRequest;
+    chip::app::Clusters::Test::Commands::TestEnumsRequest::Type mRequest;
 };
 
 /*
  * Command TestNullableOptionalRequest
  */
-class TestClusterTestNullableOptionalRequest : public ClusterCommand
+class TestTestNullableOptionalRequest : public ClusterCommand
 {
 public:
-    TestClusterTestNullableOptionalRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    TestTestNullableOptionalRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("test-nullable-optional-request", credsIssuerConfig)
     {
         AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
@@ -7926,16 +7921,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type mRequest;
+    chip::app::Clusters::Test::Commands::TestNullableOptionalRequest::Type mRequest;
 };
 
 /*
  * Command TestComplexNullableOptionalRequest
  */
-class TestClusterTestComplexNullableOptionalRequest : public ClusterCommand
+class TestTestComplexNullableOptionalRequest : public ClusterCommand
 {
 public:
-    TestClusterTestComplexNullableOptionalRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    TestTestComplexNullableOptionalRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("test-complex-nullable-optional-request", credsIssuerConfig),
         mComplex_NullableStruct(&mRequest.nullableStruct), mComplex_OptionalStruct(&mRequest.optionalStruct),
         mComplex_NullableOptionalStruct(&mRequest.nullableOptionalStruct), mComplex_NullableList(&mRequest.nullableList),
@@ -7971,30 +7966,28 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TestComplexNullableOptionalRequest::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>>
+    chip::app::Clusters::Test::Commands::TestComplexNullableOptionalRequest::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::Clusters::Test::Structs::SimpleStruct::Type>>
         mComplex_NullableStruct;
-    TypedComplexArgument<chip::Optional<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>> mComplex_OptionalStruct;
-    TypedComplexArgument<
-        chip::Optional<chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>>>
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::Test::Structs::SimpleStruct::Type>> mComplex_OptionalStruct;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::Nullable<chip::app::Clusters::Test::Structs::SimpleStruct::Type>>>
         mComplex_NullableOptionalStruct;
-    TypedComplexArgument<
-        chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>>>
+    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::app::Clusters::Test::SimpleEnum>>>
         mComplex_NullableList;
-    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>>>
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::Test::SimpleEnum>>>
         mComplex_OptionalList;
-    TypedComplexArgument<chip::Optional<
-        chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>>>>
+    TypedComplexArgument<
+        chip::Optional<chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::app::Clusters::Test::SimpleEnum>>>>
         mComplex_NullableOptionalList;
 };
 
 /*
  * Command SimpleStructEchoRequest
  */
-class TestClusterSimpleStructEchoRequest : public ClusterCommand
+class TestSimpleStructEchoRequest : public ClusterCommand
 {
 public:
-    TestClusterSimpleStructEchoRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    TestSimpleStructEchoRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("simple-struct-echo-request", credsIssuerConfig), mComplex_Arg1(&mRequest.arg1)
     {
         AddArgument("Arg1", &mComplex_Arg1);
@@ -8016,18 +8009,17 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::SimpleStructEchoRequest::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type> mComplex_Arg1;
+    chip::app::Clusters::Test::Commands::SimpleStructEchoRequest::Type mRequest;
+    TypedComplexArgument<chip::app::Clusters::Test::Structs::SimpleStruct::Type> mComplex_Arg1;
 };
 
 /*
  * Command TimedInvokeRequest
  */
-class TestClusterTimedInvokeRequest : public ClusterCommand
+class TestTimedInvokeRequest : public ClusterCommand
 {
 public:
-    TestClusterTimedInvokeRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("timed-invoke-request", credsIssuerConfig)
+    TestTimedInvokeRequest(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("timed-invoke-request", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
@@ -8047,16 +8039,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TimedInvokeRequest::Type mRequest;
+    chip::app::Clusters::Test::Commands::TimedInvokeRequest::Type mRequest;
 };
 
 /*
  * Command TestSimpleOptionalArgumentRequest
  */
-class TestClusterTestSimpleOptionalArgumentRequest : public ClusterCommand
+class TestTestSimpleOptionalArgumentRequest : public ClusterCommand
 {
 public:
-    TestClusterTestSimpleOptionalArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    TestTestSimpleOptionalArgumentRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("test-simple-optional-argument-request", credsIssuerConfig)
     {
         AddArgument("Arg1", 0, 1, &mRequest.arg1);
@@ -8078,16 +8070,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type mRequest;
+    chip::app::Clusters::Test::Commands::TestSimpleOptionalArgumentRequest::Type mRequest;
 };
 
 /*
  * Command TestEmitTestEventRequest
  */
-class TestClusterTestEmitTestEventRequest : public ClusterCommand
+class TestTestEmitTestEventRequest : public ClusterCommand
 {
 public:
-    TestClusterTestEmitTestEventRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    TestTestEmitTestEventRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("test-emit-test-event-request", credsIssuerConfig)
     {
         AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
@@ -8111,16 +8103,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::Type mRequest;
+    chip::app::Clusters::Test::Commands::TestEmitTestEventRequest::Type mRequest;
 };
 
 /*
  * Command TestEmitTestFabricScopedEventRequest
  */
-class TestClusterTestEmitTestFabricScopedEventRequest : public ClusterCommand
+class TestTestEmitTestFabricScopedEventRequest : public ClusterCommand
 {
 public:
-    TestClusterTestEmitTestFabricScopedEventRequest(CredentialIssuerCommands * credsIssuerConfig) :
+    TestTestEmitTestFabricScopedEventRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("test-emit-test-fabric-scoped-event-request", credsIssuerConfig)
     {
         AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
@@ -8142,7 +8134,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventRequest::Type mRequest;
+    chip::app::Clusters::Test::Commands::TestEmitTestFabricScopedEventRequest::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -12908,39 +12900,39 @@ void registerClusterElectricalMeasurement(Commands & commands, CredentialIssuerC
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterTest(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::TestCluster;
+    using namespace chip::app::Clusters::Test;
 
-    const char * clusterName = "TestCluster";
+    const char * clusterName = "Test";
 
     commands_list clusterCommands = {
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                                 //
-        make_unique<TestClusterTest>(credsIssuerConfig),                                    //
-        make_unique<TestClusterTestNotHandled>(credsIssuerConfig),                          //
-        make_unique<TestClusterTestSpecific>(credsIssuerConfig),                            //
-        make_unique<TestClusterTestUnknownCommand>(credsIssuerConfig),                      //
-        make_unique<TestClusterTestAddArguments>(credsIssuerConfig),                        //
-        make_unique<TestClusterTestSimpleArgumentRequest>(credsIssuerConfig),               //
-        make_unique<TestClusterTestStructArrayArgumentRequest>(credsIssuerConfig),          //
-        make_unique<TestClusterTestStructArgumentRequest>(credsIssuerConfig),               //
-        make_unique<TestClusterTestNestedStructArgumentRequest>(credsIssuerConfig),         //
-        make_unique<TestClusterTestListStructArgumentRequest>(credsIssuerConfig),           //
-        make_unique<TestClusterTestListInt8UArgumentRequest>(credsIssuerConfig),            //
-        make_unique<TestClusterTestNestedStructListArgumentRequest>(credsIssuerConfig),     //
-        make_unique<TestClusterTestListNestedStructListArgumentRequest>(credsIssuerConfig), //
-        make_unique<TestClusterTestListInt8UReverseRequest>(credsIssuerConfig),             //
-        make_unique<TestClusterTestEnumsRequest>(credsIssuerConfig),                        //
-        make_unique<TestClusterTestNullableOptionalRequest>(credsIssuerConfig),             //
-        make_unique<TestClusterTestComplexNullableOptionalRequest>(credsIssuerConfig),      //
-        make_unique<TestClusterSimpleStructEchoRequest>(credsIssuerConfig),                 //
-        make_unique<TestClusterTimedInvokeRequest>(credsIssuerConfig),                      //
-        make_unique<TestClusterTestSimpleOptionalArgumentRequest>(credsIssuerConfig),       //
-        make_unique<TestClusterTestEmitTestEventRequest>(credsIssuerConfig),                //
-        make_unique<TestClusterTestEmitTestFabricScopedEventRequest>(credsIssuerConfig),    //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                          //
+        make_unique<TestTest>(credsIssuerConfig),                                    //
+        make_unique<TestTestNotHandled>(credsIssuerConfig),                          //
+        make_unique<TestTestSpecific>(credsIssuerConfig),                            //
+        make_unique<TestTestUnknownCommand>(credsIssuerConfig),                      //
+        make_unique<TestTestAddArguments>(credsIssuerConfig),                        //
+        make_unique<TestTestSimpleArgumentRequest>(credsIssuerConfig),               //
+        make_unique<TestTestStructArrayArgumentRequest>(credsIssuerConfig),          //
+        make_unique<TestTestStructArgumentRequest>(credsIssuerConfig),               //
+        make_unique<TestTestNestedStructArgumentRequest>(credsIssuerConfig),         //
+        make_unique<TestTestListStructArgumentRequest>(credsIssuerConfig),           //
+        make_unique<TestTestListInt8UArgumentRequest>(credsIssuerConfig),            //
+        make_unique<TestTestNestedStructListArgumentRequest>(credsIssuerConfig),     //
+        make_unique<TestTestListNestedStructListArgumentRequest>(credsIssuerConfig), //
+        make_unique<TestTestListInt8UReverseRequest>(credsIssuerConfig),             //
+        make_unique<TestTestEnumsRequest>(credsIssuerConfig),                        //
+        make_unique<TestTestNullableOptionalRequest>(credsIssuerConfig),             //
+        make_unique<TestTestComplexNullableOptionalRequest>(credsIssuerConfig),      //
+        make_unique<TestSimpleStructEchoRequest>(credsIssuerConfig),                 //
+        make_unique<TestTimedInvokeRequest>(credsIssuerConfig),                      //
+        make_unique<TestTestSimpleOptionalArgumentRequest>(credsIssuerConfig),       //
+        make_unique<TestTestEmitTestEventRequest>(credsIssuerConfig),                //
+        make_unique<TestTestEmitTestFabricScopedEventRequest>(credsIssuerConfig),    //
         //
         // Attributes
         //
@@ -13039,13 +13031,13 @@ void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * 
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<bool>>(Id, "boolean", 0, 1, Attributes::Boolean::Id, credsIssuerConfig),                //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::Test::Bitmap8MaskMap>>>(
             Id, "bitmap8", 0, UINT8_MAX, Attributes::Bitmap8::Id, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::Test::Bitmap16MaskMap>>>(
             Id, "bitmap16", 0, UINT16_MAX, Attributes::Bitmap16::Id, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::Test::Bitmap32MaskMap>>>(
             Id, "bitmap32", 0, UINT32_MAX, Attributes::Bitmap32::Id, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::Test::Bitmap64MaskMap>>>(
             Id, "bitmap64", 0, UINT64_MAX, Attributes::Bitmap64::Id, credsIssuerConfig),                                     //
         make_unique<WriteAttribute<uint8_t>>(Id, "int8u", 0, UINT8_MAX, Attributes::Int8u::Id, credsIssuerConfig),           //
         make_unique<WriteAttribute<uint16_t>>(Id, "int16u", 0, UINT16_MAX, Attributes::Int16u::Id, credsIssuerConfig),       //
@@ -13077,7 +13069,7 @@ void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * 
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::ByteSpan>>>(
             Id, "list-octet-string", Attributes::ListOctetString::Id, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type>>>(
+            chip::app::DataModel::List<const chip::app::Clusters::Test::Structs::TestListStructOctet::Type>>>(
             Id, "list-struct-octet-string", Attributes::ListStructOctetString::Id, credsIssuerConfig),                            //
         make_unique<WriteAttribute<chip::ByteSpan>>(Id, "long-octet-string", Attributes::LongOctetString::Id, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "char-string", Attributes::CharString::Id, credsIssuerConfig),            //
@@ -13086,11 +13078,11 @@ void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * 
         make_unique<WriteAttribute<uint32_t>>(Id, "epoch-s", 0, UINT32_MAX, Attributes::EpochS::Id, credsIssuerConfig),           //
         make_unique<WriteAttribute<chip::VendorId>>(Id, "vendor-id", 0, UINT16_MAX, Attributes::VendorId::Id, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type>>>(
+            chip::app::DataModel::List<const chip::app::Clusters::Test::Structs::NullablesAndOptionalsStruct::Type>>>(
             Id, "list-nullables-and-optionals-struct", Attributes::ListNullablesAndOptionalsStruct::Id, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TestCluster::SimpleEnum>>(Id, "enum-attr", 0, UINT8_MAX,
-                                                                                  Attributes::EnumAttr::Id, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Test::SimpleEnum>>(Id, "enum-attr", 0, UINT8_MAX, Attributes::EnumAttr::Id,
+                                                                           credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::Test::Structs::SimpleStruct::Type>>(
             Id, "struct-attr", Attributes::StructAttr::Id, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "range-restricted-int8u", 0, UINT8_MAX, Attributes::RangeRestrictedInt8u::Id,
                                              credsIssuerConfig), //
@@ -13102,8 +13094,8 @@ void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * 
                                              Attributes::RangeRestrictedInt16s::Id, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::ByteSpan>>>(
             Id, "list-long-octet-string", Attributes::ListLongOctetString::Id, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type>>>(
+        make_unique<
+            WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::Test::Structs::TestFabricScoped::Type>>>(
             Id, "list-fabric-scoped", Attributes::ListFabricScoped::Id, credsIssuerConfig),                                       //
         make_unique<WriteAttribute<bool>>(Id, "timed-write-boolean", 0, 1, Attributes::TimedWriteBoolean::Id, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "general-error-boolean", 0, 1, Attributes::GeneralErrorBoolean::Id,
@@ -13113,17 +13105,13 @@ void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * 
         make_unique<WriteAttribute<bool>>(Id, "unsupported", 0, 1, Attributes::Unsupported::Id, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<bool>>>(Id, "nullable-boolean", 0, 1,
                                                                           Attributes::NullableBoolean::Id, credsIssuerConfig), //
-        make_unique<
-            WriteAttribute<chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>>>(
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap8MaskMap>>>>(
             Id, "nullable-bitmap8", 0, UINT8_MAX, Attributes::NullableBitmap8::Id, credsIssuerConfig), //
-        make_unique<
-            WriteAttribute<chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>>>(
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap16MaskMap>>>>(
             Id, "nullable-bitmap16", 0, UINT16_MAX, Attributes::NullableBitmap16::Id, credsIssuerConfig), //
-        make_unique<
-            WriteAttribute<chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>>>(
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap32MaskMap>>>>(
             Id, "nullable-bitmap32", 0, UINT32_MAX, Attributes::NullableBitmap32::Id, credsIssuerConfig), //
-        make_unique<
-            WriteAttribute<chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>>>(
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap64MaskMap>>>>(
             Id, "nullable-bitmap64", 0, UINT64_MAX, Attributes::NullableBitmap64::Id, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(Id, "nullable-int8u", 0, UINT8_MAX,
                                                                              Attributes::NullableInt8u::Id, credsIssuerConfig), //
@@ -13171,10 +13159,10 @@ void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * 
             Id, "nullable-octet-string", Attributes::NullableOctetString::Id, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::CharSpan>>>(
             Id, "nullable-char-string", Attributes::NullableCharString::Id, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum>>>(
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::Test::SimpleEnum>>>(
             Id, "nullable-enum-attr", 0, UINT8_MAX, Attributes::NullableEnumAttr::Id, credsIssuerConfig), //
         make_unique<
-            WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>>>(
+            WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::Clusters::Test::Structs::SimpleStruct::Type>>>(
             Id, "nullable-struct", Attributes::NullableStruct::Id, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(Id, "nullable-range-restricted-int8u", 0, UINT8_MAX,
                                                                              Attributes::NullableRangeRestrictedInt8u::Id,
@@ -13426,7 +13414,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterApplicationBasic(commands, credsIssuerConfig);
     registerClusterAccountLogin(commands, credsIssuerConfig);
     registerClusterElectricalMeasurement(commands, credsIssuerConfig);
-    registerClusterTestCluster(commands, credsIssuerConfig);
+    registerClusterTest(commands, credsIssuerConfig);
     registerClusterFaultInjection(commands, credsIssuerConfig);
     registerClusterSubscriptions(commands, credsIssuerConfig);
 }

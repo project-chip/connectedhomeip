@@ -353,6 +353,6 @@
 #define ZCL_USING_ELECTRICAL_MEASUREMENT_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_ELECTRICAL_MEASUREMENT_CLIENT
 
-// Use this macro to check if the client side of the Test Cluster cluster is included
+// Use this macro to check if the client side of the Test cluster is included
 #define ZCL_USING_TEST_CLUSTER_CLIENT
-#define EMBER_AF_PLUGIN_TEST_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_TEST_CLIENT

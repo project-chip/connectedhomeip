@@ -5196,7 +5196,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestParams : NSObject <NSCopying>
+@interface MTRTestClusterTestParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5216,7 +5216,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestSpecificResponseParams : NSObject <NSCopying>
+@interface MTRTestClusterTestSpecificResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull returnValue;
 /**
@@ -5238,7 +5238,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestNotHandledParams : NSObject <NSCopying>
+@interface MTRTestClusterTestNotHandledParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5258,7 +5258,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestAddArgumentsResponseParams : NSObject <NSCopying>
+@interface MTRTestClusterTestAddArgumentsResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull returnValue;
 /**
@@ -5280,7 +5280,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestSpecificParams : NSObject <NSCopying>
+@interface MTRTestClusterTestSpecificParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5300,7 +5300,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestSimpleArgumentResponseParams : NSObject <NSCopying>
+@interface MTRTestClusterTestSimpleArgumentResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull returnValue;
 /**
@@ -5322,7 +5322,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestUnknownCommandParams : NSObject <NSCopying>
+@interface MTRTestClusterTestUnknownCommandParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5342,7 +5342,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestStructArrayArgumentResponseParams : NSObject <NSCopying>
+@interface MTRTestClusterTestStructArrayArgumentResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSArray * _Nonnull arg1;
 
@@ -5374,7 +5374,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestAddArgumentsParams : NSObject <NSCopying>
+@interface MTRTestClusterTestAddArgumentsParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull arg1;
 
@@ -5398,7 +5398,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestListInt8UReverseResponseParams : NSObject <NSCopying>
+@interface MTRTestClusterTestListInt8UReverseResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSArray * _Nonnull arg1;
 /**
@@ -5420,7 +5420,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestSimpleArgumentRequestParams : NSObject <NSCopying>
+@interface MTRTestClusterTestSimpleArgumentRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull arg1;
 /**
@@ -5442,7 +5442,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestEnumsResponseParams : NSObject <NSCopying>
+@interface MTRTestClusterTestEnumsResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull arg1;
 
@@ -5466,7 +5466,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestStructArrayArgumentRequestParams : NSObject <NSCopying>
+@interface MTRTestClusterTestStructArrayArgumentRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSArray * _Nonnull arg1;
 
@@ -5498,7 +5498,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestNullableOptionalResponseParams : NSObject <NSCopying>
+@interface MTRTestClusterTestNullableOptionalResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull wasPresent;
 
@@ -5526,9 +5526,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestStructArgumentRequestParams : NSObject <NSCopying>
+@interface MTRTestClusterTestStructArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nonnull arg1;
+@property (nonatomic, copy) MTRTestClusterSimpleStruct * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5548,7 +5548,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestComplexNullableOptionalResponseParams : NSObject <NSCopying>
+@interface MTRTestClusterTestComplexNullableOptionalResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull nullableIntWasNull;
 
@@ -5580,17 +5580,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSNumber * _Nonnull nullableStructWasNull;
 
-@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nullable nullableStructValue;
+@property (nonatomic, copy) MTRTestClusterSimpleStruct * _Nullable nullableStructValue;
 
 @property (nonatomic, copy) NSNumber * _Nonnull optionalStructWasPresent;
 
-@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nullable optionalStructValue;
+@property (nonatomic, copy) MTRTestClusterSimpleStruct * _Nullable optionalStructValue;
 
 @property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalStructWasPresent;
 
 @property (nonatomic, copy) NSNumber * _Nullable nullableOptionalStructWasNull;
 
-@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nullable nullableOptionalStructValue;
+@property (nonatomic, copy) MTRTestClusterSimpleStruct * _Nullable nullableOptionalStructValue;
 
 @property (nonatomic, copy) NSNumber * _Nonnull nullableListWasNull;
 
@@ -5624,9 +5624,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestNestedStructArgumentRequestParams : NSObject <NSCopying>
+@interface MTRTestClusterTestNestedStructArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRTestClusterClusterNestedStruct * _Nonnull arg1;
+@property (nonatomic, copy) MTRTestClusterNestedStruct * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5646,7 +5646,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterBooleanResponseParams : NSObject <NSCopying>
+@interface MTRTestClusterBooleanResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull value;
 /**
@@ -5668,7 +5668,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestListStructArgumentRequestParams : NSObject <NSCopying>
+@interface MTRTestClusterTestListStructArgumentRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSArray * _Nonnull arg1;
 /**
@@ -5690,9 +5690,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterSimpleStructResponseParams : NSObject <NSCopying>
+@interface MTRTestClusterSimpleStructResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nonnull arg1;
+@property (nonatomic, copy) MTRTestClusterSimpleStruct * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5712,7 +5712,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestListInt8UArgumentRequestParams : NSObject <NSCopying>
+@interface MTRTestClusterTestListInt8UArgumentRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSArray * _Nonnull arg1;
 /**
@@ -5734,7 +5734,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestEmitTestEventResponseParams : NSObject <NSCopying>
+@interface MTRTestClusterTestEmitTestEventResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull value;
 /**
@@ -5756,9 +5756,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestNestedStructListArgumentRequestParams : NSObject <NSCopying>
+@interface MTRTestClusterTestNestedStructListArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRTestClusterClusterNestedStructList * _Nonnull arg1;
+@property (nonatomic, copy) MTRTestClusterNestedStructList * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5778,7 +5778,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams : NSObject <NSCopying>
+@interface MTRTestClusterTestEmitTestFabricScopedEventResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull value;
 /**
@@ -5800,7 +5800,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestListNestedStructListArgumentRequestParams : NSObject <NSCopying>
+@interface MTRTestClusterTestListNestedStructListArgumentRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSArray * _Nonnull arg1;
 /**
@@ -5822,7 +5822,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestListInt8UReverseRequestParams : NSObject <NSCopying>
+@interface MTRTestClusterTestListInt8UReverseRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSArray * _Nonnull arg1;
 /**
@@ -5844,7 +5844,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestEnumsRequestParams : NSObject <NSCopying>
+@interface MTRTestClusterTestEnumsRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull arg1;
 
@@ -5868,7 +5868,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestNullableOptionalRequestParams : NSObject <NSCopying>
+@interface MTRTestClusterTestNullableOptionalRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nullable arg1;
 /**
@@ -5890,7 +5890,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestComplexNullableOptionalRequestParams : NSObject <NSCopying>
+@interface MTRTestClusterTestComplexNullableOptionalRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nullable nullableInt;
 
@@ -5904,11 +5904,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSString * _Nullable nullableOptionalString;
 
-@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nullable nullableStruct;
+@property (nonatomic, copy) MTRTestClusterSimpleStruct * _Nullable nullableStruct;
 
-@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nullable optionalStruct;
+@property (nonatomic, copy) MTRTestClusterSimpleStruct * _Nullable optionalStruct;
 
-@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nullable nullableOptionalStruct;
+@property (nonatomic, copy) MTRTestClusterSimpleStruct * _Nullable nullableOptionalStruct;
 
 @property (nonatomic, copy) NSArray * _Nullable nullableList;
 
@@ -5934,9 +5934,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterSimpleStructEchoRequestParams : NSObject <NSCopying>
+@interface MTRTestClusterSimpleStructEchoRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nonnull arg1;
+@property (nonatomic, copy) MTRTestClusterSimpleStruct * _Nonnull arg1;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5956,7 +5956,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTimedInvokeRequestParams : NSObject <NSCopying>
+@interface MTRTestClusterTimedInvokeRequestParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5976,7 +5976,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams : NSObject <NSCopying>
+@interface MTRTestClusterTestSimpleOptionalArgumentRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nullable arg1;
 /**
@@ -5998,7 +5998,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestEmitTestEventRequestParams : NSObject <NSCopying>
+@interface MTRTestClusterTestEmitTestEventRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull arg1;
 
@@ -6024,7 +6024,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams : NSObject <NSCopying>
+@interface MTRTestClusterTestEmitTestFabricScopedEventRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull arg1;
 /**

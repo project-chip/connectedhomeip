@@ -23531,7 +23531,7 @@ using chip::SessionHandle;
 }
 @end
 
-@implementation MTRClusterTestCluster
+@implementation MTRClusterTest
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
 {
@@ -23552,7 +23552,7 @@ using chip::SessionHandle;
 {
     [self testWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
-- (void)testWithParams:(MTRTestClusterClusterTestParams * _Nullable)params
+- (void)testWithParams:(MTRTestClusterTestParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
@@ -23576,14 +23576,14 @@ using chip::SessionHandle;
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::Test::Type request;
+                Test::Commands::Test::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -23610,7 +23610,7 @@ using chip::SessionHandle;
              expectedValueInterval:expectedValueIntervalMs
                         completion:completion];
 }
-- (void)testNotHandledWithParams:(MTRTestClusterClusterTestNotHandledParams * _Nullable)params
+- (void)testNotHandledWithParams:(MTRTestClusterTestNotHandledParams * _Nullable)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                       completion:(MTRStatusCompletion)completion
@@ -23634,14 +23634,14 @@ using chip::SessionHandle;
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TestNotHandled::Type request;
+                Test::Commands::TestNotHandled::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -23661,7 +23661,7 @@ using chip::SessionHandle;
 
 - (void)testSpecificWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                            completion:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
+                            completion:(void (^)(MTRTestClusterTestSpecificResponseParams * _Nullable data,
                                            NSError * _Nullable error))completion
 {
     [self testSpecificWithParams:nil
@@ -23669,11 +23669,11 @@ using chip::SessionHandle;
            expectedValueInterval:expectedValueIntervalMs
                       completion:completion];
 }
-- (void)testSpecificWithParams:(MTRTestClusterClusterTestSpecificParams * _Nullable)params
+- (void)testSpecificWithParams:(MTRTestClusterTestSpecificParams * _Nullable)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completion:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completion
+                    completion:
+                        (void (^)(MTRTestClusterTestSpecificResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -23685,18 +23685,18 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestSpecificResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
+        new MTRTestClusterTestSpecificResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TestSpecific::Type request;
+                Test::Commands::TestSpecific::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<TestClusterClusterTestSpecificResponseCallbackType>::FromCancelable(success);
+                auto successFn = Callback<TestClusterTestSpecificResponseCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -23723,7 +23723,7 @@ using chip::SessionHandle;
                  expectedValueInterval:expectedValueIntervalMs
                             completion:completion];
 }
-- (void)testUnknownCommandWithParams:(MTRTestClusterClusterTestUnknownCommandParams * _Nullable)params
+- (void)testUnknownCommandWithParams:(MTRTestClusterTestUnknownCommandParams * _Nullable)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
@@ -23747,14 +23747,14 @@ using chip::SessionHandle;
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TestUnknownCommand::Type request;
+                Test::Commands::TestUnknownCommand::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -23772,10 +23772,10 @@ using chip::SessionHandle;
     }
 }
 
-- (void)testAddArgumentsWithParams:(MTRTestClusterClusterTestAddArgumentsParams *)params
+- (void)testAddArgumentsWithParams:(MTRTestClusterTestAddArgumentsParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                        completion:(void (^)(MTRTestClusterClusterTestAddArgumentsResponseParams * _Nullable data,
+                        completion:(void (^)(MTRTestClusterTestAddArgumentsResponseParams * _Nullable data,
                                        NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
@@ -23788,20 +23788,20 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestAddArgumentsResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
+        new MTRTestClusterTestAddArgumentsResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TestAddArguments::Type request;
+                Test::Commands::TestAddArguments::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.arg1 = params.arg1.unsignedCharValue;
                 request.arg2 = params.arg2.unsignedCharValue;
 
-                auto successFn = Callback<TestClusterClusterTestAddArgumentsResponseCallbackType>::FromCancelable(success);
+                auto successFn = Callback<TestClusterTestAddArgumentsResponseCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -23819,10 +23819,10 @@ using chip::SessionHandle;
     }
 }
 
-- (void)testSimpleArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleArgumentRequestParams *)params
+- (void)testSimpleArgumentRequestWithParams:(MTRTestClusterTestSimpleArgumentRequestParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                 completion:(void (^)(MTRTestClusterClusterTestSimpleArgumentResponseParams * _Nullable data,
+                                 completion:(void (^)(MTRTestClusterTestSimpleArgumentResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
@@ -23835,19 +23835,19 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestSimpleArgumentResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
+        new MTRTestClusterTestSimpleArgumentResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TestSimpleArgumentRequest::Type request;
+                Test::Commands::TestSimpleArgumentRequest::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.arg1 = params.arg1.boolValue;
 
-                auto successFn = Callback<TestClusterClusterTestSimpleArgumentResponseCallbackType>::FromCancelable(success);
+                auto successFn = Callback<TestClusterTestSimpleArgumentResponseCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -23865,12 +23865,11 @@ using chip::SessionHandle;
     }
 }
 
-- (void)testStructArrayArgumentRequestWithParams:(MTRTestClusterClusterTestStructArrayArgumentRequestParams *)params
+- (void)testStructArrayArgumentRequestWithParams:(MTRTestClusterTestStructArrayArgumentRequestParams *)params
                                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                      completion:
-                                          (void (^)(MTRTestClusterClusterTestStructArrayArgumentResponseParams * _Nullable data,
-                                              NSError * _Nullable error))completion
+                                      completion:(void (^)(MTRTestClusterTestStructArrayArgumentResponseParams * _Nullable data,
+                                                     NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -23882,11 +23881,11 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestStructArrayArgumentResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
+        new MTRTestClusterTestStructArrayArgumentResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TestStructArrayArgumentRequest::Type request;
+                Test::Commands::TestStructArrayArgumentRequest::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -23900,11 +23899,11 @@ using chip::SessionHandle;
                         }
                         listFreer.add(listHolder_0);
                         for (size_t i_0 = 0; i_0 < params.arg1.count; ++i_0) {
-                            if (![params.arg1[i_0] isKindOfClass:[MTRTestClusterClusterNestedStructList class]]) {
+                            if (![params.arg1[i_0] isKindOfClass:[MTRTestClusterNestedStructList class]]) {
                                 // Wrong kind of value.
                                 return CHIP_ERROR_INVALID_ARGUMENT;
                             }
-                            auto element_0 = (MTRTestClusterClusterNestedStructList *) params.arg1[i_0];
+                            auto element_0 = (MTRTestClusterNestedStructList *) params.arg1[i_0];
                             listHolder_0->mList[i_0].a = element_0.a.unsignedCharValue;
                             listHolder_0->mList[i_0].b = element_0.b.boolValue;
                             listHolder_0->mList[i_0].c.a = element_0.c.a.unsignedCharValue;
@@ -23929,11 +23928,11 @@ using chip::SessionHandle;
                                     }
                                     listFreer.add(listHolder_2);
                                     for (size_t i_2 = 0; i_2 < element_0.d.count; ++i_2) {
-                                        if (![element_0.d[i_2] isKindOfClass:[MTRTestClusterClusterSimpleStruct class]]) {
+                                        if (![element_0.d[i_2] isKindOfClass:[MTRTestClusterSimpleStruct class]]) {
                                             // Wrong kind of value.
                                             return CHIP_ERROR_INVALID_ARGUMENT;
                                         }
-                                        auto element_2 = (MTRTestClusterClusterSimpleStruct *) element_0.d[i_2];
+                                        auto element_2 = (MTRTestClusterSimpleStruct *) element_0.d[i_2];
                                         listHolder_2->mList[i_2].a = element_2.a.unsignedCharValue;
                                         listHolder_2->mList[i_2].b = element_2.b.boolValue;
                                         listHolder_2->mList[i_2].c
@@ -24034,11 +24033,11 @@ using chip::SessionHandle;
                         }
                         listFreer.add(listHolder_0);
                         for (size_t i_0 = 0; i_0 < params.arg2.count; ++i_0) {
-                            if (![params.arg2[i_0] isKindOfClass:[MTRTestClusterClusterSimpleStruct class]]) {
+                            if (![params.arg2[i_0] isKindOfClass:[MTRTestClusterSimpleStruct class]]) {
                                 // Wrong kind of value.
                                 return CHIP_ERROR_INVALID_ARGUMENT;
                             }
-                            auto element_0 = (MTRTestClusterClusterSimpleStruct *) params.arg2[i_0];
+                            auto element_0 = (MTRTestClusterSimpleStruct *) params.arg2[i_0];
                             listHolder_0->mList[i_0].a = element_0.a.unsignedCharValue;
                             listHolder_0->mList[i_0].b = element_0.b.boolValue;
                             listHolder_0->mList[i_0].c = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c)>>(
@@ -24103,9 +24102,9 @@ using chip::SessionHandle;
                 request.arg5 = static_cast<std::remove_reference_t<decltype(request.arg5)>>(params.arg5.unsignedCharValue);
                 request.arg6 = params.arg6.boolValue;
 
-                auto successFn = Callback<TestClusterClusterTestStructArrayArgumentResponseCallbackType>::FromCancelable(success);
+                auto successFn = Callback<TestClusterTestStructArrayArgumentResponseCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -24123,10 +24122,10 @@ using chip::SessionHandle;
     }
 }
 
-- (void)testStructArgumentRequestWithParams:(MTRTestClusterClusterTestStructArgumentRequestParams *)params
+- (void)testStructArgumentRequestWithParams:(MTRTestClusterTestStructArgumentRequestParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                 completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                 completion:(void (^)(MTRTestClusterBooleanResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
@@ -24139,11 +24138,11 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
+        new MTRTestClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TestStructArgumentRequest::Type request;
+                Test::Commands::TestStructArgumentRequest::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -24156,9 +24155,9 @@ using chip::SessionHandle;
                 request.arg1.g = params.arg1.g.floatValue;
                 request.arg1.h = params.arg1.h.doubleValue;
 
-                auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
+                auto successFn = Callback<TestClusterBooleanResponseCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -24176,10 +24175,10 @@ using chip::SessionHandle;
     }
 }
 
-- (void)testNestedStructArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructArgumentRequestParams *)params
+- (void)testNestedStructArgumentRequestWithParams:(MTRTestClusterTestNestedStructArgumentRequestParams *)params
                                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                       completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                       completion:(void (^)(MTRTestClusterBooleanResponseParams * _Nullable data,
                                                       NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
@@ -24192,11 +24191,11 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
+        new MTRTestClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TestNestedStructArgumentRequest::Type request;
+                Test::Commands::TestNestedStructArgumentRequest::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -24213,9 +24212,9 @@ using chip::SessionHandle;
                 request.arg1.c.g = params.arg1.c.g.floatValue;
                 request.arg1.c.h = params.arg1.c.h.doubleValue;
 
-                auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
+                auto successFn = Callback<TestClusterBooleanResponseCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -24233,10 +24232,10 @@ using chip::SessionHandle;
     }
 }
 
-- (void)testListStructArgumentRequestWithParams:(MTRTestClusterClusterTestListStructArgumentRequestParams *)params
+- (void)testListStructArgumentRequestWithParams:(MTRTestClusterTestListStructArgumentRequestParams *)params
                                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                     completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                     completion:(void (^)(MTRTestClusterBooleanResponseParams * _Nullable data,
                                                     NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
@@ -24249,11 +24248,11 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
+        new MTRTestClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TestListStructArgumentRequest::Type request;
+                Test::Commands::TestListStructArgumentRequest::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -24267,11 +24266,11 @@ using chip::SessionHandle;
                         }
                         listFreer.add(listHolder_0);
                         for (size_t i_0 = 0; i_0 < params.arg1.count; ++i_0) {
-                            if (![params.arg1[i_0] isKindOfClass:[MTRTestClusterClusterSimpleStruct class]]) {
+                            if (![params.arg1[i_0] isKindOfClass:[MTRTestClusterSimpleStruct class]]) {
                                 // Wrong kind of value.
                                 return CHIP_ERROR_INVALID_ARGUMENT;
                             }
-                            auto element_0 = (MTRTestClusterClusterSimpleStruct *) params.arg1[i_0];
+                            auto element_0 = (MTRTestClusterSimpleStruct *) params.arg1[i_0];
                             listHolder_0->mList[i_0].a = element_0.a.unsignedCharValue;
                             listHolder_0->mList[i_0].b = element_0.b.boolValue;
                             listHolder_0->mList[i_0].c = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c)>>(
@@ -24289,9 +24288,9 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
+                auto successFn = Callback<TestClusterBooleanResponseCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -24309,10 +24308,10 @@ using chip::SessionHandle;
     }
 }
 
-- (void)testListInt8UArgumentRequestWithParams:(MTRTestClusterClusterTestListInt8UArgumentRequestParams *)params
+- (void)testListInt8UArgumentRequestWithParams:(MTRTestClusterTestListInt8UArgumentRequestParams *)params
                                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                    completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                    completion:(void (^)(MTRTestClusterBooleanResponseParams * _Nullable data,
                                                    NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
@@ -24325,11 +24324,11 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
+        new MTRTestClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TestListInt8UArgumentRequest::Type request;
+                Test::Commands::TestListInt8UArgumentRequest::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -24356,9 +24355,9 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
+                auto successFn = Callback<TestClusterBooleanResponseCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -24376,10 +24375,10 @@ using chip::SessionHandle;
     }
 }
 
-- (void)testNestedStructListArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructListArgumentRequestParams *)params
+- (void)testNestedStructListArgumentRequestWithParams:(MTRTestClusterTestNestedStructListArgumentRequestParams *)params
                                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                           completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                           completion:(void (^)(MTRTestClusterBooleanResponseParams * _Nullable data,
                                                           NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
@@ -24392,11 +24391,11 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
+        new MTRTestClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TestNestedStructListArgumentRequest::Type request;
+                Test::Commands::TestNestedStructListArgumentRequest::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -24422,11 +24421,11 @@ using chip::SessionHandle;
                         }
                         listFreer.add(listHolder_1);
                         for (size_t i_1 = 0; i_1 < params.arg1.d.count; ++i_1) {
-                            if (![params.arg1.d[i_1] isKindOfClass:[MTRTestClusterClusterSimpleStruct class]]) {
+                            if (![params.arg1.d[i_1] isKindOfClass:[MTRTestClusterSimpleStruct class]]) {
                                 // Wrong kind of value.
                                 return CHIP_ERROR_INVALID_ARGUMENT;
                             }
-                            auto element_1 = (MTRTestClusterClusterSimpleStruct *) params.arg1.d[i_1];
+                            auto element_1 = (MTRTestClusterSimpleStruct *) params.arg1.d[i_1];
                             listHolder_1->mList[i_1].a = element_1.a.unsignedCharValue;
                             listHolder_1->mList[i_1].b = element_1.b.boolValue;
                             listHolder_1->mList[i_1].c = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].c)>>(
@@ -24510,9 +24509,9 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
+                auto successFn = Callback<TestClusterBooleanResponseCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -24530,11 +24529,10 @@ using chip::SessionHandle;
     }
 }
 
-- (void)testListNestedStructListArgumentRequestWithParams:
-            (MTRTestClusterClusterTestListNestedStructListArgumentRequestParams *)params
+- (void)testListNestedStructListArgumentRequestWithParams:(MTRTestClusterTestListNestedStructListArgumentRequestParams *)params
                                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                               completion:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                               completion:(void (^)(MTRTestClusterBooleanResponseParams * _Nullable data,
                                                               NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
@@ -24547,11 +24545,11 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
+        new MTRTestClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TestListNestedStructListArgumentRequest::Type request;
+                Test::Commands::TestListNestedStructListArgumentRequest::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -24565,11 +24563,11 @@ using chip::SessionHandle;
                         }
                         listFreer.add(listHolder_0);
                         for (size_t i_0 = 0; i_0 < params.arg1.count; ++i_0) {
-                            if (![params.arg1[i_0] isKindOfClass:[MTRTestClusterClusterNestedStructList class]]) {
+                            if (![params.arg1[i_0] isKindOfClass:[MTRTestClusterNestedStructList class]]) {
                                 // Wrong kind of value.
                                 return CHIP_ERROR_INVALID_ARGUMENT;
                             }
-                            auto element_0 = (MTRTestClusterClusterNestedStructList *) params.arg1[i_0];
+                            auto element_0 = (MTRTestClusterNestedStructList *) params.arg1[i_0];
                             listHolder_0->mList[i_0].a = element_0.a.unsignedCharValue;
                             listHolder_0->mList[i_0].b = element_0.b.boolValue;
                             listHolder_0->mList[i_0].c.a = element_0.c.a.unsignedCharValue;
@@ -24594,11 +24592,11 @@ using chip::SessionHandle;
                                     }
                                     listFreer.add(listHolder_2);
                                     for (size_t i_2 = 0; i_2 < element_0.d.count; ++i_2) {
-                                        if (![element_0.d[i_2] isKindOfClass:[MTRTestClusterClusterSimpleStruct class]]) {
+                                        if (![element_0.d[i_2] isKindOfClass:[MTRTestClusterSimpleStruct class]]) {
                                             // Wrong kind of value.
                                             return CHIP_ERROR_INVALID_ARGUMENT;
                                         }
-                                        auto element_2 = (MTRTestClusterClusterSimpleStruct *) element_0.d[i_2];
+                                        auto element_2 = (MTRTestClusterSimpleStruct *) element_0.d[i_2];
                                         listHolder_2->mList[i_2].a = element_2.a.unsignedCharValue;
                                         listHolder_2->mList[i_2].b = element_2.b.boolValue;
                                         listHolder_2->mList[i_2].c
@@ -24690,9 +24688,9 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
+                auto successFn = Callback<TestClusterBooleanResponseCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -24710,10 +24708,10 @@ using chip::SessionHandle;
     }
 }
 
-- (void)testListInt8UReverseRequestWithParams:(MTRTestClusterClusterTestListInt8UReverseRequestParams *)params
+- (void)testListInt8UReverseRequestWithParams:(MTRTestClusterTestListInt8UReverseRequestParams *)params
                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                   completion:(void (^)(MTRTestClusterClusterTestListInt8UReverseResponseParams * _Nullable data,
+                                   completion:(void (^)(MTRTestClusterTestListInt8UReverseResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
@@ -24726,11 +24724,11 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestListInt8UReverseResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
+        new MTRTestClusterTestListInt8UReverseResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TestListInt8UReverseRequest::Type request;
+                Test::Commands::TestListInt8UReverseRequest::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -24757,9 +24755,9 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<TestClusterClusterTestListInt8UReverseResponseCallbackType>::FromCancelable(success);
+                auto successFn = Callback<TestClusterTestListInt8UReverseResponseCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -24777,11 +24775,11 @@ using chip::SessionHandle;
     }
 }
 
-- (void)testEnumsRequestWithParams:(MTRTestClusterClusterTestEnumsRequestParams *)params
+- (void)testEnumsRequestWithParams:(MTRTestClusterTestEnumsRequestParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                        completion:(void (^)(MTRTestClusterClusterTestEnumsResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completion
+                        completion:
+                            (void (^)(MTRTestClusterTestEnumsResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -24793,20 +24791,20 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestEnumsResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
+        new MTRTestClusterTestEnumsResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TestEnumsRequest::Type request;
+                Test::Commands::TestEnumsRequest::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.arg1 = static_cast<std::remove_reference_t<decltype(request.arg1)>>(params.arg1.unsignedShortValue);
                 request.arg2 = static_cast<std::remove_reference_t<decltype(request.arg2)>>(params.arg2.unsignedCharValue);
 
-                auto successFn = Callback<TestClusterClusterTestEnumsResponseCallbackType>::FromCancelable(success);
+                auto successFn = Callback<TestClusterTestEnumsResponseCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -24824,10 +24822,10 @@ using chip::SessionHandle;
     }
 }
 
-- (void)testNullableOptionalRequestWithParams:(MTRTestClusterClusterTestNullableOptionalRequestParams * _Nullable)params
+- (void)testNullableOptionalRequestWithParams:(MTRTestClusterTestNullableOptionalRequestParams * _Nullable)params
                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                   completion:(void (^)(MTRTestClusterClusterTestNullableOptionalResponseParams * _Nullable data,
+                                   completion:(void (^)(MTRTestClusterTestNullableOptionalResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
@@ -24840,11 +24838,11 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestNullableOptionalResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
+        new MTRTestClusterTestNullableOptionalResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TestNullableOptionalRequest::Type request;
+                Test::Commands::TestNullableOptionalRequest::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -24860,9 +24858,9 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<TestClusterClusterTestNullableOptionalResponseCallbackType>::FromCancelable(success);
+                auto successFn = Callback<TestClusterTestNullableOptionalResponseCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -24880,12 +24878,11 @@ using chip::SessionHandle;
     }
 }
 
-- (void)testComplexNullableOptionalRequestWithParams:(MTRTestClusterClusterTestComplexNullableOptionalRequestParams *)params
+- (void)testComplexNullableOptionalRequestWithParams:(MTRTestClusterTestComplexNullableOptionalRequestParams *)params
                                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                           completion:
-                                              (void (^)(
-                                                  MTRTestClusterClusterTestComplexNullableOptionalResponseParams * _Nullable data,
+                                              (void (^)(MTRTestClusterTestComplexNullableOptionalResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
@@ -24898,11 +24895,11 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
+        new MTRTestClusterTestComplexNullableOptionalResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TestComplexNullableOptionalRequest::Type request;
+                Test::Commands::TestComplexNullableOptionalRequest::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -25077,10 +25074,9 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn
-                    = Callback<TestClusterClusterTestComplexNullableOptionalResponseCallbackType>::FromCancelable(success);
+                auto successFn = Callback<TestClusterTestComplexNullableOptionalResponseCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -25098,10 +25094,10 @@ using chip::SessionHandle;
     }
 }
 
-- (void)simpleStructEchoRequestWithParams:(MTRTestClusterClusterSimpleStructEchoRequestParams *)params
+- (void)simpleStructEchoRequestWithParams:(MTRTestClusterSimpleStructEchoRequestParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                               completion:(void (^)(MTRTestClusterClusterSimpleStructResponseParams * _Nullable data,
+                               completion:(void (^)(MTRTestClusterSimpleStructResponseParams * _Nullable data,
                                               NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
@@ -25114,11 +25110,11 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterSimpleStructResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
+        new MTRTestClusterSimpleStructResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::SimpleStructEchoRequest::Type request;
+                Test::Commands::SimpleStructEchoRequest::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -25131,9 +25127,9 @@ using chip::SessionHandle;
                 request.arg1.g = params.arg1.g.floatValue;
                 request.arg1.h = params.arg1.h.doubleValue;
 
-                auto successFn = Callback<TestClusterClusterSimpleStructResponseCallbackType>::FromCancelable(success);
+                auto successFn = Callback<TestClusterSimpleStructResponseCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -25160,7 +25156,7 @@ using chip::SessionHandle;
                  expectedValueInterval:expectedValueIntervalMs
                             completion:completion];
 }
-- (void)timedInvokeRequestWithParams:(MTRTestClusterClusterTimedInvokeRequestParams * _Nullable)params
+- (void)timedInvokeRequestWithParams:(MTRTestClusterTimedInvokeRequestParams * _Nullable)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
@@ -25184,7 +25180,7 @@ using chip::SessionHandle;
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TimedInvokeRequest::Type request;
+                Test::Commands::TimedInvokeRequest::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -25194,7 +25190,7 @@ using chip::SessionHandle;
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -25212,7 +25208,7 @@ using chip::SessionHandle;
     }
 }
 
-- (void)testSimpleOptionalArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
+- (void)testSimpleOptionalArgumentRequestWithParams:(MTRTestClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
                                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                          completion:(MTRStatusCompletion)completion
@@ -25236,7 +25232,7 @@ using chip::SessionHandle;
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type request;
+                Test::Commands::TestSimpleOptionalArgumentRequest::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -25249,7 +25245,7 @@ using chip::SessionHandle;
 
                 auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -25267,10 +25263,10 @@ using chip::SessionHandle;
     }
 }
 
-- (void)testEmitTestEventRequestWithParams:(MTRTestClusterClusterTestEmitTestEventRequestParams *)params
+- (void)testEmitTestEventRequestWithParams:(MTRTestClusterTestEmitTestEventRequestParams *)params
                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                completion:(void (^)(MTRTestClusterClusterTestEmitTestEventResponseParams * _Nullable data,
+                                completion:(void (^)(MTRTestClusterTestEmitTestEventResponseParams * _Nullable data,
                                                NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
@@ -25283,11 +25279,11 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestEmitTestEventResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
+        new MTRTestClusterTestEmitTestEventResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TestEmitTestEventRequest::Type request;
+                Test::Commands::TestEmitTestEventRequest::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -25295,9 +25291,9 @@ using chip::SessionHandle;
                 request.arg2 = static_cast<std::remove_reference_t<decltype(request.arg2)>>(params.arg2.unsignedCharValue);
                 request.arg3 = params.arg3.boolValue;
 
-                auto successFn = Callback<TestClusterClusterTestEmitTestEventResponseCallbackType>::FromCancelable(success);
+                auto successFn = Callback<TestClusterTestEmitTestEventResponseCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -25315,14 +25311,13 @@ using chip::SessionHandle;
     }
 }
 
-- (void)
-    testEmitTestFabricScopedEventRequestWithParams:(MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams *)params
-                                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
-                             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                        completion:
-                                            (void (^)(
-                                                MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
-                                                NSError * _Nullable error))completion
+- (void)testEmitTestFabricScopedEventRequestWithParams:(MTRTestClusterTestEmitTestFabricScopedEventRequestParams *)params
+                                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                            completion:
+                                                (void (^)(
+                                                    MTRTestClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
+                                                    NSError * _Nullable error))completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -25334,20 +25329,19 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestEmitTestFabricScopedEventResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
+        new MTRTestClusterTestEmitTestFabricScopedEventResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                TestCluster::Commands::TestEmitTestFabricScopedEventRequest::Type request;
+                Test::Commands::TestEmitTestFabricScopedEventRequest::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
                 request.arg1 = params.arg1.unsignedCharValue;
 
-                auto successFn
-                    = Callback<TestClusterClusterTestEmitTestFabricScopedEventResponseCallbackType>::FromCancelable(success);
+                auto successFn = Callback<TestClusterTestEmitTestFabricScopedEventResponseCallbackType>::FromCancelable(success);
                 auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
+                chip::Controller::TestCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(
                     request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
             });
@@ -25368,8 +25362,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBooleanWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeBooleanID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeBooleanID)
                                              params:params];
 }
 
@@ -25385,8 +25379,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeBooleanID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeBooleanID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25395,8 +25389,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBitmap8WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeBitmap8ID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeBitmap8ID)
                                              params:params];
 }
 
@@ -25412,8 +25406,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeBitmap8ID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeBitmap8ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25422,8 +25416,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBitmap16WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeBitmap16ID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeBitmap16ID)
                                              params:params];
 }
 
@@ -25439,8 +25433,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeBitmap16ID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeBitmap16ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25449,8 +25443,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBitmap32WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeBitmap32ID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeBitmap32ID)
                                              params:params];
 }
 
@@ -25466,8 +25460,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeBitmap32ID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeBitmap32ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25476,8 +25470,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeBitmap64WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeBitmap64ID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeBitmap64ID)
                                              params:params];
 }
 
@@ -25493,8 +25487,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeBitmap64ID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeBitmap64ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25503,8 +25497,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt8uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt8uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeInt8uID)
                                              params:params];
 }
 
@@ -25520,8 +25514,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt8uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeInt8uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25530,8 +25524,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt16uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt16uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeInt16uID)
                                              params:params];
 }
 
@@ -25547,8 +25541,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt16uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeInt16uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25557,8 +25551,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt24uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt24uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeInt24uID)
                                              params:params];
 }
 
@@ -25574,8 +25568,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt24uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeInt24uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25584,8 +25578,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt32uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt32uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeInt32uID)
                                              params:params];
 }
 
@@ -25601,8 +25595,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt32uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeInt32uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25611,8 +25605,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt40uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt40uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeInt40uID)
                                              params:params];
 }
 
@@ -25628,8 +25622,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt40uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeInt40uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25638,8 +25632,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt48uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt48uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeInt48uID)
                                              params:params];
 }
 
@@ -25655,8 +25649,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt48uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeInt48uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25665,8 +25659,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt56uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt56uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeInt56uID)
                                              params:params];
 }
 
@@ -25682,8 +25676,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt56uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeInt56uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25692,8 +25686,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt64uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt64uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeInt64uID)
                                              params:params];
 }
 
@@ -25709,8 +25703,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt64uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeInt64uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25719,8 +25713,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt8sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt8sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeInt8sID)
                                              params:params];
 }
 
@@ -25736,8 +25730,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt8sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeInt8sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25746,8 +25740,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt16sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt16sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeInt16sID)
                                              params:params];
 }
 
@@ -25763,8 +25757,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt16sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeInt16sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25773,8 +25767,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt24sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt24sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeInt24sID)
                                              params:params];
 }
 
@@ -25790,8 +25784,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt24sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeInt24sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25800,8 +25794,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt32sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt32sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeInt32sID)
                                              params:params];
 }
 
@@ -25817,8 +25811,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt32sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeInt32sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25827,8 +25821,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt40sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt40sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeInt40sID)
                                              params:params];
 }
 
@@ -25844,8 +25838,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt40sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeInt40sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25854,8 +25848,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt48sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt48sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeInt48sID)
                                              params:params];
 }
 
@@ -25871,8 +25865,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt48sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeInt48sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25881,8 +25875,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt56sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt56sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeInt56sID)
                                              params:params];
 }
 
@@ -25898,8 +25892,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt56sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeInt56sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25908,8 +25902,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeInt64sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeInt64sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeInt64sID)
                                              params:params];
 }
 
@@ -25925,8 +25919,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeInt64sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeInt64sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25935,8 +25929,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeEnum8WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeEnum8ID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeEnum8ID)
                                              params:params];
 }
 
@@ -25952,8 +25946,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeEnum8ID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeEnum8ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25962,8 +25956,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeEnum16WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeEnum16ID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeEnum16ID)
                                              params:params];
 }
 
@@ -25979,8 +25973,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeEnum16ID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeEnum16ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -25989,8 +25983,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeFloatSingleWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeFloatSingleID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeFloatSingleID)
                                              params:params];
 }
 
@@ -26006,8 +26000,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeFloatSingleID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeFloatSingleID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26016,8 +26010,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeFloatDoubleWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeFloatDoubleID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeFloatDoubleID)
                                              params:params];
 }
 
@@ -26033,8 +26027,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeFloatDoubleID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeFloatDoubleID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26043,8 +26037,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeOctetStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeOctetStringID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeOctetStringID)
                                              params:params];
 }
 
@@ -26060,8 +26054,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeOctetStringID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeOctetStringID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26070,8 +26064,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeListInt8uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeListInt8uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeListInt8uID)
                                              params:params];
 }
 
@@ -26087,8 +26081,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeListInt8uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeListInt8uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26097,8 +26091,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeListOctetStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeListOctetStringID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeListOctetStringID)
                                              params:params];
 }
 
@@ -26114,8 +26108,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeListOctetStringID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeListOctetStringID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26124,8 +26118,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeListStructOctetStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeListStructOctetStringID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeListStructOctetStringID)
                                              params:params];
 }
 
@@ -26143,8 +26137,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeListStructOctetStringID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeListStructOctetStringID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26153,8 +26147,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeLongOctetStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeLongOctetStringID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeLongOctetStringID)
                                              params:params];
 }
 
@@ -26170,8 +26164,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeLongOctetStringID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeLongOctetStringID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26180,8 +26174,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeCharStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeCharStringID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeCharStringID)
                                              params:params];
 }
 
@@ -26197,8 +26191,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeCharStringID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeCharStringID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26207,8 +26201,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeLongCharStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeLongCharStringID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeLongCharStringID)
                                              params:params];
 }
 
@@ -26224,8 +26218,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeLongCharStringID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeLongCharStringID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26234,8 +26228,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeEpochUsWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeEpochUsID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeEpochUsID)
                                              params:params];
 }
 
@@ -26251,8 +26245,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeEpochUsID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeEpochUsID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26261,8 +26255,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeEpochSWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeEpochSID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeEpochSID)
                                              params:params];
 }
 
@@ -26278,8 +26272,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeEpochSID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeEpochSID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26288,8 +26282,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeVendorIdWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeVendorIdID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeVendorIdID)
                                              params:params];
 }
 
@@ -26305,8 +26299,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeVendorIdID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeVendorIdID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26315,8 +26309,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeListNullablesAndOptionalsStructWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeListNullablesAndOptionalsStructID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeListNullablesAndOptionalsStructID)
                                              params:params];
 }
 
@@ -26334,8 +26328,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeListNullablesAndOptionalsStructID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeListNullablesAndOptionalsStructID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26344,8 +26338,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeEnumAttrWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeEnumAttrID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeEnumAttrID)
                                              params:params];
 }
 
@@ -26361,8 +26355,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeEnumAttrID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeEnumAttrID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26371,8 +26365,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeStructAttrWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeStructAttrID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeStructAttrID)
                                              params:params];
 }
 
@@ -26388,8 +26382,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeStructAttrID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeStructAttrID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26398,8 +26392,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeRangeRestrictedInt8uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeRangeRestrictedInt8uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeRangeRestrictedInt8uID)
                                              params:params];
 }
 
@@ -26415,8 +26409,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeRangeRestrictedInt8uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeRangeRestrictedInt8uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26425,8 +26419,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeRangeRestrictedInt8sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeRangeRestrictedInt8sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeRangeRestrictedInt8sID)
                                              params:params];
 }
 
@@ -26442,8 +26436,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeRangeRestrictedInt8sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeRangeRestrictedInt8sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26452,8 +26446,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeRangeRestrictedInt16uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeRangeRestrictedInt16uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeRangeRestrictedInt16uID)
                                              params:params];
 }
 
@@ -26471,8 +26465,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeRangeRestrictedInt16uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeRangeRestrictedInt16uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26481,8 +26475,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeRangeRestrictedInt16sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeRangeRestrictedInt16sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeRangeRestrictedInt16sID)
                                              params:params];
 }
 
@@ -26500,8 +26494,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeRangeRestrictedInt16sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeRangeRestrictedInt16sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26510,8 +26504,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeListLongOctetStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeListLongOctetStringID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeListLongOctetStringID)
                                              params:params];
 }
 
@@ -26527,8 +26521,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeListLongOctetStringID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeListLongOctetStringID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26537,8 +26531,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeListFabricScopedWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeListFabricScopedID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeListFabricScopedID)
                                              params:params];
 }
 
@@ -26554,8 +26548,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeListFabricScopedID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeListFabricScopedID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26564,8 +26558,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeTimedWriteBooleanWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeTimedWriteBooleanID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeTimedWriteBooleanID)
                                              params:params];
 }
 
@@ -26581,8 +26575,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeTimedWriteBooleanID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeTimedWriteBooleanID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26591,8 +26585,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneralErrorBooleanWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeGeneralErrorBooleanID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeGeneralErrorBooleanID)
                                              params:params];
 }
 
@@ -26608,8 +26602,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeGeneralErrorBooleanID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeGeneralErrorBooleanID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26618,8 +26612,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeClusterErrorBooleanWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeClusterErrorBooleanID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeClusterErrorBooleanID)
                                              params:params];
 }
 
@@ -26635,8 +26629,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeClusterErrorBooleanID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeClusterErrorBooleanID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26645,8 +26639,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeUnsupportedWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeUnsupportedID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeUnsupportedID)
                                              params:params];
 }
 
@@ -26662,8 +26656,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeUnsupportedID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeUnsupportedID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26672,8 +26666,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableBooleanWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableBooleanID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableBooleanID)
                                              params:params];
 }
 
@@ -26689,8 +26683,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableBooleanID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableBooleanID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26699,8 +26693,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableBitmap8WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableBitmap8ID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableBitmap8ID)
                                              params:params];
 }
 
@@ -26716,8 +26710,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableBitmap8ID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableBitmap8ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26726,8 +26720,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableBitmap16WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableBitmap16ID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableBitmap16ID)
                                              params:params];
 }
 
@@ -26743,8 +26737,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableBitmap16ID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableBitmap16ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26753,8 +26747,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableBitmap32WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableBitmap32ID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableBitmap32ID)
                                              params:params];
 }
 
@@ -26770,8 +26764,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableBitmap32ID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableBitmap32ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26780,8 +26774,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableBitmap64WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableBitmap64ID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableBitmap64ID)
                                              params:params];
 }
 
@@ -26797,8 +26791,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableBitmap64ID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableBitmap64ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26807,8 +26801,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt8uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt8uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableInt8uID)
                                              params:params];
 }
 
@@ -26824,8 +26818,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt8uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableInt8uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26834,8 +26828,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt16uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt16uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableInt16uID)
                                              params:params];
 }
 
@@ -26851,8 +26845,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt16uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableInt16uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26861,8 +26855,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt24uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt24uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableInt24uID)
                                              params:params];
 }
 
@@ -26878,8 +26872,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt24uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableInt24uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26888,8 +26882,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt32uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt32uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableInt32uID)
                                              params:params];
 }
 
@@ -26905,8 +26899,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt32uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableInt32uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26915,8 +26909,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt40uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt40uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableInt40uID)
                                              params:params];
 }
 
@@ -26932,8 +26926,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt40uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableInt40uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26942,8 +26936,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt48uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt48uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableInt48uID)
                                              params:params];
 }
 
@@ -26959,8 +26953,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt48uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableInt48uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26969,8 +26963,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt56uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt56uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableInt56uID)
                                              params:params];
 }
 
@@ -26986,8 +26980,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt56uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableInt56uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -26996,8 +26990,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt64uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt64uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableInt64uID)
                                              params:params];
 }
 
@@ -27013,8 +27007,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt64uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableInt64uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27023,8 +27017,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt8sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt8sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableInt8sID)
                                              params:params];
 }
 
@@ -27040,8 +27034,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt8sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableInt8sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27050,8 +27044,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt16sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt16sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableInt16sID)
                                              params:params];
 }
 
@@ -27067,8 +27061,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt16sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableInt16sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27077,8 +27071,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt24sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt24sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableInt24sID)
                                              params:params];
 }
 
@@ -27094,8 +27088,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt24sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableInt24sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27104,8 +27098,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt32sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt32sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableInt32sID)
                                              params:params];
 }
 
@@ -27121,8 +27115,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt32sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableInt32sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27131,8 +27125,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt40sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt40sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableInt40sID)
                                              params:params];
 }
 
@@ -27148,8 +27142,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt40sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableInt40sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27158,8 +27152,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt48sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt48sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableInt48sID)
                                              params:params];
 }
 
@@ -27175,8 +27169,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt48sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableInt48sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27185,8 +27179,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt56sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt56sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableInt56sID)
                                              params:params];
 }
 
@@ -27202,8 +27196,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt56sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableInt56sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27212,8 +27206,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt64sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableInt64sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableInt64sID)
                                              params:params];
 }
 
@@ -27229,8 +27223,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableInt64sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableInt64sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27239,8 +27233,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableEnum8WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableEnum8ID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableEnum8ID)
                                              params:params];
 }
 
@@ -27256,8 +27250,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableEnum8ID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableEnum8ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27266,8 +27260,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableEnum16WithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableEnum16ID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableEnum16ID)
                                              params:params];
 }
 
@@ -27283,8 +27277,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableEnum16ID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableEnum16ID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27293,8 +27287,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableFloatSingleWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableFloatSingleID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableFloatSingleID)
                                              params:params];
 }
 
@@ -27310,8 +27304,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableFloatSingleID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableFloatSingleID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27320,8 +27314,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableFloatDoubleWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableFloatDoubleID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableFloatDoubleID)
                                              params:params];
 }
 
@@ -27337,8 +27331,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableFloatDoubleID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableFloatDoubleID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27347,8 +27341,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableOctetStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableOctetStringID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableOctetStringID)
                                              params:params];
 }
 
@@ -27364,8 +27358,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableOctetStringID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableOctetStringID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27374,8 +27368,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableCharStringWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableCharStringID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableCharStringID)
                                              params:params];
 }
 
@@ -27391,8 +27385,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableCharStringID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableCharStringID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27401,8 +27395,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableEnumAttrWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableEnumAttrID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableEnumAttrID)
                                              params:params];
 }
 
@@ -27418,8 +27412,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableEnumAttrID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableEnumAttrID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27428,8 +27422,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableStructWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableStructID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableStructID)
                                              params:params];
 }
 
@@ -27445,8 +27439,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableStructID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableStructID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27455,8 +27449,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableRangeRestrictedInt8uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableRangeRestrictedInt8uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableRangeRestrictedInt8uID)
                                              params:params];
 }
 
@@ -27474,8 +27468,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableRangeRestrictedInt8uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableRangeRestrictedInt8uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27484,8 +27478,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableRangeRestrictedInt8sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableRangeRestrictedInt8sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableRangeRestrictedInt8sID)
                                              params:params];
 }
 
@@ -27503,8 +27497,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableRangeRestrictedInt8sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableRangeRestrictedInt8sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27513,8 +27507,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableRangeRestrictedInt16uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableRangeRestrictedInt16uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableRangeRestrictedInt16uID)
                                              params:params];
 }
 
@@ -27532,8 +27526,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableRangeRestrictedInt16uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableRangeRestrictedInt16uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27542,8 +27536,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeNullableRangeRestrictedInt16sWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeNullableRangeRestrictedInt16sID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeNullableRangeRestrictedInt16sID)
                                              params:params];
 }
 
@@ -27561,8 +27555,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeNullableRangeRestrictedInt16sID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeNullableRangeRestrictedInt16sID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27571,8 +27565,8 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeWriteOnlyInt8uWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeWriteOnlyInt8uID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeWriteOnlyInt8uID)
                                              params:params];
 }
 
@@ -27588,8 +27582,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterTestClusterID)
-                                  attributeID:@(MTRClusterTestClusterAttributeWriteOnlyInt8uID)
+                                    clusterID:@(MTRClusterTestID)
+                                  attributeID:@(MTRClusterTestAttributeWriteOnlyInt8uID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -27598,53 +27592,53 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeAttributeListID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterTestClusterID)
-                                        attributeID:@(MTRClusterTestClusterAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterTestID)
+                                        attributeID:@(MTRClusterTestAttributeClusterRevisionID)
                                              params:params];
 }
 
 @end
 
-@implementation MTRClusterTestCluster (Deprecated)
+@implementation MTRClusterTest (Deprecated)
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpoint:(uint16_t)endpoint queue:(dispatch_queue_t)queue
 {
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
-- (void)testWithParams:(MTRTestClusterClusterTestParams * _Nullable)params
+- (void)testWithParams:(MTRTestClusterTestParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(MTRStatusCompletion)completionHandler
@@ -27660,7 +27654,7 @@ using chip::SessionHandle;
 {
     [self testWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
 }
-- (void)testNotHandledWithParams:(MTRTestClusterClusterTestNotHandledParams * _Nullable)params
+- (void)testNotHandledWithParams:(MTRTestClusterTestNotHandledParams * _Nullable)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completionHandler:(MTRStatusCompletion)completionHandler
@@ -27678,11 +27672,11 @@ using chip::SessionHandle;
                      expectedValueInterval:expectedValueIntervalMs
                                 completion:completionHandler];
 }
-- (void)testSpecificWithParams:(MTRTestClusterClusterTestSpecificParams * _Nullable)params
+- (void)testSpecificWithParams:(MTRTestClusterTestSpecificParams * _Nullable)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-             completionHandler:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completionHandler
+             completionHandler:
+                 (void (^)(MTRTestClusterTestSpecificResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
 {
     [self testSpecificWithParams:params
                   expectedValues:expectedDataValueDictionaries
@@ -27691,12 +27685,12 @@ using chip::SessionHandle;
 }
 - (void)testSpecificWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                     completionHandler:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
+                     completionHandler:(void (^)(MTRTestClusterTestSpecificResponseParams * _Nullable data,
                                            NSError * _Nullable error))completionHandler
 {
     [self testSpecificWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
 }
-- (void)testUnknownCommandWithParams:(MTRTestClusterClusterTestUnknownCommandParams * _Nullable)params
+- (void)testUnknownCommandWithParams:(MTRTestClusterTestUnknownCommandParams * _Nullable)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(MTRStatusCompletion)completionHandler
@@ -27714,10 +27708,10 @@ using chip::SessionHandle;
                          expectedValueInterval:expectedValueIntervalMs
                                     completion:completionHandler];
 }
-- (void)testAddArgumentsWithParams:(MTRTestClusterClusterTestAddArgumentsParams *)params
+- (void)testAddArgumentsWithParams:(MTRTestClusterTestAddArgumentsParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                 completionHandler:(void (^)(MTRTestClusterClusterTestAddArgumentsResponseParams * _Nullable data,
+                 completionHandler:(void (^)(MTRTestClusterTestAddArgumentsResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler
 {
     [self testAddArgumentsWithParams:params
@@ -27725,10 +27719,10 @@ using chip::SessionHandle;
                expectedValueInterval:expectedValueIntervalMs
                           completion:completionHandler];
 }
-- (void)testSimpleArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleArgumentRequestParams *)params
+- (void)testSimpleArgumentRequestWithParams:(MTRTestClusterTestSimpleArgumentRequestParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                          completionHandler:(void (^)(MTRTestClusterClusterTestSimpleArgumentResponseParams * _Nullable data,
+                          completionHandler:(void (^)(MTRTestClusterTestSimpleArgumentResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completionHandler
 {
     [self testSimpleArgumentRequestWithParams:params
@@ -27736,22 +27730,21 @@ using chip::SessionHandle;
                         expectedValueInterval:expectedValueIntervalMs
                                    completion:completionHandler];
 }
-- (void)testStructArrayArgumentRequestWithParams:(MTRTestClusterClusterTestStructArrayArgumentRequestParams *)params
+- (void)testStructArrayArgumentRequestWithParams:(MTRTestClusterTestStructArrayArgumentRequestParams *)params
                                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                               completionHandler:
-                                   (void (^)(MTRTestClusterClusterTestStructArrayArgumentResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completionHandler
+                               completionHandler:(void (^)(MTRTestClusterTestStructArrayArgumentResponseParams * _Nullable data,
+                                                     NSError * _Nullable error))completionHandler
 {
     [self testStructArrayArgumentRequestWithParams:params
                                     expectedValues:expectedDataValueDictionaries
                              expectedValueInterval:expectedValueIntervalMs
                                         completion:completionHandler];
 }
-- (void)testStructArgumentRequestWithParams:(MTRTestClusterClusterTestStructArgumentRequestParams *)params
+- (void)testStructArgumentRequestWithParams:(MTRTestClusterTestStructArgumentRequestParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                          completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                          completionHandler:(void (^)(MTRTestClusterBooleanResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completionHandler
 {
     [self testStructArgumentRequestWithParams:params
@@ -27759,10 +27752,10 @@ using chip::SessionHandle;
                         expectedValueInterval:expectedValueIntervalMs
                                    completion:completionHandler];
 }
-- (void)testNestedStructArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructArgumentRequestParams *)params
+- (void)testNestedStructArgumentRequestWithParams:(MTRTestClusterTestNestedStructArgumentRequestParams *)params
                                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                                completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                completionHandler:(void (^)(MTRTestClusterBooleanResponseParams * _Nullable data,
                                                       NSError * _Nullable error))completionHandler
 {
     [self testNestedStructArgumentRequestWithParams:params
@@ -27770,10 +27763,10 @@ using chip::SessionHandle;
                               expectedValueInterval:expectedValueIntervalMs
                                          completion:completionHandler];
 }
-- (void)testListStructArgumentRequestWithParams:(MTRTestClusterClusterTestListStructArgumentRequestParams *)params
+- (void)testListStructArgumentRequestWithParams:(MTRTestClusterTestListStructArgumentRequestParams *)params
                                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                              completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                              completionHandler:(void (^)(MTRTestClusterBooleanResponseParams * _Nullable data,
                                                     NSError * _Nullable error))completionHandler
 {
     [self testListStructArgumentRequestWithParams:params
@@ -27781,10 +27774,10 @@ using chip::SessionHandle;
                             expectedValueInterval:expectedValueIntervalMs
                                        completion:completionHandler];
 }
-- (void)testListInt8UArgumentRequestWithParams:(MTRTestClusterClusterTestListInt8UArgumentRequestParams *)params
+- (void)testListInt8UArgumentRequestWithParams:(MTRTestClusterTestListInt8UArgumentRequestParams *)params
                                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                             completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                             completionHandler:(void (^)(MTRTestClusterBooleanResponseParams * _Nullable data,
                                                    NSError * _Nullable error))completionHandler
 {
     [self testListInt8UArgumentRequestWithParams:params
@@ -27792,11 +27785,11 @@ using chip::SessionHandle;
                            expectedValueInterval:expectedValueIntervalMs
                                       completion:completionHandler];
 }
-- (void)testNestedStructListArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructListArgumentRequestParams *)params
+- (void)testNestedStructListArgumentRequestWithParams:(MTRTestClusterTestNestedStructListArgumentRequestParams *)params
                                        expectedValues:
                                            (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                                    completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                    completionHandler:(void (^)(MTRTestClusterBooleanResponseParams * _Nullable data,
                                                           NSError * _Nullable error))completionHandler
 {
     [self testNestedStructListArgumentRequestWithParams:params
@@ -27804,12 +27797,11 @@ using chip::SessionHandle;
                                   expectedValueInterval:expectedValueIntervalMs
                                              completion:completionHandler];
 }
-- (void)testListNestedStructListArgumentRequestWithParams:
-            (MTRTestClusterClusterTestListNestedStructListArgumentRequestParams *)params
+- (void)testListNestedStructListArgumentRequestWithParams:(MTRTestClusterTestListNestedStructListArgumentRequestParams *)params
                                            expectedValues:
                                                (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                                        completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
+                                        completionHandler:(void (^)(MTRTestClusterBooleanResponseParams * _Nullable data,
                                                               NSError * _Nullable error))completionHandler
 {
     [self testListNestedStructListArgumentRequestWithParams:params
@@ -27817,10 +27809,10 @@ using chip::SessionHandle;
                                       expectedValueInterval:expectedValueIntervalMs
                                                  completion:completionHandler];
 }
-- (void)testListInt8UReverseRequestWithParams:(MTRTestClusterClusterTestListInt8UReverseRequestParams *)params
+- (void)testListInt8UReverseRequestWithParams:(MTRTestClusterTestListInt8UReverseRequestParams *)params
                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                            completionHandler:(void (^)(MTRTestClusterClusterTestListInt8UReverseResponseParams * _Nullable data,
+                            completionHandler:(void (^)(MTRTestClusterTestListInt8UReverseResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completionHandler
 {
     [self testListInt8UReverseRequestWithParams:params
@@ -27828,21 +27820,21 @@ using chip::SessionHandle;
                           expectedValueInterval:expectedValueIntervalMs
                                      completion:completionHandler];
 }
-- (void)testEnumsRequestWithParams:(MTRTestClusterClusterTestEnumsRequestParams *)params
+- (void)testEnumsRequestWithParams:(MTRTestClusterTestEnumsRequestParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                 completionHandler:(void (^)(MTRTestClusterClusterTestEnumsResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completionHandler
+                 completionHandler:
+                     (void (^)(MTRTestClusterTestEnumsResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
 {
     [self testEnumsRequestWithParams:params
                       expectedValues:expectedDataValueDictionaries
                expectedValueInterval:expectedValueIntervalMs
                           completion:completionHandler];
 }
-- (void)testNullableOptionalRequestWithParams:(MTRTestClusterClusterTestNullableOptionalRequestParams * _Nullable)params
+- (void)testNullableOptionalRequestWithParams:(MTRTestClusterTestNullableOptionalRequestParams * _Nullable)params
                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                            completionHandler:(void (^)(MTRTestClusterClusterTestNullableOptionalResponseParams * _Nullable data,
+                            completionHandler:(void (^)(MTRTestClusterTestNullableOptionalResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completionHandler
 {
     [self testNullableOptionalRequestWithParams:params
@@ -27850,23 +27842,22 @@ using chip::SessionHandle;
                           expectedValueInterval:expectedValueIntervalMs
                                      completion:completionHandler];
 }
-- (void)testComplexNullableOptionalRequestWithParams:(MTRTestClusterClusterTestComplexNullableOptionalRequestParams *)params
-                                      expectedValues:
-                                          (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
-                               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                                   completionHandler:
-                                       (void (^)(MTRTestClusterClusterTestComplexNullableOptionalResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completionHandler
+- (void)
+    testComplexNullableOptionalRequestWithParams:(MTRTestClusterTestComplexNullableOptionalRequestParams *)params
+                                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                               completionHandler:(void (^)(MTRTestClusterTestComplexNullableOptionalResponseParams * _Nullable data,
+                                                     NSError * _Nullable error))completionHandler
 {
     [self testComplexNullableOptionalRequestWithParams:params
                                         expectedValues:expectedDataValueDictionaries
                                  expectedValueInterval:expectedValueIntervalMs
                                             completion:completionHandler];
 }
-- (void)simpleStructEchoRequestWithParams:(MTRTestClusterClusterSimpleStructEchoRequestParams *)params
+- (void)simpleStructEchoRequestWithParams:(MTRTestClusterSimpleStructEchoRequestParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                        completionHandler:(void (^)(MTRTestClusterClusterSimpleStructResponseParams * _Nullable data,
+                        completionHandler:(void (^)(MTRTestClusterSimpleStructResponseParams * _Nullable data,
                                               NSError * _Nullable error))completionHandler
 {
     [self simpleStructEchoRequestWithParams:params
@@ -27874,7 +27865,7 @@ using chip::SessionHandle;
                       expectedValueInterval:expectedValueIntervalMs
                                  completion:completionHandler];
 }
-- (void)timedInvokeRequestWithParams:(MTRTestClusterClusterTimedInvokeRequestParams * _Nullable)params
+- (void)timedInvokeRequestWithParams:(MTRTestClusterTimedInvokeRequestParams * _Nullable)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(MTRStatusCompletion)completionHandler
@@ -27892,7 +27883,7 @@ using chip::SessionHandle;
                          expectedValueInterval:expectedValueIntervalMs
                                     completion:completionHandler];
 }
-- (void)testSimpleOptionalArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
+- (void)testSimpleOptionalArgumentRequestWithParams:(MTRTestClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
                                      expectedValues:
                                          (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
@@ -27903,10 +27894,10 @@ using chip::SessionHandle;
                                 expectedValueInterval:expectedValueIntervalMs
                                            completion:completionHandler];
 }
-- (void)testEmitTestEventRequestWithParams:(MTRTestClusterClusterTestEmitTestEventRequestParams *)params
+- (void)testEmitTestEventRequestWithParams:(MTRTestClusterTestEmitTestEventRequestParams *)params
                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                         completionHandler:(void (^)(MTRTestClusterClusterTestEmitTestEventResponseParams * _Nullable data,
+                         completionHandler:(void (^)(MTRTestClusterTestEmitTestEventResponseParams * _Nullable data,
                                                NSError * _Nullable error))completionHandler
 {
     [self testEmitTestEventRequestWithParams:params
@@ -27914,13 +27905,12 @@ using chip::SessionHandle;
                        expectedValueInterval:expectedValueIntervalMs
                                   completion:completionHandler];
 }
-- (void)testEmitTestFabricScopedEventRequestWithParams:(MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams *)params
+- (void)testEmitTestFabricScopedEventRequestWithParams:(MTRTestClusterTestEmitTestFabricScopedEventRequestParams *)params
                                         expectedValues:
                                             (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                      completionHandler:
-                                         (void (^)(
-                                             MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
+                                         (void (^)(MTRTestClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
                                              NSError * _Nullable error))completionHandler
 {
     [self testEmitTestFabricScopedEventRequestWithParams:params

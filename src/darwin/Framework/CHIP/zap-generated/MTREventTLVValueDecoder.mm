@@ -2123,8 +2123,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
         }
         break;
     }
-    case Clusters::TestCluster::Id: {
-        using namespace Clusters::TestCluster;
+    case Clusters::Test::Id: {
+        using namespace Clusters::Test;
         switch (aPath.mEventId) {
 
         case Events::TestEvent::Id: {
@@ -2134,7 +2134,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            MTRTestClusterClusterTestEventEvent * value = [MTRTestClusterClusterTestEventEvent new];
+            MTRTestClusterTestEventEvent * value = [MTRTestClusterTestEventEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -2152,8 +2152,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 value.arg3 = memberValue;
             } while (0);
             do {
-                MTRTestClusterClusterSimpleStruct * _Nonnull memberValue;
-                memberValue = [MTRTestClusterClusterSimpleStruct new];
+                MTRTestClusterSimpleStruct * _Nonnull memberValue;
+                memberValue = [MTRTestClusterSimpleStruct new];
                 memberValue.a = [NSNumber numberWithUnsignedChar:cppValue.arg4.a];
                 memberValue.b = [NSNumber numberWithBool:cppValue.arg4.b];
                 memberValue.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.arg4.c)];
@@ -2173,8 +2173,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                     auto iter_0 = cppValue.arg5.begin();
                     while (iter_0.Next()) {
                         auto & entry_0 = iter_0.GetValue();
-                        MTRTestClusterClusterSimpleStruct * newElement_0;
-                        newElement_0 = [MTRTestClusterClusterSimpleStruct new];
+                        MTRTestClusterSimpleStruct * newElement_0;
+                        newElement_0 = [MTRTestClusterSimpleStruct new];
                         newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
                         newElement_0.b = [NSNumber numberWithBool:entry_0.b];
                         newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
@@ -2227,7 +2227,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            MTRTestClusterClusterTestFabricScopedEventEvent * value = [MTRTestClusterClusterTestFabricScopedEventEvent new];
+            MTRTestClusterTestFabricScopedEventEvent * value = [MTRTestClusterTestFabricScopedEventEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;

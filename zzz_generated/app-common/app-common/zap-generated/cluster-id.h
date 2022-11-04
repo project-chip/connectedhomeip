@@ -229,7 +229,7 @@ static constexpr chip::ClusterId ZCL_ACCOUNT_LOGIN_CLUSTER_ID = 0x050E;
 // Definitions for cluster: Electrical Measurement
 static constexpr chip::ClusterId ZCL_ELECTRICAL_MEASUREMENT_CLUSTER_ID = 0x0B04;
 
-// Definitions for cluster: Test Cluster
+// Definitions for cluster: Test
 static constexpr chip::ClusterId ZCL_TEST_CLUSTER_ID = 0xFFF1FC05;
 
 // Definitions for cluster: Fault Injection

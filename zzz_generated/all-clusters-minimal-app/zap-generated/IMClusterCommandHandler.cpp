@@ -1407,7 +1407,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
 } // namespace TargetNavigator
 
-namespace TestCluster {
+namespace Test {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
@@ -1421,7 +1421,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfTestClusterClusterTestCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfTestClusterTestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1430,7 +1430,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfTestClusterClusterTestNotHandledCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfTestClusterTestNotHandledCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1439,7 +1439,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfTestClusterClusterTestSpecificCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfTestClusterTestSpecificCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1448,7 +1448,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfTestClusterClusterTestAddArgumentsCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfTestClusterTestAddArgumentsCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1457,7 +1457,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfTestClusterClusterTestStructArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfTestClusterTestStructArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1466,8 +1466,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled =
-                    emberAfTestClusterClusterTestNestedStructArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfTestClusterTestNestedStructArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1476,8 +1475,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled =
-                    emberAfTestClusterClusterTestListStructArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfTestClusterTestListStructArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1486,7 +1484,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfTestClusterClusterTestListInt8UArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfTestClusterTestListInt8UArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1495,8 +1493,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled =
-                    emberAfTestClusterClusterTestNestedStructListArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfTestClusterTestNestedStructListArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1505,8 +1502,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfTestClusterClusterTestListNestedStructListArgumentRequestCallback(apCommandObj, aCommandPath,
-                                                                                                      commandData);
+                wasHandled =
+                    emberAfTestClusterTestListNestedStructListArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1515,7 +1512,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfTestClusterClusterTestListInt8UReverseRequestCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfTestClusterTestListInt8UReverseRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1524,7 +1521,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfTestClusterClusterTestEnumsRequestCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfTestClusterTestEnumsRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1533,7 +1530,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfTestClusterClusterTestNullableOptionalRequestCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfTestClusterTestNullableOptionalRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1542,7 +1539,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfTestClusterClusterSimpleStructEchoRequestCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfTestClusterSimpleStructEchoRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1551,7 +1548,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfTestClusterClusterTimedInvokeRequestCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfTestClusterTimedInvokeRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1560,8 +1557,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled =
-                    emberAfTestClusterClusterTestSimpleOptionalArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfTestClusterTestSimpleOptionalArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1570,7 +1566,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfTestClusterClusterTestEmitTestEventRequestCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfTestClusterTestEmitTestEventRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1580,7 +1576,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled =
-                    emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(apCommandObj, aCommandPath, commandData);
+                    emberAfTestClusterTestEmitTestFabricScopedEventRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1601,7 +1597,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
     }
 }
 
-} // namespace TestCluster
+} // namespace Test
 
 namespace Thermostat {
 
@@ -1778,8 +1774,8 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
     case Clusters::TargetNavigator::Id:
         Clusters::TargetNavigator::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
-    case Clusters::TestCluster::Id:
-        Clusters::TestCluster::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+    case Clusters::Test::Id:
+        Clusters::Test::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::Thermostat::Id:
         Clusters::Thermostat::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
