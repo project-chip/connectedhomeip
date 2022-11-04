@@ -81,7 +81,7 @@ public:
                              timedInvokeTimeout:mTimedInteractionTimeoutMs.HasValue()
                                  ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()]
                                  : nil
-                                    clientQueue:callbackQueue
+                                          queue:callbackQueue
                                      completion:^(
                                          NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                          responsesNeeded--;
@@ -117,7 +117,8 @@ protected:
     void AddArguments()
     {
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs,
-            "If provided, do a timed invoke with the given timed interaction timeout.");
+            "If provided, do a timed invoke with the given timed interaction timeout. See \"7.6.10. Timed Interaction\" in the "
+            "Matter specification.");
         AddArgument("repeat-count", 1, UINT16_MAX, &mRepeatCount);
         AddArgument("repeat-delay-ms", 0, UINT16_MAX, &mRepeatDelayInMs);
         ModelCommand::AddArguments();

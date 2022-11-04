@@ -180,9 +180,9 @@ void TestCreateReleaseStruct(nlTestSuite * inSuite, void * inContext)
     }
 
     // Verify that ReleaseAll() calls the destructors.
-    for (size_t i = 0; i < kSize; ++i)
+    for (auto & obj : objs2)
     {
-        objs2[i] = pool.CreateObject(objs1);
+        obj = pool.CreateObject(objs1);
     }
     NL_TEST_ASSERT(inSuite, objs1.size() == kSize);
     NL_TEST_ASSERT(inSuite, pool.Allocated() == kSize);

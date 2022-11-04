@@ -136,43 +136,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
 } // namespace DiagnosticLogs
 
-namespace EthernetNetworkDiagnostics {
-
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
-{
-    CHIP_ERROR TLVError = CHIP_NO_ERROR;
-    bool wasHandled     = false;
-    {
-        switch (aCommandPath.mCommandId)
-        {
-        case Commands::ResetCounts::Id: {
-            Commands::ResetCounts::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
-                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
-        }
-        }
-    }
-
-    if (CHIP_NO_ERROR != TLVError || !wasHandled)
-    {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
-        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
-    }
-}
-
-} // namespace EthernetNetworkDiagnostics
-
 namespace GeneralCommissioning {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
@@ -674,97 +637,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
 } // namespace OperationalCredentials
 
-namespace Scenes {
-
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
-{
-    CHIP_ERROR TLVError = CHIP_NO_ERROR;
-    bool wasHandled     = false;
-    {
-        switch (aCommandPath.mCommandId)
-        {
-        case Commands::AddScene::Id: {
-            Commands::AddScene::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfScenesClusterAddSceneCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::ViewScene::Id: {
-            Commands::ViewScene::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfScenesClusterViewSceneCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::RemoveScene::Id: {
-            Commands::RemoveScene::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfScenesClusterRemoveSceneCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::RemoveAllScenes::Id: {
-            Commands::RemoveAllScenes::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfScenesClusterRemoveAllScenesCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::StoreScene::Id: {
-            Commands::StoreScene::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfScenesClusterStoreSceneCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::RecallScene::Id: {
-            Commands::RecallScene::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfScenesClusterRecallSceneCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::GetSceneMembership::Id: {
-            Commands::GetSceneMembership::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfScenesClusterGetSceneMembershipCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
-                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
-        }
-        }
-    }
-
-    if (CHIP_NO_ERROR != TLVError || !wasHandled)
-    {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
-        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
-    }
-}
-
-} // namespace Scenes
-
 namespace SoftwareDiagnostics {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
@@ -801,80 +673,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 }
 
 } // namespace SoftwareDiagnostics
-
-namespace ThreadNetworkDiagnostics {
-
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
-{
-    CHIP_ERROR TLVError = CHIP_NO_ERROR;
-    bool wasHandled     = false;
-    {
-        switch (aCommandPath.mCommandId)
-        {
-        case Commands::ResetCounts::Id: {
-            Commands::ResetCounts::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
-                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
-        }
-        }
-    }
-
-    if (CHIP_NO_ERROR != TLVError || !wasHandled)
-    {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
-        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
-    }
-}
-
-} // namespace ThreadNetworkDiagnostics
-
-namespace WiFiNetworkDiagnostics {
-
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
-{
-    CHIP_ERROR TLVError = CHIP_NO_ERROR;
-    bool wasHandled     = false;
-    {
-        switch (aCommandPath.mCommandId)
-        {
-        case Commands::ResetCounts::Id: {
-            Commands::ResetCounts::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
-                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
-        }
-        }
-    }
-
-    if (CHIP_NO_ERROR != TLVError || !wasHandled)
-    {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
-        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
-    }
-}
-
-} // namespace WiFiNetworkDiagnostics
 
 namespace WindowCovering {
 
@@ -981,9 +779,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
     case Clusters::DiagnosticLogs::Id:
         Clusters::DiagnosticLogs::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
-    case Clusters::EthernetNetworkDiagnostics::Id:
-        Clusters::EthernetNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
-        break;
     case Clusters::GeneralCommissioning::Id:
         Clusters::GeneralCommissioning::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
@@ -1008,17 +803,8 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
     case Clusters::OperationalCredentials::Id:
         Clusters::OperationalCredentials::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
-    case Clusters::Scenes::Id:
-        Clusters::Scenes::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
-        break;
     case Clusters::SoftwareDiagnostics::Id:
         Clusters::SoftwareDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
-        break;
-    case Clusters::ThreadNetworkDiagnostics::Id:
-        Clusters::ThreadNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
-        break;
-    case Clusters::WiFiNetworkDiagnostics::Id:
-        Clusters::WiFiNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::WindowCovering::Id:
         Clusters::WindowCovering::DispatchServerCommand(apCommandObj, aCommandPath, aReader);

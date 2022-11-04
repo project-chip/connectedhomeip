@@ -81,7 +81,7 @@ public:
                        timedWriteTimeout:mTimedInteractionTimeoutMs.HasValue()
                            ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()]
                            : nil
-                             clientQueue:callbackQueue
+                                   queue:callbackQueue
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                   if (error != nil) {
                                       LogNSError("Error writing attribute", error);
@@ -107,7 +107,8 @@ protected:
     void AddArguments()
     {
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs,
-            "If provided, do a timed write with the given timed interaction timeout.");
+            "If provided, do a timed write with the given timed interaction timeout. See \"7.6.10. Timed Interaction\" in the "
+            "Matter specification.");
         ModelCommand::AddArguments();
     }
 

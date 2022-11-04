@@ -1,5 +1,5 @@
 {
-  "featureLevel": 81,
+  "featureLevel": 82,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -235,7 +235,7 @@
           ],
           "attributes": [
             {
-              "name": "name support",
+              "name": "NameSupport",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -622,7 +622,7 @@
           "name": "On/off Switch Configuration",
           "code": 7,
           "mfgCode": null,
-          "define": "ON_OFF_SWITCH_CONFIG_CLUSTER",
+          "define": "ON_OFF_SWITCH_CONFIGURATION_CLUSTER",
           "side": "client",
           "enabled": 0,
           "attributes": [
@@ -648,7 +648,7 @@
           "name": "On/off Switch Configuration",
           "code": 7,
           "mfgCode": null,
-          "define": "ON_OFF_SWITCH_CONFIG_CLUSTER",
+          "define": "ON_OFF_SWITCH_CONFIGURATION_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -2982,7 +2982,7 @@
           "mfgCode": null,
           "define": "THREAD_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "channel",
@@ -4068,7 +4068,7 @@
           "mfgCode": null,
           "define": "WIFI_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "bssid",
@@ -4354,7 +4354,7 @@
           "mfgCode": null,
           "define": "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "PHYRate",
@@ -5645,7 +5645,7 @@
           ],
           "attributes": [
             {
-              "name": "name support",
+              "name": "NameSupport",
               "code": 0,
               "mfgCode": null,
               "side": "server",

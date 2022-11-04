@@ -44,9 +44,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID:
         emberAfDiagnosticLogsClusterInitCallback(endpoint);
         break;
-    case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID:
-        emberAfEthernetNetworkDiagnosticsClusterInitCallback(endpoint);
-        break;
     case ZCL_FAN_CONTROL_CLUSTER_ID:
         emberAfFanControlClusterInitCallback(endpoint);
         break;
@@ -89,17 +86,8 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_SWITCH_CLUSTER_ID:
         emberAfSwitchClusterInitCallback(endpoint);
         break;
-    case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
-        emberAfThreadNetworkDiagnosticsClusterInitCallback(endpoint);
-        break;
     case ZCL_TIME_FORMAT_LOCALIZATION_CLUSTER_ID:
         emberAfTimeFormatLocalizationClusterInitCallback(endpoint);
-        break;
-    case ZCL_USER_LABEL_CLUSTER_ID:
-        emberAfUserLabelClusterInitCallback(endpoint);
-        break;
-    case ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID:
-        emberAfWiFiNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
     default:
         // Unrecognized cluster ID
@@ -128,11 +116,6 @@ void __attribute__((weak)) emberAfDescriptorClusterInitCallback(EndpointId endpo
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfDiagnosticLogsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -207,98 +190,8 @@ void __attribute__((weak)) emberAfSwitchClusterInitCallback(EndpointId endpoint)
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfThreadNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
 void __attribute__((weak)) emberAfTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfUserLabelClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-
-//
-// Non-Cluster Related Callbacks
-//
-
-EmberAfAttributeWritePermission __attribute__((weak))
-emberAfAllowNetworkWriteAttributeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t * value,
-                                          uint8_t type)
-{
-    return EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_NORMAL; // Default
-}
-
-bool __attribute__((weak)) emberAfAttributeReadAccessCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
-{
-    return true;
-}
-
-bool __attribute__((weak)) emberAfAttributeWriteAccessCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
-{
-    return true;
-}
-
-bool __attribute__((weak)) emberAfDefaultResponseCallback(ClusterId clusterId, CommandId commandId, EmberAfStatus status)
-{
-    return false;
-}
-
-bool __attribute__((weak)) emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberStatus * status)
-{
-    return false;
-}
-
-bool __attribute__((weak)) emberAfMessageSentCallback(const MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                      uint16_t msgLen, uint8_t * message, EmberStatus status)
-{
-    return false;
-}
-
-EmberAfStatus __attribute__((weak))
-emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
-                                     uint8_t * buffer, uint16_t maxReadLength)
-{
-    return EMBER_ZCL_STATUS_FAILURE;
-}
-
-EmberAfStatus __attribute__((weak))
-emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
-                                      uint8_t * buffer)
-{
-    return EMBER_ZCL_STATUS_FAILURE;
-}
-
-bool __attribute__((weak))
-emberAfGetEndpointInfoCallback(EndpointId endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo)
-{
-    return false;
-}
-
-void __attribute__((weak)) emberAfRegistrationAbortCallback() {}
-
-bool __attribute__((weak)) emberAfStartMoveCallback()
-{
-    return false;
-}
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
-                                 uint8_t * value)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-void __attribute__((weak)) MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type,
-                                                             uint16_t size, uint8_t * value)
-{}
