@@ -1061,6 +1061,24 @@ void ConnectivityManagerImpl::_ConnectWiFiNetworkAsyncCallback(GObject * source_
                 mpConnectCallback = nullptr;
             });
         }
+        else
+        {
+            GError * gerror = nullptr;
+
+            result = wpa_fi_w1_wpa_supplicant1_interface_call_save_config_sync(mWpaSupplicant.iface, nullptr, &gerror);
+            if (result)
+            {
+                ChipLogProgress(DeviceLayer, "wpa_supplicant: save config succeeded!");
+            }
+            else
+            {
+                ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to save config: %s",
+                                gerror ? gerror->message : "unknown error");
+            }
+
+            if (gerror != nullptr)
+                g_error_free(gerror);
+        }
     }
 }
 
