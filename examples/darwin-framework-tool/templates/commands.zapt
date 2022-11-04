@@ -89,7 +89,7 @@ private:
 
 {{/chip_cluster_commands}}
 
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
 
 /*
@@ -237,7 +237,7 @@ public:
 };
 
 {{/if}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 {{/chip_client_clusters}}
 
 /*----------------------------------------------------------------------------*\
@@ -255,7 +255,7 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{#chip_cluster_commands}}
         make_unique<{{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}>(), //
         {{/chip_cluster_commands}}
-        {{#chip_server_cluster_attributes}}
+        {{#zcl_attributes_server}}
         {{#first}}
          make_unique<ReadAttribute>(Id), //
         {{/first}}
@@ -272,7 +272,7 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{#if isReportableAttribute}}
         make_unique<SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{/if}}
-        {{/chip_server_cluster_attributes}}
+        {{/zcl_attributes_server}}
     };
 
     commands.Register(clusterName, clusterCommands);

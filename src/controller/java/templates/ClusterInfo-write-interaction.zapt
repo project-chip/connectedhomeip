@@ -15,7 +15,7 @@ public class ClusterWriteMapping {
     Map<String, Map<String, InteractionInfo>> writeAttributeMap = new HashMap<>();
     {{#chip_client_clusters}}
       Map<String, InteractionInfo> write{{asUpperCamelCase name}}InteractionInfo = new LinkedHashMap<>();
-        {{#chip_server_cluster_attributes}}
+        {{#zcl_attributes_server}}
         {{! TODO: Add support for struct-typed attributes }}
         {{#if_unsupported_attribute_type type isArray}}
         {{else}}
@@ -40,7 +40,7 @@ public class ClusterWriteMapping {
         {{/unless}}
         {{/if}}
         {{/if_unsupported_attribute_type}}
-        {{/chip_server_cluster_attributes}}
+        {{/zcl_attributes_server}}
         writeAttributeMap.put("{{asLowerCamelCase name}}", write{{asUpperCamelCase name}}InteractionInfo);
     {{/chip_client_clusters}}
     return writeAttributeMap;

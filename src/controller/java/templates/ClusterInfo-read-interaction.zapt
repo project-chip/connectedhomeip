@@ -15,7 +15,7 @@ public class ClusterReadMapping {
     Map<String, Map<String, InteractionInfo>> readAttributeMap = new HashMap<>();
     {{#chip_client_clusters}}
        Map<String, InteractionInfo> read{{asUpperCamelCase name}}InteractionInfo = new LinkedHashMap<>();
-        {{#chip_server_cluster_attributes}}
+        {{#zcl_attributes_server}}
         {{! TODO: Add support for struct-typed attributes }}
         {{#if_unsupported_attribute_type type isArray}}
         {{else}}
@@ -39,7 +39,7 @@ public class ClusterReadMapping {
         );
         read{{asUpperCamelCase ../name}}InteractionInfo.put("read{{asUpperCamelCase name}}Attribute", read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}AttributeInteractionInfo);
         {{/if_unsupported_attribute_type}}
-        {{/chip_server_cluster_attributes}}
+        {{/zcl_attributes_server}}
         readAttributeMap.put("{{asLowerCamelCase name}}", read{{asUpperCamelCase name}}InteractionInfo);
         {{/chip_client_clusters}}
         return readAttributeMap;

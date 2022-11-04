@@ -107,7 +107,7 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 {{/unless}}
 {{/chip_cluster_commands}}
 
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server}}
 {{!Backwards compat for now: Treat DeviceTypeList as DeviceList.  Ideally we would have both, not just DeviceList. }}
 {{#*inline "attribute"}}Attribute{{#if (isStrEqual (asUpperCamelCase parent.name) "Descriptor")}}{{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeList")}}DeviceList{{else}}{{asUpperCamelCase name}}{{/if}}{{else}}{{asUpperCamelCase name}}{{/if}}{{/inline}}
 {{! TODO: We need a better setup for the API_AVALABLE annotations here; this does not scale at all sanely. }}
@@ -134,7 +134,7 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 + (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler {{#if (isStrEqual (asUpperCamelCase parent.name) "TestCluster")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}}
   MTR_NEWLY_DEPRECATED("Please use read{{>attribute}}WithAttributeCache:endpoint:queue:completion:");
 {{/if}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 
 @end
 

@@ -247,7 +247,7 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 {{/unless}}
 {{/chip_cluster_commands}}
 
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server}}
 {{!Backwards compat for now: Treat DeviceTypeList as DeviceList.  Ideally we would have both, not just DeviceList. }}
 {{#*inline "attribute"}}Attribute{{#if (isStrEqual (asUpperCamelCase parent.name) "Descriptor")}}{{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeList")}}DeviceList{{else}}{{asUpperCamelCase name}}{{/if}}{{else}}{{asUpperCamelCase name}}{{/if}}{{/inline}}
 {{! TODO: We need a better setup for the API_AVALABLE annotations here; this does not scale at all sanely. }}
@@ -290,7 +290,7 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
   [self readAttribute{{asUpperCamelCase name}}WithAttributeCache:attributeCacheContainer endpoint:endpoint queue:queue completion:completionHandler];
 }
 {{/if}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 
 - (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
                                endpoint:(uint16_t)endpoint
