@@ -60,6 +60,11 @@
             "type": "string",
             "maxLength": 64
         },
+        "product_url": {
+            "description": "link to product-specific web page",
+            "type": "string",
+            "maxLength": 256
+        },
         "part_number": {
             "description": "human-readable vendor assigned part number",
             "type": "string",
