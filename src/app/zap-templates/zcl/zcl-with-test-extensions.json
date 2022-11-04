@@ -177,7 +177,7 @@
             "FeatureMap",
             "ThreadMetrics"
         ],
-        "Test Cluster": [
+        "Test": [
             "struct_attr",
             "nullable_struct",
             "general_error_boolean",
