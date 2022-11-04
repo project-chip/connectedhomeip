@@ -71,6 +71,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRClusterPath ()
+- (instancetype)initWithPath:(const chip::app::ConcreteClusterPath &)path;
+@end
+
 @interface MTRAttributePath ()
 - (instancetype)initWithPath:(const chip::app::ConcreteDataAttributePath &)path;
 @end
