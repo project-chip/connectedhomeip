@@ -38,7 +38,7 @@
 {{#>MTRCallbackBridge type="vendor_id"    isNullable=true  ns="chip"}}NullableVendorIdAttributeCallback{{/MTRCallbackBridge}}
 
 {{#chip_client_clusters includeAll=true}}
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server}}
 {{#if isArray}}
 {{#>MTRCallbackBridge ns=parent.name                                }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}ListAttributeCallback{{/MTRCallbackBridge}}
 {{else}}
@@ -49,7 +49,7 @@
   {{#>MTRCallbackBridge ns=parent.name                              }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}AttributeCallback{{/MTRCallbackBridge}}
   {{/if_is_strongly_typed_bitmap}}
 {{/if}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 {{/chip_client_clusters}}
 
 {{#chip_client_clusters includeAll=true}}

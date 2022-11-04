@@ -17,27 +17,28 @@ public class ClusterReadMapping {
        Map<String, InteractionInfo> read{{asUpperCamelCase name}}InteractionInfo = new LinkedHashMap<>();
         {{#chip_server_cluster_attributes}}
         {{! TODO: Add support for struct-typed attributes }}
-        {{#unless (isStrEqual chipCallback.name "Unsupported")}}
+        {{#if_unsupported_attribute_type type isArray}}
+        {{else}}
         Map<String, CommandParameterInfo> read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}AttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster).read{{asUpperCamelCase name}}Attribute(
-              ({{#if_basic_global_response}}
-                ChipClusters.{{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback
-              {{else}}
+              ({{#if_attribute_complex type}}
                 ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}AttributeCallback
-              {{/if_basic_global_response}}) callback
+              {{else}}
+                ChipClusters.{{get_underlying_language_specific_zcl_type type language="java" boolean="Boolean"}}AttributeCallback
+              {{/if_attribute_complex}}) callback
             );
           },
           {{#if isArray}}
             () -> new ClusterInfoMapping.Delegated{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback(),
           {{else}}
-            () -> new ClusterInfoMapping.Delegated{{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback(),
+            () -> new ClusterInfoMapping.Delegated{{get_underlying_language_specific_zcl_type type language="java" boolean="Boolean"}}AttributeCallback(),
           {{/if}}
           read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams
         );
         read{{asUpperCamelCase ../name}}InteractionInfo.put("read{{asUpperCamelCase name}}Attribute", read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}AttributeInteractionInfo);
-        {{/unless}}
+        {{/if_unsupported_attribute_type}}
         {{/chip_server_cluster_attributes}}
         readAttributeMap.put("{{asLowerCamelCase name}}", read{{asUpperCamelCase name}}InteractionInfo);
         {{/chip_client_clusters}}
