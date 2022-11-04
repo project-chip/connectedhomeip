@@ -151,7 +151,7 @@
 
 // Use this macro to check if the client side of the OTA Software Update Requestor cluster is included
 #define ZCL_USING_OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_CLIENT
-#define EMBER_AF_PLUGIN_OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_OTA_SOFTWARE_UPDATE_REQUESTOR_CLIENT
 
 // Use this macro to check if the client side of the Localization Configuration cluster is included
 #define ZCL_USING_LOCALIZATION_CONFIGURATION_CLUSTER_CLIENT
