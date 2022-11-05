@@ -31,7 +31,6 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <trace/trace.h>
-#include <vector>
 
 using namespace chip;
 using namespace chip::app;
@@ -57,6 +56,18 @@ enum ValidWiFiCredentialLength
     kMaxWPAPSK = 63,
     kWPAPSKHex = 64,
 };
+
+void AddScanResponseWithInsertionSortByRssi(chip::Platform::ScopedMemoryBuffer<ThreadScanResponse> & scanResponseArray, size_t step,
+                                            const ThreadScanResponse & keyScanResponse)
+{
+    int j = step - 1;
+    while (j >= 0 && scanResponseArray[j].rssi < keyScanResponse.rssi)
+    {
+        scanResponseArray[j + 1] = scanResponseArray[j];
+        j--;
+    }
+    scanResponseArray[j + 1] = keyScanResponse;
+}
 
 } // namespace
 
@@ -529,7 +540,8 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
     TLV::TLVWriter * writer;
     TLV::TLVType listContainerType;
     ThreadScanResponse scanResponse;
-    std::vector<ThreadScanResponse> scanResponses;
+    chip::Platform::ScopedMemoryBuffer<ThreadScanResponse> scanResponseArray;
+    size_t scanResponseArrayLength = 0;
     uint8_t extendedAddressBuffer[Thread::kSizeExtendedPanId];
 
     SuccessOrExit(err = commandHandle->PrepareCommand(
@@ -547,18 +559,35 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
         err = writer->StartContainer(TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kThreadScanResults)),
                                      TLV::TLVType::kTLVType_Array, listContainerType));
 
+    VerifyOrExit(
+        scanResponseArray.Alloc(networks->Count() > kMaxNetworksInScanResponse ? kMaxNetworksInScanResponse : networks->Count()),
+        err = CHIP_ERROR_NO_MEMORY);
     for (; networks != nullptr && networks->Next(scanResponse);)
     {
+        if (scanResponseArrayLength == 0)
+        {
+            scanResponseArray[scanResponseArrayLength] = scanResponse;
+            scanResponseArrayLength++;
+            continue;
+        }
+
+        if ((scanResponseArrayLength == kMaxNetworksInScanResponse) &&
+            (scanResponseArray[scanResponseArrayLength - 1].rssi > scanResponse.rssi))
+        {
+            continue;
+        }
+
         bool isDuplicated = false;
 
-        for (size_t i = 0; i < scanResponses.size(); i++)
+        for (size_t i = 0; i < scanResponseArrayLength; i++)
         {
-            if ((scanResponses[i].panId == scanResponse.panId) && (scanResponses[i].extendedPanId == scanResponse.extendedPanId))
+            if ((scanResponseArray[i].panId == scanResponse.panId) &&
+                (scanResponseArray[i].extendedPanId == scanResponse.extendedPanId))
             {
                 isDuplicated = true;
-                if (scanResponses[i].rssi < scanResponse.rssi)
+                if (scanResponseArray[i].rssi < scanResponse.rssi)
                 {
-                    scanResponses[i].rssi = scanResponse.rssi;
+                    AddScanResponseWithInsertionSortByRssi(scanResponseArray, i, scanResponse);
                 }
                 break;
             }
@@ -569,28 +598,25 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
             continue;
         }
 
-        scanResponses.push_back(scanResponse);
-
-        if (scanResponses.size() > kMaxNetworksInScanResponse)
+        AddScanResponseWithInsertionSortByRssi(scanResponseArray, scanResponseArrayLength - 1, scanResponse);
+        if (scanResponseArrayLength < kMaxNetworksInScanResponse)
         {
-            std::sort(scanResponses.begin(), scanResponses.end(),
-                      [](const ThreadScanResponse & a, const ThreadScanResponse & b) -> bool { return a.rssi > b.rssi; });
-            scanResponses.pop_back();
+            scanResponseArrayLength++;
         }
     }
 
-    for (size_t i = 0; i < scanResponses.size(); i++)
+    for (size_t i = 0; i < scanResponseArrayLength; i++)
     {
         Structs::ThreadInterfaceScanResult::Type result;
-        Encoding::BigEndian::Put64(extendedAddressBuffer, scanResponses[i].extendedAddress);
-        result.panId           = scanResponses[i].panId;
-        result.extendedPanId   = scanResponses[i].extendedPanId;
-        result.networkName     = CharSpan(scanResponses[i].networkName, scanResponses[i].networkNameLen);
-        result.channel         = scanResponses[i].channel;
-        result.version         = scanResponses[i].version;
+        Encoding::BigEndian::Put64(extendedAddressBuffer, scanResponseArray[i].extendedAddress);
+        result.panId           = scanResponseArray[i].panId;
+        result.extendedPanId   = scanResponseArray[i].extendedPanId;
+        result.networkName     = CharSpan(scanResponseArray[i].networkName, scanResponseArray[i].networkNameLen);
+        result.channel         = scanResponseArray[i].channel;
+        result.version         = scanResponseArray[i].version;
         result.extendedAddress = ByteSpan(extendedAddressBuffer);
-        result.rssi            = scanResponses[i].rssi;
-        result.lqi             = scanResponses[i].lqi;
+        result.rssi            = scanResponseArray[i].rssi;
+        result.lqi             = scanResponseArray[i].lqi;
 
         SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag(), result));
     }
