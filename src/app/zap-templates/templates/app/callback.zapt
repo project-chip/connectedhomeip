@@ -198,54 +198,6 @@ bool emberAfAttributeReadAccessCallback(chip::EndpointId endpoint, chip::Cluster
  */
 bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
-/** @brief Default Response
- *
- * This function is called by the application framework when a Default Response
- * command is received from an external device.  The application should return
- * true if the message was processed or false if it was not.
- *
- * @param clusterId The cluster identifier of this response.
- * @param commandId The command identifier to which this is a response.
- * @param status Specifies either SUCCESS or the nature of the error that was
- * detected in the received command.
- */
-bool emberAfDefaultResponseCallback(chip::ClusterId clusterId, chip::CommandId commandId, EmberAfStatus status);
-
-/** @brief Pre Message Send
- *
- * This function is called by the framework when it is about to pass a message
- * to the stack primitives for sending.   This message may or may not be ZCL,
- * ZDO, or some other protocol.  This is called prior to
-        any ZigBee
- * fragmentation that may be done.  If the function returns true it is assumed
- * the callback has consumed and processed the message.  The callback must also
- * set the EmberStatus status code to be passed back to the caller.  The
- * framework will do no further processing on the message.
-        If the
- * function returns false then it is assumed that the callback has not processed
- * the mesasge and the framework will continue to process accordingly.
- *
- * @param messageStruct The structure containing the parameters of the APS
- * message to be sent.
- * @param status A pointer to the status code value that will be returned to the
- * caller.
- */
-bool emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberStatus * status);
-
-/** @brief Message Sent
- *
- * This function is called by the application framework from the message sent
- * handler, when it is informed by the stack regarding the message sent status.
- * All of the values passed to the emberMessageSentHandler are passed on to this
- * callback. This provides an opportunity for the application to verify that its
- * message has been sent successfully and take the appropriate action. This
- * callback should return a bool value of true or false. A value of true
- * indicates that the message sent notification has been handled and should not
- * be handled by the application framework.
- */
-bool emberAfMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                uint16_t msgLen, uint8_t * message, EmberStatus status);
-
 /** @brief External Attribute Read
  *
  * Like emberAfExternalAttributeWriteCallback above, this function is called
@@ -322,25 +274,6 @@ EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, ch
 EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                     const EmberAfAttributeMetadata * attributeMetadata,
                                                     uint8_t * buffer);
-
-/** @brief Get Endpoint Info
- *
- * This function is a callback to an application implemented endpoint that
- * operates outside the normal application framework.  When the framework wishes
- * to perform operations with that endpoint it uses this callback to retrieve
- * the endpoint's information.  If the endpoint exists and the application can
- * provide data then true shall be returned.  Otherwise the callback must return
- * false.
- *
- * @param endpoint The endpoint to retrieve data for.  Ver.: always
- * @param returnNetworkIndex The index corresponding to the ZigBee network the
- * endpoint belongs to.  If not using a multi-network device, 0 must be
- * returned.  Otherwise on a multi-network device the stack will switch to this
- * network before sending the message.  Ver.: always
- * @param returnEndpointInfo A pointer to a data struct that will be written
- * with information about the endpoint.  Ver.: always
- */
-bool emberAfGetEndpointInfoCallback(chip::EndpointId endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo);
 
 /** @brief Registration Abort
  *
