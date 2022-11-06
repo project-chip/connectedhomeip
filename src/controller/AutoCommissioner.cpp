@@ -234,6 +234,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
                 (mParams.GetAttemptThreadNetworkScan().ValueOr(false) &&
                  mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId))
             {
+                // Perform Scan (kScanNetworks) and collect credentials (kNeedsNetworkCreds) right before configuring network.
+                // This order of steps allows the workflow to return to collect credentials again if network enablement fails.
                 return CommissioningStage::kScanNetworks;
             }
             ChipLogProgress(Controller, "No NetworkScan enabled or WiFi/Thread endpoint not specified, skipping ScanNetworks");
@@ -260,7 +262,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
         else
         {
-            finalizePASESession();
+            setCASEFailsafeTimerIfNeeded();
             if (mParams.GetSkipCommissioningComplete().ValueOr(false))
             {
                 return CommissioningStage::kCleanup;
@@ -317,16 +319,16 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
         else if (mParams.GetSkipCommissioningComplete().ValueOr(false))
         {
-            finalizePASESession();
+            setCASEFailsafeTimerIfNeeded();
             return CommissioningStage::kCleanup;
         }
         else
         {
-            finalizePASESession();
+            setCASEFailsafeTimerIfNeeded();
             return CommissioningStage::kFindOperational;
         }
     case CommissioningStage::kThreadNetworkEnable:
-        finalizePASESession();
+        setCASEFailsafeTimerIfNeeded();
         if (mParams.GetSkipCommissioningComplete().ValueOr(false))
         {
             return CommissioningStage::kCleanup;
@@ -345,14 +347,33 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     return CommissioningStage::kError;
 }
 
-void AutoCommissioner::finalizePASESession()
+// No specific actions to take when an error happens since this command can fail and commissioning can still succeed.
+static void OnFailsafeFailureForCASE(void * context, CHIP_ERROR error)
+{
+    ChipLogProgress(Controller, "ExtendFailsafe received failure response %s\n", chip::ErrorStr(error));
+}
+
+// No specific actions to take upon success.
+static void
+OnExtendFailsafeSuccessForCASE(void * context,
+                               const app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
+{
+    ChipLogProgress(Controller, "ExtendFailsafe received ArmFailSafe response errorCode=%u", to_underlying(data.errorCode));
+}
+
+void AutoCommissioner::setCASEFailsafeTimerIfNeeded()
 {
     // if there is a final fail-safe timer configured then, send it
     if (mParams.GetCASEFailsafeTimerSeconds().HasValue())
     {
+        // send the command via the PASE session (mCommissioneeDeviceProxy) since the CASE portion of commissioning
+        // might be done by a different service (ex. PASE is done by a phone app and CASE is done by a Hub).
+        // Also, we want the CASE failsafe timer to apply for the time it takes the Hub to perform operational discovery,
+        // CASE establishment, and receipt of the commissioning complete command.
         mCommissioner->ExtendArmFailSafe(mCommissioneeDeviceProxy, CommissioningStage::kFindOperational,
                                          mParams.GetCASEFailsafeTimerSeconds().Value(),
-                                         GetCommandTimeout(mCommissioneeDeviceProxy, CommissioningStage::kArmFailsafe));
+                                         GetCommandTimeout(mCommissioneeDeviceProxy, CommissioningStage::kArmFailsafe),
+                                         OnExtendFailsafeSuccessForCASE, OnFailsafeFailureForCASE);
     }
 }
 

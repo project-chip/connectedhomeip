@@ -56,6 +56,9 @@ enum CommissioningStage : uint8_t
     /// ScanNetworks can happen anytime after kArmFailsafe.
     /// However, the cirque tests fail if it is earlier in the list
     kScanNetworks,
+    /// Waiting for the higher layer to provide network credentials before continuing the workflow.
+    /// Call CHIPDeviceController::NetworkCredentialsReady() when CommissioningParameters is populated with
+    /// network credentials to use in kWiFiNetworkSetup or kThreadNetworkSetup steps.
     kNeedsNetworkCreds,
 };
 

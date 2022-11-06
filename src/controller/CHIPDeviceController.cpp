@@ -1084,26 +1084,16 @@ void DeviceCommissioner::OnFailedToExtendedArmFailSafeDeviceAttestation(void * c
     commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
 }
 
-void OnExtendFailsafeFailure(void * context, CHIP_ERROR error)
-{
-    ChipLogProgress(Controller, "ExtendFailsafe received failure response %s\n", chip::ErrorStr(error));
-}
-
-void OnExtendFailsafeSuccess(void * context, const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
-{
-    ChipLogProgress(Controller, "ExtendFailsafe received ArmFailSafe response errorCode=%u", to_underlying(data.errorCode));
-}
-
 void DeviceCommissioner::ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
-                                           Optional<System::Clock::Timeout> timeout)
+                                           Optional<System::Clock::Timeout> timeout, OnExtendFailsafeSuccess onSuccess,
+                                           OnExtendFailsafeFailure onFailure)
 {
     uint64_t breadcrumb = static_cast<uint64_t>(step);
     GeneralCommissioning::Commands::ArmFailSafe::Type request;
     request.expiryLengthSeconds = armFailSafeTimeout;
     request.breadcrumb          = breadcrumb;
     ChipLogProgress(Controller, "Arming failsafe for CASE (%u seconds)", request.expiryLengthSeconds);
-    SendCommand<GeneralCommissioningCluster>(proxy, request, OnExtendFailsafeSuccess, OnExtendFailsafeFailure, kRootEndpointId,
-                                             timeout);
+    SendCommand<GeneralCommissioningCluster>(proxy, request, onSuccess, onFailure, kRootEndpointId, timeout);
 }
 
 void DeviceCommissioner::ExtendArmFailSafeForDeviceAttestation(const Credentials::DeviceAttestationVerifier::AttestationInfo & info,

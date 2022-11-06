@@ -51,7 +51,9 @@ protected:
 
 private:
     DeviceProxy * GetDeviceProxyForStep(CommissioningStage nextStage);
-    void finalizePASESession();
+
+    // Adjust the failsafe timer if CommissioningDelegate GetCASEFailsafeTimerSeconds is set
+    void setCASEFailsafeTimerIfNeeded();
     void ReleaseDAC();
     void ReleasePAI();
 

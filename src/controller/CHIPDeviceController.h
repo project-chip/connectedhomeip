@@ -353,6 +353,13 @@ using UdcTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #endif
 
 /**
+ * @brief Callback prototype for ExtendArmFailSafe command.
+ */
+typedef void (*OnExtendFailsafeSuccess)(
+    void * context, const app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
+typedef void (*OnExtendFailsafeFailure)(void * context, CHIP_ERROR error);
+
+/**
  * @brief
  *   The commissioner applications can use this class to pair new/unpaired CHIP devices. The application is
  *   required to provide write access to the persistent storage, where the paired device information
@@ -672,7 +679,8 @@ public:
 
     // Reset the arm failsafe timer during commissioning.
     void ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
-                           Optional<System::Clock::Timeout> timeout);
+                           Optional<System::Clock::Timeout> timeout, OnExtendFailsafeSuccess onSuccess,
+                           OnExtendFailsafeFailure onFailure);
 
 private:
     DevicePairingDelegate * mPairingDelegate;
