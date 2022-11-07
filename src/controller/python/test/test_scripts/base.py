@@ -875,7 +875,7 @@ class BaseTestHelper:
             "Reading back data (again) from fabric1 to ensure it hasn't changed")
 
         data= await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)])
-        readListDataFabric1= data[1][Clusters.UnitTesting.[Clusters.UnitTesting.Attributes.ListFabricScoped]
+        readListDataFabric1= data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
 
         self.logger.info("Comparing data on fabric1...")
         expectedDataFabric1[0].fabricIndex= self.currentFabric1
