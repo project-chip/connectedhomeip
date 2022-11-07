@@ -21,12 +21,12 @@
 class AttestationTrustStoreBridge : public chip::Credentials::AttestationTrustStore
 {
 public:
-    AttestationTrustStoreBridge(std::vector<chip::ByteSpan> paaCerts) : mPaaCerts(paaCerts) {}
+    AttestationTrustStoreBridge(std::vector<std::vector<uint8_t>> paaCerts) : mPaaCerts(paaCerts) {}
     ~AttestationTrustStoreBridge(){};
 
     CHIP_ERROR GetProductAttestationAuthorityCert(const chip::ByteSpan & skid,
                                                   chip::MutableByteSpan & outPaaDerBuffer) const override;
 
 private:
-    std::vector<chip::ByteSpan> mPaaCerts;
+    std::vector<std::vector<uint8_t>> mPaaCerts;
 };

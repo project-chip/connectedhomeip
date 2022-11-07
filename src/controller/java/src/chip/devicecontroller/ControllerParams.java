@@ -301,11 +301,25 @@ public final class ControllerParams {
       return this;
     }
 
+    /**
+     * The Product Attestation Authority certificates that are trusted to sign
+     * device attestation information.
+     * 
+     * @param paaCerts The Product Attestation Authority certificates
+     *                 containing the X.509 DER certificate.
+     */
     public Builder setPaaCerts(ArrayList<byte[]> paaCerts) {
       this.paaCerts = paaCerts;
       return this;
     }
 
+    /**
+     * The Certificate Declaration certificates that are trusted to sign
+     * device attestation information.
+     * 
+     * @param cdCerts The Certificate Declaration certificates
+     *                containing the X.509 DER certificate.
+     */
     public Builder setCdCerts(ArrayList<byte[]> cdCerts) {
       this.cdCerts = cdCerts;
       return this;

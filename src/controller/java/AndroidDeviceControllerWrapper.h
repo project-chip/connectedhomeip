@@ -206,8 +206,9 @@ private:
 
     chip::Credentials::PartialDACVerifier mPartialDACVerifier;
 
-    DeviceAttestationDelegateBridge * mDeviceAttestationDelegateBridge = nullptr;
-    AttestationTrustStoreBridge * mAttestationTrustStoreBridge         = nullptr;
+    DeviceAttestationDelegateBridge * mDeviceAttestationDelegateBridge        = nullptr;
+    AttestationTrustStoreBridge * mAttestationTrustStoreBridge                = nullptr;
+    chip::Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, AndroidOperationalCredentialsIssuerPtr opCredsIssuer) :
         mController(std::move(controller)), mOpCredsIssuer(std::move(opCredsIssuer))

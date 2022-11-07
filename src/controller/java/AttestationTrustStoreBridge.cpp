@@ -15,20 +15,21 @@
  *    limitations under the License.
  */
 
-#import "AttestationTrustStoreBridge.h"
+#include "AttestationTrustStoreBridge.h"
+#include <lib/support/CodeUtils.h>
 
 CHIP_ERROR AttestationTrustStoreBridge::GetProductAttestationAuthorityCert(const chip::ByteSpan & skid,
                                                                            chip::MutableByteSpan & outPaaDerBuffer) const
 {
     VerifyOrReturnError(skid.size() == chip::Crypto::kSubjectKeyIdentifierLength, CHIP_ERROR_INVALID_ARGUMENT);
 
-    for (auto candidate : mPaaCerts)
+    for (auto paaCert : mPaaCerts)
     {
+        chip::ByteSpan candidate                                   = chip::ByteSpan(paaCert.data(), paaCert.size());
         uint8_t skidBuf[chip::Crypto::kSubjectKeyIdentifierLength] = { 0 };
         chip::MutableByteSpan candidateSkidSpan{ skidBuf };
         VerifyOrReturnError(CHIP_NO_ERROR == chip::Crypto::ExtractSKIDFromX509Cert(candidate, candidateSkidSpan),
                             CHIP_ERROR_INTERNAL);
-
         if (skid.data_equal(candidateSkidSpan))
         {
             // Found a match

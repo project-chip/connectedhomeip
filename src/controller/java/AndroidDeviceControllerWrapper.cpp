@@ -58,6 +58,21 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
         chip::Platform::Delete(mKeypairBridge);
         mKeypairBridge = nullptr;
     }
+    if (mDeviceAttestationDelegateBridge != nullptr)
+    {
+        delete mDeviceAttestationDelegateBridge;
+        mDeviceAttestationDelegateBridge = nullptr;
+    }
+    if (mDeviceAttestationVerifier != nullptr)
+    {
+        delete mDeviceAttestationVerifier;
+        mDeviceAttestationVerifier = nullptr;
+    }
+    if (mAttestationTrustStoreBridge != nullptr)
+    {
+        delete mAttestationTrustStoreBridge;
+        mAttestationTrustStoreBridge = nullptr;
+    }
 }
 
 void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)
@@ -133,18 +148,24 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 
     // Initialize device attestation verifier
     const Credentials::AttestationTrustStore * trustStore;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     if (paaCertsArrayList)
     {
         jint listSize;
         JniReferences::GetInstance().GetListSize(paaCertsArrayList, listSize);
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        std::vector<chip::ByteSpan> paaCerts;
+        std::vector<std::vector<uint8_t>> paaCerts;
         for (uint8_t i = 0; i < listSize; i++)
         {
             jobject paaCertObj = nullptr;
             err                = JniReferences::GetInstance().GetListItem(paaCertsArrayList, i, paaCertObj);
+            if (err != CHIP_NO_ERROR)
+            {
+                *errInfoOnFailure = err;
+                return nullptr;
+            }
             JniByteArray paaCert(env, static_cast<jbyteArray>(paaCertObj));
-            paaCerts.push_back(paaCert.byteSpan());
+            // Make a copy of the cert so that it does not loss of scope.
+            paaCerts.push_back(std::vector<uint8_t>(paaCert.byteSpan().begin(), paaCert.byteSpan().end()));
         }
         wrapper->mAttestationTrustStoreBridge = new AttestationTrustStoreBridge(paaCerts);
         if (wrapper->mAttestationTrustStoreBridge == nullptr)
@@ -159,27 +180,37 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     {
         trustStore = chip::Credentials::GetTestAttestationTrustStore();
     }
-    DeviceAttestationVerifier * deviceAttestationVerifier = chip::Credentials::GetDefaultDACVerifier(trustStore);
-    chip::Credentials::SetDeviceAttestationVerifier(deviceAttestationVerifier);
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    wrapper->mDeviceAttestationVerifier = chip::Credentials::GetDefaultDACVerifier(trustStore);
+    if (wrapper->mDeviceAttestationVerifier == nullptr)
+    {
+        ChipLogError(Controller, "Init failure while creating the device attestation verifier");
+        *errInfoOnFailure = CHIP_ERROR_NO_MEMORY;
+        return nullptr;
+    }
     if (cdCertsArrayList)
     {
-        auto cdTrustStore = deviceAttestationVerifier->GetCertificationDeclarationTrustStore();
+        auto cdTrustStore = wrapper->mDeviceAttestationVerifier->GetCertificationDeclarationTrustStore();
         if (cdTrustStore == nullptr)
         {
-            ChipLogError(Controller, "Failed to create cdTrustStore");
+            ChipLogError(Controller, "Failed to get cd trust store");
             *errInfoOnFailure = CHIP_ERROR_NO_MEMORY;
             return nullptr;
         }
         jint listSize;
         JniReferences::GetInstance().GetListSize(cdCertsArrayList, listSize);
-        std::vector<chip::ByteSpan> cdCerts;
         for (uint8_t i = 0; i < listSize; i++)
         {
             jobject cdCertObj = nullptr;
             err               = JniReferences::GetInstance().GetListItem(cdCertsArrayList, i, cdCertObj);
+            if (err != CHIP_NO_ERROR)
+            {
+                *errInfoOnFailure = err;
+                return nullptr;
+            }
             JniByteArray cdCert(env, static_cast<jbyteArray>(cdCertObj));
-            err = cdTrustStore->AddTrustedKey(cdCert.byteSpan());
+            std::vector<uint8_t> cdCertCopy(cdCert.byteSpan().begin(), cdCert.byteSpan().end());
+            chip::ByteSpan trustedKey = chip::ByteSpan(cdCertCopy.data(), cdCertCopy.size());
+            err                       = cdTrustStore->AddTrustedKey(trustedKey);
             if (err != CHIP_NO_ERROR)
             {
                 *errInfoOnFailure = err;
@@ -205,6 +236,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     setupParams.operationalCredentialsDelegate = opCredsIssuer;
     setupParams.defaultCommissioner            = &wrapper->mAutoCommissioner;
     initParams.fabricIndependentStorage        = wrapperStorage;
+    setupParams.deviceAttestationVerifier      = wrapper->mDeviceAttestationVerifier;
 
     wrapper->mGroupDataProvider.SetStorageDelegate(wrapperStorage);
 
