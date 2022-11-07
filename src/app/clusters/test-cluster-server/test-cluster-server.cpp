@@ -675,7 +675,7 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedAttribute(const ConcreteDataAttr
 } // namespace
 
 bool emberAfUnitTestingClusterTestCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
-                                    const Clusters::UnitTesting::Commands::Test::DecodableType & commandData)
+                                           const Clusters::UnitTesting::Commands::Test::DecodableType & commandData)
 {
     // Setup the test variables
     emAfLoadAttributeDefaults(commandPath.mEndpointId, true, MakeOptional(commandPath.mClusterId));
@@ -701,7 +701,7 @@ bool emberAfUnitTestingClusterTestCallback(app::CommandHandler *, const app::Con
 }
 
 bool emberAfUnitTestingClusterTestSpecificCallback(CommandHandler * apCommandObj, const ConcreteCommandPath & commandPath,
-                                            const TestSpecific::DecodableType & commandData)
+                                                   const TestSpecific::DecodableType & commandData)
 {
     TestSpecificResponse::Type responseData;
     responseData.returnValue = 7;
@@ -710,13 +710,13 @@ bool emberAfUnitTestingClusterTestSpecificCallback(CommandHandler * apCommandObj
 }
 
 bool emberAfUnitTestingClusterTestNotHandledCallback(CommandHandler *, const ConcreteCommandPath & commandPath,
-                                              const TestNotHandled::DecodableType & commandData)
+                                                     const TestNotHandled::DecodableType & commandData)
 {
     return false;
 }
 
 bool emberAfUnitTestingClusterTestAddArgumentsCallback(CommandHandler * apCommandObj, const ConcreteCommandPath & commandPath,
-                                                const TestAddArguments::DecodableType & commandData)
+                                                       const TestAddArguments::DecodableType & commandData)
 {
     if (commandData.arg1 > UINT8_MAX - commandData.arg2)
     {
@@ -737,9 +737,9 @@ static bool SendBooleanResponse(CommandHandler * commandObj, const ConcreteComma
     return true;
 }
 
-bool emberAfUnitTestingClusterTestStructArgumentRequestCallback(app::CommandHandler * commandObj,
-                                                         const app::ConcreteCommandPath & commandPath,
-                                                         const Commands::TestStructArgumentRequest::DecodableType & commandData)
+bool emberAfUnitTestingClusterTestStructArgumentRequestCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::TestStructArgumentRequest::DecodableType & commandData)
 {
     return SendBooleanResponse(commandObj, commandPath, commandData.arg1.b);
 }
@@ -773,8 +773,9 @@ bool emberAfUnitTestingClusterTestListStructArgumentRequestCallback(
     return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
 
-bool emberAfUnitTestingClusterTestEmitTestEventRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                        const Commands::TestEmitTestEventRequest::DecodableType & commandData)
+bool emberAfUnitTestingClusterTestEmitTestEventRequestCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::TestEmitTestEventRequest::DecodableType & commandData)
 {
     Commands::TestEmitTestEventResponse::Type responseData;
     Structs::SimpleStruct::Type arg4;
@@ -888,8 +889,9 @@ bool emberAfUnitTestingClusterTestListNestedStructListArgumentRequestCallback(
     return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
 
-bool emberAfUnitTestingClusterTestListInt8UReverseRequestCallback(CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
-                                                           Commands::TestListInt8UReverseRequest::DecodableType const & commandData)
+bool emberAfUnitTestingClusterTestListInt8UReverseRequestCallback(
+    CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
+    Commands::TestListInt8UReverseRequest::DecodableType const & commandData)
 {
     size_t count   = 0;
     CHIP_ERROR err = commandData.arg1.ComputeSize(&count);
@@ -924,7 +926,7 @@ exit:
 }
 
 bool emberAfUnitTestingClusterTestEnumsRequestCallback(CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
-                                                TestEnumsRequest::DecodableType const & commandData)
+                                                       TestEnumsRequest::DecodableType const & commandData)
 {
     TestEnumsResponse::Type response;
     response.arg1 = commandData.arg1;
@@ -934,8 +936,9 @@ bool emberAfUnitTestingClusterTestEnumsRequestCallback(CommandHandler * commandO
     return true;
 }
 
-bool emberAfUnitTestingClusterTestNullableOptionalRequestCallback(CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
-                                                           Commands::TestNullableOptionalRequest::DecodableType const & commandData)
+bool emberAfUnitTestingClusterTestNullableOptionalRequestCallback(
+    CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
+    Commands::TestNullableOptionalRequest::DecodableType const & commandData)
 {
     Commands::TestNullableOptionalResponse::Type response;
     response.wasPresent = commandData.arg1.HasValue();
@@ -956,7 +959,7 @@ bool emberAfUnitTestingClusterTestNullableOptionalRequestCallback(CommandHandler
 }
 
 bool emberAfUnitTestingClusterSimpleStructEchoRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                       const Commands::SimpleStructEchoRequest::DecodableType & commandData)
+                                                              const Commands::SimpleStructEchoRequest::DecodableType & commandData)
 {
     Commands::SimpleStructResponse::Type response;
     response.arg1.a = commandData.arg1.a;
@@ -973,7 +976,7 @@ bool emberAfUnitTestingClusterSimpleStructEchoRequestCallback(CommandHandler * c
 }
 
 bool emberAfUnitTestingClusterTimedInvokeRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                  const Commands::TimedInvokeRequest::DecodableType & commandData)
+                                                         const Commands::TimedInvokeRequest::DecodableType & commandData)
 {
     commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
     return true;
