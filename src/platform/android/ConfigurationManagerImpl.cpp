@@ -191,24 +191,6 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetPartNumber(char * buf, size_t bufSize)
-{
-    size_t dateLen;
-    return ReadConfigValueStr(AndroidConfig::kConfigKey_PartNumber, buf, bufSize, dateLen);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetProductURL(char * buf, size_t bufSize)
-{
-    size_t dateLen;
-    return ReadConfigValueStr(AndroidConfig::kConfigKey_ProductURL, buf, bufSize, dateLen);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetProductLabel(char * buf, size_t bufSize)
-{
-    size_t dateLen;
-    return ReadConfigValueStr(AndroidConfig::kConfigKey_ProductLabel, buf, bufSize, dateLen);
-}
-
 CHIP_ERROR ConfigurationManagerImpl::GetUniqueId(char * buf, size_t bufSize)
 {
     size_t dateLen;

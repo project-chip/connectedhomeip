@@ -25,11 +25,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-- (void)subscribeWithQueue:(dispatch_queue_t)queue
-                minInterval:(NSNumber *)minInterval
-                maxInterval:(NSNumber *)maxInterval
-              reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
-    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler NS_UNAVAILABLE;
 
 - (instancetype)initWithController:(id<NSCopying>)controller
                           deviceID:(NSNumber *)deviceID

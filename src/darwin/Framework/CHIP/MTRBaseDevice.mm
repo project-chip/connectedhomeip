@@ -260,9 +260,7 @@ public:
 } // anonymous namespace
 
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                minInterval:(NSNumber *)minInterval
-                maxInterval:(NSNumber *)maxInterval
-                     params:(nullable MTRSubscribeParams *)params
+                     params:(MTRSubscribeParams *)params
     attributeCacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
      attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
          eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
@@ -297,13 +295,14 @@ public:
                                       // We want to get event reports at the minInterval, not the maxInterval.
                                       eventPath->mIsUrgentEvent = true;
                                       ReadPrepareParams readParams(session.Value());
-                                      readParams.mMinIntervalFloorSeconds = [minInterval unsignedShortValue];
-                                      readParams.mMaxIntervalCeilingSeconds = [maxInterval unsignedShortValue];
+                                      readParams.mMinIntervalFloorSeconds = [params.minInterval unsignedShortValue];
+                                      readParams.mMaxIntervalCeilingSeconds = [params.maxInterval unsignedShortValue];
                                       readParams.mpAttributePathParamsList = attributePath.get();
                                       readParams.mAttributePathParamsListSize = 1;
                                       readParams.mpEventPathParamsList = eventPath.get();
                                       readParams.mEventPathParamsListSize = 1;
-                                      readParams.mKeepSubscriptions = [params.keepPreviousSubscriptions boolValue];
+                                      readParams.mIsFabricFiltered = params.filterByFabric;
+                                      readParams.mKeepSubscriptions = !params.replaceExistingSubscriptions;
 
                                       std::unique_ptr<ClusterStateCache> attributeCache;
                                       ReadClient::Callback * callbackForReadClient = nullptr;
@@ -368,7 +367,7 @@ public:
                                           exchangeManager, *callbackForReadClient, ReadClient::InteractionType::Subscribe);
 
                                       CHIP_ERROR err;
-                                      if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                                      if (!params.resubscribeIfLost) {
                                           err = readClient->SendRequest(readParams);
                                       } else {
                                           // SendAutoResubscribeRequest cleans up the params, even on failure.
@@ -774,12 +773,12 @@ private:
     Platform::UniquePtr<app::ReadClient> mReadClient;
 };
 
-- (void)readAttributeWithEndpointID:(NSNumber *)endpointID
-                          clusterID:(NSNumber *)clusterID
-                        attributeID:(NSNumber *)attributeID
-                             params:(MTRReadParams * _Nullable)params
-                              queue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion
+- (void)readAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
+                           clusterID:(NSNumber * _Nullable)clusterID
+                         attributeID:(NSNumber * _Nullable)attributeID
+                              params:(MTRReadParams * _Nullable)params
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
 {
     endpointID = (endpointID == nil) ? nil : [endpointID copy];
     clusterID = (clusterID == nil) ? nil : [clusterID copy];
@@ -834,7 +833,7 @@ private:
             chip::app::ReadPrepareParams readParams(session);
             readParams.mpAttributePathParamsList = &attributePath;
             readParams.mAttributePathParamsListSize = 1;
-            readParams.mIsFabricFiltered = params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue];
+            readParams.mIsFabricFiltered = params.filterByFabric;
 
             auto onDone = [resultArray, resultSuccess, resultFailure, context, successCb, failureCb](
                               BufferedReadAttributeCallback<MTRDataValueDictionaryDecodableType> * callback) {
@@ -1117,15 +1116,13 @@ exit:
         });
 }
 
-- (void)subscribeAttributeWithEndpointID:(NSNumber * _Nullable)endpointID
-                               clusterID:(NSNumber * _Nullable)clusterID
-                             attributeID:(NSNumber * _Nullable)attributeID
-                             minInterval:(NSNumber *)minInterval
-                             maxInterval:(NSNumber *)maxInterval
-                                  params:(MTRSubscribeParams * _Nullable)params
-                                   queue:(dispatch_queue_t)queue
-                           reportHandler:(MTRDeviceResponseHandler)reportHandler
-                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler)subscriptionEstablished
+- (void)subscribeToAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
+                                  clusterID:(NSNumber * _Nullable)clusterID
+                                attributeID:(NSNumber * _Nullable)attributeID
+                                     params:(MTRSubscribeParams * _Nullable)params
+                                      queue:(dispatch_queue_t)queue
+                              reportHandler:(MTRDeviceResponseHandler)reportHandler
+                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler)subscriptionEstablished
 {
     if (self.isPASEDevice) {
         // We don't support subscriptions over PASE.
@@ -1139,8 +1136,6 @@ exit:
     endpointID = (endpointID == nil) ? nil : [endpointID copy];
     clusterID = (clusterID == nil) ? nil : [clusterID copy];
     attributeID = (attributeID == nil) ? nil : [attributeID copy];
-    minInterval = (minInterval == nil) ? nil : [minInterval copy];
-    maxInterval = (maxInterval == nil) ? nil : [maxInterval copy];
     params = (params == nil) ? nil : [params copy];
 
     [self.deviceController
@@ -1214,12 +1209,10 @@ exit:
                    chip::app::ReadPrepareParams readParams(session.Value());
                    readParams.mpAttributePathParamsList = container.pathParams;
                    readParams.mAttributePathParamsListSize = 1;
-                   readParams.mMinIntervalFloorSeconds = static_cast<uint16_t>([minInterval unsignedShortValue]);
-                   readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>([maxInterval unsignedShortValue]);
-                   readParams.mIsFabricFiltered
-                       = (params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue]);
-                   readParams.mKeepSubscriptions
-                       = (params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+                   readParams.mMinIntervalFloorSeconds = static_cast<uint16_t>([params.minInterval unsignedShortValue]);
+                   readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>([params.maxInterval unsignedShortValue]);
+                   readParams.mIsFabricFiltered = params.filterByFabric;
+                   readParams.mKeepSubscriptions = !params.replaceExistingSubscriptions;
 
                    auto onDone = [container](BufferedReadAttributeCallback<MTRDataValueDictionaryDecodableType> * callback) {
                        [container onDone];
@@ -1235,7 +1228,7 @@ exit:
                    auto readClient = Platform::New<app::ReadClient>(
                        engine, exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
 
-                   if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                   if (params.replaceExistingSubscriptions) {
                        err = readClient->SendRequest(readParams);
                    } else {
                        err = readClient->SendAutoResubscribeRequest(std::move(readParams));
@@ -1469,10 +1462,15 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
     subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
     resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
 {
+    MTRSubscribeParams * _Nullable subscribeParams = [params copy];
+    if (subscribeParams == nil) {
+        subscribeParams = [[MTRSubscribeParams alloc] initWithMinInterval:@(minInterval) maxInterval:@(maxInterval)];
+    } else {
+        subscribeParams.minInterval = @(minInterval);
+        subscribeParams.maxInterval = @(maxInterval);
+    }
     [self subscribeWithQueue:queue
-                    minInterval:@(minInterval)
-                    maxInterval:@(maxInterval)
-                         params:params
+                         params:subscribeParams
         attributeCacheContainer:attributeCacheContainer
          attributeReportHandler:attributeReportHandler
              eventReportHandler:eventReportHandler
@@ -1488,12 +1486,12 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion
 {
-    [self readAttributeWithEndpointID:endpointId
-                            clusterID:clusterId
-                          attributeID:attributeId
-                               params:params
-                                queue:clientQueue
-                           completion:completion];
+    [self readAttributesWithEndpointID:endpointId
+                             clusterID:clusterId
+                           attributeID:attributeId
+                                params:params
+                                 queue:clientQueue
+                            completion:completion];
 }
 
 - (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
@@ -1540,15 +1538,20 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                            reportHandler:(MTRDeviceResponseHandler)reportHandler
                  subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
 {
-    [self subscribeAttributeWithEndpointID:endpointId
-                                 clusterID:clusterId
-                               attributeID:attributeId
-                               minInterval:minInterval
-                               maxInterval:maxInterval
-                                    params:params
-                                     queue:clientQueue
-                             reportHandler:reportHandler
-                   subscriptionEstablished:subscriptionEstablishedHandler];
+    MTRSubscribeParams * _Nullable subscribeParams = [params copy];
+    if (subscribeParams == nil) {
+        subscribeParams = [[MTRSubscribeParams alloc] initWithMinInterval:minInterval maxInterval:maxInterval];
+    } else {
+        subscribeParams.minInterval = minInterval;
+        subscribeParams.maxInterval = maxInterval;
+    }
+    [self subscribeToAttributesWithEndpointID:endpointId
+                                    clusterID:clusterId
+                                  attributeID:attributeId
+                                       params:subscribeParams
+                                        queue:clientQueue
+                                reportHandler:reportHandler
+                      subscriptionEstablished:subscriptionEstablishedHandler];
 }
 
 - (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion
@@ -1558,12 +1561,59 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 @end
 
-@implementation MTRAttributePath
-- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path
+@implementation MTRClusterPath
+- (instancetype)initWithPath:(const ConcreteClusterPath &)path
 {
     if (self = [super init]) {
         _endpoint = @(path.mEndpointId);
         _cluster = @(path.mClusterId);
+    }
+    return self;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<MTRClusterPath> endpoint %u cluster %u", (uint16_t) _endpoint.unsignedShortValue,
+                     (uint32_t) _cluster.unsignedLongValue];
+}
+
++ (instancetype)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
+{
+    ConcreteClusterPath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
+        static_cast<chip::ClusterId>([clusterID unsignedLongValue]));
+
+    return [[MTRClusterPath alloc] initWithPath:path];
+}
+
+- (BOOL)isEqualToClusterPath:(MTRClusterPath *)clusterPath
+{
+    return [_endpoint isEqualToNumber:clusterPath.endpoint] && [_cluster isEqualToNumber:clusterPath.cluster];
+}
+
+- (BOOL)isEqual:(id)object
+{
+    if (![object isKindOfClass:[self class]]) {
+        return NO;
+    }
+    return [self isEqualToClusterPath:object];
+}
+
+- (NSUInteger)hash
+{
+    return _endpoint.unsignedShortValue ^ _cluster.unsignedLongValue;
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    return [MTRClusterPath clusterPathWithEndpointID:_endpoint clusterID:_cluster];
+}
+
+@end
+
+@implementation MTRAttributePath
+- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path
+{
+    if (self = [super initWithPath:path]) {
         _attribute = @(path.mAttributeId);
     }
     return self;
@@ -1572,7 +1622,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<MTRAttributePath> endpoint %u cluster %u attribute %u",
-                     (uint16_t) _endpoint.unsignedShortValue, (uint32_t) _cluster.unsignedLongValue,
+                     (uint16_t) self.endpoint.unsignedShortValue, (uint32_t) self.cluster.unsignedLongValue,
                      (uint32_t) _attribute.unsignedLongValue];
 }
 
@@ -1589,8 +1639,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 - (BOOL)isEqualToAttributePath:(MTRAttributePath *)attributePath
 {
-    return [_endpoint isEqualToNumber:attributePath.endpoint] && [_cluster isEqualToNumber:attributePath.cluster] &&
-        [_attribute isEqualToNumber:attributePath.attribute];
+    return [self isEqualToClusterPath:attributePath] && [_attribute isEqualToNumber:attributePath.attribute];
 }
 
 - (BOOL)isEqual:(id)object
@@ -1603,12 +1652,12 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 - (NSUInteger)hash
 {
-    return _endpoint.unsignedShortValue ^ _cluster.unsignedLongValue ^ _attribute.unsignedLongValue;
+    return self.endpoint.unsignedShortValue ^ self.cluster.unsignedLongValue ^ _attribute.unsignedLongValue;
 }
 
 - (id)copyWithZone:(NSZone *)zone
 {
-    return [MTRAttributePath attributePathWithEndpointID:_endpoint clusterID:_cluster attributeID:_attribute];
+    return [MTRAttributePath attributePathWithEndpointID:self.endpoint clusterID:self.cluster attributeID:_attribute];
 }
 @end
 
@@ -1624,9 +1673,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 @implementation MTREventPath
 - (instancetype)initWithPath:(const ConcreteEventPath &)path
 {
-    if (self = [super init]) {
-        _endpoint = @(path.mEndpointId);
-        _cluster = @(path.mClusterId);
+    if (self = [super initWithPath:path]) {
         _event = @(path.mEventId);
     }
     return self;
@@ -1638,6 +1685,11 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
         static_cast<chip::ClusterId>([clusterID unsignedLongValue]), static_cast<chip::EventId>([eventID unsignedLongValue]));
 
     return [[MTREventPath alloc] initWithPath:path];
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    return [MTREventPath eventPathWithEndpointID:self.endpoint clusterID:self.cluster eventID:_event];
 }
 @end
 
@@ -1651,9 +1703,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 @implementation MTRCommandPath
 - (instancetype)initWithPath:(const ConcreteCommandPath &)path
 {
-    if (self = [super init]) {
-        _endpoint = @(path.mEndpointId);
-        _cluster = @(path.mClusterId);
+    if (self = [super initWithPath:path]) {
         _command = @(path.mCommandId);
     }
     return self;
@@ -1666,6 +1716,11 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
     return [[MTRCommandPath alloc] initWithPath:path];
 }
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    return [MTRCommandPath commandPathWithEndpointID:self.endpoint clusterID:self.cluster commandID:_command];
+}
 @end
 
 @implementation MTRCommandPath (Deprecated)
@@ -1676,7 +1731,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 @end
 
 @implementation MTRAttributeReport
-- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path value:(nullable id)value error:(nullable NSError *)error
+- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path value:(id _Nullable)value error:(NSError * _Nullable)error
 {
     if (self = [super init]) {
         _path = [[MTRAttributePath alloc] initWithPath:path];
@@ -1692,8 +1747,8 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                  eventNumber:(NSNumber *)eventNumber
                     priority:(NSNumber *)priority
                    timestamp:(NSNumber *)timestamp
-                       value:(nullable id)value
-                       error:(nullable NSError *)error
+                       value:(id _Nullable)value
+                       error:(NSError * _Nullable)error
 {
     if (self = [super init]) {
         _path = [[MTREventPath alloc] initWithPath:path];

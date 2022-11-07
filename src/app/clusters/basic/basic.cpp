@@ -191,7 +191,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     case PartNumber::Id: {
         constexpr size_t kMaxLen     = DeviceLayer::ConfigurationManager::kMaxPartNumberLength;
         char partNumber[kMaxLen + 1] = { 0 };
-        status                       = ConfigurationMgr().GetPartNumber(partNumber, sizeof(partNumber));
+        status                       = GetDeviceInstanceInfoProvider()->GetPartNumber(partNumber, sizeof(partNumber));
 
         // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
         if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
@@ -207,7 +207,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     case ProductURL::Id: {
         constexpr size_t kMaxLen     = DeviceLayer::ConfigurationManager::kMaxProductURLLength;
         char productUrl[kMaxLen + 1] = { 0 };
-        status                       = ConfigurationMgr().GetProductURL(productUrl, sizeof(productUrl));
+        status                       = GetDeviceInstanceInfoProvider()->GetProductURL(productUrl, sizeof(productUrl));
 
         // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
         if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
@@ -223,7 +223,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     case ProductLabel::Id: {
         constexpr size_t kMaxLen       = DeviceLayer::ConfigurationManager::kMaxProductLabelLength;
         char productLabel[kMaxLen + 1] = { 0 };
-        status                         = ConfigurationMgr().GetProductLabel(productLabel, sizeof(productLabel));
+        status                         = GetDeviceInstanceInfoProvider()->GetProductLabel(productLabel, sizeof(productLabel));
 
         // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
         if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
