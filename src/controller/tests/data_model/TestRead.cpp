@@ -427,11 +427,11 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     chip::app::ClusterStateCache cache(delegate);
 
     chip::app::EventPathParams eventPathParams[100];
-    for (uint32_t index = 0; index < 100; index++)
+    for (auto & eventPathParam : eventPathParams)
     {
-        eventPathParams[index].mEndpointId = Test::kMockEndpoint3;
-        eventPathParams[index].mClusterId  = Test::MockClusterId(2);
-        eventPathParams[index].mEventId    = 0;
+        eventPathParam.mEndpointId = Test::kMockEndpoint3;
+        eventPathParam.mClusterId  = Test::MockClusterId(2);
+        eventPathParam.mEventId    = 0;
     }
 
     chip::app::ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());

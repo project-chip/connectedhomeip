@@ -76,7 +76,6 @@ void PrintBindings()
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
     }
-    return;
 }
 
 static CHIP_ERROR CastingHandler(int argc, char ** argv)

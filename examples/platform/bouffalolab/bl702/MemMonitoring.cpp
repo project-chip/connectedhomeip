@@ -37,7 +37,7 @@ void MemMonitoring::HeapMonitoring(void * pvParameter)
     char taskState[]           = { 'X', 'R', 'B', 'S', 'D' }; // eRunning, eReady, eBlocked, eSuspended, eDeleted
     uint32_t pulTotalRunTime;
 
-    while (1)
+    while (true)
     {
         ChipLogProgress(NotSpecified, "=============================");
         pTaskStatus = (TaskStatus_t *) malloc(uxTaskGetNumberOfTasks() * sizeof(TaskStatus_t));

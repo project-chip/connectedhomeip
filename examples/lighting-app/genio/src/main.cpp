@@ -63,7 +63,7 @@ void appError(int err)
 {
     printf("!!!!!!!!!!!! Application Critical Error: %d !!!!!!!!!!!", err);
     portDISABLE_INTERRUPTS();
-    while (1)
+    while (true)
         ;
 }
 
@@ -270,7 +270,7 @@ extern "C" int main(void)
     chip::Platform::MemoryShutdown();
 
     // Should never get here.
-    while (1)
+    while (true)
         ;
 
     return 0;

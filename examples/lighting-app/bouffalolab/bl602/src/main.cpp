@@ -51,7 +51,7 @@ void appError(int err)
 {
     log_error("!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!\r\n", err);
     portDISABLE_INTERRUPTS();
-    while (1)
+    while (true)
         ;
 }
 

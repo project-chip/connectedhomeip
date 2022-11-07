@@ -194,7 +194,7 @@
         // again.  The chance that this loop does not terminate in a reasonable
         // amount of time is astronomically low, assuming arc4random_uniform is not
         // broken.
-    } while (1);
+    } while (true);
 
     // Not reached.
     return @(chip::kSetupPINCodeUndefinedValue);
@@ -267,7 +267,7 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
     [coder encodeObject:self.serialNumber forKey:MTRSetupPayloadCodingKeySerialNumber];
 }
 
-- (nullable instancetype)initWithCoder:(NSCoder *)decoder
+- (instancetype _Nullable)initWithCoder:(NSCoder *)decoder
 {
     NSNumber * version = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyVersion];
     NSNumber * vendorID = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyVendorID];
@@ -295,7 +295,7 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
     return payload;
 }
 
-- (nullable NSString *)manualEntryCode
+- (NSString * _Nullable)manualEntryCode
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     std::string outDecimalString;

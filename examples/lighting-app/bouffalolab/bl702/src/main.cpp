@@ -65,7 +65,7 @@ void appError(int err)
 {
     ChipLogProgress(NotSpecified, "!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!", err);
     portDISABLE_INTERRUPTS();
-    while (1)
+    while (true)
         ;
 }
 
@@ -87,7 +87,7 @@ extern "C" unsigned int sleep(unsigned int seconds)
 extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
 {
     ChipLogProgress(NotSpecified, "Stack Overflow checked. Stack name %s", pcTaskName);
-    while (1)
+    while (true)
     {
         /*empty here*/
     }
@@ -96,7 +96,7 @@ extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskN
 extern "C" void vApplicationMallocFailedHook(void)
 {
     ChipLogProgress(NotSpecified, "Memory Allocate Failed. Current left size is %d bytes", xPortGetFreeHeapSize());
-    while (1)
+    while (true)
     {
         /*empty here*/
     }
@@ -168,7 +168,7 @@ extern "C" void vAssertCalled(void)
 
     taskDISABLE_INTERRUPTS();
     ChipLogProgress(NotSpecified, "vAssertCalled, ra= %p", ra);
-    while (1)
+    while (true)
         ;
 }
 

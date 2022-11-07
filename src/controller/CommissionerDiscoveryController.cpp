@@ -118,7 +118,6 @@ void CommissionerDiscoveryController::Ok()
         mUserPrompter->PromptForCommissionPincode(client->GetVendorId(), client->GetProductId(), client->GetDeviceName());
     }
     ChipLogDetail(Controller, "------Via Shell Enter: controller ux ok [pincode]");
-    return;
 }
 
 void CommissionerDiscoveryController::CommissionWithPincode(uint32_t pincode)
@@ -174,7 +173,6 @@ void CommissionerDiscoveryController::Cancel()
     }
     client->SetUDCClientProcessingState(UDCClientProcessingState::kUserDeclined);
     mPendingConsent = false;
-    return;
 }
 
 void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, uint16_t productId, NodeId nodeId,

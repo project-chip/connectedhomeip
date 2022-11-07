@@ -176,7 +176,7 @@ limitations under the License.
     <domain>General</domain>
     <description>Attributes and commands for configuring On/Off switching devices.</description>
     <code>0x0007</code>
-    <define>ON_OFF_SWITCH_CONFIG_CLUSTER</define>
+    <define>ON_OFF_SWITCH_CONFIGURATION_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <attribute side="server" code="0x0000" define="SWITCH_TYPE" type="ENUM8" min="0x00" max="0x01" writable="false" optional="false">switch type</attribute>

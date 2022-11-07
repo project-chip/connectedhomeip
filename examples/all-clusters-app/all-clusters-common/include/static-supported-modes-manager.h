@@ -54,7 +54,7 @@ class StaticSupportedModesManager : public chip::app::Clusters::ModeSelect::Supp
 public:
     static const StaticSupportedModesManager instance;
 
-    const SupportedModesManager::ModeOptionsProvider getModeOptionsProvider(EndpointId endpointId) const override;
+    SupportedModesManager::ModeOptionsProvider getModeOptionsProvider(EndpointId endpointId) const override;
 
     EmberAfStatus getModeOptionByMode(EndpointId endpointId, uint8_t mode, const ModeOptionStructType ** dataPtr) const override;
 

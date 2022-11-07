@@ -68,7 +68,7 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
 /**
  * Returns a serialized subscribe parameter object to send over XPC
  */
-+ (NSDictionary<NSString *, id> * _Nullable)encodeXPCSubscribeParams:(MTRSubscribeParams *)params;
++ (NSDictionary<NSString *, id> * _Nullable)encodeXPCSubscribeParams:(MTRSubscribeParams * _Nullable)params;
 
 /**
  * Returns a deserialized subscribe parameter object from an object received over XPC
@@ -131,7 +131,8 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
                          completion:(MTRValuesHandler)completion;
 
 /**
- * Requests subscribing attribute
+ * Requests subscribing attribute.  The minInterval/maxInterval arguments
+ * override whatever intervals might be present in params.
  */
 - (void)subscribeAttributeWithController:(id _Nullable)controller
                                   nodeId:(uint64_t)nodeId
@@ -149,7 +150,8 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
 - (void)stopReportsWithController:(id _Nullable)controller nodeId:(uint64_t)nodeId completion:(dispatch_block_t)completion;
 
 /**
- * Requests subscription of all attributes.
+ * Requests subscription of all attributes.  The minInterval/maxInterval
+ * arguments override whatever intervals might be present in params.
  */
 - (void)subscribeWithController:(id _Nullable)controller
                          nodeId:(uint64_t)nodeId

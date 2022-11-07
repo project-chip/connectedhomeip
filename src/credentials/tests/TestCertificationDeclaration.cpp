@@ -262,14 +262,10 @@ static constexpr TestCase sTestCases[] = {
       ByteSpan(sTestCMS_CDContent02), ByteSpan(sTestCMS_SignedMessage02) },
 };
 
-static constexpr size_t sNumTestCases = ArraySize(sTestCases);
-
 static void TestCD_EncodeDecode(nlTestSuite * inSuite, void * inContext)
 {
-    for (size_t i = 0; i < sNumTestCases; i++)
+    for (const auto & testCase : sTestCases)
     {
-        const TestCase & testCase = sTestCases[i];
-
         uint8_t encodedCertElemBuf[kCertificationElements_TLVEncodedMaxLength];
         MutableByteSpan encodedCDPayload(encodedCertElemBuf);
 
@@ -379,10 +375,8 @@ static void TestCD_CMSSignAndVerify(nlTestSuite * inSuite, void * inContext)
 
 static void TestCD_CMSVerifyAndExtract(nlTestSuite * inSuite, void * inContext)
 {
-    for (size_t i = 0; i < sNumTestCases; i++)
+    for (const auto & testCase : sTestCases)
     {
-        const TestCase & testCase = sTestCases[i];
-
         // Verify using signer P256PublicKey
         ByteSpan cdContentOut;
         NL_TEST_ASSERT(inSuite,
@@ -412,10 +406,8 @@ static void TestCD_CMSVerifyAndExtract(nlTestSuite * inSuite, void * inContext)
 
 static void TestCD_CertificationElementsDecoder(nlTestSuite * inSuite, void * inContext)
 {
-    for (size_t i = 0; i < sNumTestCases; i++)
+    for (const auto & testCase : sTestCases)
     {
-        const TestCase & testCase = sTestCases[i];
-
         uint8_t encodedCertElemBuf[kCertificationElements_TLVEncodedMaxLength];
         MutableByteSpan encodedCDPayload(encodedCertElemBuf);
 

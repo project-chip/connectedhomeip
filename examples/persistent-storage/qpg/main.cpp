@@ -39,7 +39,7 @@ StaticTask_t appTaskStruct;
 
 void TestTask(void * pvParameter)
 {
-    while (1)
+    while (true)
     {
         qvCHIP_Printf(LOG_MODULE_ID, "Running Tests:");
         chip::RunKvsTest();
