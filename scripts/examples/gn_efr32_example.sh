@@ -144,6 +144,10 @@ else
     shift
     while [ $# -gt 0 ]; do
         case $1 in
+            --clean)
+                DIR_CLEAN=true
+                shift
+                ;;
             --wifi)
                 if [ -z "$2" ]; then
                     echo "--wifi requires rs9116 or SiWx917 or wf200"
@@ -154,7 +158,7 @@ else
                 elif [ "$2" = "SiWx917" ]; then
                     optArgs+="use_SiWx917=true "
                 elif [ "$2" = "wf200" ]; then
-                    optArgs+="use_wf200=true "
+                    optArgs+="use_wf200=true"
                 else
                     echo "Wifi usage: --wifi rs9116|SiWx917|wf200"
                     exit 1
@@ -242,6 +246,11 @@ else
 
     BUILD_DIR=$OUTDIR/$SILABS_BOARD
     echo BUILD_DIR="$BUILD_DIR"
+
+    if [ "$DIR_CLEAN" == true ]; then
+        rm -rf "$BUILD_DIR"
+    fi
+
     if [ "$USE_WIFI" == true ]; then
         # wifi build
         # NCP mode EFR32 + wifi module
