@@ -10,11 +10,11 @@
 #import "MTRCluster_internal.h"
 #import "MTRStructsObjc.h"
 #import "MTRCommandPayloadsObjc.h"
+#import "MTRBaseClustersCpp_Internal.h"
 
 #include <lib/support/CHIPListUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <type_traits>
-#include <controller/TypedReadCallback.h>
 
 using chip::Callback::Callback;
 using chip::Callback::Cancelable;
@@ -114,21 +114,13 @@ using chip::SessionHandle;
     {{~#if_is_fabric_scoped_struct type}}
     // Make a copy of params before we go async.
     params = [params copy];
+    {{else}}
+    MTRReadParams * params = [[MTRReadParams alloc] init];
     {{/if_is_fabric_scoped_struct~}}
-    auto * bridge = new MTR{{>attribute_data_callback_name}}CallbackBridge(self.callbackQueue,
-      {{! This treats completion as taking an id for the data.  This is
-          not great from a type-safety perspective, of course. }}
-      completion,
-      ^(ExchangeManager & exchangeManager, const SessionHandle & session, {{>attribute_data_callback_name}}Callback successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-          using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
-          chip::Controller::{{asUpperCamelCase parent.name}}Cluster cppCluster(exchangeManager, session, self->_endpoint);
-          return cppCluster.ReadAttribute<TypeInfo>(bridge, successCb, failureCb
-          {{~#if_is_fabric_scoped_struct type~}}
-          , params.filterByFabric
-          {{~/if_is_fabric_scoped_struct~}}
-          );
-      });
-    std::move(*bridge).DispatchAction(self.device);
+    using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
+    return MTRReadAttribute<MTR{{>attribute_data_callback_name}}CallbackBridge,
+                         {{asObjectiveCClass type parent.name}},
+                         TypeInfo::DecodableType>(params, completion, self.callbackQueue, self.device, self->_endpoint, TypeInfo::GetClusterId(), TypeInfo::GetAttributeId());
 }
 
 {{#if isWritableAttribute}}
@@ -177,38 +169,11 @@ using chip::SessionHandle;
 {{/if}}
 {{#if isReportableAttribute}}
 - (void) subscribe{{>attribute}}WithParams:(MTRSubscribeParams * _Nonnull)params
-subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished 
+subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
 reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    auto * bridge = new MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge(self.callbackQueue,
-      {{! This treats reportHandler as taking an id for the data.  This is
-          not great from a type-safety perspective, of course. }}
-      reportHandler,
-      ^(ExchangeManager & exchangeManager, const SessionHandle & session,  {{>attribute_data_callback_name}}Callback successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-          auto * typedBridge = static_cast<MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge *>(bridge);
-          if (!params.resubscribeIfLost) {
-              // We don't support disabling auto-resubscribe.
-              return CHIP_ERROR_INVALID_ARGUMENT;
-          }
-          using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
-
-          chip::Controller::{{asUpperCamelCase parent.name}}Cluster cppCluster(exchangeManager, session, self->_endpoint);
-          CHIP_ERROR err = cppCluster.SubscribeAttribute<TypeInfo>(bridge, successCb, failureCb, [params.minInterval unsignedShortValue], [params.maxInterval unsignedShortValue], MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge::OnSubscriptionEstablished, nil,
-              params.filterByFabric,
-              !params.replaceExistingSubscriptions,
-              chip::NullOptional,
-              [typedBridge](void) { typedBridge->OnDone(); }
-          );
-          if (err == CHIP_NO_ERROR) {
-              // Now that we kicked off the subscribe, flag our callback bridge
-              // to stay alive until we get an OnDone.
-              typedBridge->KeepAliveOnCallback();
-          }
-          return err;
-      }, subscriptionEstablished);
-    std::move(*bridge).DispatchAction(self.device);
+    using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
+    MTRSubscribeAttribute<MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge, {{asObjectiveCClass type parent.name}}, TypeInfo::DecodableType>(params, subscriptionEstablished, reportHandler, self.callbackQueue, self.device, self->_endpoint, TypeInfo::GetClusterId(), TypeInfo::GetAttributeId());
 }
 
 + (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint  queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion

@@ -67,6 +67,7 @@ template <class T> class MTRCallbackBridge : public MTRCallbackBridgeBase {
 public:
     using MTRActionBlock = MTRActionBlockT<T>;
     using MTRLocalActionBlock = MTRLocalActionBlockT<T>;
+    using SuccessCallbackType = T;
 
     /**
      * Construct a callback bridge, which can then have DispatcLocalAction() called

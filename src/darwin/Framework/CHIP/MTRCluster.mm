@@ -77,6 +77,11 @@ using namespace ::chip;
     return other;
 }
 
+- (void)toReadPrepareParams:(chip::app::ReadPrepareParams &)readPrepareParams
+{
+    readPrepareParams.mIsFabricFiltered = self.filterByFabric;
+}
+
 @end
 
 @implementation MTRSubscribeParams
@@ -98,6 +103,14 @@ using namespace ::chip;
     other.replaceExistingSubscriptions = self.replaceExistingSubscriptions;
     other.resubscribeIfLost = self.resubscribeIfLost;
     return other;
+}
+
+- (void)toReadPrepareParams:(chip::app::ReadPrepareParams &)readPrepareParams
+{
+    [super toReadPrepareParams:readPrepareParams];
+    readPrepareParams.mMinIntervalFloorSeconds = self.minInterval.unsignedShortValue;
+    readPrepareParams.mMaxIntervalCeilingSeconds = self.maxInterval.unsignedShortValue;
+    readPrepareParams.mKeepSubscriptions = !self.replaceExistingSubscriptions;
 }
 
 @end

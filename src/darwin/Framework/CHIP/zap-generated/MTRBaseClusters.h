@@ -46,10 +46,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeIdentifyTimeWithValue:(NSNumber * _Nonnull)value
                                      params:(MTRWriteParams * _Nullable)params
                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeIdentifyTimeWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -62,10 +58,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeIdentifyTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeIdentifyTypeWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -78,10 +70,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -94,10 +82,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -110,10 +94,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -126,10 +106,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -142,10 +118,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -191,10 +163,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNameSupportWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNameSupportWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -207,10 +175,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -223,10 +187,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -239,10 +199,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -255,10 +211,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -271,10 +223,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -332,10 +280,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSceneCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSceneCountWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -348,10 +292,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentSceneWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentSceneWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -364,10 +304,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentGroupWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentGroupWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -380,10 +316,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSceneValidWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSceneValidWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -396,10 +328,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNameSupportWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNameSupportWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -412,10 +340,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLastConfiguredByWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLastConfiguredByWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -428,10 +352,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -444,10 +364,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -460,10 +376,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -476,10 +388,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -492,10 +400,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -538,10 +442,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOnOffWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOnOffWithParams:(MTRSubscribeParams *)params
                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -554,10 +454,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGlobalSceneControlWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGlobalSceneControlWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -574,10 +470,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOnTimeWithValue:(NSNumber * _Nonnull)value
                                params:(MTRWriteParams * _Nullable)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOnTimeWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -595,10 +487,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOffWaitTimeWithValue:(NSNumber * _Nonnull)value
                                     params:(MTRWriteParams * _Nullable)params
                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOffWaitTimeWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -616,10 +504,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeStartUpOnOffWithValue:(NSNumber * _Nullable)value
                                      params:(MTRWriteParams * _Nullable)params
                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeStartUpOnOffWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -632,10 +516,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -648,10 +528,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -664,10 +540,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -680,10 +552,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -696,10 +564,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -727,10 +591,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSwitchTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSwitchTypeWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -748,10 +608,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeSwitchActionsWithValue:(NSNumber * _Nonnull)value
                                       params:(MTRWriteParams * _Nullable)params
                                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSwitchActionsWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -764,10 +620,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -780,10 +632,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -796,10 +644,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -812,10 +656,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -828,10 +668,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -875,10 +711,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentLevelWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentLevelWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -891,10 +723,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRemainingTimeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRemainingTimeWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -907,10 +735,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMinLevelWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMinLevelWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -923,10 +747,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxLevelWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxLevelWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -939,10 +759,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentFrequencyWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentFrequencyWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -955,10 +771,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMinFrequencyWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMinFrequencyWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -971,10 +783,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxFrequencyWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxFrequencyWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -991,10 +799,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOptionsWithValue:(NSNumber * _Nonnull)value
                                 params:(MTRWriteParams * _Nullable)params
                             completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOptionsWithParams:(MTRSubscribeParams *)params
                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                               reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1012,10 +816,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOnOffTransitionTimeWithValue:(NSNumber * _Nonnull)value
                                             params:(MTRWriteParams * _Nullable)params
                                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOnOffTransitionTimeWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -1032,10 +832,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOnLevelWithValue:(NSNumber * _Nullable)value
                                 params:(MTRWriteParams * _Nullable)params
                             completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOnLevelWithParams:(MTRSubscribeParams *)params
                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                               reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1053,10 +849,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOnTransitionTimeWithValue:(NSNumber * _Nullable)value
                                          params:(MTRWriteParams * _Nullable)params
                                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOnTransitionTimeWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1074,10 +866,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOffTransitionTimeWithValue:(NSNumber * _Nullable)value
                                           params:(MTRWriteParams * _Nullable)params
                                       completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOffTransitionTimeWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1095,10 +883,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeDefaultMoveRateWithValue:(NSNumber * _Nullable)value
                                         params:(MTRWriteParams * _Nullable)params
                                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDefaultMoveRateWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1116,10 +900,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeStartUpCurrentLevelWithValue:(NSNumber * _Nullable)value
                                             params:(MTRWriteParams * _Nullable)params
                                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeStartUpCurrentLevelWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -1132,10 +912,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1148,10 +924,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1164,10 +936,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1180,10 +948,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1196,10 +960,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1231,10 +991,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeActiveTextWithValue:(NSString * _Nonnull)value
                                    params:(MTRWriteParams * _Nullable)params
                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActiveTextWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1252,10 +1008,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeDescriptionWithValue:(NSString * _Nonnull)value
                                     params:(MTRWriteParams * _Nullable)params
                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDescriptionWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1273,10 +1025,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInactiveTextWithValue:(NSString * _Nonnull)value
                                      params:(MTRWriteParams * _Nullable)params
                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInactiveTextWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1294,10 +1042,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeOutOfServiceWithValue:(NSNumber * _Nonnull)value
                                      params:(MTRWriteParams * _Nullable)params
                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOutOfServiceWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1310,10 +1054,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePolarityWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePolarityWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1331,10 +1071,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributePresentValueWithValue:(NSNumber * _Nonnull)value
                                      params:(MTRWriteParams * _Nullable)params
                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePresentValueWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1352,10 +1088,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeReliabilityWithValue:(NSNumber * _Nonnull)value
                                     params:(MTRWriteParams * _Nullable)params
                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeReliabilityWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1368,10 +1100,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeStatusFlagsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeStatusFlagsWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1384,10 +1112,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeApplicationTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeApplicationTypeWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1400,10 +1124,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1416,10 +1136,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1432,10 +1148,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1448,10 +1160,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1464,10 +1172,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1496,10 +1200,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeDeviceTypeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDeviceTypeListWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1512,10 +1212,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeServerListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeServerListWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1528,10 +1224,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClientListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClientListWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1544,10 +1236,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePartsListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePartsListWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1560,10 +1248,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1576,10 +1260,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1592,10 +1272,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1608,10 +1284,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1624,10 +1296,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1660,10 +1328,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeBindingWithValue:(NSArray * _Nonnull)value
                                 params:(MTRWriteParams * _Nullable)params
                             completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBindingWithParams:(MTRSubscribeParams *)params
                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                               reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1676,10 +1340,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1692,10 +1352,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1708,10 +1364,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1724,10 +1376,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1740,10 +1388,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1778,10 +1422,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeAclWithValue:(NSArray * _Nonnull)value
                             params:(MTRWriteParams * _Nullable)params
                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAclWithParams:(MTRSubscribeParams *)params
                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1799,10 +1439,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeExtensionWithValue:(NSArray * _Nonnull)value
                                   params:(MTRWriteParams * _Nullable)params
                               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeExtensionWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1815,10 +1451,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSubjectsPerAccessControlEntryWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSubjectsPerAccessControlEntryWithParams:(MTRSubscribeParams *)params
                                           subscriptionEstablished:
                                               (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -1832,10 +1464,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTargetsPerAccessControlEntryWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTargetsPerAccessControlEntryWithParams:(MTRSubscribeParams *)params
                                          subscriptionEstablished:
                                              (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -1849,10 +1477,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAccessControlEntriesPerFabricWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAccessControlEntriesPerFabricWithParams:(MTRSubscribeParams *)params
                                           subscriptionEstablished:
                                               (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -1866,10 +1490,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1882,10 +1502,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -1898,10 +1514,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1914,10 +1526,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1930,10 +1538,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -1986,10 +1590,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActionListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActionListWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2002,10 +1602,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeEndpointListsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeEndpointListsWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2018,10 +1614,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSetupURLWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSetupURLWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2034,10 +1626,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2050,10 +1638,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2066,10 +1650,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2082,10 +1662,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2098,10 +1674,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2135,10 +1707,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeDataModelRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDataModelRevisionWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2151,10 +1719,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeVendorNameWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeVendorNameWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2167,10 +1731,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeVendorIDWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeVendorIDWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2183,10 +1743,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeProductNameWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeProductNameWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2199,10 +1755,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeProductIDWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeProductIDWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2219,10 +1771,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNodeLabelWithValue:(NSString * _Nonnull)value
                                   params:(MTRWriteParams * _Nullable)params
                               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNodeLabelWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2239,10 +1787,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeLocationWithValue:(NSString * _Nonnull)value
                                  params:(MTRWriteParams * _Nullable)params
                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLocationWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2255,10 +1799,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeHardwareVersionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeHardwareVersionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2271,10 +1811,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeHardwareVersionStringWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeHardwareVersionStringWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSString * _Nullable value,
@@ -2287,10 +1823,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSoftwareVersionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSoftwareVersionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2303,10 +1835,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSoftwareVersionStringWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSoftwareVersionStringWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSString * _Nullable value,
@@ -2319,10 +1847,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeManufacturingDateWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeManufacturingDateWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2335,10 +1859,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePartNumberWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePartNumberWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2351,10 +1871,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeProductURLWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeProductURLWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2367,10 +1883,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeProductLabelWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeProductLabelWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2383,10 +1895,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSerialNumberWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSerialNumberWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2404,10 +1912,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeLocalConfigDisabledWithValue:(NSNumber * _Nonnull)value
                                             params:(MTRWriteParams * _Nullable)params
                                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLocalConfigDisabledWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -2420,10 +1924,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeReachableWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeReachableWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2436,10 +1936,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeUniqueIDWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeUniqueIDWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2452,10 +1948,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCapabilityMinimaWithCompletion:(void (^)(MTRBasicClusterCapabilityMinimaStruct * _Nullable value,
                                                         NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCapabilityMinimaWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(MTRBasicClusterCapabilityMinimaStruct * _Nullable value,
@@ -2468,10 +1960,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2484,10 +1972,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2500,10 +1984,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2516,10 +1996,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2532,10 +2008,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2572,10 +2044,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2588,10 +2056,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2604,10 +2068,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2620,10 +2080,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2636,10 +2092,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2676,10 +2128,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeDefaultOtaProvidersWithValue:(NSArray * _Nonnull)value
                                             params:(MTRWriteParams * _Nullable)params
                                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDefaultOtaProvidersWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2692,10 +2140,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeUpdatePossibleWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeUpdatePossibleWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2708,10 +2152,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeUpdateStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeUpdateStateWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2724,10 +2164,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeUpdateStateProgressWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeUpdateStateProgressWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -2740,10 +2176,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2756,10 +2188,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2772,10 +2200,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2788,10 +2212,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2804,10 +2224,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2843,10 +2259,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeActiveLocaleWithValue:(NSString * _Nonnull)value
                                      params:(MTRWriteParams * _Nullable)params
                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActiveLocaleWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2859,10 +2271,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSupportedLocalesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSupportedLocalesWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2875,10 +2283,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2891,10 +2295,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -2907,10 +2307,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2923,10 +2319,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2939,10 +2331,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2977,10 +2365,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeHourFormatWithValue:(NSNumber * _Nonnull)value
                                    params:(MTRWriteParams * _Nullable)params
                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeHourFormatWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -2998,10 +2382,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeActiveCalendarTypeWithValue:(NSNumber * _Nonnull)value
                                            params:(MTRWriteParams * _Nullable)params
                                        completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActiveCalendarTypeWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -3014,10 +2394,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSupportedCalendarTypesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSupportedCalendarTypesWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3030,10 +2406,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3046,10 +2418,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3062,10 +2430,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3078,10 +2442,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3094,10 +2454,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3133,10 +2489,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeTemperatureUnitWithValue:(NSNumber * _Nonnull)value
                                         params:(MTRWriteParams * _Nullable)params
                                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTemperatureUnitWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3149,10 +2501,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3165,10 +2513,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3181,10 +2525,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3197,10 +2537,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3213,10 +2549,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3244,10 +2576,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSourcesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSourcesWithParams:(MTRSubscribeParams *)params
                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                               reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3260,10 +2588,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3276,10 +2600,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3292,10 +2612,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3308,10 +2624,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3324,10 +2636,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3356,10 +2664,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeStatusWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeStatusWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3372,10 +2676,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOrderWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOrderWithParams:(MTRSubscribeParams *)params
                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3388,10 +2688,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeDescriptionWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDescriptionWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3404,10 +2700,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeWiredAssessedInputVoltageWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeWiredAssessedInputVoltageWithParams:(MTRSubscribeParams *)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                 reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -3420,10 +2712,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeWiredAssessedInputFrequencyWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeWiredAssessedInputFrequencyWithParams:(MTRSubscribeParams *)params
                                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -3436,10 +2724,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeWiredCurrentTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeWiredCurrentTypeWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3452,10 +2736,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeWiredAssessedCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeWiredAssessedCurrentWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -3468,10 +2748,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeWiredNominalVoltageWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeWiredNominalVoltageWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -3484,10 +2760,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeWiredMaximumCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeWiredMaximumCurrentWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -3500,10 +2772,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeWiredPresentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeWiredPresentWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3516,10 +2784,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActiveWiredFaultsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActiveWiredFaultsWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3532,10 +2796,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatVoltageWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBatVoltageWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3548,10 +2808,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatPercentRemainingWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBatPercentRemainingWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -3564,10 +2820,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatTimeRemainingWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBatTimeRemainingWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3580,10 +2832,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatChargeLevelWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBatChargeLevelWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3596,10 +2844,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatReplacementNeededWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBatReplacementNeededWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -3612,10 +2856,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatReplaceabilityWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBatReplaceabilityWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3628,10 +2868,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatPresentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBatPresentWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3644,10 +2880,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActiveBatFaultsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActiveBatFaultsWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3660,10 +2892,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatReplacementDescriptionWithCompletion:(void (^)(NSString * _Nullable value,
                                                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBatReplacementDescriptionWithParams:(MTRSubscribeParams *)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                 reportHandler:(void (^)(NSString * _Nullable value,
@@ -3676,10 +2904,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatCommonDesignationWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBatCommonDesignationWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -3692,10 +2916,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatANSIDesignationWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBatANSIDesignationWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSString * _Nullable value,
@@ -3708,10 +2928,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatIECDesignationWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBatIECDesignationWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3724,10 +2940,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatApprovedChemistryWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBatApprovedChemistryWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -3740,10 +2952,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatCapacityWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBatCapacityWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3756,10 +2964,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatQuantityWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBatQuantityWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3772,10 +2976,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatChargeStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBatChargeStateWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3788,10 +2988,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatTimeToFullChargeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBatTimeToFullChargeWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -3804,10 +3000,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatFunctionalWhileChargingWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBatFunctionalWhileChargingWithParams:(MTRSubscribeParams *)params
                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                  reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -3820,10 +3012,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBatChargingCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBatChargingCurrentWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -3836,10 +3024,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActiveBatChargeFaultsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActiveBatChargeFaultsWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3852,10 +3036,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3868,10 +3048,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -3884,10 +3060,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3900,10 +3072,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3916,10 +3084,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3965,10 +3129,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeBreadcrumbWithValue:(NSNumber * _Nonnull)value
                                    params:(MTRWriteParams * _Nullable)params
                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBreadcrumbWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -3982,10 +3142,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeBasicCommissioningInfoWithCompletion:
     (void (^)(MTRGeneralCommissioningClusterBasicCommissioningInfo * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBasicCommissioningInfoWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:
@@ -4001,10 +3157,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRegulatoryConfigWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRegulatoryConfigWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4017,10 +3169,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLocationCapabilityWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLocationCapabilityWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4033,10 +3181,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSupportsConcurrentConnectionWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSupportsConcurrentConnectionWithParams:(MTRSubscribeParams *)params
                                          subscriptionEstablished:
                                              (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -4050,10 +3194,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4066,10 +3206,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4082,10 +3218,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4098,10 +3230,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4114,10 +3242,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4164,10 +3288,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMaxNetworksWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxNetworksWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4180,10 +3300,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNetworksWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNetworksWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4196,10 +3312,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeScanMaxTimeSecondsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeScanMaxTimeSecondsWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4212,10 +3324,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeConnectMaxTimeSecondsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeConnectMaxTimeSecondsWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4233,10 +3341,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeInterfaceEnabledWithValue:(NSNumber * _Nonnull)value
                                          params:(MTRWriteParams * _Nullable)params
                                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInterfaceEnabledWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4249,10 +3353,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLastNetworkingStatusWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLastNetworkingStatusWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4265,10 +3365,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLastNetworkIDWithCompletion:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLastNetworkIDWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4281,10 +3377,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLastConnectErrorValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLastConnectErrorValueWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4297,10 +3389,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4313,10 +3401,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4329,10 +3413,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4345,10 +3425,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4361,10 +3437,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4396,10 +3468,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4412,10 +3480,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4428,10 +3492,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4444,10 +3504,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4460,10 +3516,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4495,10 +3547,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNetworkInterfacesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNetworkInterfacesWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4511,10 +3559,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRebootCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRebootCountWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4527,10 +3571,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeUpTimeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeUpTimeWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4543,10 +3583,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTotalOperationalHoursWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTotalOperationalHoursWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4559,10 +3595,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBootReasonsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBootReasonsWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4575,10 +3607,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActiveHardwareFaultsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActiveHardwareFaultsWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4591,10 +3619,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActiveRadioFaultsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActiveRadioFaultsWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4607,10 +3631,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActiveNetworkFaultsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActiveNetworkFaultsWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4623,10 +3643,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTestEventTriggersEnabledWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTestEventTriggersEnabledWithParams:(MTRSubscribeParams *)params
                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4639,10 +3655,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4655,10 +3667,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4671,10 +3679,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4687,10 +3691,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4703,10 +3703,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4739,10 +3735,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeThreadMetricsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeThreadMetricsWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4755,10 +3747,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentHeapFreeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentHeapFreeWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4771,10 +3759,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentHeapUsedWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentHeapUsedWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4787,10 +3771,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentHeapHighWatermarkWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentHeapHighWatermarkWithParams:(MTRSubscribeParams *)params
                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -4803,10 +3783,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4819,10 +3795,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -4835,10 +3807,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4851,10 +3819,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4867,10 +3831,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4903,10 +3863,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeChannelWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeChannelWithParams:(MTRSubscribeParams *)params
                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                               reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4919,10 +3875,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRoutingRoleWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRoutingRoleWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4935,10 +3887,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNetworkNameWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNetworkNameWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4951,10 +3899,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePanIdWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePanIdWithParams:(MTRSubscribeParams *)params
                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4967,10 +3911,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeExtendedPanIdWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeExtendedPanIdWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4983,10 +3923,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeMeshLocalPrefixWithCompletion:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMeshLocalPrefixWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler
@@ -4999,10 +3935,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOverrunCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOverrunCountWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5015,10 +3947,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeNeighborTableListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNeighborTableListWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5031,10 +3959,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRouteTableListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRouteTableListWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5047,10 +3971,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePartitionIdWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePartitionIdWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5063,10 +3983,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeWeightingWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeWeightingWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5079,10 +3995,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeDataVersionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDataVersionWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5095,10 +4007,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeStableDataVersionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeStableDataVersionWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5111,10 +4019,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLeaderRouterIdWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLeaderRouterIdWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5127,10 +4031,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeDetachedRoleCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDetachedRoleCountWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5143,10 +4043,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeChildRoleCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeChildRoleCountWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5159,10 +4055,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRouterRoleCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRouterRoleCountWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5175,10 +4067,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLeaderRoleCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLeaderRoleCountWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5191,10 +4079,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttachAttemptCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttachAttemptCountWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5207,10 +4091,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePartitionIdChangeCountWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePartitionIdChangeCountWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5223,10 +4103,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBetterPartitionAttachAttemptCountWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                          NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBetterPartitionAttachAttemptCountWithParams:(MTRSubscribeParams *)params
                                               subscriptionEstablished:
                                                   (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -5242,10 +4118,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeParentChangeCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeParentChangeCountWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5258,10 +4130,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxTotalCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTxTotalCountWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5274,10 +4142,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxUnicastCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTxUnicastCountWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5290,10 +4154,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxBroadcastCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTxBroadcastCountWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5306,10 +4166,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxAckRequestedCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTxAckRequestedCountWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5322,10 +4178,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxAckedCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTxAckedCountWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5338,10 +4190,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxNoAckRequestedCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTxNoAckRequestedCountWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5354,10 +4202,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxDataCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTxDataCountWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5370,10 +4214,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxDataPollCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTxDataPollCountWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5386,10 +4226,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxBeaconCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTxBeaconCountWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5402,10 +4238,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxBeaconRequestCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTxBeaconRequestCountWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5418,10 +4250,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxOtherCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTxOtherCountWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5434,10 +4262,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxRetryCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTxRetryCountWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5450,10 +4274,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxDirectMaxRetryExpiryCountWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTxDirectMaxRetryExpiryCountWithParams:(MTRSubscribeParams *)params
                                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5466,10 +4286,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxIndirectMaxRetryExpiryCountWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTxIndirectMaxRetryExpiryCountWithParams:(MTRSubscribeParams *)params
                                           subscriptionEstablished:
                                               (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -5483,10 +4299,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxErrCcaCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTxErrCcaCountWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5499,10 +4311,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxErrAbortCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTxErrAbortCountWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5515,10 +4323,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxErrBusyChannelCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTxErrBusyChannelCountWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5531,10 +4335,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxTotalCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRxTotalCountWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5547,10 +4347,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxUnicastCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRxUnicastCountWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5563,10 +4359,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxBroadcastCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRxBroadcastCountWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5579,10 +4371,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxDataCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRxDataCountWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5595,10 +4383,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxDataPollCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRxDataPollCountWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5611,10 +4395,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxBeaconCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRxBeaconCountWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5627,10 +4407,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxBeaconRequestCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRxBeaconRequestCountWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5643,10 +4419,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxOtherCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRxOtherCountWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5659,10 +4431,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxAddressFilteredCountWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRxAddressFilteredCountWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5675,10 +4443,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxDestAddrFilteredCountWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRxDestAddrFilteredCountWithParams:(MTRSubscribeParams *)params
                                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                               reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5691,10 +4455,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxDuplicatedCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRxDuplicatedCountWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5707,10 +4467,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxErrNoFrameCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRxErrNoFrameCountWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5723,10 +4479,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxErrUnknownNeighborCountWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRxErrUnknownNeighborCountWithParams:(MTRSubscribeParams *)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                 reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5739,10 +4491,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxErrInvalidSrcAddrCountWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRxErrInvalidSrcAddrCountWithParams:(MTRSubscribeParams *)params
                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -5755,10 +4503,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxErrSecCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRxErrSecCountWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5771,10 +4515,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxErrFcsCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRxErrFcsCountWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5787,10 +4527,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRxErrOtherCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRxErrOtherCountWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5803,10 +4539,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActiveTimestampWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActiveTimestampWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5819,10 +4551,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePendingTimestampWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePendingTimestampWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5835,10 +4563,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeDelayWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDelayWithParams:(MTRSubscribeParams *)params
                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5851,10 +4575,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSecurityPolicyWithCompletion:(void (^)(MTRThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable value,
                                                       NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSecurityPolicyWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(MTRThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable value,
@@ -5867,10 +4587,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeChannelPage0MaskWithCompletion:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeChannelPage0MaskWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5884,10 +4600,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOperationalDatasetComponentsWithCompletion:
     (void (^)(MTRThreadNetworkDiagnosticsClusterOperationalDatasetComponents * _Nullable value,
         NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)
     subscribeAttributeOperationalDatasetComponentsWithParams:(MTRSubscribeParams *)params
                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -5906,10 +4618,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActiveNetworkFaultsListWithCompletion:(void (^)(NSArray * _Nullable value,
                                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActiveNetworkFaultsListWithParams:(MTRSubscribeParams *)params
                                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                               reportHandler:(void (^)(NSArray * _Nullable value,
@@ -5922,10 +4630,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -5938,10 +4642,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -5954,10 +4654,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5970,10 +4666,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -5986,10 +4678,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6022,10 +4710,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBssidWithCompletion:(void (^)(NSData * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBssidWithParams:(MTRSubscribeParams *)params
                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                             reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6038,10 +4722,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSecurityTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSecurityTypeWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6054,10 +4734,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeWiFiVersionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeWiFiVersionWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6070,10 +4746,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeChannelNumberWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeChannelNumberWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6086,10 +4758,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeRssiWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRssiWithParams:(MTRSubscribeParams *)params
                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6102,10 +4770,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBeaconLostCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBeaconLostCountWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6118,10 +4782,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBeaconRxCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBeaconRxCountWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6134,10 +4794,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePacketMulticastRxCountWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePacketMulticastRxCountWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -6150,10 +4806,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePacketMulticastTxCountWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePacketMulticastTxCountWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -6166,10 +4818,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePacketUnicastRxCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePacketUnicastRxCountWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -6182,10 +4830,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePacketUnicastTxCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePacketUnicastTxCountWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -6198,10 +4842,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCurrentMaxRateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentMaxRateWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6214,10 +4854,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOverrunCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOverrunCountWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6230,10 +4866,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6246,10 +4878,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6262,10 +4890,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6278,10 +4902,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6294,10 +4914,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6330,10 +4946,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePHYRateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePHYRateWithParams:(MTRSubscribeParams *)params
                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                               reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6346,10 +4958,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFullDuplexWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFullDuplexWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6362,10 +4970,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePacketRxCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePacketRxCountWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6378,10 +4982,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePacketTxCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePacketTxCountWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6394,10 +4994,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTxErrCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTxErrCountWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6410,10 +5006,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCollisionCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCollisionCountWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6426,10 +5018,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOverrunCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOverrunCountWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6442,10 +5030,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeCarrierDetectWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCarrierDetectWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6458,10 +5042,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTimeSinceResetWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTimeSinceResetWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6474,10 +5054,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6490,10 +5066,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6506,10 +5078,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6522,10 +5090,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6538,10 +5102,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6572,10 +5132,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeVendorNameWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeVendorNameWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6588,10 +5144,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeVendorIDWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeVendorIDWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6604,10 +5156,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeProductNameWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeProductNameWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6624,10 +5172,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeNodeLabelWithValue:(NSString * _Nonnull)value
                                   params:(MTRWriteParams * _Nullable)params
                               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNodeLabelWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6640,10 +5184,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeHardwareVersionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeHardwareVersionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6656,10 +5196,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeHardwareVersionStringWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeHardwareVersionStringWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSString * _Nullable value,
@@ -6672,10 +5208,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSoftwareVersionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSoftwareVersionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6688,10 +5220,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSoftwareVersionStringWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSoftwareVersionStringWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSString * _Nullable value,
@@ -6704,10 +5232,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeManufacturingDateWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeManufacturingDateWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6720,10 +5244,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePartNumberWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePartNumberWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6736,10 +5256,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeProductURLWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeProductURLWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6752,10 +5268,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeProductLabelWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeProductLabelWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6768,10 +5280,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSerialNumberWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSerialNumberWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6784,10 +5292,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeReachableWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeReachableWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6800,10 +5304,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeUniqueIDWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeUniqueIDWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6816,10 +5316,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6832,10 +5328,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6848,10 +5340,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6864,10 +5352,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6880,10 +5364,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6916,10 +5396,6 @@ light or a window shade.
 
 - (void)readAttributeNumberOfPositionsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNumberOfPositionsWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6932,10 +5408,6 @@ light or a window shade.
 
 - (void)readAttributeCurrentPositionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentPositionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6948,10 +5420,6 @@ light or a window shade.
 
 - (void)readAttributeMultiPressMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMultiPressMaxWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -6964,10 +5432,6 @@ light or a window shade.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6980,10 +5444,6 @@ light or a window shade.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -6996,10 +5456,6 @@ light or a window shade.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7012,10 +5468,6 @@ light or a window shade.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7028,10 +5480,6 @@ light or a window shade.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7067,10 +5515,6 @@ light or a window shade.
 
 - (void)readAttributeWindowStatusWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeWindowStatusWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7083,10 +5527,6 @@ light or a window shade.
 
 - (void)readAttributeAdminFabricIndexWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAdminFabricIndexWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7099,10 +5539,6 @@ light or a window shade.
 
 - (void)readAttributeAdminVendorIdWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAdminVendorIdWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7115,10 +5551,6 @@ light or a window shade.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -7131,10 +5563,6 @@ light or a window shade.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -7147,10 +5575,6 @@ light or a window shade.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7163,10 +5587,6 @@ light or a window shade.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7179,10 +5599,6 @@ light or a window shade.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7235,10 +5651,6 @@ light or a window shade.
 
 - (void)readAttributeNOCsWithParams:(MTRReadParams * _Nullable)params
                          completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNOCsWithParams:(MTRSubscribeParams *)params
                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                            reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7252,10 +5664,6 @@ light or a window shade.
 - (void)readAttributeFabricsWithParams:(MTRReadParams * _Nullable)params
                             completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFabricsWithParams:(MTRSubscribeParams *)params
                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                               reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7268,10 +5676,6 @@ light or a window shade.
 
 - (void)readAttributeSupportedFabricsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSupportedFabricsWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7284,10 +5688,6 @@ light or a window shade.
 
 - (void)readAttributeCommissionedFabricsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCommissionedFabricsWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -7300,10 +5700,6 @@ light or a window shade.
 
 - (void)readAttributeTrustedRootCertificatesWithCompletion:(void (^)(NSArray * _Nullable value,
                                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTrustedRootCertificatesWithParams:(MTRSubscribeParams *)params
                                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                               reportHandler:(void (^)(NSArray * _Nullable value,
@@ -7316,10 +5712,6 @@ light or a window shade.
 
 - (void)readAttributeCurrentFabricIndexWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentFabricIndexWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -7332,10 +5724,6 @@ light or a window shade.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -7348,10 +5736,6 @@ light or a window shade.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -7364,10 +5748,6 @@ light or a window shade.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7380,10 +5760,6 @@ light or a window shade.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7396,10 +5772,6 @@ light or a window shade.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7443,10 +5815,6 @@ light or a window shade.
 - (void)writeAttributeGroupKeyMapWithValue:(NSArray * _Nonnull)value
                                     params:(MTRWriteParams * _Nullable)params
                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGroupKeyMapWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7460,10 +5828,6 @@ light or a window shade.
 - (void)readAttributeGroupTableWithParams:(MTRReadParams * _Nullable)params
                                completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGroupTableWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7476,10 +5840,6 @@ light or a window shade.
 
 - (void)readAttributeMaxGroupsPerFabricWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxGroupsPerFabricWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -7492,10 +5852,6 @@ light or a window shade.
 
 - (void)readAttributeMaxGroupKeysPerFabricWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxGroupKeysPerFabricWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -7508,10 +5864,6 @@ light or a window shade.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -7524,10 +5876,6 @@ light or a window shade.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -7540,10 +5888,6 @@ light or a window shade.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7556,10 +5900,6 @@ light or a window shade.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7572,10 +5912,6 @@ light or a window shade.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7604,10 +5940,6 @@ labels.
 
 - (void)readAttributeLabelListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLabelListWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7620,10 +5952,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -7636,10 +5964,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -7652,10 +5976,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7668,10 +5988,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7684,10 +6000,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7719,10 +6031,6 @@ labels.
 - (void)writeAttributeLabelListWithValue:(NSArray * _Nonnull)value
                                   params:(MTRWriteParams * _Nullable)params
                               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLabelListWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7735,10 +6043,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -7751,10 +6055,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -7767,10 +6067,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7783,10 +6079,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7799,10 +6091,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7830,10 +6118,6 @@ labels.
 
 - (void)readAttributeStateValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeStateValueWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7846,10 +6130,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -7862,10 +6142,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -7878,10 +6154,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7894,10 +6166,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7910,10 +6178,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7944,10 +6208,6 @@ labels.
 
 - (void)readAttributeDescriptionWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDescriptionWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7960,10 +6220,6 @@ labels.
 
 - (void)readAttributeStandardNamespaceWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeStandardNamespaceWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7976,10 +6232,6 @@ labels.
 
 - (void)readAttributeSupportedModesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSupportedModesWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -7992,10 +6244,6 @@ labels.
 
 - (void)readAttributeCurrentModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentModeWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8013,10 +6261,6 @@ labels.
 - (void)writeAttributeStartUpModeWithValue:(NSNumber * _Nullable)value
                                     params:(MTRWriteParams * _Nullable)params
                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeStartUpModeWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8033,10 +6277,6 @@ labels.
 - (void)writeAttributeOnModeWithValue:(NSNumber * _Nullable)value
                                params:(MTRWriteParams * _Nullable)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOnModeWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8049,10 +6289,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -8065,10 +6301,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -8081,10 +6313,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8097,10 +6325,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8113,10 +6337,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8186,10 +6406,6 @@ labels.
 
 - (void)readAttributeLockStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLockStateWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8202,10 +6418,6 @@ labels.
 
 - (void)readAttributeLockTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLockTypeWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8218,10 +6430,6 @@ labels.
 
 - (void)readAttributeActuatorEnabledWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActuatorEnabledWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8234,10 +6442,6 @@ labels.
 
 - (void)readAttributeDoorStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDoorStateWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8255,10 +6459,6 @@ labels.
 - (void)writeAttributeDoorOpenEventsWithValue:(NSNumber * _Nonnull)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDoorOpenEventsWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8276,10 +6476,6 @@ labels.
 - (void)writeAttributeDoorClosedEventsWithValue:(NSNumber * _Nonnull)value
                                          params:(MTRWriteParams * _Nullable)params
                                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDoorClosedEventsWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8296,10 +6492,6 @@ labels.
 - (void)writeAttributeOpenPeriodWithValue:(NSNumber * _Nonnull)value
                                    params:(MTRWriteParams * _Nullable)params
                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOpenPeriodWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8312,10 +6504,6 @@ labels.
 
 - (void)readAttributeNumberOfTotalUsersSupportedWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNumberOfTotalUsersSupportedWithParams:(MTRSubscribeParams *)params
                                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -8328,10 +6516,6 @@ labels.
 
 - (void)readAttributeNumberOfPINUsersSupportedWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNumberOfPINUsersSupportedWithParams:(MTRSubscribeParams *)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                 reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -8344,10 +6528,6 @@ labels.
 
 - (void)readAttributeNumberOfRFIDUsersSupportedWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNumberOfRFIDUsersSupportedWithParams:(MTRSubscribeParams *)params
                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                  reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -8360,10 +6540,6 @@ labels.
 
 - (void)readAttributeNumberOfWeekDaySchedulesSupportedPerUserWithCompletion:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNumberOfWeekDaySchedulesSupportedPerUserWithParams:(MTRSubscribeParams *)params
                                                      subscriptionEstablished:
                                                          (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -8380,10 +6556,6 @@ labels.
 
 - (void)readAttributeNumberOfYearDaySchedulesSupportedPerUserWithCompletion:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNumberOfYearDaySchedulesSupportedPerUserWithParams:(MTRSubscribeParams *)params
                                                      subscriptionEstablished:
                                                          (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -8400,10 +6572,6 @@ labels.
 
 - (void)readAttributeNumberOfHolidaySchedulesSupportedWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                          NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNumberOfHolidaySchedulesSupportedWithParams:(MTRSubscribeParams *)params
                                               subscriptionEstablished:
                                                   (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -8419,10 +6587,6 @@ labels.
 
 - (void)readAttributeMaxPINCodeLengthWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxPINCodeLengthWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8435,10 +6599,6 @@ labels.
 
 - (void)readAttributeMinPINCodeLengthWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMinPINCodeLengthWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8451,10 +6611,6 @@ labels.
 
 - (void)readAttributeMaxRFIDCodeLengthWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxRFIDCodeLengthWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8467,10 +6623,6 @@ labels.
 
 - (void)readAttributeMinRFIDCodeLengthWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMinRFIDCodeLengthWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8483,10 +6635,6 @@ labels.
 
 - (void)readAttributeCredentialRulesSupportWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCredentialRulesSupportWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -8499,10 +6647,6 @@ labels.
 
 - (void)readAttributeNumberOfCredentialsSupportedPerUserWithCompletion:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNumberOfCredentialsSupportedPerUserWithParams:(MTRSubscribeParams *)params
                                                 subscriptionEstablished:
                                                     (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -8522,10 +6666,6 @@ labels.
 - (void)writeAttributeLanguageWithValue:(NSString * _Nonnull)value
                                  params:(MTRWriteParams * _Nullable)params
                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLanguageWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8543,10 +6683,6 @@ labels.
 - (void)writeAttributeLEDSettingsWithValue:(NSNumber * _Nonnull)value
                                     params:(MTRWriteParams * _Nullable)params
                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLEDSettingsWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8564,10 +6700,6 @@ labels.
 - (void)writeAttributeAutoRelockTimeWithValue:(NSNumber * _Nonnull)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAutoRelockTimeWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8585,10 +6717,6 @@ labels.
 - (void)writeAttributeSoundVolumeWithValue:(NSNumber * _Nonnull)value
                                     params:(MTRWriteParams * _Nullable)params
                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSoundVolumeWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8606,10 +6734,6 @@ labels.
 - (void)writeAttributeOperatingModeWithValue:(NSNumber * _Nonnull)value
                                       params:(MTRWriteParams * _Nullable)params
                                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOperatingModeWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8622,10 +6746,6 @@ labels.
 
 - (void)readAttributeSupportedOperatingModesWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSupportedOperatingModesWithParams:(MTRSubscribeParams *)params
                                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                               reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -8638,10 +6758,6 @@ labels.
 
 - (void)readAttributeDefaultConfigurationRegisterWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDefaultConfigurationRegisterWithParams:(MTRSubscribeParams *)params
                                          subscriptionEstablished:
                                              (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -8660,10 +6776,6 @@ labels.
 - (void)writeAttributeEnableLocalProgrammingWithValue:(NSNumber * _Nonnull)value
                                                params:(MTRWriteParams * _Nullable)params
                                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeEnableLocalProgrammingWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -8681,10 +6793,6 @@ labels.
 - (void)writeAttributeEnableOneTouchLockingWithValue:(NSNumber * _Nonnull)value
                                               params:(MTRWriteParams * _Nullable)params
                                           completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeEnableOneTouchLockingWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -8702,10 +6810,6 @@ labels.
 - (void)writeAttributeEnableInsideStatusLEDWithValue:(NSNumber * _Nonnull)value
                                               params:(MTRWriteParams * _Nullable)params
                                           completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeEnableInsideStatusLEDWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -8723,10 +6827,6 @@ labels.
 - (void)writeAttributeEnablePrivacyModeButtonWithValue:(NSNumber * _Nonnull)value
                                                 params:(MTRWriteParams * _Nullable)params
                                             completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeEnablePrivacyModeButtonWithParams:(MTRSubscribeParams *)params
                                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                               reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -8744,10 +6844,6 @@ labels.
 - (void)writeAttributeLocalProgrammingFeaturesWithValue:(NSNumber * _Nonnull)value
                                                  params:(MTRWriteParams * _Nullable)params
                                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLocalProgrammingFeaturesWithParams:(MTRSubscribeParams *)params
                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -8765,10 +6861,6 @@ labels.
 - (void)writeAttributeWrongCodeEntryLimitWithValue:(NSNumber * _Nonnull)value
                                             params:(MTRWriteParams * _Nullable)params
                                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeWrongCodeEntryLimitWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -8786,10 +6878,6 @@ labels.
 - (void)writeAttributeUserCodeTemporaryDisableTimeWithValue:(NSNumber * _Nonnull)value
                                                      params:(MTRWriteParams * _Nullable)params
                                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeUserCodeTemporaryDisableTimeWithParams:(MTRSubscribeParams *)params
                                          subscriptionEstablished:
                                              (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -8808,10 +6896,6 @@ labels.
 - (void)writeAttributeSendPINOverTheAirWithValue:(NSNumber * _Nonnull)value
                                           params:(MTRWriteParams * _Nullable)params
                                       completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSendPINOverTheAirWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8829,10 +6913,6 @@ labels.
 - (void)writeAttributeRequirePINforRemoteOperationWithValue:(NSNumber * _Nonnull)value
                                                      params:(MTRWriteParams * _Nullable)params
                                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRequirePINforRemoteOperationWithParams:(MTRSubscribeParams *)params
                                          subscriptionEstablished:
                                              (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -8851,10 +6931,6 @@ labels.
 - (void)writeAttributeExpiringUserTimeoutWithValue:(NSNumber * _Nonnull)value
                                             params:(MTRWriteParams * _Nullable)params
                                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeExpiringUserTimeoutWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -8867,10 +6943,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -8883,10 +6955,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -8899,10 +6967,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8915,10 +6979,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8931,10 +6991,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8980,10 +7036,6 @@ labels.
 
 - (void)readAttributeTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTypeWithParams:(MTRSubscribeParams *)params
                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -8996,10 +7048,6 @@ labels.
 
 - (void)readAttributePhysicalClosedLimitLiftWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePhysicalClosedLimitLiftWithParams:(MTRSubscribeParams *)params
                                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                               reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -9012,10 +7060,6 @@ labels.
 
 - (void)readAttributePhysicalClosedLimitTiltWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePhysicalClosedLimitTiltWithParams:(MTRSubscribeParams *)params
                                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                               reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -9028,10 +7072,6 @@ labels.
 
 - (void)readAttributeCurrentPositionLiftWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentPositionLiftWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -9044,10 +7084,6 @@ labels.
 
 - (void)readAttributeCurrentPositionTiltWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentPositionTiltWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -9060,10 +7096,6 @@ labels.
 
 - (void)readAttributeNumberOfActuationsLiftWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNumberOfActuationsLiftWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -9076,10 +7108,6 @@ labels.
 
 - (void)readAttributeNumberOfActuationsTiltWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNumberOfActuationsTiltWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -9092,10 +7120,6 @@ labels.
 
 - (void)readAttributeConfigStatusWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeConfigStatusWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9108,10 +7132,6 @@ labels.
 
 - (void)readAttributeCurrentPositionLiftPercentageWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentPositionLiftPercentageWithParams:(MTRSubscribeParams *)params
                                           subscriptionEstablished:
                                               (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -9125,10 +7145,6 @@ labels.
 
 - (void)readAttributeCurrentPositionTiltPercentageWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentPositionTiltPercentageWithParams:(MTRSubscribeParams *)params
                                           subscriptionEstablished:
                                               (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -9142,10 +7158,6 @@ labels.
 
 - (void)readAttributeOperationalStatusWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOperationalStatusWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9158,10 +7170,6 @@ labels.
 
 - (void)readAttributeTargetPositionLiftPercent100thsWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTargetPositionLiftPercent100thsWithParams:(MTRSubscribeParams *)params
                                             subscriptionEstablished:
                                                 (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -9177,10 +7185,6 @@ labels.
 
 - (void)readAttributeTargetPositionTiltPercent100thsWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTargetPositionTiltPercent100thsWithParams:(MTRSubscribeParams *)params
                                             subscriptionEstablished:
                                                 (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -9196,10 +7200,6 @@ labels.
 
 - (void)readAttributeEndProductTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeEndProductTypeWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9212,10 +7212,6 @@ labels.
 
 - (void)readAttributeCurrentPositionLiftPercent100thsWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentPositionLiftPercent100thsWithParams:(MTRSubscribeParams *)params
                                              subscriptionEstablished:
                                                  (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -9231,10 +7227,6 @@ labels.
 
 - (void)readAttributeCurrentPositionTiltPercent100thsWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentPositionTiltPercent100thsWithParams:(MTRSubscribeParams *)params
                                              subscriptionEstablished:
                                                  (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -9250,10 +7242,6 @@ labels.
 
 - (void)readAttributeInstalledOpenLimitLiftWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInstalledOpenLimitLiftWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -9266,10 +7254,6 @@ labels.
 
 - (void)readAttributeInstalledClosedLimitLiftWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInstalledClosedLimitLiftWithParams:(MTRSubscribeParams *)params
                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -9282,10 +7266,6 @@ labels.
 
 - (void)readAttributeInstalledOpenLimitTiltWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInstalledOpenLimitTiltWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -9298,10 +7278,6 @@ labels.
 
 - (void)readAttributeInstalledClosedLimitTiltWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInstalledClosedLimitTiltWithParams:(MTRSubscribeParams *)params
                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -9318,10 +7294,6 @@ labels.
 - (void)writeAttributeModeWithValue:(NSNumber * _Nonnull)value
                              params:(MTRWriteParams * _Nullable)params
                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeModeWithParams:(MTRSubscribeParams *)params
                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9334,10 +7306,6 @@ labels.
 
 - (void)readAttributeSafetyStatusWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSafetyStatusWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9350,10 +7318,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -9366,10 +7330,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -9382,10 +7342,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9398,10 +7354,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9414,10 +7366,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9451,10 +7399,6 @@ labels.
 
 - (void)readAttributeBarrierMovingStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBarrierMovingStateWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -9467,10 +7411,6 @@ labels.
 
 - (void)readAttributeBarrierSafetyStatusWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBarrierSafetyStatusWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -9483,10 +7423,6 @@ labels.
 
 - (void)readAttributeBarrierCapabilitiesWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBarrierCapabilitiesWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -9504,10 +7440,6 @@ labels.
 - (void)writeAttributeBarrierOpenEventsWithValue:(NSNumber * _Nonnull)value
                                           params:(MTRWriteParams * _Nullable)params
                                       completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBarrierOpenEventsWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9525,10 +7457,6 @@ labels.
 - (void)writeAttributeBarrierCloseEventsWithValue:(NSNumber * _Nonnull)value
                                            params:(MTRWriteParams * _Nullable)params
                                        completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBarrierCloseEventsWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -9546,10 +7474,6 @@ labels.
 - (void)writeAttributeBarrierCommandOpenEventsWithValue:(NSNumber * _Nonnull)value
                                                  params:(MTRWriteParams * _Nullable)params
                                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBarrierCommandOpenEventsWithParams:(MTRSubscribeParams *)params
                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -9567,10 +7491,6 @@ labels.
 - (void)writeAttributeBarrierCommandCloseEventsWithValue:(NSNumber * _Nonnull)value
                                                   params:(MTRWriteParams * _Nullable)params
                                               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBarrierCommandCloseEventsWithParams:(MTRSubscribeParams *)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                 reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -9588,10 +7508,6 @@ labels.
 - (void)writeAttributeBarrierOpenPeriodWithValue:(NSNumber * _Nonnull)value
                                           params:(MTRWriteParams * _Nullable)params
                                       completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBarrierOpenPeriodWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9609,10 +7525,6 @@ labels.
 - (void)writeAttributeBarrierClosePeriodWithValue:(NSNumber * _Nonnull)value
                                            params:(MTRWriteParams * _Nullable)params
                                        completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBarrierClosePeriodWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -9625,10 +7537,6 @@ labels.
 
 - (void)readAttributeBarrierPositionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBarrierPositionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9641,10 +7549,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -9657,10 +7561,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -9673,10 +7573,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9689,10 +7585,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9705,10 +7597,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9736,10 +7624,6 @@ labels.
 
 - (void)readAttributeMaxPressureWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxPressureWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9752,10 +7636,6 @@ labels.
 
 - (void)readAttributeMaxSpeedWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxSpeedWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9768,10 +7648,6 @@ labels.
 
 - (void)readAttributeMaxFlowWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxFlowWithParams:(MTRSubscribeParams *)params
                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                               reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9784,10 +7660,6 @@ labels.
 
 - (void)readAttributeMinConstPressureWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMinConstPressureWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9800,10 +7672,6 @@ labels.
 
 - (void)readAttributeMaxConstPressureWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxConstPressureWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9816,10 +7684,6 @@ labels.
 
 - (void)readAttributeMinCompPressureWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMinCompPressureWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9832,10 +7696,6 @@ labels.
 
 - (void)readAttributeMaxCompPressureWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxCompPressureWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9848,10 +7708,6 @@ labels.
 
 - (void)readAttributeMinConstSpeedWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMinConstSpeedWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9864,10 +7720,6 @@ labels.
 
 - (void)readAttributeMaxConstSpeedWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxConstSpeedWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9880,10 +7732,6 @@ labels.
 
 - (void)readAttributeMinConstFlowWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMinConstFlowWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9896,10 +7744,6 @@ labels.
 
 - (void)readAttributeMaxConstFlowWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxConstFlowWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9912,10 +7756,6 @@ labels.
 
 - (void)readAttributeMinConstTempWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMinConstTempWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9928,10 +7768,6 @@ labels.
 
 - (void)readAttributeMaxConstTempWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxConstTempWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9944,10 +7780,6 @@ labels.
 
 - (void)readAttributePumpStatusWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePumpStatusWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -9960,10 +7792,6 @@ labels.
 
 - (void)readAttributeEffectiveOperationModeWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeEffectiveOperationModeWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -9976,10 +7804,6 @@ labels.
 
 - (void)readAttributeEffectiveControlModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeEffectiveControlModeWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -9992,10 +7816,6 @@ labels.
 
 - (void)readAttributeCapacityWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCapacityWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -10008,10 +7828,6 @@ labels.
 
 - (void)readAttributeSpeedWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSpeedWithParams:(MTRSubscribeParams *)params
                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -10029,10 +7845,6 @@ labels.
 - (void)writeAttributeLifetimeRunningHoursWithValue:(NSNumber * _Nullable)value
                                              params:(MTRWriteParams * _Nullable)params
                                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLifetimeRunningHoursWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10045,10 +7857,6 @@ labels.
 
 - (void)readAttributePowerWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePowerWithParams:(MTRSubscribeParams *)params
                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -10066,10 +7874,6 @@ labels.
 - (void)writeAttributeLifetimeEnergyConsumedWithValue:(NSNumber * _Nullable)value
                                                params:(MTRWriteParams * _Nullable)params
                                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLifetimeEnergyConsumedWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10087,10 +7891,6 @@ labels.
 - (void)writeAttributeOperationModeWithValue:(NSNumber * _Nonnull)value
                                       params:(MTRWriteParams * _Nullable)params
                                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOperationModeWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -10108,10 +7908,6 @@ labels.
 - (void)writeAttributeControlModeWithValue:(NSNumber * _Nonnull)value
                                     params:(MTRWriteParams * _Nullable)params
                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeControlModeWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -10124,10 +7920,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -10140,10 +7932,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -10156,10 +7944,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -10172,10 +7956,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -10188,10 +7968,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -10230,10 +8006,6 @@ labels.
 
 - (void)readAttributeLocalTemperatureWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLocalTemperatureWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -10246,10 +8018,6 @@ labels.
 
 - (void)readAttributeOutdoorTemperatureWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOutdoorTemperatureWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10262,10 +8030,6 @@ labels.
 
 - (void)readAttributeOccupancyWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOccupancyWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -10278,10 +8042,6 @@ labels.
 
 - (void)readAttributeAbsMinHeatSetpointLimitWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAbsMinHeatSetpointLimitWithParams:(MTRSubscribeParams *)params
                                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                               reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10294,10 +8054,6 @@ labels.
 
 - (void)readAttributeAbsMaxHeatSetpointLimitWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAbsMaxHeatSetpointLimitWithParams:(MTRSubscribeParams *)params
                                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                               reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10310,10 +8066,6 @@ labels.
 
 - (void)readAttributeAbsMinCoolSetpointLimitWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAbsMinCoolSetpointLimitWithParams:(MTRSubscribeParams *)params
                                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                               reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10326,10 +8078,6 @@ labels.
 
 - (void)readAttributeAbsMaxCoolSetpointLimitWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAbsMaxCoolSetpointLimitWithParams:(MTRSubscribeParams *)params
                                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                               reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10342,10 +8090,6 @@ labels.
 
 - (void)readAttributePICoolingDemandWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePICoolingDemandWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -10358,10 +8102,6 @@ labels.
 
 - (void)readAttributePIHeatingDemandWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePIHeatingDemandWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -10379,10 +8119,6 @@ labels.
 - (void)writeAttributeHVACSystemTypeConfigurationWithValue:(NSNumber * _Nonnull)value
                                                     params:(MTRWriteParams * _Nullable)params
                                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeHVACSystemTypeConfigurationWithParams:(MTRSubscribeParams *)params
                                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10400,10 +8136,6 @@ labels.
 - (void)writeAttributeLocalTemperatureCalibrationWithValue:(NSNumber * _Nonnull)value
                                                     params:(MTRWriteParams * _Nullable)params
                                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLocalTemperatureCalibrationWithParams:(MTRSubscribeParams *)params
                                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10421,10 +8153,6 @@ labels.
 - (void)writeAttributeOccupiedCoolingSetpointWithValue:(NSNumber * _Nonnull)value
                                                 params:(MTRWriteParams * _Nullable)params
                                             completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOccupiedCoolingSetpointWithParams:(MTRSubscribeParams *)params
                                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                               reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10442,10 +8170,6 @@ labels.
 - (void)writeAttributeOccupiedHeatingSetpointWithValue:(NSNumber * _Nonnull)value
                                                 params:(MTRWriteParams * _Nullable)params
                                             completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOccupiedHeatingSetpointWithParams:(MTRSubscribeParams *)params
                                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                               reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10463,10 +8187,6 @@ labels.
 - (void)writeAttributeUnoccupiedCoolingSetpointWithValue:(NSNumber * _Nonnull)value
                                                   params:(MTRWriteParams * _Nullable)params
                                               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeUnoccupiedCoolingSetpointWithParams:(MTRSubscribeParams *)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                 reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10484,10 +8204,6 @@ labels.
 - (void)writeAttributeUnoccupiedHeatingSetpointWithValue:(NSNumber * _Nonnull)value
                                                   params:(MTRWriteParams * _Nullable)params
                                               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeUnoccupiedHeatingSetpointWithParams:(MTRSubscribeParams *)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                 reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10505,10 +8221,6 @@ labels.
 - (void)writeAttributeMinHeatSetpointLimitWithValue:(NSNumber * _Nonnull)value
                                              params:(MTRWriteParams * _Nullable)params
                                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMinHeatSetpointLimitWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10526,10 +8238,6 @@ labels.
 - (void)writeAttributeMaxHeatSetpointLimitWithValue:(NSNumber * _Nonnull)value
                                              params:(MTRWriteParams * _Nullable)params
                                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxHeatSetpointLimitWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10547,10 +8255,6 @@ labels.
 - (void)writeAttributeMinCoolSetpointLimitWithValue:(NSNumber * _Nonnull)value
                                              params:(MTRWriteParams * _Nullable)params
                                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMinCoolSetpointLimitWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10568,10 +8272,6 @@ labels.
 - (void)writeAttributeMaxCoolSetpointLimitWithValue:(NSNumber * _Nonnull)value
                                              params:(MTRWriteParams * _Nullable)params
                                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxCoolSetpointLimitWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10589,10 +8289,6 @@ labels.
 - (void)writeAttributeMinSetpointDeadBandWithValue:(NSNumber * _Nonnull)value
                                             params:(MTRWriteParams * _Nullable)params
                                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMinSetpointDeadBandWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10610,10 +8306,6 @@ labels.
 - (void)writeAttributeRemoteSensingWithValue:(NSNumber * _Nonnull)value
                                       params:(MTRWriteParams * _Nullable)params
                                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRemoteSensingWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -10631,10 +8323,6 @@ labels.
 - (void)writeAttributeControlSequenceOfOperationWithValue:(NSNumber * _Nonnull)value
                                                    params:(MTRWriteParams * _Nullable)params
                                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeControlSequenceOfOperationWithParams:(MTRSubscribeParams *)params
                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                  reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10651,10 +8339,6 @@ labels.
 - (void)writeAttributeSystemModeWithValue:(NSNumber * _Nonnull)value
                                    params:(MTRWriteParams * _Nullable)params
                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSystemModeWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -10667,10 +8351,6 @@ labels.
 
 - (void)readAttributeThermostatRunningModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeThermostatRunningModeWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10683,10 +8363,6 @@ labels.
 
 - (void)readAttributeStartOfWeekWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeStartOfWeekWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -10699,10 +8375,6 @@ labels.
 
 - (void)readAttributeNumberOfWeeklyTransitionsWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNumberOfWeeklyTransitionsWithParams:(MTRSubscribeParams *)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                 reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10715,10 +8387,6 @@ labels.
 
 - (void)readAttributeNumberOfDailyTransitionsWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNumberOfDailyTransitionsWithParams:(MTRSubscribeParams *)params
                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10736,10 +8404,6 @@ labels.
 - (void)writeAttributeTemperatureSetpointHoldWithValue:(NSNumber * _Nonnull)value
                                                 params:(MTRWriteParams * _Nullable)params
                                             completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTemperatureSetpointHoldWithParams:(MTRSubscribeParams *)params
                                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                               reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10757,10 +8421,6 @@ labels.
 - (void)writeAttributeTemperatureSetpointHoldDurationWithValue:(NSNumber * _Nullable)value
                                                         params:(MTRWriteParams * _Nullable)params
                                                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTemperatureSetpointHoldDurationWithParams:(MTRSubscribeParams *)params
                                             subscriptionEstablished:
                                                 (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -10781,10 +8441,6 @@ labels.
 - (void)writeAttributeThermostatProgrammingOperationModeWithValue:(NSNumber * _Nonnull)value
                                                            params:(MTRWriteParams * _Nullable)params
                                                        completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeThermostatProgrammingOperationModeWithParams:(MTRSubscribeParams *)params
                                                subscriptionEstablished:
                                                    (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -10800,10 +8456,6 @@ labels.
 
 - (void)readAttributeThermostatRunningStateWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeThermostatRunningStateWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10816,10 +8468,6 @@ labels.
 
 - (void)readAttributeSetpointChangeSourceWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSetpointChangeSourceWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10832,10 +8480,6 @@ labels.
 
 - (void)readAttributeSetpointChangeAmountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSetpointChangeAmountWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10848,10 +8492,6 @@ labels.
 
 - (void)readAttributeSetpointChangeSourceTimestampWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSetpointChangeSourceTimestampWithParams:(MTRSubscribeParams *)params
                                           subscriptionEstablished:
                                               (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -10870,10 +8510,6 @@ labels.
 - (void)writeAttributeOccupiedSetbackWithValue:(NSNumber * _Nullable)value
                                         params:(MTRWriteParams * _Nullable)params
                                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOccupiedSetbackWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -10886,10 +8522,6 @@ labels.
 
 - (void)readAttributeOccupiedSetbackMinWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOccupiedSetbackMinWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10902,10 +8534,6 @@ labels.
 
 - (void)readAttributeOccupiedSetbackMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOccupiedSetbackMaxWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10923,10 +8551,6 @@ labels.
 - (void)writeAttributeUnoccupiedSetbackWithValue:(NSNumber * _Nullable)value
                                           params:(MTRWriteParams * _Nullable)params
                                       completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeUnoccupiedSetbackWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -10939,10 +8563,6 @@ labels.
 
 - (void)readAttributeUnoccupiedSetbackMinWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeUnoccupiedSetbackMinWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10955,10 +8575,6 @@ labels.
 
 - (void)readAttributeUnoccupiedSetbackMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeUnoccupiedSetbackMaxWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10976,10 +8592,6 @@ labels.
 - (void)writeAttributeEmergencyHeatDeltaWithValue:(NSNumber * _Nonnull)value
                                            params:(MTRWriteParams * _Nullable)params
                                        completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeEmergencyHeatDeltaWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -10996,10 +8608,6 @@ labels.
 - (void)writeAttributeACTypeWithValue:(NSNumber * _Nonnull)value
                                params:(MTRWriteParams * _Nullable)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeACTypeWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11016,10 +8624,6 @@ labels.
 - (void)writeAttributeACCapacityWithValue:(NSNumber * _Nonnull)value
                                    params:(MTRWriteParams * _Nullable)params
                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeACCapacityWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11037,10 +8641,6 @@ labels.
 - (void)writeAttributeACRefrigerantTypeWithValue:(NSNumber * _Nonnull)value
                                           params:(MTRWriteParams * _Nullable)params
                                       completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeACRefrigerantTypeWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11058,10 +8658,6 @@ labels.
 - (void)writeAttributeACCompressorTypeWithValue:(NSNumber * _Nonnull)value
                                          params:(MTRWriteParams * _Nullable)params
                                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeACCompressorTypeWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11079,10 +8675,6 @@ labels.
 - (void)writeAttributeACErrorCodeWithValue:(NSNumber * _Nonnull)value
                                     params:(MTRWriteParams * _Nullable)params
                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeACErrorCodeWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11100,10 +8692,6 @@ labels.
 - (void)writeAttributeACLouverPositionWithValue:(NSNumber * _Nonnull)value
                                          params:(MTRWriteParams * _Nullable)params
                                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeACLouverPositionWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11116,10 +8704,6 @@ labels.
 
 - (void)readAttributeACCoilTemperatureWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeACCoilTemperatureWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11137,10 +8721,6 @@ labels.
 - (void)writeAttributeACCapacityformatWithValue:(NSNumber * _Nonnull)value
                                          params:(MTRWriteParams * _Nullable)params
                                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeACCapacityformatWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11153,10 +8733,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -11169,10 +8745,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -11185,10 +8757,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11201,10 +8769,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11217,10 +8781,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11252,10 +8812,6 @@ labels.
 - (void)writeAttributeFanModeWithValue:(NSNumber * _Nonnull)value
                                 params:(MTRWriteParams * _Nullable)params
                             completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFanModeWithParams:(MTRSubscribeParams *)params
                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                               reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11273,10 +8829,6 @@ labels.
 - (void)writeAttributeFanModeSequenceWithValue:(NSNumber * _Nonnull)value
                                         params:(MTRWriteParams * _Nullable)params
                                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFanModeSequenceWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11294,10 +8846,6 @@ labels.
 - (void)writeAttributePercentSettingWithValue:(NSNumber * _Nullable)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePercentSettingWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11310,10 +8858,6 @@ labels.
 
 - (void)readAttributePercentCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePercentCurrentWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11326,10 +8870,6 @@ labels.
 
 - (void)readAttributeSpeedMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSpeedMaxWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11347,10 +8887,6 @@ labels.
 - (void)writeAttributeSpeedSettingWithValue:(NSNumber * _Nullable)value
                                      params:(MTRWriteParams * _Nullable)params
                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSpeedSettingWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11363,10 +8899,6 @@ labels.
 
 - (void)readAttributeSpeedCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSpeedCurrentWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11379,10 +8911,6 @@ labels.
 
 - (void)readAttributeRockSupportWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRockSupportWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11400,10 +8928,6 @@ labels.
 - (void)writeAttributeRockSettingWithValue:(NSNumber * _Nonnull)value
                                     params:(MTRWriteParams * _Nullable)params
                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRockSettingWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11416,10 +8940,6 @@ labels.
 
 - (void)readAttributeWindSupportWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeWindSupportWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11437,10 +8957,6 @@ labels.
 - (void)writeAttributeWindSettingWithValue:(NSNumber * _Nonnull)value
                                     params:(MTRWriteParams * _Nullable)params
                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeWindSettingWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11453,10 +8969,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -11469,10 +8981,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -11485,10 +8993,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11501,10 +9005,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11517,10 +9017,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11553,10 +9049,6 @@ labels.
 - (void)writeAttributeTemperatureDisplayModeWithValue:(NSNumber * _Nonnull)value
                                                params:(MTRWriteParams * _Nullable)params
                                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTemperatureDisplayModeWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -11574,10 +9066,6 @@ labels.
 - (void)writeAttributeKeypadLockoutWithValue:(NSNumber * _Nonnull)value
                                       params:(MTRWriteParams * _Nullable)params
                                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeKeypadLockoutWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11595,10 +9083,6 @@ labels.
 - (void)writeAttributeScheduleProgrammingVisibilityWithValue:(NSNumber * _Nonnull)value
                                                       params:(MTRWriteParams * _Nullable)params
                                                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeScheduleProgrammingVisibilityWithParams:(MTRSubscribeParams *)params
                                           subscriptionEstablished:
                                               (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -11612,10 +9096,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -11628,10 +9108,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -11644,10 +9120,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11660,10 +9132,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11676,10 +9144,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11746,10 +9210,6 @@ labels.
 
 - (void)readAttributeCurrentHueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentHueWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11762,10 +9222,6 @@ labels.
 
 - (void)readAttributeCurrentSaturationWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentSaturationWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11778,10 +9234,6 @@ labels.
 
 - (void)readAttributeRemainingTimeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRemainingTimeWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11794,10 +9246,6 @@ labels.
 
 - (void)readAttributeCurrentXWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentXWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11810,10 +9258,6 @@ labels.
 
 - (void)readAttributeCurrentYWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentYWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11826,10 +9270,6 @@ labels.
 
 - (void)readAttributeDriftCompensationWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDriftCompensationWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11842,10 +9282,6 @@ labels.
 
 - (void)readAttributeCompensationTextWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCompensationTextWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11858,10 +9294,6 @@ labels.
 
 - (void)readAttributeColorTemperatureMiredsWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeColorTemperatureMiredsWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -11874,10 +9306,6 @@ labels.
 
 - (void)readAttributeColorModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeColorModeWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11894,10 +9322,6 @@ labels.
 - (void)writeAttributeOptionsWithValue:(NSNumber * _Nonnull)value
                                 params:(MTRWriteParams * _Nullable)params
                             completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOptionsWithParams:(MTRSubscribeParams *)params
                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                               reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11910,10 +9334,6 @@ labels.
 
 - (void)readAttributeNumberOfPrimariesWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNumberOfPrimariesWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11926,10 +9346,6 @@ labels.
 
 - (void)readAttributePrimary1XWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePrimary1XWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11942,10 +9358,6 @@ labels.
 
 - (void)readAttributePrimary1YWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePrimary1YWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11958,10 +9370,6 @@ labels.
 
 - (void)readAttributePrimary1IntensityWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePrimary1IntensityWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11974,10 +9382,6 @@ labels.
 
 - (void)readAttributePrimary2XWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePrimary2XWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -11990,10 +9394,6 @@ labels.
 
 - (void)readAttributePrimary2YWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePrimary2YWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12006,10 +9406,6 @@ labels.
 
 - (void)readAttributePrimary2IntensityWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePrimary2IntensityWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12022,10 +9418,6 @@ labels.
 
 - (void)readAttributePrimary3XWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePrimary3XWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12038,10 +9430,6 @@ labels.
 
 - (void)readAttributePrimary3YWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePrimary3YWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12054,10 +9442,6 @@ labels.
 
 - (void)readAttributePrimary3IntensityWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePrimary3IntensityWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12070,10 +9454,6 @@ labels.
 
 - (void)readAttributePrimary4XWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePrimary4XWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12086,10 +9466,6 @@ labels.
 
 - (void)readAttributePrimary4YWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePrimary4YWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12102,10 +9478,6 @@ labels.
 
 - (void)readAttributePrimary4IntensityWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePrimary4IntensityWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12118,10 +9490,6 @@ labels.
 
 - (void)readAttributePrimary5XWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePrimary5XWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12134,10 +9502,6 @@ labels.
 
 - (void)readAttributePrimary5YWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePrimary5YWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12150,10 +9514,6 @@ labels.
 
 - (void)readAttributePrimary5IntensityWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePrimary5IntensityWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12166,10 +9526,6 @@ labels.
 
 - (void)readAttributePrimary6XWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePrimary6XWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12182,10 +9538,6 @@ labels.
 
 - (void)readAttributePrimary6YWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePrimary6YWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12198,10 +9550,6 @@ labels.
 
 - (void)readAttributePrimary6IntensityWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePrimary6IntensityWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12219,10 +9567,6 @@ labels.
 - (void)writeAttributeWhitePointXWithValue:(NSNumber * _Nonnull)value
                                     params:(MTRWriteParams * _Nullable)params
                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeWhitePointXWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12240,10 +9584,6 @@ labels.
 - (void)writeAttributeWhitePointYWithValue:(NSNumber * _Nonnull)value
                                     params:(MTRWriteParams * _Nullable)params
                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeWhitePointYWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12261,10 +9601,6 @@ labels.
 - (void)writeAttributeColorPointRXWithValue:(NSNumber * _Nonnull)value
                                      params:(MTRWriteParams * _Nullable)params
                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeColorPointRXWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12282,10 +9618,6 @@ labels.
 - (void)writeAttributeColorPointRYWithValue:(NSNumber * _Nonnull)value
                                      params:(MTRWriteParams * _Nullable)params
                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeColorPointRYWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12303,10 +9635,6 @@ labels.
 - (void)writeAttributeColorPointRIntensityWithValue:(NSNumber * _Nullable)value
                                              params:(MTRWriteParams * _Nullable)params
                                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeColorPointRIntensityWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -12324,10 +9652,6 @@ labels.
 - (void)writeAttributeColorPointGXWithValue:(NSNumber * _Nonnull)value
                                      params:(MTRWriteParams * _Nullable)params
                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeColorPointGXWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12345,10 +9669,6 @@ labels.
 - (void)writeAttributeColorPointGYWithValue:(NSNumber * _Nonnull)value
                                      params:(MTRWriteParams * _Nullable)params
                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeColorPointGYWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12366,10 +9686,6 @@ labels.
 - (void)writeAttributeColorPointGIntensityWithValue:(NSNumber * _Nullable)value
                                              params:(MTRWriteParams * _Nullable)params
                                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeColorPointGIntensityWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -12387,10 +9703,6 @@ labels.
 - (void)writeAttributeColorPointBXWithValue:(NSNumber * _Nonnull)value
                                      params:(MTRWriteParams * _Nullable)params
                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeColorPointBXWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12408,10 +9720,6 @@ labels.
 - (void)writeAttributeColorPointBYWithValue:(NSNumber * _Nonnull)value
                                      params:(MTRWriteParams * _Nullable)params
                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeColorPointBYWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12429,10 +9737,6 @@ labels.
 - (void)writeAttributeColorPointBIntensityWithValue:(NSNumber * _Nullable)value
                                              params:(MTRWriteParams * _Nullable)params
                                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeColorPointBIntensityWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -12445,10 +9749,6 @@ labels.
 
 - (void)readAttributeEnhancedCurrentHueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeEnhancedCurrentHueWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -12461,10 +9761,6 @@ labels.
 
 - (void)readAttributeEnhancedColorModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeEnhancedColorModeWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12477,10 +9773,6 @@ labels.
 
 - (void)readAttributeColorLoopActiveWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeColorLoopActiveWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12493,10 +9785,6 @@ labels.
 
 - (void)readAttributeColorLoopDirectionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeColorLoopDirectionWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -12509,10 +9797,6 @@ labels.
 
 - (void)readAttributeColorLoopTimeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeColorLoopTimeWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12525,10 +9809,6 @@ labels.
 
 - (void)readAttributeColorLoopStartEnhancedHueWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeColorLoopStartEnhancedHueWithParams:(MTRSubscribeParams *)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                 reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -12541,10 +9821,6 @@ labels.
 
 - (void)readAttributeColorLoopStoredEnhancedHueWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeColorLoopStoredEnhancedHueWithParams:(MTRSubscribeParams *)params
                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                  reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -12557,10 +9833,6 @@ labels.
 
 - (void)readAttributeColorCapabilitiesWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeColorCapabilitiesWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12573,10 +9845,6 @@ labels.
 
 - (void)readAttributeColorTempPhysicalMinMiredsWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeColorTempPhysicalMinMiredsWithParams:(MTRSubscribeParams *)params
                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                  reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -12589,10 +9857,6 @@ labels.
 
 - (void)readAttributeColorTempPhysicalMaxMiredsWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeColorTempPhysicalMaxMiredsWithParams:(MTRSubscribeParams *)params
                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                  reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -12605,10 +9869,6 @@ labels.
 
 - (void)readAttributeCoupleColorTempToLevelMinMiredsWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCoupleColorTempToLevelMinMiredsWithParams:(MTRSubscribeParams *)params
                                             subscriptionEstablished:
                                                 (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -12629,10 +9889,6 @@ labels.
 - (void)writeAttributeStartUpColorTemperatureMiredsWithValue:(NSNumber * _Nullable)value
                                                       params:(MTRWriteParams * _Nullable)params
                                                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeStartUpColorTemperatureMiredsWithParams:(MTRSubscribeParams *)params
                                           subscriptionEstablished:
                                               (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -12646,10 +9902,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -12662,10 +9914,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -12678,10 +9926,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12694,10 +9938,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12710,10 +9950,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12741,10 +9977,6 @@ labels.
 
 - (void)readAttributePhysicalMinLevelWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePhysicalMinLevelWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12757,10 +9989,6 @@ labels.
 
 - (void)readAttributePhysicalMaxLevelWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePhysicalMaxLevelWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12773,10 +10001,6 @@ labels.
 
 - (void)readAttributeBallastStatusWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBallastStatusWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12793,10 +10017,6 @@ labels.
 - (void)writeAttributeMinLevelWithValue:(NSNumber * _Nonnull)value
                                  params:(MTRWriteParams * _Nullable)params
                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMinLevelWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12813,10 +10033,6 @@ labels.
 - (void)writeAttributeMaxLevelWithValue:(NSNumber * _Nonnull)value
                                  params:(MTRWriteParams * _Nullable)params
                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxLevelWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12834,10 +10050,6 @@ labels.
 - (void)writeAttributeIntrinsicBalanceFactorWithValue:(NSNumber * _Nullable)value
                                                params:(MTRWriteParams * _Nullable)params
                                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeIntrinsicBalanceFactorWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -12855,10 +10067,6 @@ labels.
 - (void)writeAttributeBallastFactorAdjustmentWithValue:(NSNumber * _Nullable)value
                                                 params:(MTRWriteParams * _Nullable)params
                                             completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBallastFactorAdjustmentWithParams:(MTRSubscribeParams *)params
                                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                               reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -12871,10 +10079,6 @@ labels.
 
 - (void)readAttributeLampQuantityWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLampQuantityWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12891,10 +10095,6 @@ labels.
 - (void)writeAttributeLampTypeWithValue:(NSString * _Nonnull)value
                                  params:(MTRWriteParams * _Nullable)params
                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLampTypeWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12912,10 +10112,6 @@ labels.
 - (void)writeAttributeLampManufacturerWithValue:(NSString * _Nonnull)value
                                          params:(MTRWriteParams * _Nullable)params
                                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLampManufacturerWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12933,10 +10129,6 @@ labels.
 - (void)writeAttributeLampRatedHoursWithValue:(NSNumber * _Nullable)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLampRatedHoursWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12954,10 +10146,6 @@ labels.
 - (void)writeAttributeLampBurnHoursWithValue:(NSNumber * _Nullable)value
                                       params:(MTRWriteParams * _Nullable)params
                                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLampBurnHoursWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12975,10 +10163,6 @@ labels.
 - (void)writeAttributeLampAlarmModeWithValue:(NSNumber * _Nonnull)value
                                       params:(MTRWriteParams * _Nullable)params
                                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLampAlarmModeWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -12996,10 +10180,6 @@ labels.
 - (void)writeAttributeLampBurnHoursTripPointWithValue:(NSNumber * _Nullable)value
                                                params:(MTRWriteParams * _Nullable)params
                                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLampBurnHoursTripPointWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -13012,10 +10192,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -13028,10 +10204,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -13044,10 +10216,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13060,10 +10228,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13076,10 +10240,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13107,10 +10267,6 @@ labels.
 
 - (void)readAttributeMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMeasuredValueWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13123,10 +10279,6 @@ labels.
 
 - (void)readAttributeMinMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMinMeasuredValueWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13139,10 +10291,6 @@ labels.
 
 - (void)readAttributeMaxMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxMeasuredValueWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13155,10 +10303,6 @@ labels.
 
 - (void)readAttributeToleranceWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeToleranceWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13171,10 +10315,6 @@ labels.
 
 - (void)readAttributeLightSensorTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLightSensorTypeWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13187,10 +10327,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -13203,10 +10339,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -13219,10 +10351,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13235,10 +10363,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13251,10 +10375,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13282,10 +10402,6 @@ labels.
 
 - (void)readAttributeMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMeasuredValueWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13298,10 +10414,6 @@ labels.
 
 - (void)readAttributeMinMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMinMeasuredValueWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13314,10 +10426,6 @@ labels.
 
 - (void)readAttributeMaxMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxMeasuredValueWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13330,10 +10438,6 @@ labels.
 
 - (void)readAttributeToleranceWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeToleranceWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13346,10 +10450,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -13362,10 +10462,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -13378,10 +10474,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13394,10 +10486,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13410,10 +10498,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13441,10 +10525,6 @@ labels.
 
 - (void)readAttributeMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMeasuredValueWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13457,10 +10537,6 @@ labels.
 
 - (void)readAttributeMinMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMinMeasuredValueWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13473,10 +10549,6 @@ labels.
 
 - (void)readAttributeMaxMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxMeasuredValueWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13489,10 +10561,6 @@ labels.
 
 - (void)readAttributeToleranceWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeToleranceWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13505,10 +10573,6 @@ labels.
 
 - (void)readAttributeScaledValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeScaledValueWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13521,10 +10585,6 @@ labels.
 
 - (void)readAttributeMinScaledValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMinScaledValueWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13537,10 +10597,6 @@ labels.
 
 - (void)readAttributeMaxScaledValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxScaledValueWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13553,10 +10609,6 @@ labels.
 
 - (void)readAttributeScaledToleranceWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeScaledToleranceWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13569,10 +10621,6 @@ labels.
 
 - (void)readAttributeScaleWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeScaleWithParams:(MTRSubscribeParams *)params
                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13585,10 +10633,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -13601,10 +10645,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -13617,10 +10657,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13633,10 +10669,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13649,10 +10681,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13680,10 +10708,6 @@ labels.
 
 - (void)readAttributeMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMeasuredValueWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13696,10 +10720,6 @@ labels.
 
 - (void)readAttributeMinMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMinMeasuredValueWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13712,10 +10732,6 @@ labels.
 
 - (void)readAttributeMaxMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxMeasuredValueWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13728,10 +10744,6 @@ labels.
 
 - (void)readAttributeToleranceWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeToleranceWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13744,10 +10756,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -13760,10 +10768,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -13776,10 +10780,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13792,10 +10792,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13808,10 +10804,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13839,10 +10831,6 @@ labels.
 
 - (void)readAttributeMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMeasuredValueWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13855,10 +10843,6 @@ labels.
 
 - (void)readAttributeMinMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMinMeasuredValueWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13871,10 +10855,6 @@ labels.
 
 - (void)readAttributeMaxMeasuredValueWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMaxMeasuredValueWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13887,10 +10867,6 @@ labels.
 
 - (void)readAttributeToleranceWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeToleranceWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13903,10 +10879,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -13919,10 +10891,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -13935,10 +10903,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13951,10 +10915,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13967,10 +10927,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -13998,10 +10954,6 @@ labels.
 
 - (void)readAttributeOccupancyWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOccupancyWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14014,10 +10966,6 @@ labels.
 
 - (void)readAttributeOccupancySensorTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOccupancySensorTypeWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -14030,10 +10978,6 @@ labels.
 
 - (void)readAttributeOccupancySensorTypeBitmapWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOccupancySensorTypeBitmapWithParams:(MTRSubscribeParams *)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                 reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -14051,10 +10995,6 @@ labels.
 - (void)writeAttributePirOccupiedToUnoccupiedDelayWithValue:(NSNumber * _Nonnull)value
                                                      params:(MTRWriteParams * _Nullable)params
                                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePirOccupiedToUnoccupiedDelayWithParams:(MTRSubscribeParams *)params
                                          subscriptionEstablished:
                                              (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -14073,10 +11013,6 @@ labels.
 - (void)writeAttributePirUnoccupiedToOccupiedDelayWithValue:(NSNumber * _Nonnull)value
                                                      params:(MTRWriteParams * _Nullable)params
                                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePirUnoccupiedToOccupiedDelayWithParams:(MTRSubscribeParams *)params
                                          subscriptionEstablished:
                                              (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -14095,10 +11031,6 @@ labels.
 - (void)writeAttributePirUnoccupiedToOccupiedThresholdWithValue:(NSNumber * _Nonnull)value
                                                          params:(MTRWriteParams * _Nullable)params
                                                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePirUnoccupiedToOccupiedThresholdWithParams:(MTRSubscribeParams *)params
                                              subscriptionEstablished:
                                                  (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -14119,10 +11051,6 @@ labels.
 - (void)writeAttributeUltrasonicOccupiedToUnoccupiedDelayWithValue:(NSNumber * _Nonnull)value
                                                             params:(MTRWriteParams * _Nullable)params
                                                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeUltrasonicOccupiedToUnoccupiedDelayWithParams:(MTRSubscribeParams *)params
                                                 subscriptionEstablished:
                                                     (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -14143,10 +11071,6 @@ labels.
 - (void)writeAttributeUltrasonicUnoccupiedToOccupiedDelayWithValue:(NSNumber * _Nonnull)value
                                                             params:(MTRWriteParams * _Nullable)params
                                                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeUltrasonicUnoccupiedToOccupiedDelayWithParams:(MTRSubscribeParams *)params
                                                 subscriptionEstablished:
                                                     (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -14167,10 +11091,6 @@ labels.
 - (void)writeAttributeUltrasonicUnoccupiedToOccupiedThresholdWithValue:(NSNumber * _Nonnull)value
                                                                 params:(MTRWriteParams * _Nullable)params
                                                             completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeUltrasonicUnoccupiedToOccupiedThresholdWithParams:(MTRSubscribeParams *)params
                                                     subscriptionEstablished:
                                                         (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -14191,10 +11111,6 @@ labels.
 - (void)writeAttributePhysicalContactOccupiedToUnoccupiedDelayWithValue:(NSNumber * _Nonnull)value
                                                                  params:(MTRWriteParams * _Nullable)params
                                                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePhysicalContactOccupiedToUnoccupiedDelayWithParams:(MTRSubscribeParams *)params
                                                      subscriptionEstablished:
                                                          (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -14216,10 +11132,6 @@ labels.
 - (void)writeAttributePhysicalContactUnoccupiedToOccupiedDelayWithValue:(NSNumber * _Nonnull)value
                                                                  params:(MTRWriteParams * _Nullable)params
                                                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePhysicalContactUnoccupiedToOccupiedDelayWithParams:(MTRSubscribeParams *)params
                                                      subscriptionEstablished:
                                                          (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -14241,10 +11153,6 @@ labels.
 - (void)writeAttributePhysicalContactUnoccupiedToOccupiedThresholdWithValue:(NSNumber * _Nonnull)value
                                                                      params:(MTRWriteParams * _Nullable)params
                                                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePhysicalContactUnoccupiedToOccupiedThresholdWithParams:(MTRSubscribeParams *)params
                                                          subscriptionEstablished:
                                                              (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -14261,10 +11169,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -14277,10 +11181,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -14293,10 +11193,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14309,10 +11205,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14325,10 +11217,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14356,10 +11244,6 @@ labels.
 
 - (void)readAttributeMACAddressWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMACAddressWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14372,10 +11256,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -14388,10 +11268,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -14404,10 +11280,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14420,10 +11292,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14436,10 +11304,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14475,10 +11339,6 @@ labels.
 
 - (void)readAttributeChannelListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeChannelListWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14491,10 +11351,6 @@ labels.
 
 - (void)readAttributeLineupWithCompletion:(void (^)(MTRChannelClusterLineupInfo * _Nullable value,
                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLineupWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(MTRChannelClusterLineupInfo * _Nullable value,
@@ -14507,10 +11363,6 @@ labels.
 
 - (void)readAttributeCurrentChannelWithCompletion:(void (^)(MTRChannelClusterChannelInfo * _Nullable value,
                                                       NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentChannelWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(MTRChannelClusterChannelInfo * _Nullable value,
@@ -14523,10 +11375,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -14539,10 +11387,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -14555,10 +11399,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14571,10 +11411,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14587,10 +11423,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14622,10 +11454,6 @@ labels.
 
 - (void)readAttributeTargetListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTargetListWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14638,10 +11466,6 @@ labels.
 
 - (void)readAttributeCurrentTargetWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentTargetWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14654,10 +11478,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -14670,10 +11490,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -14686,10 +11502,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14702,10 +11514,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14718,10 +11526,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14800,10 +11604,6 @@ labels.
 
 - (void)readAttributeCurrentStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentStateWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14816,10 +11616,6 @@ labels.
 
 - (void)readAttributeStartTimeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeStartTimeWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14832,10 +11628,6 @@ labels.
 
 - (void)readAttributeDurationWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDurationWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14848,10 +11640,6 @@ labels.
 
 - (void)readAttributeSampledPositionWithCompletion:(void (^)(MTRMediaPlaybackClusterPlaybackPosition * _Nullable value,
                                                        NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSampledPositionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(MTRMediaPlaybackClusterPlaybackPosition * _Nullable value,
@@ -14864,10 +11652,6 @@ labels.
 
 - (void)readAttributePlaybackSpeedWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePlaybackSpeedWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14880,10 +11664,6 @@ labels.
 
 - (void)readAttributeSeekRangeEndWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSeekRangeEndWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14896,10 +11676,6 @@ labels.
 
 - (void)readAttributeSeekRangeStartWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSeekRangeStartWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14912,10 +11688,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -14928,10 +11700,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -14944,10 +11712,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14960,10 +11724,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -14976,10 +11736,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15018,10 +11774,6 @@ labels.
 
 - (void)readAttributeInputListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInputListWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15034,10 +11786,6 @@ labels.
 
 - (void)readAttributeCurrentInputWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentInputWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15050,10 +11798,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -15066,10 +11810,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -15082,10 +11822,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15098,10 +11834,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15114,10 +11846,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15149,10 +11877,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -15165,10 +11889,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -15181,10 +11901,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15197,10 +11913,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15213,10 +11925,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15248,10 +11956,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -15264,10 +11968,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -15280,10 +11980,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15296,10 +11992,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15312,10 +12004,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15350,10 +12038,6 @@ labels.
 
 - (void)readAttributeAcceptHeaderWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptHeaderWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15371,10 +12055,6 @@ labels.
 - (void)writeAttributeSupportedStreamingProtocolsWithValue:(NSNumber * _Nonnull)value
                                                     params:(MTRWriteParams * _Nullable)params
                                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeSupportedStreamingProtocolsWithParams:(MTRSubscribeParams *)params
                                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -15387,10 +12067,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -15403,10 +12079,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -15419,10 +12091,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15435,10 +12103,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15451,10 +12115,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15487,10 +12147,6 @@ labels.
 
 - (void)readAttributeOutputListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOutputListWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15503,10 +12159,6 @@ labels.
 
 - (void)readAttributeCurrentOutputWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentOutputWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15519,10 +12171,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -15535,10 +12183,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -15551,10 +12195,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15567,10 +12207,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15583,10 +12219,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15624,10 +12256,6 @@ labels.
 
 - (void)readAttributeCatalogListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCatalogListWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15645,10 +12273,6 @@ labels.
 - (void)writeAttributeCurrentAppWithValue:(MTRApplicationLauncherClusterApplicationEP * _Nullable)value
                                    params:(MTRWriteParams * _Nullable)params
                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentAppWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(MTRApplicationLauncherClusterApplicationEP * _Nullable value,
@@ -15661,10 +12285,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -15677,10 +12297,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -15693,10 +12309,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15709,10 +12321,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15725,10 +12333,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15757,10 +12361,6 @@ labels.
 
 - (void)readAttributeVendorNameWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeVendorNameWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15773,10 +12373,6 @@ labels.
 
 - (void)readAttributeVendorIDWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeVendorIDWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15789,10 +12385,6 @@ labels.
 
 - (void)readAttributeApplicationNameWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeApplicationNameWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15805,10 +12397,6 @@ labels.
 
 - (void)readAttributeProductIDWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeProductIDWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15821,10 +12409,6 @@ labels.
 
 - (void)readAttributeApplicationWithCompletion:(void (^)(MTRApplicationBasicClusterApplicationBasicApplication * _Nullable value,
                                                    NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeApplicationWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(MTRApplicationBasicClusterApplicationBasicApplication * _Nullable value,
@@ -15838,10 +12422,6 @@ labels.
 
 - (void)readAttributeStatusWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeStatusWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15854,10 +12434,6 @@ labels.
 
 - (void)readAttributeApplicationVersionWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeApplicationVersionWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSString * _Nullable value,
@@ -15870,10 +12446,6 @@ labels.
 
 - (void)readAttributeAllowedVendorListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAllowedVendorListWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15886,10 +12458,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -15902,10 +12470,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -15918,10 +12482,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15934,10 +12494,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15950,10 +12506,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -15991,10 +12543,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -16007,10 +12555,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -16023,10 +12567,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16039,10 +12579,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16055,10 +12591,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16093,10 +12625,6 @@ labels.
 
 - (void)readAttributeMeasurementTypeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMeasurementTypeWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16109,10 +12637,6 @@ labels.
 
 - (void)readAttributeDcVoltageWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDcVoltageWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16125,10 +12649,6 @@ labels.
 
 - (void)readAttributeDcVoltageMinWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDcVoltageMinWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16141,10 +12661,6 @@ labels.
 
 - (void)readAttributeDcVoltageMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDcVoltageMaxWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16157,10 +12673,6 @@ labels.
 
 - (void)readAttributeDcCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDcCurrentWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16173,10 +12685,6 @@ labels.
 
 - (void)readAttributeDcCurrentMinWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDcCurrentMinWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16189,10 +12697,6 @@ labels.
 
 - (void)readAttributeDcCurrentMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDcCurrentMaxWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16205,10 +12709,6 @@ labels.
 
 - (void)readAttributeDcPowerWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDcPowerWithParams:(MTRSubscribeParams *)params
                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                               reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16221,10 +12721,6 @@ labels.
 
 - (void)readAttributeDcPowerMinWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDcPowerMinWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16237,10 +12733,6 @@ labels.
 
 - (void)readAttributeDcPowerMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDcPowerMaxWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16253,10 +12745,6 @@ labels.
 
 - (void)readAttributeDcVoltageMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDcVoltageMultiplierWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -16269,10 +12757,6 @@ labels.
 
 - (void)readAttributeDcVoltageDivisorWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDcVoltageDivisorWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16285,10 +12769,6 @@ labels.
 
 - (void)readAttributeDcCurrentMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDcCurrentMultiplierWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -16301,10 +12781,6 @@ labels.
 
 - (void)readAttributeDcCurrentDivisorWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDcCurrentDivisorWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16317,10 +12793,6 @@ labels.
 
 - (void)readAttributeDcPowerMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDcPowerMultiplierWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16333,10 +12805,6 @@ labels.
 
 - (void)readAttributeDcPowerDivisorWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeDcPowerDivisorWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16349,10 +12817,6 @@ labels.
 
 - (void)readAttributeAcFrequencyWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcFrequencyWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16365,10 +12829,6 @@ labels.
 
 - (void)readAttributeAcFrequencyMinWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcFrequencyMinWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16381,10 +12841,6 @@ labels.
 
 - (void)readAttributeAcFrequencyMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcFrequencyMaxWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16397,10 +12853,6 @@ labels.
 
 - (void)readAttributeNeutralCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNeutralCurrentWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16413,10 +12865,6 @@ labels.
 
 - (void)readAttributeTotalActivePowerWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTotalActivePowerWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16429,10 +12877,6 @@ labels.
 
 - (void)readAttributeTotalReactivePowerWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTotalReactivePowerWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -16445,10 +12889,6 @@ labels.
 
 - (void)readAttributeTotalApparentPowerWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTotalApparentPowerWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -16461,10 +12901,6 @@ labels.
 
 - (void)readAttributeMeasured1stHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMeasured1stHarmonicCurrentWithParams:(MTRSubscribeParams *)params
                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                  reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -16477,10 +12913,6 @@ labels.
 
 - (void)readAttributeMeasured3rdHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMeasured3rdHarmonicCurrentWithParams:(MTRSubscribeParams *)params
                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                  reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -16493,10 +12925,6 @@ labels.
 
 - (void)readAttributeMeasured5thHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMeasured5thHarmonicCurrentWithParams:(MTRSubscribeParams *)params
                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                  reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -16509,10 +12937,6 @@ labels.
 
 - (void)readAttributeMeasured7thHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMeasured7thHarmonicCurrentWithParams:(MTRSubscribeParams *)params
                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                  reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -16525,10 +12949,6 @@ labels.
 
 - (void)readAttributeMeasured9thHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMeasured9thHarmonicCurrentWithParams:(MTRSubscribeParams *)params
                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                  reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -16541,10 +12961,6 @@ labels.
 
 - (void)readAttributeMeasured11thHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMeasured11thHarmonicCurrentWithParams:(MTRSubscribeParams *)params
                                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -16557,10 +12973,6 @@ labels.
 
 - (void)readAttributeMeasuredPhase1stHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMeasuredPhase1stHarmonicCurrentWithParams:(MTRSubscribeParams *)params
                                             subscriptionEstablished:
                                                 (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -16576,10 +12988,6 @@ labels.
 
 - (void)readAttributeMeasuredPhase3rdHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMeasuredPhase3rdHarmonicCurrentWithParams:(MTRSubscribeParams *)params
                                             subscriptionEstablished:
                                                 (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -16595,10 +13003,6 @@ labels.
 
 - (void)readAttributeMeasuredPhase5thHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMeasuredPhase5thHarmonicCurrentWithParams:(MTRSubscribeParams *)params
                                             subscriptionEstablished:
                                                 (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -16614,10 +13018,6 @@ labels.
 
 - (void)readAttributeMeasuredPhase7thHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMeasuredPhase7thHarmonicCurrentWithParams:(MTRSubscribeParams *)params
                                             subscriptionEstablished:
                                                 (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -16633,10 +13033,6 @@ labels.
 
 - (void)readAttributeMeasuredPhase9thHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMeasuredPhase9thHarmonicCurrentWithParams:(MTRSubscribeParams *)params
                                             subscriptionEstablished:
                                                 (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -16652,10 +13048,6 @@ labels.
 
 - (void)readAttributeMeasuredPhase11thHarmonicCurrentWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeMeasuredPhase11thHarmonicCurrentWithParams:(MTRSubscribeParams *)params
                                              subscriptionEstablished:
                                                  (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -16671,10 +13063,6 @@ labels.
 
 - (void)readAttributeAcFrequencyMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcFrequencyMultiplierWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -16687,10 +13075,6 @@ labels.
 
 - (void)readAttributeAcFrequencyDivisorWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcFrequencyDivisorWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -16703,10 +13087,6 @@ labels.
 
 - (void)readAttributePowerMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePowerMultiplierWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16719,10 +13099,6 @@ labels.
 
 - (void)readAttributePowerDivisorWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePowerDivisorWithParams:(MTRSubscribeParams *)params
                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16735,10 +13111,6 @@ labels.
 
 - (void)readAttributeHarmonicCurrentMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeHarmonicCurrentMultiplierWithParams:(MTRSubscribeParams *)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                 reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -16751,10 +13123,6 @@ labels.
 
 - (void)readAttributePhaseHarmonicCurrentMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePhaseHarmonicCurrentMultiplierWithParams:(MTRSubscribeParams *)params
                                            subscriptionEstablished:
                                                (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -16768,10 +13136,6 @@ labels.
 
 - (void)readAttributeInstantaneousVoltageWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInstantaneousVoltageWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -16784,10 +13148,6 @@ labels.
 
 - (void)readAttributeInstantaneousLineCurrentWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInstantaneousLineCurrentWithParams:(MTRSubscribeParams *)params
                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -16800,10 +13160,6 @@ labels.
 
 - (void)readAttributeInstantaneousActiveCurrentWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInstantaneousActiveCurrentWithParams:(MTRSubscribeParams *)params
                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                  reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -16816,10 +13172,6 @@ labels.
 
 - (void)readAttributeInstantaneousReactiveCurrentWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInstantaneousReactiveCurrentWithParams:(MTRSubscribeParams *)params
                                          subscriptionEstablished:
                                              (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -16833,10 +13185,6 @@ labels.
 
 - (void)readAttributeInstantaneousPowerWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInstantaneousPowerWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -16849,10 +13197,6 @@ labels.
 
 - (void)readAttributeRmsVoltageWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsVoltageWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16865,10 +13209,6 @@ labels.
 
 - (void)readAttributeRmsVoltageMinWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsVoltageMinWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16881,10 +13221,6 @@ labels.
 
 - (void)readAttributeRmsVoltageMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsVoltageMaxWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16897,10 +13233,6 @@ labels.
 
 - (void)readAttributeRmsCurrentWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsCurrentWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16913,10 +13245,6 @@ labels.
 
 - (void)readAttributeRmsCurrentMinWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsCurrentMinWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16929,10 +13257,6 @@ labels.
 
 - (void)readAttributeRmsCurrentMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsCurrentMaxWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16945,10 +13269,6 @@ labels.
 
 - (void)readAttributeActivePowerWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActivePowerWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16961,10 +13281,6 @@ labels.
 
 - (void)readAttributeActivePowerMinWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActivePowerMinWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16977,10 +13293,6 @@ labels.
 
 - (void)readAttributeActivePowerMaxWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActivePowerMaxWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -16993,10 +13305,6 @@ labels.
 
 - (void)readAttributeReactivePowerWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeReactivePowerWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17009,10 +13317,6 @@ labels.
 
 - (void)readAttributeApparentPowerWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeApparentPowerWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17025,10 +13329,6 @@ labels.
 
 - (void)readAttributePowerFactorWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePowerFactorWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17046,10 +13346,6 @@ labels.
 - (void)writeAttributeAverageRmsVoltageMeasurementPeriodWithValue:(NSNumber * _Nonnull)value
                                                            params:(MTRWriteParams * _Nullable)params
                                                        completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAverageRmsVoltageMeasurementPeriodWithParams:(MTRSubscribeParams *)params
                                                subscriptionEstablished:
                                                    (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -17070,10 +13366,6 @@ labels.
 - (void)writeAttributeAverageRmsUnderVoltageCounterWithValue:(NSNumber * _Nonnull)value
                                                       params:(MTRWriteParams * _Nullable)params
                                                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAverageRmsUnderVoltageCounterWithParams:(MTRSubscribeParams *)params
                                           subscriptionEstablished:
                                               (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -17092,10 +13384,6 @@ labels.
 - (void)writeAttributeRmsExtremeOverVoltagePeriodWithValue:(NSNumber * _Nonnull)value
                                                     params:(MTRWriteParams * _Nullable)params
                                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsExtremeOverVoltagePeriodWithParams:(MTRSubscribeParams *)params
                                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17113,10 +13401,6 @@ labels.
 - (void)writeAttributeRmsExtremeUnderVoltagePeriodWithValue:(NSNumber * _Nonnull)value
                                                      params:(MTRWriteParams * _Nullable)params
                                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsExtremeUnderVoltagePeriodWithParams:(MTRSubscribeParams *)params
                                          subscriptionEstablished:
                                              (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -17135,10 +13419,6 @@ labels.
 - (void)writeAttributeRmsVoltageSagPeriodWithValue:(NSNumber * _Nonnull)value
                                             params:(MTRWriteParams * _Nullable)params
                                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsVoltageSagPeriodWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17156,10 +13436,6 @@ labels.
 - (void)writeAttributeRmsVoltageSwellPeriodWithValue:(NSNumber * _Nonnull)value
                                               params:(MTRWriteParams * _Nullable)params
                                           completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsVoltageSwellPeriodWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17172,10 +13448,6 @@ labels.
 
 - (void)readAttributeAcVoltageMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcVoltageMultiplierWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17188,10 +13460,6 @@ labels.
 
 - (void)readAttributeAcVoltageDivisorWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcVoltageDivisorWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17204,10 +13472,6 @@ labels.
 
 - (void)readAttributeAcCurrentMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcCurrentMultiplierWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17220,10 +13484,6 @@ labels.
 
 - (void)readAttributeAcCurrentDivisorWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcCurrentDivisorWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17236,10 +13496,6 @@ labels.
 
 - (void)readAttributeAcPowerMultiplierWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcPowerMultiplierWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17252,10 +13508,6 @@ labels.
 
 - (void)readAttributeAcPowerDivisorWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcPowerDivisorWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17273,10 +13525,6 @@ labels.
 - (void)writeAttributeOverloadAlarmsMaskWithValue:(NSNumber * _Nonnull)value
                                            params:(MTRWriteParams * _Nullable)params
                                        completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOverloadAlarmsMaskWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17289,10 +13537,6 @@ labels.
 
 - (void)readAttributeVoltageOverloadWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeVoltageOverloadWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17305,10 +13549,6 @@ labels.
 
 - (void)readAttributeCurrentOverloadWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCurrentOverloadWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17326,10 +13566,6 @@ labels.
 - (void)writeAttributeAcOverloadAlarmsMaskWithValue:(NSNumber * _Nonnull)value
                                              params:(MTRWriteParams * _Nullable)params
                                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcOverloadAlarmsMaskWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17342,10 +13578,6 @@ labels.
 
 - (void)readAttributeAcVoltageOverloadWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcVoltageOverloadWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17358,10 +13590,6 @@ labels.
 
 - (void)readAttributeAcCurrentOverloadWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcCurrentOverloadWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17374,10 +13602,6 @@ labels.
 
 - (void)readAttributeAcActivePowerOverloadWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcActivePowerOverloadWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17390,10 +13614,6 @@ labels.
 
 - (void)readAttributeAcReactivePowerOverloadWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcReactivePowerOverloadWithParams:(MTRSubscribeParams *)params
                                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                               reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17406,10 +13626,6 @@ labels.
 
 - (void)readAttributeAverageRmsOverVoltageWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAverageRmsOverVoltageWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17422,10 +13638,6 @@ labels.
 
 - (void)readAttributeAverageRmsUnderVoltageWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAverageRmsUnderVoltageWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17438,10 +13650,6 @@ labels.
 
 - (void)readAttributeRmsExtremeOverVoltageWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsExtremeOverVoltageWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17454,10 +13662,6 @@ labels.
 
 - (void)readAttributeRmsExtremeUnderVoltageWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsExtremeUnderVoltageWithParams:(MTRSubscribeParams *)params
                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                              reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17470,10 +13674,6 @@ labels.
 
 - (void)readAttributeRmsVoltageSagWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsVoltageSagWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17486,10 +13686,6 @@ labels.
 
 - (void)readAttributeRmsVoltageSwellWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsVoltageSwellWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17502,10 +13698,6 @@ labels.
 
 - (void)readAttributeLineCurrentPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLineCurrentPhaseBWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17518,10 +13710,6 @@ labels.
 
 - (void)readAttributeActiveCurrentPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActiveCurrentPhaseBWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17534,10 +13722,6 @@ labels.
 
 - (void)readAttributeReactiveCurrentPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeReactiveCurrentPhaseBWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17550,10 +13734,6 @@ labels.
 
 - (void)readAttributeRmsVoltagePhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsVoltagePhaseBWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17566,10 +13746,6 @@ labels.
 
 - (void)readAttributeRmsVoltageMinPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsVoltageMinPhaseBWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17582,10 +13758,6 @@ labels.
 
 - (void)readAttributeRmsVoltageMaxPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsVoltageMaxPhaseBWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17598,10 +13770,6 @@ labels.
 
 - (void)readAttributeRmsCurrentPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsCurrentPhaseBWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17614,10 +13782,6 @@ labels.
 
 - (void)readAttributeRmsCurrentMinPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsCurrentMinPhaseBWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17630,10 +13794,6 @@ labels.
 
 - (void)readAttributeRmsCurrentMaxPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsCurrentMaxPhaseBWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17646,10 +13806,6 @@ labels.
 
 - (void)readAttributeActivePowerPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActivePowerPhaseBWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17662,10 +13818,6 @@ labels.
 
 - (void)readAttributeActivePowerMinPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActivePowerMinPhaseBWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17678,10 +13830,6 @@ labels.
 
 - (void)readAttributeActivePowerMaxPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActivePowerMaxPhaseBWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17694,10 +13842,6 @@ labels.
 
 - (void)readAttributeReactivePowerPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeReactivePowerPhaseBWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17710,10 +13854,6 @@ labels.
 
 - (void)readAttributeApparentPowerPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeApparentPowerPhaseBWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17726,10 +13866,6 @@ labels.
 
 - (void)readAttributePowerFactorPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePowerFactorPhaseBWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17742,10 +13878,6 @@ labels.
 
 - (void)readAttributeAverageRmsVoltageMeasurementPeriodPhaseBWithCompletion:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAverageRmsVoltageMeasurementPeriodPhaseBWithParams:(MTRSubscribeParams *)params
                                                      subscriptionEstablished:
                                                          (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -17762,10 +13894,6 @@ labels.
 
 - (void)readAttributeAverageRmsOverVoltageCounterPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                           NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAverageRmsOverVoltageCounterPhaseBWithParams:(MTRSubscribeParams *)params
                                                subscriptionEstablished:
                                                    (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -17781,10 +13909,6 @@ labels.
 
 - (void)readAttributeAverageRmsUnderVoltageCounterPhaseBWithCompletion:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAverageRmsUnderVoltageCounterPhaseBWithParams:(MTRSubscribeParams *)params
                                                 subscriptionEstablished:
                                                     (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -17800,10 +13924,6 @@ labels.
 
 - (void)readAttributeRmsExtremeOverVoltagePeriodPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                          NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsExtremeOverVoltagePeriodPhaseBWithParams:(MTRSubscribeParams *)params
                                               subscriptionEstablished:
                                                   (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -17819,10 +13939,6 @@ labels.
 
 - (void)readAttributeRmsExtremeUnderVoltagePeriodPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                           NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsExtremeUnderVoltagePeriodPhaseBWithParams:(MTRSubscribeParams *)params
                                                subscriptionEstablished:
                                                    (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -17838,10 +13954,6 @@ labels.
 
 - (void)readAttributeRmsVoltageSagPeriodPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsVoltageSagPeriodPhaseBWithParams:(MTRSubscribeParams *)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                 reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17854,10 +13966,6 @@ labels.
 
 - (void)readAttributeRmsVoltageSwellPeriodPhaseBWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsVoltageSwellPeriodPhaseBWithParams:(MTRSubscribeParams *)params
                                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17870,10 +13978,6 @@ labels.
 
 - (void)readAttributeLineCurrentPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLineCurrentPhaseCWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17886,10 +13990,6 @@ labels.
 
 - (void)readAttributeActiveCurrentPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActiveCurrentPhaseCWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17902,10 +14002,6 @@ labels.
 
 - (void)readAttributeReactiveCurrentPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeReactiveCurrentPhaseCWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17918,10 +14014,6 @@ labels.
 
 - (void)readAttributeRmsVoltagePhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsVoltagePhaseCWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17934,10 +14026,6 @@ labels.
 
 - (void)readAttributeRmsVoltageMinPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsVoltageMinPhaseCWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17950,10 +14038,6 @@ labels.
 
 - (void)readAttributeRmsVoltageMaxPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsVoltageMaxPhaseCWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17966,10 +14050,6 @@ labels.
 
 - (void)readAttributeRmsCurrentPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsCurrentPhaseCWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -17982,10 +14062,6 @@ labels.
 
 - (void)readAttributeRmsCurrentMinPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsCurrentMinPhaseCWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -17998,10 +14074,6 @@ labels.
 
 - (void)readAttributeRmsCurrentMaxPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsCurrentMaxPhaseCWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -18014,10 +14086,6 @@ labels.
 
 - (void)readAttributeActivePowerPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActivePowerPhaseCWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18030,10 +14098,6 @@ labels.
 
 - (void)readAttributeActivePowerMinPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActivePowerMinPhaseCWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -18046,10 +14110,6 @@ labels.
 
 - (void)readAttributeActivePowerMaxPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeActivePowerMaxPhaseCWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -18062,10 +14122,6 @@ labels.
 
 - (void)readAttributeReactivePowerPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeReactivePowerPhaseCWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -18078,10 +14134,6 @@ labels.
 
 - (void)readAttributeApparentPowerPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeApparentPowerPhaseCWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -18094,10 +14146,6 @@ labels.
 
 - (void)readAttributePowerFactorPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributePowerFactorPhaseCWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18110,10 +14158,6 @@ labels.
 
 - (void)readAttributeAverageRmsVoltageMeasurementPeriodPhaseCWithCompletion:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAverageRmsVoltageMeasurementPeriodPhaseCWithParams:(MTRSubscribeParams *)params
                                                      subscriptionEstablished:
                                                          (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -18130,10 +14174,6 @@ labels.
 
 - (void)readAttributeAverageRmsOverVoltageCounterPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                           NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAverageRmsOverVoltageCounterPhaseCWithParams:(MTRSubscribeParams *)params
                                                subscriptionEstablished:
                                                    (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -18149,10 +14189,6 @@ labels.
 
 - (void)readAttributeAverageRmsUnderVoltageCounterPhaseCWithCompletion:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAverageRmsUnderVoltageCounterPhaseCWithParams:(MTRSubscribeParams *)params
                                                 subscriptionEstablished:
                                                     (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -18168,10 +14204,6 @@ labels.
 
 - (void)readAttributeRmsExtremeOverVoltagePeriodPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                          NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsExtremeOverVoltagePeriodPhaseCWithParams:(MTRSubscribeParams *)params
                                               subscriptionEstablished:
                                                   (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -18187,10 +14219,6 @@ labels.
 
 - (void)readAttributeRmsExtremeUnderVoltagePeriodPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                           NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsExtremeUnderVoltagePeriodPhaseCWithParams:(MTRSubscribeParams *)params
                                                subscriptionEstablished:
                                                    (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -18206,10 +14234,6 @@ labels.
 
 - (void)readAttributeRmsVoltageSagPeriodPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsVoltageSagPeriodPhaseCWithParams:(MTRSubscribeParams *)params
                                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                 reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -18222,10 +14246,6 @@ labels.
 
 - (void)readAttributeRmsVoltageSwellPeriodPhaseCWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRmsVoltageSwellPeriodPhaseCWithParams:(MTRSubscribeParams *)params
                                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -18238,10 +14258,6 @@ labels.
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -18254,10 +14270,6 @@ labels.
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -18270,10 +14282,6 @@ labels.
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18286,10 +14294,6 @@ labels.
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18302,10 +14306,6 @@ labels.
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18413,10 +14413,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeBooleanWithValue:(NSNumber * _Nonnull)value
                                 params:(MTRWriteParams * _Nullable)params
                             completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBooleanWithParams:(MTRSubscribeParams *)params
                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                               reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18433,10 +14429,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeBitmap8WithValue:(NSNumber * _Nonnull)value
                                 params:(MTRWriteParams * _Nullable)params
                             completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBitmap8WithParams:(MTRSubscribeParams *)params
                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                               reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18453,10 +14445,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeBitmap16WithValue:(NSNumber * _Nonnull)value
                                  params:(MTRWriteParams * _Nullable)params
                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBitmap16WithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18473,10 +14461,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeBitmap32WithValue:(NSNumber * _Nonnull)value
                                  params:(MTRWriteParams * _Nullable)params
                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBitmap32WithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18493,10 +14477,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeBitmap64WithValue:(NSNumber * _Nonnull)value
                                  params:(MTRWriteParams * _Nullable)params
                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeBitmap64WithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18513,10 +14493,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeInt8uWithValue:(NSNumber * _Nonnull)value
                               params:(MTRWriteParams * _Nullable)params
                           completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInt8uWithParams:(MTRSubscribeParams *)params
                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18533,10 +14509,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeInt16uWithValue:(NSNumber * _Nonnull)value
                                params:(MTRWriteParams * _Nullable)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInt16uWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18553,10 +14525,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeInt24uWithValue:(NSNumber * _Nonnull)value
                                params:(MTRWriteParams * _Nullable)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInt24uWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18573,10 +14541,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeInt32uWithValue:(NSNumber * _Nonnull)value
                                params:(MTRWriteParams * _Nullable)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInt32uWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18593,10 +14557,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeInt40uWithValue:(NSNumber * _Nonnull)value
                                params:(MTRWriteParams * _Nullable)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInt40uWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18613,10 +14573,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeInt48uWithValue:(NSNumber * _Nonnull)value
                                params:(MTRWriteParams * _Nullable)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInt48uWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18633,10 +14589,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeInt56uWithValue:(NSNumber * _Nonnull)value
                                params:(MTRWriteParams * _Nullable)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInt56uWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18653,10 +14605,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeInt64uWithValue:(NSNumber * _Nonnull)value
                                params:(MTRWriteParams * _Nullable)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInt64uWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18673,10 +14621,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeInt8sWithValue:(NSNumber * _Nonnull)value
                               params:(MTRWriteParams * _Nullable)params
                           completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInt8sWithParams:(MTRSubscribeParams *)params
                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18693,10 +14637,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeInt16sWithValue:(NSNumber * _Nonnull)value
                                params:(MTRWriteParams * _Nullable)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInt16sWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18713,10 +14653,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeInt24sWithValue:(NSNumber * _Nonnull)value
                                params:(MTRWriteParams * _Nullable)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInt24sWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18733,10 +14669,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeInt32sWithValue:(NSNumber * _Nonnull)value
                                params:(MTRWriteParams * _Nullable)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInt32sWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18753,10 +14685,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeInt40sWithValue:(NSNumber * _Nonnull)value
                                params:(MTRWriteParams * _Nullable)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInt40sWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18773,10 +14701,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeInt48sWithValue:(NSNumber * _Nonnull)value
                                params:(MTRWriteParams * _Nullable)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInt48sWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18793,10 +14717,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeInt56sWithValue:(NSNumber * _Nonnull)value
                                params:(MTRWriteParams * _Nullable)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInt56sWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18813,10 +14733,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeInt64sWithValue:(NSNumber * _Nonnull)value
                                params:(MTRWriteParams * _Nullable)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeInt64sWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18833,10 +14749,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeEnum8WithValue:(NSNumber * _Nonnull)value
                               params:(MTRWriteParams * _Nullable)params
                           completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeEnum8WithParams:(MTRSubscribeParams *)params
                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18853,10 +14765,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeEnum16WithValue:(NSNumber * _Nonnull)value
                                params:(MTRWriteParams * _Nullable)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeEnum16WithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18874,10 +14782,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeFloatSingleWithValue:(NSNumber * _Nonnull)value
                                     params:(MTRWriteParams * _Nullable)params
                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFloatSingleWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18895,10 +14799,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeFloatDoubleWithValue:(NSNumber * _Nonnull)value
                                     params:(MTRWriteParams * _Nullable)params
                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFloatDoubleWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18915,10 +14815,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeOctetStringWithValue:(NSData * _Nonnull)value
                                     params:(MTRWriteParams * _Nullable)params
                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeOctetStringWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18935,10 +14831,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeListInt8uWithValue:(NSArray * _Nonnull)value
                                   params:(MTRWriteParams * _Nullable)params
                               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeListInt8uWithParams:(MTRSubscribeParams *)params
                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                 reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18956,10 +14848,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeListOctetStringWithValue:(NSArray * _Nonnull)value
                                         params:(MTRWriteParams * _Nullable)params
                                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeListOctetStringWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -18977,10 +14865,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeListStructOctetStringWithValue:(NSArray * _Nonnull)value
                                               params:(MTRWriteParams * _Nullable)params
                                           completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeListStructOctetStringWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSArray * _Nullable value,
@@ -18998,10 +14882,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeLongOctetStringWithValue:(NSData * _Nonnull)value
                                         params:(MTRWriteParams * _Nullable)params
                                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLongOctetStringWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19018,10 +14898,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeCharStringWithValue:(NSString * _Nonnull)value
                                    params:(MTRWriteParams * _Nullable)params
                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeCharStringWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19039,10 +14915,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeLongCharStringWithValue:(NSString * _Nonnull)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeLongCharStringWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19059,10 +14931,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeEpochUsWithValue:(NSNumber * _Nonnull)value
                                 params:(MTRWriteParams * _Nullable)params
                             completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeEpochUsWithParams:(MTRSubscribeParams *)params
                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                               reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19079,10 +14947,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeEpochSWithValue:(NSNumber * _Nonnull)value
                                params:(MTRWriteParams * _Nullable)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeEpochSWithParams:(MTRSubscribeParams *)params
                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19099,10 +14963,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeVendorIdWithValue:(NSNumber * _Nonnull)value
                                  params:(MTRWriteParams * _Nullable)params
                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeVendorIdWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19120,10 +14980,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeListNullablesAndOptionalsStructWithValue:(NSArray * _Nonnull)value
                                                         params:(MTRWriteParams * _Nullable)params
                                                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeListNullablesAndOptionalsStructWithParams:(MTRSubscribeParams *)params
                                             subscriptionEstablished:
                                                 (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -19143,10 +14999,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeEnumAttrWithValue:(NSNumber * _Nonnull)value
                                  params:(MTRWriteParams * _Nullable)params
                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeEnumAttrWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19164,10 +15016,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeStructAttrWithValue:(MTRUnitTestingClusterSimpleStruct * _Nonnull)value
                                    params:(MTRWriteParams * _Nullable)params
                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeStructAttrWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(MTRUnitTestingClusterSimpleStruct * _Nullable value,
@@ -19185,10 +15033,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeRangeRestrictedInt8uWithValue:(NSNumber * _Nonnull)value
                                              params:(MTRWriteParams * _Nullable)params
                                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRangeRestrictedInt8uWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -19206,10 +15050,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeRangeRestrictedInt8sWithValue:(NSNumber * _Nonnull)value
                                              params:(MTRWriteParams * _Nullable)params
                                          completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRangeRestrictedInt8sWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -19227,10 +15067,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeRangeRestrictedInt16uWithValue:(NSNumber * _Nonnull)value
                                               params:(MTRWriteParams * _Nullable)params
                                           completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRangeRestrictedInt16uWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -19248,10 +15084,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeRangeRestrictedInt16sWithValue:(NSNumber * _Nonnull)value
                                               params:(MTRWriteParams * _Nullable)params
                                           completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeRangeRestrictedInt16sWithParams:(MTRSubscribeParams *)params
                                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                             reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -19269,10 +15101,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeListLongOctetStringWithValue:(NSArray * _Nonnull)value
                                             params:(MTRWriteParams * _Nullable)params
                                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeListLongOctetStringWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -19291,10 +15119,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeListFabricScopedWithValue:(NSArray * _Nonnull)value
                                          params:(MTRWriteParams * _Nullable)params
                                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeListFabricScopedWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19312,10 +15136,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeTimedWriteBooleanWithValue:(NSNumber * _Nonnull)value
                                           params:(MTRWriteParams * _Nullable)params
                                       completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeTimedWriteBooleanWithParams:(MTRSubscribeParams *)params
                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                         reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19333,10 +15153,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeGeneralErrorBooleanWithValue:(NSNumber * _Nonnull)value
                                             params:(MTRWriteParams * _Nullable)params
                                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneralErrorBooleanWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -19354,10 +15170,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeClusterErrorBooleanWithValue:(NSNumber * _Nonnull)value
                                             params:(MTRWriteParams * _Nullable)params
                                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterErrorBooleanWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -19375,10 +15187,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeUnsupportedWithValue:(NSNumber * _Nonnull)value
                                     params:(MTRWriteParams * _Nullable)params
                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeUnsupportedWithParams:(MTRSubscribeParams *)params
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19396,10 +15204,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableBooleanWithValue:(NSNumber * _Nullable)value
                                         params:(MTRWriteParams * _Nullable)params
                                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableBooleanWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19417,10 +15221,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableBitmap8WithValue:(NSNumber * _Nullable)value
                                         params:(MTRWriteParams * _Nullable)params
                                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableBitmap8WithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19438,10 +15238,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableBitmap16WithValue:(NSNumber * _Nullable)value
                                          params:(MTRWriteParams * _Nullable)params
                                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableBitmap16WithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19459,10 +15255,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableBitmap32WithValue:(NSNumber * _Nullable)value
                                          params:(MTRWriteParams * _Nullable)params
                                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableBitmap32WithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19480,10 +15272,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableBitmap64WithValue:(NSNumber * _Nullable)value
                                          params:(MTRWriteParams * _Nullable)params
                                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableBitmap64WithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19501,10 +15289,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableInt8uWithValue:(NSNumber * _Nullable)value
                                       params:(MTRWriteParams * _Nullable)params
                                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableInt8uWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19522,10 +15306,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableInt16uWithValue:(NSNumber * _Nullable)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableInt16uWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19543,10 +15323,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableInt24uWithValue:(NSNumber * _Nullable)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableInt24uWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19564,10 +15340,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableInt32uWithValue:(NSNumber * _Nullable)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableInt32uWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19585,10 +15357,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableInt40uWithValue:(NSNumber * _Nullable)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableInt40uWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19606,10 +15374,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableInt48uWithValue:(NSNumber * _Nullable)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableInt48uWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19627,10 +15391,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableInt56uWithValue:(NSNumber * _Nullable)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableInt56uWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19648,10 +15408,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableInt64uWithValue:(NSNumber * _Nullable)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableInt64uWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19669,10 +15425,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableInt8sWithValue:(NSNumber * _Nullable)value
                                       params:(MTRWriteParams * _Nullable)params
                                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableInt8sWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19690,10 +15442,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableInt16sWithValue:(NSNumber * _Nullable)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableInt16sWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19711,10 +15459,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableInt24sWithValue:(NSNumber * _Nullable)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableInt24sWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19732,10 +15476,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableInt32sWithValue:(NSNumber * _Nullable)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableInt32sWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19753,10 +15493,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableInt40sWithValue:(NSNumber * _Nullable)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableInt40sWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19774,10 +15510,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableInt48sWithValue:(NSNumber * _Nullable)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableInt48sWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19795,10 +15527,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableInt56sWithValue:(NSNumber * _Nullable)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableInt56sWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19816,10 +15544,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableInt64sWithValue:(NSNumber * _Nullable)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableInt64sWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19837,10 +15561,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableEnum8WithValue:(NSNumber * _Nullable)value
                                       params:(MTRWriteParams * _Nullable)params
                                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableEnum8WithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19858,10 +15578,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableEnum16WithValue:(NSNumber * _Nullable)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableEnum16WithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19879,10 +15595,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableFloatSingleWithValue:(NSNumber * _Nullable)value
                                             params:(MTRWriteParams * _Nullable)params
                                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableFloatSingleWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -19900,10 +15612,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableFloatDoubleWithValue:(NSNumber * _Nullable)value
                                             params:(MTRWriteParams * _Nullable)params
                                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableFloatDoubleWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSNumber * _Nullable value,
@@ -19921,10 +15629,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableOctetStringWithValue:(NSData * _Nullable)value
                                             params:(MTRWriteParams * _Nullable)params
                                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableOctetStringWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19942,10 +15646,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableCharStringWithValue:(NSString * _Nullable)value
                                            params:(MTRWriteParams * _Nullable)params
                                        completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableCharStringWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSString * _Nullable value,
@@ -19963,10 +15663,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableEnumAttrWithValue:(NSNumber * _Nullable)value
                                          params:(MTRWriteParams * _Nullable)params
                                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableEnumAttrWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -19984,10 +15680,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableStructWithValue:(MTRUnitTestingClusterSimpleStruct * _Nullable)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableStructWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(MTRUnitTestingClusterSimpleStruct * _Nullable value,
@@ -20005,10 +15697,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableRangeRestrictedInt8uWithValue:(NSNumber * _Nullable)value
                                                      params:(MTRWriteParams * _Nullable)params
                                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableRangeRestrictedInt8uWithParams:(MTRSubscribeParams *)params
                                          subscriptionEstablished:
                                              (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -20027,10 +15715,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableRangeRestrictedInt8sWithValue:(NSNumber * _Nullable)value
                                                      params:(MTRWriteParams * _Nullable)params
                                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableRangeRestrictedInt8sWithParams:(MTRSubscribeParams *)params
                                          subscriptionEstablished:
                                              (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -20049,10 +15733,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableRangeRestrictedInt16uWithValue:(NSNumber * _Nullable)value
                                                       params:(MTRWriteParams * _Nullable)params
                                                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableRangeRestrictedInt16uWithParams:(MTRSubscribeParams *)params
                                           subscriptionEstablished:
                                               (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -20071,10 +15751,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeNullableRangeRestrictedInt16sWithValue:(NSNumber * _Nullable)value
                                                       params:(MTRWriteParams * _Nullable)params
                                                   completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeNullableRangeRestrictedInt16sWithParams:(MTRSubscribeParams *)params
                                           subscriptionEstablished:
                                               (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -20093,10 +15769,6 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeWriteOnlyInt8uWithValue:(NSNumber * _Nonnull)value
                                        params:(MTRWriteParams * _Nullable)params
                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeWriteOnlyInt8uWithParams:(MTRSubscribeParams *)params
                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -20109,10 +15781,6 @@ MTR_NEWLY_AVAILABLE
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                            reportHandler:(void (^)(NSArray * _Nullable value,
@@ -20125,10 +15793,6 @@ MTR_NEWLY_AVAILABLE
 
 - (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
@@ -20141,10 +15805,6 @@ MTR_NEWLY_AVAILABLE
 
 - (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
@@ -20157,10 +15817,6 @@ MTR_NEWLY_AVAILABLE
 
 - (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
@@ -20173,10 +15829,6 @@ MTR_NEWLY_AVAILABLE
 
 - (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
