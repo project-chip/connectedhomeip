@@ -22,28 +22,19 @@
 #include "AppEvent.h"
 #include "ButtonManager.h"
 #include "LEDWidget.h"
+#include "binding-handler.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-
-#include <DeviceInfoProviderImpl.h>
 
 #include "ThreadUtil.h"
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
-#include <app/clusters/identify-server/identify-server.h>
 #include <app/util/attribute-storage.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-
-#include <platform/CHIPDeviceLayer.h>
-
-#include <lib/support/ErrorStr.h>
-#include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <setup_payload/SetupPayload.h>
-#include <system/SystemClock.h>
 
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include "OTAUtil.h"
@@ -51,8 +42,6 @@
 
 #include <zephyr/logging/log.h>
 #include <zephyr/zephyr.h>
-
-#include <algorithm>
 
 LOG_MODULE_DECLARE(app);
 
@@ -67,7 +56,6 @@ K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppE
 LEDWidget sStatusLED;
 
 Button sFactoryResetButton;
-Button sThreadStartButton;
 Button sBleAdvStartButton;
 
 bool sIsThreadProvisioned = false;
@@ -75,42 +63,9 @@ bool sIsThreadEnabled     = false;
 bool sIsThreadAttached    = false;
 bool sHaveBLEConnections  = false;
 
-chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
-
-void OnIdentifyTriggerEffect(Identify * identify)
-{
-    switch (identify->mCurrentEffectIdentifier)
-    {
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK");
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE");
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY");
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE");
-        break;
-    default:
-        ChipLogProgress(Zcl, "No identifier effect");
-        break;
-    }
-    return;
-}
-
-Identify sIdentify = {
-    chip::EndpointId{ 1 },
-    [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStop"); },
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
-    OnIdentifyTriggerEffect,
-};
-
 } // namespace
 
-using namespace chip;
+using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
@@ -139,22 +94,28 @@ CHIP_ERROR AppTask::Init()
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 
-    // We only have network commissioning on endpoint 0.
-    // Set up a valid Network Commissioning cluster on endpoint 0 is done in
-    // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp
-    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
-
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
-    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
 #if CONFIG_CHIP_OTA_REQUESTOR
     InitBasicOTARequestor();
 #endif
 
+    // We only have network commissioning on endpoint 0.
+    // Set up a valid Network Commissioning cluster on endpoint 0 is done in
+    // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp
+    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
+
     ConfigurationMgr().LogDeviceConfig();
+
+    // Configure Bindings
+    ret = InitBindingHandlers();
+    if (ret != CHIP_NO_ERROR)
+    {
+        LOG_ERR("InitBindingHandlers() failed");
+        return ret;
+    }
+
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
     // Add CHIP event handler and start CHIP thread.
@@ -162,7 +123,7 @@ CHIP_ERROR AppTask::Init()
     // between the main and the CHIP threads.
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
-    ret = ConnectivityMgr().SetBLEDeviceName("TelinkOTAReq");
+    ret = ConnectivityMgr().SetBLEDeviceName("TelinkMinApp");
     if (ret != CHIP_NO_ERROR)
     {
         LOG_ERR("Fail to set BLE device name");
@@ -212,33 +173,6 @@ void AppTask::FactoryResetHandler(AppEvent * aEvent)
 {
     LOG_INF("Factory Reset triggered.");
     chip::Server::GetInstance().ScheduleFactoryReset();
-}
-
-void AppTask::StartThreadButtonEventHandler(void)
-{
-    AppEvent event;
-
-    event.Type               = AppEvent::kEventType_Button;
-    event.ButtonEvent.Action = kButtonPushEvent;
-    event.Handler            = StartThreadHandler;
-    sAppTask.PostEvent(&event);
-}
-
-void AppTask::StartThreadHandler(AppEvent * aEvent)
-{
-
-    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
-    {
-        // Switch context from BLE to Thread
-        BLEManagerImpl sInstance;
-        sInstance.SwitchToIeee802154();
-        StartDefaultThreadNetwork();
-        LOG_INF("Device is not commissioned to a Thread network. Starting with the default configuration.");
-    }
-    else
-    {
-        LOG_INF("Device is commissioned to a Thread network.");
-    }
 }
 
 void AppTask::StartBleAdvButtonEventHandler(void)
@@ -320,12 +254,10 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
     }
 }
 
-void AppTask::ActionInitiated(AppTask::Action_t aAction, int32_t aActor) {}
-
-void AppTask::ActionCompleted(AppTask::Action_t aAction, int32_t aActor) {}
-
 void AppTask::PostEvent(AppEvent * aEvent)
 {
+    if (!aEvent)
+        return;
     if (k_msgq_put(&sAppEventQueue, aEvent, K_NO_WAIT) != 0)
     {
         LOG_INF("Failed to post event to app task event queue");
@@ -334,6 +266,8 @@ void AppTask::PostEvent(AppEvent * aEvent)
 
 void AppTask::DispatchEvent(AppEvent * aEvent)
 {
+    if (!aEvent)
+        return;
     if (aEvent->Handler)
     {
         aEvent->Handler(aEvent);
@@ -347,10 +281,8 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 void AppTask::InitButtons(void)
 {
     sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
-    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
     sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, StartBleAdvButtonEventHandler);
 
     ButtonManagerInst().AddButton(sFactoryResetButton);
-    ButtonManagerInst().AddButton(sThreadStartButton);
     ButtonManagerInst().AddButton(sBleAdvStartButton);
 }

@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,12 +21,18 @@ from .builder import Builder
 
 
 class TelinkApp(Enum):
+    ALL_CLUSTERS = auto()
+    ALL_CLUSTERS_MINIMAL = auto()
     LIGHT = auto()
     SWITCH = auto()
     OTA_REQUESTOR = auto()
 
     def ExampleName(self):
-        if self == TelinkApp.LIGHT:
+        if self == TelinkApp.ALL_CLUSTERS:
+            return 'all-clusters-app'
+        elif self == TelinkApp.ALL_CLUSTERS_MINIMAL:
+            return 'all-clusters-minimal-app'
+        elif self == TelinkApp.LIGHT:
             return 'lighting-app'
         elif self == TelinkApp.SWITCH:
             return 'light-switch-app'
@@ -36,7 +42,11 @@ class TelinkApp(Enum):
             raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
-        if self == TelinkApp.LIGHT:
+        if self == TelinkApp.ALL_CLUSTERS:
+            return 'chip-telink-all-clusters-example'
+        elif self == TelinkApp.ALL_CLUSTERS_MINIMAL:
+            return 'chip-telink-all-clusters-minimal-example'
+        elif self == TelinkApp.LIGHT:
             return 'chip-telink-lighting-example'
         elif self == TelinkApp.SWITCH:
             return 'chip-telink-light-switch-example'
