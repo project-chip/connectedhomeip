@@ -34,7 +34,7 @@ lwip_platform = "mt793x"
 lwip_root = "${chip_root}/third_party/mt793x_sdk/lwip"
 
 chip_mdns = "platform"
-chip_inet_config_enable_ipv4 = false
+chip_inet_config_enable_ipv4 = true
 
 chip_build_libshell = true
 
