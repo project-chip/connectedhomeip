@@ -674,7 +674,7 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedAttribute(const ConcreteDataAttr
 
 } // namespace
 
-bool emberAfTestClusterTestCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
+bool emberAfUnitTestingClusterTestCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
                                     const Clusters::UnitTesting::Commands::Test::DecodableType & commandData)
 {
     // Setup the test variables
@@ -700,7 +700,7 @@ bool emberAfTestClusterTestCallback(app::CommandHandler *, const app::ConcreteCo
     return true;
 }
 
-bool emberAfTestClusterTestSpecificCallback(CommandHandler * apCommandObj, const ConcreteCommandPath & commandPath,
+bool emberAfUnitTestingClusterTestSpecificCallback(CommandHandler * apCommandObj, const ConcreteCommandPath & commandPath,
                                             const TestSpecific::DecodableType & commandData)
 {
     TestSpecificResponse::Type responseData;
@@ -709,13 +709,13 @@ bool emberAfTestClusterTestSpecificCallback(CommandHandler * apCommandObj, const
     return true;
 }
 
-bool emberAfTestClusterTestNotHandledCallback(CommandHandler *, const ConcreteCommandPath & commandPath,
+bool emberAfUnitTestingClusterTestNotHandledCallback(CommandHandler *, const ConcreteCommandPath & commandPath,
                                               const TestNotHandled::DecodableType & commandData)
 {
     return false;
 }
 
-bool emberAfTestClusterTestAddArgumentsCallback(CommandHandler * apCommandObj, const ConcreteCommandPath & commandPath,
+bool emberAfUnitTestingClusterTestAddArgumentsCallback(CommandHandler * apCommandObj, const ConcreteCommandPath & commandPath,
                                                 const TestAddArguments::DecodableType & commandData)
 {
     if (commandData.arg1 > UINT8_MAX - commandData.arg2)
@@ -737,21 +737,21 @@ static bool SendBooleanResponse(CommandHandler * commandObj, const ConcreteComma
     return true;
 }
 
-bool emberAfTestClusterTestStructArgumentRequestCallback(app::CommandHandler * commandObj,
+bool emberAfUnitTestingClusterTestStructArgumentRequestCallback(app::CommandHandler * commandObj,
                                                          const app::ConcreteCommandPath & commandPath,
                                                          const Commands::TestStructArgumentRequest::DecodableType & commandData)
 {
     return SendBooleanResponse(commandObj, commandPath, commandData.arg1.b);
 }
 
-bool emberAfTestClusterTestNestedStructArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestNestedStructArgumentRequestCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::TestNestedStructArgumentRequest::DecodableType & commandData)
 {
     return SendBooleanResponse(commandObj, commandPath, commandData.arg1.c.b);
 }
 
-bool emberAfTestClusterTestListStructArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestListStructArgumentRequestCallback(
     app::CommandHandler * commandObj, app::ConcreteCommandPath const & commandPath,
     Commands::TestListStructArgumentRequest::DecodableType const & commandData)
 {
@@ -773,7 +773,7 @@ bool emberAfTestClusterTestListStructArgumentRequestCallback(
     return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
 
-bool emberAfTestClusterTestEmitTestEventRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+bool emberAfUnitTestingClusterTestEmitTestEventRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                         const Commands::TestEmitTestEventRequest::DecodableType & commandData)
 {
     Commands::TestEmitTestEventResponse::Type responseData;
@@ -793,7 +793,7 @@ bool emberAfTestClusterTestEmitTestEventRequestCallback(CommandHandler * command
     return true;
 }
 
-bool emberAfTestClusterTestEmitTestFabricScopedEventRequestCallback(
+bool emberAfUnitTestingClusterTestEmitTestFabricScopedEventRequestCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Commands::TestEmitTestFabricScopedEventRequest::DecodableType & commandData)
 {
@@ -809,7 +809,7 @@ bool emberAfTestClusterTestEmitTestFabricScopedEventRequestCallback(
     return true;
 }
 
-bool emberAfTestClusterTestListInt8UArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestListInt8UArgumentRequestCallback(
     CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
     Commands::TestListInt8UArgumentRequest::DecodableType const & commandData)
 {
@@ -831,7 +831,7 @@ bool emberAfTestClusterTestListInt8UArgumentRequestCallback(
     return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
 
-bool emberAfTestClusterTestNestedStructListArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestNestedStructListArgumentRequestCallback(
     app::CommandHandler * commandObj, app::ConcreteCommandPath const & commandPath,
     Commands::TestNestedStructListArgumentRequest::DecodableType const & commandData)
 {
@@ -853,7 +853,7 @@ bool emberAfTestClusterTestNestedStructListArgumentRequestCallback(
     return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
 
-bool emberAfTestClusterTestListNestedStructListArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestListNestedStructListArgumentRequestCallback(
     app::CommandHandler * commandObj, app::ConcreteCommandPath const & commandPath,
     Commands::TestListNestedStructListArgumentRequest::DecodableType const & commandData)
 {
@@ -888,7 +888,7 @@ bool emberAfTestClusterTestListNestedStructListArgumentRequestCallback(
     return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
 
-bool emberAfTestClusterTestListInt8UReverseRequestCallback(CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
+bool emberAfUnitTestingClusterTestListInt8UReverseRequestCallback(CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
                                                            Commands::TestListInt8UReverseRequest::DecodableType const & commandData)
 {
     size_t count   = 0;
@@ -923,7 +923,7 @@ exit:
     return true;
 }
 
-bool emberAfTestClusterTestEnumsRequestCallback(CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
+bool emberAfUnitTestingClusterTestEnumsRequestCallback(CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
                                                 TestEnumsRequest::DecodableType const & commandData)
 {
     TestEnumsResponse::Type response;
@@ -934,7 +934,7 @@ bool emberAfTestClusterTestEnumsRequestCallback(CommandHandler * commandObj, Con
     return true;
 }
 
-bool emberAfTestClusterTestNullableOptionalRequestCallback(CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
+bool emberAfUnitTestingClusterTestNullableOptionalRequestCallback(CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
                                                            Commands::TestNullableOptionalRequest::DecodableType const & commandData)
 {
     Commands::TestNullableOptionalResponse::Type response;
@@ -955,7 +955,7 @@ bool emberAfTestClusterTestNullableOptionalRequestCallback(CommandHandler * comm
     return true;
 }
 
-bool emberAfTestClusterSimpleStructEchoRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+bool emberAfUnitTestingClusterSimpleStructEchoRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                        const Commands::SimpleStructEchoRequest::DecodableType & commandData)
 {
     Commands::SimpleStructResponse::Type response;
@@ -972,14 +972,14 @@ bool emberAfTestClusterSimpleStructEchoRequestCallback(CommandHandler * commandO
     return true;
 }
 
-bool emberAfTestClusterTimedInvokeRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+bool emberAfUnitTestingClusterTimedInvokeRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                   const Commands::TimedInvokeRequest::DecodableType & commandData)
 {
     commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
     return true;
 }
 
-bool emberAfTestClusterTestSimpleOptionalArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestSimpleOptionalArgumentRequestCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Commands::TestSimpleOptionalArgumentRequest::DecodableType & commandData)
 {
@@ -992,7 +992,7 @@ bool emberAfTestClusterTestSimpleOptionalArgumentRequestCallback(
 // -----------------------------------------------------------------------------
 // Plugin initialization
 
-void MatterTestPluginServerInitCallback(void)
+void MatterUnitTestingPluginServerInitCallback(void)
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }
