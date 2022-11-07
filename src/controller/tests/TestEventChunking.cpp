@@ -323,7 +323,7 @@ void TestReadEvents::TestEventChunking(nlTestSuite * apSuite, void * apContext)
 
     app::EventPathParams eventPath;
     eventPath.mEndpointId = kTestEndpointId;
-    eventPath.mClusterId  = app::Clusters::Test::Id;
+    eventPath.mClusterId  = app::Clusters::UnitTesting::Id;
     app::ReadPrepareParams readParams(sessionHandle);
 
     readParams.mpEventPathParamsList    = &eventPath;
@@ -390,9 +390,9 @@ void TestReadEvents::TestMixedEventsAndAttributesChunking(nlTestSuite * apSuite,
     GenerateEvents(apSuite, firstEventNumber, lastEventNumber);
 
     app::EventPathParams eventPath;
-    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::Test::Id);
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id);
     eventPath.mEndpointId = kTestEndpointId;
-    eventPath.mClusterId  = app::Clusters::Test::Id;
+    eventPath.mClusterId  = app::Clusters::UnitTesting::Id;
     app::ReadPrepareParams readParams(sessionHandle);
 
     readParams.mpAttributePathParamsList    = &attributePath;
@@ -469,9 +469,9 @@ void TestReadEvents::TestMixedEventsAndLargeAttributesChunking(nlTestSuite * apS
     GenerateEvents(apSuite, firstEventNumber, lastEventNumber);
 
     app::EventPathParams eventPath;
-    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::Test::Id, kTestListLargeAttribute);
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListLargeAttribute);
     eventPath.mEndpointId = kTestEndpointId;
-    eventPath.mClusterId  = app::Clusters::Test::Id;
+    eventPath.mClusterId  = app::Clusters::UnitTesting::Id;
     app::ReadPrepareParams readParams(sessionHandle);
 
     readParams.mpAttributePathParamsList    = &attributePath;

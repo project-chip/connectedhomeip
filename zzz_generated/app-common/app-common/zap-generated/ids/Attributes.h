@@ -4605,7 +4605,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace ElectricalMeasurement
 
-namespace Test {
+namespace UnitTesting {
 namespace Attributes {
 
 namespace Boolean {
@@ -4957,7 +4957,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace Test
+} // namespace UnitTesting
 
 namespace FaultInjection {
 namespace Attributes {

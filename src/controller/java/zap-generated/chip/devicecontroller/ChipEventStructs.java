@@ -1227,20 +1227,20 @@ public class ChipEventStructs {
     }
   }
 
-  public static class TestClusterTestEventEvent {
+  public static class UnitTestingClusterTestEventEvent {
     public Integer arg1;
     public Integer arg2;
     public Boolean arg3;
-    public ChipStructs.TestClusterSimpleStruct arg4;
-    public ArrayList<ChipStructs.TestClusterSimpleStruct> arg5;
+    public ChipStructs.UnitTestingClusterSimpleStruct arg4;
+    public ArrayList<ChipStructs.UnitTestingClusterSimpleStruct> arg5;
     public ArrayList<Object> arg6;
 
-    public TestClusterTestEventEvent(
+    public UnitTestingClusterTestEventEvent(
         Integer arg1,
         Integer arg2,
         Boolean arg3,
-        ChipStructs.TestClusterSimpleStruct arg4,
-        ArrayList<ChipStructs.TestClusterSimpleStruct> arg5,
+        ChipStructs.UnitTestingClusterSimpleStruct arg4,
+        ArrayList<ChipStructs.UnitTestingClusterSimpleStruct> arg5,
         ArrayList<Object> arg6) {
       this.arg1 = arg1;
       this.arg2 = arg2;
@@ -1253,7 +1253,7 @@ public class ChipEventStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("TestClusterTestEventEvent {\n");
+      output.append("UnitTestingClusterTestEventEvent {\n");
       output.append("\targ1: ");
       output.append(arg1);
       output.append("\n");
@@ -1277,17 +1277,17 @@ public class ChipEventStructs {
     }
   }
 
-  public static class TestClusterTestFabricScopedEventEvent {
+  public static class UnitTestingClusterTestFabricScopedEventEvent {
     public Integer fabricIndex;
 
-    public TestClusterTestFabricScopedEventEvent(Integer fabricIndex) {
+    public UnitTestingClusterTestFabricScopedEventEvent(Integer fabricIndex) {
       this.fabricIndex = fabricIndex;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("TestClusterTestFabricScopedEventEvent {\n");
+      output.append("UnitTestingClusterTestFabricScopedEventEvent {\n");
       output.append("\tfabricIndex: ");
       output.append(fabricIndex);
       output.append("\n");

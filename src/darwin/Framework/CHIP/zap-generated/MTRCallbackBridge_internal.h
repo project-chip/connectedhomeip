@@ -113,30 +113,30 @@ typedef void (*ApplicationLauncherClusterLauncherResponseCallbackType)(
     void *, const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType &);
 typedef void (*AccountLoginClusterGetSetupPINResponseCallbackType)(
     void *, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &);
-typedef void (*TestClusterTestSpecificResponseCallbackType)(
-    void *, const chip::app::Clusters::Test::Commands::TestSpecificResponse::DecodableType &);
-typedef void (*TestClusterTestAddArgumentsResponseCallbackType)(
-    void *, const chip::app::Clusters::Test::Commands::TestAddArgumentsResponse::DecodableType &);
-typedef void (*TestClusterTestSimpleArgumentResponseCallbackType)(
-    void *, const chip::app::Clusters::Test::Commands::TestSimpleArgumentResponse::DecodableType &);
-typedef void (*TestClusterTestStructArrayArgumentResponseCallbackType)(
-    void *, const chip::app::Clusters::Test::Commands::TestStructArrayArgumentResponse::DecodableType &);
-typedef void (*TestClusterTestListInt8UReverseResponseCallbackType)(
-    void *, const chip::app::Clusters::Test::Commands::TestListInt8UReverseResponse::DecodableType &);
-typedef void (*TestClusterTestEnumsResponseCallbackType)(
-    void *, const chip::app::Clusters::Test::Commands::TestEnumsResponse::DecodableType &);
-typedef void (*TestClusterTestNullableOptionalResponseCallbackType)(
-    void *, const chip::app::Clusters::Test::Commands::TestNullableOptionalResponse::DecodableType &);
-typedef void (*TestClusterTestComplexNullableOptionalResponseCallbackType)(
-    void *, const chip::app::Clusters::Test::Commands::TestComplexNullableOptionalResponse::DecodableType &);
-typedef void (*TestClusterBooleanResponseCallbackType)(void *,
-                                                       const chip::app::Clusters::Test::Commands::BooleanResponse::DecodableType &);
-typedef void (*TestClusterSimpleStructResponseCallbackType)(
-    void *, const chip::app::Clusters::Test::Commands::SimpleStructResponse::DecodableType &);
-typedef void (*TestClusterTestEmitTestEventResponseCallbackType)(
-    void *, const chip::app::Clusters::Test::Commands::TestEmitTestEventResponse::DecodableType &);
-typedef void (*TestClusterTestEmitTestFabricScopedEventResponseCallbackType)(
-    void *, const chip::app::Clusters::Test::Commands::TestEmitTestFabricScopedEventResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestSpecificResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestAddArgumentsResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestSimpleArgumentResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestStructArrayArgumentResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestListInt8UReverseResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestEnumsResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestEnumsResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestNullableOptionalResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestComplexNullableOptionalResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType &);
+typedef void (*UnitTestingClusterBooleanResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::BooleanResponse::DecodableType &);
+typedef void (*UnitTestingClusterSimpleStructResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::SimpleStructResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestEmitTestEventResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType &);
 
 typedef void (*IdentifyClusterIdentifyEffectIdentifierAttributeCallback)(void *,
                                                                          chip::app::Clusters::Identify::IdentifyEffectIdentifier);
@@ -527,9 +527,9 @@ typedef void (*ApplicationBasicClusterApplicationStatusEnumAttributeCallback)(
     void *, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum);
 typedef void (*NullableApplicationBasicClusterApplicationStatusEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum> &);
-typedef void (*TestClusterSimpleEnumAttributeCallback)(void *, chip::app::Clusters::Test::SimpleEnum);
-typedef void (*NullableTestClusterSimpleEnumAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Test::SimpleEnum> &);
+typedef void (*UnitTestingClusterSimpleEnumAttributeCallback)(void *, chip::app::Clusters::UnitTesting::SimpleEnum);
+typedef void (*NullableUnitTestingClusterSimpleEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> &);
 typedef void (*FaultInjectionClusterFaultTypeAttributeCallback)(void *, chip::app::Clusters::FaultInjection::FaultType);
 typedef void (*NullableFaultInjectionClusterFaultTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FaultInjection::FaultType> &);
@@ -1071,43 +1071,45 @@ typedef void (*ElectricalMeasurementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ElectricalMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*TestBitmap8AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::Test::Bitmap8MaskMap>);
-typedef void (*TestBitmap16AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::Test::Bitmap16MaskMap>);
-typedef void (*TestBitmap32AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::Test::Bitmap32MaskMap>);
-typedef void (*TestBitmap64AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::Test::Bitmap64MaskMap>);
-typedef void (*TestListInt8uListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<uint8_t> & data);
-typedef void (*TestListOctetStringListAttributeCallback)(void * context,
-                                                         const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
-typedef void (*TestListStructOctetStringListAttributeCallback)(
+typedef void (*UnitTestingBitmap8AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>);
+typedef void (*UnitTestingBitmap16AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>);
+typedef void (*UnitTestingBitmap32AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>);
+typedef void (*UnitTestingBitmap64AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>);
+typedef void (*UnitTestingListInt8uListAttributeCallback)(void * context,
+                                                          const chip::app::DataModel::DecodableList<uint8_t> & data);
+typedef void (*UnitTestingListOctetStringListAttributeCallback)(void * context,
+                                                                const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
+typedef void (*UnitTestingListStructOctetStringListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Test::Structs::TestListStructOctet::DecodableType> & data);
-typedef void (*TestListNullablesAndOptionalsStructListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Test::Structs::NullablesAndOptionalsStruct::DecodableType> &
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestListStructOctet::DecodableType> &
         data);
-typedef void (*TestStructAttrStructAttributeCallback)(void *,
-                                                      const chip::app::Clusters::Test::Structs::SimpleStruct::DecodableType &);
-typedef void (*TestListLongOctetStringListAttributeCallback)(void * context,
-                                                             const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
-typedef void (*TestListFabricScopedListAttributeCallback)(
+typedef void (*UnitTestingListNullablesAndOptionalsStructListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Test::Structs::TestFabricScoped::DecodableType> & data);
-typedef void (*TestNullableBitmap8AttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap8MaskMap>> &);
-typedef void (*TestNullableBitmap16AttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap16MaskMap>> &);
-typedef void (*TestNullableBitmap32AttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap32MaskMap>> &);
-typedef void (*TestNullableBitmap64AttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap64MaskMap>> &);
-typedef void (*TestNullableStructStructAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Test::Structs::SimpleStruct::DecodableType> &);
-typedef void (*TestGeneratedCommandListListAttributeCallback)(void * context,
-                                                              const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*TestAcceptedCommandListListAttributeCallback)(void * context,
-                                                             const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*TestAttributeListListAttributeCallback)(void * context,
-                                                       const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::DecodableType> & data);
+typedef void (*UnitTestingStructAttrStructAttributeCallback)(
+    void *, const chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType &);
+typedef void (*UnitTestingListLongOctetStringListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
+typedef void (*UnitTestingListFabricScopedListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestFabricScoped::DecodableType> & data);
+typedef void (*UnitTestingNullableBitmap8AttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> &);
+typedef void (*UnitTestingNullableBitmap16AttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>> &);
+typedef void (*UnitTestingNullableBitmap32AttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>> &);
+typedef void (*UnitTestingNullableBitmap64AttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>> &);
+typedef void (*UnitTestingNullableStructStructAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType> &);
+typedef void (*UnitTestingGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*UnitTestingAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*UnitTestingAttributeListListAttributeCallback)(void * context,
+                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 
 class MTRDefaultSuccessCallbackBridge : public MTRCallbackBridge<DefaultSuccessCallback>
 {
@@ -14241,37 +14243,40 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestBitmap8AttributeCallbackBridge : public MTRCallbackBridge<TestBitmap8AttributeCallback>
+class MTRUnitTestingBitmap8AttributeCallbackBridge : public MTRCallbackBridge<UnitTestingBitmap8AttributeCallback>
 {
 public:
-    MTRTestBitmap8AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                          bool keepAlive = false) :
-        MTRCallbackBridge<TestBitmap8AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingBitmap8AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
+                                                 bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingBitmap8AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRTestBitmap8AttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
-                                          ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestBitmap8AttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingBitmap8AttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
+                                                 ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingBitmap8AttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                               keepAlive){};
 
-    MTRTestBitmap8AttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                          MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestBitmap8AttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingBitmap8AttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                 MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingBitmap8AttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::Test::Bitmap8MaskMap> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> value);
 };
 
-class MTRTestBitmap8AttributeCallbackSubscriptionBridge : public MTRTestBitmap8AttributeCallbackBridge
+class MTRUnitTestingBitmap8AttributeCallbackSubscriptionBridge : public MTRUnitTestingBitmap8AttributeCallbackBridge
 {
 public:
-    MTRTestBitmap8AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
-                                                      ResponseHandler handler, MTRActionBlock action,
-                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestBitmap8AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+    MTRUnitTestingBitmap8AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                             MTRDeviceController * controller, ResponseHandler handler,
+                                                             MTRActionBlock action,
+                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingBitmap8AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRTestBitmap8AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                      MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestBitmap8AttributeCallbackBridge(queue, device, handler, action, true),
+    MTRUnitTestingBitmap8AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                             ResponseHandler handler, MTRActionBlock action,
+                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingBitmap8AttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -14281,165 +14286,170 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestBitmap16AttributeCallbackBridge : public MTRCallbackBridge<TestBitmap16AttributeCallback>
+class MTRUnitTestingBitmap16AttributeCallbackBridge : public MTRCallbackBridge<UnitTestingBitmap16AttributeCallback>
 {
 public:
-    MTRTestBitmap16AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                           bool keepAlive = false) :
-        MTRCallbackBridge<TestBitmap16AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingBitmap16AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
+                                                  bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingBitmap16AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRTestBitmap16AttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
-                                           ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestBitmap16AttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingBitmap16AttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
+                                                  ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingBitmap16AttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                keepAlive){};
 
-    MTRTestBitmap16AttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                           MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestBitmap16AttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingBitmap16AttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                  MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingBitmap16AttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::Test::Bitmap16MaskMap> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> value);
 };
 
-class MTRTestBitmap16AttributeCallbackSubscriptionBridge : public MTRTestBitmap16AttributeCallbackBridge
+class MTRUnitTestingBitmap16AttributeCallbackSubscriptionBridge : public MTRUnitTestingBitmap16AttributeCallbackBridge
 {
 public:
-    MTRTestBitmap16AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+    MTRUnitTestingBitmap16AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                              MTRDeviceController * controller, ResponseHandler handler,
+                                                              MTRActionBlock action,
+                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingBitmap16AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRUnitTestingBitmap16AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                              ResponseHandler handler, MTRActionBlock action,
+                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingBitmap16AttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRUnitTestingBitmap32AttributeCallbackBridge : public MTRCallbackBridge<UnitTestingBitmap32AttributeCallback>
+{
+public:
+    MTRUnitTestingBitmap32AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
+                                                  bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingBitmap32AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRUnitTestingBitmap32AttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
+                                                  ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingBitmap32AttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                keepAlive){};
+
+    MTRUnitTestingBitmap32AttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                  MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingBitmap32AttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> value);
+};
+
+class MTRUnitTestingBitmap32AttributeCallbackSubscriptionBridge : public MTRUnitTestingBitmap32AttributeCallbackBridge
+{
+public:
+    MTRUnitTestingBitmap32AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                              MTRDeviceController * controller, ResponseHandler handler,
+                                                              MTRActionBlock action,
+                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingBitmap32AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRUnitTestingBitmap32AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                              ResponseHandler handler, MTRActionBlock action,
+                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingBitmap32AttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRUnitTestingBitmap64AttributeCallbackBridge : public MTRCallbackBridge<UnitTestingBitmap64AttributeCallback>
+{
+public:
+    MTRUnitTestingBitmap64AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
+                                                  bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingBitmap64AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRUnitTestingBitmap64AttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
+                                                  ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingBitmap64AttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                keepAlive){};
+
+    MTRUnitTestingBitmap64AttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                  MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingBitmap64AttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> value);
+};
+
+class MTRUnitTestingBitmap64AttributeCallbackSubscriptionBridge : public MTRUnitTestingBitmap64AttributeCallbackBridge
+{
+public:
+    MTRUnitTestingBitmap64AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                              MTRDeviceController * controller, ResponseHandler handler,
+                                                              MTRActionBlock action,
+                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingBitmap64AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRUnitTestingBitmap64AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                              ResponseHandler handler, MTRActionBlock action,
+                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingBitmap64AttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRUnitTestingListInt8uListAttributeCallbackBridge : public MTRCallbackBridge<UnitTestingListInt8uListAttributeCallback>
+{
+public:
+    MTRUnitTestingListInt8uListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
+                                                       bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingListInt8uListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRUnitTestingListInt8uListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                        MTRDeviceController * controller, ResponseHandler handler,
-                                                       MTRActionBlock action,
-                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestBitmap16AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
+                                                       MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingListInt8uListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                     keepAlive){};
 
-    MTRTestBitmap16AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                       MTRActionBlock action,
-                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestBitmap16AttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRTestBitmap32AttributeCallbackBridge : public MTRCallbackBridge<TestBitmap32AttributeCallback>
-{
-public:
-    MTRTestBitmap32AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                           bool keepAlive = false) :
-        MTRCallbackBridge<TestBitmap32AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRTestBitmap32AttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
-                                           ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestBitmap32AttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRTestBitmap32AttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                           MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestBitmap32AttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::Test::Bitmap32MaskMap> value);
-};
-
-class MTRTestBitmap32AttributeCallbackSubscriptionBridge : public MTRTestBitmap32AttributeCallbackBridge
-{
-public:
-    MTRTestBitmap32AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                       MTRDeviceController * controller, ResponseHandler handler,
-                                                       MTRActionBlock action,
-                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestBitmap32AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    MTRTestBitmap32AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                       MTRActionBlock action,
-                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestBitmap32AttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRTestBitmap64AttributeCallbackBridge : public MTRCallbackBridge<TestBitmap64AttributeCallback>
-{
-public:
-    MTRTestBitmap64AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                           bool keepAlive = false) :
-        MTRCallbackBridge<TestBitmap64AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRTestBitmap64AttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
-                                           ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestBitmap64AttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRTestBitmap64AttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                           MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestBitmap64AttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::Test::Bitmap64MaskMap> value);
-};
-
-class MTRTestBitmap64AttributeCallbackSubscriptionBridge : public MTRTestBitmap64AttributeCallbackBridge
-{
-public:
-    MTRTestBitmap64AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                       MTRDeviceController * controller, ResponseHandler handler,
-                                                       MTRActionBlock action,
-                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestBitmap64AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    MTRTestBitmap64AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                       MTRActionBlock action,
-                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestBitmap64AttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRTestListInt8uListAttributeCallbackBridge : public MTRCallbackBridge<TestListInt8uListAttributeCallback>
-{
-public:
-    MTRTestListInt8uListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                                bool keepAlive = false) :
-        MTRCallbackBridge<TestListInt8uListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRTestListInt8uListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
-                                                ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestListInt8uListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRTestListInt8uListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestListInt8uListAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingListInt8uListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                       MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingListInt8uListAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
 };
 
-class MTRTestListInt8uListAttributeCallbackSubscriptionBridge : public MTRTestListInt8uListAttributeCallbackBridge
+class MTRUnitTestingListInt8uListAttributeCallbackSubscriptionBridge : public MTRUnitTestingListInt8uListAttributeCallbackBridge
 {
 public:
-    MTRTestListInt8uListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                            MTRDeviceController * controller, ResponseHandler handler,
-                                                            MTRActionBlock action,
-                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestListInt8uListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+    MTRUnitTestingListInt8uListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                   MTRDeviceController * controller, ResponseHandler handler,
+                                                                   MTRActionBlock action,
+                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingListInt8uListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRTestListInt8uListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                            MTRActionBlock action,
-                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestListInt8uListAttributeCallbackBridge(queue, device, handler, action, true),
+    MTRUnitTestingListInt8uListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                   ResponseHandler handler, MTRActionBlock action,
+                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingListInt8uListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -14449,88 +14459,45 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestListOctetStringListAttributeCallbackBridge : public MTRCallbackBridge<TestListOctetStringListAttributeCallback>
+class MTRUnitTestingListOctetStringListAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingListOctetStringListAttributeCallback>
 {
 public:
-    MTRTestListOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                                      bool keepAlive = false) :
-        MTRCallbackBridge<TestListOctetStringListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingListOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingListOctetStringListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRTestListOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
-                                                      ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestListOctetStringListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                    keepAlive){};
+    MTRUnitTestingListOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                             MTRDeviceController * controller, ResponseHandler handler,
+                                                             MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingListOctetStringListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                           keepAlive){};
 
-    MTRTestListOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                      MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestListOctetStringListAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingListOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                             ResponseHandler handler, MTRActionBlock action,
+                                                             bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingListOctetStringListAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                           keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value);
 };
 
-class MTRTestListOctetStringListAttributeCallbackSubscriptionBridge : public MTRTestListOctetStringListAttributeCallbackBridge
+class MTRUnitTestingListOctetStringListAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingListOctetStringListAttributeCallbackBridge
 {
 public:
-    MTRTestListOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                  MTRDeviceController * controller, ResponseHandler handler,
-                                                                  MTRActionBlock action,
-                                                                  MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestListOctetStringListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+    MTRUnitTestingListOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                         MTRDeviceController * controller, ResponseHandler handler,
+                                                                         MTRActionBlock action,
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingListOctetStringListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRTestListOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                  ResponseHandler handler, MTRActionBlock action,
-                                                                  MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestListOctetStringListAttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRTestListStructOctetStringListAttributeCallbackBridge
-    : public MTRCallbackBridge<TestListStructOctetStringListAttributeCallback>
-{
-public:
-    MTRTestListStructOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                            MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestListStructOctetStringListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRTestListStructOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                            MTRDeviceController * controller, ResponseHandler handler,
-                                                            MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestListStructOctetStringListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                          keepAlive){};
-
-    MTRTestListStructOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                            MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestListStructOctetStringListAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Test::Structs::TestListStructOctet::DecodableType> & value);
-};
-
-class MTRTestListStructOctetStringListAttributeCallbackSubscriptionBridge
-    : public MTRTestListStructOctetStringListAttributeCallbackBridge
-{
-public:
-    MTRTestListStructOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                        MTRDeviceController * controller, ResponseHandler handler,
-                                                                        MTRActionBlock action,
-                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestListStructOctetStringListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    MTRTestListStructOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                        ResponseHandler handler, MTRActionBlock action,
-                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestListStructOctetStringListAttributeCallbackBridge(queue, device, handler, action, true),
+    MTRUnitTestingListOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                         ResponseHandler handler, MTRActionBlock action,
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingListOctetStringListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -14540,48 +14507,47 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestListNullablesAndOptionalsStructListAttributeCallbackBridge
-    : public MTRCallbackBridge<TestListNullablesAndOptionalsStructListAttributeCallback>
+class MTRUnitTestingListStructOctetStringListAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingListStructOctetStringListAttributeCallback>
 {
 public:
-    MTRTestListNullablesAndOptionalsStructListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestListNullablesAndOptionalsStructListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
+    MTRUnitTestingListStructOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingListStructOctetStringListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRTestListNullablesAndOptionalsStructListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                      MTRDeviceController * controller, ResponseHandler handler,
-                                                                      MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestListNullablesAndOptionalsStructListAttributeCallback>(queue, nodeID, controller, handler, action,
-                                                                                    OnSuccessFn, keepAlive){};
+    MTRUnitTestingListStructOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                   MTRDeviceController * controller, ResponseHandler handler,
+                                                                   MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingListStructOctetStringListAttributeCallback>(queue, nodeID, controller, handler, action,
+                                                                                 OnSuccessFn, keepAlive){};
 
-    MTRTestListNullablesAndOptionalsStructListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                      ResponseHandler handler, MTRActionBlock action,
-                                                                      bool keepAlive = false) :
-        MTRCallbackBridge<TestListNullablesAndOptionalsStructListAttributeCallback>(queue, device, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
+    MTRUnitTestingListStructOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                   ResponseHandler handler, MTRActionBlock action,
+                                                                   bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingListStructOctetStringListAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                                 keepAlive){};
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Test::Structs::NullablesAndOptionalsStruct::DecodableType> &
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestListStructOctet::DecodableType> &
             value);
 };
 
-class MTRTestListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge
-    : public MTRTestListNullablesAndOptionalsStructListAttributeCallbackBridge
+class MTRUnitTestingListStructOctetStringListAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingListStructOctetStringListAttributeCallbackBridge
 {
 public:
-    MTRTestListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge(
+    MTRUnitTestingListStructOctetStringListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
         MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestListNullablesAndOptionalsStructListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        MTRUnitTestingListStructOctetStringListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRTestListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge(
+    MTRUnitTestingListStructOctetStringListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestListNullablesAndOptionalsStructListAttributeCallbackBridge(queue, device, handler, action, true),
+        MTRUnitTestingListStructOctetStringListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -14591,40 +14557,48 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestStructAttrStructAttributeCallbackBridge : public MTRCallbackBridge<TestStructAttrStructAttributeCallback>
+class MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingListNullablesAndOptionalsStructListAttributeCallback>
 {
 public:
-    MTRTestStructAttrStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                                   bool keepAlive = false) :
-        MTRCallbackBridge<TestStructAttrStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingListNullablesAndOptionalsStructListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
 
-    MTRTestStructAttrStructAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
-                                                   ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestStructAttrStructAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                 keepAlive){};
+    MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                             MTRDeviceController * controller,
+                                                                             ResponseHandler handler, MTRActionBlock action,
+                                                                             bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingListNullablesAndOptionalsStructListAttributeCallback>(queue, nodeID, controller, handler,
+                                                                                           action, OnSuccessFn, keepAlive){};
 
-    MTRTestStructAttrStructAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                   MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestStructAttrStructAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                             ResponseHandler handler, MTRActionBlock action,
+                                                                             bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingListNullablesAndOptionalsStructListAttributeCallback>(queue, device, handler, action,
+                                                                                           OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::Clusters::Test::Structs::SimpleStruct::DecodableType & value);
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::DecodableType> & value);
 };
 
-class MTRTestStructAttrStructAttributeCallbackSubscriptionBridge : public MTRTestStructAttrStructAttributeCallbackBridge
+class MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge
 {
 public:
-    MTRTestStructAttrStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                               MTRDeviceController * controller, ResponseHandler handler,
-                                                               MTRActionBlock action,
-                                                               MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestStructAttrStructAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+    MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRTestStructAttrStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                               ResponseHandler handler, MTRActionBlock action,
-                                                               MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestStructAttrStructAttributeCallbackBridge(queue, device, handler, action, true),
+    MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -14634,42 +14608,90 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestListLongOctetStringListAttributeCallbackBridge : public MTRCallbackBridge<TestListLongOctetStringListAttributeCallback>
+class MTRUnitTestingStructAttrStructAttributeCallbackBridge : public MTRCallbackBridge<UnitTestingStructAttrStructAttributeCallback>
 {
 public:
-    MTRTestListLongOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingStructAttrStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                           MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestListLongOctetStringListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<UnitTestingStructAttrStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRTestListLongOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+    MTRUnitTestingStructAttrStructAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                           MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestListLongOctetStringListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+        MTRCallbackBridge<UnitTestingStructAttrStructAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
                                                                         keepAlive){};
 
-    MTRTestListLongOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+    MTRUnitTestingStructAttrStructAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
                                                           MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestListLongOctetStringListAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<UnitTestingStructAttrStructAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType & value);
+};
+
+class MTRUnitTestingStructAttrStructAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingStructAttrStructAttributeCallbackBridge
+{
+public:
+    MTRUnitTestingStructAttrStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                      MTRDeviceController * controller, ResponseHandler handler,
+                                                                      MTRActionBlock action,
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingStructAttrStructAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRUnitTestingStructAttrStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                      ResponseHandler handler, MTRActionBlock action,
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingStructAttrStructAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRUnitTestingListLongOctetStringListAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingListLongOctetStringListAttributeCallback>
+{
+public:
+    MTRUnitTestingListLongOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingListLongOctetStringListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRUnitTestingListLongOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                 MTRDeviceController * controller, ResponseHandler handler,
+                                                                 MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingListLongOctetStringListAttributeCallback>(queue, nodeID, controller, handler, action,
+                                                                               OnSuccessFn, keepAlive){};
+
+    MTRUnitTestingListLongOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                 ResponseHandler handler, MTRActionBlock action,
+                                                                 bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingListLongOctetStringListAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                               keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value);
 };
 
-class MTRTestListLongOctetStringListAttributeCallbackSubscriptionBridge
-    : public MTRTestListLongOctetStringListAttributeCallbackBridge
+class MTRUnitTestingListLongOctetStringListAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingListLongOctetStringListAttributeCallbackBridge
 {
 public:
-    MTRTestListLongOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                      MTRDeviceController * controller, ResponseHandler handler,
-                                                                      MTRActionBlock action,
-                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestListLongOctetStringListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+    MTRUnitTestingListLongOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                             MTRDeviceController * controller,
+                                                                             ResponseHandler handler, MTRActionBlock action,
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingListLongOctetStringListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRTestListLongOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                      ResponseHandler handler, MTRActionBlock action,
-                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestListLongOctetStringListAttributeCallbackBridge(queue, device, handler, action, true),
+    MTRUnitTestingListLongOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                             ResponseHandler handler, MTRActionBlock action,
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingListLongOctetStringListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -14679,87 +14701,48 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestListFabricScopedListAttributeCallbackBridge : public MTRCallbackBridge<TestListFabricScopedListAttributeCallback>
+class MTRUnitTestingListFabricScopedListAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingListFabricScopedListAttributeCallback>
 {
 public:
-    MTRTestListFabricScopedListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                                       bool keepAlive = false) :
-        MTRCallbackBridge<TestListFabricScopedListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingListFabricScopedListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingListFabricScopedListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRTestListFabricScopedListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                       MTRDeviceController * controller, ResponseHandler handler,
-                                                       MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestListFabricScopedListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                     keepAlive){};
+    MTRUnitTestingListFabricScopedListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                              MTRDeviceController * controller, ResponseHandler handler,
+                                                              MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingListFabricScopedListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                            keepAlive){};
 
-    MTRTestListFabricScopedListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                       MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestListFabricScopedListAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingListFabricScopedListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                              ResponseHandler handler, MTRActionBlock action,
+                                                              bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingListFabricScopedListAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                            keepAlive){};
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Test::Structs::TestFabricScoped::DecodableType> & value);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestFabricScoped::DecodableType> &
+            value);
 };
 
-class MTRTestListFabricScopedListAttributeCallbackSubscriptionBridge : public MTRTestListFabricScopedListAttributeCallbackBridge
+class MTRUnitTestingListFabricScopedListAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingListFabricScopedListAttributeCallbackBridge
 {
 public:
-    MTRTestListFabricScopedListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                   MTRDeviceController * controller, ResponseHandler handler,
-                                                                   MTRActionBlock action,
-                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestListFabricScopedListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+    MTRUnitTestingListFabricScopedListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                          MTRDeviceController * controller, ResponseHandler handler,
+                                                                          MTRActionBlock action,
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingListFabricScopedListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRTestListFabricScopedListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                   ResponseHandler handler, MTRActionBlock action,
-                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestListFabricScopedListAttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRTestNullableBitmap8AttributeCallbackBridge : public MTRCallbackBridge<TestNullableBitmap8AttributeCallback>
-{
-public:
-    MTRTestNullableBitmap8AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                                  bool keepAlive = false) :
-        MTRCallbackBridge<TestNullableBitmap8AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRTestNullableBitmap8AttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
-                                                  ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestNullableBitmap8AttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                keepAlive){};
-
-    MTRTestNullableBitmap8AttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                  MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestNullableBitmap8AttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap8MaskMap>> & value);
-};
-
-class MTRTestNullableBitmap8AttributeCallbackSubscriptionBridge : public MTRTestNullableBitmap8AttributeCallbackBridge
-{
-public:
-    MTRTestNullableBitmap8AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                              MTRDeviceController * controller, ResponseHandler handler,
-                                                              MTRActionBlock action,
-                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestNullableBitmap8AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    MTRTestNullableBitmap8AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                              ResponseHandler handler, MTRActionBlock action,
-                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestNullableBitmap8AttributeCallbackBridge(queue, device, handler, action, true),
+    MTRUnitTestingListFabricScopedListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                          ResponseHandler handler, MTRActionBlock action,
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingListFabricScopedListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -14769,87 +14752,43 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestNullableBitmap16AttributeCallbackBridge : public MTRCallbackBridge<TestNullableBitmap16AttributeCallback>
+class MTRUnitTestingNullableBitmap8AttributeCallbackBridge : public MTRCallbackBridge<UnitTestingNullableBitmap8AttributeCallback>
 {
 public:
-    MTRTestNullableBitmap16AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                                   bool keepAlive = false) :
-        MTRCallbackBridge<TestNullableBitmap16AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingNullableBitmap8AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                         MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingNullableBitmap8AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRTestNullableBitmap16AttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
-                                                   ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestNullableBitmap16AttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                 keepAlive){};
+    MTRUnitTestingNullableBitmap8AttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                         MTRDeviceController * controller, ResponseHandler handler,
+                                                         MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingNullableBitmap8AttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                       keepAlive){};
 
-    MTRTestNullableBitmap16AttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                   MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestNullableBitmap16AttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingNullableBitmap8AttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                         MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingNullableBitmap8AttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap16MaskMap>> & value);
+                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> & value);
 };
 
-class MTRTestNullableBitmap16AttributeCallbackSubscriptionBridge : public MTRTestNullableBitmap16AttributeCallbackBridge
+class MTRUnitTestingNullableBitmap8AttributeCallbackSubscriptionBridge : public MTRUnitTestingNullableBitmap8AttributeCallbackBridge
 {
 public:
-    MTRTestNullableBitmap16AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                               MTRDeviceController * controller, ResponseHandler handler,
-                                                               MTRActionBlock action,
-                                                               MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestNullableBitmap16AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+    MTRUnitTestingNullableBitmap8AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                     MTRDeviceController * controller, ResponseHandler handler,
+                                                                     MTRActionBlock action,
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingNullableBitmap8AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRTestNullableBitmap16AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                               ResponseHandler handler, MTRActionBlock action,
-                                                               MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestNullableBitmap16AttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRTestNullableBitmap32AttributeCallbackBridge : public MTRCallbackBridge<TestNullableBitmap32AttributeCallback>
-{
-public:
-    MTRTestNullableBitmap32AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                                   bool keepAlive = false) :
-        MTRCallbackBridge<TestNullableBitmap32AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRTestNullableBitmap32AttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
-                                                   ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestNullableBitmap32AttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                 keepAlive){};
-
-    MTRTestNullableBitmap32AttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                   MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestNullableBitmap32AttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap32MaskMap>> & value);
-};
-
-class MTRTestNullableBitmap32AttributeCallbackSubscriptionBridge : public MTRTestNullableBitmap32AttributeCallbackBridge
-{
-public:
-    MTRTestNullableBitmap32AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                               MTRDeviceController * controller, ResponseHandler handler,
-                                                               MTRActionBlock action,
-                                                               MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestNullableBitmap32AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    MTRTestNullableBitmap32AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                               ResponseHandler handler, MTRActionBlock action,
-                                                               MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestNullableBitmap32AttributeCallbackBridge(queue, device, handler, action, true),
+    MTRUnitTestingNullableBitmap8AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                     ResponseHandler handler, MTRActionBlock action,
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingNullableBitmap8AttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -14859,179 +14798,44 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestNullableBitmap64AttributeCallbackBridge : public MTRCallbackBridge<TestNullableBitmap64AttributeCallback>
+class MTRUnitTestingNullableBitmap16AttributeCallbackBridge : public MTRCallbackBridge<UnitTestingNullableBitmap16AttributeCallback>
 {
 public:
-    MTRTestNullableBitmap64AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                                   bool keepAlive = false) :
-        MTRCallbackBridge<TestNullableBitmap64AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRTestNullableBitmap64AttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
-                                                   ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestNullableBitmap64AttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                 keepAlive){};
-
-    MTRTestNullableBitmap64AttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                   MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestNullableBitmap64AttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap64MaskMap>> & value);
-};
-
-class MTRTestNullableBitmap64AttributeCallbackSubscriptionBridge : public MTRTestNullableBitmap64AttributeCallbackBridge
-{
-public:
-    MTRTestNullableBitmap64AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                               MTRDeviceController * controller, ResponseHandler handler,
-                                                               MTRActionBlock action,
-                                                               MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestNullableBitmap64AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    MTRTestNullableBitmap64AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                               ResponseHandler handler, MTRActionBlock action,
-                                                               MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestNullableBitmap64AttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRTestNullableStructStructAttributeCallbackBridge : public MTRCallbackBridge<TestNullableStructStructAttributeCallback>
-{
-public:
-    MTRTestNullableStructStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                                       bool keepAlive = false) :
-        MTRCallbackBridge<TestNullableStructStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRTestNullableStructStructAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                       MTRDeviceController * controller, ResponseHandler handler,
-                                                       MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestNullableStructStructAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                     keepAlive){};
-
-    MTRTestNullableStructStructAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                       MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestNullableStructStructAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::Test::Structs::SimpleStruct::DecodableType> & value);
-};
-
-class MTRTestNullableStructStructAttributeCallbackSubscriptionBridge : public MTRTestNullableStructStructAttributeCallbackBridge
-{
-public:
-    MTRTestNullableStructStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                   MTRDeviceController * controller, ResponseHandler handler,
-                                                                   MTRActionBlock action,
-                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestNullableStructStructAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    MTRTestNullableStructStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                   ResponseHandler handler, MTRActionBlock action,
-                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestNullableStructStructAttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRTestGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<TestGeneratedCommandListListAttributeCallback>
-{
-public:
-    MTRTestGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                           MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRTestGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                           MTRDeviceController * controller, ResponseHandler handler,
-                                                           MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestGeneratedCommandListListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                         keepAlive){};
-
-    MTRTestGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                           MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestGeneratedCommandListListAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class MTRTestGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRTestGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    MTRTestGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                       MTRDeviceController * controller, ResponseHandler handler,
-                                                                       MTRActionBlock action,
-                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    MTRTestGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                       ResponseHandler handler, MTRActionBlock action,
-                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRTestAcceptedCommandListListAttributeCallbackBridge : public MTRCallbackBridge<TestAcceptedCommandListListAttributeCallback>
-{
-public:
-    MTRTestAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingNullableBitmap16AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                           MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<UnitTestingNullableBitmap16AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRTestAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+    MTRUnitTestingNullableBitmap16AttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                           MTRDeviceController * controller, ResponseHandler handler,
                                                           MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestAcceptedCommandListListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+        MTRCallbackBridge<UnitTestingNullableBitmap16AttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
                                                                         keepAlive){};
 
-    MTRTestAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+    MTRUnitTestingNullableBitmap16AttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
                                                           MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestAcceptedCommandListListAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<UnitTestingNullableBitmap16AttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>> & value);
 };
 
-class MTRTestAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRTestAcceptedCommandListListAttributeCallbackBridge
+class MTRUnitTestingNullableBitmap16AttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingNullableBitmap16AttributeCallbackBridge
 {
 public:
-    MTRTestAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+    MTRUnitTestingNullableBitmap16AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                       MTRDeviceController * controller, ResponseHandler handler,
                                                                       MTRActionBlock action,
                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        MTRUnitTestingNullableBitmap16AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRTestAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+    MTRUnitTestingNullableBitmap16AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                       ResponseHandler handler, MTRActionBlock action,
                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
+        MTRUnitTestingNullableBitmap16AttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -15041,40 +14845,282 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<TestAttributeListListAttributeCallback>
+class MTRUnitTestingNullableBitmap32AttributeCallbackBridge : public MTRCallbackBridge<UnitTestingNullableBitmap32AttributeCallback>
 {
 public:
-    MTRTestAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                                    bool keepAlive = false) :
-        MTRCallbackBridge<TestAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingNullableBitmap32AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                          MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingNullableBitmap32AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRTestAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
-                                                    ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestAttributeListListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                  keepAlive){};
+    MTRUnitTestingNullableBitmap32AttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                          MTRDeviceController * controller, ResponseHandler handler,
+                                                          MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingNullableBitmap32AttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                        keepAlive){};
 
-    MTRTestAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                    MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestAttributeListListAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingNullableBitmap32AttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                          MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingNullableBitmap32AttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>> & value);
+};
+
+class MTRUnitTestingNullableBitmap32AttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingNullableBitmap32AttributeCallbackBridge
+{
+public:
+    MTRUnitTestingNullableBitmap32AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                      MTRDeviceController * controller, ResponseHandler handler,
+                                                                      MTRActionBlock action,
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingNullableBitmap32AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRUnitTestingNullableBitmap32AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                      ResponseHandler handler, MTRActionBlock action,
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingNullableBitmap32AttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRUnitTestingNullableBitmap64AttributeCallbackBridge : public MTRCallbackBridge<UnitTestingNullableBitmap64AttributeCallback>
+{
+public:
+    MTRUnitTestingNullableBitmap64AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                          MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingNullableBitmap64AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRUnitTestingNullableBitmap64AttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                          MTRDeviceController * controller, ResponseHandler handler,
+                                                          MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingNullableBitmap64AttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                        keepAlive){};
+
+    MTRUnitTestingNullableBitmap64AttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                          MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingNullableBitmap64AttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>> & value);
+};
+
+class MTRUnitTestingNullableBitmap64AttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingNullableBitmap64AttributeCallbackBridge
+{
+public:
+    MTRUnitTestingNullableBitmap64AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                      MTRDeviceController * controller, ResponseHandler handler,
+                                                                      MTRActionBlock action,
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingNullableBitmap64AttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRUnitTestingNullableBitmap64AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                      ResponseHandler handler, MTRActionBlock action,
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingNullableBitmap64AttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRUnitTestingNullableStructStructAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingNullableStructStructAttributeCallback>
+{
+public:
+    MTRUnitTestingNullableStructStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingNullableStructStructAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRUnitTestingNullableStructStructAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                              MTRDeviceController * controller, ResponseHandler handler,
+                                                              MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingNullableStructStructAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                            keepAlive){};
+
+    MTRUnitTestingNullableStructStructAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                              ResponseHandler handler, MTRActionBlock action,
+                                                              bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingNullableStructStructAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                            keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType> & value);
+};
+
+class MTRUnitTestingNullableStructStructAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingNullableStructStructAttributeCallbackBridge
+{
+public:
+    MTRUnitTestingNullableStructStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                          MTRDeviceController * controller, ResponseHandler handler,
+                                                                          MTRActionBlock action,
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingNullableStructStructAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRUnitTestingNullableStructStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                          ResponseHandler handler, MTRActionBlock action,
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingNullableStructStructAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRUnitTestingGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRUnitTestingGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRUnitTestingGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                  MTRDeviceController * controller, ResponseHandler handler,
+                                                                  MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingGeneratedCommandListListAttributeCallback>(queue, nodeID, controller, handler, action,
+                                                                                OnSuccessFn, keepAlive){};
+
+    MTRUnitTestingGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                  ResponseHandler handler, MTRActionBlock action,
+                                                                  bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingGeneratedCommandListListAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                                keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRUnitTestingGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRUnitTestingGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingGeneratedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRUnitTestingGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingGeneratedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRUnitTestingAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRUnitTestingAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRUnitTestingAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                 MTRDeviceController * controller, ResponseHandler handler,
+                                                                 MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingAcceptedCommandListListAttributeCallback>(queue, nodeID, controller, handler, action,
+                                                                               OnSuccessFn, keepAlive){};
+
+    MTRUnitTestingAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                 ResponseHandler handler, MTRActionBlock action,
+                                                                 bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingAcceptedCommandListListAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                               keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRUnitTestingAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRUnitTestingAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                             MTRDeviceController * controller,
+                                                                             ResponseHandler handler, MTRActionBlock action,
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingAcceptedCommandListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    MTRUnitTestingAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                             ResponseHandler handler, MTRActionBlock action,
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingAcceptedCommandListListAttributeCallbackBridge(queue, device, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRUnitTestingAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingAttributeListListAttributeCallback>
+{
+public:
+    MTRUnitTestingAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                           MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRUnitTestingAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                           MTRDeviceController * controller, ResponseHandler handler,
+                                                           MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingAttributeListListAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                         keepAlive){};
+
+    MTRUnitTestingAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                           MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingAttributeListListAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-class MTRTestAttributeListListAttributeCallbackSubscriptionBridge : public MTRTestAttributeListListAttributeCallbackBridge
+class MTRUnitTestingAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingAttributeListListAttributeCallbackBridge
 {
 public:
-    MTRTestAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                MTRDeviceController * controller, ResponseHandler handler,
-                                                                MTRActionBlock action,
-                                                                MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+    MTRUnitTestingAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                       MTRDeviceController * controller, ResponseHandler handler,
+                                                                       MTRActionBlock action,
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingAttributeListListAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRTestAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
+    MTRUnitTestingAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                       ResponseHandler handler, MTRActionBlock action,
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingAttributeListListAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -16060,271 +16106,298 @@ public:
                             const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data);
 };
 
-class MTRTestClusterTestSpecificResponseCallbackBridge : public MTRCallbackBridge<TestClusterTestSpecificResponseCallbackType>
+class MTRUnitTestingClusterTestSpecificResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestSpecificResponseCallbackType>
 {
 public:
-    MTRTestClusterTestSpecificResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                                     bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestSpecificResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingClusterTestSpecificResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                            MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestSpecificResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRTestClusterTestSpecificResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
-                                                     ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestSpecificResponseCallbackType>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                       keepAlive){};
+    MTRUnitTestingClusterTestSpecificResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                            MTRDeviceController * controller, ResponseHandler handler,
+                                                            MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestSpecificResponseCallbackType>(queue, nodeID, controller, handler, action,
+                                                                              OnSuccessFn, keepAlive){};
 
-    MTRTestClusterTestSpecificResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                     MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestSpecificResponseCallbackType>(queue, device, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::Clusters::Test::Commands::TestSpecificResponse::DecodableType & data);
-};
-
-class MTRTestClusterTestAddArgumentsResponseCallbackBridge
-    : public MTRCallbackBridge<TestClusterTestAddArgumentsResponseCallbackType>
-{
-public:
-    MTRTestClusterTestAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                         MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestAddArgumentsResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRTestClusterTestAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                         MTRDeviceController * controller, ResponseHandler handler,
-                                                         MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestAddArgumentsResponseCallbackType>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                           keepAlive){};
-
-    MTRTestClusterTestAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                         MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestAddArgumentsResponseCallbackType>(queue, device, handler, action, OnSuccessFn,
-                                                                           keepAlive){};
+    MTRUnitTestingClusterTestSpecificResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                            MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestSpecificResponseCallbackType>(queue, device, handler, action, OnSuccessFn,
+                                                                              keepAlive){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Test::Commands::TestAddArgumentsResponse::DecodableType & data);
+                            const chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType & data);
 };
 
-class MTRTestClusterTestSimpleArgumentResponseCallbackBridge
-    : public MTRCallbackBridge<TestClusterTestSimpleArgumentResponseCallbackType>
+class MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestAddArgumentsResponseCallbackType>
 {
 public:
-    MTRTestClusterTestSimpleArgumentResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                           MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestSimpleArgumentResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRTestClusterTestSimpleArgumentResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                           MTRDeviceController * controller, ResponseHandler handler,
-                                                           MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestSimpleArgumentResponseCallbackType>(queue, nodeID, controller, handler, action,
-                                                                             OnSuccessFn, keepAlive){};
-
-    MTRTestClusterTestSimpleArgumentResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                           MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestSimpleArgumentResponseCallbackType>(queue, device, handler, action, OnSuccessFn,
-                                                                             keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Test::Commands::TestSimpleArgumentResponse::DecodableType & data);
-};
-
-class MTRTestClusterTestStructArrayArgumentResponseCallbackBridge
-    : public MTRCallbackBridge<TestClusterTestStructArrayArgumentResponseCallbackType>
-{
-public:
-    MTRTestClusterTestStructArrayArgumentResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                 MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestStructArrayArgumentResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+        MTRCallbackBridge<UnitTestingClusterTestAddArgumentsResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRTestClusterTestStructArrayArgumentResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+    MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                 MTRDeviceController * controller, ResponseHandler handler,
                                                                 MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestStructArrayArgumentResponseCallbackType>(queue, nodeID, controller, handler, action,
+        MTRCallbackBridge<UnitTestingClusterTestAddArgumentsResponseCallbackType>(queue, nodeID, controller, handler, action,
                                                                                   OnSuccessFn, keepAlive){};
 
-    MTRTestClusterTestStructArrayArgumentResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+    MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                 ResponseHandler handler, MTRActionBlock action,
                                                                 bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestStructArrayArgumentResponseCallbackType>(queue, device, handler, action, OnSuccessFn,
+        MTRCallbackBridge<UnitTestingClusterTestAddArgumentsResponseCallbackType>(queue, device, handler, action, OnSuccessFn,
                                                                                   keepAlive){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Test::Commands::TestStructArrayArgumentResponse::DecodableType & data);
+                            const chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType & data);
 };
 
-class MTRTestClusterTestListInt8UReverseResponseCallbackBridge
-    : public MTRCallbackBridge<TestClusterTestListInt8UReverseResponseCallbackType>
+class MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestSimpleArgumentResponseCallbackType>
 {
 public:
-    MTRTestClusterTestListInt8UReverseResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestListInt8UReverseResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestSimpleArgumentResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                    keepAlive){};
 
-    MTRTestClusterTestListInt8UReverseResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                             MTRDeviceController * controller, ResponseHandler handler,
-                                                             MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestListInt8UReverseResponseCallbackType>(queue, nodeID, controller, handler, action,
-                                                                               OnSuccessFn, keepAlive){};
+    MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                  MTRDeviceController * controller, ResponseHandler handler,
+                                                                  MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestSimpleArgumentResponseCallbackType>(queue, nodeID, controller, handler, action,
+                                                                                    OnSuccessFn, keepAlive){};
 
-    MTRTestClusterTestListInt8UReverseResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                             ResponseHandler handler, MTRActionBlock action,
-                                                             bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestListInt8UReverseResponseCallbackType>(queue, device, handler, action, OnSuccessFn,
-                                                                               keepAlive){};
+    MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                  ResponseHandler handler, MTRActionBlock action,
+                                                                  bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestSimpleArgumentResponseCallbackType>(queue, device, handler, action, OnSuccessFn,
+                                                                                    keepAlive){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Test::Commands::TestListInt8UReverseResponse::DecodableType & data);
+                            const chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType & data);
 };
 
-class MTRTestClusterTestEnumsResponseCallbackBridge : public MTRCallbackBridge<TestClusterTestEnumsResponseCallbackType>
+class MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestStructArrayArgumentResponseCallbackType>
 {
 public:
-    MTRTestClusterTestEnumsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                                  bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestEnumsResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestStructArrayArgumentResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
 
-    MTRTestClusterTestEnumsResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
-                                                  ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestEnumsResponseCallbackType>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                    keepAlive){};
+    MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                       MTRDeviceController * controller, ResponseHandler handler,
+                                                                       MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestStructArrayArgumentResponseCallbackType>(queue, nodeID, controller, handler, action,
+                                                                                         OnSuccessFn, keepAlive){};
 
-    MTRTestClusterTestEnumsResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                  MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestEnumsResponseCallbackType>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                       ResponseHandler handler, MTRActionBlock action,
+                                                                       bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestStructArrayArgumentResponseCallbackType>(queue, device, handler, action,
+                                                                                         OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::Clusters::Test::Commands::TestEnumsResponse::DecodableType & data);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType & data);
 };
 
-class MTRTestClusterTestNullableOptionalResponseCallbackBridge
-    : public MTRCallbackBridge<TestClusterTestNullableOptionalResponseCallbackType>
+class MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestListInt8UReverseResponseCallbackType>
 {
 public:
-    MTRTestClusterTestNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestNullableOptionalResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRTestClusterTestNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                             MTRDeviceController * controller, ResponseHandler handler,
-                                                             MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestNullableOptionalResponseCallbackType>(queue, nodeID, controller, handler, action,
-                                                                               OnSuccessFn, keepAlive){};
-
-    MTRTestClusterTestNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                             ResponseHandler handler, MTRActionBlock action,
-                                                             bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestNullableOptionalResponseCallbackType>(queue, device, handler, action, OnSuccessFn,
-                                                                               keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Test::Commands::TestNullableOptionalResponse::DecodableType & data);
-};
-
-class MTRTestClusterTestComplexNullableOptionalResponseCallbackBridge
-    : public MTRCallbackBridge<TestClusterTestComplexNullableOptionalResponseCallbackType>
-{
-public:
-    MTRTestClusterTestComplexNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                     MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestComplexNullableOptionalResponseCallbackType>(queue, handler, action, OnSuccessFn,
+        MTRCallbackBridge<UnitTestingClusterTestListInt8UReverseResponseCallbackType>(queue, handler, action, OnSuccessFn,
                                                                                       keepAlive){};
 
-    MTRTestClusterTestComplexNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+    MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
                                                                     MTRDeviceController * controller, ResponseHandler handler,
                                                                     MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestComplexNullableOptionalResponseCallbackType>(queue, nodeID, controller, handler, action,
+        MTRCallbackBridge<UnitTestingClusterTestListInt8UReverseResponseCallbackType>(queue, nodeID, controller, handler, action,
                                                                                       OnSuccessFn, keepAlive){};
 
-    MTRTestClusterTestComplexNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+    MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
                                                                     ResponseHandler handler, MTRActionBlock action,
                                                                     bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestComplexNullableOptionalResponseCallbackType>(queue, device, handler, action, OnSuccessFn,
+        MTRCallbackBridge<UnitTestingClusterTestListInt8UReverseResponseCallbackType>(queue, device, handler, action, OnSuccessFn,
                                                                                       keepAlive){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Test::Commands::TestComplexNullableOptionalResponse::DecodableType & data);
+                            const chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType & data);
 };
 
-class MTRTestClusterBooleanResponseCallbackBridge : public MTRCallbackBridge<TestClusterBooleanResponseCallbackType>
+class MTRUnitTestingClusterTestEnumsResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestEnumsResponseCallbackType>
 {
 public:
-    MTRTestClusterBooleanResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                                bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterBooleanResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingClusterTestEnumsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                         MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestEnumsResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRTestClusterBooleanResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
-                                                ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterBooleanResponseCallbackType>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                  keepAlive){};
+    MTRUnitTestingClusterTestEnumsResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                         MTRDeviceController * controller, ResponseHandler handler,
+                                                         MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestEnumsResponseCallbackType>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                           keepAlive){};
 
-    MTRTestClusterBooleanResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterBooleanResponseCallbackType>(queue, device, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::Clusters::Test::Commands::BooleanResponse::DecodableType & data);
-};
-
-class MTRTestClusterSimpleStructResponseCallbackBridge : public MTRCallbackBridge<TestClusterSimpleStructResponseCallbackType>
-{
-public:
-    MTRTestClusterSimpleStructResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                                     bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterSimpleStructResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRTestClusterSimpleStructResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
-                                                     ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterSimpleStructResponseCallbackType>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                       keepAlive){};
-
-    MTRTestClusterSimpleStructResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                     MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterSimpleStructResponseCallbackType>(queue, device, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::Clusters::Test::Commands::SimpleStructResponse::DecodableType & data);
-};
-
-class MTRTestClusterTestEmitTestEventResponseCallbackBridge
-    : public MTRCallbackBridge<TestClusterTestEmitTestEventResponseCallbackType>
-{
-public:
-    MTRTestClusterTestEmitTestEventResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                          MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestEmitTestEventResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    MTRTestClusterTestEmitTestEventResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                          MTRDeviceController * controller, ResponseHandler handler,
-                                                          MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestEmitTestEventResponseCallbackType>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                            keepAlive){};
-
-    MTRTestClusterTestEmitTestEventResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                          MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestEmitTestEventResponseCallbackType>(queue, device, handler, action, OnSuccessFn,
-                                                                            keepAlive){};
+    MTRUnitTestingClusterTestEnumsResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                         MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestEnumsResponseCallbackType>(queue, device, handler, action, OnSuccessFn,
+                                                                           keepAlive){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Test::Commands::TestEmitTestEventResponse::DecodableType & data);
+                            const chip::app::Clusters::UnitTesting::Commands::TestEnumsResponse::DecodableType & data);
 };
 
-class MTRTestClusterTestEmitTestFabricScopedEventResponseCallbackBridge
-    : public MTRCallbackBridge<TestClusterTestEmitTestFabricScopedEventResponseCallbackType>
+class MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestNullableOptionalResponseCallbackType>
 {
 public:
-    MTRTestClusterTestEmitTestFabricScopedEventResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestEmitTestFabricScopedEventResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
+    MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestNullableOptionalResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
 
-    MTRTestClusterTestEmitTestFabricScopedEventResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                      MTRDeviceController * controller, ResponseHandler handler,
-                                                                      MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestEmitTestFabricScopedEventResponseCallbackType>(queue, nodeID, controller, handler, action,
-                                                                                        OnSuccessFn, keepAlive){};
+    MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                    MTRDeviceController * controller, ResponseHandler handler,
+                                                                    MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestNullableOptionalResponseCallbackType>(queue, nodeID, controller, handler, action,
+                                                                                      OnSuccessFn, keepAlive){};
 
-    MTRTestClusterTestEmitTestFabricScopedEventResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                      ResponseHandler handler, MTRActionBlock action,
-                                                                      bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterTestEmitTestFabricScopedEventResponseCallbackType>(queue, device, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
+    MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                    ResponseHandler handler, MTRActionBlock action,
+                                                                    bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestNullableOptionalResponseCallbackType>(queue, device, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Test::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & data);
+                            const chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalResponse::DecodableType & data);
+};
+
+class MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestComplexNullableOptionalResponseCallbackType>
+{
+public:
+    MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestComplexNullableOptionalResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                             keepAlive){};
+
+    MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                           MTRDeviceController * controller,
+                                                                           ResponseHandler handler, MTRActionBlock action,
+                                                                           bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestComplexNullableOptionalResponseCallbackType>(queue, nodeID, controller, handler,
+                                                                                             action, OnSuccessFn, keepAlive){};
+
+    MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                           ResponseHandler handler, MTRActionBlock action,
+                                                                           bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestComplexNullableOptionalResponseCallbackType>(queue, device, handler, action,
+                                                                                             OnSuccessFn, keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType & data);
+};
+
+class MTRUnitTestingClusterBooleanResponseCallbackBridge : public MTRCallbackBridge<UnitTestingClusterBooleanResponseCallbackType>
+{
+public:
+    MTRUnitTestingClusterBooleanResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
+                                                       bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterBooleanResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRUnitTestingClusterBooleanResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                       MTRDeviceController * controller, ResponseHandler handler,
+                                                       MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterBooleanResponseCallbackType>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                         keepAlive){};
+
+    MTRUnitTestingClusterBooleanResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                       MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterBooleanResponseCallbackType>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::UnitTesting::Commands::BooleanResponse::DecodableType & data);
+};
+
+class MTRUnitTestingClusterSimpleStructResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterSimpleStructResponseCallbackType>
+{
+public:
+    MTRUnitTestingClusterSimpleStructResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                            MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterSimpleStructResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    MTRUnitTestingClusterSimpleStructResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                            MTRDeviceController * controller, ResponseHandler handler,
+                                                            MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterSimpleStructResponseCallbackType>(queue, nodeID, controller, handler, action,
+                                                                              OnSuccessFn, keepAlive){};
+
+    MTRUnitTestingClusterSimpleStructResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                            MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterSimpleStructResponseCallbackType>(queue, device, handler, action, OnSuccessFn,
+                                                                              keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::UnitTesting::Commands::SimpleStructResponse::DecodableType & data);
+};
+
+class MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestEmitTestEventResponseCallbackType>
+{
+public:
+    MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestEmitTestEventResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                 MTRDeviceController * controller, ResponseHandler handler,
+                                                                 MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestEmitTestEventResponseCallbackType>(queue, nodeID, controller, handler, action,
+                                                                                   OnSuccessFn, keepAlive){};
+
+    MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                 ResponseHandler handler, MTRActionBlock action,
+                                                                 bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestEmitTestEventResponseCallbackType>(queue, device, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType & data);
+};
+
+class MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackType>
+{
+public:
+    MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                               keepAlive){};
+
+    MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                             MTRDeviceController * controller,
+                                                                             ResponseHandler handler, MTRActionBlock action,
+                                                                             bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackType>(queue, nodeID, controller, handler,
+                                                                                               action, OnSuccessFn, keepAlive){};
+
+    MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                             ResponseHandler handler, MTRActionBlock action,
+                                                                             bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackType>(queue, device, handler, action,
+                                                                                               OnSuccessFn, keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & data);
 };
 
 class MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge
@@ -27326,40 +27399,43 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterSimpleEnumAttributeCallbackBridge : public MTRCallbackBridge<TestClusterSimpleEnumAttributeCallback>
+class MTRUnitTestingClusterSimpleEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterSimpleEnumAttributeCallback>
 {
 public:
-    MTRTestClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action,
-                                                    bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterSimpleEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                           MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterSimpleEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRTestClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller,
-                                                    ResponseHandler handler, MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterSimpleEnumAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                  keepAlive){};
+    MTRUnitTestingClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                           MTRDeviceController * controller, ResponseHandler handler,
+                                                           MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterSimpleEnumAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
+                                                                         keepAlive){};
 
-    MTRTestClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                    MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<TestClusterSimpleEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+    MTRUnitTestingClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
+                                                           MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<UnitTestingClusterSimpleEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::Test::SimpleEnum value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::UnitTesting::SimpleEnum value);
 };
 
-class MTRTestClusterSimpleEnumAttributeCallbackSubscriptionBridge : public MTRTestClusterSimpleEnumAttributeCallbackBridge
+class MTRUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingClusterSimpleEnumAttributeCallbackBridge
 {
 public:
-    MTRTestClusterSimpleEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                MTRDeviceController * controller, ResponseHandler handler,
-                                                                MTRActionBlock action,
-                                                                MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterSimpleEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+    MTRUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                       MTRDeviceController * controller, ResponseHandler handler,
+                                                                       MTRActionBlock action,
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingClusterSimpleEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRTestClusterSimpleEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                ResponseHandler handler, MTRActionBlock action,
-                                                                MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterSimpleEnumAttributeCallbackBridge(queue, device, handler, action, true),
+    MTRUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                       ResponseHandler handler, MTRActionBlock action,
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingClusterSimpleEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -27369,43 +27445,45 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableTestClusterSimpleEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableTestClusterSimpleEnumAttributeCallback>
+class MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableUnitTestingClusterSimpleEnumAttributeCallback>
 {
 public:
-    MTRNullableTestClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                            MTRLocalActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<NullableTestClusterSimpleEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   MTRLocalActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<NullableUnitTestingClusterSimpleEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    MTRNullableTestClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                            MTRDeviceController * controller, ResponseHandler handler,
-                                                            MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<NullableTestClusterSimpleEnumAttributeCallback>(queue, nodeID, controller, handler, action, OnSuccessFn,
-                                                                          keepAlive){};
+    MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, chip::NodeId nodeID,
+                                                                   MTRDeviceController * controller, ResponseHandler handler,
+                                                                   MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<NullableUnitTestingClusterSimpleEnumAttributeCallback>(queue, nodeID, controller, handler, action,
+                                                                                 OnSuccessFn, keepAlive){};
 
-    MTRNullableTestClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler,
-                                                            MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<NullableTestClusterSimpleEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn, keepAlive){};
+    MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, MTRBaseDevice * device,
+                                                                   ResponseHandler handler, MTRActionBlock action,
+                                                                   bool keepAlive = false) :
+        MTRCallbackBridge<NullableUnitTestingClusterSimpleEnumAttributeCallback>(queue, device, handler, action, OnSuccessFn,
+                                                                                 keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Test::SimpleEnum> & value);
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> & value);
 };
 
-class MTRNullableTestClusterSimpleEnumAttributeCallbackSubscriptionBridge
-    : public MTRNullableTestClusterSimpleEnumAttributeCallbackBridge
+class MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableTestClusterSimpleEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID,
-                                                                        MTRDeviceController * controller, ResponseHandler handler,
-                                                                        MTRActionBlock action,
-                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableTestClusterSimpleEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
+    MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler,
+        MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge(queue, nodeID, controller, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
-    MTRNullableTestClusterSimpleEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device,
-                                                                        ResponseHandler handler, MTRActionBlock action,
-                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableTestClusterSimpleEnumAttributeCallbackBridge(queue, device, handler, action, true),
+    MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge(queue, device, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

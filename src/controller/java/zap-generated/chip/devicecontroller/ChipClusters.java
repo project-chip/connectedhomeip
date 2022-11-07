@@ -21910,10 +21910,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class TestCluster extends BaseChipCluster {
+  public static class UnitTestingCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 4294048773L;
 
-    public TestCluster(long devicePtr, int endpointId) {
+    public UnitTestingCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -21970,37 +21970,38 @@ public class ChipClusters {
     }
 
     public void testStructArgumentRequest(
-        BooleanResponseCallback callback, ChipStructs.TestClusterSimpleStruct arg1) {
+        BooleanResponseCallback callback, ChipStructs.UnitTestingClusterSimpleStruct arg1) {
       testStructArgumentRequest(chipClusterPtr, callback, arg1, null);
     }
 
     public void testStructArgumentRequest(
         BooleanResponseCallback callback,
-        ChipStructs.TestClusterSimpleStruct arg1,
+        ChipStructs.UnitTestingClusterSimpleStruct arg1,
         int timedInvokeTimeoutMs) {
       testStructArgumentRequest(chipClusterPtr, callback, arg1, timedInvokeTimeoutMs);
     }
 
     public void testNestedStructArgumentRequest(
-        BooleanResponseCallback callback, ChipStructs.TestClusterNestedStruct arg1) {
+        BooleanResponseCallback callback, ChipStructs.UnitTestingClusterNestedStruct arg1) {
       testNestedStructArgumentRequest(chipClusterPtr, callback, arg1, null);
     }
 
     public void testNestedStructArgumentRequest(
         BooleanResponseCallback callback,
-        ChipStructs.TestClusterNestedStruct arg1,
+        ChipStructs.UnitTestingClusterNestedStruct arg1,
         int timedInvokeTimeoutMs) {
       testNestedStructArgumentRequest(chipClusterPtr, callback, arg1, timedInvokeTimeoutMs);
     }
 
     public void testListStructArgumentRequest(
-        BooleanResponseCallback callback, ArrayList<ChipStructs.TestClusterSimpleStruct> arg1) {
+        BooleanResponseCallback callback,
+        ArrayList<ChipStructs.UnitTestingClusterSimpleStruct> arg1) {
       testListStructArgumentRequest(chipClusterPtr, callback, arg1, null);
     }
 
     public void testListStructArgumentRequest(
         BooleanResponseCallback callback,
-        ArrayList<ChipStructs.TestClusterSimpleStruct> arg1,
+        ArrayList<ChipStructs.UnitTestingClusterSimpleStruct> arg1,
         int timedInvokeTimeoutMs) {
       testListStructArgumentRequest(chipClusterPtr, callback, arg1, timedInvokeTimeoutMs);
     }
@@ -22016,25 +22017,26 @@ public class ChipClusters {
     }
 
     public void testNestedStructListArgumentRequest(
-        BooleanResponseCallback callback, ChipStructs.TestClusterNestedStructList arg1) {
+        BooleanResponseCallback callback, ChipStructs.UnitTestingClusterNestedStructList arg1) {
       testNestedStructListArgumentRequest(chipClusterPtr, callback, arg1, null);
     }
 
     public void testNestedStructListArgumentRequest(
         BooleanResponseCallback callback,
-        ChipStructs.TestClusterNestedStructList arg1,
+        ChipStructs.UnitTestingClusterNestedStructList arg1,
         int timedInvokeTimeoutMs) {
       testNestedStructListArgumentRequest(chipClusterPtr, callback, arg1, timedInvokeTimeoutMs);
     }
 
     public void testListNestedStructListArgumentRequest(
-        BooleanResponseCallback callback, ArrayList<ChipStructs.TestClusterNestedStructList> arg1) {
+        BooleanResponseCallback callback,
+        ArrayList<ChipStructs.UnitTestingClusterNestedStructList> arg1) {
       testListNestedStructListArgumentRequest(chipClusterPtr, callback, arg1, null);
     }
 
     public void testListNestedStructListArgumentRequest(
         BooleanResponseCallback callback,
-        ArrayList<ChipStructs.TestClusterNestedStructList> arg1,
+        ArrayList<ChipStructs.UnitTestingClusterNestedStructList> arg1,
         int timedInvokeTimeoutMs) {
       testListNestedStructListArgumentRequest(chipClusterPtr, callback, arg1, timedInvokeTimeoutMs);
     }
@@ -22073,13 +22075,13 @@ public class ChipClusters {
     }
 
     public void simpleStructEchoRequest(
-        SimpleStructResponseCallback callback, ChipStructs.TestClusterSimpleStruct arg1) {
+        SimpleStructResponseCallback callback, ChipStructs.UnitTestingClusterSimpleStruct arg1) {
       simpleStructEchoRequest(chipClusterPtr, callback, arg1, null);
     }
 
     public void simpleStructEchoRequest(
         SimpleStructResponseCallback callback,
-        ChipStructs.TestClusterSimpleStruct arg1,
+        ChipStructs.UnitTestingClusterSimpleStruct arg1,
         int timedInvokeTimeoutMs) {
       simpleStructEchoRequest(chipClusterPtr, callback, arg1, timedInvokeTimeoutMs);
     }
@@ -22143,19 +22145,19 @@ public class ChipClusters {
     private native void testStructArgumentRequest(
         long chipClusterPtr,
         BooleanResponseCallback Callback,
-        ChipStructs.TestClusterSimpleStruct arg1,
+        ChipStructs.UnitTestingClusterSimpleStruct arg1,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void testNestedStructArgumentRequest(
         long chipClusterPtr,
         BooleanResponseCallback Callback,
-        ChipStructs.TestClusterNestedStruct arg1,
+        ChipStructs.UnitTestingClusterNestedStruct arg1,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void testListStructArgumentRequest(
         long chipClusterPtr,
         BooleanResponseCallback Callback,
-        ArrayList<ChipStructs.TestClusterSimpleStruct> arg1,
+        ArrayList<ChipStructs.UnitTestingClusterSimpleStruct> arg1,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void testListInt8UArgumentRequest(
@@ -22167,13 +22169,13 @@ public class ChipClusters {
     private native void testNestedStructListArgumentRequest(
         long chipClusterPtr,
         BooleanResponseCallback Callback,
-        ChipStructs.TestClusterNestedStructList arg1,
+        ChipStructs.UnitTestingClusterNestedStructList arg1,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void testListNestedStructListArgumentRequest(
         long chipClusterPtr,
         BooleanResponseCallback Callback,
-        ArrayList<ChipStructs.TestClusterNestedStructList> arg1,
+        ArrayList<ChipStructs.UnitTestingClusterNestedStructList> arg1,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void testListInt8UReverseRequest(
@@ -22198,7 +22200,7 @@ public class ChipClusters {
     private native void simpleStructEchoRequest(
         long chipClusterPtr,
         SimpleStructResponseCallback Callback,
-        ChipStructs.TestClusterSimpleStruct arg1,
+        ChipStructs.UnitTestingClusterSimpleStruct arg1,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void timedInvokeRequest(
@@ -22261,7 +22263,7 @@ public class ChipClusters {
     }
 
     public interface SimpleStructResponseCallback {
-      void onSuccess(ChipStructs.TestClusterSimpleStruct arg1);
+      void onSuccess(ChipStructs.UnitTestingClusterSimpleStruct arg1);
 
       void onError(Exception error);
     }
@@ -22289,7 +22291,7 @@ public class ChipClusters {
     }
 
     public interface ListStructOctetStringAttributeCallback {
-      void onSuccess(List<ChipStructs.TestClusterTestListStructOctet> valueList);
+      void onSuccess(List<ChipStructs.UnitTestingClusterTestListStructOctet> valueList);
 
       void onError(Exception ex);
 
@@ -22305,7 +22307,7 @@ public class ChipClusters {
     }
 
     public interface ListNullablesAndOptionalsStructAttributeCallback {
-      void onSuccess(List<ChipStructs.TestClusterNullablesAndOptionalsStruct> valueList);
+      void onSuccess(List<ChipStructs.UnitTestingClusterNullablesAndOptionalsStruct> valueList);
 
       void onError(Exception ex);
 
@@ -22321,7 +22323,7 @@ public class ChipClusters {
     }
 
     public interface ListFabricScopedAttributeCallback {
-      void onSuccess(List<ChipStructs.TestClusterTestFabricScoped> valueList);
+      void onSuccess(List<ChipStructs.UnitTestingClusterTestFabricScoped> valueList);
 
       void onError(Exception ex);
 
@@ -23120,13 +23122,13 @@ public class ChipClusters {
 
     public void writeListStructOctetStringAttribute(
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.TestClusterTestListStructOctet> value) {
+        ArrayList<ChipStructs.UnitTestingClusterTestListStructOctet> value) {
       writeListStructOctetStringAttribute(chipClusterPtr, callback, value, null);
     }
 
     public void writeListStructOctetStringAttribute(
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.TestClusterTestListStructOctet> value,
+        ArrayList<ChipStructs.UnitTestingClusterTestListStructOctet> value,
         int timedWriteTimeoutMs) {
       writeListStructOctetStringAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
@@ -23251,13 +23253,13 @@ public class ChipClusters {
 
     public void writeListNullablesAndOptionalsStructAttribute(
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.TestClusterNullablesAndOptionalsStruct> value) {
+        ArrayList<ChipStructs.UnitTestingClusterNullablesAndOptionalsStruct> value) {
       writeListNullablesAndOptionalsStructAttribute(chipClusterPtr, callback, value, null);
     }
 
     public void writeListNullablesAndOptionalsStructAttribute(
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.TestClusterNullablesAndOptionalsStruct> value,
+        ArrayList<ChipStructs.UnitTestingClusterNullablesAndOptionalsStruct> value,
         int timedWriteTimeoutMs) {
       writeListNullablesAndOptionalsStructAttribute(
           chipClusterPtr, callback, value, timedWriteTimeoutMs);
@@ -23387,13 +23389,14 @@ public class ChipClusters {
     }
 
     public void writeListFabricScopedAttribute(
-        DefaultClusterCallback callback, ArrayList<ChipStructs.TestClusterTestFabricScoped> value) {
+        DefaultClusterCallback callback,
+        ArrayList<ChipStructs.UnitTestingClusterTestFabricScoped> value) {
       writeListFabricScopedAttribute(chipClusterPtr, callback, value, null);
     }
 
     public void writeListFabricScopedAttribute(
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.TestClusterTestFabricScoped> value,
+        ArrayList<ChipStructs.UnitTestingClusterTestFabricScoped> value,
         int timedWriteTimeoutMs) {
       writeListFabricScopedAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
@@ -24436,7 +24439,7 @@ public class ChipClusters {
     private native void writeListStructOctetStringAttribute(
         long chipClusterPtr,
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.TestClusterTestListStructOctet> value,
+        ArrayList<ChipStructs.UnitTestingClusterTestListStructOctet> value,
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeListStructOctetStringAttribute(
@@ -24530,7 +24533,7 @@ public class ChipClusters {
     private native void writeListNullablesAndOptionalsStructAttribute(
         long chipClusterPtr,
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.TestClusterNullablesAndOptionalsStruct> value,
+        ArrayList<ChipStructs.UnitTestingClusterNullablesAndOptionalsStruct> value,
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeListNullablesAndOptionalsStructAttribute(
@@ -24620,7 +24623,7 @@ public class ChipClusters {
     private native void writeListFabricScopedAttribute(
         long chipClusterPtr,
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.TestClusterTestFabricScoped> value,
+        ArrayList<ChipStructs.UnitTestingClusterTestFabricScoped> value,
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeListFabricScopedAttribute(

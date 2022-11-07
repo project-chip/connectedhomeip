@@ -546,7 +546,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Test::Structs::DoubleNestedStructList::DecodableType & value)
+                                     const chip::app::Clusters::UnitTesting::Structs::DoubleNestedStructList::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -1175,7 +1175,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Test::Structs::NestedStruct::DecodableType & value)
+                                     const chip::app::Clusters::UnitTesting::Structs::NestedStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -1207,7 +1207,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Test::Structs::NestedStructList::DecodableType & value)
+                                     const chip::app::Clusters::UnitTesting::Structs::NestedStructList::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -1367,8 +1367,9 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Test::Structs::NullablesAndOptionalsStruct::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -1836,7 +1837,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Test::Structs::SimpleStruct::DecodableType & value)
+                                     const chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2044,7 +2045,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Test::Structs::TestFabricScoped::DecodableType & value)
+                                     const chip::app::Clusters::UnitTesting::Structs::TestFabricScoped::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2117,7 +2118,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Test::Structs::TestListStructOctet::DecodableType & value)
+                                     const chip::app::Clusters::UnitTesting::Structs::TestListStructOctet::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3487,7 +3488,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Test::Events::TestEvent::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const UnitTesting::Events::TestEvent::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3543,7 +3544,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Te
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Test::Events::TestFabricScopedEvent::DecodableType & value)
+                                     const UnitTesting::Events::TestFabricScopedEvent::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -4014,7 +4015,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Test::Commands::TestSpecificResponse::DecodableType & value)
+                                     const UnitTesting::Commands::TestSpecificResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("returnValue", indent + 1, value.returnValue));
@@ -4022,7 +4023,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Test::Commands::TestAddArgumentsResponse::DecodableType & value)
+                                     const UnitTesting::Commands::TestAddArgumentsResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("returnValue", indent + 1, value.returnValue));
@@ -4030,7 +4031,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Test::Commands::TestSimpleArgumentResponse::DecodableType & value)
+                                     const UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("returnValue", indent + 1, value.returnValue));
@@ -4038,7 +4039,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Test::Commands::TestStructArrayArgumentResponse::DecodableType & value)
+                                     const UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("arg1", indent + 1, value.arg1));
@@ -4051,7 +4052,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Test::Commands::TestListInt8UReverseResponse::DecodableType & value)
+                                     const UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("arg1", indent + 1, value.arg1));
@@ -4059,7 +4060,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Test::Commands::TestEnumsResponse::DecodableType & value)
+                                     const UnitTesting::Commands::TestEnumsResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("arg1", indent + 1, value.arg1));
@@ -4068,7 +4069,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Test::Commands::TestNullableOptionalResponse::DecodableType & value)
+                                     const UnitTesting::Commands::TestNullableOptionalResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("wasPresent", indent + 1, value.wasPresent));
@@ -4079,7 +4080,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Test::Commands::TestComplexNullableOptionalResponse::DecodableType & value)
+                                     const UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("nullableIntWasNull", indent + 1, value.nullableIntWasNull));
@@ -4120,7 +4121,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Test::Commands::BooleanResponse::DecodableType & value)
+                                     const UnitTesting::Commands::BooleanResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("value", indent + 1, value.value));
@@ -4128,7 +4129,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Test::Commands::SimpleStructResponse::DecodableType & value)
+                                     const UnitTesting::Commands::SimpleStructResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("arg1", indent + 1, value.arg1));
@@ -4136,7 +4137,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Test::Commands::TestEmitTestEventResponse::DecodableType & value)
+                                     const UnitTesting::Commands::TestEmitTestEventResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("value", indent + 1, value.value));
@@ -4144,7 +4145,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Test::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & value)
+                                     const UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("value", indent + 1, value.value));
@@ -9562,441 +9563,443 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case Test::Id: {
+    case UnitTesting::Id: {
         switch (path.mAttributeId)
         {
-        case Test::Attributes::Boolean::Id: {
+        case UnitTesting::Attributes::Boolean::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("boolean", 1, value);
         }
-        case Test::Attributes::Bitmap8::Id: {
-            chip::BitMask<chip::app::Clusters::Test::Bitmap8MaskMap> value;
+        case UnitTesting::Attributes::Bitmap8::Id: {
+            chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("bitmap8", 1, value);
         }
-        case Test::Attributes::Bitmap16::Id: {
-            chip::BitMask<chip::app::Clusters::Test::Bitmap16MaskMap> value;
+        case UnitTesting::Attributes::Bitmap16::Id: {
+            chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("bitmap16", 1, value);
         }
-        case Test::Attributes::Bitmap32::Id: {
-            chip::BitMask<chip::app::Clusters::Test::Bitmap32MaskMap> value;
+        case UnitTesting::Attributes::Bitmap32::Id: {
+            chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("bitmap32", 1, value);
         }
-        case Test::Attributes::Bitmap64::Id: {
-            chip::BitMask<chip::app::Clusters::Test::Bitmap64MaskMap> value;
+        case UnitTesting::Attributes::Bitmap64::Id: {
+            chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("bitmap64", 1, value);
         }
-        case Test::Attributes::Int8u::Id: {
+        case UnitTesting::Attributes::Int8u::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("int8u", 1, value);
         }
-        case Test::Attributes::Int16u::Id: {
+        case UnitTesting::Attributes::Int16u::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("int16u", 1, value);
         }
-        case Test::Attributes::Int24u::Id: {
+        case UnitTesting::Attributes::Int24u::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("int24u", 1, value);
         }
-        case Test::Attributes::Int32u::Id: {
+        case UnitTesting::Attributes::Int32u::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("int32u", 1, value);
         }
-        case Test::Attributes::Int40u::Id: {
+        case UnitTesting::Attributes::Int40u::Id: {
             uint64_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("int40u", 1, value);
         }
-        case Test::Attributes::Int48u::Id: {
+        case UnitTesting::Attributes::Int48u::Id: {
             uint64_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("int48u", 1, value);
         }
-        case Test::Attributes::Int56u::Id: {
+        case UnitTesting::Attributes::Int56u::Id: {
             uint64_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("int56u", 1, value);
         }
-        case Test::Attributes::Int64u::Id: {
+        case UnitTesting::Attributes::Int64u::Id: {
             uint64_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("int64u", 1, value);
         }
-        case Test::Attributes::Int8s::Id: {
+        case UnitTesting::Attributes::Int8s::Id: {
             int8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("int8s", 1, value);
         }
-        case Test::Attributes::Int16s::Id: {
+        case UnitTesting::Attributes::Int16s::Id: {
             int16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("int16s", 1, value);
         }
-        case Test::Attributes::Int24s::Id: {
+        case UnitTesting::Attributes::Int24s::Id: {
             int32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("int24s", 1, value);
         }
-        case Test::Attributes::Int32s::Id: {
+        case UnitTesting::Attributes::Int32s::Id: {
             int32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("int32s", 1, value);
         }
-        case Test::Attributes::Int40s::Id: {
+        case UnitTesting::Attributes::Int40s::Id: {
             int64_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("int40s", 1, value);
         }
-        case Test::Attributes::Int48s::Id: {
+        case UnitTesting::Attributes::Int48s::Id: {
             int64_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("int48s", 1, value);
         }
-        case Test::Attributes::Int56s::Id: {
+        case UnitTesting::Attributes::Int56s::Id: {
             int64_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("int56s", 1, value);
         }
-        case Test::Attributes::Int64s::Id: {
+        case UnitTesting::Attributes::Int64s::Id: {
             int64_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("int64s", 1, value);
         }
-        case Test::Attributes::Enum8::Id: {
+        case UnitTesting::Attributes::Enum8::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("enum8", 1, value);
         }
-        case Test::Attributes::Enum16::Id: {
+        case UnitTesting::Attributes::Enum16::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("enum16", 1, value);
         }
-        case Test::Attributes::FloatSingle::Id: {
+        case UnitTesting::Attributes::FloatSingle::Id: {
             float value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("float_single", 1, value);
         }
-        case Test::Attributes::FloatDouble::Id: {
+        case UnitTesting::Attributes::FloatDouble::Id: {
             double value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("float_double", 1, value);
         }
-        case Test::Attributes::OctetString::Id: {
+        case UnitTesting::Attributes::OctetString::Id: {
             chip::ByteSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("octet_string", 1, value);
         }
-        case Test::Attributes::ListInt8u::Id: {
+        case UnitTesting::Attributes::ListInt8u::Id: {
             chip::app::DataModel::DecodableList<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("list_int8u", 1, value);
         }
-        case Test::Attributes::ListOctetString::Id: {
+        case UnitTesting::Attributes::ListOctetString::Id: {
             chip::app::DataModel::DecodableList<chip::ByteSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("list_octet_string", 1, value);
         }
-        case Test::Attributes::ListStructOctetString::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::Test::Structs::TestListStructOctet::DecodableType> value;
+        case UnitTesting::Attributes::ListStructOctetString::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestListStructOctet::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("list_struct_octet_string", 1, value);
         }
-        case Test::Attributes::LongOctetString::Id: {
+        case UnitTesting::Attributes::LongOctetString::Id: {
             chip::ByteSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("long_octet_string", 1, value);
         }
-        case Test::Attributes::CharString::Id: {
+        case UnitTesting::Attributes::CharString::Id: {
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("char_string", 1, value);
         }
-        case Test::Attributes::LongCharString::Id: {
+        case UnitTesting::Attributes::LongCharString::Id: {
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("long_char_string", 1, value);
         }
-        case Test::Attributes::EpochUs::Id: {
+        case UnitTesting::Attributes::EpochUs::Id: {
             uint64_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("epoch_us", 1, value);
         }
-        case Test::Attributes::EpochS::Id: {
+        case UnitTesting::Attributes::EpochS::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("epoch_s", 1, value);
         }
-        case Test::Attributes::VendorId::Id: {
+        case UnitTesting::Attributes::VendorId::Id: {
             chip::VendorId value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("vendor_id", 1, value);
         }
-        case Test::Attributes::ListNullablesAndOptionalsStruct::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::Test::Structs::NullablesAndOptionalsStruct::DecodableType>
+        case UnitTesting::Attributes::ListNullablesAndOptionalsStruct::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("list_nullables_and_optionals_struct", 1, value);
         }
-        case Test::Attributes::EnumAttr::Id: {
-            chip::app::Clusters::Test::SimpleEnum value;
+        case UnitTesting::Attributes::EnumAttr::Id: {
+            chip::app::Clusters::UnitTesting::SimpleEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("enum_attr", 1, value);
         }
-        case Test::Attributes::StructAttr::Id: {
-            chip::app::Clusters::Test::Structs::SimpleStruct::DecodableType value;
+        case UnitTesting::Attributes::StructAttr::Id: {
+            chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("struct_attr", 1, value);
         }
-        case Test::Attributes::RangeRestrictedInt8u::Id: {
+        case UnitTesting::Attributes::RangeRestrictedInt8u::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("range_restricted_int8u", 1, value);
         }
-        case Test::Attributes::RangeRestrictedInt8s::Id: {
+        case UnitTesting::Attributes::RangeRestrictedInt8s::Id: {
             int8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("range_restricted_int8s", 1, value);
         }
-        case Test::Attributes::RangeRestrictedInt16u::Id: {
+        case UnitTesting::Attributes::RangeRestrictedInt16u::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("range_restricted_int16u", 1, value);
         }
-        case Test::Attributes::RangeRestrictedInt16s::Id: {
+        case UnitTesting::Attributes::RangeRestrictedInt16s::Id: {
             int16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("range_restricted_int16s", 1, value);
         }
-        case Test::Attributes::ListLongOctetString::Id: {
+        case UnitTesting::Attributes::ListLongOctetString::Id: {
             chip::app::DataModel::DecodableList<chip::ByteSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("list_long_octet_string", 1, value);
         }
-        case Test::Attributes::ListFabricScoped::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::Test::Structs::TestFabricScoped::DecodableType> value;
+        case UnitTesting::Attributes::ListFabricScoped::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestFabricScoped::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("list_fabric_scoped", 1, value);
         }
-        case Test::Attributes::TimedWriteBoolean::Id: {
+        case UnitTesting::Attributes::TimedWriteBoolean::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("timed_write_boolean", 1, value);
         }
-        case Test::Attributes::GeneralErrorBoolean::Id: {
+        case UnitTesting::Attributes::GeneralErrorBoolean::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("general_error_boolean", 1, value);
         }
-        case Test::Attributes::ClusterErrorBoolean::Id: {
+        case UnitTesting::Attributes::ClusterErrorBoolean::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("cluster_error_boolean", 1, value);
         }
-        case Test::Attributes::Unsupported::Id: {
+        case UnitTesting::Attributes::Unsupported::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("unsupported", 1, value);
         }
-        case Test::Attributes::NullableBoolean::Id: {
+        case UnitTesting::Attributes::NullableBoolean::Id: {
             chip::app::DataModel::Nullable<bool> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_boolean", 1, value);
         }
-        case Test::Attributes::NullableBitmap8::Id: {
-            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap8MaskMap>> value;
+        case UnitTesting::Attributes::NullableBitmap8::Id: {
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_bitmap8", 1, value);
         }
-        case Test::Attributes::NullableBitmap16::Id: {
-            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap16MaskMap>> value;
+        case UnitTesting::Attributes::NullableBitmap16::Id: {
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_bitmap16", 1, value);
         }
-        case Test::Attributes::NullableBitmap32::Id: {
-            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap32MaskMap>> value;
+        case UnitTesting::Attributes::NullableBitmap32::Id: {
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_bitmap32", 1, value);
         }
-        case Test::Attributes::NullableBitmap64::Id: {
-            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap64MaskMap>> value;
+        case UnitTesting::Attributes::NullableBitmap64::Id: {
+            chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_bitmap64", 1, value);
         }
-        case Test::Attributes::NullableInt8u::Id: {
+        case UnitTesting::Attributes::NullableInt8u::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_int8u", 1, value);
         }
-        case Test::Attributes::NullableInt16u::Id: {
+        case UnitTesting::Attributes::NullableInt16u::Id: {
             chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_int16u", 1, value);
         }
-        case Test::Attributes::NullableInt24u::Id: {
+        case UnitTesting::Attributes::NullableInt24u::Id: {
             chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_int24u", 1, value);
         }
-        case Test::Attributes::NullableInt32u::Id: {
+        case UnitTesting::Attributes::NullableInt32u::Id: {
             chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_int32u", 1, value);
         }
-        case Test::Attributes::NullableInt40u::Id: {
+        case UnitTesting::Attributes::NullableInt40u::Id: {
             chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_int40u", 1, value);
         }
-        case Test::Attributes::NullableInt48u::Id: {
+        case UnitTesting::Attributes::NullableInt48u::Id: {
             chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_int48u", 1, value);
         }
-        case Test::Attributes::NullableInt56u::Id: {
+        case UnitTesting::Attributes::NullableInt56u::Id: {
             chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_int56u", 1, value);
         }
-        case Test::Attributes::NullableInt64u::Id: {
+        case UnitTesting::Attributes::NullableInt64u::Id: {
             chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_int64u", 1, value);
         }
-        case Test::Attributes::NullableInt8s::Id: {
+        case UnitTesting::Attributes::NullableInt8s::Id: {
             chip::app::DataModel::Nullable<int8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_int8s", 1, value);
         }
-        case Test::Attributes::NullableInt16s::Id: {
+        case UnitTesting::Attributes::NullableInt16s::Id: {
             chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_int16s", 1, value);
         }
-        case Test::Attributes::NullableInt24s::Id: {
+        case UnitTesting::Attributes::NullableInt24s::Id: {
             chip::app::DataModel::Nullable<int32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_int24s", 1, value);
         }
-        case Test::Attributes::NullableInt32s::Id: {
+        case UnitTesting::Attributes::NullableInt32s::Id: {
             chip::app::DataModel::Nullable<int32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_int32s", 1, value);
         }
-        case Test::Attributes::NullableInt40s::Id: {
+        case UnitTesting::Attributes::NullableInt40s::Id: {
             chip::app::DataModel::Nullable<int64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_int40s", 1, value);
         }
-        case Test::Attributes::NullableInt48s::Id: {
+        case UnitTesting::Attributes::NullableInt48s::Id: {
             chip::app::DataModel::Nullable<int64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_int48s", 1, value);
         }
-        case Test::Attributes::NullableInt56s::Id: {
+        case UnitTesting::Attributes::NullableInt56s::Id: {
             chip::app::DataModel::Nullable<int64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_int56s", 1, value);
         }
-        case Test::Attributes::NullableInt64s::Id: {
+        case UnitTesting::Attributes::NullableInt64s::Id: {
             chip::app::DataModel::Nullable<int64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_int64s", 1, value);
         }
-        case Test::Attributes::NullableEnum8::Id: {
+        case UnitTesting::Attributes::NullableEnum8::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_enum8", 1, value);
         }
-        case Test::Attributes::NullableEnum16::Id: {
+        case UnitTesting::Attributes::NullableEnum16::Id: {
             chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_enum16", 1, value);
         }
-        case Test::Attributes::NullableFloatSingle::Id: {
+        case UnitTesting::Attributes::NullableFloatSingle::Id: {
             chip::app::DataModel::Nullable<float> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_float_single", 1, value);
         }
-        case Test::Attributes::NullableFloatDouble::Id: {
+        case UnitTesting::Attributes::NullableFloatDouble::Id: {
             chip::app::DataModel::Nullable<double> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_float_double", 1, value);
         }
-        case Test::Attributes::NullableOctetString::Id: {
+        case UnitTesting::Attributes::NullableOctetString::Id: {
             chip::app::DataModel::Nullable<chip::ByteSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_octet_string", 1, value);
         }
-        case Test::Attributes::NullableCharString::Id: {
+        case UnitTesting::Attributes::NullableCharString::Id: {
             chip::app::DataModel::Nullable<chip::CharSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_char_string", 1, value);
         }
-        case Test::Attributes::NullableEnumAttr::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::Test::SimpleEnum> value;
+        case UnitTesting::Attributes::NullableEnumAttr::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_enum_attr", 1, value);
         }
-        case Test::Attributes::NullableStruct::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::Test::Structs::SimpleStruct::DecodableType> value;
+        case UnitTesting::Attributes::NullableStruct::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_struct", 1, value);
         }
-        case Test::Attributes::NullableRangeRestrictedInt8u::Id: {
+        case UnitTesting::Attributes::NullableRangeRestrictedInt8u::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_range_restricted_int8u", 1, value);
         }
-        case Test::Attributes::NullableRangeRestrictedInt8s::Id: {
+        case UnitTesting::Attributes::NullableRangeRestrictedInt8s::Id: {
             chip::app::DataModel::Nullable<int8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_range_restricted_int8s", 1, value);
         }
-        case Test::Attributes::NullableRangeRestrictedInt16u::Id: {
+        case UnitTesting::Attributes::NullableRangeRestrictedInt16u::Id: {
             chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_range_restricted_int16u", 1, value);
         }
-        case Test::Attributes::NullableRangeRestrictedInt16s::Id: {
+        case UnitTesting::Attributes::NullableRangeRestrictedInt16s::Id: {
             chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("nullable_range_restricted_int16s", 1, value);
         }
-        case Test::Attributes::WriteOnlyInt8u::Id: {
+        case UnitTesting::Attributes::WriteOnlyInt8u::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("write_only_int8u", 1, value);
         }
-        case Test::Attributes::GeneratedCommandList::Id: {
+        case UnitTesting::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
         }
-        case Test::Attributes::AcceptedCommandList::Id: {
+        case UnitTesting::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
         }
-        case Test::Attributes::AttributeList::Id: {
+        case UnitTesting::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
-        case Test::Attributes::FeatureMap::Id: {
+        case UnitTesting::Attributes::FeatureMap::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
-        case Test::Attributes::ClusterRevision::Id: {
+        case UnitTesting::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -10346,66 +10349,66 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         }
         break;
     }
-    case Test::Id: {
+    case UnitTesting::Id: {
         switch (path.mCommandId)
         {
-        case Test::Commands::TestSpecificResponse::Id: {
-            Test::Commands::TestSpecificResponse::DecodableType value;
+        case UnitTesting::Commands::TestSpecificResponse::Id: {
+            UnitTesting::Commands::TestSpecificResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestSpecificResponse", 1, value);
         }
-        case Test::Commands::TestAddArgumentsResponse::Id: {
-            Test::Commands::TestAddArgumentsResponse::DecodableType value;
+        case UnitTesting::Commands::TestAddArgumentsResponse::Id: {
+            UnitTesting::Commands::TestAddArgumentsResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestAddArgumentsResponse", 1, value);
         }
-        case Test::Commands::TestSimpleArgumentResponse::Id: {
-            Test::Commands::TestSimpleArgumentResponse::DecodableType value;
+        case UnitTesting::Commands::TestSimpleArgumentResponse::Id: {
+            UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestSimpleArgumentResponse", 1, value);
         }
-        case Test::Commands::TestStructArrayArgumentResponse::Id: {
-            Test::Commands::TestStructArrayArgumentResponse::DecodableType value;
+        case UnitTesting::Commands::TestStructArrayArgumentResponse::Id: {
+            UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestStructArrayArgumentResponse", 1, value);
         }
-        case Test::Commands::TestListInt8UReverseResponse::Id: {
-            Test::Commands::TestListInt8UReverseResponse::DecodableType value;
+        case UnitTesting::Commands::TestListInt8UReverseResponse::Id: {
+            UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestListInt8UReverseResponse", 1, value);
         }
-        case Test::Commands::TestEnumsResponse::Id: {
-            Test::Commands::TestEnumsResponse::DecodableType value;
+        case UnitTesting::Commands::TestEnumsResponse::Id: {
+            UnitTesting::Commands::TestEnumsResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestEnumsResponse", 1, value);
         }
-        case Test::Commands::TestNullableOptionalResponse::Id: {
-            Test::Commands::TestNullableOptionalResponse::DecodableType value;
+        case UnitTesting::Commands::TestNullableOptionalResponse::Id: {
+            UnitTesting::Commands::TestNullableOptionalResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestNullableOptionalResponse", 1, value);
         }
-        case Test::Commands::TestComplexNullableOptionalResponse::Id: {
-            Test::Commands::TestComplexNullableOptionalResponse::DecodableType value;
+        case UnitTesting::Commands::TestComplexNullableOptionalResponse::Id: {
+            UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestComplexNullableOptionalResponse", 1, value);
         }
-        case Test::Commands::BooleanResponse::Id: {
-            Test::Commands::BooleanResponse::DecodableType value;
+        case UnitTesting::Commands::BooleanResponse::Id: {
+            UnitTesting::Commands::BooleanResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BooleanResponse", 1, value);
         }
-        case Test::Commands::SimpleStructResponse::Id: {
-            Test::Commands::SimpleStructResponse::DecodableType value;
+        case UnitTesting::Commands::SimpleStructResponse::Id: {
+            UnitTesting::Commands::SimpleStructResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SimpleStructResponse", 1, value);
         }
-        case Test::Commands::TestEmitTestEventResponse::Id: {
-            Test::Commands::TestEmitTestEventResponse::DecodableType value;
+        case UnitTesting::Commands::TestEmitTestEventResponse::Id: {
+            UnitTesting::Commands::TestEmitTestEventResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestEmitTestEventResponse", 1, value);
         }
-        case Test::Commands::TestEmitTestFabricScopedEventResponse::Id: {
-            Test::Commands::TestEmitTestFabricScopedEventResponse::DecodableType value;
+        case UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::Id: {
+            UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestEmitTestFabricScopedEventResponse", 1, value);
         }
@@ -10800,16 +10803,16 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         }
         break;
     }
-    case Test::Id: {
+    case UnitTesting::Id: {
         switch (header.mPath.mEventId)
         {
-        case Test::Events::TestEvent::Id: {
-            chip::app::Clusters::Test::Events::TestEvent::DecodableType value;
+        case UnitTesting::Events::TestEvent::Id: {
+            chip::app::Clusters::UnitTesting::Events::TestEvent::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestEvent", 1, value);
         }
-        case Test::Events::TestFabricScopedEvent::Id: {
-            chip::app::Clusters::Test::Events::TestFabricScopedEvent::DecodableType value;
+        case UnitTesting::Events::TestFabricScopedEvent::Id: {
+            chip::app::Clusters::UnitTesting::Events::TestFabricScopedEvent::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestFabricScopedEvent", 1, value);
         }

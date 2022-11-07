@@ -6698,7 +6698,8 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedTestSpecificResponseCallback
-      implements ChipClusters.TestCluster.TestSpecificResponseCallback, DelegatedClusterCallback {
+      implements ChipClusters.UnitTestingCluster.TestSpecificResponseCallback,
+          DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
     @Override
@@ -6722,7 +6723,7 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedTestAddArgumentsResponseCallback
-      implements ChipClusters.TestCluster.TestAddArgumentsResponseCallback,
+      implements ChipClusters.UnitTestingCluster.TestAddArgumentsResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -6747,7 +6748,7 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedTestListInt8UReverseResponseCallback
-      implements ChipClusters.TestCluster.TestListInt8UReverseResponseCallback,
+      implements ChipClusters.UnitTestingCluster.TestListInt8UReverseResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -6771,7 +6772,8 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedTestEnumsResponseCallback
-      implements ChipClusters.TestCluster.TestEnumsResponseCallback, DelegatedClusterCallback {
+      implements ChipClusters.UnitTestingCluster.TestEnumsResponseCallback,
+          DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
     @Override
@@ -6796,7 +6798,7 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedTestNullableOptionalResponseCallback
-      implements ChipClusters.TestCluster.TestNullableOptionalResponseCallback,
+      implements ChipClusters.UnitTestingCluster.TestNullableOptionalResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -6834,7 +6836,7 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedBooleanResponseCallback
-      implements ChipClusters.TestCluster.BooleanResponseCallback, DelegatedClusterCallback {
+      implements ChipClusters.UnitTestingCluster.BooleanResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
     @Override
@@ -6857,7 +6859,8 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedSimpleStructResponseCallback
-      implements ChipClusters.TestCluster.SimpleStructResponseCallback, DelegatedClusterCallback {
+      implements ChipClusters.UnitTestingCluster.SimpleStructResponseCallback,
+          DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
     @Override
@@ -6866,7 +6869,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(ChipStructs.TestClusterSimpleStruct arg1) {
+    public void onSuccess(ChipStructs.UnitTestingClusterSimpleStruct arg1) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       // arg1: Struct SimpleStruct
       // Conversion from this type to Java is not properly implemented yet
@@ -6880,7 +6883,7 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedTestEmitTestEventResponseCallback
-      implements ChipClusters.TestCluster.TestEmitTestEventResponseCallback,
+      implements ChipClusters.UnitTestingCluster.TestEmitTestEventResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -6903,8 +6906,9 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedTestClusterListInt8uAttributeCallback
-      implements ChipClusters.TestCluster.ListInt8uAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedUnitTestingClusterListInt8uAttributeCallback
+      implements ChipClusters.UnitTestingCluster.ListInt8uAttributeCallback,
+          DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
     @Override
@@ -6927,8 +6931,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedTestClusterListOctetStringAttributeCallback
-      implements ChipClusters.TestCluster.ListOctetStringAttributeCallback,
+  public static class DelegatedUnitTestingClusterListOctetStringAttributeCallback
+      implements ChipClusters.UnitTestingCluster.ListOctetStringAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -6952,8 +6956,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedTestClusterListStructOctetStringAttributeCallback
-      implements ChipClusters.TestCluster.ListStructOctetStringAttributeCallback,
+  public static class DelegatedUnitTestingClusterListStructOctetStringAttributeCallback
+      implements ChipClusters.UnitTestingCluster.ListStructOctetStringAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -6963,36 +6967,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.TestClusterTestListStructOctet> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo =
-          new CommandResponseInfo("valueList", "List<ChipStructs.TestClusterTestListStructOctet>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedTestClusterListNullablesAndOptionalsStructAttributeCallback
-      implements ChipClusters.TestCluster.ListNullablesAndOptionalsStructAttributeCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<ChipStructs.TestClusterNullablesAndOptionalsStruct> valueList) {
+    public void onSuccess(List<ChipStructs.UnitTestingClusterTestListStructOctet> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
-              "valueList", "List<ChipStructs.TestClusterNullablesAndOptionalsStruct>");
+              "valueList", "List<ChipStructs.UnitTestingClusterTestListStructOctet>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -7003,8 +6982,35 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedTestClusterListLongOctetStringAttributeCallback
-      implements ChipClusters.TestCluster.ListLongOctetStringAttributeCallback,
+  public static class DelegatedUnitTestingClusterListNullablesAndOptionalsStructAttributeCallback
+      implements ChipClusters.UnitTestingCluster.ListNullablesAndOptionalsStructAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(
+        List<ChipStructs.UnitTestingClusterNullablesAndOptionalsStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo(
+              "valueList", "List<ChipStructs.UnitTestingClusterNullablesAndOptionalsStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedUnitTestingClusterListLongOctetStringAttributeCallback
+      implements ChipClusters.UnitTestingCluster.ListLongOctetStringAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -7028,8 +7034,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedTestClusterListFabricScopedAttributeCallback
-      implements ChipClusters.TestCluster.ListFabricScopedAttributeCallback,
+  public static class DelegatedUnitTestingClusterListFabricScopedAttributeCallback
+      implements ChipClusters.UnitTestingCluster.ListFabricScopedAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -7039,10 +7045,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.TestClusterTestFabricScoped> valueList) {
+    public void onSuccess(List<ChipStructs.UnitTestingClusterTestFabricScoped> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
-          new CommandResponseInfo("valueList", "List<ChipStructs.TestClusterTestFabricScoped>");
+          new CommandResponseInfo(
+              "valueList", "List<ChipStructs.UnitTestingClusterTestFabricScoped>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -7053,8 +7060,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedTestClusterGeneratedCommandListAttributeCallback
-      implements ChipClusters.TestCluster.GeneratedCommandListAttributeCallback,
+  public static class DelegatedUnitTestingClusterGeneratedCommandListAttributeCallback
+      implements ChipClusters.UnitTestingCluster.GeneratedCommandListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -7077,8 +7084,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedTestClusterAcceptedCommandListAttributeCallback
-      implements ChipClusters.TestCluster.AcceptedCommandListAttributeCallback,
+  public static class DelegatedUnitTestingClusterAcceptedCommandListAttributeCallback
+      implements ChipClusters.UnitTestingCluster.AcceptedCommandListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -7101,8 +7108,9 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedTestClusterAttributeListAttributeCallback
-      implements ChipClusters.TestCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedUnitTestingClusterAttributeListAttributeCallback
+      implements ChipClusters.UnitTestingCluster.AttributeListAttributeCallback,
+          DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
     @Override
@@ -7458,10 +7466,11 @@ public class ClusterInfoMapping {
             (ptr, endpointId) -> new ChipClusters.ElectricalMeasurementCluster(ptr, endpointId),
             new HashMap<>());
     clusterMap.put("electricalMeasurement", electricalMeasurementClusterInfo);
-    ClusterInfo testClusterInfo =
+    ClusterInfo unitTestingClusterInfo =
         new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.TestCluster(ptr, endpointId), new HashMap<>());
-    clusterMap.put("test", testClusterInfo);
+            (ptr, endpointId) -> new ChipClusters.UnitTestingCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("unitTesting", unitTestingClusterInfo);
     return clusterMap;
   }
 
@@ -7553,7 +7562,7 @@ public class ClusterInfoMapping {
     destination.get("applicationBasic").combineCommands(source.get("applicationBasic"));
     destination.get("accountLogin").combineCommands(source.get("accountLogin"));
     destination.get("electricalMeasurement").combineCommands(source.get("electricalMeasurement"));
-    destination.get("test").combineCommands(source.get("test"));
+    destination.get("unitTesting").combineCommands(source.get("unitTesting"));
   }
 
   @SuppressWarnings("unchecked")
@@ -11681,301 +11690,318 @@ public class ClusterInfoMapping {
     Map<String, InteractionInfo> electricalMeasurementClusterInteractionInfoMap =
         new LinkedHashMap<>();
     commandMap.put("electricalMeasurement", electricalMeasurementClusterInteractionInfoMap);
-    Map<String, InteractionInfo> testClusterInteractionInfoMap = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> testtestCommandParams =
+    Map<String, InteractionInfo> unitTestingClusterInteractionInfoMap = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> unitTestingtestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo testtestInteractionInfo =
+    InteractionInfo unitTestingtestInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TestCluster) cluster).test((DefaultClusterCallback) callback);
+              ((ChipClusters.UnitTestingCluster) cluster).test((DefaultClusterCallback) callback);
             },
             () -> new DelegatedDefaultClusterCallback(),
-            testtestCommandParams);
-    testClusterInteractionInfoMap.put("test", testtestInteractionInfo);
-    Map<String, CommandParameterInfo> testtestNotHandledCommandParams =
+            unitTestingtestCommandParams);
+    unitTestingClusterInteractionInfoMap.put("test", unitTestingtestInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingtestNotHandledCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo testtestNotHandledInteractionInfo =
+    InteractionInfo unitTestingtestNotHandledInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TestCluster) cluster)
+              ((ChipClusters.UnitTestingCluster) cluster)
                   .testNotHandled((DefaultClusterCallback) callback);
             },
             () -> new DelegatedDefaultClusterCallback(),
-            testtestNotHandledCommandParams);
-    testClusterInteractionInfoMap.put("testNotHandled", testtestNotHandledInteractionInfo);
-    Map<String, CommandParameterInfo> testtestSpecificCommandParams =
+            unitTestingtestNotHandledCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "testNotHandled", unitTestingtestNotHandledInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingtestSpecificCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo testtestSpecificInteractionInfo =
+    InteractionInfo unitTestingtestSpecificInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TestCluster) cluster)
-                  .testSpecific((ChipClusters.TestCluster.TestSpecificResponseCallback) callback);
+              ((ChipClusters.UnitTestingCluster) cluster)
+                  .testSpecific(
+                      (ChipClusters.UnitTestingCluster.TestSpecificResponseCallback) callback);
             },
             () -> new DelegatedTestSpecificResponseCallback(),
-            testtestSpecificCommandParams);
-    testClusterInteractionInfoMap.put("testSpecific", testtestSpecificInteractionInfo);
-    Map<String, CommandParameterInfo> testtestUnknownCommandCommandParams =
+            unitTestingtestSpecificCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "testSpecific", unitTestingtestSpecificInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingtestUnknownCommandCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo testtestUnknownCommandInteractionInfo =
+    InteractionInfo unitTestingtestUnknownCommandInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TestCluster) cluster)
+              ((ChipClusters.UnitTestingCluster) cluster)
                   .testUnknownCommand((DefaultClusterCallback) callback);
             },
             () -> new DelegatedDefaultClusterCallback(),
-            testtestUnknownCommandCommandParams);
-    testClusterInteractionInfoMap.put("testUnknownCommand", testtestUnknownCommandInteractionInfo);
-    Map<String, CommandParameterInfo> testtestAddArgumentsCommandParams =
+            unitTestingtestUnknownCommandCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "testUnknownCommand", unitTestingtestUnknownCommandInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingtestAddArgumentsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo testtestAddArgumentsarg1CommandParameterInfo =
+    CommandParameterInfo unitTestingtestAddArgumentsarg1CommandParameterInfo =
         new CommandParameterInfo("arg1", Integer.class, Integer.class);
-    testtestAddArgumentsCommandParams.put("arg1", testtestAddArgumentsarg1CommandParameterInfo);
+    unitTestingtestAddArgumentsCommandParams.put(
+        "arg1", unitTestingtestAddArgumentsarg1CommandParameterInfo);
 
-    CommandParameterInfo testtestAddArgumentsarg2CommandParameterInfo =
+    CommandParameterInfo unitTestingtestAddArgumentsarg2CommandParameterInfo =
         new CommandParameterInfo("arg2", Integer.class, Integer.class);
-    testtestAddArgumentsCommandParams.put("arg2", testtestAddArgumentsarg2CommandParameterInfo);
+    unitTestingtestAddArgumentsCommandParams.put(
+        "arg2", unitTestingtestAddArgumentsarg2CommandParameterInfo);
 
-    InteractionInfo testtestAddArgumentsInteractionInfo =
+    InteractionInfo unitTestingtestAddArgumentsInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TestCluster) cluster)
+              ((ChipClusters.UnitTestingCluster) cluster)
                   .testAddArguments(
-                      (ChipClusters.TestCluster.TestAddArgumentsResponseCallback) callback,
+                      (ChipClusters.UnitTestingCluster.TestAddArgumentsResponseCallback) callback,
                       (Integer) commandArguments.get("arg1"),
                       (Integer) commandArguments.get("arg2"));
             },
             () -> new DelegatedTestAddArgumentsResponseCallback(),
-            testtestAddArgumentsCommandParams);
-    testClusterInteractionInfoMap.put("testAddArguments", testtestAddArgumentsInteractionInfo);
-    Map<String, CommandParameterInfo> testtestStructArgumentRequestCommandParams =
+            unitTestingtestAddArgumentsCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "testAddArguments", unitTestingtestAddArgumentsInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingtestStructArgumentRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo testtestStructArgumentRequestInteractionInfo =
+    InteractionInfo unitTestingtestStructArgumentRequestInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TestCluster) cluster)
+              ((ChipClusters.UnitTestingCluster) cluster)
                   .testStructArgumentRequest(
-                      (ChipClusters.TestCluster.BooleanResponseCallback) callback,
-                      (ChipStructs.TestClusterSimpleStruct) commandArguments.get("arg1"));
+                      (ChipClusters.UnitTestingCluster.BooleanResponseCallback) callback,
+                      (ChipStructs.UnitTestingClusterSimpleStruct) commandArguments.get("arg1"));
             },
             () -> new DelegatedBooleanResponseCallback(),
-            testtestStructArgumentRequestCommandParams);
-    testClusterInteractionInfoMap.put(
-        "testStructArgumentRequest", testtestStructArgumentRequestInteractionInfo);
-    Map<String, CommandParameterInfo> testtestNestedStructArgumentRequestCommandParams =
+            unitTestingtestStructArgumentRequestCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "testStructArgumentRequest", unitTestingtestStructArgumentRequestInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingtestNestedStructArgumentRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo testtestNestedStructArgumentRequestInteractionInfo =
+    InteractionInfo unitTestingtestNestedStructArgumentRequestInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TestCluster) cluster)
+              ((ChipClusters.UnitTestingCluster) cluster)
                   .testNestedStructArgumentRequest(
-                      (ChipClusters.TestCluster.BooleanResponseCallback) callback,
-                      (ChipStructs.TestClusterNestedStruct) commandArguments.get("arg1"));
+                      (ChipClusters.UnitTestingCluster.BooleanResponseCallback) callback,
+                      (ChipStructs.UnitTestingClusterNestedStruct) commandArguments.get("arg1"));
             },
             () -> new DelegatedBooleanResponseCallback(),
-            testtestNestedStructArgumentRequestCommandParams);
-    testClusterInteractionInfoMap.put(
-        "testNestedStructArgumentRequest", testtestNestedStructArgumentRequestInteractionInfo);
-    Map<String, CommandParameterInfo> testtestListStructArgumentRequestCommandParams =
+            unitTestingtestNestedStructArgumentRequestCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "testNestedStructArgumentRequest",
+        unitTestingtestNestedStructArgumentRequestInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingtestListStructArgumentRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo testtestListStructArgumentRequestInteractionInfo =
+    InteractionInfo unitTestingtestListStructArgumentRequestInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TestCluster) cluster)
+              ((ChipClusters.UnitTestingCluster) cluster)
                   .testListStructArgumentRequest(
-                      (ChipClusters.TestCluster.BooleanResponseCallback) callback,
-                      (ArrayList<ChipStructs.TestClusterSimpleStruct>)
+                      (ChipClusters.UnitTestingCluster.BooleanResponseCallback) callback,
+                      (ArrayList<ChipStructs.UnitTestingClusterSimpleStruct>)
                           commandArguments.get("arg1"));
             },
             () -> new DelegatedBooleanResponseCallback(),
-            testtestListStructArgumentRequestCommandParams);
-    testClusterInteractionInfoMap.put(
-        "testListStructArgumentRequest", testtestListStructArgumentRequestInteractionInfo);
-    Map<String, CommandParameterInfo> testtestListInt8UArgumentRequestCommandParams =
+            unitTestingtestListStructArgumentRequestCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "testListStructArgumentRequest", unitTestingtestListStructArgumentRequestInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingtestListInt8UArgumentRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo testtestListInt8UArgumentRequestarg1CommandParameterInfo =
+    CommandParameterInfo unitTestingtestListInt8UArgumentRequestarg1CommandParameterInfo =
         new CommandParameterInfo("arg1", ArrayList.class, Object.class);
-    testtestListInt8UArgumentRequestCommandParams.put(
-        "arg1", testtestListInt8UArgumentRequestarg1CommandParameterInfo);
+    unitTestingtestListInt8UArgumentRequestCommandParams.put(
+        "arg1", unitTestingtestListInt8UArgumentRequestarg1CommandParameterInfo);
 
-    InteractionInfo testtestListInt8UArgumentRequestInteractionInfo =
+    InteractionInfo unitTestingtestListInt8UArgumentRequestInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TestCluster) cluster)
+              ((ChipClusters.UnitTestingCluster) cluster)
                   .testListInt8UArgumentRequest(
-                      (ChipClusters.TestCluster.BooleanResponseCallback) callback,
+                      (ChipClusters.UnitTestingCluster.BooleanResponseCallback) callback,
                       (ArrayList<Integer>) commandArguments.get("arg1"));
             },
             () -> new DelegatedBooleanResponseCallback(),
-            testtestListInt8UArgumentRequestCommandParams);
-    testClusterInteractionInfoMap.put(
-        "testListInt8UArgumentRequest", testtestListInt8UArgumentRequestInteractionInfo);
-    Map<String, CommandParameterInfo> testtestNestedStructListArgumentRequestCommandParams =
+            unitTestingtestListInt8UArgumentRequestCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "testListInt8UArgumentRequest", unitTestingtestListInt8UArgumentRequestInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingtestNestedStructListArgumentRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo testtestNestedStructListArgumentRequestInteractionInfo =
+    InteractionInfo unitTestingtestNestedStructListArgumentRequestInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TestCluster) cluster)
+              ((ChipClusters.UnitTestingCluster) cluster)
                   .testNestedStructListArgumentRequest(
-                      (ChipClusters.TestCluster.BooleanResponseCallback) callback,
-                      (ChipStructs.TestClusterNestedStructList) commandArguments.get("arg1"));
-            },
-            () -> new DelegatedBooleanResponseCallback(),
-            testtestNestedStructListArgumentRequestCommandParams);
-    testClusterInteractionInfoMap.put(
-        "testNestedStructListArgumentRequest",
-        testtestNestedStructListArgumentRequestInteractionInfo);
-    Map<String, CommandParameterInfo> testtestListNestedStructListArgumentRequestCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo testtestListNestedStructListArgumentRequestInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TestCluster) cluster)
-                  .testListNestedStructListArgumentRequest(
-                      (ChipClusters.TestCluster.BooleanResponseCallback) callback,
-                      (ArrayList<ChipStructs.TestClusterNestedStructList>)
+                      (ChipClusters.UnitTestingCluster.BooleanResponseCallback) callback,
+                      (ChipStructs.UnitTestingClusterNestedStructList)
                           commandArguments.get("arg1"));
             },
             () -> new DelegatedBooleanResponseCallback(),
-            testtestListNestedStructListArgumentRequestCommandParams);
-    testClusterInteractionInfoMap.put(
-        "testListNestedStructListArgumentRequest",
-        testtestListNestedStructListArgumentRequestInteractionInfo);
-    Map<String, CommandParameterInfo> testtestListInt8UReverseRequestCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo testtestListInt8UReverseRequestarg1CommandParameterInfo =
-        new CommandParameterInfo("arg1", ArrayList.class, Object.class);
-    testtestListInt8UReverseRequestCommandParams.put(
-        "arg1", testtestListInt8UReverseRequestarg1CommandParameterInfo);
-
-    InteractionInfo testtestListInt8UReverseRequestInteractionInfo =
+            unitTestingtestNestedStructListArgumentRequestCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "testNestedStructListArgumentRequest",
+        unitTestingtestNestedStructListArgumentRequestInteractionInfo);
+    Map<String, CommandParameterInfo>
+        unitTestingtestListNestedStructListArgumentRequestCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo unitTestingtestListNestedStructListArgumentRequestInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TestCluster) cluster)
+              ((ChipClusters.UnitTestingCluster) cluster)
+                  .testListNestedStructListArgumentRequest(
+                      (ChipClusters.UnitTestingCluster.BooleanResponseCallback) callback,
+                      (ArrayList<ChipStructs.UnitTestingClusterNestedStructList>)
+                          commandArguments.get("arg1"));
+            },
+            () -> new DelegatedBooleanResponseCallback(),
+            unitTestingtestListNestedStructListArgumentRequestCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "testListNestedStructListArgumentRequest",
+        unitTestingtestListNestedStructListArgumentRequestInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingtestListInt8UReverseRequestCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo unitTestingtestListInt8UReverseRequestarg1CommandParameterInfo =
+        new CommandParameterInfo("arg1", ArrayList.class, Object.class);
+    unitTestingtestListInt8UReverseRequestCommandParams.put(
+        "arg1", unitTestingtestListInt8UReverseRequestarg1CommandParameterInfo);
+
+    InteractionInfo unitTestingtestListInt8UReverseRequestInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UnitTestingCluster) cluster)
                   .testListInt8UReverseRequest(
-                      (ChipClusters.TestCluster.TestListInt8UReverseResponseCallback) callback,
+                      (ChipClusters.UnitTestingCluster.TestListInt8UReverseResponseCallback)
+                          callback,
                       (ArrayList<Integer>) commandArguments.get("arg1"));
             },
             () -> new DelegatedTestListInt8UReverseResponseCallback(),
-            testtestListInt8UReverseRequestCommandParams);
-    testClusterInteractionInfoMap.put(
-        "testListInt8UReverseRequest", testtestListInt8UReverseRequestInteractionInfo);
-    Map<String, CommandParameterInfo> testtestEnumsRequestCommandParams =
+            unitTestingtestListInt8UReverseRequestCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "testListInt8UReverseRequest", unitTestingtestListInt8UReverseRequestInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingtestEnumsRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo testtestEnumsRequestarg1CommandParameterInfo =
+    CommandParameterInfo unitTestingtestEnumsRequestarg1CommandParameterInfo =
         new CommandParameterInfo("arg1", Integer.class, Integer.class);
-    testtestEnumsRequestCommandParams.put("arg1", testtestEnumsRequestarg1CommandParameterInfo);
+    unitTestingtestEnumsRequestCommandParams.put(
+        "arg1", unitTestingtestEnumsRequestarg1CommandParameterInfo);
 
-    CommandParameterInfo testtestEnumsRequestarg2CommandParameterInfo =
+    CommandParameterInfo unitTestingtestEnumsRequestarg2CommandParameterInfo =
         new CommandParameterInfo("arg2", Integer.class, Integer.class);
-    testtestEnumsRequestCommandParams.put("arg2", testtestEnumsRequestarg2CommandParameterInfo);
+    unitTestingtestEnumsRequestCommandParams.put(
+        "arg2", unitTestingtestEnumsRequestarg2CommandParameterInfo);
 
-    InteractionInfo testtestEnumsRequestInteractionInfo =
+    InteractionInfo unitTestingtestEnumsRequestInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TestCluster) cluster)
+              ((ChipClusters.UnitTestingCluster) cluster)
                   .testEnumsRequest(
-                      (ChipClusters.TestCluster.TestEnumsResponseCallback) callback,
+                      (ChipClusters.UnitTestingCluster.TestEnumsResponseCallback) callback,
                       (Integer) commandArguments.get("arg1"),
                       (Integer) commandArguments.get("arg2"));
             },
             () -> new DelegatedTestEnumsResponseCallback(),
-            testtestEnumsRequestCommandParams);
-    testClusterInteractionInfoMap.put("testEnumsRequest", testtestEnumsRequestInteractionInfo);
-    Map<String, CommandParameterInfo> testtestNullableOptionalRequestCommandParams =
+            unitTestingtestEnumsRequestCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "testEnumsRequest", unitTestingtestEnumsRequestInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingtestNullableOptionalRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo testtestNullableOptionalRequestarg1CommandParameterInfo =
+    CommandParameterInfo unitTestingtestNullableOptionalRequestarg1CommandParameterInfo =
         new CommandParameterInfo("arg1", Optional.class, Integer.class);
-    testtestNullableOptionalRequestCommandParams.put(
-        "arg1", testtestNullableOptionalRequestarg1CommandParameterInfo);
+    unitTestingtestNullableOptionalRequestCommandParams.put(
+        "arg1", unitTestingtestNullableOptionalRequestarg1CommandParameterInfo);
 
-    InteractionInfo testtestNullableOptionalRequestInteractionInfo =
+    InteractionInfo unitTestingtestNullableOptionalRequestInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TestCluster) cluster)
+              ((ChipClusters.UnitTestingCluster) cluster)
                   .testNullableOptionalRequest(
-                      (ChipClusters.TestCluster.TestNullableOptionalResponseCallback) callback,
+                      (ChipClusters.UnitTestingCluster.TestNullableOptionalResponseCallback)
+                          callback,
                       (Optional<Integer>) commandArguments.get("arg1"));
             },
             () -> new DelegatedTestNullableOptionalResponseCallback(),
-            testtestNullableOptionalRequestCommandParams);
-    testClusterInteractionInfoMap.put(
-        "testNullableOptionalRequest", testtestNullableOptionalRequestInteractionInfo);
-    Map<String, CommandParameterInfo> testsimpleStructEchoRequestCommandParams =
+            unitTestingtestNullableOptionalRequestCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "testNullableOptionalRequest", unitTestingtestNullableOptionalRequestInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingsimpleStructEchoRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo testsimpleStructEchoRequestInteractionInfo =
+    InteractionInfo unitTestingsimpleStructEchoRequestInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TestCluster) cluster)
+              ((ChipClusters.UnitTestingCluster) cluster)
                   .simpleStructEchoRequest(
-                      (ChipClusters.TestCluster.SimpleStructResponseCallback) callback,
-                      (ChipStructs.TestClusterSimpleStruct) commandArguments.get("arg1"));
+                      (ChipClusters.UnitTestingCluster.SimpleStructResponseCallback) callback,
+                      (ChipStructs.UnitTestingClusterSimpleStruct) commandArguments.get("arg1"));
             },
             () -> new DelegatedSimpleStructResponseCallback(),
-            testsimpleStructEchoRequestCommandParams);
-    testClusterInteractionInfoMap.put(
-        "simpleStructEchoRequest", testsimpleStructEchoRequestInteractionInfo);
-    Map<String, CommandParameterInfo> testtimedInvokeRequestCommandParams =
+            unitTestingsimpleStructEchoRequestCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "simpleStructEchoRequest", unitTestingsimpleStructEchoRequestInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingtimedInvokeRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo testtimedInvokeRequestInteractionInfo =
+    InteractionInfo unitTestingtimedInvokeRequestInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TestCluster) cluster)
+              ((ChipClusters.UnitTestingCluster) cluster)
                   .timedInvokeRequest((DefaultClusterCallback) callback, 10000);
             },
             () -> new DelegatedDefaultClusterCallback(),
-            testtimedInvokeRequestCommandParams);
-    testClusterInteractionInfoMap.put("timedInvokeRequest", testtimedInvokeRequestInteractionInfo);
-    Map<String, CommandParameterInfo> testtestSimpleOptionalArgumentRequestCommandParams =
+            unitTestingtimedInvokeRequestCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "timedInvokeRequest", unitTestingtimedInvokeRequestInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingtestSimpleOptionalArgumentRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo testtestSimpleOptionalArgumentRequestarg1CommandParameterInfo =
+    CommandParameterInfo unitTestingtestSimpleOptionalArgumentRequestarg1CommandParameterInfo =
         new CommandParameterInfo("arg1", Optional.class, Boolean.class);
-    testtestSimpleOptionalArgumentRequestCommandParams.put(
-        "arg1", testtestSimpleOptionalArgumentRequestarg1CommandParameterInfo);
+    unitTestingtestSimpleOptionalArgumentRequestCommandParams.put(
+        "arg1", unitTestingtestSimpleOptionalArgumentRequestarg1CommandParameterInfo);
 
-    InteractionInfo testtestSimpleOptionalArgumentRequestInteractionInfo =
+    InteractionInfo unitTestingtestSimpleOptionalArgumentRequestInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TestCluster) cluster)
+              ((ChipClusters.UnitTestingCluster) cluster)
                   .testSimpleOptionalArgumentRequest(
                       (DefaultClusterCallback) callback,
                       (Optional<Boolean>) commandArguments.get("arg1"));
             },
             () -> new DelegatedDefaultClusterCallback(),
-            testtestSimpleOptionalArgumentRequestCommandParams);
-    testClusterInteractionInfoMap.put(
-        "testSimpleOptionalArgumentRequest", testtestSimpleOptionalArgumentRequestInteractionInfo);
-    Map<String, CommandParameterInfo> testtestEmitTestEventRequestCommandParams =
+            unitTestingtestSimpleOptionalArgumentRequestCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "testSimpleOptionalArgumentRequest",
+        unitTestingtestSimpleOptionalArgumentRequestInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingtestEmitTestEventRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo testtestEmitTestEventRequestarg1CommandParameterInfo =
+    CommandParameterInfo unitTestingtestEmitTestEventRequestarg1CommandParameterInfo =
         new CommandParameterInfo("arg1", Integer.class, Integer.class);
-    testtestEmitTestEventRequestCommandParams.put(
-        "arg1", testtestEmitTestEventRequestarg1CommandParameterInfo);
+    unitTestingtestEmitTestEventRequestCommandParams.put(
+        "arg1", unitTestingtestEmitTestEventRequestarg1CommandParameterInfo);
 
-    CommandParameterInfo testtestEmitTestEventRequestarg2CommandParameterInfo =
+    CommandParameterInfo unitTestingtestEmitTestEventRequestarg2CommandParameterInfo =
         new CommandParameterInfo("arg2", Integer.class, Integer.class);
-    testtestEmitTestEventRequestCommandParams.put(
-        "arg2", testtestEmitTestEventRequestarg2CommandParameterInfo);
+    unitTestingtestEmitTestEventRequestCommandParams.put(
+        "arg2", unitTestingtestEmitTestEventRequestarg2CommandParameterInfo);
 
-    CommandParameterInfo testtestEmitTestEventRequestarg3CommandParameterInfo =
+    CommandParameterInfo unitTestingtestEmitTestEventRequestarg3CommandParameterInfo =
         new CommandParameterInfo("arg3", Boolean.class, Boolean.class);
-    testtestEmitTestEventRequestCommandParams.put(
-        "arg3", testtestEmitTestEventRequestarg3CommandParameterInfo);
+    unitTestingtestEmitTestEventRequestCommandParams.put(
+        "arg3", unitTestingtestEmitTestEventRequestarg3CommandParameterInfo);
 
-    InteractionInfo testtestEmitTestEventRequestInteractionInfo =
+    InteractionInfo unitTestingtestEmitTestEventRequestInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TestCluster) cluster)
+              ((ChipClusters.UnitTestingCluster) cluster)
                   .testEmitTestEventRequest(
-                      (ChipClusters.TestCluster.TestEmitTestEventResponseCallback) callback,
+                      (ChipClusters.UnitTestingCluster.TestEmitTestEventResponseCallback) callback,
                       (Integer) commandArguments.get("arg1"),
                       (Integer) commandArguments.get("arg2"),
                       (Boolean) commandArguments.get("arg3"));
             },
             () -> new DelegatedTestEmitTestEventResponseCallback(),
-            testtestEmitTestEventRequestCommandParams);
-    testClusterInteractionInfoMap.put(
-        "testEmitTestEventRequest", testtestEmitTestEventRequestInteractionInfo);
-    commandMap.put("test", testClusterInteractionInfoMap);
+            unitTestingtestEmitTestEventRequestCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "testEmitTestEventRequest", unitTestingtestEmitTestEventRequestInteractionInfo);
+    commandMap.put("unitTesting", unitTestingClusterInteractionInfoMap);
     return commandMap;
   }
 }

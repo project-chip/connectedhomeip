@@ -34,7 +34,7 @@ using TestContext = chip::Test::AppContext;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::Test;
+using namespace chip::app::Clusters::UnitTesting;
 using namespace chip::Protocols;
 
 namespace {

@@ -25774,8 +25774,8 @@ void CHIPElectricalMeasurementAttributeListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPTestListInt8uAttributeCallback::CHIPTestListInt8uAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterListInt8uAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingListInt8uAttributeCallback::CHIPUnitTestingListInt8uAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterListInt8uAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -25791,7 +25791,7 @@ CHIPTestListInt8uAttributeCallback::CHIPTestListInt8uAttributeCallback(jobject j
     }
 }
 
-CHIPTestListInt8uAttributeCallback::~CHIPTestListInt8uAttributeCallback()
+CHIPUnitTestingListInt8uAttributeCallback::~CHIPUnitTestingListInt8uAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -25802,7 +25802,8 @@ CHIPTestListInt8uAttributeCallback::~CHIPTestListInt8uAttributeCallback()
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestListInt8uAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
+void CHIPUnitTestingListInt8uAttributeCallback::CallbackFn(void * context,
+                                                           const chip::app::DataModel::DecodableList<uint8_t> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -25811,8 +25812,8 @@ void CHIPTestListInt8uAttributeCallback::CallbackFn(void * context, const chip::
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPTestListInt8uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestListInt8uAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingListInt8uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingListInt8uAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -25842,8 +25843,10 @@ void CHIPTestListInt8uAttributeCallback::CallbackFn(void * context, const chip::
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPTestListOctetStringAttributeCallback::CHIPTestListOctetStringAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterListOctetStringAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingListOctetStringAttributeCallback::CHIPUnitTestingListOctetStringAttributeCallback(jobject javaCallback,
+                                                                                                 bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterListOctetStringAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -25859,7 +25862,7 @@ CHIPTestListOctetStringAttributeCallback::CHIPTestListOctetStringAttributeCallba
     }
 }
 
-CHIPTestListOctetStringAttributeCallback::~CHIPTestListOctetStringAttributeCallback()
+CHIPUnitTestingListOctetStringAttributeCallback::~CHIPUnitTestingListOctetStringAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -25870,8 +25873,8 @@ CHIPTestListOctetStringAttributeCallback::~CHIPTestListOctetStringAttributeCallb
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestListOctetStringAttributeCallback::CallbackFn(void * context,
-                                                          const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
+void CHIPUnitTestingListOctetStringAttributeCallback::CallbackFn(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -25880,8 +25883,8 @@ void CHIPTestListOctetStringAttributeCallback::CallbackFn(void * context,
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPTestListOctetStringAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestListOctetStringAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingListOctetStringAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingListOctetStringAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -25911,9 +25914,9 @@ void CHIPTestListOctetStringAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPTestListStructOctetStringAttributeCallback::CHIPTestListStructOctetStringAttributeCallback(jobject javaCallback,
-                                                                                               bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterListStructOctetStringAttributeCallbackType>(CallbackFn, this),
+CHIPUnitTestingListStructOctetStringAttributeCallback::CHIPUnitTestingListStructOctetStringAttributeCallback(jobject javaCallback,
+                                                                                                             bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterListStructOctetStringAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -25930,7 +25933,7 @@ CHIPTestListStructOctetStringAttributeCallback::CHIPTestListStructOctetStringAtt
     }
 }
 
-CHIPTestListStructOctetStringAttributeCallback::~CHIPTestListStructOctetStringAttributeCallback()
+CHIPUnitTestingListStructOctetStringAttributeCallback::~CHIPUnitTestingListStructOctetStringAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -25941,9 +25944,9 @@ CHIPTestListStructOctetStringAttributeCallback::~CHIPTestListStructOctetStringAt
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestListStructOctetStringAttributeCallback::CallbackFn(
+void CHIPUnitTestingListStructOctetStringAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Test::Structs::TestListStructOctet::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestListStructOctet::DecodableType> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -25952,8 +25955,8 @@ void CHIPTestListStructOctetStringAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPTestListStructOctetStringAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestListStructOctetStringAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingListStructOctetStringAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingListStructOctetStringAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -25986,17 +25989,17 @@ void CHIPTestListStructOctetStringAttributeCallback::CallbackFn(
 
         jclass testListStructOctetStructClass_1;
         err = chip::JniReferences::GetInstance().GetClassRef(
-            env, "chip/devicecontroller/ChipStructs$TestClusterTestListStructOctet", testListStructOctetStructClass_1);
+            env, "chip/devicecontroller/ChipStructs$UnitTestingClusterTestListStructOctet", testListStructOctetStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterTestListStructOctet");
+            ChipLogError(Zcl, "Could not find class ChipStructs$UnitTestingClusterTestListStructOctet");
             return;
         }
         jmethodID testListStructOctetStructCtor_1 =
             env->GetMethodID(testListStructOctetStructClass_1, "<init>", "(Ljava/lang/Long;[B)V");
         if (testListStructOctetStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$TestClusterTestListStructOctet constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$UnitTestingClusterTestListStructOctet constructor");
             return;
         }
 
@@ -26009,8 +26012,8 @@ void CHIPTestListStructOctetStringAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPTestVendorIdAttributeCallback::CHIPTestVendorIdAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterVendorIdAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingVendorIdAttributeCallback::CHIPUnitTestingVendorIdAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterVendorIdAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -26026,7 +26029,7 @@ CHIPTestVendorIdAttributeCallback::CHIPTestVendorIdAttributeCallback(jobject jav
     }
 }
 
-CHIPTestVendorIdAttributeCallback::~CHIPTestVendorIdAttributeCallback()
+CHIPUnitTestingVendorIdAttributeCallback::~CHIPUnitTestingVendorIdAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -26037,7 +26040,7 @@ CHIPTestVendorIdAttributeCallback::~CHIPTestVendorIdAttributeCallback()
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestVendorIdAttributeCallback::CallbackFn(void * context, chip::VendorId value)
+void CHIPUnitTestingVendorIdAttributeCallback::CallbackFn(void * context, chip::VendorId value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -26045,8 +26048,8 @@ void CHIPTestVendorIdAttributeCallback::CallbackFn(void * context, chip::VendorI
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestVendorIdAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestVendorIdAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingVendorIdAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingVendorIdAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -26066,9 +26069,9 @@ void CHIPTestVendorIdAttributeCallback::CallbackFn(void * context, chip::VendorI
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestListNullablesAndOptionalsStructAttributeCallback::CHIPTestListNullablesAndOptionalsStructAttributeCallback(
+CHIPUnitTestingListNullablesAndOptionalsStructAttributeCallback::CHIPUnitTestingListNullablesAndOptionalsStructAttributeCallback(
     jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterListNullablesAndOptionalsStructAttributeCallbackType>(CallbackFn, this),
+    chip::Callback::Callback<CHIPUnitTestingClusterListNullablesAndOptionalsStructAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -26085,7 +26088,7 @@ CHIPTestListNullablesAndOptionalsStructAttributeCallback::CHIPTestListNullablesA
     }
 }
 
-CHIPTestListNullablesAndOptionalsStructAttributeCallback::~CHIPTestListNullablesAndOptionalsStructAttributeCallback()
+CHIPUnitTestingListNullablesAndOptionalsStructAttributeCallback::~CHIPUnitTestingListNullablesAndOptionalsStructAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -26096,10 +26099,10 @@ CHIPTestListNullablesAndOptionalsStructAttributeCallback::~CHIPTestListNullables
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestListNullablesAndOptionalsStructAttributeCallback::CallbackFn(
+void CHIPUnitTestingListNullablesAndOptionalsStructAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Test::Structs::NullablesAndOptionalsStruct::DecodableType> &
-        list)
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::DecodableType> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -26108,8 +26111,8 @@ void CHIPTestListNullablesAndOptionalsStructAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPTestListNullablesAndOptionalsStructAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestListNullablesAndOptionalsStructAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingListNullablesAndOptionalsStructAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingListNullablesAndOptionalsStructAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -26281,11 +26284,11 @@ void CHIPTestListNullablesAndOptionalsStructAttributeCallback::CallbackFn(
                 entry_0.nullableStruct.Value().h, newElement_0_nullableStruct_h);
 
             jclass simpleStructStructClass_3;
-            err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$TestClusterSimpleStruct",
-                                                                 simpleStructStructClass_3);
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct", simpleStructStructClass_3);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterSimpleStruct");
+                ChipLogError(Zcl, "Could not find class ChipStructs$UnitTestingClusterSimpleStruct");
                 return;
             }
             jmethodID simpleStructStructCtor_3 =
@@ -26294,7 +26297,7 @@ void CHIPTestListNullablesAndOptionalsStructAttributeCallback::CallbackFn(
                                  "Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
             if (simpleStructStructCtor_3 == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipStructs$TestClusterSimpleStruct constructor");
+                ChipLogError(Zcl, "Could not find ChipStructs$UnitTestingClusterSimpleStruct constructor");
                 return;
             }
 
@@ -26365,11 +26368,11 @@ void CHIPTestListNullablesAndOptionalsStructAttributeCallback::CallbackFn(
                 newElement_0_optionalStructInsideOptional_h);
 
             jclass simpleStructStructClass_3;
-            err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$TestClusterSimpleStruct",
-                                                                 simpleStructStructClass_3);
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct", simpleStructStructClass_3);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterSimpleStruct");
+                ChipLogError(Zcl, "Could not find class ChipStructs$UnitTestingClusterSimpleStruct");
                 return;
             }
             jmethodID simpleStructStructCtor_3 =
@@ -26378,7 +26381,7 @@ void CHIPTestListNullablesAndOptionalsStructAttributeCallback::CallbackFn(
                                  "Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
             if (simpleStructStructCtor_3 == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipStructs$TestClusterSimpleStruct constructor");
+                ChipLogError(Zcl, "Could not find ChipStructs$UnitTestingClusterSimpleStruct constructor");
                 return;
             }
 
@@ -26463,10 +26466,10 @@ void CHIPTestListNullablesAndOptionalsStructAttributeCallback::CallbackFn(
 
                 jclass simpleStructStructClass_4;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$TestClusterSimpleStruct", simpleStructStructClass_4);
+                    env, "chip/devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct", simpleStructStructClass_4);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterSimpleStruct");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$UnitTestingClusterSimpleStruct");
                     return;
                 }
                 jmethodID simpleStructStructCtor_4 =
@@ -26475,7 +26478,7 @@ void CHIPTestListNullablesAndOptionalsStructAttributeCallback::CallbackFn(
                                      "Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
                 if (simpleStructStructCtor_4 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$TestClusterSimpleStruct constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$UnitTestingClusterSimpleStruct constructor");
                     return;
                 }
 
@@ -26568,21 +26571,21 @@ void CHIPTestListNullablesAndOptionalsStructAttributeCallback::CallbackFn(
 
         jclass nullablesAndOptionalsStructStructClass_1;
         err = chip::JniReferences::GetInstance().GetClassRef(
-            env, "chip/devicecontroller/ChipStructs$TestClusterNullablesAndOptionalsStruct",
+            env, "chip/devicecontroller/ChipStructs$UnitTestingClusterNullablesAndOptionalsStruct",
             nullablesAndOptionalsStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterNullablesAndOptionalsStruct");
+            ChipLogError(Zcl, "Could not find class ChipStructs$UnitTestingClusterNullablesAndOptionalsStruct");
             return;
         }
         jmethodID nullablesAndOptionalsStructStructCtor_1 =
             env->GetMethodID(nullablesAndOptionalsStructStructClass_1, "<init>",
                              "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/String;Ljava/util/"
-                             "Optional;Ljava/util/Optional;Lchip/devicecontroller/ChipStructs$TestClusterSimpleStruct;Ljava/util/"
-                             "Optional;Ljava/util/Optional;Ljava/util/ArrayList;Ljava/util/Optional;Ljava/util/Optional;)V");
+                             "Optional;Ljava/util/Optional;Lchip/devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct;Ljava/"
+                             "util/Optional;Ljava/util/Optional;Ljava/util/ArrayList;Ljava/util/Optional;Ljava/util/Optional;)V");
         if (nullablesAndOptionalsStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$TestClusterNullablesAndOptionalsStruct constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$UnitTestingClusterNullablesAndOptionalsStruct constructor");
             return;
         }
 
@@ -26598,8 +26601,10 @@ void CHIPTestListNullablesAndOptionalsStructAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPTestListLongOctetStringAttributeCallback::CHIPTestListLongOctetStringAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterListLongOctetStringAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingListLongOctetStringAttributeCallback::CHIPUnitTestingListLongOctetStringAttributeCallback(jobject javaCallback,
+                                                                                                         bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterListLongOctetStringAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -26615,7 +26620,7 @@ CHIPTestListLongOctetStringAttributeCallback::CHIPTestListLongOctetStringAttribu
     }
 }
 
-CHIPTestListLongOctetStringAttributeCallback::~CHIPTestListLongOctetStringAttributeCallback()
+CHIPUnitTestingListLongOctetStringAttributeCallback::~CHIPUnitTestingListLongOctetStringAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -26626,8 +26631,8 @@ CHIPTestListLongOctetStringAttributeCallback::~CHIPTestListLongOctetStringAttrib
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestListLongOctetStringAttributeCallback::CallbackFn(void * context,
-                                                              const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
+void CHIPUnitTestingListLongOctetStringAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -26636,8 +26641,8 @@ void CHIPTestListLongOctetStringAttributeCallback::CallbackFn(void * context,
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPTestListLongOctetStringAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestListLongOctetStringAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingListLongOctetStringAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingListLongOctetStringAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -26667,8 +26672,10 @@ void CHIPTestListLongOctetStringAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPTestListFabricScopedAttributeCallback::CHIPTestListFabricScopedAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterListFabricScopedAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingListFabricScopedAttributeCallback::CHIPUnitTestingListFabricScopedAttributeCallback(jobject javaCallback,
+                                                                                                   bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterListFabricScopedAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -26684,7 +26691,7 @@ CHIPTestListFabricScopedAttributeCallback::CHIPTestListFabricScopedAttributeCall
     }
 }
 
-CHIPTestListFabricScopedAttributeCallback::~CHIPTestListFabricScopedAttributeCallback()
+CHIPUnitTestingListFabricScopedAttributeCallback::~CHIPUnitTestingListFabricScopedAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -26695,9 +26702,9 @@ CHIPTestListFabricScopedAttributeCallback::~CHIPTestListFabricScopedAttributeCal
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestListFabricScopedAttributeCallback::CallbackFn(
+void CHIPUnitTestingListFabricScopedAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Test::Structs::TestFabricScoped::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestFabricScoped::DecodableType> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -26706,8 +26713,8 @@ void CHIPTestListFabricScopedAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPTestListFabricScopedAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestListFabricScopedAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingListFabricScopedAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingListFabricScopedAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -26840,11 +26847,11 @@ void CHIPTestListFabricScopedAttributeCallback::CallbackFn(
             entry_0.fabricSensitiveStruct.h, newElement_0_fabricSensitiveStruct_h);
 
         jclass simpleStructStructClass_2;
-        err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$TestClusterSimpleStruct",
-                                                             simpleStructStructClass_2);
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct", simpleStructStructClass_2);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterSimpleStruct");
+            ChipLogError(Zcl, "Could not find class ChipStructs$UnitTestingClusterSimpleStruct");
             return;
         }
         jmethodID simpleStructStructCtor_2 =
@@ -26853,7 +26860,7 @@ void CHIPTestListFabricScopedAttributeCallback::CallbackFn(
                              "Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
         if (simpleStructStructCtor_2 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$TestClusterSimpleStruct constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$UnitTestingClusterSimpleStruct constructor");
             return;
         }
 
@@ -26884,20 +26891,20 @@ void CHIPTestListFabricScopedAttributeCallback::CallbackFn(
                                                                       entry_0.fabricIndex, newElement_0_fabricIndex);
 
         jclass testFabricScopedStructClass_1;
-        err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$TestClusterTestFabricScoped",
-                                                             testFabricScopedStructClass_1);
+        err = chip::JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipStructs$UnitTestingClusterTestFabricScoped", testFabricScopedStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$TestClusterTestFabricScoped");
+            ChipLogError(Zcl, "Could not find class ChipStructs$UnitTestingClusterTestFabricScoped");
             return;
         }
         jmethodID testFabricScopedStructCtor_1 = env->GetMethodID(
             testFabricScopedStructClass_1, "<init>",
             "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/lang/Integer;Ljava/util/Optional;Ljava/lang/String;Lchip/"
-            "devicecontroller/ChipStructs$TestClusterSimpleStruct;Ljava/util/ArrayList;Ljava/lang/Integer;)V");
+            "devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct;Ljava/util/ArrayList;Ljava/lang/Integer;)V");
         if (testFabricScopedStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$TestClusterTestFabricScoped constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$UnitTestingClusterTestFabricScoped constructor");
             return;
         }
 
@@ -26913,8 +26920,10 @@ void CHIPTestListFabricScopedAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPTestNullableBooleanAttributeCallback::CHIPTestNullableBooleanAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableBooleanAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableBooleanAttributeCallback::CHIPUnitTestingNullableBooleanAttributeCallback(jobject javaCallback,
+                                                                                                 bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableBooleanAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -26930,7 +26939,7 @@ CHIPTestNullableBooleanAttributeCallback::CHIPTestNullableBooleanAttributeCallba
     }
 }
 
-CHIPTestNullableBooleanAttributeCallback::~CHIPTestNullableBooleanAttributeCallback()
+CHIPUnitTestingNullableBooleanAttributeCallback::~CHIPUnitTestingNullableBooleanAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -26941,7 +26950,7 @@ CHIPTestNullableBooleanAttributeCallback::~CHIPTestNullableBooleanAttributeCallb
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableBooleanAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<bool> & value)
+void CHIPUnitTestingNullableBooleanAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<bool> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -26949,8 +26958,8 @@ void CHIPTestNullableBooleanAttributeCallback::CallbackFn(void * context, const 
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableBooleanAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableBooleanAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableBooleanAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableBooleanAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -26977,8 +26986,10 @@ void CHIPTestNullableBooleanAttributeCallback::CallbackFn(void * context, const 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableBitmap8AttributeCallback::CHIPTestNullableBitmap8AttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableBitmap8AttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableBitmap8AttributeCallback::CHIPUnitTestingNullableBitmap8AttributeCallback(jobject javaCallback,
+                                                                                                 bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableBitmap8AttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -26994,7 +27005,7 @@ CHIPTestNullableBitmap8AttributeCallback::CHIPTestNullableBitmap8AttributeCallba
     }
 }
 
-CHIPTestNullableBitmap8AttributeCallback::~CHIPTestNullableBitmap8AttributeCallback()
+CHIPUnitTestingNullableBitmap8AttributeCallback::~CHIPUnitTestingNullableBitmap8AttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27005,8 +27016,8 @@ CHIPTestNullableBitmap8AttributeCallback::~CHIPTestNullableBitmap8AttributeCallb
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableBitmap8AttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap8MaskMap>> & value)
+void CHIPUnitTestingNullableBitmap8AttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -27014,8 +27025,8 @@ void CHIPTestNullableBitmap8AttributeCallback::CallbackFn(
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableBitmap8AttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableBitmap8AttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableBitmap8AttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableBitmap8AttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -27042,8 +27053,10 @@ void CHIPTestNullableBitmap8AttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableBitmap16AttributeCallback::CHIPTestNullableBitmap16AttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableBitmap16AttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableBitmap16AttributeCallback::CHIPUnitTestingNullableBitmap16AttributeCallback(jobject javaCallback,
+                                                                                                   bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableBitmap16AttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27059,7 +27072,7 @@ CHIPTestNullableBitmap16AttributeCallback::CHIPTestNullableBitmap16AttributeCall
     }
 }
 
-CHIPTestNullableBitmap16AttributeCallback::~CHIPTestNullableBitmap16AttributeCallback()
+CHIPUnitTestingNullableBitmap16AttributeCallback::~CHIPUnitTestingNullableBitmap16AttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27070,8 +27083,8 @@ CHIPTestNullableBitmap16AttributeCallback::~CHIPTestNullableBitmap16AttributeCal
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableBitmap16AttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap16MaskMap>> & value)
+void CHIPUnitTestingNullableBitmap16AttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -27079,8 +27092,8 @@ void CHIPTestNullableBitmap16AttributeCallback::CallbackFn(
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableBitmap16AttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableBitmap16AttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableBitmap16AttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableBitmap16AttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -27107,8 +27120,10 @@ void CHIPTestNullableBitmap16AttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableBitmap32AttributeCallback::CHIPTestNullableBitmap32AttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableBitmap32AttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableBitmap32AttributeCallback::CHIPUnitTestingNullableBitmap32AttributeCallback(jobject javaCallback,
+                                                                                                   bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableBitmap32AttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27124,7 +27139,7 @@ CHIPTestNullableBitmap32AttributeCallback::CHIPTestNullableBitmap32AttributeCall
     }
 }
 
-CHIPTestNullableBitmap32AttributeCallback::~CHIPTestNullableBitmap32AttributeCallback()
+CHIPUnitTestingNullableBitmap32AttributeCallback::~CHIPUnitTestingNullableBitmap32AttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27135,8 +27150,8 @@ CHIPTestNullableBitmap32AttributeCallback::~CHIPTestNullableBitmap32AttributeCal
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableBitmap32AttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap32MaskMap>> & value)
+void CHIPUnitTestingNullableBitmap32AttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -27144,8 +27159,8 @@ void CHIPTestNullableBitmap32AttributeCallback::CallbackFn(
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableBitmap32AttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableBitmap32AttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableBitmap32AttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableBitmap32AttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -27172,8 +27187,10 @@ void CHIPTestNullableBitmap32AttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableBitmap64AttributeCallback::CHIPTestNullableBitmap64AttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableBitmap64AttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableBitmap64AttributeCallback::CHIPUnitTestingNullableBitmap64AttributeCallback(jobject javaCallback,
+                                                                                                   bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableBitmap64AttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27189,7 +27206,7 @@ CHIPTestNullableBitmap64AttributeCallback::CHIPTestNullableBitmap64AttributeCall
     }
 }
 
-CHIPTestNullableBitmap64AttributeCallback::~CHIPTestNullableBitmap64AttributeCallback()
+CHIPUnitTestingNullableBitmap64AttributeCallback::~CHIPUnitTestingNullableBitmap64AttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27200,8 +27217,8 @@ CHIPTestNullableBitmap64AttributeCallback::~CHIPTestNullableBitmap64AttributeCal
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableBitmap64AttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::Test::Bitmap64MaskMap>> & value)
+void CHIPUnitTestingNullableBitmap64AttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -27209,8 +27226,8 @@ void CHIPTestNullableBitmap64AttributeCallback::CallbackFn(
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableBitmap64AttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableBitmap64AttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableBitmap64AttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableBitmap64AttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -27237,8 +27254,8 @@ void CHIPTestNullableBitmap64AttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableInt8uAttributeCallback::CHIPTestNullableInt8uAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableInt8uAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableInt8uAttributeCallback::CHIPUnitTestingNullableInt8uAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt8uAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27254,7 +27271,7 @@ CHIPTestNullableInt8uAttributeCallback::CHIPTestNullableInt8uAttributeCallback(j
     }
 }
 
-CHIPTestNullableInt8uAttributeCallback::~CHIPTestNullableInt8uAttributeCallback()
+CHIPUnitTestingNullableInt8uAttributeCallback::~CHIPUnitTestingNullableInt8uAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27265,7 +27282,8 @@ CHIPTestNullableInt8uAttributeCallback::~CHIPTestNullableInt8uAttributeCallback(
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableInt8uAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
+void CHIPUnitTestingNullableInt8uAttributeCallback::CallbackFn(void * context,
+                                                               const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -27273,8 +27291,8 @@ void CHIPTestNullableInt8uAttributeCallback::CallbackFn(void * context, const ch
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableInt8uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableInt8uAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableInt8uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableInt8uAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -27301,8 +27319,10 @@ void CHIPTestNullableInt8uAttributeCallback::CallbackFn(void * context, const ch
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableInt16uAttributeCallback::CHIPTestNullableInt16uAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableInt16uAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableInt16uAttributeCallback::CHIPUnitTestingNullableInt16uAttributeCallback(jobject javaCallback,
+                                                                                               bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt16uAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27318,7 +27338,7 @@ CHIPTestNullableInt16uAttributeCallback::CHIPTestNullableInt16uAttributeCallback
     }
 }
 
-CHIPTestNullableInt16uAttributeCallback::~CHIPTestNullableInt16uAttributeCallback()
+CHIPUnitTestingNullableInt16uAttributeCallback::~CHIPUnitTestingNullableInt16uAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27329,7 +27349,8 @@ CHIPTestNullableInt16uAttributeCallback::~CHIPTestNullableInt16uAttributeCallbac
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableInt16uAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
+void CHIPUnitTestingNullableInt16uAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::Nullable<uint16_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -27337,8 +27358,8 @@ void CHIPTestNullableInt16uAttributeCallback::CallbackFn(void * context, const c
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableInt16uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableInt16uAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableInt16uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableInt16uAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -27365,8 +27386,10 @@ void CHIPTestNullableInt16uAttributeCallback::CallbackFn(void * context, const c
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableInt24uAttributeCallback::CHIPTestNullableInt24uAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableInt24uAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableInt24uAttributeCallback::CHIPUnitTestingNullableInt24uAttributeCallback(jobject javaCallback,
+                                                                                               bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt24uAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27382,7 +27405,7 @@ CHIPTestNullableInt24uAttributeCallback::CHIPTestNullableInt24uAttributeCallback
     }
 }
 
-CHIPTestNullableInt24uAttributeCallback::~CHIPTestNullableInt24uAttributeCallback()
+CHIPUnitTestingNullableInt24uAttributeCallback::~CHIPUnitTestingNullableInt24uAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27393,7 +27416,8 @@ CHIPTestNullableInt24uAttributeCallback::~CHIPTestNullableInt24uAttributeCallbac
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableInt24uAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
+void CHIPUnitTestingNullableInt24uAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::Nullable<uint32_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -27401,8 +27425,8 @@ void CHIPTestNullableInt24uAttributeCallback::CallbackFn(void * context, const c
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableInt24uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableInt24uAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableInt24uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableInt24uAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -27429,8 +27453,10 @@ void CHIPTestNullableInt24uAttributeCallback::CallbackFn(void * context, const c
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableInt32uAttributeCallback::CHIPTestNullableInt32uAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableInt32uAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableInt32uAttributeCallback::CHIPUnitTestingNullableInt32uAttributeCallback(jobject javaCallback,
+                                                                                               bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt32uAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27446,7 +27472,7 @@ CHIPTestNullableInt32uAttributeCallback::CHIPTestNullableInt32uAttributeCallback
     }
 }
 
-CHIPTestNullableInt32uAttributeCallback::~CHIPTestNullableInt32uAttributeCallback()
+CHIPUnitTestingNullableInt32uAttributeCallback::~CHIPUnitTestingNullableInt32uAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27457,7 +27483,8 @@ CHIPTestNullableInt32uAttributeCallback::~CHIPTestNullableInt32uAttributeCallbac
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableInt32uAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
+void CHIPUnitTestingNullableInt32uAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::Nullable<uint32_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -27465,8 +27492,8 @@ void CHIPTestNullableInt32uAttributeCallback::CallbackFn(void * context, const c
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableInt32uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableInt32uAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableInt32uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableInt32uAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -27493,8 +27520,10 @@ void CHIPTestNullableInt32uAttributeCallback::CallbackFn(void * context, const c
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableInt40uAttributeCallback::CHIPTestNullableInt40uAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableInt40uAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableInt40uAttributeCallback::CHIPUnitTestingNullableInt40uAttributeCallback(jobject javaCallback,
+                                                                                               bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt40uAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27510,7 +27539,7 @@ CHIPTestNullableInt40uAttributeCallback::CHIPTestNullableInt40uAttributeCallback
     }
 }
 
-CHIPTestNullableInt40uAttributeCallback::~CHIPTestNullableInt40uAttributeCallback()
+CHIPUnitTestingNullableInt40uAttributeCallback::~CHIPUnitTestingNullableInt40uAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27521,7 +27550,8 @@ CHIPTestNullableInt40uAttributeCallback::~CHIPTestNullableInt40uAttributeCallbac
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableInt40uAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
+void CHIPUnitTestingNullableInt40uAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::Nullable<uint64_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -27529,8 +27559,8 @@ void CHIPTestNullableInt40uAttributeCallback::CallbackFn(void * context, const c
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableInt40uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableInt40uAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableInt40uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableInt40uAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -27557,8 +27587,10 @@ void CHIPTestNullableInt40uAttributeCallback::CallbackFn(void * context, const c
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableInt48uAttributeCallback::CHIPTestNullableInt48uAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableInt48uAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableInt48uAttributeCallback::CHIPUnitTestingNullableInt48uAttributeCallback(jobject javaCallback,
+                                                                                               bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt48uAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27574,7 +27606,7 @@ CHIPTestNullableInt48uAttributeCallback::CHIPTestNullableInt48uAttributeCallback
     }
 }
 
-CHIPTestNullableInt48uAttributeCallback::~CHIPTestNullableInt48uAttributeCallback()
+CHIPUnitTestingNullableInt48uAttributeCallback::~CHIPUnitTestingNullableInt48uAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27585,7 +27617,8 @@ CHIPTestNullableInt48uAttributeCallback::~CHIPTestNullableInt48uAttributeCallbac
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableInt48uAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
+void CHIPUnitTestingNullableInt48uAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::Nullable<uint64_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -27593,8 +27626,8 @@ void CHIPTestNullableInt48uAttributeCallback::CallbackFn(void * context, const c
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableInt48uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableInt48uAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableInt48uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableInt48uAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -27621,8 +27654,10 @@ void CHIPTestNullableInt48uAttributeCallback::CallbackFn(void * context, const c
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableInt56uAttributeCallback::CHIPTestNullableInt56uAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableInt56uAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableInt56uAttributeCallback::CHIPUnitTestingNullableInt56uAttributeCallback(jobject javaCallback,
+                                                                                               bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt56uAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27638,7 +27673,7 @@ CHIPTestNullableInt56uAttributeCallback::CHIPTestNullableInt56uAttributeCallback
     }
 }
 
-CHIPTestNullableInt56uAttributeCallback::~CHIPTestNullableInt56uAttributeCallback()
+CHIPUnitTestingNullableInt56uAttributeCallback::~CHIPUnitTestingNullableInt56uAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27649,7 +27684,8 @@ CHIPTestNullableInt56uAttributeCallback::~CHIPTestNullableInt56uAttributeCallbac
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableInt56uAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
+void CHIPUnitTestingNullableInt56uAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::Nullable<uint64_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -27657,8 +27693,8 @@ void CHIPTestNullableInt56uAttributeCallback::CallbackFn(void * context, const c
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableInt56uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableInt56uAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableInt56uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableInt56uAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -27685,8 +27721,10 @@ void CHIPTestNullableInt56uAttributeCallback::CallbackFn(void * context, const c
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableInt64uAttributeCallback::CHIPTestNullableInt64uAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableInt64uAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableInt64uAttributeCallback::CHIPUnitTestingNullableInt64uAttributeCallback(jobject javaCallback,
+                                                                                               bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt64uAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27702,7 +27740,7 @@ CHIPTestNullableInt64uAttributeCallback::CHIPTestNullableInt64uAttributeCallback
     }
 }
 
-CHIPTestNullableInt64uAttributeCallback::~CHIPTestNullableInt64uAttributeCallback()
+CHIPUnitTestingNullableInt64uAttributeCallback::~CHIPUnitTestingNullableInt64uAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27713,7 +27751,8 @@ CHIPTestNullableInt64uAttributeCallback::~CHIPTestNullableInt64uAttributeCallbac
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableInt64uAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
+void CHIPUnitTestingNullableInt64uAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::Nullable<uint64_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -27721,8 +27760,8 @@ void CHIPTestNullableInt64uAttributeCallback::CallbackFn(void * context, const c
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableInt64uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableInt64uAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableInt64uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableInt64uAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -27749,8 +27788,8 @@ void CHIPTestNullableInt64uAttributeCallback::CallbackFn(void * context, const c
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableInt8sAttributeCallback::CHIPTestNullableInt8sAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableInt8sAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableInt8sAttributeCallback::CHIPUnitTestingNullableInt8sAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt8sAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27766,7 +27805,7 @@ CHIPTestNullableInt8sAttributeCallback::CHIPTestNullableInt8sAttributeCallback(j
     }
 }
 
-CHIPTestNullableInt8sAttributeCallback::~CHIPTestNullableInt8sAttributeCallback()
+CHIPUnitTestingNullableInt8sAttributeCallback::~CHIPUnitTestingNullableInt8sAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27777,7 +27816,7 @@ CHIPTestNullableInt8sAttributeCallback::~CHIPTestNullableInt8sAttributeCallback(
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableInt8sAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<int8_t> & value)
+void CHIPUnitTestingNullableInt8sAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<int8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -27785,8 +27824,8 @@ void CHIPTestNullableInt8sAttributeCallback::CallbackFn(void * context, const ch
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableInt8sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableInt8sAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableInt8sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableInt8sAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -27813,8 +27852,10 @@ void CHIPTestNullableInt8sAttributeCallback::CallbackFn(void * context, const ch
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableInt16sAttributeCallback::CHIPTestNullableInt16sAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableInt16sAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableInt16sAttributeCallback::CHIPUnitTestingNullableInt16sAttributeCallback(jobject javaCallback,
+                                                                                               bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt16sAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27830,7 +27871,7 @@ CHIPTestNullableInt16sAttributeCallback::CHIPTestNullableInt16sAttributeCallback
     }
 }
 
-CHIPTestNullableInt16sAttributeCallback::~CHIPTestNullableInt16sAttributeCallback()
+CHIPUnitTestingNullableInt16sAttributeCallback::~CHIPUnitTestingNullableInt16sAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27841,7 +27882,8 @@ CHIPTestNullableInt16sAttributeCallback::~CHIPTestNullableInt16sAttributeCallbac
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableInt16sAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value)
+void CHIPUnitTestingNullableInt16sAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::Nullable<int16_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -27849,8 +27891,8 @@ void CHIPTestNullableInt16sAttributeCallback::CallbackFn(void * context, const c
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableInt16sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableInt16sAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableInt16sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableInt16sAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -27877,8 +27919,10 @@ void CHIPTestNullableInt16sAttributeCallback::CallbackFn(void * context, const c
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableInt24sAttributeCallback::CHIPTestNullableInt24sAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableInt24sAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableInt24sAttributeCallback::CHIPUnitTestingNullableInt24sAttributeCallback(jobject javaCallback,
+                                                                                               bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt24sAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27894,7 +27938,7 @@ CHIPTestNullableInt24sAttributeCallback::CHIPTestNullableInt24sAttributeCallback
     }
 }
 
-CHIPTestNullableInt24sAttributeCallback::~CHIPTestNullableInt24sAttributeCallback()
+CHIPUnitTestingNullableInt24sAttributeCallback::~CHIPUnitTestingNullableInt24sAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27905,7 +27949,8 @@ CHIPTestNullableInt24sAttributeCallback::~CHIPTestNullableInt24sAttributeCallbac
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableInt24sAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<int32_t> & value)
+void CHIPUnitTestingNullableInt24sAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::Nullable<int32_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -27913,8 +27958,8 @@ void CHIPTestNullableInt24sAttributeCallback::CallbackFn(void * context, const c
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableInt24sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableInt24sAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableInt24sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableInt24sAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -27941,8 +27986,10 @@ void CHIPTestNullableInt24sAttributeCallback::CallbackFn(void * context, const c
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableInt32sAttributeCallback::CHIPTestNullableInt32sAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableInt32sAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableInt32sAttributeCallback::CHIPUnitTestingNullableInt32sAttributeCallback(jobject javaCallback,
+                                                                                               bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt32sAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27958,7 +28005,7 @@ CHIPTestNullableInt32sAttributeCallback::CHIPTestNullableInt32sAttributeCallback
     }
 }
 
-CHIPTestNullableInt32sAttributeCallback::~CHIPTestNullableInt32sAttributeCallback()
+CHIPUnitTestingNullableInt32sAttributeCallback::~CHIPUnitTestingNullableInt32sAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27969,7 +28016,8 @@ CHIPTestNullableInt32sAttributeCallback::~CHIPTestNullableInt32sAttributeCallbac
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableInt32sAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<int32_t> & value)
+void CHIPUnitTestingNullableInt32sAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::Nullable<int32_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -27977,8 +28025,8 @@ void CHIPTestNullableInt32sAttributeCallback::CallbackFn(void * context, const c
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableInt32sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableInt32sAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableInt32sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableInt32sAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -28005,8 +28053,10 @@ void CHIPTestNullableInt32sAttributeCallback::CallbackFn(void * context, const c
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableInt40sAttributeCallback::CHIPTestNullableInt40sAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableInt40sAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableInt40sAttributeCallback::CHIPUnitTestingNullableInt40sAttributeCallback(jobject javaCallback,
+                                                                                               bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt40sAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28022,7 +28072,7 @@ CHIPTestNullableInt40sAttributeCallback::CHIPTestNullableInt40sAttributeCallback
     }
 }
 
-CHIPTestNullableInt40sAttributeCallback::~CHIPTestNullableInt40sAttributeCallback()
+CHIPUnitTestingNullableInt40sAttributeCallback::~CHIPUnitTestingNullableInt40sAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28033,7 +28083,8 @@ CHIPTestNullableInt40sAttributeCallback::~CHIPTestNullableInt40sAttributeCallbac
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableInt40sAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
+void CHIPUnitTestingNullableInt40sAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::Nullable<int64_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -28041,8 +28092,8 @@ void CHIPTestNullableInt40sAttributeCallback::CallbackFn(void * context, const c
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableInt40sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableInt40sAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableInt40sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableInt40sAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -28069,8 +28120,10 @@ void CHIPTestNullableInt40sAttributeCallback::CallbackFn(void * context, const c
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableInt48sAttributeCallback::CHIPTestNullableInt48sAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableInt48sAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableInt48sAttributeCallback::CHIPUnitTestingNullableInt48sAttributeCallback(jobject javaCallback,
+                                                                                               bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt48sAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28086,7 +28139,7 @@ CHIPTestNullableInt48sAttributeCallback::CHIPTestNullableInt48sAttributeCallback
     }
 }
 
-CHIPTestNullableInt48sAttributeCallback::~CHIPTestNullableInt48sAttributeCallback()
+CHIPUnitTestingNullableInt48sAttributeCallback::~CHIPUnitTestingNullableInt48sAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28097,7 +28150,8 @@ CHIPTestNullableInt48sAttributeCallback::~CHIPTestNullableInt48sAttributeCallbac
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableInt48sAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
+void CHIPUnitTestingNullableInt48sAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::Nullable<int64_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -28105,8 +28159,8 @@ void CHIPTestNullableInt48sAttributeCallback::CallbackFn(void * context, const c
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableInt48sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableInt48sAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableInt48sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableInt48sAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -28133,8 +28187,10 @@ void CHIPTestNullableInt48sAttributeCallback::CallbackFn(void * context, const c
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableInt56sAttributeCallback::CHIPTestNullableInt56sAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableInt56sAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableInt56sAttributeCallback::CHIPUnitTestingNullableInt56sAttributeCallback(jobject javaCallback,
+                                                                                               bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt56sAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28150,7 +28206,7 @@ CHIPTestNullableInt56sAttributeCallback::CHIPTestNullableInt56sAttributeCallback
     }
 }
 
-CHIPTestNullableInt56sAttributeCallback::~CHIPTestNullableInt56sAttributeCallback()
+CHIPUnitTestingNullableInt56sAttributeCallback::~CHIPUnitTestingNullableInt56sAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28161,7 +28217,8 @@ CHIPTestNullableInt56sAttributeCallback::~CHIPTestNullableInt56sAttributeCallbac
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableInt56sAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
+void CHIPUnitTestingNullableInt56sAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::Nullable<int64_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -28169,8 +28226,8 @@ void CHIPTestNullableInt56sAttributeCallback::CallbackFn(void * context, const c
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableInt56sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableInt56sAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableInt56sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableInt56sAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -28197,8 +28254,10 @@ void CHIPTestNullableInt56sAttributeCallback::CallbackFn(void * context, const c
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableInt64sAttributeCallback::CHIPTestNullableInt64sAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableInt64sAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableInt64sAttributeCallback::CHIPUnitTestingNullableInt64sAttributeCallback(jobject javaCallback,
+                                                                                               bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt64sAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28214,7 +28273,7 @@ CHIPTestNullableInt64sAttributeCallback::CHIPTestNullableInt64sAttributeCallback
     }
 }
 
-CHIPTestNullableInt64sAttributeCallback::~CHIPTestNullableInt64sAttributeCallback()
+CHIPUnitTestingNullableInt64sAttributeCallback::~CHIPUnitTestingNullableInt64sAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28225,7 +28284,8 @@ CHIPTestNullableInt64sAttributeCallback::~CHIPTestNullableInt64sAttributeCallbac
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableInt64sAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
+void CHIPUnitTestingNullableInt64sAttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::Nullable<int64_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -28233,8 +28293,8 @@ void CHIPTestNullableInt64sAttributeCallback::CallbackFn(void * context, const c
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableInt64sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableInt64sAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableInt64sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableInt64sAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -28261,8 +28321,8 @@ void CHIPTestNullableInt64sAttributeCallback::CallbackFn(void * context, const c
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableEnum8AttributeCallback::CHIPTestNullableEnum8AttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableEnum8AttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableEnum8AttributeCallback::CHIPUnitTestingNullableEnum8AttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableEnum8AttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28278,7 +28338,7 @@ CHIPTestNullableEnum8AttributeCallback::CHIPTestNullableEnum8AttributeCallback(j
     }
 }
 
-CHIPTestNullableEnum8AttributeCallback::~CHIPTestNullableEnum8AttributeCallback()
+CHIPUnitTestingNullableEnum8AttributeCallback::~CHIPUnitTestingNullableEnum8AttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28289,7 +28349,8 @@ CHIPTestNullableEnum8AttributeCallback::~CHIPTestNullableEnum8AttributeCallback(
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableEnum8AttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
+void CHIPUnitTestingNullableEnum8AttributeCallback::CallbackFn(void * context,
+                                                               const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -28297,8 +28358,8 @@ void CHIPTestNullableEnum8AttributeCallback::CallbackFn(void * context, const ch
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableEnum8AttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableEnum8AttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableEnum8AttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableEnum8AttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -28325,8 +28386,10 @@ void CHIPTestNullableEnum8AttributeCallback::CallbackFn(void * context, const ch
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableEnum16AttributeCallback::CHIPTestNullableEnum16AttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableEnum16AttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableEnum16AttributeCallback::CHIPUnitTestingNullableEnum16AttributeCallback(jobject javaCallback,
+                                                                                               bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableEnum16AttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28342,7 +28405,7 @@ CHIPTestNullableEnum16AttributeCallback::CHIPTestNullableEnum16AttributeCallback
     }
 }
 
-CHIPTestNullableEnum16AttributeCallback::~CHIPTestNullableEnum16AttributeCallback()
+CHIPUnitTestingNullableEnum16AttributeCallback::~CHIPUnitTestingNullableEnum16AttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28353,7 +28416,8 @@ CHIPTestNullableEnum16AttributeCallback::~CHIPTestNullableEnum16AttributeCallbac
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableEnum16AttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
+void CHIPUnitTestingNullableEnum16AttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::Nullable<uint16_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -28361,8 +28425,8 @@ void CHIPTestNullableEnum16AttributeCallback::CallbackFn(void * context, const c
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableEnum16AttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableEnum16AttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableEnum16AttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableEnum16AttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -28389,8 +28453,10 @@ void CHIPTestNullableEnum16AttributeCallback::CallbackFn(void * context, const c
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableFloatSingleAttributeCallback::CHIPTestNullableFloatSingleAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableFloatSingleAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableFloatSingleAttributeCallback::CHIPUnitTestingNullableFloatSingleAttributeCallback(jobject javaCallback,
+                                                                                                         bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableFloatSingleAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28406,7 +28472,7 @@ CHIPTestNullableFloatSingleAttributeCallback::CHIPTestNullableFloatSingleAttribu
     }
 }
 
-CHIPTestNullableFloatSingleAttributeCallback::~CHIPTestNullableFloatSingleAttributeCallback()
+CHIPUnitTestingNullableFloatSingleAttributeCallback::~CHIPUnitTestingNullableFloatSingleAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28417,7 +28483,8 @@ CHIPTestNullableFloatSingleAttributeCallback::~CHIPTestNullableFloatSingleAttrib
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableFloatSingleAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<float> & value)
+void CHIPUnitTestingNullableFloatSingleAttributeCallback::CallbackFn(void * context,
+                                                                     const chip::app::DataModel::Nullable<float> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -28425,8 +28492,8 @@ void CHIPTestNullableFloatSingleAttributeCallback::CallbackFn(void * context, co
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableFloatSingleAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableFloatSingleAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableFloatSingleAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableFloatSingleAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -28453,8 +28520,10 @@ void CHIPTestNullableFloatSingleAttributeCallback::CallbackFn(void * context, co
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableFloatDoubleAttributeCallback::CHIPTestNullableFloatDoubleAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableFloatDoubleAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableFloatDoubleAttributeCallback::CHIPUnitTestingNullableFloatDoubleAttributeCallback(jobject javaCallback,
+                                                                                                         bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableFloatDoubleAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28470,7 +28539,7 @@ CHIPTestNullableFloatDoubleAttributeCallback::CHIPTestNullableFloatDoubleAttribu
     }
 }
 
-CHIPTestNullableFloatDoubleAttributeCallback::~CHIPTestNullableFloatDoubleAttributeCallback()
+CHIPUnitTestingNullableFloatDoubleAttributeCallback::~CHIPUnitTestingNullableFloatDoubleAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28481,7 +28550,8 @@ CHIPTestNullableFloatDoubleAttributeCallback::~CHIPTestNullableFloatDoubleAttrib
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableFloatDoubleAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<double> & value)
+void CHIPUnitTestingNullableFloatDoubleAttributeCallback::CallbackFn(void * context,
+                                                                     const chip::app::DataModel::Nullable<double> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -28489,8 +28559,8 @@ void CHIPTestNullableFloatDoubleAttributeCallback::CallbackFn(void * context, co
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableFloatDoubleAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableFloatDoubleAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableFloatDoubleAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableFloatDoubleAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -28517,8 +28587,10 @@ void CHIPTestNullableFloatDoubleAttributeCallback::CallbackFn(void * context, co
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableOctetStringAttributeCallback::CHIPTestNullableOctetStringAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableOctetStringAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableOctetStringAttributeCallback::CHIPUnitTestingNullableOctetStringAttributeCallback(jobject javaCallback,
+                                                                                                         bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableOctetStringAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28534,7 +28606,7 @@ CHIPTestNullableOctetStringAttributeCallback::CHIPTestNullableOctetStringAttribu
     }
 }
 
-CHIPTestNullableOctetStringAttributeCallback::~CHIPTestNullableOctetStringAttributeCallback()
+CHIPUnitTestingNullableOctetStringAttributeCallback::~CHIPUnitTestingNullableOctetStringAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28545,8 +28617,8 @@ CHIPTestNullableOctetStringAttributeCallback::~CHIPTestNullableOctetStringAttrib
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableOctetStringAttributeCallback::CallbackFn(void * context,
-                                                              const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
+void CHIPUnitTestingNullableOctetStringAttributeCallback::CallbackFn(void * context,
+                                                                     const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -28554,8 +28626,8 @@ void CHIPTestNullableOctetStringAttributeCallback::CallbackFn(void * context,
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableOctetStringAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableOctetStringAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableOctetStringAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableOctetStringAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -28582,8 +28654,10 @@ void CHIPTestNullableOctetStringAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableCharStringAttributeCallback::CHIPTestNullableCharStringAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableCharStringAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableCharStringAttributeCallback::CHIPUnitTestingNullableCharStringAttributeCallback(jobject javaCallback,
+                                                                                                       bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableCharStringAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28599,7 +28673,7 @@ CHIPTestNullableCharStringAttributeCallback::CHIPTestNullableCharStringAttribute
     }
 }
 
-CHIPTestNullableCharStringAttributeCallback::~CHIPTestNullableCharStringAttributeCallback()
+CHIPUnitTestingNullableCharStringAttributeCallback::~CHIPUnitTestingNullableCharStringAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28610,8 +28684,8 @@ CHIPTestNullableCharStringAttributeCallback::~CHIPTestNullableCharStringAttribut
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableCharStringAttributeCallback::CallbackFn(void * context,
-                                                             const chip::app::DataModel::Nullable<chip::CharSpan> & value)
+void CHIPUnitTestingNullableCharStringAttributeCallback::CallbackFn(void * context,
+                                                                    const chip::app::DataModel::Nullable<chip::CharSpan> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -28619,8 +28693,8 @@ void CHIPTestNullableCharStringAttributeCallback::CallbackFn(void * context,
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableCharStringAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableCharStringAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableCharStringAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableCharStringAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -28644,8 +28718,10 @@ void CHIPTestNullableCharStringAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableEnumAttrAttributeCallback::CHIPTestNullableEnumAttrAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableEnumAttrAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingNullableEnumAttrAttributeCallback::CHIPUnitTestingNullableEnumAttrAttributeCallback(jobject javaCallback,
+                                                                                                   bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableEnumAttrAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28661,7 +28737,7 @@ CHIPTestNullableEnumAttrAttributeCallback::CHIPTestNullableEnumAttrAttributeCall
     }
 }
 
-CHIPTestNullableEnumAttrAttributeCallback::~CHIPTestNullableEnumAttrAttributeCallback()
+CHIPUnitTestingNullableEnumAttrAttributeCallback::~CHIPUnitTestingNullableEnumAttrAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28672,8 +28748,8 @@ CHIPTestNullableEnumAttrAttributeCallback::~CHIPTestNullableEnumAttrAttributeCal
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableEnumAttrAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Test::SimpleEnum> & value)
+void CHIPUnitTestingNullableEnumAttrAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -28681,8 +28757,8 @@ void CHIPTestNullableEnumAttrAttributeCallback::CallbackFn(
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableEnumAttrAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableEnumAttrAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableEnumAttrAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableEnumAttrAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -28709,9 +28785,9 @@ void CHIPTestNullableEnumAttrAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableRangeRestrictedInt8uAttributeCallback::CHIPTestNullableRangeRestrictedInt8uAttributeCallback(jobject javaCallback,
-                                                                                                             bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableRangeRestrictedInt8uAttributeCallbackType>(CallbackFn, this),
+CHIPUnitTestingNullableRangeRestrictedInt8uAttributeCallback::CHIPUnitTestingNullableRangeRestrictedInt8uAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableRangeRestrictedInt8uAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -28728,7 +28804,7 @@ CHIPTestNullableRangeRestrictedInt8uAttributeCallback::CHIPTestNullableRangeRest
     }
 }
 
-CHIPTestNullableRangeRestrictedInt8uAttributeCallback::~CHIPTestNullableRangeRestrictedInt8uAttributeCallback()
+CHIPUnitTestingNullableRangeRestrictedInt8uAttributeCallback::~CHIPUnitTestingNullableRangeRestrictedInt8uAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28739,8 +28815,8 @@ CHIPTestNullableRangeRestrictedInt8uAttributeCallback::~CHIPTestNullableRangeRes
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableRangeRestrictedInt8uAttributeCallback::CallbackFn(void * context,
-                                                                       const chip::app::DataModel::Nullable<uint8_t> & value)
+void CHIPUnitTestingNullableRangeRestrictedInt8uAttributeCallback::CallbackFn(void * context,
+                                                                              const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -28748,8 +28824,8 @@ void CHIPTestNullableRangeRestrictedInt8uAttributeCallback::CallbackFn(void * co
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableRangeRestrictedInt8uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableRangeRestrictedInt8uAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableRangeRestrictedInt8uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableRangeRestrictedInt8uAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -28776,9 +28852,9 @@ void CHIPTestNullableRangeRestrictedInt8uAttributeCallback::CallbackFn(void * co
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableRangeRestrictedInt8sAttributeCallback::CHIPTestNullableRangeRestrictedInt8sAttributeCallback(jobject javaCallback,
-                                                                                                             bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableRangeRestrictedInt8sAttributeCallbackType>(CallbackFn, this),
+CHIPUnitTestingNullableRangeRestrictedInt8sAttributeCallback::CHIPUnitTestingNullableRangeRestrictedInt8sAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableRangeRestrictedInt8sAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -28795,7 +28871,7 @@ CHIPTestNullableRangeRestrictedInt8sAttributeCallback::CHIPTestNullableRangeRest
     }
 }
 
-CHIPTestNullableRangeRestrictedInt8sAttributeCallback::~CHIPTestNullableRangeRestrictedInt8sAttributeCallback()
+CHIPUnitTestingNullableRangeRestrictedInt8sAttributeCallback::~CHIPUnitTestingNullableRangeRestrictedInt8sAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28806,8 +28882,8 @@ CHIPTestNullableRangeRestrictedInt8sAttributeCallback::~CHIPTestNullableRangeRes
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableRangeRestrictedInt8sAttributeCallback::CallbackFn(void * context,
-                                                                       const chip::app::DataModel::Nullable<int8_t> & value)
+void CHIPUnitTestingNullableRangeRestrictedInt8sAttributeCallback::CallbackFn(void * context,
+                                                                              const chip::app::DataModel::Nullable<int8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -28815,8 +28891,8 @@ void CHIPTestNullableRangeRestrictedInt8sAttributeCallback::CallbackFn(void * co
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableRangeRestrictedInt8sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableRangeRestrictedInt8sAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableRangeRestrictedInt8sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableRangeRestrictedInt8sAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -28843,9 +28919,9 @@ void CHIPTestNullableRangeRestrictedInt8sAttributeCallback::CallbackFn(void * co
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableRangeRestrictedInt16uAttributeCallback::CHIPTestNullableRangeRestrictedInt16uAttributeCallback(jobject javaCallback,
-                                                                                                               bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableRangeRestrictedInt16uAttributeCallbackType>(CallbackFn, this),
+CHIPUnitTestingNullableRangeRestrictedInt16uAttributeCallback::CHIPUnitTestingNullableRangeRestrictedInt16uAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableRangeRestrictedInt16uAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -28862,7 +28938,7 @@ CHIPTestNullableRangeRestrictedInt16uAttributeCallback::CHIPTestNullableRangeRes
     }
 }
 
-CHIPTestNullableRangeRestrictedInt16uAttributeCallback::~CHIPTestNullableRangeRestrictedInt16uAttributeCallback()
+CHIPUnitTestingNullableRangeRestrictedInt16uAttributeCallback::~CHIPUnitTestingNullableRangeRestrictedInt16uAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28873,8 +28949,8 @@ CHIPTestNullableRangeRestrictedInt16uAttributeCallback::~CHIPTestNullableRangeRe
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableRangeRestrictedInt16uAttributeCallback::CallbackFn(void * context,
-                                                                        const chip::app::DataModel::Nullable<uint16_t> & value)
+void CHIPUnitTestingNullableRangeRestrictedInt16uAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -28882,8 +28958,8 @@ void CHIPTestNullableRangeRestrictedInt16uAttributeCallback::CallbackFn(void * c
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableRangeRestrictedInt16uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableRangeRestrictedInt16uAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableRangeRestrictedInt16uAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableRangeRestrictedInt16uAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -28910,9 +28986,9 @@ void CHIPTestNullableRangeRestrictedInt16uAttributeCallback::CallbackFn(void * c
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestNullableRangeRestrictedInt16sAttributeCallback::CHIPTestNullableRangeRestrictedInt16sAttributeCallback(jobject javaCallback,
-                                                                                                               bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterNullableRangeRestrictedInt16sAttributeCallbackType>(CallbackFn, this),
+CHIPUnitTestingNullableRangeRestrictedInt16sAttributeCallback::CHIPUnitTestingNullableRangeRestrictedInt16sAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableRangeRestrictedInt16sAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -28929,7 +29005,7 @@ CHIPTestNullableRangeRestrictedInt16sAttributeCallback::CHIPTestNullableRangeRes
     }
 }
 
-CHIPTestNullableRangeRestrictedInt16sAttributeCallback::~CHIPTestNullableRangeRestrictedInt16sAttributeCallback()
+CHIPUnitTestingNullableRangeRestrictedInt16sAttributeCallback::~CHIPUnitTestingNullableRangeRestrictedInt16sAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28940,8 +29016,8 @@ CHIPTestNullableRangeRestrictedInt16sAttributeCallback::~CHIPTestNullableRangeRe
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestNullableRangeRestrictedInt16sAttributeCallback::CallbackFn(void * context,
-                                                                        const chip::app::DataModel::Nullable<int16_t> & value)
+void CHIPUnitTestingNullableRangeRestrictedInt16sAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<int16_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -28949,8 +29025,8 @@ void CHIPTestNullableRangeRestrictedInt16sAttributeCallback::CallbackFn(void * c
     jobject javaCallbackRef;
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPTestNullableRangeRestrictedInt16sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestNullableRangeRestrictedInt16sAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingNullableRangeRestrictedInt16sAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingNullableRangeRestrictedInt16sAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -28977,8 +29053,10 @@ void CHIPTestNullableRangeRestrictedInt16sAttributeCallback::CallbackFn(void * c
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPTestGeneratedCommandListAttributeCallback::CHIPTestGeneratedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingGeneratedCommandListAttributeCallback::CHIPUnitTestingGeneratedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                           bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28994,7 +29072,7 @@ CHIPTestGeneratedCommandListAttributeCallback::CHIPTestGeneratedCommandListAttri
     }
 }
 
-CHIPTestGeneratedCommandListAttributeCallback::~CHIPTestGeneratedCommandListAttributeCallback()
+CHIPUnitTestingGeneratedCommandListAttributeCallback::~CHIPUnitTestingGeneratedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -29005,8 +29083,8 @@ CHIPTestGeneratedCommandListAttributeCallback::~CHIPTestGeneratedCommandListAttr
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestGeneratedCommandListAttributeCallback::CallbackFn(void * context,
-                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & list)
+void CHIPUnitTestingGeneratedCommandListAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -29015,8 +29093,8 @@ void CHIPTestGeneratedCommandListAttributeCallback::CallbackFn(void * context,
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPTestGeneratedCommandListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestGeneratedCommandListAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingGeneratedCommandListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingGeneratedCommandListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -29046,8 +29124,10 @@ void CHIPTestGeneratedCommandListAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPTestAcceptedCommandListAttributeCallback::CHIPTestAcceptedCommandListAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingAcceptedCommandListAttributeCallback::CHIPUnitTestingAcceptedCommandListAttributeCallback(jobject javaCallback,
+                                                                                                         bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -29063,7 +29143,7 @@ CHIPTestAcceptedCommandListAttributeCallback::CHIPTestAcceptedCommandListAttribu
     }
 }
 
-CHIPTestAcceptedCommandListAttributeCallback::~CHIPTestAcceptedCommandListAttributeCallback()
+CHIPUnitTestingAcceptedCommandListAttributeCallback::~CHIPUnitTestingAcceptedCommandListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -29074,8 +29154,8 @@ CHIPTestAcceptedCommandListAttributeCallback::~CHIPTestAcceptedCommandListAttrib
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestAcceptedCommandListAttributeCallback::CallbackFn(void * context,
-                                                              const chip::app::DataModel::DecodableList<chip::CommandId> & list)
+void CHIPUnitTestingAcceptedCommandListAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -29084,8 +29164,8 @@ void CHIPTestAcceptedCommandListAttributeCallback::CallbackFn(void * context,
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPTestAcceptedCommandListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestAcceptedCommandListAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingAcceptedCommandListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingAcceptedCommandListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -29115,8 +29195,8 @@ void CHIPTestAcceptedCommandListAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPTestAttributeListAttributeCallback::CHIPTestAttributeListAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPTestClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+CHIPUnitTestingAttributeListAttributeCallback::CHIPUnitTestingAttributeListAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPUnitTestingClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -29132,7 +29212,7 @@ CHIPTestAttributeListAttributeCallback::CHIPTestAttributeListAttributeCallback(j
     }
 }
 
-CHIPTestAttributeListAttributeCallback::~CHIPTestAttributeListAttributeCallback()
+CHIPUnitTestingAttributeListAttributeCallback::~CHIPUnitTestingAttributeListAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -29143,8 +29223,8 @@ CHIPTestAttributeListAttributeCallback::~CHIPTestAttributeListAttributeCallback(
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestAttributeListAttributeCallback::CallbackFn(void * context,
-                                                        const chip::app::DataModel::DecodableList<chip::AttributeId> & list)
+void CHIPUnitTestingAttributeListAttributeCallback::CallbackFn(void * context,
+                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -29153,8 +29233,8 @@ void CHIPTestAttributeListAttributeCallback::CallbackFn(void * context,
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPTestAttributeListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPTestAttributeListAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPUnitTestingAttributeListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPUnitTestingAttributeListAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;

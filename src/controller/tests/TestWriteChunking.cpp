@@ -201,7 +201,7 @@ void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
 
-    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::Test::Id, kTestListAttribute);
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
     //
     // We've empirically determined that by reserving 950 bytes in the packet buffer, we can fit 2
     // AttributeDataIBs into the packet. ~30-40 bytes covers a single write chunk, but let's 2-3x that
@@ -275,7 +275,7 @@ void TestWriteChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
 
-    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::Test::Id, kTestListAttribute);
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
 
     for (int i = 850; i < static_cast<int>(chip::app::kMaxSecureSduLengthBytes); i++)
     {
@@ -356,7 +356,7 @@ void TestWriteChunking::TestConflictWrite(nlTestSuite * apSuite, void * apContex
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
 
-    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::Test::Id, kTestListAttribute);
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
 
     TestWriteCallback writeCallback1;
     app::WriteClient writeClient1(
@@ -432,8 +432,8 @@ void TestWriteChunking::TestNonConflictWrite(nlTestSuite * apSuite, void * apCon
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
 
-    app::AttributePathParams attributePath1(kTestEndpointId, app::Clusters::Test::Id, kTestListAttribute);
-    app::AttributePathParams attributePath2(kTestEndpointId, app::Clusters::Test::Id, kTestListAttribute2);
+    app::AttributePathParams attributePath1(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
+    app::AttributePathParams attributePath2(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute2);
 
     TestWriteCallback writeCallback1;
     app::WriteClient writeClient1(

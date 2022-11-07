@@ -38,9 +38,9 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::Test;
-using namespace chip::app::Clusters::Test::Commands;
-using namespace chip::app::Clusters::Test::Attributes;
+using namespace chip::app::Clusters::UnitTesting;
+using namespace chip::app::Clusters::UnitTesting::Commands;
+using namespace chip::app::Clusters::UnitTesting::Attributes;
 
 // The number of elements in the test attribute list
 constexpr uint8_t kAttributeListLength = 4;
@@ -115,7 +115,7 @@ OctetStringData gStructAttributeByteSpanData;
 Structs::SimpleStruct::Type gStructAttributeValue;
 NullableStruct::TypeInfo::Type gNullableStructAttributeValue;
 
-chip::app::Clusters::Test::Structs::TestFabricScoped::Type gListFabricScopedAttributeValue[kAttributeListLength];
+chip::app::Clusters::UnitTesting::Structs::TestFabricScoped::Type gListFabricScopedAttributeValue[kAttributeListLength];
 uint8_t gListFabricScoped_fabricSensitiveInt8uList[kAttributeListLength][kFabricSensitiveIntListLength];
 size_t gListFabricScopedAttributeLen = 0;
 char gListFabricScoped_fabricSensitiveCharBuf[kAttributeListLength][kFabricSensitiveCharLength];
@@ -433,7 +433,7 @@ CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(const ConcreteDat
     }
     if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
-        chip::app::Clusters::Test::Structs::TestListStructOctet::DecodableType entry;
+        chip::app::Clusters::UnitTesting::Structs::TestListStructOctet::DecodableType entry;
         ReturnErrorOnFailure(aDecoder.Decode(entry));
         size_t index = gListOperationalCertLen;
 

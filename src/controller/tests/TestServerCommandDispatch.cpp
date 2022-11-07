@@ -215,7 +215,7 @@ constexpr CommandId testClusterCommands1[] = {
     kInvalidCommandId,
 };
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters1)
-DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::Test::Id, testClusterAttrs, testClusterCommands1, nullptr),
+DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::UnitTesting::Id, testClusterAttrs, testClusterCommands1, nullptr),
     DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::Descriptor::Id, descriptorAttrs, nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
@@ -225,14 +225,14 @@ constexpr CommandId testClusterCommands2[] = {
     kInvalidCommandId,
 };
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters2)
-DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::Test::Id, testClusterAttrs, testClusterCommands2, nullptr),
+DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::UnitTesting::Id, testClusterAttrs, testClusterCommands2, nullptr),
     DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::Descriptor::Id, descriptorAttrs, nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint2, testEndpointClusters2);
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters3)
-DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::Test::Id, testClusterAttrs, nullptr, nullptr),
+DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::UnitTesting::Id, testClusterAttrs, nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::Descriptor::Id, descriptorAttrs, nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER_LIST_END;
 

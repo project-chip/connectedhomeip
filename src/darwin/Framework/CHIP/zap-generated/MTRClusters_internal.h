@@ -343,7 +343,7 @@
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterTest ()
+@interface MTRClusterUnitTesting ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end

@@ -373,7 +373,7 @@ void TestReadChunking::TestChunking(nlTestSuite * apSuite, void * apContext)
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
-    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::Test::Id);
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id);
     app::ReadPrepareParams readParams(sessionHandle);
 
     readParams.mpAttributePathParamsList    = &attributePath;
@@ -438,7 +438,7 @@ void TestReadChunking::TestListChunking(nlTestSuite * apSuite, void * apContext)
     DataVersion dataVersionStorage[ArraySize(testEndpoint3Clusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, Span<DataVersion>(dataVersionStorage));
 
-    app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::Test::Id, kTestListAttribute);
+    app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::UnitTesting::Id, kTestListAttribute);
     app::ReadPrepareParams readParams(sessionHandle);
 
     readParams.mpAttributePathParamsList    = &attributePath;
@@ -504,7 +504,7 @@ void TestReadChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
     DataVersion dataVersionStorage[ArraySize(testEndpoint3Clusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, Span<DataVersion>(dataVersionStorage));
 
-    app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::Test::Id, kTestBadAttribute);
+    app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::UnitTesting::Id, kTestBadAttribute);
     app::ReadPrepareParams readParams(sessionHandle);
 
     readParams.mpAttributePathParamsList    = &attributePath;

@@ -2081,9 +2081,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ApplicationBasic::Appli
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(Test::SimpleEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(UnitTesting::SimpleEnum val)
 {
-    using EnumType = Test::SimpleEnum;
+    using EnumType = UnitTesting::SimpleEnum;
     switch (val)
     {
     case EnumType::kUnspecified:

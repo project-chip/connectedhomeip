@@ -5151,12 +5151,12 @@ JNI_METHOD(void, ContentLauncherCluster, writeSupportedStreamingProtocolsAttribu
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeBooleanAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeBooleanAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Boolean::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Boolean::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -5177,8 +5177,8 @@ JNI_METHOD(void, TestCluster, writeBooleanAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -5203,12 +5203,12 @@ JNI_METHOD(void, TestCluster, writeBooleanAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeBitmap8Attribute)
+JNI_METHOD(void, UnitTestingCluster, writeBitmap8Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Bitmap8::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Bitmap8::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -5229,8 +5229,8 @@ JNI_METHOD(void, TestCluster, writeBitmap8Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -5255,12 +5255,12 @@ JNI_METHOD(void, TestCluster, writeBitmap8Attribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeBitmap16Attribute)
+JNI_METHOD(void, UnitTestingCluster, writeBitmap16Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Bitmap16::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Bitmap16::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -5281,8 +5281,8 @@ JNI_METHOD(void, TestCluster, writeBitmap16Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -5307,12 +5307,12 @@ JNI_METHOD(void, TestCluster, writeBitmap16Attribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeBitmap32Attribute)
+JNI_METHOD(void, UnitTestingCluster, writeBitmap32Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Bitmap32::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Bitmap32::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -5332,8 +5332,8 @@ JNI_METHOD(void, TestCluster, writeBitmap32Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -5358,12 +5358,12 @@ JNI_METHOD(void, TestCluster, writeBitmap32Attribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeBitmap64Attribute)
+JNI_METHOD(void, UnitTestingCluster, writeBitmap64Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Bitmap64::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Bitmap64::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -5383,8 +5383,8 @@ JNI_METHOD(void, TestCluster, writeBitmap64Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -5409,12 +5409,12 @@ JNI_METHOD(void, TestCluster, writeBitmap64Attribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeInt8uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeInt8uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Int8u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Int8u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -5435,8 +5435,8 @@ JNI_METHOD(void, TestCluster, writeInt8uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -5461,12 +5461,12 @@ JNI_METHOD(void, TestCluster, writeInt8uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeInt16uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeInt16uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Int16u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Int16u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -5487,8 +5487,8 @@ JNI_METHOD(void, TestCluster, writeInt16uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -5513,12 +5513,12 @@ JNI_METHOD(void, TestCluster, writeInt16uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeInt24uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeInt24uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Int24u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Int24u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -5538,8 +5538,8 @@ JNI_METHOD(void, TestCluster, writeInt24uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -5564,12 +5564,12 @@ JNI_METHOD(void, TestCluster, writeInt24uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeInt32uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeInt32uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Int32u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Int32u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -5589,8 +5589,8 @@ JNI_METHOD(void, TestCluster, writeInt32uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -5615,12 +5615,12 @@ JNI_METHOD(void, TestCluster, writeInt32uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeInt40uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeInt40uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Int40u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Int40u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -5640,8 +5640,8 @@ JNI_METHOD(void, TestCluster, writeInt40uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -5666,12 +5666,12 @@ JNI_METHOD(void, TestCluster, writeInt40uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeInt48uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeInt48uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Int48u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Int48u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -5691,8 +5691,8 @@ JNI_METHOD(void, TestCluster, writeInt48uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -5717,12 +5717,12 @@ JNI_METHOD(void, TestCluster, writeInt48uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeInt56uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeInt56uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Int56u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Int56u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -5742,8 +5742,8 @@ JNI_METHOD(void, TestCluster, writeInt56uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -5768,12 +5768,12 @@ JNI_METHOD(void, TestCluster, writeInt56uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeInt64uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeInt64uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Int64u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Int64u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -5793,8 +5793,8 @@ JNI_METHOD(void, TestCluster, writeInt64uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -5819,12 +5819,12 @@ JNI_METHOD(void, TestCluster, writeInt64uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeInt8sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeInt8sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Int8s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Int8s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -5845,8 +5845,8 @@ JNI_METHOD(void, TestCluster, writeInt8sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -5871,12 +5871,12 @@ JNI_METHOD(void, TestCluster, writeInt8sAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeInt16sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeInt16sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Int16s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Int16s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -5897,8 +5897,8 @@ JNI_METHOD(void, TestCluster, writeInt16sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -5923,12 +5923,12 @@ JNI_METHOD(void, TestCluster, writeInt16sAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeInt24sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeInt24sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Int24s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Int24s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -5948,8 +5948,8 @@ JNI_METHOD(void, TestCluster, writeInt24sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -5974,12 +5974,12 @@ JNI_METHOD(void, TestCluster, writeInt24sAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeInt32sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeInt32sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Int32s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Int32s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -5999,8 +5999,8 @@ JNI_METHOD(void, TestCluster, writeInt32sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -6025,12 +6025,12 @@ JNI_METHOD(void, TestCluster, writeInt32sAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeInt40sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeInt40sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Int40s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Int40s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -6050,8 +6050,8 @@ JNI_METHOD(void, TestCluster, writeInt40sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -6076,12 +6076,12 @@ JNI_METHOD(void, TestCluster, writeInt40sAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeInt48sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeInt48sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Int48s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Int48s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -6101,8 +6101,8 @@ JNI_METHOD(void, TestCluster, writeInt48sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -6127,12 +6127,12 @@ JNI_METHOD(void, TestCluster, writeInt48sAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeInt56sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeInt56sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Int56s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Int56s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -6152,8 +6152,8 @@ JNI_METHOD(void, TestCluster, writeInt56sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -6178,12 +6178,12 @@ JNI_METHOD(void, TestCluster, writeInt56sAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeInt64sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeInt64sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Int64s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Int64s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -6203,8 +6203,8 @@ JNI_METHOD(void, TestCluster, writeInt64sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -6229,12 +6229,12 @@ JNI_METHOD(void, TestCluster, writeInt64sAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeEnum8Attribute)
+JNI_METHOD(void, UnitTestingCluster, writeEnum8Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Enum8::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Enum8::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -6255,8 +6255,8 @@ JNI_METHOD(void, TestCluster, writeEnum8Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -6281,12 +6281,12 @@ JNI_METHOD(void, TestCluster, writeEnum8Attribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeEnum16Attribute)
+JNI_METHOD(void, UnitTestingCluster, writeEnum16Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Enum16::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Enum16::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -6307,8 +6307,8 @@ JNI_METHOD(void, TestCluster, writeEnum16Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -6333,12 +6333,12 @@ JNI_METHOD(void, TestCluster, writeEnum16Attribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeFloatSingleAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeFloatSingleAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::FloatSingle::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::FloatSingle::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -6358,8 +6358,8 @@ JNI_METHOD(void, TestCluster, writeFloatSingleAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -6384,12 +6384,12 @@ JNI_METHOD(void, TestCluster, writeFloatSingleAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeFloatDoubleAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeFloatDoubleAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::FloatDouble::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::FloatDouble::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -6410,8 +6410,8 @@ JNI_METHOD(void, TestCluster, writeFloatDoubleAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -6436,12 +6436,12 @@ JNI_METHOD(void, TestCluster, writeFloatDoubleAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeOctetStringAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeOctetStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::OctetString::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::OctetString::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -6462,8 +6462,8 @@ JNI_METHOD(void, TestCluster, writeOctetStringAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -6488,12 +6488,12 @@ JNI_METHOD(void, TestCluster, writeOctetStringAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeListInt8uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeListInt8uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::ListInt8u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::ListInt8u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -6536,8 +6536,8 @@ JNI_METHOD(void, TestCluster, writeListInt8uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -6562,12 +6562,12 @@ JNI_METHOD(void, TestCluster, writeListInt8uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeListOctetStringAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeListOctetStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::ListOctetString::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::ListOctetString::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -6611,8 +6611,8 @@ JNI_METHOD(void, TestCluster, writeListOctetStringAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -6637,12 +6637,12 @@ JNI_METHOD(void, TestCluster, writeListOctetStringAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeListStructOctetStringAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeListStructOctetStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::ListStructOctetString::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -6693,8 +6693,8 @@ JNI_METHOD(void, TestCluster, writeListStructOctetStringAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -6719,12 +6719,12 @@ JNI_METHOD(void, TestCluster, writeListStructOctetStringAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeLongOctetStringAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeLongOctetStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::LongOctetString::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::LongOctetString::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -6745,8 +6745,8 @@ JNI_METHOD(void, TestCluster, writeLongOctetStringAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -6771,12 +6771,12 @@ JNI_METHOD(void, TestCluster, writeLongOctetStringAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeCharStringAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeCharStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::CharString::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::CharString::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -6797,8 +6797,8 @@ JNI_METHOD(void, TestCluster, writeCharStringAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -6823,12 +6823,12 @@ JNI_METHOD(void, TestCluster, writeCharStringAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeLongCharStringAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeLongCharStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::LongCharString::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::LongCharString::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -6849,8 +6849,8 @@ JNI_METHOD(void, TestCluster, writeLongCharStringAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -6875,12 +6875,12 @@ JNI_METHOD(void, TestCluster, writeLongCharStringAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeEpochUsAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeEpochUsAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::EpochUs::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::EpochUs::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -6900,8 +6900,8 @@ JNI_METHOD(void, TestCluster, writeEpochUsAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -6926,12 +6926,12 @@ JNI_METHOD(void, TestCluster, writeEpochUsAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeEpochSAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeEpochSAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::EpochS::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::EpochS::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -6951,8 +6951,8 @@ JNI_METHOD(void, TestCluster, writeEpochSAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -6977,12 +6977,12 @@ JNI_METHOD(void, TestCluster, writeEpochSAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeVendorIdAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeVendorIdAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::VendorId::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::VendorId::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -7003,8 +7003,8 @@ JNI_METHOD(void, TestCluster, writeVendorIdAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -7029,12 +7029,12 @@ JNI_METHOD(void, TestCluster, writeVendorIdAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeListNullablesAndOptionalsStructAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeListNullablesAndOptionalsStructAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::ListNullablesAndOptionalsStruct::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::ListNullablesAndOptionalsStruct::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -7156,9 +7156,9 @@ JNI_METHOD(void, TestCluster, writeListNullablesAndOptionalsStructAttribute)
                     }
                 }
                 jobject element_0_nullableStructItem_1;
-                chip::JniReferences::GetInstance().GetObjectField(element_0, "nullableStruct",
-                                                                  "Lchip/devicecontroller/ChipStructs$TestClusterSimpleStruct;",
-                                                                  element_0_nullableStructItem_1);
+                chip::JniReferences::GetInstance().GetObjectField(
+                    element_0, "nullableStruct", "Lchip/devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct;",
+                    element_0_nullableStructItem_1);
                 if (element_0_nullableStructItem_1 == nullptr)
                 {
                     listHolder_0->mList[i_0].nullableStruct.SetNull();
@@ -7462,8 +7462,8 @@ JNI_METHOD(void, TestCluster, writeListNullablesAndOptionalsStructAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -7488,12 +7488,12 @@ JNI_METHOD(void, TestCluster, writeListNullablesAndOptionalsStructAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeEnumAttrAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeEnumAttrAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::EnumAttr::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::EnumAttr::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -7514,8 +7514,8 @@ JNI_METHOD(void, TestCluster, writeEnumAttrAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -7540,12 +7540,12 @@ JNI_METHOD(void, TestCluster, writeEnumAttrAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeRangeRestrictedInt8uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeRangeRestrictedInt8uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::RangeRestrictedInt8u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::RangeRestrictedInt8u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -7566,8 +7566,8 @@ JNI_METHOD(void, TestCluster, writeRangeRestrictedInt8uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -7592,12 +7592,12 @@ JNI_METHOD(void, TestCluster, writeRangeRestrictedInt8uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeRangeRestrictedInt8sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeRangeRestrictedInt8sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::RangeRestrictedInt8s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::RangeRestrictedInt8s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -7618,8 +7618,8 @@ JNI_METHOD(void, TestCluster, writeRangeRestrictedInt8sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -7644,12 +7644,12 @@ JNI_METHOD(void, TestCluster, writeRangeRestrictedInt8sAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeRangeRestrictedInt16uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeRangeRestrictedInt16uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::RangeRestrictedInt16u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::RangeRestrictedInt16u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -7670,8 +7670,8 @@ JNI_METHOD(void, TestCluster, writeRangeRestrictedInt16uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -7696,12 +7696,12 @@ JNI_METHOD(void, TestCluster, writeRangeRestrictedInt16uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeRangeRestrictedInt16sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeRangeRestrictedInt16sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::RangeRestrictedInt16s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::RangeRestrictedInt16s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -7722,8 +7722,8 @@ JNI_METHOD(void, TestCluster, writeRangeRestrictedInt16sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -7748,12 +7748,12 @@ JNI_METHOD(void, TestCluster, writeRangeRestrictedInt16sAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeListLongOctetStringAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeListLongOctetStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::ListLongOctetString::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::ListLongOctetString::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -7797,8 +7797,8 @@ JNI_METHOD(void, TestCluster, writeListLongOctetStringAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -7823,12 +7823,12 @@ JNI_METHOD(void, TestCluster, writeListLongOctetStringAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeListFabricScopedAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeListFabricScopedAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::ListFabricScoped::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -7913,9 +7913,9 @@ JNI_METHOD(void, TestCluster, writeListFabricScopedAttribute)
                     env, static_cast<jstring>(element_0_fabricSensitiveCharStringItem_1)));
                 listHolder_0->mList[i_0].fabricSensitiveCharString = cleanupStrings.back()->charSpan();
                 jobject element_0_fabricSensitiveStructItem_1;
-                chip::JniReferences::GetInstance().GetObjectField(element_0, "fabricSensitiveStruct",
-                                                                  "Lchip/devicecontroller/ChipStructs$TestClusterSimpleStruct;",
-                                                                  element_0_fabricSensitiveStructItem_1);
+                chip::JniReferences::GetInstance().GetObjectField(
+                    element_0, "fabricSensitiveStruct", "Lchip/devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct;",
+                    element_0_fabricSensitiveStructItem_1);
                 jobject element_0_fabricSensitiveStructItem_1_aItem_2;
                 chip::JniReferences::GetInstance().GetObjectField(element_0_fabricSensitiveStructItem_1, "a", "Ljava/lang/Integer;",
                                                                   element_0_fabricSensitiveStructItem_1_aItem_2);
@@ -8021,8 +8021,8 @@ JNI_METHOD(void, TestCluster, writeListFabricScopedAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -8047,12 +8047,12 @@ JNI_METHOD(void, TestCluster, writeListFabricScopedAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeTimedWriteBooleanAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeTimedWriteBooleanAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::TimedWriteBoolean::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::TimedWriteBoolean::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -8073,8 +8073,8 @@ JNI_METHOD(void, TestCluster, writeTimedWriteBooleanAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -8092,12 +8092,12 @@ JNI_METHOD(void, TestCluster, writeTimedWriteBooleanAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeGeneralErrorBooleanAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeGeneralErrorBooleanAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::GeneralErrorBoolean::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::GeneralErrorBoolean::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -8118,8 +8118,8 @@ JNI_METHOD(void, TestCluster, writeGeneralErrorBooleanAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -8144,12 +8144,12 @@ JNI_METHOD(void, TestCluster, writeGeneralErrorBooleanAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeClusterErrorBooleanAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeClusterErrorBooleanAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::ClusterErrorBoolean::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::ClusterErrorBoolean::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -8170,8 +8170,8 @@ JNI_METHOD(void, TestCluster, writeClusterErrorBooleanAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -8196,12 +8196,12 @@ JNI_METHOD(void, TestCluster, writeClusterErrorBooleanAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeUnsupportedAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeUnsupportedAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::Unsupported::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::Unsupported::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -8222,8 +8222,8 @@ JNI_METHOD(void, TestCluster, writeUnsupportedAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -8248,12 +8248,12 @@ JNI_METHOD(void, TestCluster, writeUnsupportedAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableBooleanAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableBooleanAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableBoolean::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableBoolean::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -8282,8 +8282,8 @@ JNI_METHOD(void, TestCluster, writeNullableBooleanAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -8308,12 +8308,12 @@ JNI_METHOD(void, TestCluster, writeNullableBooleanAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableBitmap8Attribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableBitmap8Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableBitmap8::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableBitmap8::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -8342,8 +8342,8 @@ JNI_METHOD(void, TestCluster, writeNullableBitmap8Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -8368,12 +8368,12 @@ JNI_METHOD(void, TestCluster, writeNullableBitmap8Attribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableBitmap16Attribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableBitmap16Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableBitmap16::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableBitmap16::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -8402,8 +8402,8 @@ JNI_METHOD(void, TestCluster, writeNullableBitmap16Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -8428,12 +8428,12 @@ JNI_METHOD(void, TestCluster, writeNullableBitmap16Attribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableBitmap32Attribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableBitmap32Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableBitmap32::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableBitmap32::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -8462,8 +8462,8 @@ JNI_METHOD(void, TestCluster, writeNullableBitmap32Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -8488,12 +8488,12 @@ JNI_METHOD(void, TestCluster, writeNullableBitmap32Attribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableBitmap64Attribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableBitmap64Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableBitmap64::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableBitmap64::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -8522,8 +8522,8 @@ JNI_METHOD(void, TestCluster, writeNullableBitmap64Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -8548,12 +8548,12 @@ JNI_METHOD(void, TestCluster, writeNullableBitmap64Attribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableInt8uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableInt8uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableInt8u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableInt8u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -8582,8 +8582,8 @@ JNI_METHOD(void, TestCluster, writeNullableInt8uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -8608,12 +8608,12 @@ JNI_METHOD(void, TestCluster, writeNullableInt8uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableInt16uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableInt16uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableInt16u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableInt16u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -8642,8 +8642,8 @@ JNI_METHOD(void, TestCluster, writeNullableInt16uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -8668,12 +8668,12 @@ JNI_METHOD(void, TestCluster, writeNullableInt16uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableInt24uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableInt24uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableInt24u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableInt24u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -8702,8 +8702,8 @@ JNI_METHOD(void, TestCluster, writeNullableInt24uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -8728,12 +8728,12 @@ JNI_METHOD(void, TestCluster, writeNullableInt24uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableInt32uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableInt32uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableInt32u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableInt32u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -8762,8 +8762,8 @@ JNI_METHOD(void, TestCluster, writeNullableInt32uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -8788,12 +8788,12 @@ JNI_METHOD(void, TestCluster, writeNullableInt32uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableInt40uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableInt40uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableInt40u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableInt40u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -8822,8 +8822,8 @@ JNI_METHOD(void, TestCluster, writeNullableInt40uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -8848,12 +8848,12 @@ JNI_METHOD(void, TestCluster, writeNullableInt40uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableInt48uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableInt48uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableInt48u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableInt48u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -8882,8 +8882,8 @@ JNI_METHOD(void, TestCluster, writeNullableInt48uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -8908,12 +8908,12 @@ JNI_METHOD(void, TestCluster, writeNullableInt48uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableInt56uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableInt56uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableInt56u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableInt56u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -8942,8 +8942,8 @@ JNI_METHOD(void, TestCluster, writeNullableInt56uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -8968,12 +8968,12 @@ JNI_METHOD(void, TestCluster, writeNullableInt56uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableInt64uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableInt64uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableInt64u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableInt64u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -9002,8 +9002,8 @@ JNI_METHOD(void, TestCluster, writeNullableInt64uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -9028,12 +9028,12 @@ JNI_METHOD(void, TestCluster, writeNullableInt64uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableInt8sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableInt8sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableInt8s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableInt8s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -9062,8 +9062,8 @@ JNI_METHOD(void, TestCluster, writeNullableInt8sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -9088,12 +9088,12 @@ JNI_METHOD(void, TestCluster, writeNullableInt8sAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableInt16sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableInt16sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableInt16s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableInt16s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -9122,8 +9122,8 @@ JNI_METHOD(void, TestCluster, writeNullableInt16sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -9148,12 +9148,12 @@ JNI_METHOD(void, TestCluster, writeNullableInt16sAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableInt24sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableInt24sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableInt24s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableInt24s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -9182,8 +9182,8 @@ JNI_METHOD(void, TestCluster, writeNullableInt24sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -9208,12 +9208,12 @@ JNI_METHOD(void, TestCluster, writeNullableInt24sAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableInt32sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableInt32sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableInt32s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableInt32s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -9242,8 +9242,8 @@ JNI_METHOD(void, TestCluster, writeNullableInt32sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -9268,12 +9268,12 @@ JNI_METHOD(void, TestCluster, writeNullableInt32sAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableInt40sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableInt40sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableInt40s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableInt40s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -9302,8 +9302,8 @@ JNI_METHOD(void, TestCluster, writeNullableInt40sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -9328,12 +9328,12 @@ JNI_METHOD(void, TestCluster, writeNullableInt40sAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableInt48sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableInt48sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableInt48s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableInt48s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -9362,8 +9362,8 @@ JNI_METHOD(void, TestCluster, writeNullableInt48sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -9388,12 +9388,12 @@ JNI_METHOD(void, TestCluster, writeNullableInt48sAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableInt56sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableInt56sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableInt56s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableInt56s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -9422,8 +9422,8 @@ JNI_METHOD(void, TestCluster, writeNullableInt56sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -9448,12 +9448,12 @@ JNI_METHOD(void, TestCluster, writeNullableInt56sAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableInt64sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableInt64sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableInt64s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableInt64s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -9482,8 +9482,8 @@ JNI_METHOD(void, TestCluster, writeNullableInt64sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -9508,12 +9508,12 @@ JNI_METHOD(void, TestCluster, writeNullableInt64sAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableEnum8Attribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableEnum8Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableEnum8::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableEnum8::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -9542,8 +9542,8 @@ JNI_METHOD(void, TestCluster, writeNullableEnum8Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -9568,12 +9568,12 @@ JNI_METHOD(void, TestCluster, writeNullableEnum8Attribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableEnum16Attribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableEnum16Attribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableEnum16::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableEnum16::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -9602,8 +9602,8 @@ JNI_METHOD(void, TestCluster, writeNullableEnum16Attribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -9628,12 +9628,12 @@ JNI_METHOD(void, TestCluster, writeNullableEnum16Attribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableFloatSingleAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableFloatSingleAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableFloatSingle::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableFloatSingle::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -9662,8 +9662,8 @@ JNI_METHOD(void, TestCluster, writeNullableFloatSingleAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -9688,12 +9688,12 @@ JNI_METHOD(void, TestCluster, writeNullableFloatSingleAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableFloatDoubleAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableFloatDoubleAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableFloatDouble::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableFloatDouble::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -9722,8 +9722,8 @@ JNI_METHOD(void, TestCluster, writeNullableFloatDoubleAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -9748,12 +9748,12 @@ JNI_METHOD(void, TestCluster, writeNullableFloatDoubleAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableOctetStringAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableOctetStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableOctetString::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableOctetString::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -9782,8 +9782,8 @@ JNI_METHOD(void, TestCluster, writeNullableOctetStringAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -9808,12 +9808,12 @@ JNI_METHOD(void, TestCluster, writeNullableOctetStringAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableCharStringAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableCharStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableCharString::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableCharString::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -9842,8 +9842,8 @@ JNI_METHOD(void, TestCluster, writeNullableCharStringAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -9868,12 +9868,12 @@ JNI_METHOD(void, TestCluster, writeNullableCharStringAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableEnumAttrAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableEnumAttrAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableEnumAttr::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableEnumAttr::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -9902,8 +9902,8 @@ JNI_METHOD(void, TestCluster, writeNullableEnumAttrAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -9928,12 +9928,12 @@ JNI_METHOD(void, TestCluster, writeNullableEnumAttrAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableRangeRestrictedInt8uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableRangeRestrictedInt8uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableRangeRestrictedInt8u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableRangeRestrictedInt8u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -9962,8 +9962,8 @@ JNI_METHOD(void, TestCluster, writeNullableRangeRestrictedInt8uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -9988,12 +9988,12 @@ JNI_METHOD(void, TestCluster, writeNullableRangeRestrictedInt8uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableRangeRestrictedInt8sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableRangeRestrictedInt8sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableRangeRestrictedInt8s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableRangeRestrictedInt8s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -10022,8 +10022,8 @@ JNI_METHOD(void, TestCluster, writeNullableRangeRestrictedInt8sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -10048,12 +10048,12 @@ JNI_METHOD(void, TestCluster, writeNullableRangeRestrictedInt8sAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableRangeRestrictedInt16uAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableRangeRestrictedInt16uAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableRangeRestrictedInt16u::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableRangeRestrictedInt16u::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -10082,8 +10082,8 @@ JNI_METHOD(void, TestCluster, writeNullableRangeRestrictedInt16uAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -10108,12 +10108,12 @@ JNI_METHOD(void, TestCluster, writeNullableRangeRestrictedInt16uAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, TestCluster, writeNullableRangeRestrictedInt16sAttribute)
+JNI_METHOD(void, UnitTestingCluster, writeNullableRangeRestrictedInt16sAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Test::Attributes::NullableRangeRestrictedInt16s::TypeInfo;
+    using TypeInfo = chip::app::Clusters::UnitTesting::Attributes::NullableRangeRestrictedInt16s::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -10142,8 +10142,8 @@ JNI_METHOD(void, TestCluster, writeNullableRangeRestrictedInt16sAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    TestCluster * cppCluster = reinterpret_cast<TestCluster *>(clusterPtr);
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    UnitTestingCluster * cppCluster = reinterpret_cast<UnitTestingCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));

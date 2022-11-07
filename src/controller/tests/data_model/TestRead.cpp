@@ -117,8 +117,8 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
 
     if (responseDirective == kSendDataResponse)
     {
-        if (aPath.mClusterId == app::Clusters::Test::Id &&
-            aPath.mAttributeId == app::Clusters::Test::Attributes::ListFabricScoped::Id)
+        if (aPath.mClusterId == app::Clusters::UnitTesting::Id &&
+            aPath.mAttributeId == app::Clusters::UnitTesting::Attributes::ListFabricScoped::Id)
         {
             AttributeValueEncoder::AttributeEncodeState state =
                 (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
@@ -126,7 +126,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
                                                kDataVersion /* data version */, aIsFabricFiltered, state);
 
             return valueEncoder.EncodeList([aSubjectDescriptor](const auto & encoder) -> CHIP_ERROR {
-                app::Clusters::Test::Structs::TestFabricScoped::Type val;
+                app::Clusters::UnitTesting::Structs::TestFabricScoped::Type val;
                 val.fabricIndex = aSubjectDescriptor.fabricIndex;
                 ReturnErrorOnFailure(encoder.Encode(val));
                 val.fabricIndex = (val.fabricIndex == 1) ? 2 : 1;
@@ -134,7 +134,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
                 return CHIP_NO_ERROR;
             });
         }
-        if (aPath.mClusterId == app::Clusters::Test::Id && aPath.mAttributeId == app::Clusters::Test::Attributes::Int16u::Id)
+        if (aPath.mClusterId == app::Clusters::UnitTesting::Id && aPath.mAttributeId == app::Clusters::UnitTesting::Attributes::Int16u::Id)
         {
             AttributeValueEncoder::AttributeEncodeState state =
                 (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
@@ -144,7 +144,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
             return valueEncoder.Encode(++totalReadCount);
         }
         if (aPath.mClusterId == kPerpetualClusterId ||
-            (aPath.mClusterId == app::Clusters::Test::Id && aPath.mAttributeId == kPerpetualAttributeid))
+            (aPath.mClusterId == app::Clusters::UnitTesting::Id && aPath.mAttributeId == kPerpetualAttributeid))
         {
             AttributeValueEncoder::AttributeEncodeState state = AttributeValueEncoder::AttributeEncodeState();
             AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor.fabricIndex, aPath,
@@ -1607,8 +1607,8 @@ void TestReadInteraction::TestResubscribeAttributeTimeout(nlTestSuite * apSuite,
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
         attributePathParams[0].mEndpointId             = kTestEndpointId;
-        attributePathParams[0].mClusterId              = app::Clusters::Test::Id;
-        attributePathParams[0].mAttributeId            = app::Clusters::Test::Attributes::Boolean::Id;
+        attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::Boolean::Id;
 
         readPrepareParams.mMaxIntervalCeilingSeconds = 1;
 
@@ -1683,8 +1683,8 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
         attributePathParams[0].mEndpointId             = kTestEndpointId;
-        attributePathParams[0].mClusterId              = app::Clusters::Test::Id;
-        attributePathParams[0].mAttributeId            = app::Clusters::Test::Attributes::Boolean::Id;
+        attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::Boolean::Id;
 
         //
         // Request a max interval that's very small to reduce time to discovering a liveness failure.
@@ -2960,8 +2960,8 @@ void TestReadInteraction::TestSubscribeAttributeDeniedNotExistPath(nlTestSuite *
         app::AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
-        attributePathParams[0].mClusterId              = app::Clusters::Test::Id;
-        attributePathParams[0].mAttributeId            = app::Clusters::Test::Attributes::ListStructOctetString::Id;
+        attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::ListStructOctetString::Id;
 
         //
         // Request a max interval that's very small to reduce time to discovering a liveness failure.

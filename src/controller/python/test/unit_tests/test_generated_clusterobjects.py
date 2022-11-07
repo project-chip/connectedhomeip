@@ -29,10 +29,10 @@ class TestGeneratedClusterObjects(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     def test_simple_struct(self):
-        data = Clusters.Test.Structs.SimpleStruct()
+        data = Clusters.UnitTesting.Structs.SimpleStruct()
         data.a = 23
         data.b = True
-        data.c = Clusters.Test.Enums.SimpleEnum.kValueA
+        data.c = Clusters.UnitTesting.Enums.SimpleEnum.kValueA
         data.d = b'1234'
         data.e = 'hello'
         data.f = 1
@@ -42,17 +42,17 @@ class TestGeneratedClusterObjects(unittest.TestCase):
         self.CheckData(data)
 
     def test_double_nested_struct_list(self):
-        simpleStruct = Clusters.Test.Structs.SimpleStruct()
+        simpleStruct = Clusters.UnitTesting.Structs.SimpleStruct()
         simpleStruct.a = 23
         simpleStruct.b = True
-        simpleStruct.c = Clusters.Test.Enums.SimpleEnum.kValueA
+        simpleStruct.c = Clusters.UnitTesting.Enums.SimpleEnum.kValueA
         simpleStruct.d = b'1234'
         simpleStruct.e = 'hello'
         simpleStruct.f = 1
         simpleStruct.g = 0
         simpleStruct.h = 0
 
-        data = Clusters.Test.Structs.NestedStructList()
+        data = Clusters.UnitTesting.Structs.NestedStructList()
         data.a = 23
         data.b = True
         data.c = simpleStruct
@@ -67,7 +67,7 @@ class TestGeneratedClusterObjects(unittest.TestCase):
         self.CheckData(data)
 
     def test_nullable_optional_struct(self):
-        data = Clusters.Test.Structs.NullablesAndOptionalsStruct()
+        data = Clusters.UnitTesting.Structs.NullablesAndOptionalsStruct()
 
         data.nullableInt = 2
         data.optionalInt = 3
@@ -75,17 +75,17 @@ class TestGeneratedClusterObjects(unittest.TestCase):
         data.nullableString = 'hello1'
         data.optionalString = 'hello2'
         data.nullableOptionalString = 'hello3'
-        data.nullableStruct = Clusters.Test.Structs.SimpleStruct(
-            23, True, Clusters.Test.Enums.SimpleEnum.kValueA, b'1234', 'hello', 1, 0, 0)
-        data.optionalStruct = Clusters.Test.Structs.SimpleStruct(
-            24, True, Clusters.Test.Enums.SimpleEnum.kValueA, b'1234', 'hello', 1, 0, 0)
-        data.nullableOptionalStruct = Clusters.Test.Structs.SimpleStruct(
-            25, True, Clusters.Test.Enums.SimpleEnum.kValueA, b'1234', 'hello', 1, 0, 0)
+        data.nullableStruct = Clusters.UnitTesting.Structs.SimpleStruct(
+            23, True, Clusters.UnitTesting.Enums.SimpleEnum.kValueA, b'1234', 'hello', 1, 0, 0)
+        data.optionalStruct = Clusters.UnitTesting.Structs.SimpleStruct(
+            24, True, Clusters.UnitTesting.Enums.SimpleEnum.kValueA, b'1234', 'hello', 1, 0, 0)
+        data.nullableOptionalStruct = Clusters.UnitTesting.Structs.SimpleStruct(
+            25, True, Clusters.UnitTesting.Enums.SimpleEnum.kValueA, b'1234', 'hello', 1, 0, 0)
 
-        data.nullableList = [Clusters.Test.Enums.SimpleEnum.kValueA]
-        data.optionalList = [Clusters.Test.Enums.SimpleEnum.kValueA]
+        data.nullableList = [Clusters.UnitTesting.Enums.SimpleEnum.kValueA]
+        data.optionalList = [Clusters.UnitTesting.Enums.SimpleEnum.kValueA]
         data.nullableOptionalList = [
-            Clusters.Test.Enums.SimpleEnum.kValueA]
+            Clusters.UnitTesting.Enums.SimpleEnum.kValueA]
 
         self.CheckData(data)
 

@@ -184,7 +184,7 @@ void TestReadEvents::TestBasicCaching(nlTestSuite * apSuite, void * apContext)
 
     app::EventPathParams eventPath;
     eventPath.mEndpointId = kTestEndpointId;
-    eventPath.mClusterId  = app::Clusters::Test::Id;
+    eventPath.mClusterId  = app::Clusters::UnitTesting::Id;
     app::ReadPrepareParams readParams(sessionHandle);
 
     readParams.mpEventPathParamsList    = &eventPath;
