@@ -782,8 +782,8 @@ class BaseTestHelper:
         # Update the expected data's fabric index to that we just read back
         # before we attempt to compare the data
         #
-        expectedDataFabric1[0].fabricIndex= self.currentFabric1
-        expectedDataFabric1[1].fabricIndex= self.currentFabric1
+        expectedDataFabric1[0].fabricIndex = self.currentFabric1
+        expectedDataFabric1[1].fabricIndex = self.currentFabric1
 
         self.logger.info("Comparing data on fabric1...")
         if (expectedDataFabric1 != readListDataFabric1):
@@ -791,15 +791,15 @@ class BaseTestHelper:
 
         self.logger.info("Reading back data from fabric2...")
 
-        data= await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)])
-        readListDataFabric2= data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
+        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)])
+        readListDataFabric2 = data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
 
         #
         # Update the expected data's fabric index to that we just read back
         # before we attempt to compare the data
         #
-        expectedDataFabric2[0].fabricIndex= self.currentFabric2
-        expectedDataFabric2[1].fabricIndex= self.currentFabric2
+        expectedDataFabric2[0].fabricIndex = self.currentFabric2
+        expectedDataFabric2[1].fabricIndex = self.currentFabric2
 
         self.logger.info("Comparing data on fabric2...")
         if (expectedDataFabric2 != readListDataFabric2):
@@ -809,7 +809,7 @@ class BaseTestHelper:
             "Reading back unfiltered data across all fabrics from fabric1...")
 
         def CompareUnfilteredData(accessingFabric, otherFabric, expectedData):
-            index= 0
+            index = 0
 
             self.logger.info(
                 f"Comparing data from accessing fabric {accessingFabric}...")
@@ -823,7 +823,7 @@ class BaseTestHelper:
                     if (item != expectedData[index]):
                         raise AssertionError("Got back mismatched data")
 
-                    index= index + 1
+                    index = index + 1
                 else:
                     #
                     # We should not be able to see any fabric sensitive data from the non accessing fabric.
@@ -832,32 +832,32 @@ class BaseTestHelper:
                     # which should automatically be initialized with defaults and compare that
                     # against what we got back.
                     #
-                    expectedDefaultData= Clusters.UnitTesting.Structs.TestFabricScoped()
-                    expectedDefaultData.fabricIndex= otherFabric
+                    expectedDefaultData = Clusters.UnitTesting.Structs.TestFabricScoped()
+                    expectedDefaultData.fabricIndex = otherFabric
 
                     if (item != expectedDefaultData):
                         raise AssertionError("Got back mismatched data")
 
-        data= await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)], fabricFiltered=False)
-        readListDataFabric= data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
+        data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)], fabricFiltered=False)
+        readListDataFabric = data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
         CompareUnfilteredData(self.currentFabric1,
                               self.currentFabric2, expectedDataFabric1)
 
-        data= await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)], fabricFiltered=False)
-        readListDataFabric= data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
+        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)], fabricFiltered=False)
+        readListDataFabric = data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
         CompareUnfilteredData(self.currentFabric2,
                               self.currentFabric1, expectedDataFabric2)
 
         self.logger.info("Writing smaller list from alpha (again)")
 
-        expectedDataFabric1[0].fabricIndex= 100
-        expectedDataFabric1[0].fabricSensitiveInt8u= 53
-        expectedDataFabric1[0].optionalFabricSensitiveInt8u= 54
-        expectedDataFabric1[0].nullableFabricSensitiveInt8u= 55
-        expectedDataFabric1[0].nullableOptionalFabricSensitiveInt8u= Clusters.Types.NullValue
-        expectedDataFabric1[0].fabricSensitiveCharString= "alpha3"
-        expectedDataFabric1[0].fabricSensitiveStruct.a= 56
-        expectedDataFabric1[0].fabricSensitiveInt8uList= [51, 52, 53, 54]
+        expectedDataFabric1[0].fabricIndex = 100
+        expectedDataFabric1[0].fabricSensitiveInt8u = 53
+        expectedDataFabric1[0].optionalFabricSensitiveInt8u = 54
+        expectedDataFabric1[0].nullableFabricSensitiveInt8u = 55
+        expectedDataFabric1[0].nullableOptionalFabricSensitiveInt8u = Clusters.Types.NullValue
+        expectedDataFabric1[0].fabricSensitiveCharString = "alpha3"
+        expectedDataFabric1[0].fabricSensitiveStruct.a = 56
+        expectedDataFabric1[0].fabricSensitiveInt8uList = [51, 52, 53, 54]
 
         expectedDataFabric1.pop(1)
 
@@ -866,19 +866,19 @@ class BaseTestHelper:
         self.logger.info(
             "Reading back data (again) from fabric2 to ensure it hasn't changed")
 
-        data= await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)])
-        readListDataFabric2= data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
+        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)])
+        readListDataFabric2 = data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
         if (expectedDataFabric2 != readListDataFabric2):
             raise AssertionError("Got back mismatched data")
 
         self.logger.info(
             "Reading back data (again) from fabric1 to ensure it hasn't changed")
 
-        data= await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)])
-        readListDataFabric1= data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
+        data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)])
+        readListDataFabric1 = data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
 
         self.logger.info("Comparing data on fabric1...")
-        expectedDataFabric1[0].fabricIndex= self.currentFabric1
+        expectedDataFabric1[0].fabricIndex = self.currentFabric1
         if (expectedDataFabric1 != readListDataFabric1):
             raise AssertionError("Got back mismatched data")
 
@@ -888,14 +888,14 @@ class BaseTestHelper:
             trigger CASE session establishment and subscription restablishment. Both the attempt and successful
             restablishment of the subscription are validated.
         '''
-        cv= asyncio.Condition()
-        resubAttempted= False
-        resubSucceeded= True
+        cv = asyncio.Condition()
+        resubAttempted = False
+        resubSucceeded = True
 
         async def OnResubscriptionAttempted(transaction, errorEncountered: int, nextResubscribeIntervalMsec: int):
             self.logger.info("Re-subscription Attempted")
             nonlocal resubAttempted
-            resubAttempted= True
+            resubAttempted = True
 
         async def OnResubscriptionSucceeded(transaction):
             self.logger.info("Re-subscription Succeeded")
@@ -903,7 +903,7 @@ class BaseTestHelper:
             async with cv:
                 cv.notify()
 
-        subscription= await self.devCtrl.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)], reportInterval=(0, 5))
+        subscription = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)], reportInterval=(0, 5))
 
         #
         # Register async callbacks that will fire when a re-sub is attempted or succeeds.
@@ -920,7 +920,7 @@ class BaseTestHelper:
 
         async with cv:
             if (not(resubAttempted) or not(resubSucceeded)):
-                res= await asyncio.wait_for(cv.wait(), 3)
+                res = await asyncio.wait_for(cv.wait(), 3)
                 if not res:
                     self.logger.error("Timed out waiting for resubscription to succeed")
                     return False
@@ -946,13 +946,13 @@ class BaseTestHelper:
     def TestOnOffCluster(self, nodeid: int, endpoint: int, group: int):
         self.logger.info(
             "Sending On/Off commands to device {} endpoint {}".format(nodeid, endpoint))
-        err, resp= self.devCtrl.ZCLSend("OnOff", "On", nodeid,
+        err, resp = self.devCtrl.ZCLSend("OnOff", "On", nodeid,
                                          endpoint, group, {}, blocking=True)
         if err != 0:
             self.logger.error(
                 "failed to send OnOff.On: error is {} with im response{}".format(err, resp))
             return False
-        err, resp= self.devCtrl.ZCLSend("OnOff", "Off", nodeid,
+        err, resp = self.devCtrl.ZCLSend("OnOff", "Off", nodeid,
                                          endpoint, group, {}, blocking=True)
         if err != 0:
             self.logger.error(
@@ -964,12 +964,12 @@ class BaseTestHelper:
         self.logger.info(
             f"Sending MoveToLevel command to device {nodeid} endpoint {endpoint}")
         try:
-            commonArgs= dict(transitionTime=0, optionsMask=1, optionsOverride=1)
+            commonArgs = dict(transitionTime=0, optionsMask=1, optionsOverride=1)
 
             # Move to 1
             self.devCtrl.ZCLSend("LevelControl", "MoveToLevel", nodeid,
                                  endpoint, group, dict(**commonArgs, level=1), blocking=True)
-            res= self.devCtrl.ZCLReadAttribute(cluster="LevelControl",
+            res = self.devCtrl.ZCLReadAttribute(cluster="LevelControl",
                                                 attribute="CurrentLevel",
                                                 nodeid=nodeid,
                                                 endpoint=endpoint,
@@ -980,7 +980,7 @@ class BaseTestHelper:
             # Move to 254
             self.devCtrl.ZCLSend("LevelControl", "MoveToLevel", nodeid,
                                  endpoint, group, dict(**commonArgs, level=254), blocking=True)
-            res= self.devCtrl.ZCLReadAttribute(cluster="LevelControl",
+            res = self.devCtrl.ZCLReadAttribute(cluster="LevelControl",
                                                 attribute="CurrentLevel",
                                                 nodeid=nodeid,
                                                 endpoint=endpoint,
@@ -998,11 +998,11 @@ class BaseTestHelper:
             "Resolve: node id = {:08x}".format(nodeid))
         try:
             self.devCtrl.ResolveNode(nodeid=nodeid)
-            addr= None
+            addr = None
 
-            start= time.time()
+            start = time.time()
             while not addr:
-                addr= self.devCtrl.GetAddressAndPort(nodeid)
+                addr = self.devCtrl.GetAddressAndPort(nodeid)
                 if time.time() - start > 10:
                     self.logger.exception(f"Timeout waiting for address...")
                     break
@@ -1020,7 +1020,7 @@ class BaseTestHelper:
             return False
 
     def TestReadBasicAttributes(self, nodeid: int, endpoint: int, group: int):
-        basic_cluster_attrs= {
+        basic_cluster_attrs = {
             "VendorName": "TEST_VENDOR",
             "VendorID": 0xFFF1,
             "ProductName": "TEST_PRODUCT",
@@ -1032,10 +1032,10 @@ class BaseTestHelper:
             "SoftwareVersion": 1,
             "SoftwareVersionString": "1.0",
         }
-        failed_zcl= {}
+        failed_zcl = {}
         for basic_attr, expected_value in basic_cluster_attrs.items():
             try:
-                res= self.devCtrl.ZCLReadAttribute(cluster="Basic",
+                res = self.devCtrl.ZCLReadAttribute(cluster="Basic",
                                                     attribute=basic_attr,
                                                     nodeid=nodeid,
                                                     endpoint=endpoint,
@@ -1043,7 +1043,7 @@ class BaseTestHelper:
                 TestResult(f"Read attribute {basic_attr}", res).assertValueEqual(
                     expected_value)
             except Exception as ex:
-                failed_zcl[basic_attr]= str(ex)
+                failed_zcl[basic_attr] = str(ex)
         if failed_zcl:
             self.logger.exception(f"Following attributes failed: {failed_zcl}")
             return False
@@ -1055,14 +1055,14 @@ class BaseTestHelper:
             cluster: str
             attribute: str
             value: Any
-            expected_status: IM.Status= IM.Status.Success
+            expected_status: IM.Status = IM.Status.Success
 
-        requests= [
+        requests = [
             AttributeWriteRequest("Basic", "NodeLabel", "Test"),
             AttributeWriteRequest("Basic", "Location",
                                   "a pretty loooooooooooooog string", IM.Status.ConstraintError),
         ]
-        failed_zcl= []
+        failed_zcl = []
         for req in requests:
             try:
                 try:
@@ -1080,7 +1080,7 @@ class BaseTestHelper:
                         continue
                     else:
                         raise ex
-                res= self.devCtrl.ZCLReadAttribute(
+                res = self.devCtrl.ZCLReadAttribute(
                     cluster=req.cluster, attribute=req.attribute, nodeid=nodeid, endpoint=endpoint, groupid=group)
                 TestResult(f"Read attribute {req.cluster}.{req.attribute}", res).assertValueEqual(
                     req.value)
@@ -1092,17 +1092,17 @@ class BaseTestHelper:
         return True
 
     def TestSubscription(self, nodeid: int, endpoint: int):
-        desiredPath= None
-        receivedUpdate= 0
-        updateLock= threading.Lock()
-        updateCv= threading.Condition(updateLock)
+        desiredPath = None
+        receivedUpdate = 0
+        updateLock = threading.Lock()
+        updateCv = threading.Condition(updateLock)
 
         def OnValueChange(path: Attribute.TypedAttributePath, transaction: Attribute.SubscriptionTransaction) -> None:
             nonlocal desiredPath, updateCv, updateLock, receivedUpdate
             if path.Path != desiredPath:
                 return
 
-            data= transaction.GetAttribute(path)
+            data = transaction.GetAttribute(path)
             logger.info(
                 f"Received report from server: path: {path.Path}, value: {data}")
             with updateLock:
@@ -1112,9 +1112,9 @@ class BaseTestHelper:
         class _conductAttributeChange(threading.Thread):
             def __init__(self, devCtrl: ChipDeviceCtrl.ChipDeviceController, nodeid: int, endpoint: int):
                 super(_conductAttributeChange, self).__init__()
-                self.nodeid= nodeid
-                self.endpoint= endpoint
-                self.devCtrl= devCtrl
+                self.nodeid = nodeid
+                self.endpoint = endpoint
+                self.devCtrl = devCtrl
 
             def run(self):
                 for i in range(5):
@@ -1123,13 +1123,13 @@ class BaseTestHelper:
                         "OnOff", "Toggle", self.nodeid, self.endpoint, 0, {})
 
         try:
-            desiredPath= Clusters.Attribute.AttributePath(
+            desiredPath = Clusters.Attribute.AttributePath(
                 EndpointId=1, ClusterId=6, AttributeId=0)
             # OnOff Cluster, OnOff Attribute
-            subscription= self.devCtrl.ZCLSubscribeAttribute(
+            subscription = self.devCtrl.ZCLSubscribeAttribute(
                 "OnOff", "OnOff", nodeid, endpoint, 1, 10)
             subscription.SetAttributeUpdateCallback(OnValueChange)
-            changeThread= _conductAttributeChange(
+            changeThread = _conductAttributeChange(
                 self.devCtrl, nodeid, endpoint)
             # Reset the number of subscriptions received as subscribing causes a callback.
             changeThread.start()
@@ -1171,8 +1171,8 @@ class BaseTestHelper:
         TODO: Add more tests for APIs
         '''
         try:
-            cluster= self.devCtrl.GetClusterHandler()
-            clusterInfo= cluster.GetClusterInfoById(0xFFF1FC05)  # TestCluster
+            cluster = self.devCtrl.GetClusterHandler()
+            clusterInfo = cluster.GetClusterInfoById(0xFFF1FC05)  # TestCluster
             if clusterInfo["clusterName"] != "Test":
                 raise Exception(
                     f"Wrong cluster info clusterName: {clusterInfo['clusterName']} expected 'Test'")
@@ -1186,11 +1186,11 @@ class BaseTestHelper:
 
         The nodeid is the PASE pseudo-node-ID used during PASE establishment
         '''
-        status= None
+        status = None
         try:
-            response= asyncio.run(self.devCtrl.SendCommand(
+            response = asyncio.run(self.devCtrl.SendCommand(
                 nodeid, 0, Clusters.OperationalCredentials.Commands.UpdateFabricLabel("roboto")))
         except IM.InteractionModelError as ex:
-            status= ex.status
+            status = ex.status
 
         return status == IM.Status.UnsupportedAccess
