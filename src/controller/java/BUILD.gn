@@ -14,18 +14,23 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("${build_root}/config/android_abi.gni")
 import("${chip_root}/build/chip/java/rules.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
 
+build_java_matter_controller = true
 if (defined(build_java_matter_controller)) {
   build_java_matter_controller = build_java_matter_controller
+
 } else {
   build_java_matter_controller = false
 }
 
 shared_library("jni") {
   output_name = "libCHIPController"
-
+  include_dirs = [
+      "/usr/local/buildtools/java/jdk/include/",
+      "/usr/local/buildtools/java/jdk/include/linux",
+  ]
   sources = [
     "AndroidCallbacks-JNI.cpp",
     "AndroidCallbacks.cpp",
@@ -60,13 +65,14 @@ shared_library("jni") {
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
-    "${chip_root}/src/platform/android",
+    "${chip_root}/src/platform/Linux",
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]
 
-  output_dir = "${root_out_dir}/lib/jni/${android_abi}"
+  output_dir = "${root_out_dir}/lib/jni"
 
+  cflags = [ "-Wno-unknown-pragmas" ]
   ldflags = [ "-Wl,--gc-sections" ]
 }
 
@@ -77,7 +83,6 @@ android_library("java") {
 
   data_deps = [
     ":jni",
-    "${chip_root}/build/chip/java:shared_cpplib",
   ]
 
   sources = [

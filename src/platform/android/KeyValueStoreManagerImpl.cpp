@@ -22,7 +22,7 @@
  */
 
 #include <platform/KeyValueStoreManager.h>
-
+#include "KeyValueStoreManagerImpl.h"
 #include <algorithm>
 #include <string.h>
 

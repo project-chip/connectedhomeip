@@ -232,13 +232,7 @@ config("warnings_common") {
 
 config("strict_warnings") {
   cflags = [
-    "-Wextra",
-    "-Wshadow",
-    "-Wunreachable-code",
-    "-Wvla",
-    "-Wformat",
-    "-Wformat-nonliteral",
-    "-Wformat-security",
+
   ]
 
   if (current_os == "webos") {

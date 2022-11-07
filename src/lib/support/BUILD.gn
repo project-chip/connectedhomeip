@@ -75,6 +75,11 @@ source_set("chip_version_header") {
   deps = [ ":gen_chip_version" ]
 }
 
+pw_JAVA_NATIVE_INTERFACE_INCLUDE_DIRS = [
+"/usr/local/buildtools/java/jdk/include/",
+"/usr/local/buildtools/java/jdk/include/linux",
+]
+
 static_library("support") {
   output_name = "libSupportLayer"
 
@@ -145,8 +150,10 @@ static_library("support") {
     "verhoeff/Verhoeff36.cpp",
   ]
 
+  include_dirs = pw_JAVA_NATIVE_INTERFACE_INCLUDE_DIRS
+
   # added JNI helper on android
-  if (current_os == "android") {
+  if (current_os != "android") {
     sources += [
       "CHIPJNIError.h",
       "JniReferences.cpp",

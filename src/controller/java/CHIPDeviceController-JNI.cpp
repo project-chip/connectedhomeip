@@ -122,8 +122,8 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     SuccessOrExit(err);
     ChipLogProgress(Controller, "Java class references loaded.");
 
-    err = AndroidChipPlatformJNI_OnLoad(jvm, reserved);
-    SuccessOrExit(err);
+    //err = AndroidChipPlatformJNI_OnLoad(jvm, reserved);
+    //SuccessOrExit(err);
 
 exit:
     if (err != CHIP_NO_ERROR)

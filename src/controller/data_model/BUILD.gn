@@ -29,7 +29,7 @@ chip_data_model("data_model") {
   allow_circular_includes_from = [ "${chip_root}/src/controller" ]
 }
 
-if (current_os == "android") {
+if (current_os != "android") {
   chip_codegen("java-jni-generate") {
     input = "controller-clusters.matter"
     generator = "java"
@@ -171,14 +171,16 @@ if (current_os == "android") {
   source_set("java-jni-sources") {
     sources = get_target_outputs(":java-jni-generate")
     public_configs = [ "${chip_root}/src:includes" ]
-
+    include_dirs = [
+      "/usr/local/buildtools/java/jdk/include/",
+      "/usr/local/buildtools/java/jdk/include/linux",
+      ]
     deps = [
       ":data_model",
       ":java-jni-generate",
       "${chip_root}/src/inet",
       "${chip_root}/src/lib",
       "${chip_root}/src/platform",
-      "${chip_root}/src/platform/android",
     ]
   }
 }

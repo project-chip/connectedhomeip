@@ -24,6 +24,8 @@
 #pragma once
 
 #include <jni.h>
+#include <lib/core/CHIPError.h>
+#include <platform/KeyValueStoreManager.h>
 
 namespace chip {
 namespace DeviceLayer {

@@ -29,7 +29,7 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.h>
 #include <lib/support/TimeUtils.h>
-#include <platform/android/CHIPP256KeypairBridge.h>
+//#include <platform/android/CHIPP256KeypairBridge.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
 #include "AndroidOperationalCredentialsIssuer.h"
@@ -49,20 +49,6 @@ public:
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
     jobject JavaObjectRef() { return mJavaObjectRef; }
     jlong ToJNIHandle();
-
-    /**
-     * Returns a CHIPP256KeypairBridge which can be used to delegate signing operations
-     * to a KeypairDelegate in the Java layer. Note that this will always return a pointer
-     * to the same instance, once initialized.
-     */
-    CHIPP256KeypairBridge * GetP256KeypairBridge()
-    {
-        if (mKeypairBridge == nullptr)
-        {
-            mKeypairBridge = chip::Platform::New<CHIPP256KeypairBridge>();
-        }
-        return mKeypairBridge;
-    }
 
     void CallJavaMethod(const char * methodName, jint argument);
     CHIP_ERROR InitializeOperationalCredentialsIssuer();
@@ -169,7 +155,7 @@ private:
 
     JavaVM * mJavaVM                       = nullptr;
     jobject mJavaObjectRef                 = nullptr;
-    CHIPP256KeypairBridge * mKeypairBridge = nullptr;
+
 
     // These fields allow us to release the string/byte array memory later.
     jstring ssidStr                    = nullptr;

@@ -100,5 +100,4 @@ class GnBuilder(Builder):
             ]
 
         self._Execute(cmd, title='Building ' + self.identifier)
-
         self.PostBuildCommand()

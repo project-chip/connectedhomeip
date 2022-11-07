@@ -22,6 +22,7 @@ import("${chip_root}/src/platform/device.gni")
 
 assert(chip_device_platform == "linux")
 
+chip_enable_openthread = false
 if (chip_use_pw_logging) {
   import("//build_overrides/pigweed.gni")
 }

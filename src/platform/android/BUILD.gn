@@ -15,16 +15,16 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/src/platform/device.gni")
-
-import("${build_root}/config/android_abi.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/build/chip/java/rules.gni")
-
-assert(chip_device_platform == "android")
+import("${chip_root}/src/platform/device.gni")
 
 static_library("android") {
   output_name = "libAndroidPlatform"
-
+  include_dirs = [
+    "/usr/local/buildtools/java/jdk/include/",
+    "/usr/local/buildtools/java/jdk/include/linux",
+  ]
   sources = [
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
@@ -72,10 +72,7 @@ static_library("android") {
 android_library("java") {
   output_name = "AndroidPlatform.jar"
 
-  deps = [
-    ":android_sdk",
-    "${chip_root}/third_party/android_deps:annotation",
-  ]
+  deps = [ "${chip_root}/third_party/android_deps:annotation" ]
   data_deps = [ ":android" ]
 
   sources = [
@@ -100,8 +97,4 @@ android_library("java") {
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
-}
-
-java_prebuilt("android_sdk") {
-  jar_path = "${android_sdk_root}/platforms/android-21/android.jar"
 }

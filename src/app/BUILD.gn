@@ -61,7 +61,10 @@ source_set("app_config") {
 
 static_library("app") {
   output_name = "libCHIPDataModel"
-
+  include_dirs = [
+    "/usr/local/buildtools/java/jdk/include/",
+    "/usr/local/buildtools/java/jdk/include/linux",
+  ]
   sources = [
     "AttributeAccessInterface.cpp",
     "AttributePathExpandIterator.cpp",

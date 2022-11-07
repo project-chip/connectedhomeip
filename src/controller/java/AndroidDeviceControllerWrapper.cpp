@@ -38,7 +38,7 @@
 #include <lib/support/TestGroupData.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/KeyValueStoreManager.h>
-#include <platform/android/CHIPP256KeypairBridge.h>
+//#include <platform/android/CHIPP256KeypairBridge.h>
 
 using namespace chip;
 using namespace chip::Controller;
@@ -53,11 +53,6 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
     }
     mController->Shutdown();
 
-    if (mKeypairBridge != nullptr)
-    {
-        chip::Platform::Delete(mKeypairBridge);
-        mKeypairBridge = nullptr;
-    }
 }
 
 void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)
@@ -209,42 +204,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     // The lifetime of the ephemeralKey variable must be kept until SetupParams is saved.
     Crypto::P256Keypair ephemeralKey;
 
-    if (rootCertificate != nullptr && nodeOperationalCertificate != nullptr && keypairDelegate != nullptr)
-    {
-        CHIPP256KeypairBridge * nativeKeypairBridge = wrapper->GetP256KeypairBridge();
-        nativeKeypairBridge->SetDelegate(keypairDelegate);
-        *errInfoOnFailure = nativeKeypairBridge->Initialize();
-        if (*errInfoOnFailure != CHIP_NO_ERROR)
-        {
-            return nullptr;
-        }
-
-        setupParams.operationalKeypair                   = nativeKeypairBridge;
-        setupParams.hasExternallyOwnedOperationalKeypair = true;
-
-        JniByteArray jniRcac(env, rootCertificate);
-        JniByteArray jniNoc(env, nodeOperationalCertificate);
-
-        // Make copies of the cert that outlive the scope so that future factor init does not
-        // cause loss of scope from the JNI refs going away. Also, this keeps the certs
-        // handy for debugging commissioner init.
-        wrapper->mRcacCertificate = std::vector<uint8_t>(jniRcac.byteSpan().begin(), jniRcac.byteSpan().end());
-
-        // Intermediate cert could be missing. Let's only copy it if present
-        wrapper->mIcacCertificate.clear();
-        if (intermediateCertificate != nullptr)
-        {
-            JniByteArray jniIcac(env, intermediateCertificate);
-            wrapper->mIcacCertificate = std::vector<uint8_t>(jniIcac.byteSpan().begin(), jniIcac.byteSpan().end());
-        }
-
-        wrapper->mNocCertificate = std::vector<uint8_t>(jniNoc.byteSpan().begin(), jniNoc.byteSpan().end());
-
-        setupParams.controllerRCAC = chip::ByteSpan(wrapper->mRcacCertificate.data(), wrapper->mRcacCertificate.size());
-        setupParams.controllerICAC = chip::ByteSpan(wrapper->mIcacCertificate.data(), wrapper->mIcacCertificate.size());
-        setupParams.controllerNOC  = chip::ByteSpan(wrapper->mNocCertificate.data(), wrapper->mNocCertificate.size());
-    }
-    else
+    
     {
         ChipLogProgress(Controller,
                         "No existing credentials provided: generating ephemeral local NOC chain with OperationalCredentialsIssuer");

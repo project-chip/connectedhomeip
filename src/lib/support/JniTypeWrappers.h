@@ -135,7 +135,7 @@ private:
 class JniClass
 {
 public:
-    explicit JniClass(jclass mClassRef) : mClassRef(mClassRef) {}
+    explicit JniClass(jclass classRef) : mClassRef(classRef) {}
     ~JniClass() { chip::JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mClassRef); }
 
     jclass classRef() { return mClassRef; }
