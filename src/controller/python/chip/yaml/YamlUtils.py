@@ -30,7 +30,7 @@ class ValidationError(Exception):
         super().__init__(message)
 
 
-def fixup_yaml_arguments(arg_values):
+def convert_name_value_pair_to_dict(arg_values):
     ''' Fix yaml command arguments.
 
     For some reason, instead of treating the entire data payload of a
@@ -48,7 +48,7 @@ def fixup_yaml_arguments(arg_values):
     return ret_value
 
 
-def fixup_yaml_types(field_value, field_type, use_from_dict=False):
+def convert_yaml_type(field_value, field_type, use_from_dict=False):
     ''' Converts yaml value to expected python type.
 
     The YAML representation when converted to a Python dictionary does not
@@ -97,7 +97,7 @@ def fixup_yaml_types(field_value, field_type, use_from_dict=False):
                 raise ValidationError(
                     f'Did not find field "{item}" in {str(field_type)}') from None
 
-            return_field_value[field_descriptor.Label] = fixup_yaml_types(
+            return_field_value[field_descriptor.Label] = convert_yaml_type(
                 field_value[item], field_descriptor.Type, use_from_dict)
         if use_from_dict:
             return field_type.FromDict(return_field_value)
@@ -110,7 +110,7 @@ def fixup_yaml_types(field_value, field_type, use_from_dict=False):
 
         # The field type passed in is the type of the list element and not list[T].
         for idx, item in enumerate(field_value):
-            field_value[idx] = fixup_yaml_types(item, list_element_type, use_from_dict)
+            field_value[idx] = convert_yaml_type(item, list_element_type, use_from_dict)
         return field_value
     # YAML conversion treats all numbers as ints. Convert to a uint type if the schema
     # type indicates so.

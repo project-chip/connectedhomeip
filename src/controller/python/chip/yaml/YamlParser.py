@@ -15,127 +15,250 @@
 #    limitations under the License.
 #
 
+from abc import ABC, abstractmethod
 from dataclasses import field
 import typing
 from chip import ChipDeviceCtrl
 from chip.tlv import float32
 import yaml
 import stringcase
-import chip.clusters as Clusters
 import chip.interaction_model
 import asyncio as asyncio
 import logging
 import math
+from chip.yaml.DataModelLookup import (
+    DataModelLookup as DataModelLookup,
+    PreDefinedDataModelLookup as PreDefinedDataModelLookup)
 import chip.yaml.YamlUtils as YamlUtils
 
 
 logger = logging.getLogger('YamlParser')
 
 
-class ParsingError(Exception):
+class ParsingError(ValueError):
     def __init__(self, message):
         super().__init__(message)
 
 
-class SingleCommandInterface:
-    '''Interface for a single yaml command that is to be executed.'''
+class UnexpectedParsingError(ParsingError):
+    def __init__(self, message):
+        super().__init__(message)
 
-    def __init__(self):
+
+class BaseAction(ABC):
+    '''Interface for a single yaml action that is to be executed.'''
+
+    def __init__(self, label):
+        self._label = label
+
+    @property
+    def label(self):
+        return self._label
+
+    @abstractmethod
+    def run_action(self, dev_ctrl: ChipDeviceCtrl, endpoint: int, node_id: int):
         pass
 
-    def run_command(self, dev_ctrl: ChipDeviceCtrl, endpoint: int, node_id: int):
-        pass
 
+class InvokeAction(BaseAction):
+    '''Single invoke action to be executed including validation of response.'''
 
-class ClusterCommand(SingleCommandInterface):
-    '''Single cluster command to be executed including validation of response.'''
+    def __init__(self, item: dict, cluster: str, data_model_lookup: DataModelLookup):
+        '''Parse cluster invoke from yaml test configuration.
 
-    def __init__(self, label, request_type_name, cluster):
-        self.label: str = label
-        self.request_type_name: str = request_type_name
-        self.cluster: str = cluster
-        self.request_data: dict = field(default_factory=dict)
-        self.request_object: None = None
-        self.expected_response_data: dict = field(default_factory=dict)
-        self.expected_response_object: None = None
-        self.expected_raw_response: dict = field(default_factory=dict)
-        super().__init__()
+        Args:
+          'item': Dictionary containing single invoke to be parsed.
+          'cluster': Name of cluster which to invoke action is targeting.
+          'data_model_lookup': Data model lookup to get attribute object.
+        Raises:
+          ParsingError: Raised if there is a benign error, and there is currently no
+            action to perform for this write attribute.
+          UnexpectedParsingError: Raised if there is an unexpected parsing error.
+        '''
+        super().__init__(item['label'])
+        self._command_name = stringcase.pascalcase(item['command'])
+        self._cluster = cluster
+        self._request_object = None
+        self._expected_raw_response: dict = field(default_factory=dict)
+        self._expected_response_object = None
 
-    def run_command(self, dev_ctrl: ChipDeviceCtrl, endpoint: int, node_id: int):
+        command = data_model_lookup.get_command(self._cluster, self._command_name)
+
+        if command is None:
+            raise ParsingError(
+                f'Failed to find cluster:{self._cluster} Command:{self._command_name}')
+
+        command_object = command()
+        if (item.get('arguments')):
+            args = item['arguments']['values']
+
+            request_data_as_dict = YamlUtils.convert_name_value_pair_to_dict(args)
+
+            try:
+                request_data = YamlUtils.convert_yaml_type(
+                    request_data_as_dict, type(command_object))
+            except ValueError:
+                raise ParsingError('Could not covert yaml type')
+
+            # Create a cluster object for the request from the provided YAML data.
+            self._request_object = command_object.FromDict(request_data)
+        else:
+            self._request_object = command_object
+
+        self._expected_raw_response = item.get('response')
+
+        if (self._request_object.response_type is not None and
+                self._expected_raw_response is not None and
+                self._expected_raw_response.get('values')):
+            response_type = stringcase.pascalcase(self._request_object.response_type)
+            expected_command = data_model_lookup.get_command(self._cluster, response_type)
+            expected_response_args = self._expected_raw_response['values']
+            expected_response_data_as_dict = YamlUtils.convert_name_value_pair_to_dict(expected_response_args)
+            expected_response_data = YamlUtils.convert_yaml_type(expected_response_data_as_dict, expected_command)
+            self._expected_response_object = expected_command.FromDict(expected_response_data)
+
+    def run_action(self, dev_ctrl: ChipDeviceCtrl, endpoint: int, node_id: int):
         try:
-            resp = asyncio.run(dev_ctrl.SendCommand(node_id, endpoint, self.request_object))
+            resp = asyncio.run(dev_ctrl.SendCommand(node_id, endpoint, self._request_object))
         except chip.interaction_model.InteractionModelError:
-            if (self.expected_raw_response is not None and
-                    self.expected_raw_response.get('error')):
+            if (self._expected_raw_response is not None and
+                    self._expected_raw_response.get('error')):
                 logger.debug('Got error response, but was expected')
             else:
                 raise
 
-        if (self.expected_response_object is not None):
-            if (self.expected_response_object != resp):
-                logger.error(f'Expected response {self.expected_response_object} didnt match '
+        if (self._expected_response_object is not None):
+            if (self._expected_response_object != resp):
+                logger.error(f'Expected response {self._expected_response_object} did not match '
                              f'actual object {resp}')
 
 
-class ReadAttributeCommand(SingleCommandInterface):
-    '''Single read attribute command to be executed including validation.'''
+class ReadAttributeAction(BaseAction):
+    '''Single read attribute action to be executed including validation.'''
 
-    def __init__(self, label, request_type_name, cluster):
-        self.label: str = label
-        self.request_type_name: str = request_type_name
-        self.cluster: str = cluster
-        self.request_object: None = None
-        self.expected_response_data: dict = field(default_factory=dict)
-        self.expected_response_object: None = None
-        self.expected_raw_response: dict = field(default_factory=dict)
-        self.possibly_unsupported: bool = False
-        super().__init__()
+    def __init__(self, item: dict, cluster: str, data_model_lookup: DataModelLookup):
+        '''Parse read attribute action from yaml test configuration.
 
-    def run_command(self, dev_ctrl: ChipDeviceCtrl, endpoint: int, node_id: int):
+        Args:
+          'item': Dictionary contains single read attribute action to be parsed.
+          'cluster': Name of cluster read attribute action is targeting.
+          'data_model_lookup': Data model lookup to get attribute object.
+        Raises:
+          ParsingError: Raised if there is a benign error, and there is currently no
+            action to perform for this read attribute.
+          UnexpectedParsingError: Raised if there is an unexpected parsing error.
+        '''
+        super().__init__(item['label'])
+        self._attribute_name = stringcase.pascalcase(item['attribute'])
+        self._cluster = cluster
+        self._cluster_object = None
+        self._request_object = None
+        self._expected_raw_response: dict = field(default_factory=dict)
+        self._expected_response_object: None = None
+        self._possibly_unsupported = False
+
+        self._cluster_object = data_model_lookup.get_cluster(self._cluster)
+        if self._cluster_object is None:
+            raise UnexpectedParsingError(
+                f'ReadAttribute failed to find cluster object:{self._cluster}')
+
+        self._request_object = data_model_lookup.get_attribute(self._cluster, self._attribute_name)
+        if self._request_object is None:
+            raise ParsingError(
+                f'ReadAttribute failed to find cluster:{self._cluster} '
+                f'Attribute:{self._attribute_name}')
+
+        if (item.get('arguments')):
+            raise UnexpectedParsingError(
+                f'ReadAttribute should not contain arguments. {self.label}')
+
+        if self._request_object.attribute_type is None:
+            raise UnexpectedParsingError(
+                f'ReadAttribute doesnt have valid attribute_type. {self.label}')
+
+        self._expected_raw_response = item.get('response')
+        if (self._expected_raw_response is None):
+            raise UnexpectedParsingError(f'ReadAttribute missing expected response. {self.label}')
+
+        if 'optional' in item:
+            self._possibly_unsupported = True
+
+        if 'value' in self._expected_raw_response:
+            self._expected_response_object = self._request_object.attribute_type.Type
+            expected_response_value = self._expected_raw_response['value']
+            self._expected_response_data = YamlUtils.convert_yaml_type(
+                expected_response_value, self._expected_response_object, use_from_dict=True)
+
+    def run_action(self, dev_ctrl: ChipDeviceCtrl, endpoint: int, node_id: int):
         try:
-            resp = asyncio.run(dev_ctrl.ReadAttribute(node_id, [(self.request_object)]))
+            resp = asyncio.run(dev_ctrl.ReadAttribute(node_id, [(self._request_object)]))
         except chip.interaction_model.InteractionModelError:
-            if (self.expected_raw_response is not None and
-                    self.expected_raw_response.get('error')):
+            if (self._expected_raw_response is not None and
+                    self._expected_raw_response.get('error')):
                 logger.debug('Got error, but was expected')
             else:
                 raise
 
-        if self.possibly_unsupported and not resp:
-            # We have found an unsupported attribute and test case did specify
-            # that it might be unsupports, so nothing left to validate.
+        if self._possibly_unsupported and not resp:
+            # We have found an unsupported attribute. Parsed test did specify that it might be
+            # unsupported, so nothing left to validate.
             return
 
         # TODO: There is likely an issue here with Optional fields since None
-        if (self.expected_response_object is not None):
-            cluster_object_key = eval(f'Clusters.Objects.{self.cluster}')
-            cluster_value_key = eval(
-                f'Clusters.Objects.{self.cluster}.Attributes.{self.request_type_name}')
-            parsed_resp = resp[endpoint][cluster_object_key][cluster_value_key]
+        if (self._expected_response_object is not None):
+            parsed_resp = resp[endpoint][self._cluster_object][self._request_object]
 
-            if (self.expected_response_data != parsed_resp):
+            if (self._expected_response_data != parsed_resp):
                 # TODO: It is debatable if this is the right thing to be doing here. This might
                 # need a follow up cleanup.
-                if (self.expected_response_object != float32 or
-                        not math.isclose(self.expected_response_data, parsed_resp, rel_tol=1e-6)):
-                    logger.error(f'Expected response {self.expected_response_data} didnt match '
+                if (self._expected_response_object != float32 or
+                        not math.isclose(self._expected_response_data, parsed_resp, rel_tol=1e-6)):
+                    logger.error(f'Expected response {self._expected_response_data} didnt match '
                                  f'actual object {parsed_resp}')
 
 
-class WriteAttributeCommand(SingleCommandInterface):
-    '''Single write attribute command to be executed including validation.'''
+class WriteAttributeAction(BaseAction):
+    '''Single write attribute action to be executed including validation.'''
 
-    def __init__(self, label, request_type_name, cluster):
-        self.label: str = label
-        self.request_type_name: str = request_type_name
-        self.cluster: str = cluster
-        self.request_data: dict = field(default_factory=dict)
-        self.request_object: None = None
-        super().__init__()
+    def __init__(self, item: dict, cluster: str, data_model_lookup: DataModelLookup):
+        '''Parse write attribute action from yaml test configuration.
 
-    def run_command(self, dev_ctrl: ChipDeviceCtrl, endpoint: int, node_id: int):
+        Args:
+          'item': Dictionary contains single write attribute action to be parsed.
+          'cluster': Name of cluster write attribute action is targeting.
+          'data_model_lookup': Data model lookup to get attribute object.
+        Raises:
+          ParsingError: Raised if there is a benign error, and there is currently no
+            action to perform for this write attribute.
+          UnexpectedParsingError: Raised if there is an unexpected parsing error.
+        '''
+        super().__init__(item['label'])
+        self._attribute_name = stringcase.pascalcase(item['attribute'])
+        self._cluster = cluster
+        self._request_object = None
+
+        attribute = data_model_lookup.get_attribute(self._cluster, self._attribute_name)
+        if attribute is None:
+            raise ParsingError(
+                f'WriteAttribute failed to find cluster:{self._cluster} '
+                f'Attribute:{self._attribute_name}')
+
+        if (item.get('arguments')):
+            args = item['arguments']['value']
+            try:
+                request_data = YamlUtils.convert_yaml_type(
+                    args, attribute.attribute_type.Type)
+            except ValueError:
+                raise ParsingError('Could not covert yaml type')
+
+            # Create a cluster object for the request from the provided YAML data.
+            self._request_object = attribute(request_data)
+        else:
+            raise UnexpectedParsingError(f'WriteAttribute action does have arguments {self.label}')
+
+    def run_action(self, dev_ctrl: ChipDeviceCtrl, endpoint: int, node_id: int):
         try:
-            resp = asyncio.run(dev_ctrl.WriteAttribute(node_id, [(endpoint, self.request_object)]))
+            resp = asyncio.run(dev_ctrl.WriteAttribute(node_id, [(endpoint, self._request_object)]))
         except chip.interaction_model.InteractionModelError:
             if (self.expected_raw_response is not None and
                     self.expected_raw_response.get('error')):
@@ -143,153 +266,10 @@ class WriteAttributeCommand(SingleCommandInterface):
             else:
                 raise
 
-        # TODO: confirm resp give a Success value, although not all write commands are expected
+        # TODO: confirm resp give a Success value, although not all write action are expected
         # to succeed, hence why this is a todo and not simply just done. Below is example of
         # what success check might look like.
         # asserts.assert_equal(resp[0].Status, StatusEnum.Success, 'label write must succeed')
-
-
-def ClusterCommandFactory(item: dict, cluster: str):
-    '''Parse cluster command from yaml test configuration.
-
-    Args:
-      'item': Dictionary contains single cluster command test to be parsed
-      'cluster': Name of cluster command is targeting.
-    Returns:
-      ReadAttributeCommand if 'item' is a valid command to be executed.
-      None if 'item' was not parsed to a command to be executed for a known reason
-        that is none fatal.
-    Raises:
-      ParsingError: Raised if there is an unexpected parsing error.
-    '''
-    test = ClusterCommand(item['label'], stringcase.pascalcase(item['command']), cluster)
-
-    try:
-        test.request_object = eval(f'Clusters.{test.cluster}.Commands.{test.request_type_name}')()
-    except AttributeError:
-        pass
-
-    if test.request_object is None:
-        return None
-
-    if (item.get('arguments')):
-        args = item['arguments']['values']
-
-        test.request_data = YamlUtils.fixup_yaml_arguments(args)
-
-        try:
-            test.request_data = YamlUtils.fixup_yaml_types(
-                test.request_data, type(test.request_object))
-        except ValueError:
-            return None
-
-        # Create a cluster object for the request from the provided YAML data.
-        test.request_object = test.request_object.FromDict(test.request_data)
-
-    test.expected_raw_response = item.get('response')
-    if (test.request_object.response_type is not None and
-            test.expected_raw_response is not None and
-            test.expected_raw_response.get('values')):
-        response_type = stringcase.pascalcase(test.request_object.response_type)
-        expected_command = f'Clusters.{test.cluster}.Commands.{response_type}'
-        test.expected_response_object = eval(expected_command)
-        test.expected_response_data = test.expected_raw_response['values']
-        test.expected_response_data = YamlUtils.fixup_yaml_arguments(test.expected_response_data)
-
-        test.expected_response_data = YamlUtils.fixup_yaml_types(
-            test.expected_response_data, test.expected_response_object)
-        test.expected_response_object = test.expected_response_object.FromDict(
-            test.expected_response_data)
-
-    return test
-
-
-def AttributeReadCommandFactory(item: dict, cluster: str):
-    '''Parse read attribute command from yaml test configuration.
-
-    Args:
-      'item': Dictionary contains single read attribute test to be parsed
-      'cluster': Name of cluster read attribute command is targeting.
-    Returns:
-      ReadAttributeCommand if 'item' is a valid command to be executed.
-      None if 'item' was not parsed to a command to be executed for a known reason
-        that is none fatal.
-    Raises:
-      ParsingError: Raised if there is an unexpected parsing error.
-    '''
-    test = ReadAttributeCommand(item['label'], stringcase.pascalcase(item['attribute']), cluster)
-
-    try:
-        test.request_object = eval(f'Clusters.{test.cluster}.Attributes.{test.request_type_name}')
-    except AttributeError:
-        pass
-
-    if test.request_object is None:
-        raise ParsingError(
-            f'ReadAttribute failed to find cluster:{test.cluster} '
-            f'Attribute:{test.request_type_name}')
-
-    if (item.get('arguments')):
-        raise ParsingError(f'ReadAttribute should not contain arguments. {test.label}')
-
-    if test.request_object.attribute_type is None:
-        raise ParsingError(f'ReadAttribute doesnt have valid attribute_type. {test.label}')
-
-    test.expected_raw_response = item.get('response')
-    if (test.expected_raw_response is None):
-        raise ParsingError(f'ReadAttribute missing expected response. {test.label}')
-
-    if 'optional' in item:
-        test.possibly_unsupported = True
-
-    if 'value' in test.expected_raw_response:
-        test.expected_response_object = test.request_object.attribute_type.Type
-        value = test.expected_raw_response['value']
-        test.expected_response_data = YamlUtils.fixup_yaml_types(
-            value, test.expected_response_object, use_from_dict=True)
-
-    return test
-
-
-def AttributeWriteCommandFactory(item: dict, cluster: str):
-    '''Parse write attribute command from yaml test configuration.
-
-    Args:
-      'item': Dictionary contains single write attribute test to be parsed
-      'cluster': Name of cluster write attribute command is targeting.
-    Returns:
-      WriteAttributeCommand if 'item' is a valid command to be executed.
-      None if 'item' was not parsed to a command to be executed for a known reason
-        that is none fatal.
-    Raises:
-      ParsingError: Raised if there is an unexpected parsing error.
-    '''
-    test = WriteAttributeCommand(item['label'], stringcase.pascalcase(item['attribute']), cluster)
-
-    try:
-        test.request_object = eval(f'Clusters.{test.cluster}.Attributes.{test.request_type_name}')
-    except AttributeError:
-        pass
-
-    if test.request_object is None:
-        raise ParsingError(
-            f'WriteAttribute failed to find cluster:{test.cluster} '
-            f'Attribute:{test.request_type_name}')
-
-    if (item.get('arguments')):
-        args = item['arguments']['value']
-        try:
-            test.request_data = YamlUtils.fixup_yaml_types(
-                args, test.request_object.attribute_type.Type)
-        except ValueError:
-            return None
-
-        # Create a cluster object for the request from the provided YAML data.
-        test.request_object = test.request_object(test.request_data)
-    else:
-        raise ParsingError(f'WriteAttribute command does have arguments {test.label}')
-
-    return test
 
 
 class YamlTestParser:
@@ -297,12 +277,6 @@ class YamlTestParser:
 
     The parser also permits execution of those tests there-after.
     '''
-    _name: str
-    _node_id: int
-    _cluster: str
-    _endpoint: int
-    _base_command_test_list: typing.List[SingleCommandInterface]
-    _raw_data: dict
 
     def __init__(self, yaml_path: str):
         '''Constructor that parser the given a path to YAML test file.'''
@@ -316,12 +290,13 @@ class YamlTestParser:
         self._node_id = self._raw_data['config']['nodeId']
         self._cluster = self._raw_data['config']['cluster'].replace(' ', '')
         self._endpoint = self._raw_data['config']['endpoint']
-        self._base_command_test_list = []
+        self._base_action_test_list = []
+        self._data_model_lookup = PreDefinedDataModelLookup()
 
         for item in self._raw_data['tests']:
             # We only support parsing invoke interactions. As support for write/reads get added,
             # these skips will be removed.
-            test = None
+            action = None
             cluster = self._cluster
             # Some of the tests contain 'cluster over-rides' that refer to a different
             # cluster than that specified in 'config'.
@@ -332,20 +307,65 @@ class YamlTestParser:
                 logger.info(f"Test is disabled, skipping {item['label']}")
                 continue
             if item['command'] == 'writeAttribute':
-                test = AttributeWriteCommandFactory(item, cluster)
+                action = self._attribute_write_action_factory(item, cluster)
             elif item['command'] == 'readAttribute':
-                test = AttributeReadCommandFactory(item, cluster)
+                action = self._attribute_read_action_factory(item, cluster)
             else:
-                test = ClusterCommandFactory(item, cluster)
+                action = self._invoke_action_factory(item, cluster)
 
-            if test is not None:
-                self._base_command_test_list.append(test)
+            if action is not None:
+                self._base_action_test_list.append(action)
             else:
                 logger.warn(f"Failed to parse {item['label']}")
 
+    def _invoke_action_factory(self, item: dict, cluster: str):
+        '''Parse cluster command from yaml test configuration.
+
+        Args:
+          'item': Dictionary contains single cluster action test to be parsed
+          'cluster': Name of cluster action is targeting.
+        Returns:
+          InvokeAction if 'item' is a valid action to be executed.
+          None if 'item' was not parsed for a known reason that is not fatal.
+        '''
+        try:
+            return InvokeAction(item, cluster, self._data_model_lookup)
+        except ParsingError:
+            return None
+
+    def _attribute_read_action_factory(self, item: dict, cluster: str):
+        '''Parse read attribute action from yaml test configuration.
+
+        Args:
+          'item': Dictionary contains single read attribute action to be parsed.
+          'cluster': Name of cluster read attribute action is targeting.
+        Returns:
+          ReadAttributeAction if 'item' is a valid action to be executed.
+          None if 'item' was not parsed for a known reason that is not fatal.
+        '''
+        try:
+            return ReadAttributeAction(item, cluster, self._data_model_lookup)
+        except ParsingError:
+            return None
+
+    def _attribute_write_action_factory(self, item: dict, cluster: str):
+        '''Parse write attribute action from yaml test configuration.
+
+        Args:
+          'item': Dictionary contains single write attribute action to be parsed.
+          'cluster': Name of cluster write attribute action is targeting.
+        Returns:
+          WriteAttributeAction if 'item' is a valid action to be executed.
+          None if 'item' was not parsed for a known reason that is not fatal.
+        '''
+        try:
+            return WriteAttributeAction(item, cluster, self._data_model_lookup)
+        except ParsingError:
+            return None
+
     def execute_tests(self, dev_ctrl: ChipDeviceCtrl):
         '''Executes parsed YAML tests.'''
-        for idx, test in enumerate(self._base_command_test_list):
-            logger.info(f'Test: {idx} -- Executing{test.label}')
+        for idx, action in enumerate(self._base_action_test_list):
+            logger.info(f'test: {idx} -- Executing{action.label}')
 
-            test.run_command(dev_ctrl, self._endpoint, self._node_id)
+            action.run_action(dev_ctrl, self._endpoint, self._node_id)

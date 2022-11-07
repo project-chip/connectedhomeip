@@ -226,6 +226,7 @@ chip_python_wheel_action("chip-core") {
         "chip/storage/__init__.py",
         "chip/utils/CommissioningBuildingBlocks.py",
         "chip/utils/__init__.py",
+        "chip/yaml/DataModelLookup.py",
         "chip/yaml/YamlParser.py",
         "chip/yaml/YamlUtils.py",
         "chip/yaml/__init__.py",
