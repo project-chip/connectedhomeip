@@ -12,7 +12,6 @@ import com.matter.tv.app.api.Clusters;
 import com.matter.tv.app.api.MatterIntentConstants;
 import com.matter.tv.app.api.SetSupportedClustersRequest;
 import com.matter.tv.app.api.SupportedCluster;
-
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -89,42 +88,50 @@ public class MainActivity extends AppCompatActivity {
               break;
             case ATTR_TL_LONG_BAD:
               AttributeHolder.getInstance()
-                      .setAttributeValue(
-                              Clusters.TargetNavigator.Id,
-                              Clusters.TargetNavigator.Attributes.TargetList,
-                              AttributeHolder.TL_LONG_BAD);
+                  .setAttributeValue(
+                      Clusters.TargetNavigator.Id,
+                      Clusters.TargetNavigator.Attributes.TargetList,
+                      AttributeHolder.TL_LONG_BAD);
               reportAttributeChange(
-                      Clusters.TargetNavigator.Id, Clusters.TargetNavigator.Attributes.TargetList);
+                  Clusters.TargetNavigator.Id, Clusters.TargetNavigator.Attributes.TargetList);
               break;
             case ATTR_TL_LONG:
               AttributeHolder.getInstance()
-                      .setAttributeValue(
-                              Clusters.TargetNavigator.Id,
-                              Clusters.TargetNavigator.Attributes.TargetList,
-                              AttributeHolder.TL_LONG);
+                  .setAttributeValue(
+                      Clusters.TargetNavigator.Id,
+                      Clusters.TargetNavigator.Attributes.TargetList,
+                      AttributeHolder.TL_LONG);
               reportAttributeChange(
-                      Clusters.TargetNavigator.Id, Clusters.TargetNavigator.Attributes.TargetList);
+                  Clusters.TargetNavigator.Id, Clusters.TargetNavigator.Attributes.TargetList);
               break;
             case ATTR_TL_SHORT:
               AttributeHolder.getInstance()
-                      .setAttributeValue(
-                              Clusters.TargetNavigator.Id,
-                              Clusters.TargetNavigator.Attributes.TargetList,
-                              AttributeHolder.TL_SHORT);
+                  .setAttributeValue(
+                      Clusters.TargetNavigator.Id,
+                      Clusters.TargetNavigator.Attributes.TargetList,
+                      AttributeHolder.TL_SHORT);
               reportAttributeChange(
-                      Clusters.TargetNavigator.Id, Clusters.TargetNavigator.Attributes.TargetList);
+                  Clusters.TargetNavigator.Id, Clusters.TargetNavigator.Attributes.TargetList);
               break;
           }
         });
     Spinner dropdown = findViewById(R.id.spinnerAttribute);
     String[] items =
-        new String[] {ATTR_PS_PLAYING, ATTR_PS_PAUSED, ATTR_PS_NOT_PLAYING, ATTR_PS_BUFFERING, ATTR_TL_LONG, ATTR_TL_SHORT, ATTR_TL_LONG_BAD};
+        new String[] {
+          ATTR_PS_PLAYING,
+          ATTR_PS_PAUSED,
+          ATTR_PS_NOT_PLAYING,
+          ATTR_PS_BUFFERING,
+          ATTR_TL_LONG,
+          ATTR_TL_SHORT,
+          ATTR_TL_LONG_BAD
+        };
     ArrayAdapter<String> adapter =
         new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
     dropdown.setAdapter(adapter);
 
     MatterAgentClient matterAgentClient = MatterAgentClient.getInstance();
-    if(matterAgentClient != null) {
+    if (matterAgentClient != null) {
       SetSupportedClustersRequest supportedClustersRequest = new SetSupportedClustersRequest();
       supportedClustersRequest.supportedClusters = new ArrayList<SupportedCluster>();
       SupportedCluster supportedCluster = new SupportedCluster();

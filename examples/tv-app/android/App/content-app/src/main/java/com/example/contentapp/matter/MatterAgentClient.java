@@ -10,14 +10,10 @@ import android.content.pm.ResolveInfo;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
-
 import androidx.annotation.Nullable;
-
 import com.matter.tv.app.api.IMatterAppAgent;
 import com.matter.tv.app.api.MatterIntentConstants;
 import com.matter.tv.app.api.SetSupportedClustersRequest;
-import com.matter.tv.app.api.SupportedCluster;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;

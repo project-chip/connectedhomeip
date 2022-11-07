@@ -1,7 +1,6 @@
 package com.example.contentapp;
 
 import android.util.Log;
-
 import com.matter.tv.app.api.Clusters;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,81 +10,83 @@ public class AttributeHolder {
   private Map<Long, Map<Long, Object>> attributeValues = new HashMap<>();
   private static final String TAG = "AttributeHolder";
 
-  public static final String TL_LONG = "[{\"0\":1, \"1\":\"Home\"},{\"0\":2, \"1\":\"Settings\"},{\"0\":3, \"1\":\"Casting Home\"}" +
-          ",{\"0\":249, \"1\":\"" +
-          "1skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt\"}" +
-          ",{\"0\":250, \"1\":\"" +
-          "2skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt\"}" +
-          ",{\"0\":251, \"1\":\"" +
-          "3skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt\"}" +
-          ",{\"0\":252, \"1\":\"" +
-          "4skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt\"}" +
-          ",{\"0\":253, \"1\":\"" +
-          "5skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt\"}" +
-          ",{\"0\":254, \"1\":\"" +
-          "6skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt\"}" +
-          "]";
-  public static final String TL_SHORT = "[{\"0\":1, \"1\":\"Home\"},{\"0\":2, \"1\":\"Settings\"},{\"0\":3, \"1\":\"Casting Home\"}]";
-  public static final String TL_LONG_BAD = "[{\"0\":1, \"1\":\"Home\"},{\"0\":2, \"1\":\"Settings\"},{\"0\":3, \"1\":\"Casting Home\"}" +
-          ",{\"0\":254, \"1\":\"" +
-          "badskfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt" +
-          "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt\"}" +
-          "]";
+  public static final String TL_LONG =
+      "[{\"0\":1, \"1\":\"Home\"},{\"0\":2, \"1\":\"Settings\"},{\"0\":3, \"1\":\"Casting Home\"}"
+          + ",{\"0\":249, \"1\":\""
+          + "1skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt\"}"
+          + ",{\"0\":250, \"1\":\""
+          + "2skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt\"}"
+          + ",{\"0\":251, \"1\":\""
+          + "3skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt\"}"
+          + ",{\"0\":252, \"1\":\""
+          + "4skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt\"}"
+          + ",{\"0\":253, \"1\":\""
+          + "5skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt\"}"
+          + ",{\"0\":254, \"1\":\""
+          + "6skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt\"}"
+          + "]";
+  public static final String TL_SHORT =
+      "[{\"0\":1, \"1\":\"Home\"},{\"0\":2, \"1\":\"Settings\"},{\"0\":3, \"1\":\"Casting Home\"}]";
+  public static final String TL_LONG_BAD =
+      "[{\"0\":1, \"1\":\"Home\"},{\"0\":2, \"1\":\"Settings\"},{\"0\":3, \"1\":\"Casting Home\"}"
+          + ",{\"0\":254, \"1\":\""
+          + "badskfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt"
+          + "skfguioufgirufgieufgifugaeifugaeifugadifugbdifugadfiugawdfiuawgdfiuawdbvawiufvafuvwiufgwieufgdhtskhtdhhtbbsagthdkgusdfjgfghdgrbt\"}"
+          + "]";
   private static AttributeHolder instance = new AttributeHolder();
-
 
   private AttributeHolder() {
     // Setting up attribute defaults
@@ -99,9 +100,7 @@ public class AttributeHolder {
         3);
     setAttributeValue(Clusters.MediaPlayback.Id, Clusters.MediaPlayback.Attributes.CurrentState, 2);
     setAttributeValue(
-        Clusters.TargetNavigator.Id,
-        Clusters.TargetNavigator.Attributes.TargetList,
-        TL_SHORT);
+        Clusters.TargetNavigator.Id, Clusters.TargetNavigator.Attributes.TargetList, TL_SHORT);
     setAttributeValue(
         Clusters.TargetNavigator.Id, Clusters.TargetNavigator.Attributes.CurrentTarget, 1);
   };
