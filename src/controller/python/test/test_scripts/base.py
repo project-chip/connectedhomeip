@@ -776,7 +776,7 @@ class BaseTestHelper:
         self.logger.info("Reading back data from fabric1...")
 
         data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)])
-        readListDataFabric1 = data[1][Clusters.UnitTesting.[Clusters.UnitTesting.Attributes.ListFabricScoped]
+        readListDataFabric1 = data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
 
         #
         # Update the expected data's fabric index to that we just read back
@@ -839,12 +839,12 @@ class BaseTestHelper:
                         raise AssertionError("Got back mismatched data")
 
         data= await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)], fabricFiltered=False)
-        readListDataFabric= data[1][Clusters.UnitTesting.[Clusters.UnitTesting.Attributes.ListFabricScoped]
+        readListDataFabric= data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
         CompareUnfilteredData(self.currentFabric1,
                               self.currentFabric2, expectedDataFabric1)
 
         data= await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)], fabricFiltered=False)
-        readListDataFabric= data[1][Clusters.UnitTesting.[Clusters.UnitTesting.Attributes.ListFabricScoped]
+        readListDataFabric= data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
         CompareUnfilteredData(self.currentFabric2,
                               self.currentFabric1, expectedDataFabric2)
 
@@ -867,7 +867,7 @@ class BaseTestHelper:
             "Reading back data (again) from fabric2 to ensure it hasn't changed")
 
         data= await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)])
-        readListDataFabric2= data[1][Clusters.UnitTesting.[Clusters.UnitTesting.Attributes.ListFabricScoped]
+        readListDataFabric2= data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
         if (expectedDataFabric2 != readListDataFabric2):
             raise AssertionError("Got back mismatched data")
 
