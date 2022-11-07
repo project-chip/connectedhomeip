@@ -25,6 +25,7 @@ import android.net.wifi.WifiManager.MulticastLock;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -40,7 +41,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   private Handler mainThreadHandler;
   private List<NsdManager.RegistrationListener> registrationListeners = new ArrayList<>();
   private final CopyOnWriteArrayList<String> mMFServiceName = new CopyOnWriteArrayList<>();
-  private final NsdManagerResolverAvailState nsdManagerResolverAvailState;
+  @Nullable private final NsdManagerResolverAvailState nsdManagerResolverAvailState;
 
   /**
    * @param context application context
@@ -48,7 +49,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
    *     NsdManagerServiceResolver to synchronize on the usage of NsdManager's resolveService() API
    */
   public NsdManagerServiceResolver(
-      Context context, NsdManagerResolverAvailState nsdManagerResolverAvailState) {
+      Context context, @Nullable NsdManagerResolverAvailState nsdManagerResolverAvailState) {
     this.nsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
     this.mainThreadHandler = new Handler(Looper.getMainLooper());
 
@@ -102,7 +103,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
         };
 
     if (nsdManagerResolverAvailState != null) {
-      nsdManagerResolverAvailState.markBusyIfFreeOrWait();
+      nsdManagerResolverAvailState.acquireResolver();
     }
 
     this.nsdManager.resolveService(
@@ -274,28 +275,32 @@ public class NsdManagerServiceResolver implements ServiceResolver {
      * Waits if the NsdManager is already busy with resolving a service. Otherwise, it marks it as
      * busy and returns
      */
-    public void markBusyIfFreeOrWait() {
+    public void acquireResolver() {
       lock.lock();
       try {
         while (busy) {
           Log.d(TAG, "Found NsdManager Resolver busy, waiting");
           condition.await();
         }
-        Log.d(TAG, "Found NsdManager Resolver free, using it");
+        Log.d(TAG, "Found NsdManager Resolver free, using it and marking it as busy");
         busy = true;
       } catch (InterruptedException e) {
         Log.e(TAG, "Failure while waiting for condition: " + e);
+      } finally {
+        lock.unlock();
       }
-      lock.unlock();
     }
 
     /** Signals the NsdManager resolver as free */
     public void signalFree() {
       lock.lock();
-      Log.d(TAG, "Signaling NsdManager Resolver as free");
-      busy = false;
-      condition.signalAll();
-      lock.unlock();
+      try {
+        Log.d(TAG, "Signaling NsdManager Resolver as free");
+        busy = false;
+        condition.signal();
+      } finally {
+        lock.unlock();
+      }
     }
   }
 }
