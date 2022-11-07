@@ -28,8 +28,9 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
+
+#include <platform/logging/LogV.h>
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -150,7 +151,7 @@ void SetLogRedirectCallback(LogRedirectCallback_t callback)
  *                      correspond to the format specifiers in @a msg.
  *
  */
-DLL_EXPORT void Log(uint8_t module, uint8_t category, const char * msg, ...)
+void Log(uint8_t module, uint8_t category, const char * msg, ...)
 {
 
     va_list v;
@@ -159,7 +160,7 @@ DLL_EXPORT void Log(uint8_t module, uint8_t category, const char * msg, ...)
     va_end(v);
 }
 
-DLL_EXPORT void LogByteSpan(uint8_t module, uint8_t category, const chip::ByteSpan & span)
+void LogByteSpan(uint8_t module, uint8_t category, const chip::ByteSpan & span)
 {
     // Maximum number of characters needed to print 8 byte buffer including formatting (0x)
     // 8 bytes * (2 nibbles per byte + 4 character for ", 0x") + null termination.
@@ -192,14 +193,8 @@ DLL_EXPORT void LogByteSpan(uint8_t module, uint8_t category, const chip::ByteSp
 
 void LogV(uint8_t module, uint8_t category, const char * msg, va_list args)
 {
-    if (!IsCategoryEnabled(category))
-    {
-        return;
-    }
-
-    const char * moduleName = GetModuleName(static_cast<LogModule>(module));
+    const char * moduleName        = GetModuleName(static_cast<LogModule>(module));
     LogRedirectCallback_t redirect = sLogRedirectCallback.load();
-
     if (redirect != nullptr)
     {
         redirect(moduleName, category, msg, args);
@@ -212,41 +207,38 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list args)
 
 #if CHIP_LOG_FILTERING
 uint8_t gLogFilter = kLogCategory_Max;
-DLL_EXPORT bool IsCategoryEnabled(uint8_t category)
-{
-    return (category <= gLogFilter);
-}
 
-DLL_EXPORT uint8_t GetLogFilter()
+uint8_t GetLogFilter()
 {
     return gLogFilter;
 }
 
-DLL_EXPORT void SetLogFilter(uint8_t category)
+void SetLogFilter(uint8_t category)
 {
     gLogFilter = category;
 }
 
 #else  // CHIP_LOG_FILTERING
 
-DLL_EXPORT bool IsCategoryEnabled(uint8_t category)
-{
-    (void) category;
-    return true;
-}
-
-DLL_EXPORT uint8_t GetLogFilter()
+uint8_t GetLogFilter()
 {
     return kLogCategory_Max;
 }
 
-DLL_EXPORT void SetLogFilter(uint8_t category)
+void SetLogFilter(uint8_t category)
 {
-    (void) category;
+    IgnoreUnusedVariable(category);
 }
 #endif // CHIP_LOG_FILTERING
 
-#endif /* _CHIP_USE_LOGGING */
+#if CHIP_LOG_FILTERING
+bool IsCategoryEnabled(uint8_t category)
+{
+    return (category <= gLogFilter);
+}
+#endif // CHIP_LOG_FILTERING
+
+#endif // _CHIP_USE_LOGGING
 
 } // namespace Logging
 } // namespace chip

@@ -191,6 +191,10 @@ static_library("support") {
     public_deps += [ "${chip_root}/src/platform/logging:android" ]
   }
 
+  if (current_os == "mac" || current_os == "ios") {
+    public_deps += [ "${chip_root}/src/platform/Darwin:logging" ]
+  }
+
   public_configs = [
     "${chip_root}/src:includes",
     "${chip_root}/src/system:system_config",

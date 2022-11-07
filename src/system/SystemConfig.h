@@ -494,6 +494,18 @@ struct LwIPEvent;
 #endif /* CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE */
 
 /**
+ *  @def CHIP_SYSTEM_CONFIG_PLATFORM_LOG
+ *
+ *  @brief
+ *      Defines whether (1) or not (0) the system uses a platform-specific logging implementation.
+ *
+ *  See CHIPLogging.h for details.
+ */
+#ifndef CHIP_SYSTEM_CONFIG_PLATFORM_LOG
+#define CHIP_SYSTEM_CONFIG_PLATFORM_LOG 0
+#endif // CHIP_SYSTEM_CONFIG_PLATFORM_LOG
+
+/**
  *  @def CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
  *
  *  @brief

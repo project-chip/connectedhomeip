@@ -285,7 +285,7 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  @param[in]  expr        A Boolean expression to be evaluated.
  *  @param[in]  code        A value to return if @a expr is false.
  */
-#define VerifyOrReturnError(expr, code) VerifyOrReturnValue(expr, code)
+#define VerifyOrReturnError(expr, code, ...) VerifyOrReturnValue(expr, code, ##__VA_ARGS__)
 
 /**
  *  @def VerifyOrReturnValue(expr, value)
@@ -302,11 +302,12 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  @param[in]  expr        A Boolean expression to be evaluated.
  *  @param[in]  value       A value to return if @a expr is false.
  */
-#define VerifyOrReturnValue(expr, value)                                                                                           \
+#define VerifyOrReturnValue(expr, value, ...)                                                                                      \
     do                                                                                                                             \
     {                                                                                                                              \
         if (!(expr))                                                                                                               \
         {                                                                                                                          \
+            __VA_ARGS__;                                                                                                           \
             return (value);                                                                                                        \
         }                                                                                                                          \
     } while (false)
