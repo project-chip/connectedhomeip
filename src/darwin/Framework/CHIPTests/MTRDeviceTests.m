@@ -1148,7 +1148,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * expectation = [self expectationWithDescription:@"ReuseMTRClusterObjectFirstCall"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    MTRBaseClusterTest * cluster = [[MTRBaseClusterTest alloc] initWithDevice:device endpointID:@(1) queue:queue];
+    MTRBaseClusterUnitTesting * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:device endpointID:@(1) queue:queue];
     XCTAssertNotNil(cluster);
 
     [cluster testWithCompletion:^(NSError * err) {
