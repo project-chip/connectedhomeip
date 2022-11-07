@@ -51,6 +51,9 @@ public:
     void StoreCurrentScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId);
     void RecallScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId);
 
+    void RegisterSceneHandler(scenes::SceneHandler * handler);
+    bool IsHandlerRegistered(scenes::SceneHandler * handler);
+
 private:
     ScenesServer() : CommandHandlerInterface(Optional<EndpointId>(), Id), AttributeAccessInterface(Optional<EndpointId>(), Id) {}
     ~ScenesServer() {}

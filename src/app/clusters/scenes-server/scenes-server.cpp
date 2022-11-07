@@ -547,6 +547,22 @@ void ScenesServer::RecallScene(FabricIndex aFabricIx, EndpointId aEndpointId, Gr
     }
 }
 
+bool ScenesServer::IsHandlerRegistered(scenes::SceneHandler * handler)
+{
+    SceneTable * sceneTable = scenes::GetSceneTableImpl();
+    return sceneTable->mHandlerList.Contains(handler);
+}
+
+void ScenesServer::RegisterSceneHandler(scenes::SceneHandler * handler)
+{
+    SceneTable * sceneTable = scenes::GetSceneTableImpl();
+
+    if (!IsHandlerRegistered(handler))
+    {
+        sceneTable->RegisterHandler(handler);
+    }
+}
+
 void ScenesServer::HandleAddScene(HandlerContext & ctx, const Commands::AddScene::DecodableType & req)
 {
     AddSceneParse<Commands::AddScene::DecodableType, Commands::AddSceneResponse::Type>(ctx, req, mGroupProvider);

@@ -41,6 +41,166 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OnOff;
 using chip::Protocols::InteractionModel::Status;
 
+#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
+static bool LevelControlWithOnOffFeaturePresent(EndpointId endpoint)
+{
+    if (!emberAfContainsServer(endpoint, LevelControl::Id))
+    {
+        return false;
+    }
+
+    return LevelControlHasFeature(endpoint, LevelControl::Feature::kOnOff);
+}
+#endif // EMBER_AF_PLUGIN_LEVEL_CONTROL
+
+#ifdef EMBER_AF_PLUGIN_SCENES
+static void sceneOnOffCallback(EndpointId endpoint);
+
+class DefaultOnOffSceneHandler : public scenes::DefaultSceneHandlerImpl
+{
+public:
+    bool mSceneOnOffState = false;
+    // As per spec, 1 attribute is scenable in the on off cluster
+    static constexpr uint8_t scenableAttributeCount = 1;
+
+    DefaultOnOffSceneHandler() = default;
+    ~DefaultOnOffSceneHandler() override {}
+
+    // Default function for OnOff cluster, only puts the OnOff cluster ID in the span if supported on the caller endpoint
+    virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
+    {
+        ClusterId * buffer = clusterBuffer.data();
+        if (emberAfContainsServer(endpoint, OnOff::Id) && clusterBuffer.size() >= 1)
+        {
+            buffer[0] = OnOff::Id;
+            clusterBuffer.reduce_size(1);
+        }
+    }
+
+    // Default function for OnOff cluster, only checks if OnOff is enabled on the endpoint
+    bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override
+    {
+        return (cluster == OnOff::Id) && (emberAfContainsServer(endpoint, OnOff::Id));
+    }
+
+    /// @brief Serialize the Cluster's EFS value
+    /// @param endpoint target endpoint
+    /// @param cluster  target cluster
+    /// @param serializedBytes data to serialize into EFS
+    /// @return CHIP_NO_ERROR if successfully serialized the data, CHIP_ERROR_INVALID_ARGUMENT otherwise
+    CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override
+    {
+        using AttributeValuePair = Scenes::Structs::AttributeValuePair::Type;
+
+        bool currentValue;
+
+        // read current on/off value
+        EmberAfStatus status = Attributes::OnOff::Get(endpoint, &currentValue);
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            ChipLogError(Zcl, "ERR: reading on/off %x", status);
+            return CHIP_ERROR_READ_FAILED;
+        }
+
+        AttributeValuePair Pairs[scenableAttributeCount];
+        Pairs[0].attributeID.SetValue(Attributes::OnOff::Id);
+        Pairs[0].attributeValue = currentValue;
+
+        app::DataModel::List<const AttributeValuePair> attributeValueList(Pairs);
+
+        TLV::TLVWriter writer;
+        TLV::TLVType outer;
+        // Serialize Extension Field sets in a way consistent with the default Deserialize method from SceneTableImpl.h
+        writer.Init(serializedBytes);
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
+        ReturnErrorOnFailure(app::DataModel::Encode(
+            writer, TLV::ContextTag(to_underlying(Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)),
+            attributeValueList));
+        ReturnErrorOnFailure(writer.EndContainer(outer));
+        serializedBytes.reduce_size(writer.GetLengthWritten());
+
+        return CHIP_NO_ERROR;
+    }
+
+    /// @brief Default EFS interaction when applying scene to the OnOff Cluster
+    /// @param endpoint target endpoint
+    /// @param cluster  target cluster
+    /// @param serializedBytes Data from nvm
+    /// @param timeMs transition time in ms
+    /// @return CHIP_NO_ERROR if value as expected, CHIP_ERROR_INVALID_ARGUMENT otherwise
+    CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
+                          scenes::TransitionTimeMs timeMs) override
+    {
+        app::DataModel::DecodableList<Scenes::Structs::AttributeValuePair::DecodableType> attributeValueList;
+        Scenes::Structs::AttributeValuePair::DecodableType decodePair;
+
+        TLV::TLVReader reader;
+        TLV::TLVType outer;
+
+        size_t attributeCount = 0;
+
+        VerifyOrReturnError(cluster == OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
+
+        reader.Init(serializedBytes);
+        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+        ReturnErrorOnFailure(reader.EnterContainer(outer));
+        ReturnErrorOnFailure(reader.Next(
+            TLV::kTLVType_Array, TLV::ContextTag(app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)));
+        ReturnErrorOnFailure(attributeValueList.Decode(reader));
+
+        ReturnErrorOnFailure(attributeValueList.ComputeSize(&attributeCount));
+        VerifyOrReturnError(attributeCount <= scenableAttributeCount, CHIP_ERROR_BUFFER_TOO_SMALL);
+        auto pair_iterator = attributeValueList.begin();
+
+        // Assumes the OnOff cluster has only one Attribute
+        pair_iterator.Next();
+        // Verify that the EFS was completely read
+        ReturnErrorOnFailure(pair_iterator.GetStatus());
+
+        decodePair = pair_iterator.GetValue();
+
+        if (decodePair.attributeID.HasValue())
+        {
+            // If attribute ID was encoded, verify it is the proper ID for the OnOff attribute
+            VerifyOrReturnError(decodePair.attributeID.Value() == Attributes::OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
+        }
+
+        mSceneOnOffState = decodePair.attributeValue;
+
+        ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+        OnOffServer::Instance().scheduleTimerCallbackMs(sceneEventControl(endpoint), timeMs);
+
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    /**
+     * @brief Configures EventControl callback when setting On Off through scenes callback
+     *
+     * @param[in] endpoint endpoint to start timer for
+     * @return EmberEventControl* configured event control
+     */
+    EmberEventControl * sceneEventControl(EndpointId endpoint)
+    {
+        EmberEventControl * controller = OnOffServer::Instance().getEventControl(endpoint);
+        VerifyOrReturnError(controller != nullptr, nullptr);
+
+        controller->endpoint = endpoint;
+        controller->callback = &sceneOnOffCallback;
+
+        return controller;
+    }
+};
+static DefaultOnOffSceneHandler sOnOffSceneHandler;
+
+static void sceneOnOffCallback(EndpointId endpoint)
+{
+    chip::CommandId command = (sOnOffSceneHandler.mSceneOnOffState) ? Commands::On::Id : Commands::Off::Id;
+    OnOffServer::Instance().setOnOffValue(endpoint, command, false);
+}
+#endif // EMBER_AF_PLUGIN_SCENES
+
 /**********************************************************
  * Attributes Definition
  *********************************************************/
@@ -107,6 +267,16 @@ OnOffServer & OnOffServer::Instance()
     return instance;
 }
 
+chip::scenes::SceneHandler * OnOffServer::GetSceneHandler()
+{
+
+#ifdef EMBER_AF_PLUGIN_SCENES
+    return &sOnOffSceneHandler;
+#else
+    return nullptr;
+#endif // EMBER_AF_PLUGIN_SCENES
+}
+
 bool OnOffServer::HasFeature(chip::EndpointId endpoint, Feature feature)
 {
     bool success;
@@ -129,18 +299,6 @@ EmberAfStatus OnOffServer::getOnOffValue(chip::EndpointId endpoint, bool * curre
 
     return status;
 }
-
-#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
-static bool LevelControlWithOnOffFeaturePresent(EndpointId endpoint)
-{
-    if (!emberAfContainsServer(endpoint, LevelControl::Id))
-    {
-        return false;
-    }
-
-    return LevelControlHasFeature(endpoint, LevelControl::Feature::kOnOff);
-}
-#endif // EMBER_AF_PLUGIN_LEVEL_CONTROL
 
 /** @brief On/off Cluster Set Value
  *
@@ -307,6 +465,11 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
             status = setOnOffValue(endpoint, onOffValueForStartUp, true);
         }
 
+#ifdef EMBER_AF_PLUGIN_SCENES
+        // Registers Scene handlers for the On/Off cluster on the server
+        app::Clusters::Scenes::ScenesServer::Instance().RegisterSceneHandler(OnOffServer::Instance().GetSceneHandler());
+#endif
+
 #ifdef EMBER_AF_PLUGIN_MODE_SELECT
         // If OnMode is not a null value, then change the current mode to it.
         if (onOffValueForStartUp && emberAfContainsServer(endpoint, ModeSelect::Id) &&
@@ -322,6 +485,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
 #endif
     }
 #endif // IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
+
     emberAfPluginOnOffClusterServerPostInitCallback(endpoint);
 }
 

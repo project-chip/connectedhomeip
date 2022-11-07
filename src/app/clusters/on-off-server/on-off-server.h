@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/clusters/scenes-server/SceneTable.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -48,6 +49,8 @@ public:
      *********************************************************/
 
     static OnOffServer & Instance();
+
+    chip::scenes::SceneHandler * GetSceneHandler();
 
     bool offCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
     bool onCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
@@ -92,6 +95,8 @@ private:
 
     static OnOffServer instance;
     chip::System::Clock::Timestamp nextDesiredOnWithTimedOffTimestamp;
+
+    friend class DefaultOnOffSceneHandler;
 };
 
 struct OnOffEffect
