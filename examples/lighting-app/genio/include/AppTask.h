@@ -45,10 +45,11 @@ public:
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
 
-    void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);
+    void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint32_t uValue);
     void PostEvent(const AppEvent * event);
 
     void ButtonHandler(const filogic_button_t & button);
+    void OccupancyHandler(bool present);
 
 private:
     friend AppTask & GetAppTask(void);
@@ -62,6 +63,7 @@ private:
 
     static void SingleButtonEventHandler(AppEvent * aEvent);
     static void ButtonTimerEventHandler(AppEvent * aEvent);
+    static void OccupancyEventHandler(AppEvent * aEvent);
 
     static void LightActionEventHandler(AppEvent * aEvent);
 

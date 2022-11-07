@@ -1027,7 +1027,7 @@ void task_main(void * param)
         }
     }
 
-    while (1)
+    while (true)
     {
         /* wait for interface up */
         os_thread_sleep(os_msec_to_ticks(5000));
@@ -1131,7 +1131,7 @@ static void rst_args_lt(System::Layer * aSystemLayer, void * aAppState)
 
 void task_test_main(void * param)
 {
-    while (1)
+    while (true)
     {
         /* wait for interface up */
         os_thread_sleep(os_msec_to_ticks(500));
@@ -1272,7 +1272,11 @@ void ShellCLIMain(void * pvParameter)
             strcpy(def_psk, "nxp12345");
         }
         PRINTF("Connecting to [%s, %s] \r\n", def_ssid, def_psk);
-        ConnectivityMgrImpl().ProvisionWiFiNetwork(def_ssid, def_psk);
+
+        // TODO: ConnectivityMgrImpl is the platform implementation of ConnectivityMgr layer.
+        // Application should use the APIs defined src/include/platform to talk to the Matter
+        // platfrom layer, instead of calling into the functions defined in the platform implemenation.
+        // ConnectivityMgrImpl().ProvisionWiFiNetwork(def_ssid, def_psk);
     }
 
     // Run CHIP servers

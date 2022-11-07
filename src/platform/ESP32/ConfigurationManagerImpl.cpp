@@ -185,26 +185,6 @@ CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOp
     return WriteConfigValue(ESP32Config::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetProductURL(char * buf, size_t bufSize)
-{
-    CHIP_ERROR err = ReadConfigValueStr(ESP32Config::kConfigKey_ProductURL, buf, bufSize, bufSize);
-    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    }
-    return err;
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetProductLabel(char * buf, size_t bufSize)
-{
-    CHIP_ERROR err = ReadConfigValueStr(ESP32Config::kConfigKey_ProductLabel, buf, bufSize, bufSize);
-    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    }
-    return err;
-}
-
 CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t bufSize)
 {
     memset(buf, 0, bufSize);

@@ -78,6 +78,7 @@
 
 #if CHIP_CRYPTO_HSM
 #include "DeviceAttestationSe05xCredsExample.h"
+#include "se05x_t4t_utils.h"
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #include <crypto/hsm/nxp/PersistentStorageOperationalKeystoreHSM.h>
 #endif
@@ -366,6 +367,10 @@ void ChipLinuxAppMainLoop()
     static CommonCaseDeviceServerInitParams_Se05x initParams;
 #else
     static chip::CommonCaseDeviceServerInitParams initParams;
+#endif
+
+#if CHIP_CRYPTO_HSM
+    VerifyOrDie(se05x_enable_contactless_interface() == 0);
 #endif
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
 

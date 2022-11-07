@@ -340,6 +340,8 @@ public:
 
     Credentials::OperationalCertificateStore * GetOpCertStore() { return mOpCertStore; }
 
+    app::DefaultAttributePersistenceProvider & GetDefaultAttributePersister() { return mAttributePersister; }
+
     /**
      * This function send the ShutDown event before stopping
      * the event loop.
@@ -446,8 +448,7 @@ private:
 
             //  Remove ACL extension entry for the given fabricIndex.
             auto & storage = mServer->GetPersistentStorage();
-            DefaultStorageKeyAllocator key;
-            aclErr = storage.SyncDeleteKeyValue(key.AccessControlExtensionEntry(fabricIndex));
+            aclErr = storage.SyncDeleteKeyValue(DefaultStorageKeyAllocator::AccessControlExtensionEntry(fabricIndex).KeyName());
 
             if (aclErr != CHIP_NO_ERROR && aclErr != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
             {

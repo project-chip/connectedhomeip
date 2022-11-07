@@ -292,9 +292,9 @@ void Resolver::ReArmTimer()
     System::Clock::Timestamp now = mTimeSource.GetMonotonicTimestamp();
 
     System::Clock::Timeout nextTimeout = kInvalidTimeout;
-    for (auto it = mActiveLookups.begin(); it != mActiveLookups.end(); it++)
+    for (auto & activeLookup : mActiveLookups)
     {
-        System::Clock::Timeout timeout = it->NextEventTimeout(now);
+        System::Clock::Timeout timeout = activeLookup.NextEventTimeout(now);
 
         if (timeout < nextTimeout)
         {

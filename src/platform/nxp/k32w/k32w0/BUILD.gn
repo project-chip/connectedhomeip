@@ -39,8 +39,6 @@ static_library("k32w0") {
     "ConnectivityManagerImpl.h",
     "DefaultTestEventTriggerDelegate.cpp",
     "DefaultTestEventTriggerDelegate.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "K32W0Config.cpp",

@@ -38,6 +38,7 @@
 #include <lib/shell/Engine.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <mbedtls/platform.h>
+#include <platform/Infineon/CYW30739/FactoryDataProvider.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <sparcommon.h>
 #include <stdio.h>
@@ -60,6 +61,8 @@ using namespace CYW30739DoorLock::LockInitParams;
 wiced_bool_t syncClusterToButtonAction = false;
 
 static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+static FactoryDataProvider sFactoryDataProvider;
+
 static void InitApp(intptr_t args);
 static void ActionInitiated(LockManager::Action_t aAction, int32_t aActor);
 static void ActionCompleted(LockManager::Action_t aAction);
@@ -193,7 +196,7 @@ void InitApp(intptr_t args)
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
     chip::Server::GetInstance().Init(initParams);
 
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
 
     // Initial lock state
     chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state;

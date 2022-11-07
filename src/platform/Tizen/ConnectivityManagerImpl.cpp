@@ -220,11 +220,6 @@ void ConnectivityManagerImpl::DeactivateWiFiManager(::chip::System::Layer * aLay
 {
     WiFiMgr().Deactivate();
 }
-
-CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, const char * key)
-{
-    return WiFiMgr().Connect(ssid, key);
-}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 } // namespace DeviceLayer

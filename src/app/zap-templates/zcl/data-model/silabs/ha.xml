@@ -94,7 +94,7 @@ limitations under the License.
     <domain>HVAC</domain>
     <description>An interface for configuring the user interface of a thermostat (which may be remote from the thermostat).</description>
     <code>0x0204</code>
-    <define>THERMOSTAT_UI_CONFIG_CLUSTER</define>
+    <define>THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <attribute side="server" code="0x0000" define="TEMPERATURE_DISPLAY_MODE" type="ENUM8" min="0x00" max="0x01" writable="true" default="0x00" optional="false">temperature display mode</attribute>

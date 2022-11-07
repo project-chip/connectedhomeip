@@ -173,7 +173,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * Attempts to retrieve the attestation challenge for a commissionee with the given Device ID.
  * Returns nil if given Device ID does not match an active commissionee, or if a Secure Session is not availale.
  */
-- (nullable NSData *)fetchAttestationChallengeForDeviceID:(uint64_t)deviceID MTR_NEWLY_AVAILABLE;
+- (NSData * _Nullable)attestationChallengeForDeviceID:(NSNumber *)deviceID MTR_NEWLY_AVAILABLE;
 
 /**
  * Compute a PASE verifier and passcode ID for the desired setup pincode.
@@ -199,7 +199,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 @property (readonly, nonatomic, nullable) NSNumber * controllerNodeId MTR_NEWLY_DEPRECATED("Please use controllerNodeID");
 
 - (nullable NSData *)fetchAttestationChallengeForDeviceId:(uint64_t)deviceId
-    MTR_NEWLY_DEPRECATED("Please use fetchAttestationChallengeForDeviceID");
+    MTR_NEWLY_DEPRECATED("Please use attestationChallengeForDeviceID");
 
 - (BOOL)getBaseDevice:(uint64_t)deviceID
                 queue:(dispatch_queue_t)queue

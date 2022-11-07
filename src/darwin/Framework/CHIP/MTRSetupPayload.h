@@ -84,7 +84,7 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
 @property (nonatomic, copy) NSNumber * setupPasscode MTR_NEWLY_AVAILABLE;
 
 @property (nonatomic, copy, nullable) NSString * serialNumber;
-- (nullable NSArray<MTROptionalQRCodeInfo *> *)getAllOptionalVendorData:(NSError * __autoreleasing *)error;
+- (NSArray<MTROptionalQRCodeInfo *> * _Nullable)getAllOptionalVendorData:(NSError * __autoreleasing *)error;
 
 /**
  * Generate a random Matter-valid setup PIN.
@@ -113,7 +113,7 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
                         discriminator:(NSNumber *)discriminator API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 /** Get 11 digit manual entry code from the setup payload. */
-- (nullable NSString *)manualEntryCode;
+- (NSString * _Nullable)manualEntryCode;
 
 /**
  * Get a QR code from the setup payload.
