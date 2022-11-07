@@ -75,7 +75,7 @@ class TestAttrAccess : public AttributeAccessInterface
 {
 public:
     // Register for the Test Cluster cluster on all endpoints.
-    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::Test::Id) {}
+    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
@@ -675,7 +675,7 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedAttribute(const ConcreteDataAttr
 } // namespace
 
 bool emberAfTestClusterTestCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
-                                    const Clusters::Test::Commands::Test::DecodableType & commandData)
+                                    const Clusters::UnitTesting::Commands::Test::DecodableType & commandData)
 {
     // Setup the test variables
     emAfLoadAttributeDefaults(commandPath.mEndpointId, true, MakeOptional(commandPath.mClusterId));

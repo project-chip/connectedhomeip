@@ -89,7 +89,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(0x00000001, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE(0x
     DECLARE_DYNAMIC_ATTRIBUTE(0x00000005, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
-DECLARE_DYNAMIC_CLUSTER(Clusters::Test::Id, testClusterAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(Clusters::UnitTesting::Id, testClusterAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 
@@ -98,7 +98,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute, ARRAY, 1, 0), DECLARE_DYNAMIC_ATTR
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint3Clusters)
-DECLARE_DYNAMIC_CLUSTER(Clusters::Test::Id, testClusterAttrsOnEndpoint3, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(Clusters::UnitTesting::Id, testClusterAttrsOnEndpoint3, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint3, testEndpoint3Clusters);
 
@@ -106,7 +106,7 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint4)
 DECLARE_DYNAMIC_ATTRIBUTE(0x00000001, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint4Clusters)
-DECLARE_DYNAMIC_CLUSTER(Clusters::Test::Id, testClusterAttrsOnEndpoint4, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(Clusters::UnitTesting::Id, testClusterAttrsOnEndpoint4, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint4, testEndpoint4Clusters);
 
@@ -116,7 +116,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(0x00000001, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE(0x
     DECLARE_DYNAMIC_ATTRIBUTE(0x00000003, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint5Clusters)
-DECLARE_DYNAMIC_CLUSTER(Clusters::Test::Id, testClusterAttrsOnEndpoint5, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(Clusters::UnitTesting::Id, testClusterAttrsOnEndpoint5, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint5, testEndpoint5Clusters);
 
@@ -212,7 +212,7 @@ public:
     {
         app::AttributePathParams path;
         path.mEndpointId  = kTestEndpointId5;
-        path.mClusterId   = Clusters::Test::Id;
+        path.mClusterId   = Clusters::UnitTesting::Id;
         path.mAttributeId = attr;
         app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
     }
@@ -246,7 +246,7 @@ class TestAttrAccess : public app::AttributeAccessInterface
 {
 public:
     // Register for the Test Cluster cluster on all endpoints.
-    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::Test::Id)
+    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id)
     {
         registerAttributeAccessOverride(this);
     }
@@ -320,7 +320,7 @@ void TestMutableReadCallback::OnAttributeData(const app::ConcreteDataAttributePa
                                               const app::StatusIB & aStatus)
 {
     VerifyOrReturn(apData != nullptr);
-    NL_TEST_ASSERT(gSuite, aPath.mClusterId == Clusters::Test::Id);
+    NL_TEST_ASSERT(gSuite, aPath.mClusterId == Clusters::UnitTesting::Id);
 
     mAttributeCount++;
     if (aPath.mAttributeId <= 5)
@@ -649,7 +649,7 @@ auto TouchAttrOp(AttributeIdWithEndpointId attr)
     return [=]() {
         app::AttributePathParams path;
         path.mEndpointId  = attr.first;
-        path.mClusterId   = Clusters::Test::Id;
+        path.mClusterId   = Clusters::UnitTesting::Id;
         path.mAttributeId = attr.second;
         gIterationCount++;
         app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
@@ -843,9 +843,9 @@ void TestReadChunking::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * a
         app::AttributePathParams attributePath[3];
         app::ReadPrepareParams readParams(sessionHandle);
 
-        attributePath[0] = app::AttributePathParams(kTestEndpointId5, Clusters::Test::Id, Attr1);
-        attributePath[1] = app::AttributePathParams(kTestEndpointId5, Clusters::Test::Id, Attr2);
-        attributePath[2] = app::AttributePathParams(kTestEndpointId5, Clusters::Test::Id, Attr3);
+        attributePath[0] = app::AttributePathParams(kTestEndpointId5, Clusters::UnitTesting::Id, Attr1);
+        attributePath[1] = app::AttributePathParams(kTestEndpointId5, Clusters::UnitTesting::Id, Attr2);
+        attributePath[2] = app::AttributePathParams(kTestEndpointId5, Clusters::UnitTesting::Id, Attr3);
 
         readParams.mpAttributePathParamsList    = attributePath;
         readParams.mAttributePathParamsListSize = 3;

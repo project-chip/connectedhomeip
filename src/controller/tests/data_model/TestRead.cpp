@@ -75,7 +75,7 @@ enum ResponseDirective
 
 ResponseDirective responseDirective;
 
-// Number of reads of Clusters::Test::Attributes::Int16u that we have observed.
+// Number of reads of Clusters::UnitTesting::Attributes::Int16u that we have observed.
 // Every read will increment this count by 1 and return the new value.
 uint16_t totalReadCount = 0;
 
@@ -94,7 +94,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
 
     if (responseDirective == kSendManyDataResponses || responseDirective == kSendManyDataResponsesWrongPath)
     {
-        if (aPath.mClusterId != Clusters::Test::Id || aPath.mAttributeId != Clusters::Test::Attributes::Boolean::Id)
+        if (aPath.mClusterId != Clusters::UnitTesting::Id || aPath.mAttributeId != Clusters::UnitTesting::Attributes::Boolean::Id)
         {
             return CHIP_ERROR_INCORRECT_STATE;
         }
@@ -171,8 +171,8 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
         ReturnErrorOnFailure(aAttributeReports.GetError());
         AttributeDataIB::Builder & attributeData = attributeReport.CreateAttributeData();
         ReturnErrorOnFailure(attributeReport.GetError());
-        Clusters::Test::Attributes::ListStructOctetString::TypeInfo::Type value;
-        Clusters::Test::Structs::TestListStructOctet::Type valueBuf[4];
+        Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::Type value;
+        Clusters::UnitTesting::Structs::TestListStructOctet::Type valueBuf[4];
 
         value = valueBuf;
 
@@ -406,7 +406,7 @@ void TestReadInteraction::TestReadAttributeResponse(nlTestSuite * apSuite, void 
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
@@ -1440,7 +1440,7 @@ void TestReadInteraction::TestReadEventResponse(nlTestSuite * apSuite, void * ap
 
     auto onDoneCb = [&onDoneCbInvoked](app::ReadClient * apReadClient) { onDoneCbInvoked = true; };
 
-    Controller::ReadEvent<Clusters::Test::Events::TestEvent::DecodableType>(&ctx.GetExchangeManager(), sessionHandle,
+    Controller::ReadEvent<Clusters::UnitTesting::Events::TestEvent::DecodableType>(&ctx.GetExchangeManager(), sessionHandle,
                                                                             kTestEndpointId, onSuccessCb, onFailureCb, onDoneCb);
 
     ctx.DrainAndServiceIO();
@@ -1474,7 +1474,7 @@ void TestReadInteraction::TestReadAttributeError(nlTestSuite * apSuite, void * a
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
@@ -1506,7 +1506,7 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
 
     ctx.ExpireSessionAliceToBob();
@@ -1769,7 +1769,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
     for (size_t i = 0; i < (app::InteractionModelEngine::kReadHandlerPoolSize + 1); i++)
     {
         NL_TEST_ASSERT(apSuite,
-                       Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+                       Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                            &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 20,
                            onSubscriptionEstablishedCb, nullptr, false, true) == CHIP_NO_ERROR);
     }
@@ -1833,7 +1833,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionAppRejection(nlTestSuite *
     gTestReadInteraction.mEmitSubscriptionError = true;
 
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
                        onSubscriptionEstablishedCb, nullptr, false, true) == CHIP_NO_ERROR);
 
@@ -1906,7 +1906,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest1(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = false;
 
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 5, 5,
                        onSubscriptionEstablishedCb, nullptr, true) == CHIP_NO_ERROR);
 
@@ -1981,7 +1981,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest2(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = false;
 
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
                        onSubscriptionEstablishedCb, nullptr, true) == CHIP_NO_ERROR);
 
@@ -2056,7 +2056,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest3(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = true;
     gTestReadInteraction.mMaxInterval                = 3000;
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
                        onSubscriptionEstablishedCb, nullptr, true) == CHIP_NO_ERROR);
 
@@ -2122,7 +2122,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest4(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = true;
     gTestReadInteraction.mMaxInterval                = 3700;
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
                        onSubscriptionEstablishedCb, nullptr, true) == CHIP_NO_ERROR);
 
@@ -2196,7 +2196,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest5(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = false;
 
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 4000,
                        onSubscriptionEstablishedCb, nullptr, true) == CHIP_NO_ERROR);
 
@@ -2271,7 +2271,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest6(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = true;
     gTestReadInteraction.mMaxInterval                = 3000;
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 4000,
                        onSubscriptionEstablishedCb, nullptr, true) == CHIP_NO_ERROR);
 
@@ -2345,7 +2345,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest7(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = true;
     gTestReadInteraction.mMaxInterval                = 3700;
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 4000,
                        onSubscriptionEstablishedCb, nullptr, true) == CHIP_NO_ERROR);
 
@@ -2410,7 +2410,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest8(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = true;
     gTestReadInteraction.mMaxInterval                = 4100;
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 4000,
                        onSubscriptionEstablishedCb, nullptr, true) == CHIP_NO_ERROR);
 
@@ -2474,7 +2474,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest9(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = false;
 
     NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 5, 4,
                        onSubscriptionEstablishedCb, nullptr, true) == CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -2579,7 +2579,7 @@ void TestReadInteraction::SubscribeThenReadHelper(nlTestSuite * apSuite, TestCon
     for (size_t i = 0; i < aSubscribeCount; ++i)
     {
         NL_TEST_ASSERT(apSuite,
-                       Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+                       Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                            &aCtx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
                            onSubscriptionEstablishedCb, nullptr, false, true) == CHIP_NO_ERROR);
     }
@@ -2621,7 +2621,7 @@ void TestReadInteraction::MultipleReadHelperInternal(nlTestSuite * apSuite, Test
         };
 
         NL_TEST_ASSERT(apSuite,
-                       Controller::ReadAttribute<Clusters::Test::Attributes::Int16u::TypeInfo>(
+                       Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Int16u::TypeInfo>(
                            &aCtx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb) == CHIP_NO_ERROR);
     }
 }
@@ -2678,7 +2678,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
     for (size_t i = 0; i < (app::InteractionModelEngine::kReadHandlerPoolSize + 1); i++)
     {
         NL_TEST_ASSERT(apSuite,
-                       Controller::SubscribeAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+                       Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                            &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
                            onSubscriptionEstablishedCb, nullptr, false, true, dataVersion) == CHIP_NO_ERROR);
     }
@@ -2729,7 +2729,7 @@ void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads(nlTest
     app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
 
     NL_TEST_ASSERT(apSuite,
-                   Controller::ReadAttribute<Clusters::Test::Attributes::ListStructOctetString::TypeInfo>(
+                   Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb) == CHIP_NO_ERROR);
 
     ctx.DrainAndServiceIO();
@@ -2780,7 +2780,7 @@ void TestReadInteraction::TestReadFabricScopedWithoutFabricFilter(nlTestSuite * 
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<Clusters::Test::Attributes::ListFabricScoped::TypeInfo>(
+    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, false /* fabric filtered */);
 
     ctx.DrainAndServiceIO();
@@ -2836,7 +2836,7 @@ void TestReadInteraction::TestReadFabricScopedWithFabricFilter(nlTestSuite * apS
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<Clusters::Test::Attributes::ListFabricScoped::TypeInfo>(
+    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, true /* fabric filtered */);
 
     ctx.DrainAndServiceIO();
@@ -3005,10 +3005,10 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     std::vector<std::unique_ptr<app::ReadClient>> readClients;
 
     EstablishReadOrSubscriptions(apSuite, ctx.GetSessionAliceToBob(), 1, 1,
-                                 app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, kPerpetualAttributeid),
+                                 app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, kPerpetualAttributeid),
                                  app::ReadClient::InteractionType::Read, &perpetualReadCallback, readClients);
     EstablishReadOrSubscriptions(apSuite, ctx.GetSessionBobToAlice(), 1, 1,
-                                 app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, kPerpetualAttributeid),
+                                 app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, kPerpetualAttributeid),
                                  app::ReadClient::InteractionType::Read, &perpetualReadCallback, readClients);
     ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
         return app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read) == 2;
@@ -3029,12 +3029,12 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     // Subscription A
     EstablishReadOrSubscriptions(
         apSuite, ctx.GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1,
-        app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+        app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
         app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
     // Subscription B
     EstablishReadOrSubscriptions(
         apSuite, ctx.GetSessionBobToAlice(), kExpectedParallelSubs, app::InteractionModelEngine::kMinSupportedPathsPerSubscription,
-        app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+        app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
         app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
 
     // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
@@ -3067,7 +3067,7 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
         std::vector<std::unique_ptr<app::ReadClient>> outReadClient;
         EstablishReadOrSubscriptions(
             apSuite, ctx.GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1,
-            app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+            app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
             app::ReadClient::InteractionType::Subscribe, &callback, outReadClient);
 
         ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return callback.mOnError == 1; });
@@ -3082,7 +3082,7 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     {
         EstablishReadOrSubscriptions(
             apSuite, ctx.GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription,
-            app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+            app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
             app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
 
         readCallback.ClearCounters();
@@ -3105,8 +3105,8 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     {
         app::AttributePathParams path;
         path.mEndpointId  = kTestEndpointId;
-        path.mClusterId   = Clusters::Test::Id;
-        path.mAttributeId = Clusters::Test::Attributes::Int16u::Id;
+        path.mClusterId   = Clusters::UnitTesting::Id;
+        path.mAttributeId = Clusters::UnitTesting::Attributes::Int16u::Id;
         app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
     }
     readCallback.ClearCounters();
@@ -3138,7 +3138,7 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
         EstablishReadOrSubscriptions(
             apSuite, ctx.GetSessionAliceToBob(), app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric,
             app::InteractionModelEngine::kMinSupportedPathsPerSubscription,
-            app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+            app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
             app::ReadClient::InteractionType::Subscribe, &readCallbackFabric2, readClients);
 
         // Run until we have established the subscriptions.
@@ -3164,8 +3164,8 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     {
         app::AttributePathParams path;
         path.mEndpointId  = kTestEndpointId;
-        path.mClusterId   = Clusters::Test::Id;
-        path.mAttributeId = Clusters::Test::Attributes::Int16u::Id;
+        path.mClusterId   = Clusters::UnitTesting::Id;
+        path.mAttributeId = Clusters::UnitTesting::Attributes::Int16u::Id;
         app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
     }
     readCallback.ClearCounters();
@@ -3232,7 +3232,7 @@ void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * 
     // This should just use all availbale resources.
     EstablishReadOrSubscriptions(
         apSuite, ctx.GetSessionBobToAlice(), kExpectedParallelSubs, app::InteractionModelEngine::kMinSupportedPathsPerSubscription,
-        app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+        app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
         app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
 
     ctx.DrainAndServiceIO();
@@ -3252,7 +3252,7 @@ void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * 
         std::vector<std::unique_ptr<app::ReadClient>> outReadClient;
         EstablishReadOrSubscriptions(
             apSuite, ctx.GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1,
-            app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+            app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
             app::ReadClient::InteractionType::Subscribe, &callback, outReadClient);
 
         ctx.DrainAndServiceIO();
@@ -3266,7 +3266,7 @@ void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * 
     {
         EstablishReadOrSubscriptions(
             apSuite, ctx.GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription,
-            app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+            app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
             app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
         readCallback.ClearCounters();
 
@@ -3283,8 +3283,8 @@ void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * 
     {
         app::AttributePathParams path;
         path.mEndpointId  = kTestEndpointId;
-        path.mClusterId   = Clusters::Test::Id;
-        path.mAttributeId = Clusters::Test::Attributes::Int16u::Id;
+        path.mClusterId   = Clusters::UnitTesting::Id;
+        path.mAttributeId = Clusters::UnitTesting::Attributes::Int16u::Id;
         app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
     }
     readCallback.ClearCounters();
@@ -3388,7 +3388,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
-                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3431,7 +3431,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
-                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3472,7 +3472,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
-                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3523,7 +3523,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionAliceToBob(), 1, 1,
-                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3572,7 +3572,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3628,7 +3628,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3684,7 +3684,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3735,7 +3735,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3789,7 +3789,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3847,7 +3847,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionCharlieToDavid(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3902,7 +3902,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionCharlieToDavid(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -3958,7 +3958,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionCharlieToDavid(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -4005,7 +4005,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionCharlieToDavid(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
 
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
@@ -4050,7 +4050,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
@@ -4096,7 +4096,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionBobToAlice(), 1, 1,
-                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
@@ -4147,7 +4147,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
 
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionBobToAlice(), 1, 1,
-                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
@@ -4201,7 +4201,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
             // We have to evict one read transaction on PASE session and one read transaction on Alice's fabric.
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
@@ -4263,7 +4263,7 @@ void TestReadInteraction::TestReadHandler_ParallelReads(nlTestSuite * apSuite, v
             // To handle this read request, we must evict both read transactions from the PASE session.
             EstablishReadOrSubscriptions(
                 apSuite, ctx.GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id),
+                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
                 app::ReadClient::InteractionType::Read, &readCallback, readClients);
             ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
@@ -4421,7 +4421,7 @@ void TestReadInteraction::TestReadAttribute_ManyDataValues(nlTestSuite * apSuite
     // not safe to do so.
     auto onFailureCb = [&failureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
-    Controller::ReadAttribute<Clusters::Test::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
+    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
                                                                              kTestEndpointId, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
@@ -4455,7 +4455,7 @@ void TestReadInteraction::TestReadAttribute_ManyDataValuesWrongPath(nlTestSuite 
     // not safe to do so.
     auto onFailureCb = [&failureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
-    Controller::ReadAttribute<Clusters::Test::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
+    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
                                                                              kTestEndpointId, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
@@ -4489,7 +4489,7 @@ void TestReadInteraction::TestReadAttribute_ManyErrors(nlTestSuite * apSuite, vo
     // not safe to do so.
     auto onFailureCb = [&failureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
-    Controller::ReadAttribute<Clusters::Test::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
+    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
                                                                              kTestEndpointId, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
@@ -4513,7 +4513,7 @@ void TestReadInteraction::TestReadHandler_KeepSubscriptionTest(nlTestSuite * apS
 
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     TestReadCallback readCallback;
-    app::AttributePathParams pathParams(kTestEndpointId, Clusters::Test::Id, Clusters::Test::Attributes::Int16u::Id);
+    app::AttributePathParams pathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id);
 
     app::ReadPrepareParams readParam(ctx.GetSessionAliceToBob());
     readParam.mpAttributePathParamsList    = &pathParams;

@@ -118,7 +118,7 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
-DECLARE_DYNAMIC_CLUSTER(Clusters::Test::Id, testClusterAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(Clusters::UnitTesting::Id, testClusterAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 
@@ -140,7 +140,7 @@ void GenerateEvents(nlTestSuite * apSuite, chip::EventNumber & firstEventNumber,
     CHIP_ERROR err                 = CHIP_NO_ERROR;
     static uint8_t generationCount = 0;
 
-    Clusters::Test::Events::TestEvent::Type content;
+    Clusters::UnitTesting::Events::TestEvent::Type content;
 
     for (int i = 0; i < 5; i++)
     {
@@ -204,11 +204,11 @@ void TestReadEvents::TestBasicCaching(nlTestSuite * apSuite, void * apContext)
         uint8_t generationCount = 0;
         readCallback.mClusterCacheAdapter.ForEachEventData(
             [&apSuite, &readCallback, &generationCount](const app::EventHeader & header) {
-                NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == Clusters::Test::Id);
-                NL_TEST_ASSERT(apSuite, header.mPath.mEventId == Clusters::Test::Events::TestEvent::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == Clusters::UnitTesting::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mEventId == Clusters::UnitTesting::Events::TestEvent::Id);
                 NL_TEST_ASSERT(apSuite, header.mPath.mEndpointId == kTestEndpointId);
 
-                Clusters::Test::Events::TestEvent::DecodableType eventData;
+                Clusters::UnitTesting::Events::TestEvent::DecodableType eventData;
                 NL_TEST_ASSERT(apSuite, readCallback.mClusterCacheAdapter.Get(header.mEventNumber, eventData) == CHIP_NO_ERROR);
 
                 NL_TEST_ASSERT(apSuite, eventData.arg1 == generationCount);
@@ -228,18 +228,18 @@ void TestReadEvents::TestBasicCaching(nlTestSuite * apSuite, void * apContext)
         generationCount = 0;
         readCallback.mClusterCacheAdapter.ForEachEventData(
             [&apSuite, &readCallback, &generationCount](const app::EventHeader & header) {
-                NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == Clusters::Test::Id);
-                NL_TEST_ASSERT(apSuite, header.mPath.mEventId == Clusters::Test::Events::TestEvent::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == Clusters::UnitTesting::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mEventId == Clusters::UnitTesting::Events::TestEvent::Id);
                 NL_TEST_ASSERT(apSuite, header.mPath.mEndpointId == kTestEndpointId);
 
-                Clusters::Test::Events::TestEvent::DecodableType eventData;
+                Clusters::UnitTesting::Events::TestEvent::DecodableType eventData;
                 NL_TEST_ASSERT(apSuite, readCallback.mClusterCacheAdapter.Get(header.mEventNumber, eventData) == CHIP_NO_ERROR);
 
                 NL_TEST_ASSERT(apSuite, eventData.arg1 == generationCount);
                 generationCount++;
                 return CHIP_NO_ERROR;
             },
-            app::EventPathParams(kInvalidEndpointId, Clusters::Test::Id, kInvalidEventId));
+            app::EventPathParams(kInvalidEndpointId, Clusters::UnitTesting::Id, kInvalidEventId));
 
         NL_TEST_ASSERT(apSuite, generationCount == 5);
 
@@ -249,18 +249,18 @@ void TestReadEvents::TestBasicCaching(nlTestSuite * apSuite, void * apContext)
         generationCount = 0;
         readCallback.mClusterCacheAdapter.ForEachEventData(
             [&apSuite, &readCallback, &generationCount](const app::EventHeader & header) {
-                NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == Clusters::Test::Id);
-                NL_TEST_ASSERT(apSuite, header.mPath.mEventId == Clusters::Test::Events::TestEvent::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == Clusters::UnitTesting::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mEventId == Clusters::UnitTesting::Events::TestEvent::Id);
                 NL_TEST_ASSERT(apSuite, header.mPath.mEndpointId == kTestEndpointId);
 
-                Clusters::Test::Events::TestEvent::DecodableType eventData;
+                Clusters::UnitTesting::Events::TestEvent::DecodableType eventData;
                 NL_TEST_ASSERT(apSuite, readCallback.mClusterCacheAdapter.Get(header.mEventNumber, eventData) == CHIP_NO_ERROR);
 
                 NL_TEST_ASSERT(apSuite, eventData.arg1 == generationCount);
                 generationCount++;
                 return CHIP_NO_ERROR;
             },
-            app::EventPathParams(kInvalidEndpointId, Clusters::Test::Id, Clusters::Test::Events::TestEvent::Id));
+            app::EventPathParams(kInvalidEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Events::TestEvent::Id));
 
         NL_TEST_ASSERT(apSuite, generationCount == 5);
 
@@ -270,11 +270,11 @@ void TestReadEvents::TestBasicCaching(nlTestSuite * apSuite, void * apContext)
         generationCount = 1;
         readCallback.mClusterCacheAdapter.ForEachEventData(
             [&apSuite, &readCallback, &generationCount](const app::EventHeader & header) {
-                NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == Clusters::Test::Id);
-                NL_TEST_ASSERT(apSuite, header.mPath.mEventId == Clusters::Test::Events::TestEvent::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == Clusters::UnitTesting::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mEventId == Clusters::UnitTesting::Events::TestEvent::Id);
                 NL_TEST_ASSERT(apSuite, header.mPath.mEndpointId == kTestEndpointId);
 
-                Clusters::Test::Events::TestEvent::DecodableType eventData;
+                Clusters::UnitTesting::Events::TestEvent::DecodableType eventData;
                 NL_TEST_ASSERT(apSuite, readCallback.mClusterCacheAdapter.Get(header.mEventNumber, eventData) == CHIP_NO_ERROR);
 
                 NL_TEST_ASSERT(apSuite, eventData.arg1 == generationCount);
@@ -292,18 +292,18 @@ void TestReadEvents::TestBasicCaching(nlTestSuite * apSuite, void * apContext)
         generationCount = 1;
         readCallback.mClusterCacheAdapter.ForEachEventData(
             [&apSuite, &readCallback, &generationCount](const app::EventHeader & header) {
-                NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == Clusters::Test::Id);
-                NL_TEST_ASSERT(apSuite, header.mPath.mEventId == Clusters::Test::Events::TestEvent::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == Clusters::UnitTesting::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mEventId == Clusters::UnitTesting::Events::TestEvent::Id);
                 NL_TEST_ASSERT(apSuite, header.mPath.mEndpointId == kTestEndpointId);
 
-                Clusters::Test::Events::TestEvent::DecodableType eventData;
+                Clusters::UnitTesting::Events::TestEvent::DecodableType eventData;
                 NL_TEST_ASSERT(apSuite, readCallback.mClusterCacheAdapter.Get(header.mEventNumber, eventData) == CHIP_NO_ERROR);
 
                 NL_TEST_ASSERT(apSuite, eventData.arg1 == generationCount);
                 generationCount++;
                 return CHIP_NO_ERROR;
             },
-            app::EventPathParams(kInvalidEndpointId, Clusters::Test::Id, kInvalidEventId), 1);
+            app::EventPathParams(kInvalidEndpointId, Clusters::UnitTesting::Id, kInvalidEventId), 1);
 
         NL_TEST_ASSERT(apSuite, generationCount == 5);
     }
@@ -328,11 +328,11 @@ void TestReadEvents::TestBasicCaching(nlTestSuite * apSuite, void * apContext)
         uint8_t generationCount = 0;
         readCallback.mClusterCacheAdapter.ForEachEventData(
             [&apSuite, &readCallback, &generationCount](const app::EventHeader & header) {
-                NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == Clusters::Test::Id);
-                NL_TEST_ASSERT(apSuite, header.mPath.mEventId == Clusters::Test::Events::TestEvent::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == Clusters::UnitTesting::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mEventId == Clusters::UnitTesting::Events::TestEvent::Id);
                 NL_TEST_ASSERT(apSuite, header.mPath.mEndpointId == kTestEndpointId);
 
-                Clusters::Test::Events::TestEvent::DecodableType eventData;
+                Clusters::UnitTesting::Events::TestEvent::DecodableType eventData;
                 NL_TEST_ASSERT(apSuite, readCallback.mClusterCacheAdapter.Get(header.mEventNumber, eventData) == CHIP_NO_ERROR);
 
                 NL_TEST_ASSERT(apSuite, eventData.arg1 == generationCount);
@@ -377,11 +377,11 @@ void TestReadEvents::TestBasicCaching(nlTestSuite * apSuite, void * apContext)
         uint8_t generationCount = 4;
         readCallback.mClusterCacheAdapter.ForEachEventData(
             [&apSuite, &readCallback, &generationCount](const app::EventHeader & header) {
-                NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == Clusters::Test::Id);
-                NL_TEST_ASSERT(apSuite, header.mPath.mEventId == Clusters::Test::Events::TestEvent::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == Clusters::UnitTesting::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mEventId == Clusters::UnitTesting::Events::TestEvent::Id);
                 NL_TEST_ASSERT(apSuite, header.mPath.mEndpointId == kTestEndpointId);
 
-                Clusters::Test::Events::TestEvent::DecodableType eventData;
+                Clusters::UnitTesting::Events::TestEvent::DecodableType eventData;
                 NL_TEST_ASSERT(apSuite, readCallback.mClusterCacheAdapter.Get(header.mEventNumber, eventData) == CHIP_NO_ERROR);
 
                 NL_TEST_ASSERT(apSuite, eventData.arg1 == generationCount);
@@ -417,11 +417,11 @@ void TestReadEvents::TestBasicCaching(nlTestSuite * apSuite, void * apContext)
         uint8_t generationCount = 5;
         readCallback.mClusterCacheAdapter.ForEachEventData(
             [&apSuite, &readCallback, &generationCount](const app::EventHeader & header) {
-                NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == Clusters::Test::Id);
-                NL_TEST_ASSERT(apSuite, header.mPath.mEventId == Clusters::Test::Events::TestEvent::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mClusterId == Clusters::UnitTesting::Id);
+                NL_TEST_ASSERT(apSuite, header.mPath.mEventId == Clusters::UnitTesting::Events::TestEvent::Id);
                 NL_TEST_ASSERT(apSuite, header.mPath.mEndpointId == kTestEndpointId);
 
-                Clusters::Test::Events::TestEvent::DecodableType eventData;
+                Clusters::UnitTesting::Events::TestEvent::DecodableType eventData;
                 NL_TEST_ASSERT(apSuite, readCallback.mClusterCacheAdapter.Get(header.mEventNumber, eventData) == CHIP_NO_ERROR);
 
                 NL_TEST_ASSERT(apSuite, eventData.arg1 == generationCount);

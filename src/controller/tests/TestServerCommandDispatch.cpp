@@ -63,7 +63,7 @@ ResponseDirective responseDirective;
 class TestClusterCommandHandler : public chip::app::CommandHandlerInterface
 {
 public:
-    TestClusterCommandHandler() : chip::app::CommandHandlerInterface(Optional<EndpointId>::Missing(), Clusters::Test::Id)
+    TestClusterCommandHandler() : chip::app::CommandHandlerInterface(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id)
     {
         chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this);
     }
@@ -83,12 +83,12 @@ private:
 
 void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & handlerContext)
 {
-    HandleCommand<Clusters::Test::Commands::TestSimpleArgumentRequest::DecodableType>(
+    HandleCommand<Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::DecodableType>(
         handlerContext, [](chip::app::CommandHandlerInterface::HandlerContext & ctx, const auto & requestPayload) {
             if (responseDirective == kSendDataResponse)
             {
-                Clusters::Test::Commands::TestStructArrayArgumentResponse::Type dataResponse;
-                Clusters::Test::Structs::NestedStructList::Type nestedStructList[4];
+                Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::Type dataResponse;
+                Clusters::UnitTesting::Structs::NestedStructList::Type nestedStructList[4];
 
                 uint8_t i = 0;
                 for (auto & item : nestedStructList)
@@ -124,7 +124,7 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
     }
 
     // We just have one command id.
-    callback(Clusters::Test::Commands::TestSimpleArgumentRequest::Id, context);
+    callback(Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id, context);
     return CHIP_NO_ERROR;
 }
 
@@ -152,9 +152,9 @@ private:
 // We want to send a TestSimpleArgumentRequest::Type, but get a
 // TestStructArrayArgumentResponse in return, so need to shadow the actual
 // ResponseType that TestSimpleArgumentRequest has.
-struct FakeRequest : public Clusters::Test::Commands::TestSimpleArgumentRequest::Type
+struct FakeRequest : public Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Type
 {
-    using ResponseType = Clusters::Test::Commands::TestStructArrayArgumentResponse::DecodableType;
+    using ResponseType = Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType;
 };
 
 void TestCommandInteraction::TestNoHandler(nlTestSuite * apSuite, void * apContext)
@@ -211,7 +211,7 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 constexpr CommandId testClusterCommands1[] = {
-    Clusters::Test::Commands::TestSimpleArgumentRequest::Id,
+    Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id,
     kInvalidCommandId,
 };
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters1)
@@ -308,7 +308,7 @@ void TestCommandInteraction::TestDataResponseHelper(nlTestSuite * apSuite, void 
         {
             // We only expect 0 or 1 command ids here.
             NL_TEST_ASSERT(apSuite, count == 0);
-            NL_TEST_ASSERT(apSuite, iter.GetValue() == Clusters::Test::Commands::TestSimpleArgumentRequest::Id);
+            NL_TEST_ASSERT(apSuite, iter.GetValue() == Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id);
             ++count;
         }
         NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
@@ -327,7 +327,7 @@ void TestCommandInteraction::TestDataResponseHelper(nlTestSuite * apSuite, void 
         ChipLogError(NotSpecified, "TEST FAILURE: %" CHIP_ERROR_FORMAT, aError.Format());
     };
 
-    chip::Controller::ReadAttribute<Clusters::Test::Attributes::AcceptedCommandList::TypeInfo>(
+    chip::Controller::ReadAttribute<Clusters::UnitTesting::Attributes::AcceptedCommandList::TypeInfo>(
         &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, readSuccessCb, readFailureCb);
 
     ctx.DrainAndServiceIO();
