@@ -226,6 +226,9 @@ chip_python_wheel_action("chip-core") {
         "chip/storage/__init__.py",
         "chip/utils/CommissioningBuildingBlocks.py",
         "chip/utils/__init__.py",
+        "chip/yaml/YamlParser.py",
+        "chip/yaml/YamlUtils.py",
+        "chip/yaml/__init__.py",
       ]
 
       if (chip_controller) {
@@ -269,6 +272,7 @@ chip_python_wheel_action("chip-core") {
     "chip.internal",
     "chip.interaction_model",
     "chip.logging",
+    "chip.yaml",
     "chip.native",
     "chip.clusters",
     "chip.setup_payload",

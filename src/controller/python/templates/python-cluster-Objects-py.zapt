@@ -90,6 +90,12 @@ class {{asUpperCamelCase name}}(Cluster):
             is_client: typing.ClassVar[bool] = True
 {{/if}}       
 
+            {{~#if responseName}}
+            response_type: str = '{{asUpperCamelCase responseName}}'
+            {{else}}
+            response_type: str = None
+            {{/if}}
+
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
