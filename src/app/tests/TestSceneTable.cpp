@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/scenes/SceneTableImpl.h>
+#include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/TLV.h>
 #include <lib/support/Span.h>

@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/scenes/SceneTableImpl.h>
+#include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <stdlib.h>
@@ -867,6 +867,20 @@ bool DefaultSceneTableImpl::SceneEntryIteratorImpl::Next(SceneTableEntry & outpu
 void DefaultSceneTableImpl::SceneEntryIteratorImpl::Release()
 {
     mProvider.mSceneEntryIterators.ReleaseObject(this);
+}
+
+namespace {
+
+static DefaultSceneTableImpl gSceneTableImpl;
+
+} // namespace
+
+/// @brief Instance getter for the default global scene table implementation
+///        Should only be used in the scene cluster
+/// @return Default global scene table implementation
+DefaultSceneTableImpl * GetSceneTableImpl()
+{
+    return &gSceneTableImpl;
 }
 
 } // namespace scenes

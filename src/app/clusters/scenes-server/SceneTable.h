@@ -17,7 +17,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/clusters/scenes/ExtensionFieldSets.h>
+#include <app/clusters/scenes-server/ExtensionFieldSets.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/IntrusiveList.h>
@@ -84,7 +84,6 @@ public:
     /// @param serialisedBytes[out] Buffer to fill from the ExtensionFieldSet in command
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
     /// @note Only gets called after the scene-cluster has previously verified that the endpoint,cluster pair is supported by
-
     /// the handler. It is therefore the implementation's reponsibility to also implement the SupportsCluster method.
     virtual CHIP_ERROR SerializeAdd(EndpointId endpoint,
                                     const app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,

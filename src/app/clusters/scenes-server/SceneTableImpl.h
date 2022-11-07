@@ -16,8 +16,8 @@
  */
 
 #pragma once
-#include <app/clusters/scenes/ExtensionFieldSetsImpl.h>
-#include <app/clusters/scenes/SceneTable.h>
+#include <app/clusters/scenes-server/ExtensionFieldSetsImpl.h>
+#include <app/clusters/scenes-server/SceneTable.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/PersistentData.h>
@@ -186,10 +186,8 @@ public:
 protected:
     // This constructor is meant for test purposes, it allows to change the defined max for scenes per fabric and global, which
     // allows to simulate OTA where this value was changed
-    DefaultSceneTableImpl(uint8_t maxScenesPerFabric = scenes::kMaxScenesPerFabric,
-                          uint8_t maxScenesGlobal    = scenes::kMaxScenesGlobal) :
-        mMaxScenesPerFabric(maxScenesPerFabric),
-        mMaxScenesGlobal(maxScenesGlobal)
+    DefaultSceneTableImpl(uint8_t maxScenesPerFabric, uint8_t maxScenesGlobal) :
+        mMaxScenesPerFabric(maxScenesPerFabric), mMaxScenesGlobal(maxScenesGlobal)
     {}
 
     // Global scene count
@@ -223,6 +221,9 @@ protected:
     chip::PersistentStorageDelegate * mStorage = nullptr;
     ObjectPool<SceneEntryIteratorImpl, kIteratorsMax> mSceneEntryIterators;
 }; // class DefaultSceneTableImpl
+
+///
+DefaultSceneTableImpl * GetSceneTableImpl();
 
 } // namespace scenes
 } // namespace chip
