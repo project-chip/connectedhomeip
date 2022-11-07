@@ -23,6 +23,7 @@
 #include <lib/core/GroupId.h>
 #include <lib/core/NodeId.h>
 #include <lib/core/PasscodeId.h>
+#include <lib/core/SceneId.h>
 
 namespace chip {
 
