@@ -37,6 +37,7 @@ constexpr GroupId kGlobalGroupSceneId        = 0x0000;
 constexpr SceneIndex kUndefinedSceneIndex    = 0xff;
 constexpr SceneId kUndefinedSceneId          = 0xff;
 static constexpr uint8_t kMaxScenesPerFabric = CHIP_CONFIG_SCENES_MAX_PER_FABRIC;
+static constexpr uint8_t kMaxScenesGlobal    = CHIP_CONFIG_SCENES_MAX_NUMBER;
 
 static constexpr size_t kIteratorsMax       = CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS;
 static constexpr size_t kSceneNameMaxLength = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;
@@ -268,11 +269,19 @@ public:
     virtual CHIP_ERROR Init(PersistentStorageDelegate * storage) = 0;
     virtual void Finish()                                        = 0;
 
+    // Global scene count
+    virtual CHIP_ERROR GetGlobalSceneCount(uint8_t & scene_count) = 0;
+
     // Data
+    virtual CHIP_ERROR GetRemainingCapacity(FabricIndex fabric_index, uint8_t & capacity)                             = 0;
     virtual CHIP_ERROR SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry)                    = 0;
     virtual CHIP_ERROR GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry) = 0;
     virtual CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id)                       = 0;
     virtual CHIP_ERROR RemoveSceneTableEntryAtPosition(FabricIndex fabric_index, SceneIndex scene_idx)                = 0;
+
+    // Groups
+    virtual CHIP_ERROR GetAllSceneIdsInGroup(FabricIndex fabric_index, GroupId group_id, Span<SceneId> & scene_list) = 0;
+    virtual CHIP_ERROR DeleteAllScenesInGroup(FabricIndex fabric_index, GroupId group_id)                            = 0;
 
     // SceneHandlers
     virtual void RegisterHandler(SceneHandler * handler)   = 0;
