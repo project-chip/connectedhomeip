@@ -792,7 +792,7 @@ class BaseTestHelper:
         self.logger.info("Reading back data from fabric2...")
 
         data= await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)])
-        readListDataFabric2= data[1][Clusters.UnitTesting.[Clusters.UnitTesting.Attributes.ListFabricScoped]
+        readListDataFabric2= data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
 
         #
         # Update the expected data's fabric index to that we just read back
