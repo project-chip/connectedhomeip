@@ -298,6 +298,7 @@ class FactoryDataGenerator:
             self._add_entry("vendor_name", self._args.vendor_name)
             self._add_entry("product_name", self._args.product_name)
             self._add_entry("product_label", self._args.product_label)
+            self._add_entry("product_url", self._args.product_url)
             self._add_entry("part_number", self._args.part_number)
             self._add_entry("date", self._args.date)
             self._add_entry("hw_ver", self._args.hw_ver)
@@ -434,6 +435,8 @@ def main():
                                      the setup code. Discriminator is used during a discovery process.")
 
     # optional keys
+    optional_arguments.add_argument("--product_url", type=str,
+                                    help="[string] provide link to product-specific web page")
     optional_arguments.add_argument("--product_label", type=str,
                                     help="[string] provide human-readable product label")
     optional_arguments.add_argument("--part_number", type=str,

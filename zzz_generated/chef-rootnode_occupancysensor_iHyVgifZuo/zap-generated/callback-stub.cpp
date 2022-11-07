@@ -71,10 +71,10 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
         break;
-    case ZCL_OTA_PROVIDER_CLUSTER_ID:
+    case ZCL_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_ID:
         emberAfOtaSoftwareUpdateProviderClusterInitCallback(endpoint);
         break;
-    case ZCL_OTA_REQUESTOR_CLUSTER_ID:
+    case ZCL_OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_ID:
         emberAfOtaSoftwareUpdateRequestorClusterInitCallback(endpoint);
         break;
     case ZCL_OCCUPANCY_SENSING_CLUSTER_ID:

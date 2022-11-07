@@ -24,6 +24,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -31,33 +32,43 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AlertDialog
+import androidx.camera.core.*
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
 import chip.setuppayload.SetupPayload
 import chip.setuppayload.SetupPayloadParser
-import chip.setuppayload.SetupPayloadParser.SetupPayloadException
 import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
-import com.google.android.gms.vision.CameraSource
-import com.google.android.gms.vision.barcode.Barcode
-import com.google.android.gms.vision.barcode.BarcodeDetector
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.SelectActionFragment
 import com.google.chip.chiptool.util.FragmentUtil
-import java.io.IOException
+import com.google.mlkit.vision.barcode.BarcodeScanner
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.common.InputImage
 import kotlinx.android.synthetic.main.barcode_fragment.view.inputAddressBtn
+import java.util.concurrent.Executors
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 /** Launches the camera to scan for QR code. */
-class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListener {
+class BarcodeFragment : Fragment() {
 
-    private var cameraSource: CameraSource? = null
-    private var cameraSourceView: CameraSourceView? = null
-    private var barcodeDetector: BarcodeDetector? = null
-    private var cameraStarted = false
-
+    private lateinit var previewView: PreviewView
     private var manualCodeEditText: EditText? = null
     private var manualCodeBtn: Button? = null
+
+    private fun aspectRatio(width: Int, height: Int): Int {
+        val previewRatio = max(width, height).toDouble() / min(width, height)
+        if (abs(previewRatio - RATIO_4_3_VALUE) <= abs(previewRatio - RATIO_16_9_VALUE)) {
+            return AspectRatio.RATIO_4_3
+        }
+        return AspectRatio.RATIO_16_9
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,11 +83,10 @@ class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListene
         savedInstanceState: Bundle?
     ): View {
         return inflater.inflate(R.layout.barcode_fragment, container, false).apply {
-            cameraSourceView = findViewById(R.id.camera_view)
-            
+            previewView = findViewById(R.id.camera_view)
             manualCodeEditText = findViewById(R.id.manualCodeEditText)
             manualCodeBtn = findViewById(R.id.manualCodeBtn)
-            
+            startCamera()
             inputAddressBtn.setOnClickListener {
                 FragmentUtil.getHost(
                     this@BarcodeFragment,
@@ -86,44 +96,74 @@ class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListene
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initializeBarcodeDetectorAndCamera()
-    }
+    @SuppressLint("UnsafeOptInUsageError")
+    private fun startCamera() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireActivity())
+        cameraProviderFuture.addListener({
+            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+            val metrics = DisplayMetrics().also { previewView.display?.getRealMetrics(it) }
+            val screenAspectRatio = aspectRatio(metrics.widthPixels, metrics.heightPixels)
+            // Preview
+            val preview: Preview = Preview.Builder()
+                .setTargetAspectRatio(screenAspectRatio)
+                .setTargetRotation(previewView.display.rotation)
+                .build()
+            preview.setSurfaceProvider(previewView.surfaceProvider)
 
-    @SuppressLint("MissingPermission")
-    override fun onResume() {
-        super.onResume()
-
-        if (hasCameraPermission() && !cameraStarted) {
-            startCamera()
-        }
-    }
-
-    private fun initializeBarcodeDetectorAndCamera() {
-        barcodeDetector?.let { detector ->
-            if (!detector.isOperational) {
-                showCameraUnavailableAlert()
+            // Setup barcode scanner
+            val imageAnalysis = ImageAnalysis.Builder()
+                .setTargetAspectRatio(screenAspectRatio)
+                .setTargetRotation(previewView.display.rotation)
+                .build()
+            val cameraExecutor = Executors.newSingleThreadExecutor()
+            val barcodeScanner: BarcodeScanner = BarcodeScanning.getClient()
+            imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
+                processImageProxy(barcodeScanner, imageProxy)
             }
-            return
-        }
+            // Select back camera as a default
+            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+            try {
+                // Unbind use cases before rebinding
+                cameraProvider.unbindAll()
 
-        val context = requireContext()
-        barcodeDetector = BarcodeDetector.Builder(context).build().apply {
-            setProcessor(CHIPBarcodeProcessor(this@BarcodeFragment))
-        }
-        cameraSource = CameraSource.Builder(context, barcodeDetector)
-            .setFacing(CameraSource.CAMERA_FACING_BACK)
-            .setAutoFocusEnabled(true)
-            .setRequestedFps(30.0f)
-            .build()
+                // Bind use cases to camera
+                cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis)
+
+            } catch (exc: Exception) {
+                Log.e(TAG, "Use case binding failed", exc)
+            }
+        }, ContextCompat.getMainExecutor(requireActivity()))
 
         //workaround: can not use gms to scan the code in China, added a EditText to debug
         manualCodeBtn?.setOnClickListener {
-            var qrCode = manualCodeEditText?.text.toString()
+            val qrCode = manualCodeEditText?.text.toString()
             Log.d(TAG, "Submit Code:$qrCode")
             handleInputQrCode(qrCode)
         }
+    }
+
+    @ExperimentalGetImage
+    private fun processImageProxy(
+        barcodeScanner: BarcodeScanner,
+        imageProxy: ImageProxy
+    ) {
+        val inputImage =
+            InputImage.fromMediaImage(imageProxy.image!!, imageProxy.imageInfo.rotationDegrees)
+
+        barcodeScanner.process(inputImage)
+            .addOnSuccessListener { barcodes ->
+                barcodes.forEach {
+                    handleScannedQrCode(it)
+                }
+            }
+            .addOnFailureListener {
+                Log.e(TAG, it.message ?: it.toString())
+            }.addOnCompleteListener {
+                // When the image is from CameraX analysis use case, must call image.close() on received
+                // images when finished using them. Otherwise, new images may not be received or the camera
+                // may stall.
+                imageProxy.close()
+            }
     }
 
     override fun onRequestPermissionsResult(
@@ -146,61 +186,25 @@ class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListene
             payload = SetupPayloadParser().parseQrCode(qrCode)
         } catch (ex: UnrecognizedQrCodeException) {
             Log.e(TAG, "Unrecognized QR Code", ex)
-            Toast.makeText(requireContext(), "Unrecognized QR Code : ${ex.message}", Toast.LENGTH_SHORT).show()
-            payload = SetupPayload()
-            return
-        } catch (ex: SetupPayloadException) {
-            Log.e(TAG, "Exception ", ex)
-            Toast.makeText(requireContext(), "Exception : ${ex.message}", Toast.LENGTH_SHORT).show()
-            payload = SetupPayload()
-            return
+            Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
         }
         FragmentUtil.getHost(this, Callback::class.java)
             ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
     }
 
-    @SuppressLint("MissingPermission")
-    override fun handleScannedQrCode(barcode: Barcode) {
+    private fun handleScannedQrCode(barcode: Barcode) {
         Handler(Looper.getMainLooper()).post {
-            stopCamera()
-
             lateinit var payload: SetupPayload
             try {
                 payload = SetupPayloadParser().parseQrCode(barcode.displayValue)
             } catch (ex: UnrecognizedQrCodeException) {
                 Log.e(TAG, "Unrecognized QR Code", ex)
                 Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
-
-                // Restart camera view.
-                if (hasCameraPermission() && !cameraStarted) {
-                    startCamera()
-                }
-                payload = SetupPayload()
-                return@post
-            } catch (ex: SetupPayloadException) {
-                Log.e(TAG, "Exception ", ex)
-                Toast.makeText(requireContext(), "Exception : ${ex.message}", Toast.LENGTH_SHORT).show()
-
-                // Restart camera view.
-                if (hasCameraPermission() && !cameraStarted) {
-                    startCamera()
-                }
-                payload = SetupPayload()
                 return@post
             }
             FragmentUtil.getHost(this, Callback::class.java)
                 ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        stopCamera()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        cameraSourceView?.release()
     }
 
     private fun showCameraPermissionAlert() {
@@ -227,24 +231,9 @@ class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListene
             .show()
     }
 
-    @RequiresPermission(Manifest.permission.CAMERA)
-    private fun startCamera() {
-        try {
-            cameraSourceView?.start(cameraSource)
-            cameraStarted = true
-        } catch (e: IOException) {
-            Log.e(TAG, "Unable to start camera source.", e)
-        }
-    }
-
-    private fun stopCamera() {
-        cameraSourceView?.stop()
-        cameraStarted = false
-    }
-
     private fun hasCameraPermission(): Boolean {
         return (PackageManager.PERMISSION_GRANTED
-            == checkSelfPermission(requireContext(), Manifest.permission.CAMERA))
+                == checkSelfPermission(requireContext(), Manifest.permission.CAMERA))
     }
 
     private fun requestCameraPermission() {
@@ -262,6 +251,10 @@ class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListene
         private const val TAG = "BarcodeFragment"
         private const val REQUEST_CODE_CAMERA_PERMISSION = 100;
 
-        @JvmStatic fun newInstance() = BarcodeFragment()
+        @JvmStatic
+        fun newInstance() = BarcodeFragment()
+
+        private const val RATIO_4_3_VALUE = 4.0 / 3.0
+        private const val RATIO_16_9_VALUE = 16.0 / 9.0
     }
 }

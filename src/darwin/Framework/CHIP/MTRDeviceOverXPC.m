@@ -47,9 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                minInterval:(NSNumber *)minInterval
-                maxInterval:(NSNumber *)maxInterval
-                     params:(MTRSubscribeParams * _Nullable)params
+                     params:(MTRSubscribeParams *)params
     attributeCacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
      attributeReportHandler:(void (^_Nullable)(NSArray * value))attributeReportHandler
          eventReportHandler:(void (^_Nullable)(NSArray * value))eventReportHandler
@@ -67,8 +65,8 @@ NS_ASSUME_NONNULL_BEGIN
             if (handle) {
                 [handle.proxy subscribeWithController:self.controller
                                                nodeId:self.nodeID.unsignedLongLongValue
-                                          minInterval:minInterval
-                                          maxInterval:maxInterval
+                                          minInterval:params.minInterval
+                                          maxInterval:params.maxInterval
                                                params:[MTRDeviceController encodeXPCSubscribeParams:params]
                                           shouldCache:(attributeCacheContainer != nil)
                                            completion:^(NSError * _Nullable error) {
@@ -206,8 +204,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)subscribeToAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
                                   clusterID:(NSNumber * _Nullable)clusterID
                                 attributeID:(NSNumber * _Nullable)attributeID
-                                minInterval:(NSNumber *)minInterval
-                                maxInterval:(NSNumber *)maxInterval
                                      params:(MTRSubscribeParams * _Nullable)params
                                       queue:(dispatch_queue_t)queue
                               reportHandler:(MTRDeviceResponseHandler)reportHandler
@@ -257,8 +253,8 @@ NS_ASSUME_NONNULL_BEGIN
                                                 endpointId:endpointID
                                                  clusterId:clusterID
                                                attributeId:attributeID
-                                               minInterval:minInterval
-                                               maxInterval:maxInterval
+                                               minInterval:params.minInterval
+                                               maxInterval:params.maxInterval
                                                     params:[MTRDeviceController encodeXPCSubscribeParams:params]
                                         establishedHandler:^{
                                             dispatch_async(queue, ^{

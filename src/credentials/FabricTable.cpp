@@ -140,7 +140,7 @@ CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage) cons
 
         const auto metadataLength = writer.GetLengthWritten();
         VerifyOrReturnError(CanCastTo<uint16_t>(metadataLength), CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorOnFailure(storage->SyncSetKeyValue(DefaultStorageKeyAllocator::FabricMetadata(mFabricIndex), buf,
+        ReturnErrorOnFailure(storage->SyncSetKeyValue(DefaultStorageKeyAllocator::FabricMetadata(mFabricIndex).KeyName(), buf,
                                                       static_cast<uint16_t>(metadataLength)));
     }
 
@@ -175,7 +175,8 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage, Fabr
     {
         uint8_t buf[MetadataTLVMaxSize()];
         uint16_t size = sizeof(buf);
-        ReturnErrorOnFailure(storage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricMetadata(mFabricIndex), buf, size));
+        ReturnErrorOnFailure(
+            storage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricMetadata(mFabricIndex).KeyName(), buf, size));
         TLV::ContiguousBufferTLVReader reader;
         reader.Init(buf, size);
 
@@ -214,7 +215,7 @@ CHIP_ERROR FabricTable::DeleteMetadataFromStorage(FabricIndex fabricIndex)
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    CHIP_ERROR deleteErr = mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricMetadata(fabricIndex));
+    CHIP_ERROR deleteErr = mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricMetadata(fabricIndex).KeyName());
 
     if (deleteErr != CHIP_NO_ERROR)
     {
@@ -1055,7 +1056,7 @@ CHIP_ERROR FabricTable::Init(const FabricTable::InitParams & initParams)
 
     uint8_t buf[IndexInfoTLVMaxSize()];
     uint16_t size  = sizeof(buf);
-    CHIP_ERROR err = mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricIndexInfo(), buf, size);
+    CHIP_ERROR err = mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricIndexInfo().KeyName(), buf, size);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         // No fabrics yet.  Nothing to be done here.
@@ -1303,8 +1304,8 @@ CHIP_ERROR FabricTable::StoreFabricIndexInfo() const
     const auto indexInfoLength = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(indexInfoLength), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    ReturnErrorOnFailure(
-        mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::FabricIndexInfo(), buf, static_cast<uint16_t>(indexInfoLength)));
+    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::FabricIndexInfo().KeyName(), buf,
+                                                   static_cast<uint16_t>(indexInfoLength)));
 
     return CHIP_NO_ERROR;
 }
@@ -1422,7 +1423,7 @@ CHIP_ERROR FabricTable::StoreCommitMarker(const CommitMarker & commitMarker)
     const auto markerContextTLVLength = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(markerContextTLVLength), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::FailSafeCommitMarkerKey(), tlvBuf,
+    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::FailSafeCommitMarkerKey().KeyName(), tlvBuf,
                                      static_cast<uint16_t>(markerContextTLVLength));
 }
 
@@ -1430,7 +1431,8 @@ CHIP_ERROR FabricTable::GetCommitMarker(CommitMarker & outCommitMarker)
 {
     uint8_t tlvBuf[CommitMarkerContextTLVMaxSize()];
     uint16_t tlvSize = sizeof(tlvBuf);
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FailSafeCommitMarkerKey(), tlvBuf, tlvSize));
+    ReturnErrorOnFailure(
+        mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FailSafeCommitMarkerKey().KeyName(), tlvBuf, tlvSize));
 
     // If buffer was too small, we won't reach here.
     TLV::ContiguousBufferTLVReader reader;
@@ -1454,7 +1456,7 @@ CHIP_ERROR FabricTable::GetCommitMarker(CommitMarker & outCommitMarker)
 
 void FabricTable::ClearCommitMarker()
 {
-    mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FailSafeCommitMarkerKey());
+    mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FailSafeCommitMarkerKey().KeyName());
 }
 
 bool FabricTable::HasOperationalKeyForFabric(FabricIndex fabricIndex) const

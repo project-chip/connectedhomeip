@@ -44,13 +44,11 @@ NS_ASSUME_NONNULL_BEGIN
 {{/if}}
 {{#if isReportableAttribute}}
 /**
- * This API does not support setting autoResubscribe to NO in the
+ * This API does not support setting resubscribeIfLost to NO in the
  * MTRSubscribeParams.
  */
-{{! TODO: The "New" bit is a hack for now until the selector changes when we move min/maxInterval into the params.  Then we can remove the "New" bit. }}
-- (void) Newsubscribe{{>attribute}}WithMinInterval:(NSNumber * _Nonnull)minInterval  maxInterval:(NSNumber * _Nonnull)maxInterval
-       params:(MTRSubscribeParams * _Nullable)params
-subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
+- (void) subscribe{{>attribute}}WithParams:(MTRSubscribeParams *)params
+subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
 + (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 {{/if}}
 {{/chip_server_cluster_attributes}}
