@@ -228,8 +228,8 @@ void TestWriteInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCont
         onFailureCbInvoked = true;
     };
 
-    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId,
-                                                                                                  value, onSuccessCb, onFailureCb);
+    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 
@@ -387,8 +387,8 @@ void TestWriteInteraction::TestFabricScopedAttributeWithoutFabricIndex(nlTestSui
         onFailureCbInvoked = true;
     };
 
-    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(sessionHandle, kTestEndpointId, value,
-                                                                                             onSuccessCb, onFailureCb);
+    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
+        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 
@@ -415,7 +415,7 @@ void TestWriteInteraction::TestMultipleSuccessResponses(nlTestSuite * apSuite, v
     auto onFailureCb = [&failureCalls](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(sessionHandle, kTestEndpointId, true,
-                                                                                    onSuccessCb, onFailureCb);
+                                                                                           onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 
@@ -443,7 +443,7 @@ void TestWriteInteraction::TestMultipleFailureResponses(nlTestSuite * apSuite, v
     auto onFailureCb = [&failureCalls](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(sessionHandle, kTestEndpointId, true,
-                                                                                    onSuccessCb, onFailureCb);
+                                                                                           onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 

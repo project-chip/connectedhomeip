@@ -134,7 +134,8 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
                 return CHIP_NO_ERROR;
             });
         }
-        if (aPath.mClusterId == app::Clusters::UnitTesting::Id && aPath.mAttributeId == app::Clusters::UnitTesting::Attributes::Int16u::Id)
+        if (aPath.mClusterId == app::Clusters::UnitTesting::Id &&
+            aPath.mAttributeId == app::Clusters::UnitTesting::Attributes::Int16u::Id)
         {
             AttributeValueEncoder::AttributeEncodeState state =
                 (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
@@ -1440,8 +1441,8 @@ void TestReadInteraction::TestReadEventResponse(nlTestSuite * apSuite, void * ap
 
     auto onDoneCb = [&onDoneCbInvoked](app::ReadClient * apReadClient) { onDoneCbInvoked = true; };
 
-    Controller::ReadEvent<Clusters::UnitTesting::Events::TestEvent::DecodableType>(&ctx.GetExchangeManager(), sessionHandle,
-                                                                            kTestEndpointId, onSuccessCb, onFailureCb, onDoneCb);
+    Controller::ReadEvent<Clusters::UnitTesting::Events::TestEvent::DecodableType>(
+        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, onDoneCb);
 
     ctx.DrainAndServiceIO();
 
@@ -4422,7 +4423,7 @@ void TestReadInteraction::TestReadAttribute_ManyDataValues(nlTestSuite * apSuite
     auto onFailureCb = [&failureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
     Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
-                                                                             kTestEndpointId, onSuccessCb, onFailureCb);
+                                                                                    kTestEndpointId, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 
@@ -4456,7 +4457,7 @@ void TestReadInteraction::TestReadAttribute_ManyDataValuesWrongPath(nlTestSuite 
     auto onFailureCb = [&failureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
     Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
-                                                                             kTestEndpointId, onSuccessCb, onFailureCb);
+                                                                                    kTestEndpointId, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 
@@ -4490,7 +4491,7 @@ void TestReadInteraction::TestReadAttribute_ManyErrors(nlTestSuite * apSuite, vo
     auto onFailureCb = [&failureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
     Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle,
-                                                                             kTestEndpointId, onSuccessCb, onFailureCb);
+                                                                                    kTestEndpointId, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 

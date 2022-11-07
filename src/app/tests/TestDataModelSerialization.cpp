@@ -659,7 +659,8 @@ void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSui
                 MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kC)), t.c),
                 MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kD)), t.d),
                 MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE)), t.e),
-                MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE) + 1), t.a));
+                MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE) + 1),
+                                 t.a));
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         }
 
@@ -731,7 +732,8 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
                     MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kB)), t.b),
                     MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kC)), t.c),
                     MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kD)), t.d),
-                    MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE)), t.e));
+                    MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE)),
+                                     t.e));
                 NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
             }
 
@@ -783,7 +785,8 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
                     MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kB)), t.b),
                     MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kC)), t.c),
                     MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kD)), t.e),
-                    MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE)), t.e));
+                    MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE)),
+                                     t.e));
                 NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
             }
 
@@ -828,7 +831,8 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidListType(nlTe
         {
             err = EncodeStruct(
                 _this->mWriter, TLV::AnonymousTag(),
-                MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::NestedStructList::Fields::kD)), t.e));
+                MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::NestedStructList::Fields::kD)),
+                                 t.e));
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         }
 
@@ -923,7 +927,8 @@ void TestDataModelSerialization::NullablesOptionalsEncodeDecodeCheck(nlTestSuite
     myStruct.e = CharSpan::fromCharString(structStr);
     myStruct.f = Clusters::UnitTesting::SimpleBitmap(2);
 
-    Clusters::UnitTesting::SimpleEnum enumListVals[] = { Clusters::UnitTesting::SimpleEnum::kValueA, Clusters::UnitTesting::SimpleEnum::kValueC };
+    Clusters::UnitTesting::SimpleEnum enumListVals[] = { Clusters::UnitTesting::SimpleEnum::kValueA,
+                                                         Clusters::UnitTesting::SimpleEnum::kValueC };
     DataModel::List<Clusters::UnitTesting::SimpleEnum> enumList(enumListVals);
 
     // Encode
