@@ -30,12 +30,6 @@
 #include <lib/support/Span.h>
 
 // List specific responses
-typedef void (*ScenesGeneratedCommandListListAttributeCallback)(void * context,
-                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ScenesAcceptedCommandListListAttributeCallback)(void * context,
-                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ScenesAttributeListListAttributeCallback)(void * context,
-                                                         const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*OnOffGeneratedCommandListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OnOffAcceptedCommandListListAttributeCallback)(void * context,

@@ -303,7 +303,7 @@ DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nul
                             applicationLauncherOutgoingCommands),
     DECLARE_DYNAMIC_CLUSTER(ZCL_ACCOUNT_LOGIN_CLUSTER_ID, accountLoginAttrs, accountLoginIncomingCommands,
                             accountLoginOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_CONTENT_LAUNCH_CLUSTER_ID, contentLauncherAttrs, contentLauncherIncomingCommands,
+    DECLARE_DYNAMIC_CLUSTER(ZCL_CONTENT_LAUNCHER_CLUSTER_ID, contentLauncherAttrs, contentLauncherIncomingCommands,
                             contentLauncherOutgoingCommands),
     DECLARE_DYNAMIC_CLUSTER(ZCL_MEDIA_PLAYBACK_CLUSTER_ID, mediaPlaybackAttrs, mediaPlaybackIncomingCommands,
                             mediaPlaybackOutgoingCommands),

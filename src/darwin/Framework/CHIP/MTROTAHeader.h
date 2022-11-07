@@ -17,6 +17,11 @@
 
 #import <Foundation/Foundation.h>
 
+/**
+ * A representation of an OTA image header as defined in the Matter
+ * specification's "Over-the-Air (OTA) Software Update File Format" section.
+ */
+
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSUInteger, MTROTAImageDigestType) {
@@ -38,7 +43,6 @@ typedef NS_ENUM(NSUInteger, MTROTAImageDigestType) {
 
 /**
  * The identifier of the vendor whose product this image is meant for.
- *
  *
  * This field can be compared to the vendor id received in the Query Image
  * command to determine whether an image matches.
@@ -101,8 +105,10 @@ typedef NS_ENUM(NSUInteger, MTROTAImageDigestType) {
  */
 @property (nonatomic, copy, nullable) NSNumber * maxApplicableVersion;
 
++ (nullable MTROTAHeader *)headerFromData:(NSData *)data error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 @end
 
+MTR_NEWLY_DEPRECATED("Please use [MTROTAHeader headerFromData]")
 @interface MTROTAHeaderParser : NSObject
 + (nullable MTROTAHeader *)headerFromData:(NSData *)data error:(NSError * __autoreleasing *)error;
 @end

@@ -616,9 +616,9 @@ ChipDN::~ChipDN() {}
 
 void ChipDN::Clear()
 {
-    for (uint8_t i = 0; i < CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES; i++)
+    for (auto & dn : rdn)
     {
-        rdn[i].Clear();
+        dn.Clear();
     }
 }
 

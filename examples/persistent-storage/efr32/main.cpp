@@ -38,7 +38,7 @@
 static TaskHandle_t sTestTaskHandle;
 void TestTask(void * pvParameter)
 {
-    while (1)
+    while (true)
     {
         EFR32_LOG("Running Tests:");
         chip::RunKvsTest();

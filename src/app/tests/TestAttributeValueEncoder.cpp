@@ -261,9 +261,9 @@ void TestEncodeFabricScoped(nlTestSuite * aSuite, void * aContext)
 
     // We tried to encode three items, however, the encoder should only put the item with matching fabric index into the final list.
     CHIP_ERROR err = test.encoder.EncodeList([items](const auto & encoder) -> CHIP_ERROR {
-        for (size_t i = 0; i < 3; i++)
+        for (const auto & item : items)
         {
-            ReturnErrorOnFailure(encoder.Encode(items[i]));
+            ReturnErrorOnFailure(encoder.Encode(item));
         }
         return CHIP_NO_ERROR;
     });

@@ -64,7 +64,7 @@ static int app_get_random(uint8_t * aOutput, size_t aLen)
     rtn = TRNG_generateEntropy(TRNG_handle_app, &entropyKey);
     if (rtn != TRNG_STATUS_SUCCESS)
     {
-        while (1)
+        while (true)
             ;
     }
     return 0;
@@ -84,7 +84,7 @@ static void app_random_init(void)
     TRNG_handle_app = TRNG_open(CONFIG_TRNG_APP, &TRNGParams);
     if (TRNG_handle_app == NULL)
     {
-        while (1)
+        while (true)
             ;
     }
 

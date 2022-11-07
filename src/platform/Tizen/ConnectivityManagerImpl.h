@@ -85,8 +85,6 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 
 public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    CHIP_ERROR ProvisionWiFiNetwork(const char * ssid, const char * key);
-
     void StartWiFiManagement(void);
     void StopWiFiManagement(void);
 #endif

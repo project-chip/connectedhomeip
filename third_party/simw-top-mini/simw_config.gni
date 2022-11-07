@@ -15,6 +15,5 @@
 # Configuration file
 
 declare_args() {
-  # possible values host_k32w, host_linux
-  host = "host_k32w"
+  chip_rpi_se05x_t4t_demo = 0
 }

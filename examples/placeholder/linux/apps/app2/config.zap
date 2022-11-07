@@ -4252,7 +4252,7 @@
           "name": "Pump Configuration and Control",
           "code": 512,
           "mfgCode": null,
-          "define": "PUMP_CONFIG_CONTROL_CLUSTER",
+          "define": "PUMP_CONFIGURATION_AND_CONTROL_CLUSTER",
           "side": "client",
           "enabled": 0,
           "attributes": [
@@ -4278,7 +4278,7 @@
           "name": "Pump Configuration and Control",
           "code": 512,
           "mfgCode": null,
-          "define": "PUMP_CONFIG_CONTROL_CLUSTER",
+          "define": "PUMP_CONFIGURATION_AND_CONTROL_CLUSTER",
           "side": "server",
           "enabled": 1,
           "attributes": [
@@ -5104,7 +5104,7 @@
           "name": "Thermostat User Interface Configuration",
           "code": 516,
           "mfgCode": null,
-          "define": "THERMOSTAT_UI_CONFIG_CLUSTER",
+          "define": "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -5146,7 +5146,7 @@
           "name": "Thermostat User Interface Configuration",
           "code": 516,
           "mfgCode": null,
-          "define": "THERMOSTAT_UI_CONFIG_CLUSTER",
+          "define": "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER",
           "side": "server",
           "enabled": 1,
           "attributes": [
@@ -5432,7 +5432,7 @@
           "name": "Temperature Measurement",
           "code": 1026,
           "mfgCode": null,
-          "define": "TEMP_MEASUREMENT_CLUSTER",
+          "define": "TEMPERATURE_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -5458,7 +5458,7 @@
           "name": "Temperature Measurement",
           "code": 1026,
           "mfgCode": null,
-          "define": "TEMP_MEASUREMENT_CLUSTER",
+          "define": "TEMPERATURE_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 1,
           "attributes": [
@@ -6408,7 +6408,7 @@
           "name": "Content Launcher",
           "code": 1290,
           "mfgCode": null,
-          "define": "CONTENT_LAUNCH_CLUSTER",
+          "define": "CONTENT_LAUNCHER_CLUSTER",
           "side": "client",
           "enabled": 1,
           "commands": [
@@ -6452,7 +6452,7 @@
           "name": "Content Launcher",
           "code": 1290,
           "mfgCode": null,
-          "define": "CONTENT_LAUNCH_CLUSTER",
+          "define": "CONTENT_LAUNCHER_CLUSTER",
           "side": "server",
           "enabled": 1,
           "commands": [

@@ -39,7 +39,6 @@
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     62, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: label list, Privilege: view */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
@@ -54,7 +53,6 @@
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     0, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: label list, Privilege: view */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
@@ -69,7 +67,6 @@
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: label list, Privilege: view */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -85,7 +82,6 @@
     40, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
     48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     63, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    65, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for write attribute
@@ -99,7 +95,6 @@
     16, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
     0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    0, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
@@ -113,7 +108,6 @@
     kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -125,10 +119,6 @@
     4, /* Cluster: Groups, Command: RemoveGroup, Privilege: manage */ \
     4, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
     4, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
-    5, /* Cluster: Scenes, Command: AddScene, Privilege: manage */ \
-    5, /* Cluster: Scenes, Command: RemoveScene, Privilege: manage */ \
-    5, /* Cluster: Scenes, Command: RemoveAllScenes, Privilege: manage */ \
-    5, /* Cluster: Scenes, Command: StoreScene, Privilege: manage */ \
     48, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     48, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     48, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
@@ -157,10 +147,6 @@
     3, /* Cluster: Groups, Command: RemoveGroup, Privilege: manage */ \
     4, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
     5, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
-    0, /* Cluster: Scenes, Command: AddScene, Privilege: manage */ \
-    2, /* Cluster: Scenes, Command: RemoveScene, Privilege: manage */ \
-    3, /* Cluster: Scenes, Command: RemoveAllScenes, Privilege: manage */ \
-    4, /* Cluster: Scenes, Command: StoreScene, Privilege: manage */ \
     0, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     2, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     4, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \
@@ -189,10 +175,6 @@
     kMatterAccessPrivilegeManage, /* Cluster: Groups, Command: RemoveGroup, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Scenes, Command: AddScene, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Scenes, Command: RemoveScene, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Scenes, Command: RemoveAllScenes, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Scenes, Command: StoreScene, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: ArmFailSafe, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: SetRegulatoryConfig, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Command: CommissioningComplete, Privilege: administer */ \

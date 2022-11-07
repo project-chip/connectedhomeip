@@ -167,8 +167,7 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, opKeystore.HasOpKeypairForFabric(kFabricIndex) == true);
 
     // Committing key resets pending state and adds storage
-    DefaultStorageKeyAllocator keyAllocator;
-    std::string opKeyStorageKey = keyAllocator.FabricOpKey(kFabricIndex);
+    std::string opKeyStorageKey = DefaultStorageKeyAllocator::FabricOpKey(kFabricIndex).KeyName();
     err                         = opKeystore.CommitOpKeypairForFabric(kFabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == false);

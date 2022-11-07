@@ -136,7 +136,7 @@ void vAssertCalled(void)
 void vApplicationMallocFailedHook(void)
 {
     printf("Memory Allocate Failed. Current left size is %d bytes\r\n", xPortGetFreeHeapSize());
-    while (1)
+    while (true)
     {
         /*empty here*/
     }
