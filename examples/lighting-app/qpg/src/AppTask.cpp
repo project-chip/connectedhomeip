@@ -611,33 +611,29 @@ void AppTask::UpdateLEDs(void)
 
 void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
 {
-    switch(event->Type)
+    switch (event->Type)
     {
-        case DeviceEventType::kServiceProvisioningChange:
-        {
-            sIsThreadProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
-            break;
-        }
+    case DeviceEventType::kServiceProvisioningChange: {
+        sIsThreadProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
+        break;
+    }
 
-        case DeviceEventType::kThreadConnectivityChange:
-        {
-            sIsThreadEnabled = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
-            break;
-        }
+    case DeviceEventType::kThreadConnectivityChange: {
+        sIsThreadEnabled = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
+        break;
+    }
 
-        case DeviceEventType::kCHIPoBLEConnectionEstablished:
-        {
-            sHaveBLEConnections = true;
-            break;
-        }
+    case DeviceEventType::kCHIPoBLEConnectionEstablished: {
+        sHaveBLEConnections = true;
+        break;
+    }
 
-        case DeviceEventType::kCHIPoBLEConnectionClosed:
-        {
-            sHaveBLEConnections = false;
-            break;
-        }
+    case DeviceEventType::kCHIPoBLEConnectionClosed: {
+        sHaveBLEConnections = false;
+        break;
+    }
 
-        default:
+    default:
         break;
     }
 
