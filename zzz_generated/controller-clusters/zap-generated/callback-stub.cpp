@@ -209,7 +209,7 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_UNIT_LOCALIZATION_CLUSTER_ID:
         emberAfUnitLocalizationClusterInitCallback(endpoint);
         break;
-    case ZCL_UNIT_TESTING_ID:
+    case ZCL_UNIT_TESTING_CLUSTER_ID:
         emberAfUnitTestingClusterInitCallback(endpoint);
         break;
     case ZCL_USER_LABEL_CLUSTER_ID:
