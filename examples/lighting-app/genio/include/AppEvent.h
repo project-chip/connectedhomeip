@@ -30,6 +30,7 @@ struct AppEvent
         kEventType_Timer,
         kEventType_Light,
         kEventType_Install,
+        kEventType_Occupancy,
     };
 
     uint16_t Type;
@@ -48,7 +49,12 @@ struct AppEvent
         {
             uint8_t Action;
             int32_t Actor;
+            uint32_t Value;
         } LightEvent;
+        struct
+        {
+            bool Present;
+        } OccupancytEvent;
     };
 
     EventHandler Handler;
