@@ -8,3 +8,7 @@
 # See https://github.com/project-chip/connectedhomeip/issues/14710 for
 # addressing this.
 called_from_lib:libglib
+
+# NOTE: This change will allow PR #45045 to be merged. In the future this whole
+#       suppression file will be removed anyway (when PR #23529 will get merged).
+race:g_main_context_dispatch
