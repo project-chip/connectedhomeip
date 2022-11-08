@@ -31,7 +31,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 
 @interface MTRDeviceController : NSObject
 
-@property (readonly, nonatomic) BOOL isRunning;
+@property (readonly, nonatomic, getter=isRunning) BOOL running;
 
 /**
  * Return the Node ID assigned to the controller.  Will return nil if the
@@ -139,7 +139,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
                                           error:(NSError * __autoreleasing *)error;
 
 /**
- * Controllers are created via the MTRControllerFactory object.
+ * Controllers are created via the MTRDeviceControllerFactory object.
  */
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;

@@ -30,7 +30,7 @@ using namespace chip;
 
 @implementation MTRDeviceControllerStartupParams
 
-- (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner fabricID:(NSNumber *)fabricID ipk:(NSData *)ipk
+- (instancetype)initWithIPK:(NSData *)ipk fabricID:(NSNumber *)fabricID nocSigner:(id<MTRKeypair>)nocSigner
 {
     if (!(self = [super init])) {
         return nil;
@@ -48,11 +48,11 @@ using namespace chip;
     return self;
 }
 
-- (instancetype)initWithOperationalKeypair:(id<MTRKeypair>)operationalKeypair
-                    operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
-                   intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
-                           rootCertificate:(MTRCertificateDERBytes)rootCertificate
-                                       ipk:(NSData *)ipk
+- (instancetype)initWithIPK:(NSData *)ipk
+         operationalKeypair:(id<MTRKeypair>)operationalKeypair
+     operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
+    intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
+            rootCertificate:(MTRCertificateDERBytes)rootCertificate
 {
     if (!(self = [super init])) {
         return nil;
@@ -152,7 +152,20 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
 - (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner fabricId:(uint64_t)fabricId ipk:(NSData *)ipk
 {
-    return [self initWithSigningKeypair:nocSigner fabricID:@(fabricId) ipk:ipk];
+    return [self initWithIPK:ipk fabricID:@(fabricId) nocSigner:nocSigner];
+}
+
+- (instancetype)initWithOperationalKeypair:(id<MTRKeypair>)operationalKeypair
+                    operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
+                   intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
+                           rootCertificate:(MTRCertificateDERBytes)rootCertificate
+                                       ipk:(NSData *)ipk
+{
+    return [self initWithIPK:ipk
+             operationalKeypair:operationalKeypair
+         operationalCertificate:operationalCertificate
+        intermediateCertificate:intermediateCertificate
+                rootCertificate:rootCertificate];
 }
 
 @end
