@@ -26,6 +26,7 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/SortUtils.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/PlatformManager.h>
@@ -56,18 +57,6 @@ enum ValidWiFiCredentialLength
     kMaxWPAPSK = 63,
     kWPAPSKHex = 64,
 };
-
-void AddScanResponseWithInsertionSortByRssi(chip::Platform::ScopedMemoryBuffer<ThreadScanResponse> & scanResponseArray, size_t step,
-                                            const ThreadScanResponse & keyScanResponse)
-{
-    int j = step - 1;
-    while (j >= 0 && scanResponseArray[j].rssi < keyScanResponse.rssi)
-    {
-        scanResponseArray[j + 1] = scanResponseArray[j];
-        j--;
-    }
-    scanResponseArray[j + 1] = keyScanResponse;
-}
 
 } // namespace
 
@@ -564,13 +553,6 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
         err = CHIP_ERROR_NO_MEMORY);
     for (; networks != nullptr && networks->Next(scanResponse);)
     {
-        if (scanResponseArrayLength == 0)
-        {
-            scanResponseArray[scanResponseArrayLength] = scanResponse;
-            scanResponseArrayLength++;
-            continue;
-        }
-
         if ((scanResponseArrayLength == kMaxNetworksInScanResponse) &&
             (scanResponseArray[scanResponseArrayLength - 1].rssi > scanResponse.rssi))
         {
@@ -587,7 +569,10 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
                 isDuplicated = true;
                 if (scanResponseArray[i].rssi < scanResponse.rssi)
                 {
-                    AddScanResponseWithInsertionSortByRssi(scanResponseArray, i, scanResponse);
+                    scanResponseArray[i] = scanResponse;
+                    Sorting::InsertionSort(
+                        scanResponseArray.Get(), scanResponseArrayLength,
+                        [](const ThreadScanResponse & a, const ThreadScanResponse & b) -> bool { return a.rssi > b.rssi; });
                 }
                 break;
             }
@@ -598,11 +583,13 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
             continue;
         }
 
-        AddScanResponseWithInsertionSortByRssi(scanResponseArray, scanResponseArrayLength - 1, scanResponse);
         if (scanResponseArrayLength < kMaxNetworksInScanResponse)
         {
             scanResponseArrayLength++;
         }
+        scanResponseArray[scanResponseArrayLength - 1] = scanResponse;
+        Sorting::InsertionSort(scanResponseArray.Get(), scanResponseArrayLength,
+                               [](const ThreadScanResponse & a, const ThreadScanResponse & b) -> bool { return a.rssi > b.rssi; });
     }
 
     for (size_t i = 0; i < scanResponseArrayLength; i++)
