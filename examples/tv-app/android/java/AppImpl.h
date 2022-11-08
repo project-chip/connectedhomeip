@@ -163,6 +163,11 @@ public:
     // When a vendor has admin privileges, it will get access to all clusters on ep1
     Access::Privilege GetVendorPrivilege(uint16_t vendorId) override;
 
+    // Get the cluster list this vendorId/productId should have on static endpoints such as ep1 for casting video clients.
+    // When a vendor has admin privileges, it will get access to all clusters on ep1
+    std::list<ClusterId> GetAllowedClusterListForStaticEndpoint(EndpointId endpointId, uint16_t vendorId,
+                                                                uint16_t productId) override;
+
     void AddAdminVendorId(uint16_t vendorId);
 
     void setContentAppAttributeDelegate(ContentAppAttributeDelegate * attributeDelegate);
