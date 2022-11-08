@@ -180,7 +180,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     {
         trustStore = chip::Credentials::GetTestAttestationTrustStore();
     }
-    wrapper->mDeviceAttestationVerifier = chip::Credentials::GetDefaultDACVerifier(trustStore);
+    wrapper->mDeviceAttestationVerifier = new Credentials::DefaultDACVerifier(trustStore);
     if (wrapper->mDeviceAttestationVerifier == nullptr)
     {
         ChipLogError(Controller, "Init failure while creating the device attestation verifier");
