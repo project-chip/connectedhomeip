@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import com.chip.casting.ContentApp;
 import com.chip.casting.FailureCallback;
 import com.chip.casting.MatterError;
@@ -68,16 +69,18 @@ public class MediaPlaybackFragment extends Fragment {
                       TAG,
                       "handle() called on SuccessCallback<MediaPlaybackResponseTypes.PlaybackStateEnum> with "
                           + playbackStateEnum);
-                  getActivity()
-                      .runOnUiThread(
-                          new Runnable() {
-                            @Override
-                            public void run() {
-                              if (playbackStateEnum != null) {
-                                currentStateValue.setText(playbackStateEnum.toString());
-                              }
+                  FragmentActivity fragmentActivity = getActivity();
+                  if (fragmentActivity != null) {
+                    fragmentActivity.runOnUiThread(
+                        new Runnable() {
+                          @Override
+                          public void run() {
+                            if (playbackStateEnum != null) {
+                              currentStateValue.setText(playbackStateEnum.toString());
                             }
-                          });
+                          }
+                        });
+                  }
                 };
 
             FailureCallback failureCallback =
@@ -85,14 +88,16 @@ public class MediaPlaybackFragment extends Fragment {
                   @Override
                   public void handle(MatterError matterError) {
                     Log.d(TAG, "handle() called on FailureCallback with " + matterError);
-                    getActivity()
-                        .runOnUiThread(
-                            new Runnable() {
-                              @Override
-                              public void run() {
-                                currentStateValue.setText("Error!");
-                              }
-                            });
+                    FragmentActivity fragmentActivity = getActivity();
+                    if (fragmentActivity != null) {
+                      fragmentActivity.runOnUiThread(
+                          new Runnable() {
+                            @Override
+                            public void run() {
+                              currentStateValue.setText("Error!");
+                            }
+                          });
+                    }
                   }
                 };
 
@@ -100,14 +105,16 @@ public class MediaPlaybackFragment extends Fragment {
                 (SubscriptionEstablishedCallback)
                     () -> {
                       Log.d(TAG, "handle() called on SubscriptionEstablishedCallback");
-                      getActivity()
-                          .runOnUiThread(
-                              new Runnable() {
-                                @Override
-                                public void run() {
-                                  subscriptionStatus.setText("Subscription established!");
-                                }
-                              });
+                      FragmentActivity fragmentActivity = getActivity();
+                      if (fragmentActivity != null) {
+                        fragmentActivity.runOnUiThread(
+                            new Runnable() {
+                              @Override
+                              public void run() {
+                                subscriptionStatus.setText("Subscription established!");
+                              }
+                            });
+                      }
                     };
 
             boolean retVal =
