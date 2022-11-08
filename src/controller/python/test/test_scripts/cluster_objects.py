@@ -295,7 +295,7 @@ class ClusterObjectTests:
 
         logger.info("7: Reading Chunked List")
         res=await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.UnitTesting.Attributes.ListLongOctetString)])
-        if res[1][Clusters.UnitTesting.[Clusters.UnitTesting.Attributes.ListLongOctetString] != [b'0123456789abcdef' * 32] * 4:
+        if res[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListLongOctetString] != [b'0123456789abcdef' * 32] * 4:
             raise AssertionError("Unexpected read result")
 
         logger.info("*: Getting current fabric index")
@@ -305,13 +305,13 @@ class ClusterObjectTests:
         # Note: ListFabricScoped is an empty list for now. We should re-enable this test after we make it return expected data.
         # logger.info("8: Read without fabric filter")
         # res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.UnitTesting.Attributes.ListFabricScoped)], fabricFiltered=False)
-        # if len(res[1][Clusters.UnitTesting.[Clusters.UnitTesting.Attributes.ListFabricScoped]) == 1:
+        # if len(res[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]) == 1:
         #     raise AssertionError("Expect more elements in the response")
         # logger.info("9: Read with fabric filter")
         # res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.UnitTesting.Attributes.ListFabricScoped)], fabricFiltered=True)
-        # if len(res[1][Clusters.UnitTesting.[Clusters.UnitTesting.Attributes.ListFabricScoped]) != 1:
+        # if len(res[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]) != 1:
         #     raise AssertionError("Expect exact one element in the response")
-        # if res[1][Clusters.UnitTesting.[Clusters.UnitTesting.Attributes.ListFabricScoped][0].fabricIndex != fabricIndex:
+        # if res[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped][0].fabricIndex != fabricIndex:
         #     raise AssertionError(
         #         "Expect the fabric index matches the one current reading")
 
