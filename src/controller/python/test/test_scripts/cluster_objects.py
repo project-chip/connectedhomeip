@@ -127,7 +127,7 @@ class ClusterObjectTests:
     async def TestReadWriteOnlyAttribute(cls, devCtrl):
         logger.info("Test wildcard read of attributes containing write-only attribute")
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(Clusters.UnitTesting)])
-        if Clusters.UnitTesting.Attributes.WriteOnlyInt8u in res[1][Clusters.UnitTesting.:
+        if Clusters.UnitTesting.Attributes.WriteOnlyInt8u in res[1][Clusters.UnitTesting]:
             raise AssertionError("Received un-expected WriteOnlyInt8u attribute in TestCluster")
 
     @ classmethod
@@ -290,8 +290,8 @@ class ClusterObjectTests:
         # TestCluster will be ValueDecodeError here, so we comment out the log below.
         # Values are not expected to be ValueDecodeError for real clusters.
         # logger.info(
-        #    f"Test Cluster - Struct: {res[1][Clusters.UnitTesting..structAttr}")
-        logger.info(f"Test Cluster: {res[1][Clusters.UnitTesting.}")
+        #    f"Test Cluster - Struct: {res[1][Clusters.UnitTesting].structAttr}")
+        logger.info(f"Test Cluster: {res[1][Clusters.UnitTesting]}")
 
         logger.info("7: Reading Chunked List")
         res=await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.UnitTesting.Attributes.ListLongOctetString)])
@@ -367,7 +367,7 @@ class ClusterObjectTests:
 
         logger.info("2: Reading Ex Cx E*")
         req=[
-            (1, Clusters.UnitTesting. 0),
+            (1, Clusters.UnitTesting, 0),
         ]
 
         await cls.TriggerAndWaitForEvents(devCtrl, req)
@@ -388,7 +388,7 @@ class ClusterObjectTests:
 
         logger.info("5: Reading Ex Cx E* Urgency")
         req=[
-            (1, Clusters.UnitTesting. 1),
+            (1, Clusters.UnitTesting, 1),
         ]
 
         await cls.TriggerAndWaitForEvents(devCtrl, req)
@@ -549,10 +549,10 @@ class ClusterObjectTests:
 
         def eventPathPossibilities():
             yield ('Ex Cx Ex', [(1, Clusters.UnitTesting.Events.TestEvent, 0)])
-            yield ('Ex Cx E*', [(1, Clusters.UnitTesting. 0)])
+            yield ('Ex Cx E*', [(1, Clusters.UnitTesting, 0)])
             yield ('Ex C* E*', [1])
             yield ('E* C* E*', ['*'])
-            yield ('Ex Cx E* Urgent', [(1, Clusters.UnitTesting. 1)])
+            yield ('Ex Cx E* Urgent', [(1, Clusters.UnitTesting, 1)])
 
         testCount=0
 
