@@ -126,7 +126,7 @@ class ClusterObjectTests:
     @base.test_case
     async def TestReadWriteOnlyAttribute(cls, devCtrl):
         logger.info("Test wildcard read of attributes containing write-only attribute")
-        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(Clusters.UnitTesting.])
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(Clusters.UnitTesting)])
         if Clusters.UnitTesting.Attributes.WriteOnlyInt8u in res[1][Clusters.UnitTesting.:
             raise AssertionError("Received un-expected WriteOnlyInt8u attribute in TestCluster")
 
