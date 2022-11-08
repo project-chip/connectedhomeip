@@ -35,10 +35,10 @@ LIGHTING_ENDPOINT_ID = 1
 
 # Ignore failures decoding these attributes (e.g. not yet implemented)
 ignoreAttributeDecodeFailureList = [
-    (1, Clusters.Objects.Test,
-     Clusters.Objects.Test.Attributes.GeneralErrorBoolean),
-    (1, Clusters.Objects.Test,
-     Clusters.Objects.Test.Attributes.ClusterErrorBoolean),
+    (1, Clusters.Objects.UnitTesting,
+     Clusters.Objects.UnitTesting.Attributes.GeneralErrorBoolean),
+    (1, Clusters.Objects.UnitTesting,
+     Clusters.Objects.UnitTesting.Attributes.ClusterErrorBoolean),
 ]
 
 
