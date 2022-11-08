@@ -20,12 +20,14 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
+#include "ColorFormat.h"
 #include "LEDWidget.h"
 
 #include "qrcodegen.h"
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -47,6 +49,11 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/mt793x/NetworkCommissioningWiFiDriver.h>
 
+#if defined(ENABLE_CHIP_SHELL)
+#include "lib/shell/Engine.h"
+#include "lib/shell/commands/Help.h"
+#endif // ENABLE_CHIP_SHELL
+
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_TASK_STACK_SIZE (4096)
@@ -64,6 +71,20 @@
 
 #define UNUSED_PARAMETER(a) (a = a)
 
+#if defined(ENABLE_CHIP_SHELL)
+using chip::Shell::Engine;
+using chip::Shell::PrintCommandHelp;
+using chip::Shell::shell_command_t;
+using chip::Shell::streamer_get;
+using chip::Shell::streamer_printf;
+
+using namespace chip::app::Clusters;
+
+Engine sShellLightSubCommands;
+Engine sShellLightOnOffSubCommands;
+
+#endif // defined(ENABLE_CHIP_SHELL)
+
 namespace {
 
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
@@ -71,7 +92,7 @@ TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
 LEDWidget sStatusLED;
-LEDWidget sLightLED;
+uint8_t sLightLEDLevelChangedCount = 0;
 
 bool sIsWiFiProvisioned = false;
 bool sIsWiFiEnabled     = false;
@@ -97,6 +118,182 @@ using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 
+#ifdef ENABLE_CHIP_SHELL
+
+/********************************************************
+ * Light shell functions
+ *********************************************************/
+
+CHIP_ERROR LightHelpHandler(int argc, char ** argv)
+{
+    sShellLightSubCommands.ForEachCommand(PrintCommandHelp, nullptr);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LightCommandHandler(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        return LightHelpHandler(argc, argv);
+    }
+
+    return sShellLightSubCommands.ExecCommand(argc, argv);
+}
+
+/********************************************************
+ * OnOff switch shell functions
+ *********************************************************/
+
+CHIP_ERROR OnOffHelpHandler(int argc, char ** argv)
+{
+    sShellLightOnOffSubCommands.ForEachCommand(PrintCommandHelp, nullptr);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OnOffLightCommandHandler(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        return OnOffHelpHandler(argc, argv);
+    }
+
+    return sShellLightOnOffSubCommands.ExecCommand(argc, argv);
+}
+
+CHIP_ERROR OnLightCommandHandler(int argc, char ** argv)
+{
+    GetAppTask().PostLightActionRequest(0, LightingManager::ON_ACTION, 0);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OffLightCommandHandler(int argc, char ** argv)
+{
+    GetAppTask().PostLightActionRequest(0, LightingManager::OFF_ACTION, 0);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ColorLightCommandHandler(int argc, char ** argv)
+{
+    uint32_t rgb = 0;
+
+    if (argc < 3)
+    {
+        return LightHelpHandler(argc, argv);
+    }
+
+    rgb = (atoi(argv[2]) << 16) | (atoi(argv[1]) << 8) | atoi(argv[0]);
+    MT793X_LOG("ColorLightCommandHandler: %x", rgb);
+
+    GetAppTask().PostLightActionRequest(0, LightingManager::COLOR_ACTION, rgb);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LevelLightCommandHandler(int argc, char ** argv)
+{
+    uint8_t level = 0;
+    if (argc < 1)
+    {
+        return LightHelpHandler(argc, argv);
+    }
+
+    level = atoi(argv[0]);
+    MT793X_LOG("LevelLightCommandHandler: %d", level);
+    GetAppTask().PostLightActionRequest(0, LightingManager::LEVEL_ACTION, level);
+    return CHIP_NO_ERROR;
+}
+
+/********************************************************
+ * Occupancy sensor simulation shell functions
+ *********************************************************/
+
+CHIP_ERROR OccuPresentLightCommandHandler(int argc, char ** argv)
+{
+    GetAppTask().OccupancyHandler(true);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OccuClearLightCommandHandler(int argc, char ** argv)
+{
+    GetAppTask().OccupancyHandler(false);
+    return CHIP_NO_ERROR;
+}
+
+/********************************************************
+ * Register all light commands
+ *********************************************************/
+
+/**
+ * @brief configures lighting-app matter shell
+ *
+ */
+static void RegisterLightCommands()
+{
+    static const shell_command_t sLightSubCommands[] = {
+        {
+            .cmd_func = LightHelpHandler,
+            .cmd_name = "help",
+            .cmd_help = "Usage: light <subcommand>",
+        },
+        {
+            .cmd_func = OnOffLightCommandHandler,
+            .cmd_name = "onoff",
+            .cmd_help = "Usage: light onoff <subcommand>",
+        },
+        {
+            .cmd_func = ColorLightCommandHandler,
+            .cmd_name = "color",
+            .cmd_help = "Usage: light color <r:0~255> <g:0~255> <b:0~255>",
+        },
+        {
+            .cmd_func = LevelLightCommandHandler,
+            .cmd_name = "level",
+            .cmd_help = "Usage: light level <level:0~100>",
+        },
+        {
+            .cmd_func = OccuPresentLightCommandHandler,
+            .cmd_name = "present",
+            .cmd_help = "Sends occupancy present event to lighting app",
+        },
+        {
+            .cmd_func = OccuClearLightCommandHandler,
+            .cmd_name = "clear",
+            .cmd_help = "Sends occupancy clear to lighting app",
+        },
+    };
+
+    static const shell_command_t sLightOnOffSubCommands[] = {
+        {
+            .cmd_func = OnOffHelpHandler,
+            .cmd_name = "help",
+            .cmd_help = "Usage : light ononff <subcommand>",
+        },
+        {
+            .cmd_func = OnLightCommandHandler,
+            .cmd_name = "on",
+            .cmd_help = "Sends on command to lighting app",
+        },
+        {
+            .cmd_func = OffLightCommandHandler,
+            .cmd_name = "off",
+            .cmd_help = "Sends off command to lighting app",
+        },
+    };
+
+    static const shell_command_t sLightCommand[] = {
+        {
+            .cmd_func = LightCommandHandler,
+            .cmd_name = "light",
+            .cmd_help = "Lighting-app commands. Usage: light <subcommand>",
+        },
+    };
+
+    sShellLightOnOffSubCommands.RegisterCommands(sLightOnOffSubCommands, ArraySize(sLightOnOffSubCommands));
+    sShellLightSubCommands.RegisterCommands(sLightSubCommands, ArraySize(sLightSubCommands));
+
+    Engine::Root().RegisterCommands(sLightCommand, ArraySize(sLightCommand));
+}
+#endif // ENABLE_CHIP_SHELL
+
 CHIP_ERROR AppTask::StartAppTask()
 {
     sAppEventQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), sAppEventQueueBuffer, &sAppEventQueueStruct);
@@ -117,6 +314,8 @@ CHIP_ERROR AppTask::StartAppTask()
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
+
+    sLightLEDLevelChangedCount = 0;
 
     // Wait for the WiFi to be initialized
     MT793X_LOG("APP: Wait WiFi Init");
@@ -159,13 +358,15 @@ CHIP_ERROR AppTask::Init()
     LightMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     sStatusLED.Init(LED_STATUS);
-    sLightLED.Init(LED_LIGHT);
-    sLightLED.Set(LightMgr().IsLightOn());
 
     ConfigurationMgr().LogDeviceConfig();
 
     // PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kSoftAP));
+
+#if defined(ENABLE_CHIP_SHELL)
+    RegisterLightCommands();
+#endif
 
     return error;
 }
@@ -238,23 +439,32 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     LightingManager::Action_t action;
     int32_t actor;
     CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t level  = 0;
 
     if (aEvent->Type == AppEvent::kEventType_Light)
     {
         action = static_cast<LightingManager::Action_t>(aEvent->LightEvent.Action);
         actor  = aEvent->LightEvent.Actor;
+        level  = aEvent->LightEvent.Value;
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        if (LightMgr().IsLightOn())
+        if (LightMgr().IsLightOn() && sLightLEDLevelChangedCount >= 4)
         {
-            action = LightingManager::OFF_ACTION;
+            sLightLEDLevelChangedCount = 1;
+            action                     = LightingManager::OFF_ACTION;
+        }
+        else if (LightMgr().IsLightOn() && sLightLEDLevelChangedCount < 4)
+        {
+            sLightLEDLevelChangedCount += 1;
+            action = LightingManager::LEVEL_ACTION;
         }
         else
         {
             action = LightingManager::ON_ACTION;
         }
         actor = AppEvent::kEventType_Button;
+        level = sLightLEDLevelChangedCount * 25;
     }
     else
     {
@@ -263,7 +473,20 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
 
     if (err == CHIP_NO_ERROR)
     {
-        initiated = LightMgr().InitiateAction(actor, action);
+        if (action == LightingManager::COLOR_ACTION)
+        {
+            RgbColor_t rbg;
+            uint32_t rbg_raw = aEvent->LightEvent.Value;
+            rbg.r            = rbg_raw & 0xFF;
+            rbg.g            = (rbg_raw & 0xFF00) >> 8;
+            rbg.b            = (rbg_raw & 0xFF0000) >> 16;
+            initiated        = LightMgr().InitiateAction(AppEvent::kEventType_Light, action, (uint8_t *) &rbg);
+        }
+        else
+        {
+            MT793X_LOG("Lighting level: %d", level);
+            initiated = LightMgr().InitiateAction(AppEvent::kEventType_Light, action, &level);
+        }
 
         if (!initiated)
         {
@@ -308,6 +531,21 @@ void AppTask::ButtonTimerEventHandler(AppEvent * aEvent)
     default:
         break;
     }
+}
+
+void AppTask::OccupancyEventHandler(AppEvent * aEvent)
+{
+    if (aEvent->Type != AppEvent::kEventType_Occupancy)
+    {
+        MT793X_LOG("A Non Occupancy received %d", aEvent->Type);
+        return;
+    }
+
+    uint8_t attributeValue = aEvent->OccupancytEvent.Present ? 1 : 0;
+
+    MT793X_LOG("Lighting occupancy: %u", attributeValue);
+
+    OccupancySensing::Attributes::Occupancy::Set(1, attributeValue);
 }
 
 void AppTask::SingleButtonEventHandler(AppEvent * aEvent)
@@ -359,6 +597,15 @@ void AppTask::SingleButtonEventHandler(AppEvent * aEvent)
 
         sAppTask.mFunction = kFunction_NoneSelected;
     }
+}
+
+void AppTask::OccupancyHandler(bool present)
+{
+    AppEvent occupancy_event                = {};
+    occupancy_event.Type                    = AppEvent::kEventType_Occupancy;
+    occupancy_event.OccupancytEvent.Present = present;
+    occupancy_event.Handler                 = OccupancyEventHandler;
+    sAppTask.PostEvent(&occupancy_event);
 }
 
 void AppTask::ButtonHandler(const filogic_button_t & button)
@@ -416,12 +663,18 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
     if (aAction == LightingManager::ON_ACTION)
     {
         MT793X_LOG("Turning light ON")
-        sLightLED.Set(true);
     }
     else if (aAction == LightingManager::OFF_ACTION)
     {
         MT793X_LOG("Turning light OFF")
-        sLightLED.Set(false);
+    }
+    else if (aAction == LightingManager::LEVEL_ACTION)
+    {
+        MT793X_LOG("Changing light level")
+    }
+    else if (aAction == LightingManager::COLOR_ACTION)
+    {
+        MT793X_LOG("Changing light color")
     }
 }
 
@@ -436,14 +689,23 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
     {
         MT793X_LOG("Light OFF")
     }
+    else if (aAction == LightingManager::LEVEL_ACTION)
+    {
+        MT793X_LOG("Light level changed")
+    }
+    else if (aAction == LightingManager::COLOR_ACTION)
+    {
+        MT793X_LOG("Light color changed")
+    }
 }
 
-void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction)
+void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint32_t uValue)
 {
     AppEvent event;
     event.Type              = AppEvent::kEventType_Light;
     event.LightEvent.Actor  = aActor;
     event.LightEvent.Action = aAction;
+    event.LightEvent.Value  = uValue;
     event.Handler           = LightActionEventHandler;
     PostEvent(&event);
 }
