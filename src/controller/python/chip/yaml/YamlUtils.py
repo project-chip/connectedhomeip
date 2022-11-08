@@ -48,7 +48,7 @@ def convert_name_value_pair_to_dict(arg_values):
 
 
 def convert_yaml_type(field_value, field_type, use_from_dict=False):
-    ''' Converts yaml value to expected python type.
+    ''' Converts yaml value to expected type.
 
     The YAML representation when converted to a Python dictionary does not
     quite line up in terms of type (see each of the specific if branches
