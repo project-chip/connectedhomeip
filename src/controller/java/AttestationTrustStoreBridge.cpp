@@ -18,6 +18,20 @@
 #include "AttestationTrustStoreBridge.h"
 #include <lib/support/CodeUtils.h>
 
+AttestationTrustStoreBridge::~AttestationTrustStoreBridge()
+{
+    if (!mPaaCerts.empty())
+    {
+        for (auto paaCert : mPaaCerts)
+        {
+            paaCert.clear();
+            paaCert.shrink_to_fit();
+        }
+        mPaaCerts.clear();
+        mPaaCerts.shrink_to_fit();
+    }
+}
+
 CHIP_ERROR AttestationTrustStoreBridge::GetProductAttestationAuthorityCert(const chip::ByteSpan & skid,
                                                                            chip::MutableByteSpan & outPaaDerBuffer) const
 {
