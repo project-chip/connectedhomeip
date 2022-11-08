@@ -17,8 +17,7 @@
 
 #
 #    @file
-#      Provides Python APIs for CHIP.
-#
+#      Provides Python APIs for Matter.
 
-"""Provides yaml parser Python APIs for CHIP."""
+"""Provides yaml parser Python APIs for Matter."""
 from . import YamlParser
