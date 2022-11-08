@@ -113,8 +113,10 @@ class InvokeAction(BaseAction):
             response_type = stringcase.pascalcase(self._request_object.response_type)
             expected_command = data_model_lookup.get_command(self._cluster, response_type)
             expected_response_args = self._expected_raw_response['values']
-            expected_response_data_as_dict = YamlUtils.convert_name_value_pair_to_dict(expected_response_args)
-            expected_response_data = YamlUtils.convert_yaml_type(expected_response_data_as_dict, expected_command)
+            expected_response_data_as_dict = YamlUtils.convert_name_value_pair_to_dict(
+                expected_response_args)
+            expected_response_data = YamlUtils.convert_yaml_type(
+                expected_response_data_as_dict, expected_command)
             self._expected_response_object = expected_command.FromDict(expected_response_data)
 
     def run_action(self, dev_ctrl: ChipDeviceCtrl, endpoint: int, node_id: int):
@@ -258,7 +260,8 @@ class WriteAttributeAction(BaseAction):
 
     def run_action(self, dev_ctrl: ChipDeviceCtrl, endpoint: int, node_id: int):
         try:
-            resp = asyncio.run(dev_ctrl.WriteAttribute(node_id, [(endpoint, self._request_object)]))
+            resp = asyncio.run(
+                dev_ctrl.WriteAttribute(node_id, [(endpoint, self._request_object)]))
         except chip.interaction_model.InteractionModelError:
             if (self.expected_raw_response is not None and
                     self.expected_raw_response.get('error')):
