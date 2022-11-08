@@ -19,10 +19,9 @@ import typing
 from chip.clusters.Types import Nullable, NullValue
 from chip.tlv import uint, float32
 import enum
-import stringcase
 
 
-HEX_PREFIX = 'hex:'
+_HEX_PREFIX = 'hex:'
 
 
 class ValidationError(Exception):
@@ -123,8 +122,8 @@ def convert_yaml_type(field_value, field_type, use_from_dict=False):
         return field_type(field_value)
     # YAML treats bytes as strings. Convert to a byte string.
     elif (field_type == bytes and type(field_value) != bytes):
-        if isinstance(field_value, str) and field_value.startswith(HEX_PREFIX):
-            return bytes.fromhex(field_value[len(HEX_PREFIX):])
+        if isinstance(field_value, str) and field_value.startswith(_HEX_PREFIX):
+            return bytes.fromhex(field_value[len(_HEX_PREFIX):])
         return str.encode(field_value)
     # By default, just return the field_value casted to field_type.
     else:

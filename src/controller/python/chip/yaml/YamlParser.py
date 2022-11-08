@@ -31,7 +31,7 @@ from chip.yaml.DataModelLookup import (
     PreDefinedDataModelLookup as PreDefinedDataModelLookup)
 import chip.yaml.YamlUtils as YamlUtils
 
-
+_SUCCESS_STATUS_CODE = "SUCCESS"
 logger = logging.getLogger('YamlParser')
 
 
@@ -123,8 +123,11 @@ class InvokeAction(BaseAction):
         try:
             resp = asyncio.run(dev_ctrl.SendCommand(node_id, endpoint, self._request_object))
         except chip.interaction_model.InteractionModelError:
-            if (self._expected_raw_response is not None and
-                    self._expected_raw_response.get('error')):
+            if self._expected_raw_response is None:
+                raise
+
+            expected_status_code = self._expected_raw_response.get('error')
+            if expected_status_code is not None and expected_status_code != _SUCCESS_STATUS_CODE:
                 logger.debug('Got error response, but was expected')
             else:
                 raise
@@ -195,9 +198,12 @@ class ReadAttributeAction(BaseAction):
         try:
             resp = asyncio.run(dev_ctrl.ReadAttribute(node_id, [(self._request_object)]))
         except chip.interaction_model.InteractionModelError:
-            if (self._expected_raw_response is not None and
-                    self._expected_raw_response.get('error')):
-                logger.debug('Got error, but was expected')
+            if self._expected_raw_response is None:
+                raise
+
+            expected_status_code = self._expected_raw_response.get('error')
+            if expected_status_code is not None and expected_status_code != _SUCCESS_STATUS_CODE:
+                logger.debug('Got error response, but was expected')
             else:
                 raise
 
@@ -297,18 +303,18 @@ class YamlTestParser:
         self._data_model_lookup = PreDefinedDataModelLookup()
 
         for item in self._raw_data['tests']:
-            # We only support parsing invoke interactions. As support for write/reads get added,
-            # these skips will be removed.
+            # This currently behaves differently than the c++ version. We are evaluating if test
+            # is disabled before anything else, allowing for incorrectly named commands.
+            if item.get('disabled'):
+                logger.info(f"Test is disabled, skipping {item['label']}")
+                continue
+
             action = None
             cluster = self._cluster
             # Some of the tests contain 'cluster over-rides' that refer to a different
             # cluster than that specified in 'config'.
             if (item.get('cluster')):
                 cluster = item.get('cluster').replace(' ', '').replace('/', '')
-
-            if item.get('disabled'):
-                logger.info(f"Test is disabled, skipping {item['label']}")
-                continue
             if item['command'] == 'writeAttribute':
                 action = self._attribute_write_action_factory(item, cluster)
             elif item['command'] == 'readAttribute':
