@@ -29,10 +29,14 @@ public:
                              chip::Controller::ReadResponseSuccessCallback<typename TypeInfo::DecodableArgType> successFn,
                              chip::Controller::ReadResponseFailureCallback failureFn)
     {
-        VerifyOrDieWithMsg(mTargetVideoPlayerInfo != nullptr, AppServer, "Target unknown");
+        ReturnErrorCodeIf(mTargetVideoPlayerInfo == nullptr, CHIP_ERROR_PEER_NODE_NOT_FOUND);
 
         auto deviceProxy = mTargetVideoPlayerInfo->GetOperationalDeviceProxy();
         ReturnErrorCodeIf(deviceProxy == nullptr || !deviceProxy->ConnectionReady(), CHIP_ERROR_PEER_NODE_NOT_FOUND);
+        ReturnErrorCodeIf(!deviceProxy->GetSecureSession().HasValue(), CHIP_ERROR_MISSING_SECURE_SESSION);
+        const chip::SessionHandle & sessionHandle = deviceProxy->GetSecureSession().Value();
+        ReturnErrorCodeIf(!sessionHandle->IsSecureSession(), CHIP_ERROR_MISSING_SECURE_SESSION);
+        ReturnErrorCodeIf(sessionHandle->AsSecureSession()->IsDefunct(), CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY);
 
         MediaClusterBase cluster(*deviceProxy->GetExchangeManager(), deviceProxy->GetSecureSession().Value(), mClusterId,
                                  mTvEndpoint);
