@@ -28,6 +28,7 @@ if (CONFIG_CHIP)
 include(ExternalProject)
 include(../../zephyr/ota-image.cmake)
 include(../../zephyr/zephyr-util.cmake)
+include(generate_factory_data.cmake)
 
 # ==============================================================================
 # Declare configuration variables and define constants
@@ -45,7 +46,7 @@ list(APPEND CHIP_CFLAGS_CC)
 # CHIP libraries that the application should be linked with
 list(APPEND CHIP_LIBRARIES)
 
-# GN meta-build system arguments in the form of 'key1 = value1\nkey2 = value2...' string
+# GN meta-build system arguments passed to the make_gn_args.py script
 string(APPEND CHIP_GN_ARGS)
 
 # C/C++ compiler flags which should not be forwarded to CHIP
@@ -67,28 +68,27 @@ set(CHIP_CFLAG_EXCLUDES
 # ==============================================================================
 
 macro(chip_gn_arg_import FILE)
-    string(APPEND CHIP_GN_ARGS "import(\"${FILE}\")\n")
+    string(APPEND CHIP_GN_ARGS "--module\n${FILE}\n")
 endmacro()
 
 macro(chip_gn_arg_string ARG STRING)
-    string(APPEND CHIP_GN_ARGS "${ARG} = \"${STRING}\"\n")
+    string(APPEND CHIP_GN_ARGS "--arg-string\n${ARG}\n${STRING}\n")
 endmacro()
 
-macro(chip_gn_arg_bool ARG BOOLEAN)
-    if (${BOOLEAN})
-        string(APPEND CHIP_GN_ARGS "${ARG} = true\n")
+macro(chip_gn_arg_bool ARG)
+    if (${ARGN})
+        string(APPEND CHIP_GN_ARGS "--arg\n${ARG}\ntrue\n")
     else()
-        string(APPEND CHIP_GN_ARGS "${ARG} = false\n")
+        string(APPEND CHIP_GN_ARGS "--arg\n${ARG}\nfalse\n")
     endif()
 endmacro()
 
 macro(chip_gn_arg_cflags ARG CFLAGS)
-    set(CFLAG_EXCLUDES "[")
-    foreach(cflag ${CHIP_CFLAG_EXCLUDES})
-        string(APPEND CFLAG_EXCLUDES "\"${cflag}\", ")
-    endforeach()
-    string(APPEND CFLAG_EXCLUDES "]")
-    string(APPEND CHIP_GN_ARGS "${ARG} = filter_exclude(string_split(\"${CFLAGS}\"), ${CFLAG_EXCLUDES})\n")
+    string(APPEND CHIP_GN_ARGS "--arg-cflags\n${ARG}\n${CFLAGS}\n")
+endmacro()
+
+macro(chip_gn_arg ARG VALUE)
+    string(APPEND CHIP_GN_ARGS "--arg\n${ARG}\n${VALUE}\n")
 endmacro()
 
 # ==============================================================================
@@ -197,8 +197,6 @@ chip_gn_arg_cflags("target_cflags_cc"                       ${CHIP_CFLAGS_CC})
 chip_gn_arg_string("zephyr_ar"                              ${CMAKE_AR})
 chip_gn_arg_string("zephyr_cc"                              ${CMAKE_C_COMPILER})
 chip_gn_arg_string("zephyr_cxx"                             ${CMAKE_CXX_COMPILER})
-chip_gn_arg_string("chip_project_config_include"            "${CHIP_PROJECT_CONFIG}")
-chip_gn_arg_string("chip_system_project_config_include"     "${CHIP_PROJECT_CONFIG}")
 chip_gn_arg_bool  ("is_debug"                               CONFIG_DEBUG)
 chip_gn_arg_bool  ("chip_enable_openthread"                 CONFIG_NET_L2_OPENTHREAD)
 chip_gn_arg_bool  ("chip_openthread_ftd"                    CONFIG_OPENTHREAD_FTD)
@@ -208,16 +206,32 @@ chip_gn_arg_bool  ("chip_build_tests"                       CONFIG_CHIP_BUILD_TE
 chip_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHELL)
 
+if (CONFIG_CHIP_FACTORY_DATA)
+    chip_gn_arg_bool  ("chip_use_transitional_commissionable_data_provider"  "false")
+    chip_gn_arg_bool  ("chip_enable_factory_data"                            "true")
+elseif (CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
+    chip_gn_arg_bool  ("chip_use_transitional_commissionable_data_provider"  "false")
+endif()
+
+if (CONFIG_CHIP_ROTATING_DEVICE_ID)
+    chip_gn_arg_bool("chip_enable_rotating_device_id"          "true")
+    chip_gn_arg_bool("chip_enable_additional_data_advertising" "true")
+endif()
+
 if (CONFIG_CHIP_ENABLE_DNSSD_SRP)
     chip_gn_arg_string("chip_mdns" "platform")
 endif()
 
+if (CHIP_PROJECT_CONFIG)
+    chip_gn_arg_string("chip_project_config_include"        ${CHIP_PROJECT_CONFIG})
+    chip_gn_arg_string("chip_system_project_config_include" ${CHIP_PROJECT_CONFIG})
+endif()
 if (CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER)
     chip_gn_arg_bool("chip_build_example_providers" "true")
     list(APPEND CHIP_LIBRARIES -lMatterDeviceInfoProviderExample)
 endif()
 
-file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/args.gn CONTENT ${CHIP_GN_ARGS})
+file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/args.tmp" CONTENT ${CHIP_GN_ARGS})
 
 # ==============================================================================
 # Define 'chip-gn' target that builds CHIP library(ies) with GN build system
@@ -227,13 +241,17 @@ ExternalProject_Add(
     PREFIX                  ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR              ${CHIP_ROOT}
     BINARY_DIR              ${CMAKE_CURRENT_BINARY_DIR}
-    CONFIGURE_COMMAND       ${GN_EXECUTABLE}
+    CONFIGURE_COMMAND       ""
+    BUILD_COMMAND           ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/make_gn_args.py
+                                @args.tmp > args.gn &&
+                            ${GN_EXECUTABLE}
                                 --root=${CHIP_ROOT}
                                 --root-target=${GN_ROOT_TARGET}
                                 --dotfile=${GN_ROOT_TARGET}/.gn
                                 --script-executable=${Python3_EXECUTABLE}
-                                gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
-    BUILD_COMMAND           ninja
+                                --export-compile-commands
+                                gen --check --fail-on-unused-args . &&
+                            ninja
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${CHIP_LIBRARIES}
     BUILD_ALWAYS            TRUE
@@ -288,11 +306,11 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
         west sign -t imgtool -p ${ZEPHYR_BASE}/../bootloader/mcuboot/scripts/imgtool.py -d ${PROJECT_BINARY_DIR}/.. -- --key ${ZEPHYR_BASE}/../bootloader/mcuboot/root-rsa-2048.pem
     )
 
-    add_custom_target(final_bin ALL
+    add_custom_target(merge_mcuboot ALL
         COMMAND
-        dd if=${PROJECT_BINARY_DIR}/../modules/chip-module/build_mcuboot/zephyr/zephyr.bin of=${PROJECT_BINARY_DIR}/zephyr_final.bin
+        dd if=${PROJECT_BINARY_DIR}/../modules/chip-module/build_mcuboot/zephyr/zephyr.bin of=${PROJECT_BINARY_DIR}/zephyr.bin
         COMMAND
-        dd if=${PROJECT_BINARY_DIR}/zephyr.signed.bin of=${PROJECT_BINARY_DIR}/zephyr_final.bin bs=1024 seek=64
+        dd if=${PROJECT_BINARY_DIR}/zephyr.signed.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=64
     )
 
     chip_ota_image(chip-ota-image
@@ -301,8 +319,28 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     )
 
     add_dependencies(west_sign ${ZEPHYR_FINAL_EXECUTABLE})
-    add_dependencies(final_bin west_sign)
+    add_dependencies(merge_mcuboot west_sign)
     add_dependencies(chip-ota-image west_sign)
+endif()
+
+if (CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)
+    add_custom_target(merge_factory_data ALL
+        COMMAND
+        dd if=${PROJECT_BINARY_DIR}/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=976
+    )
+if (CONFIG_CHIP_OTA_IMAGE_BUILD)
+    add_dependencies(merge_factory_data merge_mcuboot)
+else()
+    add_dependencies(merge_factory_data ${ZEPHYR_FINAL_EXECUTABLE})
+endif()
+endif()
+
+# ==============================================================================
+# Define 'factory_data' target for generating a factory data partition
+# ==============================================================================
+
+if (CONFIG_CHIP_FACTORY_DATA_BUILD)
+    telink_generate_factory_data()
 endif()
 
 endif() # CONFIG_CHIP
