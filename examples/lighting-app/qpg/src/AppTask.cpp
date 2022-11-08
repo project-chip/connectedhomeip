@@ -615,27 +615,29 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
     {
     case DeviceEventType::kServiceProvisioningChange: {
         sIsThreadProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
+        UpdateLEDs();
         break;
     }
 
     case DeviceEventType::kThreadConnectivityChange: {
         sIsThreadEnabled = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
+        UpdateLEDs();
         break;
     }
 
     case DeviceEventType::kCHIPoBLEConnectionEstablished: {
         sHaveBLEConnections = true;
+        UpdateLEDs();
         break;
     }
 
     case DeviceEventType::kCHIPoBLEConnectionClosed: {
         sHaveBLEConnections = false;
+        UpdateLEDs();
         break;
     }
 
     default:
         break;
     }
-
-    UpdateLEDs();
 }
