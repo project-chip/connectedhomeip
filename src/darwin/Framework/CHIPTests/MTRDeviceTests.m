@@ -1234,6 +1234,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type clusterStateCacheContainer = [[MTRAttributeCacheContainer alloc] init];
     __auto_type * params = [[MTRSubscribeParams alloc] init];
     params.resubscribeIfLost = NO;
+    params.replaceExistingSubscriptions = NO; // Not strictly needed, but checking that doing this does not
+                                              // affect this subscription erroring out correctly.
     [device subscribeWithQueue:queue
         minInterval:1
         maxInterval:2
@@ -1272,6 +1274,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Create second subscription which will cancel the first subscription.  We
     // can use a non-existent path here to cut down on the work that gets done.
+    params.replaceExistingSubscriptions = YES;
     [device subscribeAttributeWithEndpointId:@10000
                                    clusterId:@6
                                  attributeId:@0
@@ -1330,6 +1333,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Create second subscription which will cancel the first subscription.  We
     // can use a non-existent path here to cut down on the work that gets done.
+    params.replaceExistingSubscriptions = YES;
     [device subscribeAttributeWithEndpointId:@10000
                                    clusterId:@6
                                  attributeId:@0
@@ -1364,6 +1368,67 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [device setDelegate:delegate queue:queue];
 
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+}
+
+- (void)test018_SubscriptionErrorWhenNotResubscribing
+{
+#if MANUAL_INDIVIDUAL_TEST
+    [self initStack];
+    [self waitForCommissionee];
+#endif
+    MTRBaseDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * firstSubscribeExpectation = [self expectationWithDescription:@"First subscription complete"];
+    XCTestExpectation * errorExpectation = [self expectationWithDescription:@"First subscription errored out"];
+
+    // Subscribe
+    MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
+    params.resubscribeIfLost = NO;
+    params.replaceExistingSubscriptions = NO; // Not strictly needed, but checking that doing this does not
+                                              // affect this subscription erroring out correctly.
+    __block BOOL subscriptionEstablished = NO;
+    [device subscribeToAttributesWithEndpointID:@1
+        clusterID:@6
+        attributeID:@0
+        params:params
+        queue:queue
+        reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+            if (subscriptionEstablished) {
+                // We should only get an error here.
+                XCTAssertNil(values);
+                XCTAssertNotNil(error);
+                [errorExpectation fulfill];
+            } else {
+                XCTAssertNotNil(values);
+                XCTAssertNil(error);
+            }
+        }
+        subscriptionEstablished:^{
+            NSLog(@"subscribe attribute: OnOff established");
+            XCTAssertFalse(subscriptionEstablished);
+            subscriptionEstablished = YES;
+            [firstSubscribeExpectation fulfill];
+        }];
+
+    // Wait till establishment
+    [self waitForExpectations:@[ firstSubscribeExpectation ] timeout:kTimeoutInSeconds];
+
+    // Create second subscription which will cancel the first subscription.  We
+    // can use a non-existent path here to cut down on the work that gets done.
+    params.replaceExistingSubscriptions = YES;
+    [device subscribeAttributeWithEndpointId:@10000
+                                   clusterId:@6
+                                 attributeId:@0
+                                 minInterval:@(1)
+                                 maxInterval:@(2)
+                                      params:params
+                                 clientQueue:queue
+                               reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+                               }
+                     subscriptionEstablished:^() {
+                     }];
+    [self waitForExpectations:@[ errorExpectation ] timeout:60];
 }
 
 - (void)test900_SubscribeAllAttributes
