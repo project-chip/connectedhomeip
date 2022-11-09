@@ -1,4 +1,4 @@
-# Bouffalo Lab
+# `Bouffalo Lab`
 
 This example functions as a light bulb device type, with on/off and level
 capabilities and uses a test Vendor ID (VID) and a Product ID (PID)
@@ -95,12 +95,15 @@ and BL706 develop board `XT-ZB6-DevKit`.
     After building gets done, python script
     `chip-bl602-lighting-example.flash.py` or
     `chip-bl702-lighting-example.flash.py` will generate under build output
-    folder for BL602 or BL702 building. 
+    folder for BL602 or BL702 building.
+
     > Note, different build options will generate different output folder.
 
     > Note, make sure terminal is under Matter build environment.
 
-    Download operation steps as below, please check `help` option of script for more detail.
+    Download operation steps as below, please check `help` option of script for
+    more detail.
+
     -   Connect the board to your build machine
 
     -   Put the board to the download mode:
