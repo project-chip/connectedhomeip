@@ -1222,7 +1222,7 @@ exit:
                    auto readClient = Platform::New<app::ReadClient>(
                        engine, exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
 
-                   if (params.replaceExistingSubscriptions) {
+                   if (!params.resubscribeIfLost) {
                        err = readClient->SendRequest(readParams);
                    } else {
                        err = readClient->SendAutoResubscribeRequest(std::move(readParams));
