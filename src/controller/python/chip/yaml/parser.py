@@ -286,7 +286,9 @@ class YamlTestParser:
 
         self._name = self._raw_data['name']
         self._node_id = self._raw_data['config']['nodeId']
-        self._cluster = self._raw_data['config']['cluster'].replace(' ', '')
+        self._cluster = self._raw_data['config'].get('cluster')
+        if self._cluster:
+            self._cluster = self._cluster.replace(' ', '')
         self._endpoint = self._raw_data['config']['endpoint']
         self._base_action_test_list = []
         self._data_model_lookup = PreDefinedDataModelLookup()
