@@ -26,7 +26,7 @@ public class AppParameters {
   private byte[] rotatingDeviceIdUniqueId;
   private DACProvider dacProvider = TEST_DAC_PROVIDER;
   private int setupPasscode = TEST_SETUP_PASSCODE;
-  public int discriminator = TEST_DISCRIMINATOR;
+  private int discriminator = TEST_DISCRIMINATOR;
 
   public void setRotatingDeviceIdUniqueId(byte[] rotatingDeviceIdUniqueId) {
     this.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueId;
