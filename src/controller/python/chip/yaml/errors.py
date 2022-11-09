@@ -15,9 +15,16 @@
 #    limitations under the License.
 #
 
-#
-#    @file
-#      Provides Python APIs for Matter.
+class ParsingError(ValueError):
+    def __init__(self, message):
+        super().__init__(message)
 
-"""Provides yaml parser Python APIs for Matter."""
-from . import parser
+
+class UnexpectedParsingError(ParsingError):
+    def __init__(self, message):
+        super().__init__(message)
+
+
+class ValidationError(Exception):
+    def __init__(self, message):
+        super().__init__(message)

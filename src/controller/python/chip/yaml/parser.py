@@ -26,23 +26,12 @@ import chip.interaction_model
 import asyncio as asyncio
 import logging
 import math
-from chip.yaml.DataModelLookup import (
-    DataModelLookup as DataModelLookup,
-    PreDefinedDataModelLookup as PreDefinedDataModelLookup)
-import chip.yaml.YamlUtils as YamlUtils
+from chip.yaml.errors import ParsingError, UnexpectedParsingError
+from .data_model_lookup import *
+import chip.yaml.format_converter as Converter
 
 _SUCCESS_STATUS_CODE = "SUCCESS"
 logger = logging.getLogger('YamlParser')
-
-
-class ParsingError(ValueError):
-    def __init__(self, message):
-        super().__init__(message)
-
-
-class UnexpectedParsingError(ParsingError):
-    def __init__(self, message):
-        super().__init__(message)
 
 
 class BaseAction(ABC):
@@ -92,10 +81,10 @@ class InvokeAction(BaseAction):
         if (item.get('arguments')):
             args = item['arguments']['values']
 
-            request_data_as_dict = YamlUtils.convert_name_value_pair_to_dict(args)
+            request_data_as_dict = Converter.convert_name_value_pair_to_dict(args)
 
             try:
-                request_data = YamlUtils.convert_yaml_type(
+                request_data = Converter.convert_yaml_type(
                     request_data_as_dict, type(command_object))
             except ValueError:
                 raise ParsingError('Could not covert yaml type')
@@ -113,9 +102,9 @@ class InvokeAction(BaseAction):
             response_type = stringcase.pascalcase(self._request_object.response_type)
             expected_command = data_model_lookup.get_command(self._cluster, response_type)
             expected_response_args = self._expected_raw_response['values']
-            expected_response_data_as_dict = YamlUtils.convert_name_value_pair_to_dict(
+            expected_response_data_as_dict = Converter.convert_name_value_pair_to_dict(
                 expected_response_args)
-            expected_response_data = YamlUtils.convert_yaml_type(
+            expected_response_data = Converter.convert_yaml_type(
                 expected_response_data_as_dict, expected_command)
             self._expected_response_object = expected_command.FromDict(expected_response_data)
 
@@ -191,7 +180,7 @@ class ReadAttributeAction(BaseAction):
         if 'value' in self._expected_raw_response:
             self._expected_response_object = self._request_object.attribute_type.Type
             expected_response_value = self._expected_raw_response['value']
-            self._expected_response_data = YamlUtils.convert_yaml_type(
+            self._expected_response_data = Converter.convert_yaml_type(
                 expected_response_value, self._expected_response_object, use_from_dict=True)
 
     def run_action(self, dev_ctrl: ChipDeviceCtrl, endpoint: int, node_id: int):
@@ -254,7 +243,7 @@ class WriteAttributeAction(BaseAction):
         if (item.get('arguments')):
             args = item['arguments']['value']
             try:
-                request_data = YamlUtils.convert_yaml_type(
+                request_data = Converter.convert_yaml_type(
                     args, attribute.attribute_type.Type)
             except ValueError:
                 raise ParsingError('Could not covert yaml type')

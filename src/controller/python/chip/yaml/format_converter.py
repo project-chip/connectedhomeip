@@ -19,14 +19,10 @@ import typing
 from chip.clusters.Types import Nullable, NullValue
 from chip.tlv import uint, float32
 import enum
+from chip.yaml.errors import ValidationError
 
 
 _HEX_PREFIX = 'hex:'
-
-
-class ValidationError(Exception):
-    def __init__(self, message):
-        super().__init__(message)
 
 
 def convert_name_value_pair_to_dict(arg_values):
