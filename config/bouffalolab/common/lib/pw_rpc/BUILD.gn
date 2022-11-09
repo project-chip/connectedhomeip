@@ -14,13 +14,34 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
-import("${chip_root}/src/platform/bouffalolab/BL602/args.gni")
+import("$dir_pw_build/target_types.gni")
 
-bl602_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+config("pw_string_config") {
+  defines = [
+    "_GLIBCXX_USE_C99_MATH_TR1",
+    "_LDBL_EQ_DBL",
+  ]
+}
 
-pw_log_BACKEND = "${chip_root}/src/lib/support/pw_log_chip"
-pw_assert_BACKEND = "$dir_pw_assert_log"
-pw_rpc_CONFIG = "$dir_pw_rpc:disable_global_mutex"
+pw_source_set("pw_string_dep") {
+  public_configs = [ ":pw_string_config" ]
+}
 
-chip_enable_ota_requestor = true
-chip_detail_logging = false
+static_library("pw_rpc") {
+  output_name = "libPwRpc"
+
+  public_configs = [ "${dir_pigweed}/pw_hdlc:default_config" ]
+
+  public_deps = [
+    "$dir_pw_rpc:server",
+    "$dir_pw_rpc/nanopb:echo_service",
+    "${chip_root}/examples/platform/bouffalolab/common/rpc/pw_sys_io:pw_sys_io",
+    "${dir_pigweed}/pw_hdlc:pw_rpc",
+    dir_pw_assert,
+    dir_pw_checksum,
+    dir_pw_hdlc,
+    dir_pw_log,
+  ]
+
+  output_dir = "${root_out_dir}/lib"
+}
