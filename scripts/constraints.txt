@@ -61,9 +61,7 @@ cryptography==3.4.7
     # via
     #   -c constraints.esp32.txt
     #   -r requirements.txt
-cxxfilt==0.2.2
-    # via -r requirements.txt
-dbus-python==1.2.18 ; sys_platform == "linux"
+cxxfilt==0.2.2 ; sys_platform == "linux"
     # via -r requirements.txt
 decorator==5.0.9
     # via ipython
