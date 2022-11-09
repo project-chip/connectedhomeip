@@ -139,9 +139,6 @@ class DeviceProvisioningFragment : Fragment() {
       if (thread != null) {
         network = NetworkCredentials.forThread(NetworkCredentials.ThreadCredentials(thread.operationalDataset))
       }
-      if(network == null) {
-        throw IllegalArgumentException("Network credentials is empty.")
-      }
       deviceController.setDeviceAttestationFailureCallback(600
       ) { devicePtr, errorCode ->
         Log.i(TAG, "Device attestation errorCode: $errorCode")
