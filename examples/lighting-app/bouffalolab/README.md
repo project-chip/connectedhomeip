@@ -1,4 +1,4 @@
-# BL602
+# Bouffalo Lab
 
 This example functions as a light bulb device type, with on/off and level
 capabilities and uses a test Vendor ID (VID) and a Product ID (PID)
@@ -55,7 +55,7 @@ Mac OS.
 
 ## Build CHIP Lighting App example
 
-The following steps take examples for BL602 develop board BL602-IoT-Matter-V1
+The following steps take examples for BL602 develop board `BL602-IoT-Matter-V1`
 and BL706 develop board `XT-ZB6-DevKit`.
 
 -   Build lighting app
@@ -94,11 +94,13 @@ and BL706 develop board `XT-ZB6-DevKit`.
 
     After building gets done, python script
     `chip-bl602-lighting-example.flash.py` or
-    `chip-bl702-lighting-example.flash.py` will generated under build output
-    folder for BL602 or BL702 building. These python script python uses module
-    `bflb-iot-tool`, make sure terminal is under Matter build environment.
-    Please check `help` option of script for more detail.
+    `chip-bl702-lighting-example.flash.py` will generate under build output
+    folder for BL602 or BL702 building. 
+    > Note, different build options will generate different output folder.
 
+    > Note, make sure terminal is under Matter build environment.
+
+    Download operation steps as below, please check `help` option of script for more detail.
     -   Connect the board to your build machine
 
     -   Put the board to the download mode:
@@ -116,7 +118,7 @@ and BL706 develop board `XT-ZB6-DevKit`.
             ./out/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0
             ```
 
-        -   `xt-zb6-devkit` without additional build options
+        -   `xt-zb6-devkit` with 115200 baudrate setting
 
             ```shell
             ./out/bouffalolab-xt-zb6-devkit-light-115200/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0
