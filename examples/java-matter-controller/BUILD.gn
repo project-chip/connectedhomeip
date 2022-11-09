@@ -21,7 +21,7 @@ import("${chip_root}/build/chip/tools.gni")
 
 build_java_matter_controller = true
 
-android_binary("java-matter-controller") {
+java_binary("java-matter-controller") {
   output_name = "java-matter-controller"
   deps = [
     "${chip_root}/src/controller/java",
