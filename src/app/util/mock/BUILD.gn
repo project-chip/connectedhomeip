@@ -20,10 +20,6 @@ config("mock_include") {
 
 source_set("mock_ember") {
   sources = [ "attribute-storage.cpp" ]
-  include_dirs = [
-    "/usr/local/buildtools/java/jdk/include/",
-    "/usr/local/buildtools/java/jdk/include/linux",
-  ]
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/lib/core",

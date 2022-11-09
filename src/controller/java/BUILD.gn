@@ -27,10 +27,7 @@ if (defined(build_java_matter_controller)) {
 
 shared_library("jni") {
   output_name = "libCHIPController"
-  include_dirs = [
-      "/usr/local/buildtools/java/jdk/include/",
-      "/usr/local/buildtools/java/jdk/include/linux",
-  ]
+
   sources = [
     "AndroidCallbacks-JNI.cpp",
     "AndroidCallbacks.cpp",
@@ -72,7 +69,26 @@ shared_library("jni") {
 
   output_dir = "${root_out_dir}/lib/jni"
 
-  cflags = [ "-Wno-unknown-pragmas" ]
+  if (build_java_matter_controller)
+  {
+    include_dirs = [
+        "/usr/local/buildtools/java/jdk/include/",
+        "/usr/local/buildtools/java/jdk/include/linux",
+    ]
+
+    deps += [
+        "${chip_root}/src/platform/Linux",
+    ]
+
+    cflags = [ "-Wno-unknown-pragmas" ]
+  }
+  else
+  {
+    deps += [
+        "${chip_root}/src/platform/android",
+    ]
+  }
+
   ldflags = [ "-Wl,--gc-sections" ]
 }
 

@@ -22,7 +22,6 @@ import("${chip_root}/src/platform/device.gni")
 
 assert(chip_device_platform == "linux")
 
-chip_enable_openthread = false
 if (chip_use_pw_logging) {
   import("//build_overrides/pigweed.gni")
 }
@@ -68,6 +67,7 @@ static_library("Linux") {
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
+    "Logging.cpp",
     "NetworkCommissioningDriver.h",
     "NetworkCommissioningEthernetDriver.cpp",
     "PlatformManagerImpl.cpp",
@@ -77,10 +77,6 @@ static_library("Linux") {
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
   ]
-
-  if (!chip_use_external_logging) {
-    sources += [ "Logging.cpp" ]
-  }
 
   if (chip_enable_openthread) {
     sources += [ "NetworkCommissioningThreadDriver.cpp" ]

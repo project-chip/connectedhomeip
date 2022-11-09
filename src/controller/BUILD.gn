@@ -56,7 +56,7 @@ static_library("controller") {
     ]
   }
 
-  cflags = [ "-Wconversion", "-Wno-error", "-Wno-dangling-pointer"]
+  cflags = [ "-Wconversion", "-Wno-dangling-pointer" ]
 
   public_deps = [
     "${chip_root}/src/app",

@@ -25,10 +25,6 @@ config("server_config") {
 
 static_library("server") {
   output_name = "libCHIPAppServer"
-  include_dirs = [
-    "/usr/local/buildtools/java/jdk/include/",
-    "/usr/local/buildtools/java/jdk/include/linux",
-  ]
   sources = [
     "AclStorage.cpp",
     "AclStorage.h",

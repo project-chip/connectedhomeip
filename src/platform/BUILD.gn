@@ -22,7 +22,6 @@ import("${chip_root}/build/chip/buildconfig_header.gni")
 
 import("device.gni")
 
-chip_enable_openthread = false
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
 
@@ -322,10 +321,6 @@ if (chip_device_platform != "none") {
 
   static_library("platform") {
     output_name = "libDeviceLayer"
-    include_dirs = [
-      "/usr/local/buildtools/java/jdk/include/",
-      "/usr/local/buildtools/java/jdk/include/linux",
-    ]
     sources = [
       "../include/platform/BuildTime.h",
       "../include/platform/CHIPDeviceConfig.h",
@@ -343,6 +338,7 @@ if (chip_device_platform != "none") {
       "../include/platform/PersistedStorage.h",
       "../include/platform/PlatformManager.h",
       "../include/platform/TestOnlyCommissionableDataProvider.h",
+      "../include/platform/ThreadStackManager.h",
       "../include/platform/internal/BLEManager.h",
       "../include/platform/internal/CHIPDeviceLayerInternal.h",
       "../include/platform/internal/DeviceNetworkInfo.h",

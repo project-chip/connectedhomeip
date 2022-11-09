@@ -23,6 +23,13 @@ import("${chip_root}/build/chip/chip_version.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/lib/core/core.gni")
 
+build_java_matter_controller = true
+if (defined(build_java_matter_controller)) {
+  build_java_matter_controller = build_java_matter_controller
+} else {
+  build_java_matter_controller = false
+}
+
 declare_args() {
   # Set to true to run the PersistentStorageDelegate API compliance audit
   chip_support_enable_storage_api_audit = false
@@ -74,11 +81,6 @@ source_set("chip_version_header") {
 
   deps = [ ":gen_chip_version" ]
 }
-
-pw_JAVA_NATIVE_INTERFACE_INCLUDE_DIRS = [
-"/usr/local/buildtools/java/jdk/include/",
-"/usr/local/buildtools/java/jdk/include/linux",
-]
 
 static_library("support") {
   output_name = "libSupportLayer"
@@ -150,10 +152,16 @@ static_library("support") {
     "verhoeff/Verhoeff36.cpp",
   ]
 
-  include_dirs = pw_JAVA_NATIVE_INTERFACE_INCLUDE_DIRS
+  if (build_java_matter_controller)
+  {
+    include_dirs = [
+      "/usr/local/buildtools/java/jdk/include/",
+      "/usr/local/buildtools/java/jdk/include/linux",
+    ]
+  }
 
   # added JNI helper on android
-  if (current_os != "android") {
+  if (current_os == "android" || build_java_matter_controller) {
     sources += [
       "CHIPJNIError.h",
       "JniReferences.cpp",

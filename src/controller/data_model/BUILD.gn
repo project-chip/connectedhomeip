@@ -20,6 +20,13 @@ import("$dir_pw_build/python.gni")
 import("${chip_root}/build/chip/chip_codegen.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
+build_java_matter_controller = true
+if (defined(build_java_matter_controller)) {
+  build_java_matter_controller = build_java_matter_controller
+} else {
+  build_java_matter_controller = false
+}
+
 chip_data_model("data_model") {
   zap_file = "controller-clusters.zap"
 
@@ -29,7 +36,7 @@ chip_data_model("data_model") {
   allow_circular_includes_from = [ "${chip_root}/src/controller" ]
 }
 
-if (current_os != "android") {
+if (current_os == "android" || build_java_matter_controller) {
   chip_codegen("java-jni-generate") {
     input = "controller-clusters.matter"
     generator = "java"
@@ -171,10 +178,6 @@ if (current_os != "android") {
   source_set("java-jni-sources") {
     sources = get_target_outputs(":java-jni-generate")
     public_configs = [ "${chip_root}/src:includes" ]
-    include_dirs = [
-      "/usr/local/buildtools/java/jdk/include/",
-      "/usr/local/buildtools/java/jdk/include/linux",
-      ]
     deps = [
       ":data_model",
       ":java-jni-generate",
@@ -182,5 +185,21 @@ if (current_os != "android") {
       "${chip_root}/src/lib",
       "${chip_root}/src/platform",
     ]
+
+    if (build_java_matter_controller) {
+      include_dirs = [
+        "/usr/local/buildtools/java/jdk/include/",
+        "/usr/local/buildtools/java/jdk/include/linux",
+        ]
+      deps += [
+        "${chip_root}/src/platform/Linux",
+      ]
+    }
+    else
+    {
+      deps += [
+        "${chip_root}/src/platform/android",
+      ]
+    }
   }
 }
