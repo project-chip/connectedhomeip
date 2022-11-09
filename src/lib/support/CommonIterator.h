@@ -28,10 +28,10 @@ namespace chip {
  * Template used to generate a custom iterator
  */
 template <typename T>
-class Iterator
+class CommonIterator
 {
 public:
-    virtual ~Iterator() = default;
+    virtual ~CommonIterator() = default;
     /**
      *  @retval The number of entries in total that will be iterated.
      */
@@ -49,7 +49,7 @@ public:
     virtual void Release() = 0;
 
 protected:
-    Iterator() = default;
+    CommonIterator() = default;
 };
 
 } // namespace chip
