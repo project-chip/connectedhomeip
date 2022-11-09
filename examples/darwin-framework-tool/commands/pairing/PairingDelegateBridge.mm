@@ -54,7 +54,7 @@
     ChipLogProgress(chipTool, "Pairing Success");
     ChipLogProgress(chipTool, "PASE establishment successful");
     NSError * commissionError;
-    [_commissioner commissionDevice:_deviceID commissioningParams:_params error:&commissionError];
+    [_commissioner commissionNodeWithID:@(_deviceID) commissioningParams:_params error:&commissionError];
     if (commissionError != nil) {
         _commandBridge->SetCommandExitStatus(commissionError);
         return;
