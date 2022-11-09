@@ -72,10 +72,9 @@ public:
      * Construct a callback bridge, which can then have DispatcLocalAction() called
      * on it.
      */
-    MTRCallbackBridge(dispatch_queue_t queue, MTRResponseHandler handler, T OnSuccessFn, bool keepAlive)
+    MTRCallbackBridge(dispatch_queue_t queue, MTRResponseHandler handler, T OnSuccessFn)
         : mQueue(queue)
         , mHandler(handler)
-        , mKeepAlive(keepAlive)
         , mSuccess(OnSuccessFn)
         , mFailure(OnFailureFn)
     {
@@ -85,11 +84,10 @@ public:
      * Construct a callback bridge, which can then have DispatchAction() called
      * on it.
      */
-    MTRCallbackBridge(dispatch_queue_t queue, MTRResponseHandler handler, MTRActionBlock action, T OnSuccessFn, bool keepAlive)
+    MTRCallbackBridge(dispatch_queue_t queue, MTRResponseHandler handler, MTRActionBlock action, T OnSuccessFn)
         : mQueue(queue)
         , mHandler(handler)
         , mAction(action)
-        , mKeepAlive(keepAlive)
         , mSuccess(OnSuccessFn)
         , mFailure(OnFailureFn)
     {
@@ -220,6 +218,7 @@ public:
 
 protected:
     dispatch_queue_t mQueue;
+    bool mKeepAlive = false;
 
 private:
     static void DispatchCallbackResult(void * context, NSError * error, id value)
@@ -230,13 +229,10 @@ private:
         }
 
         if (!callbackBridge->mQueue) {
-            delete callbackBridge;
+            if (!callbackBridge->mKeepAlive) {
+                delete callbackBridge;
+            }
             return;
-        }
-
-        if (error) {
-            // We should delete ourselves; there will be no more callbacks.
-            callbackBridge->mKeepAlive = false;
         }
 
         dispatch_async(callbackBridge->mQueue, ^{
@@ -252,7 +248,6 @@ private:
 
     MTRResponseHandler mHandler;
     MTRActionBlock mAction;
-    bool mKeepAlive;
 
     T mSuccess;
     MTRErrorCallback mFailure;
