@@ -63,10 +63,11 @@ if(CONFIG_CHIP_FACTORY_DATA_USE_DEFAULT_CERTS)
     # convert decimal PID to its hexadecimal representation to find out certification files in repository
     math(EXPR LOCAL_PID "${CONFIG_CHIP_DEVICE_PRODUCT_ID}" OUTPUT_FORMAT HEXADECIMAL)
     string(SUBSTRING ${LOCAL_PID} 2 -1 raw_pid)
+    string(TOUPPER ${raw_pid} raw_pid_upper)
     # all certs are located in ${CHIP_ROOT}/credentials/development/attestation
     # it can be used during development without need to generate new certifications
-    string(APPEND script_args "--dac_cert \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-DAC-${raw_pid}-Cert.der\"\n")
-    string(APPEND script_args "--dac_key \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-DAC-${raw_pid}-Key.der\"\n")
+    string(APPEND script_args "--dac_cert \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-DAC-${raw_pid_upper}-Cert.der\"\n")
+    string(APPEND script_args "--dac_key \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-DAC-${raw_pid_upper}-Key.der\"\n")
     string(APPEND script_args "--pai_cert \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-PAI-noPID-Cert.der\"\n")
 else()
     find_program(chip_cert_exe NAMES chip-cert REQUIRED)
@@ -79,6 +80,7 @@ string(APPEND script_args "--spake2_it \"${CONFIG_CHIP_DEVICE_SPAKE2_IT}\"\n")
 string(APPEND script_args "--spake2_salt \"${CONFIG_CHIP_DEVICE_SPAKE2_SALT}\"\n")
 string(APPEND script_args "--discriminator ${CONFIG_CHIP_DEVICE_DISCRIMINATOR}\n")
 string(APPEND script_args "--passcode ${CONFIG_CHIP_DEVICE_SPAKE2_PASSCODE}\n")
+string(APPEND script_args "--include_passcode\n")
 string(APPEND script_args "--overwrite\n")
 
 # check if spake2 verifier should be generated using script
