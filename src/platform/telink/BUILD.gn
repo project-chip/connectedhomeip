@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/telink.gni")
 
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/telink/args.gni")
 
 assert(chip_device_platform == "telink")
 
@@ -50,10 +51,25 @@ static_library("telink") {
 
   deps = []
 
+  public = [
+    "${chip_root}/src/credentials/CHIPCert.h",
+    "${chip_root}/src/credentials/CertificationDeclaration.h",
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+  ]
+
   public_deps = [
     "${chip_root}/src/platform:platform_base",
     "${telink_sdk_build_root}",
   ]
+
+  if (chip_enable_factory_data) {
+    sources += [
+      "FactoryDataParser.c",
+      "FactoryDataParser.h",
+      "FactoryDataProvider.cpp",
+      "FactoryDataProvider.h",
+    ]
+  }
 
   if (chip_enable_openthread) {
     sources += [
