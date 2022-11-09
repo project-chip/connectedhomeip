@@ -64,6 +64,9 @@ private:
     static void LightingActionEventHandler(AppEvent * aEvent);
     static void TimerEventHandler(chip::System::Layer * aLayer, void * aAppState);
 
+    static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    static void UpdateLEDs(void);
+
     void StartTimer(uint32_t aTimeoutMs);
     void CancelTimer(void);
 

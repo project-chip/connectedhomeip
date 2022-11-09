@@ -64,7 +64,6 @@ template("bl702_sdk") {
       "CONFIG_ENABLE_PW_RPC=0",
       "__FILENAME__=strrchr(__FILE__,'/')?strrchr(__FILE__,'/')+1:__FILE__",
       "OT_FREERTOS_ENABLE=1",
-      "INCLUDE_xSemaphoreGetMutexHolder=1",
     ]
 
     if (defined(invoker.defines)) {

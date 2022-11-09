@@ -41,9 +41,11 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <zap-generated/CHIPClusters.h>
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::AppPlatform;
 using namespace chip::Credentials;
 
@@ -201,9 +203,44 @@ class MyPostCommissioningListener : public PostCommissioningListener
     void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
                                 SessionHandle & sessionHandle) override
     {
+        // read current binding list
+        chip::Controller::BindingCluster cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
 
-        ContentAppPlatform::GetInstance().ManageClientAccess(
-            exchangeMgr, sessionHandle, vendorId, GetDeviceCommissioner()->GetNodeId(), OnSuccessResponse, OnFailureResponse);
+        cacheContext(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
+
+        CHIP_ERROR err =
+            cluster.ReadAttribute<Binding::Attributes::Binding::TypeInfo>(this, OnReadSuccessResponse, OnReadFailureResponse);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Failed in reading binding. Error %s", ErrorStr(err));
+            clearContext();
+        }
+    }
+
+    /* Callback when command results in success */
+    static void
+    OnReadSuccessResponse(void * context,
+                          const app::DataModel::DecodableList<Binding::Structs::TargetStruct::DecodableType> & responseData)
+    {
+        ChipLogProgress(Controller, "OnReadSuccessResponse - Binding Read Successfully");
+
+        MyPostCommissioningListener * listener = static_cast<MyPostCommissioningListener *>(context);
+        listener->finishTargetConfiguration(responseData);
+    }
+
+    /* Callback when command results in failure */
+    static void OnReadFailureResponse(void * context, CHIP_ERROR error)
+    {
+        ChipLogProgress(Controller, "OnReadFailureResponse - Binding Read Failed");
+
+        MyPostCommissioningListener * listener = static_cast<MyPostCommissioningListener *>(context);
+        listener->clearContext();
+
+        CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+        if (cdc != nullptr)
+        {
+            cdc->PostCommissioningFailed(error);
+        }
     }
 
     /* Callback when command results in success */
@@ -227,6 +264,60 @@ class MyPostCommissioningListener : public PostCommissioningListener
             cdc->PostCommissioningFailed(error);
         }
     }
+
+    void
+    finishTargetConfiguration(const app::DataModel::DecodableList<Binding::Structs::TargetStruct::DecodableType> & responseList)
+    {
+        std::vector<app::Clusters::Binding::Structs::TargetStruct::Type> bindings;
+        NodeId localNodeId = GetDeviceCommissioner()->GetNodeId();
+
+        auto iter = responseList.begin();
+        while (iter.Next())
+        {
+            auto & binding = iter.GetValue();
+            ChipLogProgress(Controller, "Binding found nodeId=0x" ChipLogFormatX64 " my nodeId=0x" ChipLogFormatX64,
+                            ChipLogValueX64(binding.node.ValueOr(0)), ChipLogValueX64(localNodeId));
+            if (binding.node.ValueOr(0) != localNodeId)
+            {
+                ChipLogProgress(Controller, "Found a binding for a different node, preserving");
+                bindings.push_back(binding);
+            }
+            else
+            {
+                ChipLogProgress(Controller, "Found a binding for a matching node, dropping");
+            }
+        }
+
+        Optional<SessionHandle> opt   = mSecureSession.Get();
+        SessionHandle & sessionHandle = opt.Value();
+        ContentAppPlatform::GetInstance().ManageClientAccess(*mExchangeMgr, sessionHandle, mVendorId, mProductId, localNodeId,
+                                                             bindings, OnSuccessResponse, OnFailureResponse);
+        clearContext();
+    }
+
+    void cacheContext(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
+                      SessionHandle & sessionHandle)
+    {
+        mVendorId    = vendorId;
+        mProductId   = productId;
+        mNodeId      = nodeId;
+        mExchangeMgr = &exchangeMgr;
+        mSecureSession.ShiftToSession(sessionHandle);
+    }
+
+    void clearContext()
+    {
+        mVendorId    = 0;
+        mProductId   = 0;
+        mNodeId      = 0;
+        mExchangeMgr = nullptr;
+        mSecureSession.SessionReleased();
+    }
+    uint16_t mVendorId                        = 0;
+    uint16_t mProductId                       = 0;
+    NodeId mNodeId                            = 0;
+    Messaging::ExchangeManager * mExchangeMgr = nullptr;
+    SessionHolder mSecureSession;
 };
 
 MyPostCommissioningListener gMyPostCommissioningListener;

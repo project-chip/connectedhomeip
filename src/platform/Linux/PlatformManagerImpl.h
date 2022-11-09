@@ -70,7 +70,7 @@ public:
      * @brief Convenience method to require less casts to void pointers.
      */
     template <class T>
-    CHIP_ERROR ScheduleOnGLibMainLoopThread(int (*callback)(T *), T * userData, bool wait = false)
+    CHIP_ERROR ScheduleOnGLibMainLoopThread(gboolean (*callback)(T *), T * userData, bool wait = false)
     {
         return RunOnGLibMainLoopThread(G_SOURCE_FUNC(callback), userData, wait);
     }

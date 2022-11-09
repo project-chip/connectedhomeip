@@ -1,1 +1,1 @@
-0.6.06 Version bump reason: [Telink] Update Telink Docker.
+0.6.07 Version bump reason: Build glib-2.0 libs with TSAN
