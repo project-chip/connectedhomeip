@@ -70,13 +70,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Identify::Commands::Identify::Type request;
@@ -85,12 +86,10 @@ using chip::SessionHandle;
                 }
                 request.identifyTime = params.identifyTime.unsignedShortValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::IdentifyCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -120,13 +119,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Identify::Commands::TriggerEffect::Type request;
@@ -138,12 +138,10 @@ using chip::SessionHandle;
                 request.effectVariant
                     = static_cast<std::remove_reference_t<decltype(request.effectVariant)>>(params.effectVariant.unsignedCharValue);
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::IdentifyCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -294,8 +292,9 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRGroupsClusterAddGroupResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRGroupsClusterAddGroupResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, GroupsClusterAddGroupResponseCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Groups::Commands::AddGroup::Type request;
@@ -305,12 +304,10 @@ using chip::SessionHandle;
                 request.groupId = params.groupId.unsignedShortValue;
                 request.groupName = [self asCharSpan:params.groupName];
 
-                auto successFn = Callback<GroupsClusterAddGroupResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -341,8 +338,9 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRGroupsClusterViewGroupResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRGroupsClusterViewGroupResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                GroupsClusterViewGroupResponseCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Groups::Commands::ViewGroup::Type request;
@@ -351,12 +349,10 @@ using chip::SessionHandle;
                 }
                 request.groupId = params.groupId.unsignedShortValue;
 
-                auto successFn = Callback<GroupsClusterViewGroupResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -387,8 +383,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRGroupsClusterGetGroupMembershipResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRGroupsClusterGetGroupMembershipResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                GroupsClusterGetGroupMembershipResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Groups::Commands::GetGroupMembership::Type request;
@@ -418,12 +416,10 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<GroupsClusterGetGroupMembershipResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -454,8 +450,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRGroupsClusterRemoveGroupResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRGroupsClusterRemoveGroupResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                GroupsClusterRemoveGroupResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Groups::Commands::RemoveGroup::Type request;
@@ -464,12 +462,10 @@ using chip::SessionHandle;
                 }
                 request.groupId = params.groupId.unsignedShortValue;
 
-                auto successFn = Callback<GroupsClusterRemoveGroupResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -508,13 +504,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Groups::Commands::RemoveAllGroups::Type request;
@@ -522,12 +519,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -557,13 +552,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Groups::Commands::AddGroupIfIdentifying::Type request;
@@ -573,12 +569,10 @@ using chip::SessionHandle;
                 request.groupId = params.groupId.unsignedShortValue;
                 request.groupName = [self asCharSpan:params.groupName];
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -754,8 +748,9 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRScenesClusterAddSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRScenesClusterAddSceneResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, ScenesClusterAddSceneResponseCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::AddScene::Type request;
@@ -841,12 +836,10 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<ScenesClusterAddSceneResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -877,8 +870,9 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRScenesClusterViewSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRScenesClusterViewSceneResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                ScenesClusterViewSceneResponseCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::ViewScene::Type request;
@@ -888,12 +882,10 @@ using chip::SessionHandle;
                 request.groupId = params.groupId.unsignedShortValue;
                 request.sceneId = params.sceneId.unsignedCharValue;
 
-                auto successFn = Callback<ScenesClusterViewSceneResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -924,8 +916,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRScenesClusterRemoveSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRScenesClusterRemoveSceneResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                ScenesClusterRemoveSceneResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::RemoveScene::Type request;
@@ -935,12 +929,10 @@ using chip::SessionHandle;
                 request.groupId = params.groupId.unsignedShortValue;
                 request.sceneId = params.sceneId.unsignedCharValue;
 
-                auto successFn = Callback<ScenesClusterRemoveSceneResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -971,8 +963,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRScenesClusterRemoveAllScenesResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRScenesClusterRemoveAllScenesResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                ScenesClusterRemoveAllScenesResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::RemoveAllScenes::Type request;
@@ -981,12 +975,10 @@ using chip::SessionHandle;
                 }
                 request.groupId = params.groupId.unsignedShortValue;
 
-                auto successFn = Callback<ScenesClusterRemoveAllScenesResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -1017,8 +1009,9 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRScenesClusterStoreSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRScenesClusterStoreSceneResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                ScenesClusterStoreSceneResponseCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::StoreScene::Type request;
@@ -1028,12 +1021,10 @@ using chip::SessionHandle;
                 request.groupId = params.groupId.unsignedShortValue;
                 request.sceneId = params.sceneId.unsignedCharValue;
 
-                auto successFn = Callback<ScenesClusterStoreSceneResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -1063,13 +1054,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::RecallScene::Type request;
@@ -1088,12 +1080,10 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -1124,8 +1114,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRScenesClusterGetSceneMembershipResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRScenesClusterGetSceneMembershipResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                ScenesClusterGetSceneMembershipResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::GetSceneMembership::Type request;
@@ -1134,12 +1126,10 @@ using chip::SessionHandle;
                 }
                 request.groupId = params.groupId.unsignedShortValue;
 
-                auto successFn = Callback<ScenesClusterGetSceneMembershipResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -1170,8 +1160,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRScenesClusterEnhancedAddSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRScenesClusterEnhancedAddSceneResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                ScenesClusterEnhancedAddSceneResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::EnhancedAddScene::Type request;
@@ -1257,12 +1249,10 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<ScenesClusterEnhancedAddSceneResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -1293,8 +1283,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRScenesClusterEnhancedViewSceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRScenesClusterEnhancedViewSceneResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                ScenesClusterEnhancedViewSceneResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::EnhancedViewScene::Type request;
@@ -1304,12 +1296,10 @@ using chip::SessionHandle;
                 request.groupId = params.groupId.unsignedShortValue;
                 request.sceneId = params.sceneId.unsignedCharValue;
 
-                auto successFn = Callback<ScenesClusterEnhancedViewSceneResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -1340,8 +1330,9 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRScenesClusterCopySceneResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRScenesClusterCopySceneResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                ScenesClusterCopySceneResponseCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Scenes::Commands::CopyScene::Type request;
@@ -1354,12 +1345,10 @@ using chip::SessionHandle;
                 request.groupIdTo = params.groupIdTo.unsignedShortValue;
                 request.sceneIdTo = params.sceneIdTo.unsignedCharValue;
 
-                auto successFn = Callback<ScenesClusterCopySceneResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ScenesCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -1618,13 +1607,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OnOff::Commands::Off::Type request;
@@ -1632,12 +1622,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::OnOffCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -1673,13 +1661,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OnOff::Commands::On::Type request;
@@ -1687,12 +1676,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::OnOffCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -1728,13 +1715,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OnOff::Commands::Toggle::Type request;
@@ -1742,12 +1730,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::OnOffCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -1777,13 +1763,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OnOff::Commands::OffWithEffect::Type request;
@@ -1795,12 +1782,10 @@ using chip::SessionHandle;
                 request.effectVariant
                     = static_cast<std::remove_reference_t<decltype(request.effectVariant)>>(params.effectVariant.unsignedCharValue);
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::OnOffCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -1839,13 +1824,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OnOff::Commands::OnWithRecallGlobalScene::Type request;
@@ -1853,12 +1839,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::OnOffCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -1888,13 +1872,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OnOff::Commands::OnWithTimedOff::Type request;
@@ -1906,12 +1891,10 @@ using chip::SessionHandle;
                 request.onTime = params.onTime.unsignedShortValue;
                 request.offWaitTime = params.offWaitTime.unsignedShortValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::OnOffCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -2291,13 +2274,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LevelControl::Commands::MoveToLevel::Type request;
@@ -2314,12 +2298,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -2349,13 +2331,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LevelControl::Commands::Move::Type request;
@@ -2373,12 +2356,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -2408,13 +2389,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LevelControl::Commands::Step::Type request;
@@ -2433,12 +2415,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -2468,13 +2448,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LevelControl::Commands::Stop::Type request;
@@ -2484,12 +2465,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -2519,13 +2498,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LevelControl::Commands::MoveToLevelWithOnOff::Type request;
@@ -2542,12 +2522,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -2577,13 +2555,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LevelControl::Commands::MoveWithOnOff::Type request;
@@ -2601,12 +2580,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -2636,13 +2613,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LevelControl::Commands::StepWithOnOff::Type request;
@@ -2661,12 +2639,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -2696,13 +2672,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LevelControl::Commands::StopWithOnOff::Type request;
@@ -2712,12 +2689,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -2747,13 +2722,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LevelControl::Commands::MoveToClosestFrequency::Type request;
@@ -2762,12 +2738,10 @@ using chip::SessionHandle;
                 }
                 request.frequency = params.frequency.unsignedShortValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -3785,13 +3759,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::InstantAction::Type request;
@@ -3804,12 +3779,10 @@ using chip::SessionHandle;
                     definedValue_0 = params.invokeID.unsignedIntValue;
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -3839,13 +3812,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::InstantActionWithTransition::Type request;
@@ -3859,12 +3833,10 @@ using chip::SessionHandle;
                 }
                 request.transitionTime = params.transitionTime.unsignedShortValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -3894,13 +3866,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::StartAction::Type request;
@@ -3913,12 +3886,10 @@ using chip::SessionHandle;
                     definedValue_0 = params.invokeID.unsignedIntValue;
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -3948,13 +3919,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::StartActionWithDuration::Type request;
@@ -3968,12 +3940,10 @@ using chip::SessionHandle;
                 }
                 request.duration = params.duration.unsignedIntValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -4003,13 +3973,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::StopAction::Type request;
@@ -4022,12 +3993,10 @@ using chip::SessionHandle;
                     definedValue_0 = params.invokeID.unsignedIntValue;
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -4057,13 +4026,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::PauseAction::Type request;
@@ -4076,12 +4046,10 @@ using chip::SessionHandle;
                     definedValue_0 = params.invokeID.unsignedIntValue;
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -4111,13 +4079,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::PauseActionWithDuration::Type request;
@@ -4131,12 +4100,10 @@ using chip::SessionHandle;
                 }
                 request.duration = params.duration.unsignedIntValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -4166,13 +4133,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::ResumeAction::Type request;
@@ -4185,12 +4153,10 @@ using chip::SessionHandle;
                     definedValue_0 = params.invokeID.unsignedIntValue;
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -4220,13 +4186,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::EnableAction::Type request;
@@ -4239,12 +4206,10 @@ using chip::SessionHandle;
                     definedValue_0 = params.invokeID.unsignedIntValue;
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -4274,13 +4239,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::EnableActionWithDuration::Type request;
@@ -4294,12 +4260,10 @@ using chip::SessionHandle;
                 }
                 request.duration = params.duration.unsignedIntValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -4329,13 +4293,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::DisableAction::Type request;
@@ -4348,12 +4313,10 @@ using chip::SessionHandle;
                     definedValue_0 = params.invokeID.unsignedIntValue;
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -4383,13 +4346,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Actions::Commands::DisableActionWithDuration::Type request;
@@ -4403,12 +4367,10 @@ using chip::SessionHandle;
                 }
                 request.duration = params.duration.unsignedIntValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ActionsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -4657,13 +4619,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Basic::Commands::MfgSpecificPing::Type request;
@@ -4671,12 +4634,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::BasicCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -5008,8 +4969,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                OtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OtaSoftwareUpdateProvider::Commands::QueryImage::Type request;
@@ -5060,12 +5023,10 @@ using chip::SessionHandle;
                     definedValue_0 = [self asByteSpan:params.metadataForProvider];
                 }
 
-                auto successFn = Callback<OtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::OtaSoftwareUpdateProviderCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -5096,8 +5057,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type request;
@@ -5107,12 +5070,10 @@ using chip::SessionHandle;
                 request.updateToken = [self asByteSpan:params.updateToken];
                 request.newVersion = params.newVersion.unsignedIntValue;
 
-                auto successFn = Callback<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::OtaSoftwareUpdateProviderCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -5142,13 +5103,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type request;
@@ -5158,12 +5120,10 @@ using chip::SessionHandle;
                 request.updateToken = [self asByteSpan:params.updateToken];
                 request.softwareVersion = params.softwareVersion.unsignedIntValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::OtaSoftwareUpdateProviderCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -5291,13 +5251,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type request;
@@ -5315,12 +5276,10 @@ using chip::SessionHandle;
                 }
                 request.endpoint = params.endpoint.unsignedShortValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::OtaSoftwareUpdateRequestorCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -6188,8 +6147,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                GeneralCommissioningClusterArmFailSafeResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 GeneralCommissioning::Commands::ArmFailSafe::Type request;
@@ -6199,12 +6160,10 @@ using chip::SessionHandle;
                 request.expiryLengthSeconds = params.expiryLengthSeconds.unsignedShortValue;
                 request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
 
-                auto successFn = Callback<GeneralCommissioningClusterArmFailSafeResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::GeneralCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -6235,8 +6194,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                GeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 GeneralCommissioning::Commands::SetRegulatoryConfig::Type request;
@@ -6248,13 +6209,10 @@ using chip::SessionHandle;
                 request.countryCode = [self asCharSpan:params.countryCode];
                 request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
 
-                auto successFn
-                    = Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::GeneralCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -6298,22 +6256,22 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
-                chip::Optional<uint16_t> timedInvokeTimeoutMs;
-                ListFreer listFreer;
-                GeneralCommissioning::Commands::CommissioningComplete::Type request;
-                if (timedInvokeTimeoutMsParam != nil) {
-                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
-                }
+        auto * bridge
+            = new MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(self.callbackQueue, completion,
+                ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                    GeneralCommissioningClusterCommissioningCompleteResponseCallbackType successCb, MTRErrorCallback failureCb,
+                    MTRCallbackBridgeBase * bridge) {
+                    chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                    ListFreer listFreer;
+                    GeneralCommissioning::Commands::CommissioningComplete::Type request;
+                    if (timedInvokeTimeoutMsParam != nil) {
+                        timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+                    }
 
-                auto successFn
-                    = Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-                chip::Controller::GeneralCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-            });
+                    chip::Controller::GeneralCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
+                    return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
+                });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -6513,8 +6471,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                NetworkCommissioningClusterScanNetworksResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 NetworkCommissioning::Commands::ScanNetworks::Type request;
@@ -6537,12 +6497,10 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<NetworkCommissioningClusterScanNetworksResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::NetworkCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -6573,8 +6531,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                NetworkCommissioningClusterNetworkConfigResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type request;
@@ -6588,12 +6548,10 @@ using chip::SessionHandle;
                     definedValue_0 = params.breadcrumb.unsignedLongLongValue;
                 }
 
-                auto successFn = Callback<NetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::NetworkCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -6624,8 +6582,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                NetworkCommissioningClusterNetworkConfigResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type request;
@@ -6638,12 +6598,10 @@ using chip::SessionHandle;
                     definedValue_0 = params.breadcrumb.unsignedLongLongValue;
                 }
 
-                auto successFn = Callback<NetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::NetworkCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -6674,8 +6632,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                NetworkCommissioningClusterNetworkConfigResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 NetworkCommissioning::Commands::RemoveNetwork::Type request;
@@ -6688,12 +6648,10 @@ using chip::SessionHandle;
                     definedValue_0 = params.breadcrumb.unsignedLongLongValue;
                 }
 
-                auto successFn = Callback<NetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::NetworkCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -6724,8 +6682,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                NetworkCommissioningClusterConnectNetworkResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 NetworkCommissioning::Commands::ConnectNetwork::Type request;
@@ -6738,12 +6698,10 @@ using chip::SessionHandle;
                     definedValue_0 = params.breadcrumb.unsignedLongLongValue;
                 }
 
-                auto successFn = Callback<NetworkCommissioningClusterConnectNetworkResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::NetworkCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -6774,8 +6732,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                NetworkCommissioningClusterNetworkConfigResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 NetworkCommissioning::Commands::ReorderNetwork::Type request;
@@ -6789,12 +6749,10 @@ using chip::SessionHandle;
                     definedValue_0 = params.breadcrumb.unsignedLongLongValue;
                 }
 
-                auto successFn = Callback<NetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::NetworkCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -7040,8 +6998,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                DiagnosticLogsClusterRetrieveLogsResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DiagnosticLogs::Commands::RetrieveLogsRequest::Type request;
@@ -7053,12 +7013,10 @@ using chip::SessionHandle;
                     params.requestedProtocol.unsignedCharValue);
                 request.transferFileDesignator = [self asByteSpan:params.transferFileDesignator];
 
-                auto successFn = Callback<DiagnosticLogsClusterRetrieveLogsResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::DiagnosticLogsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -7165,13 +7123,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 GeneralDiagnostics::Commands::TestEventTrigger::Type request;
@@ -7181,12 +7140,10 @@ using chip::SessionHandle;
                 request.enableKey = [self asByteSpan:params.enableKey];
                 request.eventTrigger = params.eventTrigger.unsignedLongLongValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::GeneralDiagnosticsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -7373,13 +7330,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 SoftwareDiagnostics::Commands::ResetWatermarks::Type request;
@@ -7387,12 +7345,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::SoftwareDiagnosticsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -7547,13 +7503,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ThreadNetworkDiagnostics::Commands::ResetCounts::Type request;
@@ -7561,12 +7518,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ThreadNetworkDiagnosticsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -8192,13 +8147,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 WiFiNetworkDiagnostics::Commands::ResetCounts::Type request;
@@ -8206,12 +8162,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::WiFiNetworkDiagnosticsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -8436,13 +8390,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 EthernetNetworkDiagnostics::Commands::ResetCounts::Type request;
@@ -8450,12 +8405,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::EthernetNetworkDiagnosticsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -8934,13 +8887,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
@@ -8956,12 +8910,10 @@ using chip::SessionHandle;
                 request.iterations = params.iterations.unsignedIntValue;
                 request.salt = [self asByteSpan:params.salt];
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::AdministratorCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -8991,13 +8943,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type request;
@@ -9009,12 +8962,10 @@ using chip::SessionHandle;
                 }
                 request.commissioningTimeout = params.commissioningTimeout.unsignedShortValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::AdministratorCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -9053,13 +9004,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 AdministratorCommissioning::Commands::RevokeCommissioning::Type request;
@@ -9070,12 +9022,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(10000);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::AdministratorCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -9234,8 +9184,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTROperationalCredentialsClusterAttestationResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTROperationalCredentialsClusterAttestationResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                OperationalCredentialsClusterAttestationResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OperationalCredentials::Commands::AttestationRequest::Type request;
@@ -9244,12 +9196,10 @@ using chip::SessionHandle;
                 }
                 request.attestationNonce = [self asByteSpan:params.attestationNonce];
 
-                auto successFn = Callback<OperationalCredentialsClusterAttestationResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -9280,8 +9230,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                OperationalCredentialsClusterCertificateChainResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OperationalCredentials::Commands::CertificateChainRequest::Type request;
@@ -9290,13 +9242,10 @@ using chip::SessionHandle;
                 }
                 request.certificateType = params.certificateType.unsignedCharValue;
 
-                auto successFn
-                    = Callback<OperationalCredentialsClusterCertificateChainResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -9327,8 +9276,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTROperationalCredentialsClusterCSRResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTROperationalCredentialsClusterCSRResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                OperationalCredentialsClusterCSRResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OperationalCredentials::Commands::CSRRequest::Type request;
@@ -9341,12 +9292,10 @@ using chip::SessionHandle;
                     definedValue_0 = params.isForUpdateNOC.boolValue;
                 }
 
-                auto successFn = Callback<OperationalCredentialsClusterCSRResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -9377,8 +9326,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                OperationalCredentialsClusterNOCResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OperationalCredentials::Commands::AddNOC::Type request;
@@ -9395,12 +9346,10 @@ using chip::SessionHandle;
                 request.adminVendorId = static_cast<std::remove_reference_t<decltype(request.adminVendorId)>>(
                     params.adminVendorId.unsignedShortValue);
 
-                auto successFn = Callback<OperationalCredentialsClusterNOCResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -9431,8 +9380,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                OperationalCredentialsClusterNOCResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OperationalCredentials::Commands::UpdateNOC::Type request;
@@ -9445,12 +9396,10 @@ using chip::SessionHandle;
                     definedValue_0 = [self asByteSpan:params.icacValue];
                 }
 
-                auto successFn = Callback<OperationalCredentialsClusterNOCResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -9481,8 +9430,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                OperationalCredentialsClusterNOCResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OperationalCredentials::Commands::UpdateFabricLabel::Type request;
@@ -9491,12 +9442,10 @@ using chip::SessionHandle;
                 }
                 request.label = [self asCharSpan:params.label];
 
-                auto successFn = Callback<OperationalCredentialsClusterNOCResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -9527,8 +9476,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                OperationalCredentialsClusterNOCResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OperationalCredentials::Commands::RemoveFabric::Type request;
@@ -9537,12 +9488,10 @@ using chip::SessionHandle;
                 }
                 request.fabricIndex = params.fabricIndex.unsignedCharValue;
 
-                auto successFn = Callback<OperationalCredentialsClusterNOCResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -9572,13 +9521,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 OperationalCredentials::Commands::AddTrustedRootCertificate::Type request;
@@ -9587,12 +9537,10 @@ using chip::SessionHandle;
                 }
                 request.rootCertificate = [self asByteSpan:params.rootCertificate];
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -9823,13 +9771,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 GroupKeyManagement::Commands::KeySetWrite::Type request;
@@ -9877,12 +9826,10 @@ using chip::SessionHandle;
                     nonNullValue_1 = params.groupKeySet.epochStartTime2.unsignedLongLongValue;
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::GroupKeyManagementCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -9913,8 +9860,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                GroupKeyManagementClusterKeySetReadResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 GroupKeyManagement::Commands::KeySetRead::Type request;
@@ -9923,12 +9872,10 @@ using chip::SessionHandle;
                 }
                 request.groupKeySetID = params.groupKeySetID.unsignedShortValue;
 
-                auto successFn = Callback<GroupKeyManagementClusterKeySetReadResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::GroupKeyManagementCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -9958,13 +9905,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 GroupKeyManagement::Commands::KeySetRemove::Type request;
@@ -9973,12 +9921,10 @@ using chip::SessionHandle;
                 }
                 request.groupKeySetID = params.groupKeySetID.unsignedShortValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::GroupKeyManagementCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -10009,8 +9955,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                GroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 GroupKeyManagement::Commands::KeySetReadAllIndices::Type request;
@@ -10040,13 +9988,10 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn
-                    = Callback<GroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::GroupKeyManagementCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -10476,13 +10421,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ModeSelect::Commands::ChangeToMode::Type request;
@@ -10491,12 +10437,10 @@ using chip::SessionHandle;
                 }
                 request.newMode = params.newMode.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ModeSelectCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -10688,13 +10632,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::LockDoor::Type request;
@@ -10711,12 +10656,10 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -10746,13 +10689,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::UnlockDoor::Type request;
@@ -10769,12 +10713,10 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -10804,13 +10746,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::UnlockWithTimeout::Type request;
@@ -10826,12 +10769,10 @@ using chip::SessionHandle;
                     definedValue_0 = [self asByteSpan:params.pinCode];
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -10861,13 +10802,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::SetWeekDaySchedule::Type request;
@@ -10883,12 +10825,10 @@ using chip::SessionHandle;
                 request.endHour = params.endHour.unsignedCharValue;
                 request.endMinute = params.endMinute.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -10919,8 +10859,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                DoorLockClusterGetWeekDayScheduleResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::GetWeekDaySchedule::Type request;
@@ -10930,12 +10872,10 @@ using chip::SessionHandle;
                 request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
                 request.userIndex = params.userIndex.unsignedShortValue;
 
-                auto successFn = Callback<DoorLockClusterGetWeekDayScheduleResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -10965,13 +10905,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::ClearWeekDaySchedule::Type request;
@@ -10981,12 +10922,10 @@ using chip::SessionHandle;
                 request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
                 request.userIndex = params.userIndex.unsignedShortValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -11016,13 +10955,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::SetYearDaySchedule::Type request;
@@ -11034,12 +10974,10 @@ using chip::SessionHandle;
                 request.localStartTime = params.localStartTime.unsignedIntValue;
                 request.localEndTime = params.localEndTime.unsignedIntValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -11070,8 +11008,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                DoorLockClusterGetYearDayScheduleResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::GetYearDaySchedule::Type request;
@@ -11081,12 +11021,10 @@ using chip::SessionHandle;
                 request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
                 request.userIndex = params.userIndex.unsignedShortValue;
 
-                auto successFn = Callback<DoorLockClusterGetYearDayScheduleResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -11116,13 +11054,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::ClearYearDaySchedule::Type request;
@@ -11132,12 +11071,10 @@ using chip::SessionHandle;
                 request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
                 request.userIndex = params.userIndex.unsignedShortValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -11167,13 +11104,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::SetHolidaySchedule::Type request;
@@ -11186,12 +11124,10 @@ using chip::SessionHandle;
                 request.operatingMode
                     = static_cast<std::remove_reference_t<decltype(request.operatingMode)>>(params.operatingMode.unsignedCharValue);
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -11222,8 +11158,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                DoorLockClusterGetHolidayScheduleResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::GetHolidaySchedule::Type request;
@@ -11232,12 +11170,10 @@ using chip::SessionHandle;
                 }
                 request.holidayIndex = params.holidayIndex.unsignedCharValue;
 
-                auto successFn = Callback<DoorLockClusterGetHolidayScheduleResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -11267,13 +11203,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::ClearHolidaySchedule::Type request;
@@ -11282,12 +11219,10 @@ using chip::SessionHandle;
                 }
                 request.holidayIndex = params.holidayIndex.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -11317,13 +11252,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::SetUser::Type request;
@@ -11370,12 +11306,10 @@ using chip::SessionHandle;
                         = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(params.credentialRule.unsignedCharValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -11405,8 +11339,9 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRDoorLockClusterGetUserResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRDoorLockClusterGetUserResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                DoorLockClusterGetUserResponseCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::GetUser::Type request;
@@ -11415,12 +11350,10 @@ using chip::SessionHandle;
                 }
                 request.userIndex = params.userIndex.unsignedShortValue;
 
-                auto successFn = Callback<DoorLockClusterGetUserResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -11450,13 +11383,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::ClearUser::Type request;
@@ -11468,12 +11402,10 @@ using chip::SessionHandle;
                 }
                 request.userIndex = params.userIndex.unsignedShortValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -11504,8 +11436,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRDoorLockClusterSetCredentialResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRDoorLockClusterSetCredentialResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                DoorLockClusterSetCredentialResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::SetCredential::Type request;
@@ -11543,12 +11477,10 @@ using chip::SessionHandle;
                         = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(params.userType.unsignedCharValue);
                 }
 
-                auto successFn = Callback<DoorLockClusterSetCredentialResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -11579,8 +11511,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                DoorLockClusterGetCredentialStatusResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::GetCredentialStatus::Type request;
@@ -11592,12 +11526,10 @@ using chip::SessionHandle;
                         params.credential.credentialType.unsignedCharValue);
                 request.credential.credentialIndex = params.credential.credentialIndex.unsignedShortValue;
 
-                auto successFn = Callback<DoorLockClusterGetCredentialStatusResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -11627,13 +11559,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 DoorLock::Commands::ClearCredential::Type request;
@@ -11652,12 +11585,10 @@ using chip::SessionHandle;
                     nonNullValue_0.credentialIndex = params.credential.credentialIndex.unsignedShortValue;
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::DoorLockCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -12589,13 +12520,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 WindowCovering::Commands::UpOrOpen::Type request;
@@ -12603,12 +12535,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -12647,13 +12577,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 WindowCovering::Commands::DownOrClose::Type request;
@@ -12661,12 +12592,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -12705,13 +12634,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 WindowCovering::Commands::StopMotion::Type request;
@@ -12719,12 +12649,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -12754,13 +12682,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 WindowCovering::Commands::GoToLiftValue::Type request;
@@ -12769,12 +12698,10 @@ using chip::SessionHandle;
                 }
                 request.liftValue = params.liftValue.unsignedShortValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -12804,13 +12731,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 WindowCovering::Commands::GoToLiftPercentage::Type request;
@@ -12819,12 +12747,10 @@ using chip::SessionHandle;
                 }
                 request.liftPercent100thsValue = params.liftPercent100thsValue.unsignedShortValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -12854,13 +12780,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 WindowCovering::Commands::GoToTiltValue::Type request;
@@ -12869,12 +12796,10 @@ using chip::SessionHandle;
                 }
                 request.tiltValue = params.tiltValue.unsignedShortValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -12904,13 +12829,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 WindowCovering::Commands::GoToTiltPercentage::Type request;
@@ -12919,12 +12845,10 @@ using chip::SessionHandle;
                 }
                 request.tiltPercent100thsValue = params.tiltPercent100thsValue.unsignedShortValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::WindowCoveringCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -13303,13 +13227,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 BarrierControl::Commands::BarrierControlGoToPercent::Type request;
@@ -13318,12 +13243,10 @@ using chip::SessionHandle;
                 }
                 request.percentOpen = params.percentOpen.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::BarrierControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -13362,13 +13285,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 BarrierControl::Commands::BarrierControlStop::Type request;
@@ -13376,12 +13300,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::BarrierControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -14031,13 +13953,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Thermostat::Commands::SetpointRaiseLower::Type request;
@@ -14047,12 +13970,10 @@ using chip::SessionHandle;
                 request.mode = static_cast<std::remove_reference_t<decltype(request.mode)>>(params.mode.unsignedCharValue);
                 request.amount = params.amount.charValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ThermostatCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -14082,13 +14003,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Thermostat::Commands::SetWeeklySchedule::Type request;
@@ -14135,12 +14057,10 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ThermostatCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -14171,8 +14091,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                ThermostatClusterGetWeeklyScheduleResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Thermostat::Commands::GetWeeklySchedule::Type request;
@@ -14184,12 +14106,10 @@ using chip::SessionHandle;
                 request.modeToReturn
                     = static_cast<std::remove_reference_t<decltype(request.modeToReturn)>>(params.modeToReturn.unsignedCharValue);
 
-                auto successFn = Callback<ThermostatClusterGetWeeklyScheduleResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ThermostatCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -14228,13 +14148,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Thermostat::Commands::ClearWeeklySchedule::Type request;
@@ -14242,12 +14163,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ThermostatCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -15739,13 +15658,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::MoveToHue::Type request;
@@ -15759,12 +15679,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -15794,13 +15712,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::MoveHue::Type request;
@@ -15813,12 +15732,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -15848,13 +15765,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::StepHue::Type request;
@@ -15868,12 +15786,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -15903,13 +15819,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::MoveToSaturation::Type request;
@@ -15921,12 +15838,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -15956,13 +15871,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::MoveSaturation::Type request;
@@ -15975,12 +15891,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -16010,13 +15924,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::StepSaturation::Type request;
@@ -16030,12 +15945,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -16065,13 +15978,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::MoveToHueAndSaturation::Type request;
@@ -16084,12 +15998,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -16119,13 +16031,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::MoveToColor::Type request;
@@ -16138,12 +16051,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -16173,13 +16084,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::MoveColor::Type request;
@@ -16191,12 +16103,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -16226,13 +16136,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::StepColor::Type request;
@@ -16245,12 +16156,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -16280,13 +16189,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::MoveToColorTemperature::Type request;
@@ -16298,12 +16208,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -16333,13 +16241,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::EnhancedMoveToHue::Type request;
@@ -16353,12 +16262,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -16388,13 +16295,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::EnhancedMoveHue::Type request;
@@ -16407,12 +16315,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -16442,13 +16348,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::EnhancedStepHue::Type request;
@@ -16462,12 +16369,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -16497,13 +16402,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type request;
@@ -16516,12 +16422,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -16551,13 +16455,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::ColorLoopSet::Type request;
@@ -16574,12 +16479,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -16609,13 +16512,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::StopMoveStep::Type request;
@@ -16625,12 +16529,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -16660,13 +16562,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::MoveColorTemperature::Type request;
@@ -16681,12 +16584,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -16716,13 +16617,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ColorControl::Commands::StepColorTemperature::Type request;
@@ -16738,12 +16640,10 @@ using chip::SessionHandle;
                 request.optionsMask = params.optionsMask.unsignedCharValue;
                 request.optionsOverride = params.optionsOverride.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ColorControlCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -19034,8 +18934,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRChannelClusterChangeChannelResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRChannelClusterChangeChannelResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                ChannelClusterChangeChannelResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Channel::Commands::ChangeChannel::Type request;
@@ -19044,12 +18946,10 @@ using chip::SessionHandle;
                 }
                 request.match = [self asCharSpan:params.match];
 
-                auto successFn = Callback<ChannelClusterChangeChannelResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ChannelCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -19079,13 +18979,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Channel::Commands::ChangeChannelByNumber::Type request;
@@ -19095,12 +18996,10 @@ using chip::SessionHandle;
                 request.majorNumber = params.majorNumber.unsignedShortValue;
                 request.minorNumber = params.minorNumber.unsignedShortValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ChannelCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -19130,13 +19029,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 Channel::Commands::SkipChannel::Type request;
@@ -19145,12 +19045,10 @@ using chip::SessionHandle;
                 }
                 request.count = params.count.unsignedShortValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ChannelCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -19302,8 +19200,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                TargetNavigatorClusterNavigateTargetResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TargetNavigator::Commands::NavigateTarget::Type request;
@@ -19316,12 +19216,10 @@ using chip::SessionHandle;
                     definedValue_0 = [self asCharSpan:params.data];
                 }
 
-                auto successFn = Callback<TargetNavigatorClusterNavigateTargetResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TargetNavigatorCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -19452,8 +19350,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::Play::Type request;
@@ -19461,12 +19361,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -19504,8 +19402,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::Pause::Type request;
@@ -19513,12 +19413,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -19559,8 +19457,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::StopPlayback::Type request;
@@ -19568,12 +19468,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -19614,8 +19512,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::StartOver::Type request;
@@ -19623,12 +19523,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -19666,8 +19564,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::Previous::Type request;
@@ -19675,12 +19575,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -19718,8 +19616,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::Next::Type request;
@@ -19727,12 +19627,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -19770,8 +19668,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::Rewind::Type request;
@@ -19779,12 +19679,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -19825,8 +19723,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::FastForward::Type request;
@@ -19834,12 +19734,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -19870,8 +19768,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::SkipForward::Type request;
@@ -19880,12 +19780,10 @@ using chip::SessionHandle;
                 }
                 request.deltaPositionMilliseconds = params.deltaPositionMilliseconds.unsignedLongLongValue;
 
-                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -19916,8 +19814,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::SkipBackward::Type request;
@@ -19926,12 +19826,10 @@ using chip::SessionHandle;
                 }
                 request.deltaPositionMilliseconds = params.deltaPositionMilliseconds.unsignedLongLongValue;
 
-                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -19962,8 +19860,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaPlayback::Commands::Seek::Type request;
@@ -19972,12 +19872,10 @@ using chip::SessionHandle;
                 }
                 request.position = params.position.unsignedLongLongValue;
 
-                auto successFn = Callback<MediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::MediaPlaybackCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -20306,13 +20204,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaInput::Commands::SelectInput::Type request;
@@ -20321,12 +20220,10 @@ using chip::SessionHandle;
                 }
                 request.index = params.index.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::MediaInputCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -20365,13 +20262,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaInput::Commands::ShowInputStatus::Type request;
@@ -20379,12 +20277,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::MediaInputCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -20423,13 +20319,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaInput::Commands::HideInputStatus::Type request;
@@ -20437,12 +20334,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::MediaInputCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -20472,13 +20367,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 MediaInput::Commands::RenameInput::Type request;
@@ -20488,12 +20384,10 @@ using chip::SessionHandle;
                 request.index = params.index.unsignedCharValue;
                 request.name = [self asCharSpan:params.name];
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::MediaInputCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -20667,13 +20561,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 LowPower::Commands::Sleep::Type request;
@@ -20681,12 +20576,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::LowPowerCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -20799,8 +20692,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRKeypadInputClusterSendKeyResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRKeypadInputClusterSendKeyResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                KeypadInputClusterSendKeyResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 KeypadInput::Commands::SendKey::Type request;
@@ -20809,12 +20704,10 @@ using chip::SessionHandle;
                 }
                 request.keyCode = static_cast<std::remove_reference_t<decltype(request.keyCode)>>(params.keyCode.unsignedCharValue);
 
-                auto successFn = Callback<KeypadInputClusterSendKeyResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::KeypadInputCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -20922,8 +20815,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRContentLauncherClusterLaunchResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRContentLauncherClusterLaunchResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                ContentLauncherClusterLaunchResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ContentLauncher::Commands::LaunchContent::Type request;
@@ -20989,12 +20884,10 @@ using chip::SessionHandle;
                     definedValue_0 = [self asCharSpan:params.data];
                 }
 
-                auto successFn = Callback<ContentLauncherClusterLaunchResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ContentLauncherCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -21025,8 +20918,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRContentLauncherClusterLaunchResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRContentLauncherClusterLaunchResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                ContentLauncherClusterLaunchResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ContentLauncher::Commands::LaunchURL::Type request;
@@ -21133,12 +21028,10 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<ContentLauncherClusterLaunchResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ContentLauncherCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -21293,13 +21186,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 AudioOutput::Commands::SelectOutput::Type request;
@@ -21308,12 +21202,10 @@ using chip::SessionHandle;
                 }
                 request.index = params.index.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::AudioOutputCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -21343,13 +21235,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 AudioOutput::Commands::RenameOutput::Type request;
@@ -21359,12 +21252,10 @@ using chip::SessionHandle;
                 request.index = params.index.unsignedCharValue;
                 request.name = [self asCharSpan:params.name];
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::AudioOutputCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -21497,8 +21388,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                ApplicationLauncherClusterLauncherResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ApplicationLauncher::Commands::LaunchApp::Type request;
@@ -21512,12 +21405,10 @@ using chip::SessionHandle;
                     definedValue_0 = [self asByteSpan:params.data];
                 }
 
-                auto successFn = Callback<ApplicationLauncherClusterLauncherResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ApplicationLauncherCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -21548,8 +21439,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                ApplicationLauncherClusterLauncherResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ApplicationLauncher::Commands::StopApp::Type request;
@@ -21559,12 +21452,10 @@ using chip::SessionHandle;
                 request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
                 request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
-                auto successFn = Callback<ApplicationLauncherClusterLauncherResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ApplicationLauncherCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -21595,8 +21486,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                ApplicationLauncherClusterLauncherResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ApplicationLauncher::Commands::HideApp::Type request;
@@ -21606,12 +21499,10 @@ using chip::SessionHandle;
                 request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
                 request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
-                auto successFn = Callback<ApplicationLauncherClusterLauncherResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ApplicationLauncherCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -21906,8 +21797,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRAccountLoginClusterGetSetupPINResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRAccountLoginClusterGetSetupPINResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                AccountLoginClusterGetSetupPINResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 AccountLogin::Commands::GetSetupPIN::Type request;
@@ -21919,12 +21812,10 @@ using chip::SessionHandle;
                 }
                 request.tempAccountIdentifier = [self asCharSpan:params.tempAccountIdentifier];
 
-                auto successFn = Callback<AccountLoginClusterGetSetupPINResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::AccountLoginCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -21954,13 +21845,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 AccountLogin::Commands::Login::Type request;
@@ -21973,12 +21865,10 @@ using chip::SessionHandle;
                 request.tempAccountIdentifier = [self asCharSpan:params.tempAccountIdentifier];
                 request.setupPIN = [self asCharSpan:params.setupPIN];
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::AccountLoginCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -22014,13 +21904,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 AccountLogin::Commands::Logout::Type request;
@@ -22031,12 +21922,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(10000);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::AccountLoginCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -22178,13 +22067,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ElectricalMeasurement::Commands::GetProfileInfoCommand::Type request;
@@ -22192,12 +22082,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ElectricalMeasurementCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -22227,13 +22115,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 ElectricalMeasurement::Commands::GetMeasurementProfileCommand::Type request;
@@ -22244,12 +22133,10 @@ using chip::SessionHandle;
                 request.startTime = params.startTime.unsignedIntValue;
                 request.numberOfIntervals = params.numberOfIntervals.unsignedCharValue;
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::ElectricalMeasurementCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -23567,13 +23454,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::Test::Type request;
@@ -23581,12 +23469,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -23625,13 +23511,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestNotHandled::Type request;
@@ -23639,12 +23526,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -23685,8 +23570,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestSpecificResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRTestClusterClusterTestSpecificResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                TestClusterClusterTestSpecificResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestSpecific::Type request;
@@ -23694,12 +23581,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<TestClusterClusterTestSpecificResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -23738,13 +23623,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestUnknownCommand::Type request;
@@ -23752,12 +23638,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -23788,8 +23672,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestAddArgumentsResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRTestClusterClusterTestAddArgumentsResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                TestClusterClusterTestAddArgumentsResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestAddArguments::Type request;
@@ -23799,12 +23685,10 @@ using chip::SessionHandle;
                 request.arg1 = params.arg1.unsignedCharValue;
                 request.arg2 = params.arg2.unsignedCharValue;
 
-                auto successFn = Callback<TestClusterClusterTestAddArgumentsResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -23835,8 +23719,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestSimpleArgumentResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRTestClusterClusterTestSimpleArgumentResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                TestClusterClusterTestSimpleArgumentResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestSimpleArgumentRequest::Type request;
@@ -23845,12 +23731,10 @@ using chip::SessionHandle;
                 }
                 request.arg1 = params.arg1.boolValue;
 
-                auto successFn = Callback<TestClusterClusterTestSimpleArgumentResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -23882,8 +23766,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestStructArrayArgumentResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRTestClusterClusterTestStructArrayArgumentResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                TestClusterClusterTestStructArrayArgumentResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestStructArrayArgumentRequest::Type request;
@@ -24103,12 +23989,10 @@ using chip::SessionHandle;
                 request.arg5 = static_cast<std::remove_reference_t<decltype(request.arg5)>>(params.arg5.unsignedCharValue);
                 request.arg6 = params.arg6.boolValue;
 
-                auto successFn = Callback<TestClusterClusterTestStructArrayArgumentResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -24139,8 +24023,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                TestClusterClusterBooleanResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestStructArgumentRequest::Type request;
@@ -24156,12 +24042,10 @@ using chip::SessionHandle;
                 request.arg1.g = params.arg1.g.floatValue;
                 request.arg1.h = params.arg1.h.doubleValue;
 
-                auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -24192,8 +24076,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                TestClusterClusterBooleanResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestNestedStructArgumentRequest::Type request;
@@ -24213,12 +24099,10 @@ using chip::SessionHandle;
                 request.arg1.c.g = params.arg1.c.g.floatValue;
                 request.arg1.c.h = params.arg1.c.h.doubleValue;
 
-                auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -24249,8 +24133,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                TestClusterClusterBooleanResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestListStructArgumentRequest::Type request;
@@ -24289,12 +24175,10 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -24325,8 +24209,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                TestClusterClusterBooleanResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestListInt8UArgumentRequest::Type request;
@@ -24356,12 +24242,10 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -24392,8 +24276,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                TestClusterClusterBooleanResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestNestedStructListArgumentRequest::Type request;
@@ -24510,12 +24396,10 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -24547,8 +24431,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRTestClusterClusterBooleanResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                TestClusterClusterBooleanResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestListNestedStructListArgumentRequest::Type request;
@@ -24690,12 +24576,10 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<TestClusterClusterBooleanResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -24726,8 +24610,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestListInt8UReverseResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRTestClusterClusterTestListInt8UReverseResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                TestClusterClusterTestListInt8UReverseResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestListInt8UReverseRequest::Type request;
@@ -24757,12 +24643,10 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<TestClusterClusterTestListInt8UReverseResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -24793,8 +24677,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestEnumsResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRTestClusterClusterTestEnumsResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                TestClusterClusterTestEnumsResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestEnumsRequest::Type request;
@@ -24804,12 +24690,10 @@ using chip::SessionHandle;
                 request.arg1 = static_cast<std::remove_reference_t<decltype(request.arg1)>>(params.arg1.unsignedShortValue);
                 request.arg2 = static_cast<std::remove_reference_t<decltype(request.arg2)>>(params.arg2.unsignedCharValue);
 
-                auto successFn = Callback<TestClusterClusterTestEnumsResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -24840,8 +24724,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestNullableOptionalResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRTestClusterClusterTestNullableOptionalResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                TestClusterClusterTestNullableOptionalResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestNullableOptionalRequest::Type request;
@@ -24860,12 +24746,10 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<TestClusterClusterTestNullableOptionalResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -24898,8 +24782,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                TestClusterClusterTestComplexNullableOptionalResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestComplexNullableOptionalRequest::Type request;
@@ -25077,13 +24963,10 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn
-                    = Callback<TestClusterClusterTestComplexNullableOptionalResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -25114,8 +24997,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterSimpleStructResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRTestClusterClusterSimpleStructResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                TestClusterClusterSimpleStructResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::SimpleStructEchoRequest::Type request;
@@ -25131,12 +25016,10 @@ using chip::SessionHandle;
                 request.arg1.g = params.arg1.g.floatValue;
                 request.arg1.h = params.arg1.h.doubleValue;
 
-                auto successFn = Callback<TestClusterClusterSimpleStructResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -25175,13 +25058,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TimedInvokeRequest::Type request;
@@ -25192,12 +25076,10 @@ using chip::SessionHandle;
                     timedInvokeTimeoutMs.SetValue(10000);
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -25227,13 +25109,14 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue, baseDevice,
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
                 [workItem endWork];
             },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type request;
@@ -25247,12 +25130,10 @@ using chip::SessionHandle;
                     }
                 }
 
-                auto successFn = Callback<CommandSuccessCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -25283,8 +25164,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestEmitTestEventResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRTestClusterClusterTestEmitTestEventResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                TestClusterClusterTestEmitTestEventResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestEmitTestEventRequest::Type request;
@@ -25295,12 +25178,10 @@ using chip::SessionHandle;
                 request.arg2 = static_cast<std::remove_reference_t<decltype(request.arg2)>>(params.arg2.unsignedCharValue);
                 request.arg3 = params.arg3.boolValue;
 
-                auto successFn = Callback<TestClusterClusterTestEmitTestEventResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
@@ -25334,8 +25215,10 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        new MTRTestClusterClusterTestEmitTestFabricScopedEventResponseCallbackBridge(self.callbackQueue, baseDevice, completion,
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+        auto * bridge = new MTRTestClusterClusterTestEmitTestFabricScopedEventResponseCallbackBridge(self.callbackQueue, completion,
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                TestClusterClusterTestEmitTestFabricScopedEventResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
                 TestCluster::Commands::TestEmitTestFabricScopedEventRequest::Type request;
@@ -25344,13 +25227,10 @@ using chip::SessionHandle;
                 }
                 request.arg1 = params.arg1.unsignedCharValue;
 
-                auto successFn
-                    = Callback<TestClusterClusterTestEmitTestFabricScopedEventResponseCallbackType>::FromCancelable(success);
-                auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
                 chip::Controller::TestClusterCluster cppCluster(exchangeManager, session, self->_endpoint);
-                return cppCluster.InvokeCommand(
-                    request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
             });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
