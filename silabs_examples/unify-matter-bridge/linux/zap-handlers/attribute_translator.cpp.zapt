@@ -36,6 +36,19 @@ using namespace unify::matter_bridge;
 #include "chip_types_from_json.hpp"
 #include "unify_accessors.hpp"
 
+// ZCL cluster revision
+{{#zcl_clusters}}
+{{#if (supportedCluster label)}}
+{{#global_attribute_default code="0xFFFD"}}
+{{#if defaultValue}}
+constexpr uint16_t ZCL_{{asDelimitedMacro parent.label}}_REVISION = {{defaultValue}};
+{{else}}
+constexpr uint16_t ZCL_{{asDelimitedMacro parent.label}}_REVISION = 0;
+{{/if}}
+{{/global_attribute_default}}
+{{/if}}
+{{/zcl_clusters}}
+
 {{#zcl_clusters}}
 {{#if (supportedCluster label)}}
 CHIP_ERROR
@@ -48,7 +61,7 @@ CHIP_ERROR
     return CHIP_ERROR_INVALID_ARGUMENT;
   }
 
-  ConcreteAttributePath atrpath = ConcreteAttributePath(aPath.mEndpointId,
+  ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId,
                                                         aPath.mClusterId,
                                                         aPath.mAttributeId);
   try {
@@ -60,8 +73,10 @@ CHIP_ERROR
       MN::{{asUpperCamelCase label}}::TypeInfo::Type value;
       {{#if (isStrEqual (asUpperCamelCase label) "FeatureMap")  }}
       value = get_feature_map_settings(aPath);
+      {{else if (isStrEqual (asUpperCamelCase label) "ClusterRevision") }}
+      value = ZCL_{{asDelimitedMacro parent.label}}_REVISION;
       {{else}}
-      UN::{{asUpperCamelCase label}}::Get(atrpath, value);
+      UN::{{asUpperCamelCase label}}::Get(atr_path, value);
       {{/if}}
       return aEncoder.Encode(value);
     }
@@ -71,9 +86,8 @@ CHIP_ERROR
   } catch (const std::out_of_range &e) {
     sl_log_info(
       LOG_TAG,
-      "The request attribute Path is not found in the attribute state "
-      "contanier, %s\n",
-      e.what());
+      "The request attribute Path for endpoint [%i] is not found in the attribute state "
+      "container: %s\n", atr_path.mEndpointId, e.what());
       return CHIP_ERROR_NO_MESSAGE_HANDLER;
   }
   return CHIP_NO_ERROR;
