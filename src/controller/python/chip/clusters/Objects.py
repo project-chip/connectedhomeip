@@ -85,7 +85,7 @@ class Identify(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0003
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -101,7 +101,7 @@ class Identify(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0003
             command_id: typing.ClassVar[int] = 0x0040
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -261,7 +261,7 @@ class Groups(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0004
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'AddGroupResponse'
+            response_type: typing.ClassVar[str] = 'AddGroupResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -279,7 +279,7 @@ class Groups(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0004
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -297,7 +297,7 @@ class Groups(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0004
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'ViewGroupResponse'
+            response_type: typing.ClassVar[str] = 'ViewGroupResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -313,7 +313,7 @@ class Groups(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0004
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -333,7 +333,7 @@ class Groups(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0004
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'GetGroupMembershipResponse'
+            response_type: typing.ClassVar[str] = 'GetGroupMembershipResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -349,7 +349,7 @@ class Groups(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0004
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -367,7 +367,7 @@ class Groups(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0004
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'RemoveGroupResponse'
+            response_type: typing.ClassVar[str] = 'RemoveGroupResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -383,7 +383,7 @@ class Groups(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0004
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -401,7 +401,7 @@ class Groups(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0004
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -415,7 +415,7 @@ class Groups(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0004
             command_id: typing.ClassVar[int] = 0x0005
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -597,7 +597,7 @@ class Scenes(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0005
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'AddSceneResponse'
+            response_type: typing.ClassVar[str] = 'AddSceneResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -621,7 +621,7 @@ class Scenes(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0005
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -641,7 +641,7 @@ class Scenes(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0005
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'ViewSceneResponse'
+            response_type: typing.ClassVar[str] = 'ViewSceneResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -659,7 +659,7 @@ class Scenes(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0005
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -685,7 +685,7 @@ class Scenes(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0005
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'RemoveSceneResponse'
+            response_type: typing.ClassVar[str] = 'RemoveSceneResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -703,7 +703,7 @@ class Scenes(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0005
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -723,7 +723,7 @@ class Scenes(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0005
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'RemoveAllScenesResponse'
+            response_type: typing.ClassVar[str] = 'RemoveAllScenesResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -739,7 +739,7 @@ class Scenes(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0005
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -757,7 +757,7 @@ class Scenes(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0005
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'StoreSceneResponse'
+            response_type: typing.ClassVar[str] = 'StoreSceneResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -775,7 +775,7 @@ class Scenes(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0005
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -795,7 +795,7 @@ class Scenes(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0005
             command_id: typing.ClassVar[int] = 0x0005
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -815,7 +815,7 @@ class Scenes(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0005
             command_id: typing.ClassVar[int] = 0x0006
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'GetSceneMembershipResponse'
+            response_type: typing.ClassVar[str] = 'GetSceneMembershipResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -831,7 +831,7 @@ class Scenes(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0005
             command_id: typing.ClassVar[int] = 0x0006
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -853,7 +853,7 @@ class Scenes(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0005
             command_id: typing.ClassVar[int] = 0x0040
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'EnhancedAddSceneResponse'
+            response_type: typing.ClassVar[str] = 'EnhancedAddSceneResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -877,7 +877,7 @@ class Scenes(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0005
             command_id: typing.ClassVar[int] = 0x0040
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -897,7 +897,7 @@ class Scenes(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0005
             command_id: typing.ClassVar[int] = 0x0041
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'EnhancedViewSceneResponse'
+            response_type: typing.ClassVar[str] = 'EnhancedViewSceneResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -915,7 +915,7 @@ class Scenes(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0005
             command_id: typing.ClassVar[int] = 0x0041
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -941,7 +941,7 @@ class Scenes(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0005
             command_id: typing.ClassVar[int] = 0x0042
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'CopySceneResponse'
+            response_type: typing.ClassVar[str] = 'CopySceneResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -965,7 +965,7 @@ class Scenes(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0005
             command_id: typing.ClassVar[int] = 0x0042
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1217,7 +1217,7 @@ class OnOff(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0006
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1231,7 +1231,7 @@ class OnOff(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0006
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1245,7 +1245,7 @@ class OnOff(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0006
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1259,7 +1259,7 @@ class OnOff(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0006
             command_id: typing.ClassVar[int] = 0x0040
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1277,7 +1277,7 @@ class OnOff(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0006
             command_id: typing.ClassVar[int] = 0x0041
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1291,7 +1291,7 @@ class OnOff(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0006
             command_id: typing.ClassVar[int] = 0x0042
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1679,7 +1679,7 @@ class LevelControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0008
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1701,7 +1701,7 @@ class LevelControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0008
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1723,7 +1723,7 @@ class LevelControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0008
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1747,7 +1747,7 @@ class LevelControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0008
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1765,7 +1765,7 @@ class LevelControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0008
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1787,7 +1787,7 @@ class LevelControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0008
             command_id: typing.ClassVar[int] = 0x0005
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1809,7 +1809,7 @@ class LevelControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0008
             command_id: typing.ClassVar[int] = 0x0006
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1833,7 +1833,7 @@ class LevelControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0008
             command_id: typing.ClassVar[int] = 0x0007
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -1851,7 +1851,7 @@ class LevelControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0008
             command_id: typing.ClassVar[int] = 0x0008
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3305,7 +3305,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3323,7 +3323,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3343,7 +3343,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3361,7 +3361,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3381,7 +3381,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3399,7 +3399,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0005
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3417,7 +3417,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0006
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3437,7 +3437,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0007
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3455,7 +3455,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0008
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3473,7 +3473,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x0009
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3493,7 +3493,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x000A
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3511,7 +3511,7 @@ class Actions(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0025
             command_id: typing.ClassVar[int] = 0x000B
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -3791,7 +3791,7 @@ class Basic(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0028
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -4326,7 +4326,7 @@ class OtaSoftwareUpdateProvider(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0029
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'QueryImageResponse'
+            response_type: typing.ClassVar[str] = 'QueryImageResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -4356,7 +4356,7 @@ class OtaSoftwareUpdateProvider(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0029
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -4386,7 +4386,7 @@ class OtaSoftwareUpdateProvider(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0029
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'ApplyUpdateResponse'
+            response_type: typing.ClassVar[str] = 'ApplyUpdateResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -4404,7 +4404,7 @@ class OtaSoftwareUpdateProvider(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0029
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -4422,7 +4422,7 @@ class OtaSoftwareUpdateProvider(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0029
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -4597,7 +4597,7 @@ class OtaSoftwareUpdateRequestor(Cluster):
             cluster_id: typing.ClassVar[int] = 0x002A
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -6239,7 +6239,7 @@ class GeneralCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0030
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'ArmFailSafeResponse'
+            response_type: typing.ClassVar[str] = 'ArmFailSafeResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -6257,7 +6257,7 @@ class GeneralCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0030
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -6275,7 +6275,7 @@ class GeneralCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0030
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'SetRegulatoryConfigResponse'
+            response_type: typing.ClassVar[str] = 'SetRegulatoryConfigResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -6295,7 +6295,7 @@ class GeneralCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0030
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -6313,7 +6313,7 @@ class GeneralCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0030
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'CommissioningCompleteResponse'
+            response_type: typing.ClassVar[str] = 'CommissioningCompleteResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -6327,7 +6327,7 @@ class GeneralCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0030
             command_id: typing.ClassVar[int] = 0x0005
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -6633,7 +6633,7 @@ class NetworkCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0031
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'ScanNetworksResponse'
+            response_type: typing.ClassVar[str] = 'ScanNetworksResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -6651,7 +6651,7 @@ class NetworkCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0031
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -6673,7 +6673,7 @@ class NetworkCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0031
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'NetworkConfigResponse'
+            response_type: typing.ClassVar[str] = 'NetworkConfigResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -6693,7 +6693,7 @@ class NetworkCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0031
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'NetworkConfigResponse'
+            response_type: typing.ClassVar[str] = 'NetworkConfigResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -6711,7 +6711,7 @@ class NetworkCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0031
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'NetworkConfigResponse'
+            response_type: typing.ClassVar[str] = 'NetworkConfigResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -6729,7 +6729,7 @@ class NetworkCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0031
             command_id: typing.ClassVar[int] = 0x0005
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -6749,7 +6749,7 @@ class NetworkCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0031
             command_id: typing.ClassVar[int] = 0x0006
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'ConnectNetworkResponse'
+            response_type: typing.ClassVar[str] = 'ConnectNetworkResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -6767,7 +6767,7 @@ class NetworkCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0031
             command_id: typing.ClassVar[int] = 0x0007
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -6787,7 +6787,7 @@ class NetworkCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0031
             command_id: typing.ClassVar[int] = 0x0008
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'NetworkConfigResponse'
+            response_type: typing.ClassVar[str] = 'NetworkConfigResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -7060,7 +7060,7 @@ class DiagnosticLogs(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0032
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'RetrieveLogsResponse'
+            response_type: typing.ClassVar[str] = 'RetrieveLogsResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -7080,7 +7080,7 @@ class DiagnosticLogs(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0032
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -7300,7 +7300,7 @@ class GeneralDiagnostics(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0033
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -7682,7 +7682,7 @@ class SoftwareDiagnostics(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0034
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -8152,7 +8152,7 @@ class ThreadNetworkDiagnostics(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0035
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -9376,7 +9376,7 @@ class WiFiNetworkDiagnostics(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0036
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -9797,7 +9797,7 @@ class EthernetNetworkDiagnostics(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0037
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -10142,7 +10142,7 @@ class TimeSynchronization(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0038
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -11196,7 +11196,7 @@ class AdministratorCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003C
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -11224,7 +11224,7 @@ class AdministratorCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003C
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -11244,7 +11244,7 @@ class AdministratorCommissioning(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003C
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -11481,7 +11481,7 @@ class OperationalCredentials(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003E
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'AttestationResponse'
+            response_type: typing.ClassVar[str] = 'AttestationResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -11497,7 +11497,7 @@ class OperationalCredentials(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003E
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -11515,7 +11515,7 @@ class OperationalCredentials(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003E
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'CertificateChainResponse'
+            response_type: typing.ClassVar[str] = 'CertificateChainResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -11531,7 +11531,7 @@ class OperationalCredentials(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003E
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -11547,7 +11547,7 @@ class OperationalCredentials(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003E
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'CSRResponse'
+            response_type: typing.ClassVar[str] = 'CSRResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -11565,7 +11565,7 @@ class OperationalCredentials(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003E
             command_id: typing.ClassVar[int] = 0x0005
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -11583,7 +11583,7 @@ class OperationalCredentials(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003E
             command_id: typing.ClassVar[int] = 0x0006
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'NOCResponse'
+            response_type: typing.ClassVar[str] = 'NOCResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -11607,7 +11607,7 @@ class OperationalCredentials(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003E
             command_id: typing.ClassVar[int] = 0x0007
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'NOCResponse'
+            response_type: typing.ClassVar[str] = 'NOCResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -11625,7 +11625,7 @@ class OperationalCredentials(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003E
             command_id: typing.ClassVar[int] = 0x0008
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -11645,7 +11645,7 @@ class OperationalCredentials(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003E
             command_id: typing.ClassVar[int] = 0x0009
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'NOCResponse'
+            response_type: typing.ClassVar[str] = 'NOCResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -11661,7 +11661,7 @@ class OperationalCredentials(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003E
             command_id: typing.ClassVar[int] = 0x000A
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'NOCResponse'
+            response_type: typing.ClassVar[str] = 'NOCResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -11677,7 +11677,7 @@ class OperationalCredentials(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003E
             command_id: typing.ClassVar[int] = 0x000B
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -11969,7 +11969,7 @@ class GroupKeyManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003F
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -11985,7 +11985,7 @@ class GroupKeyManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003F
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'KeySetReadResponse'
+            response_type: typing.ClassVar[str] = 'KeySetReadResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -12001,7 +12001,7 @@ class GroupKeyManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003F
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -12017,7 +12017,7 @@ class GroupKeyManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003F
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -12033,7 +12033,7 @@ class GroupKeyManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003F
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'KeySetReadAllIndicesResponse'
+            response_type: typing.ClassVar[str] = 'KeySetReadAllIndicesResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -12049,7 +12049,7 @@ class GroupKeyManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x003F
             command_id: typing.ClassVar[int] = 0x0005
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13025,7 +13025,7 @@ class ModeSelect(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0050
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13502,7 +13502,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13522,7 +13522,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13542,7 +13542,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13564,7 +13564,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x000B
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13592,7 +13592,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x000C
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'GetWeekDayScheduleResponse'
+            response_type: typing.ClassVar[str] = 'GetWeekDayScheduleResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13610,7 +13610,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x000C
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13640,7 +13640,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x000D
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13658,7 +13658,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x000E
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13680,7 +13680,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x000F
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'GetYearDayScheduleResponse'
+            response_type: typing.ClassVar[str] = 'GetYearDayScheduleResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13698,7 +13698,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x000F
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13722,7 +13722,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x0010
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13740,7 +13740,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x0011
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13762,7 +13762,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x0012
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'GetHolidayScheduleResponse'
+            response_type: typing.ClassVar[str] = 'GetHolidayScheduleResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13778,7 +13778,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x0012
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13802,7 +13802,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x0013
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13818,7 +13818,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x001A
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13850,7 +13850,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x001B
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'GetUserResponse'
+            response_type: typing.ClassVar[str] = 'GetUserResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13866,7 +13866,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x001C
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13900,7 +13900,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x001D
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13920,7 +13920,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x0022
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'SetCredentialResponse'
+            response_type: typing.ClassVar[str] = 'SetCredentialResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13950,7 +13950,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x0023
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13970,7 +13970,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x0024
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'GetCredentialStatusResponse'
+            response_type: typing.ClassVar[str] = 'GetCredentialStatusResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13986,7 +13986,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x0025
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14010,7 +14010,7 @@ class DoorLock(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0101
             command_id: typing.ClassVar[int] = 0x0026
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14929,7 +14929,7 @@ class WindowCovering(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0102
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14943,7 +14943,7 @@ class WindowCovering(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0102
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14957,7 +14957,7 @@ class WindowCovering(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0102
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14971,7 +14971,7 @@ class WindowCovering(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0102
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14987,7 +14987,7 @@ class WindowCovering(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0102
             command_id: typing.ClassVar[int] = 0x0005
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -15003,7 +15003,7 @@ class WindowCovering(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0102
             command_id: typing.ClassVar[int] = 0x0007
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -15019,7 +15019,7 @@ class WindowCovering(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0102
             command_id: typing.ClassVar[int] = 0x0008
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -15515,7 +15515,7 @@ class BarrierControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0103
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -15531,7 +15531,7 @@ class BarrierControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0103
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -16782,7 +16782,7 @@ class Thermostat(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0201
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -16800,7 +16800,7 @@ class Thermostat(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0201
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -16822,7 +16822,7 @@ class Thermostat(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0201
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -16844,7 +16844,7 @@ class Thermostat(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0201
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'GetWeeklyScheduleResponse'
+            response_type: typing.ClassVar[str] = 'GetWeeklyScheduleResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -16862,7 +16862,7 @@ class Thermostat(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0201
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18395,7 +18395,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0300
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18419,7 +18419,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0300
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18441,7 +18441,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0300
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18465,7 +18465,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0300
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18487,7 +18487,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0300
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18509,7 +18509,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0300
             command_id: typing.ClassVar[int] = 0x0005
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18533,7 +18533,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0300
             command_id: typing.ClassVar[int] = 0x0006
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18557,7 +18557,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0300
             command_id: typing.ClassVar[int] = 0x0007
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18581,7 +18581,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0300
             command_id: typing.ClassVar[int] = 0x0008
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18603,7 +18603,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0300
             command_id: typing.ClassVar[int] = 0x0009
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18627,7 +18627,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0300
             command_id: typing.ClassVar[int] = 0x000A
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18649,7 +18649,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0300
             command_id: typing.ClassVar[int] = 0x0040
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18673,7 +18673,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0300
             command_id: typing.ClassVar[int] = 0x0041
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18695,7 +18695,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0300
             command_id: typing.ClassVar[int] = 0x0042
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18719,7 +18719,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0300
             command_id: typing.ClassVar[int] = 0x0043
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18743,7 +18743,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0300
             command_id: typing.ClassVar[int] = 0x0044
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18771,7 +18771,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0300
             command_id: typing.ClassVar[int] = 0x0047
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18789,7 +18789,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0300
             command_id: typing.ClassVar[int] = 0x004B
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -18815,7 +18815,7 @@ class ColorControl(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0300
             command_id: typing.ClassVar[int] = 0x004C
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -21651,7 +21651,7 @@ class Channel(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0504
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'ChangeChannelResponse'
+            response_type: typing.ClassVar[str] = 'ChangeChannelResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -21667,7 +21667,7 @@ class Channel(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0504
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -21685,7 +21685,7 @@ class Channel(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0504
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -21703,7 +21703,7 @@ class Channel(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0504
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -21900,7 +21900,7 @@ class TargetNavigator(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0505
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'NavigateTargetResponse'
+            response_type: typing.ClassVar[str] = 'NavigateTargetResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -21918,7 +21918,7 @@ class TargetNavigator(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0505
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22120,7 +22120,7 @@ class MediaPlayback(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'PlaybackResponse'
+            response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22134,7 +22134,7 @@ class MediaPlayback(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'PlaybackResponse'
+            response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22148,7 +22148,7 @@ class MediaPlayback(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'PlaybackResponse'
+            response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22162,7 +22162,7 @@ class MediaPlayback(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'PlaybackResponse'
+            response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22176,7 +22176,7 @@ class MediaPlayback(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'PlaybackResponse'
+            response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22190,7 +22190,7 @@ class MediaPlayback(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0005
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'PlaybackResponse'
+            response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22204,7 +22204,7 @@ class MediaPlayback(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0006
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'PlaybackResponse'
+            response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22218,7 +22218,7 @@ class MediaPlayback(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0007
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'PlaybackResponse'
+            response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22232,7 +22232,7 @@ class MediaPlayback(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0008
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'PlaybackResponse'
+            response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22248,7 +22248,7 @@ class MediaPlayback(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0009
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'PlaybackResponse'
+            response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22264,7 +22264,7 @@ class MediaPlayback(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x000A
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22282,7 +22282,7 @@ class MediaPlayback(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x000B
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'PlaybackResponse'
+            response_type: typing.ClassVar[str] = 'PlaybackResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22556,7 +22556,7 @@ class MediaInput(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0507
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22572,7 +22572,7 @@ class MediaInput(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0507
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22586,7 +22586,7 @@ class MediaInput(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0507
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22600,7 +22600,7 @@ class MediaInput(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0507
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22758,7 +22758,7 @@ class LowPower(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0508
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22974,7 +22974,7 @@ class KeypadInput(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0509
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'SendKeyResponse'
+            response_type: typing.ClassVar[str] = 'SendKeyResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -22990,7 +22990,7 @@ class KeypadInput(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0509
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -23235,7 +23235,7 @@ class ContentLauncher(Cluster):
             cluster_id: typing.ClassVar[int] = 0x050A
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'LaunchResponse'
+            response_type: typing.ClassVar[str] = 'LaunchResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -23255,7 +23255,7 @@ class ContentLauncher(Cluster):
             cluster_id: typing.ClassVar[int] = 0x050A
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'LaunchResponse'
+            response_type: typing.ClassVar[str] = 'LaunchResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -23275,7 +23275,7 @@ class ContentLauncher(Cluster):
             cluster_id: typing.ClassVar[int] = 0x050A
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -23463,7 +23463,7 @@ class AudioOutput(Cluster):
             cluster_id: typing.ClassVar[int] = 0x050B
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -23479,7 +23479,7 @@ class AudioOutput(Cluster):
             cluster_id: typing.ClassVar[int] = 0x050B
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -23675,7 +23675,7 @@ class ApplicationLauncher(Cluster):
             cluster_id: typing.ClassVar[int] = 0x050C
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'LauncherResponse'
+            response_type: typing.ClassVar[str] = 'LauncherResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -23693,7 +23693,7 @@ class ApplicationLauncher(Cluster):
             cluster_id: typing.ClassVar[int] = 0x050C
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'LauncherResponse'
+            response_type: typing.ClassVar[str] = 'LauncherResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -23709,7 +23709,7 @@ class ApplicationLauncher(Cluster):
             cluster_id: typing.ClassVar[int] = 0x050C
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'LauncherResponse'
+            response_type: typing.ClassVar[str] = 'LauncherResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -23725,7 +23725,7 @@ class ApplicationLauncher(Cluster):
             cluster_id: typing.ClassVar[int] = 0x050C
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -24156,7 +24156,7 @@ class AccountLogin(Cluster):
             cluster_id: typing.ClassVar[int] = 0x050E
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'GetSetupPINResponse'
+            response_type: typing.ClassVar[str] = 'GetSetupPINResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -24176,7 +24176,7 @@ class AccountLogin(Cluster):
             cluster_id: typing.ClassVar[int] = 0x050E
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -24192,7 +24192,7 @@ class AccountLogin(Cluster):
             cluster_id: typing.ClassVar[int] = 0x050E
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -24214,7 +24214,7 @@ class AccountLogin(Cluster):
             cluster_id: typing.ClassVar[int] = 0x050E
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -24596,7 +24596,7 @@ class ElectricalMeasurement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0B04
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -24618,7 +24618,7 @@ class ElectricalMeasurement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0B04
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -24632,7 +24632,7 @@ class ElectricalMeasurement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0B04
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -24658,7 +24658,7 @@ class ElectricalMeasurement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x0B04
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27152,7 +27152,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27166,7 +27166,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27182,7 +27182,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27196,7 +27196,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27212,7 +27212,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'TestSpecificResponse'
+            response_type: typing.ClassVar[str] = 'TestSpecificResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27226,7 +27226,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27242,7 +27242,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27256,7 +27256,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27282,7 +27282,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'TestAddArgumentsResponse'
+            response_type: typing.ClassVar[str] = 'TestAddArgumentsResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27300,7 +27300,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27316,7 +27316,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0005
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'TestSimpleArgumentResponse'
+            response_type: typing.ClassVar[str] = 'TestSimpleArgumentResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27332,7 +27332,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0005
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27350,7 +27350,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0006
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'TestStructArrayArgumentResponse'
+            response_type: typing.ClassVar[str] = 'TestStructArrayArgumentResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27376,7 +27376,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0006
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27398,7 +27398,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0007
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'BooleanResponse'
+            response_type: typing.ClassVar[str] = 'BooleanResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27414,7 +27414,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0007
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27484,7 +27484,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0008
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'BooleanResponse'
+            response_type: typing.ClassVar[str] = 'BooleanResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27500,7 +27500,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0008
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27516,7 +27516,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0009
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'BooleanResponse'
+            response_type: typing.ClassVar[str] = 'BooleanResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27532,7 +27532,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0009
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27548,7 +27548,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x000A
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'BooleanResponse'
+            response_type: typing.ClassVar[str] = 'BooleanResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27564,7 +27564,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x000A
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27580,7 +27580,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x000B
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'BooleanResponse'
+            response_type: typing.ClassVar[str] = 'BooleanResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27596,7 +27596,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x000B
             is_client: typing.ClassVar[bool] = False
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27612,7 +27612,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x000C
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'BooleanResponse'
+            response_type: typing.ClassVar[str] = 'BooleanResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27628,7 +27628,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x000D
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'TestListInt8UReverseResponse'
+            response_type: typing.ClassVar[str] = 'TestListInt8UReverseResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27644,7 +27644,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x000E
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'TestEnumsResponse'
+            response_type: typing.ClassVar[str] = 'TestEnumsResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27662,7 +27662,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x000F
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'TestNullableOptionalResponse'
+            response_type: typing.ClassVar[str] = 'TestNullableOptionalResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27678,7 +27678,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0010
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'TestComplexNullableOptionalResponse'
+            response_type: typing.ClassVar[str] = 'TestComplexNullableOptionalResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27716,7 +27716,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0011
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'SimpleStructResponse'
+            response_type: typing.ClassVar[str] = 'SimpleStructResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27732,7 +27732,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0012
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27750,7 +27750,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0013
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27766,7 +27766,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0014
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'TestEmitTestEventResponse'
+            response_type: typing.ClassVar[str] = 'TestEmitTestEventResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -27786,7 +27786,7 @@ class TestCluster(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0015
             is_client: typing.ClassVar[bool] = True
-            response_type: str = 'TestEmitTestFabricScopedEventResponse'
+            response_type: typing.ClassVar[str] = 'TestEmitTestFabricScopedEventResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -29283,7 +29283,7 @@ class FaultInjection(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC06
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -29307,7 +29307,7 @@ class FaultInjection(Cluster):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC06
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
-            response_type: str = None
+            response_type: typing.ClassVar[str] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
