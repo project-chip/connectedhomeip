@@ -32,6 +32,9 @@ CONFIG_BT_NIMBLE_ENABLED=y
 #enable lwip ipv6 autoconfig
 CONFIG_LWIP_IPV6_AUTOCONFIG=y
 
+#enable debug shell
+CONFIG_ENABLE_CHIP_SHELL=y
+
 # Use a custom partition table
 CONFIG_PARTITION_TABLE_CUSTOM=y
 CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"

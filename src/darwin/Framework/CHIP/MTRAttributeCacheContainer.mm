@@ -43,12 +43,12 @@ using namespace chip;
 }
 
 - (void)setXPCConnection:(MTRDeviceControllerXPCConnection *)xpcConnection
-            controllerId:(id<NSCopying>)controllerId
-                deviceId:(uint64_t)deviceId
+            controllerID:(id<NSCopying>)controllerID
+                deviceID:(NSNumber *)deviceID
 {
     self.xpcConnection = xpcConnection;
-    self.xpcControllerId = controllerId;
-    self.deviceId = deviceId;
+    self.xpcControllerID = controllerID;
+    self.deviceID = deviceID;
     self.shouldUseXPC = YES;
 }
 
@@ -78,15 +78,14 @@ static CHIP_ERROR AppendAttibuteValueToArray(
     return err;
 }
 
-- (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
-                          clusterId:(NSNumber * _Nullable)clusterId
-                        attributeId:(NSNumber * _Nullable)attributeId
-                        clientQueue:(dispatch_queue_t)clientQueue
-                         completion:(void (^)(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
-                                        NSError * _Nullable error))completion
+- (void)readAttributeWithEndpointID:(NSNumber * _Nullable)endpointID
+                          clusterID:(NSNumber * _Nullable)clusterID
+                        attributeID:(NSNumber * _Nullable)attributeID
+                              queue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion
 {
     __auto_type completionHandler = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-        dispatch_async(clientQueue, ^{
+        dispatch_async(queue, ^{
             completion(values, error);
         });
     };
@@ -98,16 +97,16 @@ static CHIP_ERROR AppendAttibuteValueToArray(
             completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
             return;
         }
-        __auto_type controllerId = self.xpcControllerId;
-        uint64_t nodeId = self.deviceId;
+        __auto_type controllerId = self.xpcControllerID;
+        NSNumber * nodeId = self.deviceID;
         [xpcConnection
             getProxyHandleWithCompletion:^(dispatch_queue_t _Nonnull queue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
                 if (handle) {
                     [handle.proxy readAttributeCacheWithController:controllerId
-                                                            nodeId:nodeId
-                                                        endpointId:endpointId
-                                                         clusterId:clusterId
-                                                       attributeId:attributeId
+                                                            nodeId:nodeId.unsignedLongLongValue
+                                                        endpointId:endpointID
+                                                         clusterId:clusterID
+                                                       attributeId:attributeID
                                                         completion:^(id _Nullable values, NSError * _Nullable error) {
                                                             completion([MTRDeviceController decodeXPCResponseValues:values], error);
                                                             __auto_type handleRetainer = handle;
@@ -122,7 +121,7 @@ static CHIP_ERROR AppendAttibuteValueToArray(
     }
 
     dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-        if (endpointId == nil && clusterId == nil) {
+        if (endpointID == nil && clusterID == nil) {
             MTR_LOG_ERROR("Error: currently read from attribute cache does not support wildcards for both endpoint and cluster");
             completionHandler(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidArgument userInfo:nil]);
             return;
@@ -136,39 +135,39 @@ static CHIP_ERROR AppendAttibuteValueToArray(
 
         NSMutableArray * result = [[NSMutableArray alloc] init];
         CHIP_ERROR err = CHIP_NO_ERROR;
-        if (endpointId == nil) {
+        if (endpointID == nil) {
             err = self.cppAttributeCache->ForEachAttribute(
-                static_cast<chip::ClusterId>([clusterId unsignedLongValue]), [&](const app::ConcreteAttributePath & path) {
-                    if (attributeId == nil
-                        || static_cast<chip::AttributeId>([attributeId unsignedLongValue]) == path.mAttributeId) {
+                static_cast<chip::ClusterId>([clusterID unsignedLongValue]), [&](const app::ConcreteAttributePath & path) {
+                    if (attributeID == nil
+                        || static_cast<chip::AttributeId>([attributeID unsignedLongValue]) == path.mAttributeId) {
                         (void) AppendAttibuteValueToArray(path, self.cppAttributeCache, result);
                     }
                     return CHIP_NO_ERROR;
                 });
-        } else if (clusterId == nil) {
+        } else if (clusterID == nil) {
             err = self.cppAttributeCache->ForEachCluster(
-                static_cast<chip::EndpointId>([endpointId unsignedShortValue]), [&](chip::ClusterId enumeratedClusterId) {
-                    (void) self.cppAttributeCache->ForEachAttribute(static_cast<chip::EndpointId>([endpointId unsignedShortValue]),
+                static_cast<chip::EndpointId>([endpointID unsignedShortValue]), [&](chip::ClusterId enumeratedClusterId) {
+                    (void) self.cppAttributeCache->ForEachAttribute(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
                         enumeratedClusterId, [&](const app::ConcreteAttributePath & path) {
-                            if (attributeId == nil
-                                || static_cast<chip::AttributeId>([attributeId unsignedLongValue]) == path.mAttributeId) {
+                            if (attributeID == nil
+                                || static_cast<chip::AttributeId>([attributeID unsignedLongValue]) == path.mAttributeId) {
                                 (void) AppendAttibuteValueToArray(path, self.cppAttributeCache, result);
                             }
                             return CHIP_NO_ERROR;
                         });
                     return CHIP_NO_ERROR;
                 });
-        } else if (attributeId == nil) {
-            err = self.cppAttributeCache->ForEachAttribute(static_cast<chip::EndpointId>([endpointId unsignedShortValue]),
-                static_cast<chip::ClusterId>([clusterId unsignedLongValue]), [&](const app::ConcreteAttributePath & path) {
+        } else if (attributeID == nil) {
+            err = self.cppAttributeCache->ForEachAttribute(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
+                static_cast<chip::ClusterId>([clusterID unsignedLongValue]), [&](const app::ConcreteAttributePath & path) {
                     (void) AppendAttibuteValueToArray(path, self.cppAttributeCache, result);
                     return CHIP_NO_ERROR;
                 });
         } else {
             app::ConcreteAttributePath path;
-            path.mEndpointId = static_cast<chip::EndpointId>([endpointId unsignedShortValue]);
-            path.mClusterId = static_cast<chip::ClusterId>([clusterId unsignedLongValue]);
-            path.mAttributeId = static_cast<chip::AttributeId>([attributeId unsignedLongValue]);
+            path.mEndpointId = static_cast<chip::EndpointId>([endpointID unsignedShortValue]);
+            path.mClusterId = static_cast<chip::ClusterId>([clusterID unsignedLongValue]);
+            path.mAttributeId = static_cast<chip::AttributeId>([attributeID unsignedLongValue]);
             err = AppendAttibuteValueToArray(path, self.cppAttributeCache, result);
         }
         if (err == CHIP_NO_ERROR) {
@@ -177,6 +176,23 @@ static CHIP_ERROR AppendAttibuteValueToArray(
             completionHandler(nil, [NSError errorWithDomain:MTRErrorDomain code:err.AsInteger() userInfo:nil]);
         }
     });
+}
+
+@end
+
+@implementation MTRAttributeCacheContainer (Deprecated)
+
+- (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
+                          clusterId:(NSNumber * _Nullable)clusterId
+                        attributeId:(NSNumber * _Nullable)attributeId
+                        clientQueue:(dispatch_queue_t)clientQueue
+                         completion:(MTRDeviceResponseHandler)completion
+{
+    [self readAttributeWithEndpointID:endpointId
+                            clusterID:clusterId
+                          attributeID:attributeId
+                                queue:clientQueue
+                           completion:completion];
 }
 
 @end

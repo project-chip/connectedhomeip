@@ -23,4 +23,28 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRCommissioningParameters (Deprecated)
+
+- (NSData * _Nullable)CSRNonce
+{
+    return self.csrNonce;
+}
+
+- (void)setCSRNonce:(NSData * _Nullable)CSRNonce
+{
+    self.csrNonce = CSRNonce;
+}
+
+- (NSNumber * _Nullable)failSafeExpiryTimeoutSecs
+{
+    return self.failSafeExpiryTimeout;
+}
+
+- (void)setFailSafeExpiryTimeoutSecs:(NSNumber * _Nullable)failSafeExpiryTimeoutSecs
+{
+    self.failSafeExpiryTimeout = failSafeExpiryTimeoutSecs;
+}
+
+@end
+
 NS_ASSUME_NONNULL_END

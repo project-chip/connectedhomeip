@@ -20,3 +20,7 @@ import("${chip_root}/build/chip/java/rules.gni")
 java_prebuilt("annotation") {
   jar_path = "artifacts/jsr305-3.0.2.jar"
 }
+
+java_prebuilt("json") {
+  jar_path = "artifacts/json-20220924.jar"
+}

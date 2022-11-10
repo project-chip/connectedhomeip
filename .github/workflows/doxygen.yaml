@@ -82,14 +82,14 @@ jobs:
 
         runs-on: ubuntu-20.04
         container:
-            image: connectedhomeip/chip-build-doxygen:0.6.05
+            image: connectedhomeip/chip-build-doxygen:0.6.06
 
         if: github.actor != 'restyled-io[bot]'
 
         steps:
             - name: "Print Actor"
               run: echo ${{github.actor}}
-            - uses: Wandalen/wretry.action@v1.0.15
+            - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
                   action: actions/checkout@v3

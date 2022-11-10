@@ -1,4 +1,4 @@
-{{> header}}
+{{> header excludeZapComment=true}}
 
 #import <Foundation/Foundation.h>
 
@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{/zcl_struct_items}}
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 {{/inline}}
 {{! TODO: We need a better setup for the API_AVALABLE annotations here; this does not scale at all sanely. }}
 {{#if (isStrEqual (asUpperCamelCase parent.name) "Descriptor")}}
@@ -43,7 +43,7 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 {{/zcl_event_fields}}
 
 - (instancetype)init;
-- (id)copyWithZone:(nullable NSZone *)zone;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 {{/zcl_events}}

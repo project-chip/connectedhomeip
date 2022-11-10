@@ -37,7 +37,6 @@ public:
      * list) to non-volatile memory.
      *
      * @param [in] aPath the attribute path for the data being written.
-     * @param [in] aMetadata the attribute metadata, as a convenience.
      * @param [in] aValue the data to write.  Integers and floats are
      *             represented in native endianness.  Strings are represented
      *             as Pascal-style strings, as in ZCL, with a length prefix
@@ -51,8 +50,7 @@ public:
      *             of the data in the string (including the length prefix),
      *             which is no larger than the `size` member of aMetadata.
      */
-    virtual CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const EmberAfAttributeMetadata * aMetadata,
-                                  const ByteSpan & aValue) = 0;
+    virtual CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) = 0;
 
     /**
      * Read an attribute value from non-volatile memory.

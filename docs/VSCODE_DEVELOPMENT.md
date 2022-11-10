@@ -21,7 +21,7 @@ Tested on:
 1. _Windows Only_ Install Ubuntu from the Windows App Store here:
    <https://www.microsoft.com/en-us/p/ubuntu-1804-lts/9n9tngvndl3q>
 1. Install [Docker](https://www.docker.com/) for your operating system of choice
-   from here: <https://docs.docker.com/install>
+   from here: <https://docs.docker.com/engine/install>
 1. Install [Visual Studio Code](https://code.visualstudio.com/) for your
    operating system of choice here: <https://code.visualstudio.com/Download>
 1. Install [Git](https://git-scm.com/) if you haven't already

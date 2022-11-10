@@ -432,7 +432,7 @@ CHIP_ERROR CC32XXConfig::FactoryResetConfig()
 {
     cc32xxLog("[%s] ", __FUNCTION__);
 
-    while (1)
+    while (true)
         ;
     CHIP_ERROR err = CHIP_NO_ERROR;
     return err;

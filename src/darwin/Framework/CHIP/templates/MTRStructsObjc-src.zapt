@@ -1,4 +1,4 @@
-{{> header}}
+{{> header excludeZapComment=true}}
 
 #import "MTRStructsObjc.h"
 
@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
   return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
   auto other = [[{{interfaceName}} alloc] init];
 
@@ -61,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
   return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
   auto other = [[MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event alloc] init];
 

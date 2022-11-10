@@ -35,6 +35,7 @@
 #include <lib/shell/Engine.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <mbedtls/platform.h>
+#include <platform/Infineon/CYW30739/FactoryDataProvider.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <sparcommon.h>
 #include <stdio.h>
@@ -47,6 +48,8 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::Shell;
 
 static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+static FactoryDataProvider sFactoryDataProvider;
+
 static void InitApp(intptr_t args);
 static void LightManagerCallback(LightingManager::Actor_t actor, LightingManager::Action_t action, uint8_t value);
 
@@ -196,7 +199,7 @@ void InitApp(intptr_t args)
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
     chip::Server::GetInstance().Init(initParams);
 
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
 
     LightMgr().Init();
     LightMgr().SetCallbacks(LightManagerCallback, nullptr);

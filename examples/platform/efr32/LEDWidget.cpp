@@ -18,7 +18,10 @@
  */
 
 #include "LEDWidget.h"
+
+extern "C" {
 #include "sl_simple_led_instances.h"
+}
 
 #include <platform/CHIPDeviceLayer.h>
 

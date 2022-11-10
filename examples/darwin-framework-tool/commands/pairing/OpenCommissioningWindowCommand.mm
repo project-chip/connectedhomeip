@@ -29,20 +29,20 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
 
     auto * self = this;
     if (mCommissioningWindowOption == 0) {
-        auto * cluster = [[MTRClusterAdministratorCommissioning alloc] initWithDevice:device endpoint:0 queue:mWorkQueue];
+        auto * cluster = [[MTRClusterAdministratorCommissioning alloc] initWithDevice:device endpointID:@(0) queue:mWorkQueue];
         auto * params = [[MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams alloc] init];
         params.commissioningTimeout = @(mCommissioningWindowTimeoutMs);
         params.timedInvokeTimeoutMs = @(10000);
         [cluster openBasicCommissioningWindowWithParams:params
                                          expectedValues:nil
                                   expectedValueInterval:nil
-                                      completionHandler:^(NSError * _Nullable error) {
-                                          if (error == nil) {
-                                              self->SetCommandExitStatus(CHIP_NO_ERROR);
-                                          } else {
-                                              self->SetCommandExitStatus(MTRErrorToCHIPErrorCode(error));
-                                          }
-                                      }];
+                                             completion:^(NSError * _Nullable error) {
+                                                 if (error == nil) {
+                                                     self->SetCommandExitStatus(CHIP_NO_ERROR);
+                                                 } else {
+                                                     self->SetCommandExitStatus(MTRErrorToCHIPErrorCode(error));
+                                                 }
+                                             }];
     } else {
         [device
             openCommissioningWindowWithSetupPasscode:[MTRSetupPayload generateRandomSetupPasscode]

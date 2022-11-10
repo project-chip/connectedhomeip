@@ -51,6 +51,7 @@ IGNORE: Set[str] = {
     '/platform/Infineon/PSOC6/',
     '/platform/bouffalolab/BL602',
     '/platform/webos/',
+    '/platform/mt793x/',
     r'POSIX\.h$',
 }
 

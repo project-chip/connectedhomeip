@@ -27,7 +27,7 @@ void appError(int err)
 {
     EFR32_LOG("!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!", err);
     portDISABLE_INTERRUPTS();
-    while (1)
+    while (true)
         ;
 }
 

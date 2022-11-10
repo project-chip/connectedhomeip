@@ -215,11 +215,11 @@ void ForwardFreeAndRealloc(nlTestSuite * inSuite, void * inContext)
     PrivateHeapAllocator<(2 * kNumBlocks + 1) * kBlockHeaderSize> allocator;
     void * ptrs[kNumBlocks];
 
-    for (int i = 0; i < kNumBlocks; ++i)
+    for (auto & ptr : ptrs)
     {
-        ptrs[i] = allocator.HeapAlloc(kBlockHeaderSize);
-        NL_TEST_ASSERT(inSuite, nullptr != ptrs[i]);
-        memset(ptrs[i], 0xab, kBlockHeaderSize);
+        ptr = allocator.HeapAlloc(kBlockHeaderSize);
+        NL_TEST_ASSERT(inSuite, nullptr != ptr);
+        memset(ptr, 0xab, kBlockHeaderSize);
     }
 
     // heap looks like:
@@ -243,11 +243,11 @@ void BackwardFreeAndRealloc(nlTestSuite * inSuite, void * inContext)
     PrivateHeapAllocator<(2 * kNumBlocks + 1) * kBlockHeaderSize> allocator;
     void * ptrs[kNumBlocks];
 
-    for (int i = 0; i < kNumBlocks; ++i)
+    for (auto & ptr : ptrs)
     {
-        ptrs[i] = allocator.HeapAlloc(kBlockHeaderSize);
-        NL_TEST_ASSERT(inSuite, nullptr != ptrs[i]);
-        memset(ptrs[i], 0xab, kBlockHeaderSize);
+        ptr = allocator.HeapAlloc(kBlockHeaderSize);
+        NL_TEST_ASSERT(inSuite, nullptr != ptr);
+        memset(ptr, 0xab, kBlockHeaderSize);
     }
 
     // heap looks like:

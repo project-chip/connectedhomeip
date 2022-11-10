@@ -1149,6 +1149,8 @@ JNI_METHOD(void, read)
     err = ParseEventPathList(eventPathList, eventPathParamsList);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error parsing Java event paths: %s", ErrorStr(err)));
 
+    VerifyOrReturn(attributePathParamsList.size() != 0 || eventPathParamsList.size() != 0,
+                   ChipLogError(Controller, "Error parsing Java both event paths and attribute paths"));
     app::ReadPrepareParams params(device->GetSecureSession().Value());
     params.mpAttributePathParamsList    = attributePathParamsList.data();
     params.mAttributePathParamsListSize = attributePathParamsList.size();
@@ -1182,6 +1184,12 @@ JNI_METHOD(void, read)
 CHIP_ERROR ParseAttributePathList(jobject attributePathList, std::vector<app::AttributePathParams> & outAttributePathParamsList)
 {
     jint listSize;
+
+    if (attributePathList == nullptr)
+    {
+        return CHIP_NO_ERROR;
+    }
+
     ReturnErrorOnFailure(JniReferences::GetInstance().GetListSize(attributePathList, listSize));
 
     for (uint8_t i = 0; i < listSize; i++)
@@ -1241,6 +1249,12 @@ CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndpointId,
 CHIP_ERROR ParseEventPathList(jobject eventPathList, std::vector<app::EventPathParams> & outEventPathParamsList)
 {
     jint listSize;
+
+    if (eventPathList == nullptr)
+    {
+        return CHIP_NO_ERROR;
+    }
+
     ReturnErrorOnFailure(JniReferences::GetInstance().GetListSize(eventPathList, listSize));
 
     for (uint8_t i = 0; i < listSize; i++)

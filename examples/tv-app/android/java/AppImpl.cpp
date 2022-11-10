@@ -235,7 +235,7 @@ DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nul
                             applicationLauncherOutgoingCommands),
     DECLARE_DYNAMIC_CLUSTER(ZCL_ACCOUNT_LOGIN_CLUSTER_ID, accountLoginAttrs, accountLoginIncomingCommands,
                             accountLoginOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_CONTENT_LAUNCH_CLUSTER_ID, contentLauncherAttrs, contentLauncherIncomingCommands,
+    DECLARE_DYNAMIC_CLUSTER(ZCL_CONTENT_LAUNCHER_CLUSTER_ID, contentLauncherAttrs, contentLauncherIncomingCommands,
                             contentLauncherOutgoingCommands),
     DECLARE_DYNAMIC_CLUSTER(ZCL_MEDIA_PLAYBACK_CLUSTER_ID, mediaPlaybackAttrs, mediaPlaybackIncomingCommands,
                             mediaPlaybackOutgoingCommands),
@@ -401,6 +401,19 @@ Access::Privilege ContentAppFactoryImpl::GetVendorPrivilege(uint16_t vendorId)
         }
     }
     return Access::Privilege::kOperate;
+}
+
+std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoint(EndpointId endpointId, uint16_t vendorId,
+                                                                                   uint16_t productId)
+{
+    if (endpointId == kLocalVideoPlayerEndpointId)
+    {
+        return { chip::app::Clusters::Descriptor::Id,      chip::app::Clusters::OnOff::Id,
+                 chip::app::Clusters::WakeOnLan::Id,       chip::app::Clusters::MediaPlayback::Id,
+                 chip::app::Clusters::LowPower::Id,        chip::app::Clusters::KeypadInput::Id,
+                 chip::app::Clusters::ContentLauncher::Id, chip::app::Clusters::AudioOutput::Id };
+    }
+    return {};
 }
 
 } // namespace AppPlatform

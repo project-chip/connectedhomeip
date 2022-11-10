@@ -1015,7 +1015,7 @@ const EmberAfCluster * emberAfGetClusterByIndex(EndpointId endpoint, uint8_t clu
     return &(definedEndpoint->endpointType->cluster[clusterIndex]);
 }
 
-const chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::EndpointId endpoint, CHIP_ERROR & err)
+chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::EndpointId endpoint, CHIP_ERROR & err)
 {
     uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
     chip::Span<const EmberAfDeviceType> ret;
@@ -1300,8 +1300,7 @@ void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, EndpointId endpoint, Clu
     auto * attrStorage = app::GetAttributePersistenceProvider();
     if (attrStorage)
     {
-        attrStorage->WriteValue(app::ConcreteAttributePath(endpoint, clusterId, metadata->attributeId), metadata,
-                                ByteSpan(data, dataSize));
+        attrStorage->WriteValue(app::ConcreteAttributePath(endpoint, clusterId, metadata->attributeId), ByteSpan(data, dataSize));
     }
     else
     {

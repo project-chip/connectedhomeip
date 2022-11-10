@@ -42,9 +42,9 @@ bool Command::InitArguments(int argc, char ** argv)
     size_t argvExtraArgsCount = (size_t) argc;
     size_t mandatoryArgsCount = 0;
     size_t optionalArgsCount  = 0;
-    for (size_t i = 0; i < mArgs.size(); i++)
+    for (auto & arg : mArgs)
     {
-        if (mArgs[i].isOptional())
+        if (arg.isOptional())
         {
             optionalArgsCount++;
         }
@@ -877,9 +877,8 @@ void ResetOptionalArg(const Argument & arg)
 
 void Command::ResetArguments()
 {
-    for (size_t i = 0; i < mArgs.size(); i++)
+    for (const auto & arg : mArgs)
     {
-        const Argument arg      = mArgs[i];
         const ArgumentType type = arg.type;
         if (arg.isOptional())
         {

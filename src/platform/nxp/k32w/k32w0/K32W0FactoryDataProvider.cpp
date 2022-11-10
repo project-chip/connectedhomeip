@@ -294,6 +294,21 @@ CHIP_ERROR K32W0FactoryDataProvider::GetProductId(uint16_t & productId)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR K32W0FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR K32W0FactoryDataProvider::GetProductURL(char * buf, size_t bufSize)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR K32W0FactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
 CHIP_ERROR K32W0FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;

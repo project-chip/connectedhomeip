@@ -134,7 +134,6 @@ void TestPersistentStorage(nlTestSuite * aSuite, void * aContext)
 {
     chip::TestPersistentStorageDelegate testStorage;
     BindingTable table;
-    chip::DefaultStorageKeyAllocator key;
     chip::Optional<chip::ClusterId> cluster = chip::MakeOptional<chip::ClusterId>(static_cast<chip::ClusterId>(UINT16_MAX + 6));
     std::vector<EmberBindingTableEntry> expected = {
         EmberBindingTableEntry::ForNode(0, 0, 0, 0, NullOptional),
@@ -150,13 +149,13 @@ void TestPersistentStorage(nlTestSuite * aSuite, void * aContext)
     VerifyRestored(aSuite, testStorage, expected);
 
     // Verify storage untouched if add fails
-    testStorage.AddPoisonKey(key.BindingTableEntry(4));
+    testStorage.AddPoisonKey(chip::DefaultStorageKeyAllocator::BindingTableEntry(4).KeyName());
     NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(4, 4, 0, 0, NullOptional)) != CHIP_NO_ERROR);
     VerifyRestored(aSuite, testStorage, expected);
     testStorage.ClearPoisonKeys();
 
     // Verify storage untouched if removing head fails
-    testStorage.AddPoisonKey(key.BindingTable());
+    testStorage.AddPoisonKey(chip::DefaultStorageKeyAllocator::BindingTable().KeyName());
     auto iter = table.begin();
     NL_TEST_ASSERT(aSuite, table.RemoveAt(iter) != CHIP_NO_ERROR);
     VerifyTableSame(aSuite, table, expected);
@@ -164,7 +163,7 @@ void TestPersistentStorage(nlTestSuite * aSuite, void * aContext)
     VerifyRestored(aSuite, testStorage, expected);
 
     // Verify storage untouched if removing other nodes fails
-    testStorage.AddPoisonKey(key.BindingTableEntry(0));
+    testStorage.AddPoisonKey(chip::DefaultStorageKeyAllocator::BindingTableEntry(0).KeyName());
     iter = table.begin();
     ++iter;
     NL_TEST_ASSERT(aSuite, table.RemoveAt(iter) != CHIP_NO_ERROR);

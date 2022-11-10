@@ -20,55 +20,82 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef void (^MTRQueryImageCompletionHandler)(
+    MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error);
+
+typedef void (^MTRApplyUpdateRequestCompletionHandler)(
+    MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error);
+
+typedef void (^MTRBDXQueryCompletionHandler)(NSData * _Nullable data, BOOL isEOF);
+
 /**
  * The protocol definition for the MTROTAProviderDelegate
  *
  * All delegate methods will be called on the supplied Delegate Queue.
+ *
+ * While the selectors on this protocol are marked @optional, in practice an
+ * implementation must provide an implementation for one of each pair of
+ * selectors (e.g. one of the two handleQueryImageForNodeID selectors must be
+ * implemented).  The selector ending in "completion:" will be used if present;
+ * otherwise the one ending in "completionHandler:" will be used.
  */
 @protocol MTROTAProviderDelegate <NSObject>
-@required
+@optional
 /**
  * Notify the delegate when the query image command is received from some node.
  * The controller identifies the fabric the node is on, and the nodeID
  * identifies the node within that fabric.
  *
- * If completionHandler is passed a non-nil error, that will be converted into
+ * If completion is passed a non-nil error, that will be converted into
  * an error response to the client.  Otherwise it must have a non-nil data,
  * which will be returned to the client.
  */
 - (void)handleQueryImageForNodeID:(NSNumber *)nodeID
                        controller:(MTRDeviceController *)controller
                            params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
-                completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
-                                      NSError * _Nullable error))completionHandler;
+                       completion:(MTRQueryImageCompletionHandler)completion MTR_NEWLY_AVAILABLE;
+- (void)handleQueryImageForNodeID:(NSNumber *)nodeID
+                       controller:(MTRDeviceController *)controller
+                           params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
+                completionHandler:(MTRQueryImageCompletionHandler)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use the selector ending in completion:");
 
 /**
  * Notify the delegate when the apply update request command is received from
  * some node.  The controller identifies the fabric the node is on, and the
  * nodeID identifies the node within that fabric.
  *
- * If completionHandler is passed a non-nil error, that will be converted into
+ * If completion is passed a non-nil error, that will be converted into
  * an error response to the client.  Otherwise it must have a non-nil data,
  * which will be returned to the client.
  */
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber *)nodeID
                                controller:(MTRDeviceController *)controller
                                    params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
-                        completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
-                                              NSError * _Nullable error))completionHandler;
+                               completion:(MTRApplyUpdateRequestCompletionHandler)completion MTR_NEWLY_AVAILABLE;
+- (void)handleApplyUpdateRequestForNodeID:(NSNumber *)nodeID
+                               controller:(MTRDeviceController *)controller
+                                   params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
+                        completionHandler:(MTRApplyUpdateRequestCompletionHandler)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use the selector ending in completion:");
 
 /**
  * Notify the delegate when the notify update applied command is received from
  * some node.  The controller identifies the fabric the node is on, and the
  * nodeID identifies the node within that fabric.
  *
- * If completionHandler is passed a non-nil error, that will be converted into
+ * If completion is passed a non-nil error, that will be converted into
  * an error response to the client.  Otherwise a success response will be sent.
  */
 - (void)handleNotifyUpdateAppliedForNodeID:(NSNumber *)nodeID
                                 controller:(MTRDeviceController *)controller
                                     params:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
-                         completionHandler:(StatusCompletion)completionHandler;
+                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)handleNotifyUpdateAppliedForNodeID:(NSNumber *)nodeID
+                                controller:(MTRDeviceController *)controller
+                                    params:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
+                         completionHandler:(StatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use the selector ending in completion:");
 
 /**
  * Notify the delegate when a BDX Session starts for some node.  The controller
@@ -79,7 +106,13 @@ NS_ASSUME_NONNULL_BEGIN
                                     controller:(MTRDeviceController *)controller
                                 fileDesignator:(NSString *)fileDesignator
                                         offset:(NSNumber *)offset
-                             completionHandler:(void (^)(NSError * error))completionHandler;
+                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)handleBDXTransferSessionBeginForNodeID:(NSNumber *)nodeID
+                                    controller:(MTRDeviceController *)controller
+                                fileDesignator:(NSString *)fileDesignator
+                                        offset:(NSNumber *)offset
+                             completionHandler:(StatusCompletion)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use the selector ending in completion:");
 
 /**
  * Notify the delegate when a BDX Session ends for some node.  The controller
@@ -100,7 +133,15 @@ NS_ASSUME_NONNULL_BEGIN
                       blockSize:(NSNumber *)blockSize
                      blockIndex:(NSNumber *)blockIndex
                     bytesToSkip:(NSNumber *)bytesToSkip
-              completionHandler:(void (^)(NSData * _Nullable data, BOOL isEOF))completionHandler;
+                     completion:(MTRBDXQueryCompletionHandler)completion MTR_NEWLY_AVAILABLE;
+- (void)handleBDXQueryForNodeID:(NSNumber *)nodeID
+                     controller:(MTRDeviceController *)controller
+                      blockSize:(NSNumber *)blockSize
+                     blockIndex:(NSNumber *)blockIndex
+                    bytesToSkip:(NSNumber *)bytesToSkip
+              completionHandler:(MTRBDXQueryCompletionHandler)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use the selector ending in completion:");
+
 @end
 
 NS_ASSUME_NONNULL_END

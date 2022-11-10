@@ -23,6 +23,18 @@ declare_args() {
   cyw30739_sdk_root = "${cyw30739_sdk_build_root}/repos"
   cyw30739_sdk_verbose = false
   cyw30739_sdk_debug = 0
+
+  # Matter DAC in the DER format.
+  matter_dac = "${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8002-0010-Cert.der"
+
+  # Matter DAC EC key in the DER format.
+  matter_dac_key = "${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8002-0010-Key.der"
+
+  # Matter PAI certificate in the DER format.
+  matter_pai = "${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-NoPID-Cert.der"
+
+  # Matter Certification Declaration in the DER format.
+  matter_cd = "${chip_root}/credentials/test/certification-declaration/Chip-Test-CD-FFF2-8001-8002.der"
 }
 
 assert(cyw30739_sdk_root != "", "cyw30739_sdk_root must be specified")
@@ -257,12 +269,14 @@ template("cyw30739_sdk_post_build") {
   output_base_path = "${root_out_dir}/${invoker.output_base_name}"
   elf = "${output_base_path}.elf"
   hex = "${output_base_path}_download.hex"
+  ss_hex = "${output_base_path}.ss.hex"
   ds_hex = "${output_base_path}.ds.hex"
   xs_hex = "${output_base_path}.xs.hex"
+  ss_hdf = "${output_base_path}.ss.hdf"
   ss_cgs = "${output_base_path}.ss.cgs"
+  empty_cgs = "${output_base_path}.empty.cgs"
   cgs = "${output_base_path}.cgs"
   cx_cgs = "${output_base_path}.cx.cgs"
-  static_config = "${output_base_path}.static_config.txt"
   hdf = "${root_out_dir}/configdef30739A0.hdf"
 
   patched_cgs_args =
@@ -284,26 +298,11 @@ template("cyw30739_sdk_post_build") {
     cgs_args += string_split(arg)
   }
 
-  action(target_name) {
-    script = "${cyw30739_sdk_build_root}/merge_hex.py"
-
-    outputs = [ hex ]
-
-    sources = [
-      ds_hex,
-      xs_hex,
-    ]
-
-    args = [
-      "--output=" + rebase_path(hex, root_build_dir),
-      "--ds_hex=" + rebase_path(ds_hex, root_build_dir),
-      "--xs_hex=" + rebase_path(xs_hex, root_build_dir),
-    ]
-
-    deps = [
-      ":${target_name}_gen_ds_hex",
-      ":${target_name}_gen_xs_hex",
-    ]
+  group(target_name) {
+    deps = [ ":${target_name}_merge_hex" ]
+    if (chip_enable_ota_requestor) {
+      deps += [ ":${target_name}_ota_image" ]
+    }
 
     data_deps = [
       ":${target_name}_btp",
@@ -311,6 +310,77 @@ template("cyw30739_sdk_post_build") {
       ":${target_name}_hci_id",
       ":${target_name}_minidriver",
     ]
+  }
+
+  action("${target_name}_merge_hex") {
+    config_header =
+        "${chip_root}/src/platform/Infineon/CYW30739/CYW30739Config.h"
+
+    script = "${cyw30739_sdk_build_root}/merge_hex.py"
+
+    outputs = [ hex ]
+
+    sources = [
+      config_header,
+      ds_hex,
+      matter_cd,
+      matter_dac,
+      matter_dac_key,
+      matter_pai,
+      ss_hex,
+      xs_hex,
+    ]
+
+    args = [
+      "--output=" + rebase_path(hex, root_build_dir),
+      "--ss_hex=" + rebase_path(ss_hex, root_build_dir),
+      "--ds_hex=" + rebase_path(ds_hex, root_build_dir),
+      "--xs_hex=" + rebase_path(xs_hex, root_build_dir),
+      "--config_header=" + rebase_path(config_header, root_build_dir),
+      "--config=DAC:file:" + rebase_path(matter_dac, root_build_dir),
+      "--config=DACKey:file:" + rebase_path(matter_dac_key, root_build_dir),
+      "--config=PAICert:file:" + rebase_path(matter_pai, root_build_dir),
+      "--config=CertDeclaration:file:" + rebase_path(matter_cd, root_build_dir),
+    ]
+    foreach(arg, cgs_args) {
+      options = []
+      options = string_split(arg, ":")
+      if (options[0] == "DLConfigBD_ADDRBase") {
+        args += [ "--config=ExtendedAddress:address:" + options[1] ]
+      }
+    }
+
+    deps = [
+      ":${invoker.target_name}_gen_ds_hex",
+      ":${invoker.target_name}_gen_ss_hex",
+      ":${invoker.target_name}_gen_xs_hex",
+    ]
+  }
+
+  action("${target_name}_gen_ss_hex") {
+    script = "${build_root}/gn_run_binary.py"
+
+    outputs = [ ss_hex ]
+
+    sources = [
+      cyw30739_sdk_btp_file,
+      empty_cgs,
+    ]
+
+    args = [
+      rebase_path("${cyw30739_sdk_tools_dir}/CGS/cgs", root_build_dir),
+      "-D",
+      rebase_path(root_out_dir, root_build_dir),
+      "-I",
+      rebase_path(ss_hex, root_build_dir),
+      "-B",
+      rebase_path(cyw30739_sdk_btp_file, root_build_dir),
+      "--cgs-files",
+      rebase_path(empty_cgs, root_build_dir),
+    ]
+    args += cgs_args
+
+    deps = [ ":${invoker.target_name}_gen_ss_cgs" ]
   }
 
   action("${target_name}_gen_ds_hex") {
@@ -325,8 +395,9 @@ template("cyw30739_sdk_post_build") {
     sources = [
       cx_cgs,
       cyw30739_sdk_btp_file,
-      ss_cgs,
     ]
+
+    inputs = [ hdf ]
 
     args = [
       rebase_path("${cyw30739_sdk_tools_dir}/CGS/cgs", root_build_dir),
@@ -338,16 +409,15 @@ template("cyw30739_sdk_post_build") {
       rebase_path(ds_hex, root_build_dir),
       "-B",
       rebase_path(cyw30739_sdk_btp_file, root_build_dir),
-      "--ss-cgs",
-      rebase_path(ss_cgs, root_build_dir),
       "--cgs-files",
       rebase_path(cx_cgs, root_build_dir),
+      "--paramoverride",
+      "DLConfigFixedHeader:0",
     ]
-    args += cgs_args
 
     deps = [
       ":${invoker.target_name}_compress_cgs_data",
-      ":${invoker.target_name}_gen_ss_cgs",
+      ":${invoker.target_name}_hdf",
     ]
   }
 
@@ -387,37 +457,19 @@ template("cyw30739_sdk_post_build") {
   }
 
   action("${target_name}_gen_ss_cgs") {
-    hdf_in = "${cyw30739_sdk_baselib_dir}/internal/30739A0/configdef30739A0.hdf"
-
-    script_file = "${cyw30739_sdk_scripts_dir}/wiced-gen-ss-cgs.pl"
-
-    script = "${build_root}/gn_run_binary.py"
-
-    inputs = [ script_file ]
-
-    sources = [
-      hdf_in,
-      static_config,
-    ]
+    script = "${cyw30739_sdk_build_root}/scripts/gen_ss_cgs.py"
 
     outputs = [
-      hdf,
+      ss_hdf,
       ss_cgs,
+      empty_cgs,
     ]
 
     args = [
-      "perl",
-      "-I",
-      rebase_path(cyw30739_sdk_scripts_dir, root_build_dir),
-      rebase_path(script_file, root_build_dir),
-      "config=" + rebase_path(static_config, root_build_dir),
-      "hdf_in=" + rebase_path(hdf_in, root_build_dir),
-      "hdf_out=" + rebase_path(hdf, root_build_dir),
-      "cgs_out=" + rebase_path(ss_cgs, root_build_dir),
+      "--ss_hdf=" + rebase_path(ss_hdf, root_build_dir),
+      "--ss_cgs=" + rebase_path(ss_cgs, root_build_dir),
+      "--empty_cgs=" + rebase_path(empty_cgs, root_build_dir),
     ]
-    args += cgs_args
-
-    deps = [ ":${invoker.target_name}_static_config" ]
   }
 
   action("${target_name}_gen_cgs") {
@@ -454,7 +506,7 @@ template("cyw30739_sdk_post_build") {
     deps = [
       ":${invoker.executable_target}",
       ":${invoker.pre_build_target}",
-      ":${invoker.target_name}_gen_ss_cgs",
+      ":${invoker.target_name}_hdf",
     ]
   }
 
@@ -480,14 +532,15 @@ template("cyw30739_sdk_post_build") {
     deps = [ ":${invoker.executable_target}" ]
   }
 
-  copy("${target_name}_static_config") {
-    sources = [ "static_config.txt" ]
-    outputs = [ static_config ]
-  }
-
   copy("${target_name}_btp") {
     sources = [ "${cyw30739_sdk_btp_file}" ]
     outputs = [ "${output_base_path}.btp" ]
+  }
+
+  copy("${target_name}_hdf") {
+    sources =
+        [ "${cyw30739_sdk_baselib_dir}/internal/30739A0/configdef30739A0.hdf" ]
+    outputs = [ hdf ]
   }
 
   copy("${target_name}_hci_id") {
@@ -501,24 +554,23 @@ template("cyw30739_sdk_post_build") {
   }
 
   write_file("${root_out_dir}/chipload_flags.txt", "-NOHCIRESET")
-}
 
-template("cyw30739_sdk_ota_image") {
-  action(target_name) {
-    forward_variables_from(invoker, [ "deps" ])
-
+  action("${target_name}_ota_image") {
     script = "${cyw30739_sdk_build_root}/gen_ota_image.py"
 
-    binary = "${root_out_dir}/${invoker.output_base_name}.bin"
-    hex = "${root_out_dir}/${invoker.output_base_name}_download.hex"
+    binary = "${output_base_path}.bin"
 
     outputs = [ binary ]
 
-    inputs = [ hex ]
+    sources = [
+      ds_hex,
+      xs_hex,
+    ]
 
     args = [
       "--binary=" + rebase_path(binary, root_build_dir),
-      "--hex=" + rebase_path(hex, root_build_dir),
+      "--ds_hex=" + rebase_path(ds_hex, root_build_dir),
+      "--xs_hex=" + rebase_path(xs_hex, root_build_dir),
       "--lzss_tool=" +
           rebase_path(cyw30739_sdk_tools_dir + "/lzss/lzss", root_build_dir),
       "--active_xs_len=${btp.ConfigXS1Length}",
@@ -527,6 +579,11 @@ template("cyw30739_sdk_ota_image") {
           rebase_path("//include/CHIPProjectConfig.h", root_build_dir),
       "--ota_image_tool=" +
           rebase_path("${chip_root}/src/app/ota_image_tool.py", root_build_dir),
+    ]
+
+    deps = [
+      ":${invoker.target_name}_gen_ds_hex",
+      ":${invoker.target_name}_gen_xs_hex",
     ]
   }
 }

@@ -47,7 +47,7 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_COLOR_CONTROL_CLUSTER_ID:
         emberAfColorControlClusterInitCallback(endpoint);
         break;
-    case ZCL_CONTENT_LAUNCH_CLUSTER_ID:
+    case ZCL_CONTENT_LAUNCHER_CLUSTER_ID:
         emberAfContentLauncherClusterInitCallback(endpoint);
         break;
     case ZCL_DESCRIPTOR_CLUSTER_ID:
@@ -101,7 +101,7 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_PRESSURE_MEASUREMENT_CLUSTER_ID:
         emberAfPressureMeasurementClusterInitCallback(endpoint);
         break;
-    case ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID:
+    case ZCL_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_ID:
         emberAfPumpConfigurationAndControlClusterInitCallback(endpoint);
         break;
     case ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID:
@@ -119,13 +119,13 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_TARGET_NAVIGATOR_CLUSTER_ID:
         emberAfTargetNavigatorClusterInitCallback(endpoint);
         break;
-    case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
+    case ZCL_TEMPERATURE_MEASUREMENT_CLUSTER_ID:
         emberAfTemperatureMeasurementClusterInitCallback(endpoint);
         break;
     case ZCL_THERMOSTAT_CLUSTER_ID:
         emberAfThermostatClusterInitCallback(endpoint);
         break;
-    case ZCL_THERMOSTAT_UI_CONFIG_CLUSTER_ID:
+    case ZCL_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_ID:
         emberAfThermostatUserInterfaceConfigurationClusterInitCallback(endpoint);
         break;
     case ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID:
@@ -315,78 +315,3 @@ void __attribute__((weak)) emberAfWindowCoveringClusterInitCallback(EndpointId e
     // To prevent warning
     (void) endpoint;
 }
-
-//
-// Non-Cluster Related Callbacks
-//
-
-EmberAfAttributeWritePermission __attribute__((weak))
-emberAfAllowNetworkWriteAttributeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t * value,
-                                          uint8_t type)
-{
-    return EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_NORMAL; // Default
-}
-
-bool __attribute__((weak)) emberAfAttributeReadAccessCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
-{
-    return true;
-}
-
-bool __attribute__((weak)) emberAfAttributeWriteAccessCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
-{
-    return true;
-}
-
-bool __attribute__((weak)) emberAfDefaultResponseCallback(ClusterId clusterId, CommandId commandId, EmberAfStatus status)
-{
-    return false;
-}
-
-bool __attribute__((weak)) emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberStatus * status)
-{
-    return false;
-}
-
-bool __attribute__((weak)) emberAfMessageSentCallback(const MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                      uint16_t msgLen, uint8_t * message, EmberStatus status)
-{
-    return false;
-}
-
-EmberAfStatus __attribute__((weak))
-emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
-                                     uint8_t * buffer, uint16_t maxReadLength)
-{
-    return EMBER_ZCL_STATUS_FAILURE;
-}
-
-EmberAfStatus __attribute__((weak))
-emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
-                                      uint8_t * buffer)
-{
-    return EMBER_ZCL_STATUS_FAILURE;
-}
-
-bool __attribute__((weak))
-emberAfGetEndpointInfoCallback(EndpointId endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo)
-{
-    return false;
-}
-
-void __attribute__((weak)) emberAfRegistrationAbortCallback() {}
-
-bool __attribute__((weak)) emberAfStartMoveCallback()
-{
-    return false;
-}
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
-                                 uint8_t * value)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-void __attribute__((weak)) MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type,
-                                                             uint16_t size, uint8_t * value)
-{}

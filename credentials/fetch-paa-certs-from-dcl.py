@@ -18,19 +18,8 @@
 
 # Script that was used to fetch CHIP Development Product Attestation Authority (PAA)
 # certificates from DCL.
-# The script expects the path to the dcld tool binary as an input argument.
-#
-# Usage example when the script is run from the CHIP SDK root directory:
-#     python ./credentials/development/fetch-development-paa-certs-from-dcl.py /path/to/dcld
-#
-# Usage example when the script is run from the CHIP SDK root directory for fetching production PAAs:
-#     python ./credentials/development/fetch-development-paa-certs-from-dcl.py /path/to/dcld production
-#
-# The result will be stored in:
-#     credentials/development/paa-root-certs
-# In case of production - 2nd usage example above - the result will be stored in:
-#     credentials/production/paa-root-certs
-#
+# For usage please run:.
+#     python ./credentials/fetch-paa-certs-from-dcl.py --help
 
 from contextlib import nullcontext
 import os
@@ -40,8 +29,13 @@ import copy
 import re
 from cryptography.hazmat.primitives import serialization
 from cryptography import x509
+import click
+from click_option_group import optgroup, RequiredMutuallyExclusiveOptionGroup
+import requests
 
-PRODUCTION_NODE_URL = 'https://on.dcl.csa-iot.org:26657'
+PRODUCTION_NODE_URL = "https://on.dcl.csa-iot.org:26657"
+PRODUCTION_NODE_URL_REST = "https://on.dcl.csa-iot.org"
+TEST_NODE_URL_REST = "https://on.test-net.dcl.csa-iot.org"
 
 
 def parse_paa_root_certs(cmdpipe, paa_list):
@@ -79,90 +73,112 @@ def parse_paa_root_certs(cmdpipe, paa_list):
         else:
             if b': ' in line:
                 key, value = line.split(b': ')
-                result[key.strip(b' -')] = value.strip()
+                result[key.strip(b' -').decode("utf-8")] = value.strip().decode("utf-8")
                 parse_paa_root_certs.counter += 1
                 if parse_paa_root_certs.counter % 2 == 0:
                     paa_list.append(copy.deepcopy(result))
 
 
-def write_paa_root_cert(cmdpipe, subject, prefix):
-    pem_read = False
-    subject_as_text_read = False
-
-    filename = prefix + 'paa-root-certs/dcld_mirror_' + \
+def write_paa_root_cert(certificate, subject):
+    filename = 'dcld_mirror_' + \
         re.sub('[^a-zA-Z0-9_-]', '', re.sub('[=, ]', '_', subject))
-    with open(filename + '.pem', 'wb+') as outfile:
-        while True:
-            line = cmdpipe.stdout.readline()
-            if not line:
+    with open(filename + '.pem', 'w+') as outfile:
+        outfile.write(certificate)
+    # convert pem file to der
+    with open(filename + '.pem', 'rb') as infile:
+        pem_certificate = x509.load_pem_x509_certificate(infile.read())
+    with open(filename + '.der', 'wb+') as outfile:
+        der_certificate = pem_certificate.public_bytes(
+            serialization.Encoding.DER)
+        outfile.write(der_certificate)
+
+
+def parse_paa_root_cert_from_dcld(cmdpipe):
+    subject = None
+    certificate = ""
+
+    while True:
+        line = cmdpipe.stdout.readline()
+        if not line:
+            break
+        else:
+            if b'pemCert: |' in line:
+                while True:
+                    line = cmdpipe.stdout.readline()
+                    certificate += line.strip(b' \t').decode("utf-8")
+                    if b'-----END CERTIFICATE-----' in line:
+                        break
+            if b'subjectAsText:' in line:
+                subject = line.split(b': ')[1].strip().decode("utf-8")
                 break
-            else:
-                if b'pemCert: |' in line:
-                    while True:
-                        line = cmdpipe.stdout.readline()
-                        outfile.write(line.strip(b' \t'))
-                        if b'-----END CERTIFICATE-----' in line:
-                            pem_read = True
-                            break
-                if b'subjectAsText:' in line:
-                    new_subject = line.split(b': ')[1].strip().decode("utf-8")
-                    new_filename = prefix + 'paa-root-certs/dcld_mirror_' + \
-                        re.sub('[=,\\\\ ]', '_', new_subject)
-                    subject_as_text_read = True
-                    break
 
-    # if successfully obtained all mandatory fields from the root certificate
-    if pem_read == True and subject_as_text_read == True:
-        os.rename(filename + '.pem', new_filename + '.pem')
-        # convert pem file to der
-        with open(new_filename + '.pem', 'rb') as infile:
-            pem_certificate = x509.load_pem_x509_certificate(infile.read())
-        with open(new_filename + '.der', 'wb+') as outfile:
-            der_certificate = pem_certificate.public_bytes(
-                serialization.Encoding.DER)
-            outfile.write(der_certificate)
+    return (certificate, subject)
 
 
-def main():
-    if len(sys.argv) >= 2:
-        dcld = sys.argv[1]
-    else:
-        sys.exit(
-            "Error: Please specify exactly one input argument; the path to the dcld tool binary")
+def use_dcld(dcld, production, cmdlist):
+    return [dcld] + cmdlist + (['--node', PRODUCTION_NODE_URL] if production else [])
+
+
+@click.command()
+@click.help_option('-h', '--help')
+@optgroup.group('Input data sources', cls=RequiredMutuallyExclusiveOptionGroup)
+@optgroup.option('--use-main-net-dcld', type=str, default='', metavar='PATH', help="Location of `dcld` binary, to use `dcld` for mirroring MainNet.")
+@optgroup.option('--use-test-net-dcld', type=str, default='', metavar='PATH', help="Location of `dcld` binary, to use `dcld` for mirroring TestNet.")
+@optgroup.option('--use-main-net-http', is_flag=True, type=str, help="Use RESTful API with HTTPS against public MainNet observer.")
+@optgroup.option('--use-test-net-http', is_flag=True, type=str, help="Use RESTful API with HTTPS against public TestNet observer.")
+@optgroup.group('Optional arguments')
+@optgroup.option('--paa-trust-store-path', default='paa-root-certs', type=str, metavar='PATH', help="PAA trust store path (default: paa-root-certs)")
+def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_http, paa_trust_store_path):
+    """DCL PAA mirroring tools"""
 
     production = False
-    if len(sys.argv) >= 3:
-        if sys.argv[2] == "production":
-            production = True
+    dcld = use_test_net_dcld
 
-    previous_dir = os.getcwd()
-    abspath = os.path.dirname(sys.argv[0])
-    os.chdir(abspath)
+    if len(use_main_net_dcld) > 0:
+        dcld = use_main_net_dcld
+        production = True
 
-    os.makedirs('paa-root-certs', exist_ok=True)
+    use_rest = use_main_net_http or use_test_net_http
+    if use_main_net_http:
+        production = True
 
-    cmdlist = ['query', 'pki', 'all-x509-root-certs']
-    production_node_cmdlist = ['--node', PRODUCTION_NODE_URL]
+    rest_node_url = PRODUCTION_NODE_URL_REST if production else TEST_NODE_URL_REST
 
-    cmdpipe = subprocess.Popen([dcld] + cmdlist + production_node_cmdlist if production else [],
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    os.makedirs(paa_trust_store_path, exist_ok=True)
+    os.chdir(paa_trust_store_path)
 
-    paa_list = []
-    parse_paa_root_certs.counter = 0
-    parse_paa_root_certs(cmdpipe, paa_list)
+    if use_rest:
+        paa_list = requests.get(f"{rest_node_url}/dcl/pki/root-certificates").json()["approvedRootCertificates"]["certs"]
+    else:
+        cmdlist = ['query', 'pki', 'all-x509-root-certs']
+
+        cmdpipe = subprocess.Popen(use_dcld(dcld, production, cmdlist), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        paa_list = []
+        parse_paa_root_certs.counter = 0
+        parse_paa_root_certs(cmdpipe, paa_list)
 
     for paa in paa_list:
 
-        cmdlist = ['query', 'pki', 'x509-cert', '-u',
-                   paa[b'subject'].decode("utf-8"), '-k', paa[b'subjectKeyId'].decode("utf-8")]
+        if use_rest:
+            response = requests.get(
+                f"{rest_node_url}/dcl/pki/certificates/{paa['subject']}/{paa['subjectKeyId']}").json()["approvedCertificates"]["certs"][0]
+            certificate = response["pemCert"]
+            subject = response["subjectAsText"]
+        else:
+            cmdlist = ['query', 'pki', 'x509-cert', '-u', paa['subject'], '-k', paa['subjectKeyId']]
 
-        cmdpipe = subprocess.Popen(
-            [dcld] + cmdlist + production_node_cmdlist if production else [],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        write_paa_root_cert(cmdpipe, paa[b'subject'].decode("utf-8"), "production/" if production else "development/")
+            cmdpipe = subprocess.Popen(use_dcld(dcld, production, cmdlist), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    os.chdir(previous_dir)
+            (certificate, subject) = parse_paa_root_cert_from_dcld(cmdpipe)
+
+        certificate = certificate.rstrip('\n')
+
+        write_paa_root_cert(certificate, subject)
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) == 1:
+        main.main(['--help'])
+    else:
+        main()

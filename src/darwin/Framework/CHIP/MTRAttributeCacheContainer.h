@@ -17,6 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRDeviceController.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -28,20 +29,30 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Reads an attribute with specific attribute path
  *
- * @param endpointId  endpoint ID of the attribute
- * @param clusterId  cluster ID of the attribute
- * @param attributeId  attribute ID of the attribute
- * @param clientQueue  client queue to dispatch the completion handler through
+ * @param endpointID  endpoint ID of the attribute
+ * @param clusterID  cluster ID of the attribute
+ * @param attributeID  attribute ID of the attribute
+ * @param queue  client queue to dispatch the completion handler through
  * @param completion  block to receive the result.
  *                   "values" received by the block will have the same format of object as the one received by completion block
- *                   of CHIPDevice readAttributeWithEndpointId:clusterId:attributeId:clientQueue:completion method.
+ *                   of MTRBaseDevice readAttributeWithEndpointID:clusterID:attributeID:queue:completion method.
  */
+- (void)readAttributeWithEndpointID:(NSNumber * _Nullable)endpointID
+                          clusterID:(NSNumber * _Nullable)clusterID
+                        attributeID:(NSNumber * _Nullable)attributeID
+                              queue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
+
+@end
+
+@interface MTRAttributeCacheContainer (Deprecated)
+
 - (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
                           clusterId:(NSNumber * _Nullable)clusterId
                         attributeId:(NSNumber * _Nullable)attributeId
                         clientQueue:(dispatch_queue_t)clientQueue
-                         completion:(void (^)(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
-                                        NSError * _Nullable error))completion;
+                         completion:(MTRDeviceResponseHandler)completion
+    MTR_NEWLY_DEPRECATED("Please use readAttributeWithEndpointID:clusterID:attributeID:queue:completion:");
 
 @end
 

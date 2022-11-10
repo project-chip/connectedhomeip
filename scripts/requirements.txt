@@ -14,6 +14,9 @@ virtualenv
 # openiotsdk
 -r requirements.openiotsdk.txt
 
+# Infineon
+-r requirements.infineon.txt
+
 # cirque tests
 requests>=2.24.0
 

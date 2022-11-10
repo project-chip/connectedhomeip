@@ -205,6 +205,8 @@ def BuildEfr32Target():
 
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('with-ota-requestor', enable_ota_requestor=True)
+    target.AppendModifier('sed', enable_sed=True)
+    target.AppendModifier('low-power', enable_low_power=True)
 
     return target
 
@@ -449,7 +451,7 @@ def BuildBouffalolabTarget():
         TargetPart('BL602-IoT-Matter-V1', board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
         TargetPart('BL602-IOT-DVK-3S', board=BouffalolabBoard.BL602_IOT_DVK_3S, module_type="BL602"),
         TargetPart('BL602-NIGHT-LIGHT', board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
-        TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.BL706_IoT_DVK, module_type="BL706C-22"),
+        TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit, module_type="BL706C-22"),
         TargetPart('BL706-IoT-DVK', board=BouffalolabBoard.BL706_IoT_DVK, module_type="BL706C-22"),
         TargetPart('BL706-NIGHT-LIGHT', board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL702"),
     ])
@@ -500,6 +502,8 @@ def BuildTelinkTarget():
     target.AppendFixedTargets([TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D)])
 
     target.AppendFixedTargets([
+        TargetPart('all-clusters', app=TelinkApp.ALL_CLUSTERS),
+        TargetPart('all-clusters-minimal', app=TelinkApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('light', app=TelinkApp.LIGHT),
         TargetPart('light-switch', app=TelinkApp.SWITCH),
         TargetPart('ota-requestor', app=TelinkApp.OTA_REQUESTOR),

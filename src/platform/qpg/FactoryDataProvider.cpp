@@ -281,6 +281,21 @@ CHIP_ERROR FactoryDataProvider::GetProductId(uint16_t & productId)
     return MapQorvoError(status);
 }
 
+CHIP_ERROR FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR FactoryDataProvider::GetProductURL(char * buf, size_t bufSize)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR FactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
 CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 {
     return MapQorvoError(qvCHIP_FactoryDataGetValue(TAG_ID_SERIAL_NUMBER, (uint8_t *) buf, bufSize, NULL));
