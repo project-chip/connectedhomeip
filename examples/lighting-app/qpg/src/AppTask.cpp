@@ -298,13 +298,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 {
     AppEvent event;
 
-    // CHIP_ERROR err = sAppTask.Init();
-    // if (err != CHIP_NO_ERROR)
-    // {
-    //     ChipLogError(NotSpecified, "AppTask.Init() failed: %" CHIP_ERROR_FORMAT, err.Format());
-    //     return;
-    // }
-
     while (true)
     {
         BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
