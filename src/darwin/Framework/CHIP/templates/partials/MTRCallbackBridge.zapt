@@ -13,16 +13,12 @@
 class MTR{{> @partial-block}}Bridge : public MTRCallbackBridge<{{>callbackType}}>
 {
 public:
-    MTR{{> @partial-block}}Bridge(dispatch_queue_t queue, ResponseHandler handler, MTRLocalActionBlock action, bool keepAlive = false)
+    MTR{{> @partial-block}}Bridge(dispatch_queue_t queue, ResponseHandler handler, bool keepAlive = false)
+      : MTRCallbackBridge<{{>callbackType}}>(queue, handler, OnSuccessFn, keepAlive)
+      {};
+
+    MTR{{> @partial-block}}Bridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, bool keepAlive = false)
       : MTRCallbackBridge<{{>callbackType}}>(queue, handler, action, OnSuccessFn, keepAlive)
-      {};
-
-    MTR{{> @partial-block}}Bridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler, MTRActionBlock action, bool keepAlive = false)
-      : MTRCallbackBridge<{{>callbackType}}>(queue, nodeID, controller, handler, action, OnSuccessFn, keepAlive)
-      {};
-
-    MTR{{> @partial-block}}Bridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action, bool keepAlive = false)
-      : MTRCallbackBridge<{{>callbackType}}>(queue, device, handler, action, OnSuccessFn, keepAlive)
       {};
 
     static void OnSuccessFn(void * context
@@ -46,13 +42,8 @@ public:
 class MTR{{> @partial-block}}SubscriptionBridge : public MTR{{> @partial-block}}Bridge
 {
 public:
-    MTR{{> @partial-block}}SubscriptionBridge(dispatch_queue_t queue, chip::NodeId nodeID, MTRDeviceController * controller, ResponseHandler handler, MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler)
-      : MTR{{> @partial-block}}Bridge(queue, nodeID, controller, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-      {}
-
-    MTR{{> @partial-block}}SubscriptionBridge(dispatch_queue_t queue, MTRBaseDevice * device, ResponseHandler handler, MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler)
-      : MTR{{> @partial-block}}Bridge(queue, device, handler, action, true),
+    MTR{{> @partial-block}}SubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler)
+      : MTR{{> @partial-block}}Bridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
       {}
 

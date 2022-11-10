@@ -20,6 +20,7 @@
 #import <Matter/MTRCluster.h>
 
 @class MTRSetupPayload;
+@class MTRDeviceController;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -124,6 +125,14 @@ extern NSString * const MTRArrayValueType;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * Create a device object with the given node id and controller.  This
+ * will always succeed, even if there is no such node id on the controller's
+ * fabric, but attempts to actually use the MTRBaseDevice will fail
+ * (asynchronously) in that case.
+ */
++ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller MTR_NEWLY_AVAILABLE;
 
 /**
  * Subscribe to receive attribute reports for everything (all endpoints, all
