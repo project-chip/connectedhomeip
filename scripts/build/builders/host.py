@@ -231,7 +231,7 @@ class HostBuilder(GnBuilder):
                  minmdns_high_verbosity=False,
                  crypto_library: HostCryptoLibrary = None):
         super(HostBuilder, self).__init__(
-            root=os.path.join(root, 'examples', app.ExamplePath()),
+            root=root,
             runner=runner)
 
         self.app = app

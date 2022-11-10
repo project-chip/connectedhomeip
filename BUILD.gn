@@ -46,6 +46,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Build the Linux all clusters app example with default group
     chip_build_all_clusters_app = false
+    chip_build_java_matter_controller = true
   }
 
   if (enable_fuzz_test_targets) {
@@ -230,6 +231,12 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
           "${chip_root}/examples/all-clusters-app/linux:chip-all-clusters-app",
         ]
       }
+    }
+
+    if (chip_build_java_matter_controller) {
+        deps += [
+          "${chip_root}/examples/java-matter-controller:java-matter-controller",
+        ]
     }
   }
 

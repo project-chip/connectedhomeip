@@ -76,7 +76,6 @@ android_library("java") {
     ":android_sdk",
     "${chip_root}/third_party/android_deps:annotation",
   ]
-
   data_deps = [ ":android" ]
 
   sources = [

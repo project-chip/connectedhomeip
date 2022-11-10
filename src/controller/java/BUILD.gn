@@ -17,7 +17,6 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 
-build_java_matter_controller = true
 if (defined(build_java_matter_controller)) {
   build_java_matter_controller = build_java_matter_controller
 
