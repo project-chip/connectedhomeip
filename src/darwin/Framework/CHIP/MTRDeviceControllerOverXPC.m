@@ -57,39 +57,27 @@ static void SetupXPCQueue(void)
     return NO;
 }
 
-// Keep this available until clients have migrated
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (BOOL)pairDevice:(uint64_t)deviceID
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
-#pragma clang diagnostic pop
 {
     MTR_LOG_ERROR("MTRDevice doesn't support pairDevice over XPC");
     return NO;
 }
 
-// Keep this available until clients have migrated
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (BOOL)pairDevice:(uint64_t)deviceID
            address:(NSString *)address
               port:(uint16_t)port
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
-#pragma clang diagnostic pop
 {
     MTR_LOG_ERROR("MTRDevice doesn't support pairDevice over XPC");
     return NO;
 }
 
-// Keep this available until clients have migrated
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error
-#pragma clang diagnostic pop
 {
     MTR_LOG_ERROR("MTRDevice doesn't support pairDevice over XPC");
     return NO;

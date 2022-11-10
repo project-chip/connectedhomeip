@@ -73,8 +73,6 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
     API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 /**
- * @deprecated - Use the setupCommissioningSessionWithPayload API to pair devices
- *
  * Start pairing for a device with the given ID, using the provided setup PIN
  * to establish a PASE connection.
  *
@@ -89,11 +87,9 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 - (BOOL)pairDevice:(uint64_t)deviceID
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
-             error:(NSError * __autoreleasing *)error DEPRECATED_MSG_ATTRIBUTE("Use setupCommissioningSessionWithPayload method.");
+             error:(NSError * __autoreleasing *)error;
 
 /**
- * @deprecated - Use the setupCommissioningSessionWithPayload API to pair devices
- *
  * Start pairing for a device with the given ID, using the provided IP address
  * and port to connect to the device and the provided setup PIN to establish a
  * PASE connection.
@@ -107,11 +103,9 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
            address:(NSString *)address
               port:(uint16_t)port
       setupPINCode:(uint32_t)setupPINCode
-             error:(NSError * __autoreleasing *)error DEPRECATED_MSG_ATTRIBUTE("Use setupCommissioningSessionWithPayload method.");
+             error:(NSError * __autoreleasing *)error;
 
 /**
- * @deprecated - Use the setupCommissioningSessionWithPayload API to pair devices
- *
  * Start pairing for a device with the given ID and onboarding payload (QR code
  * or manual setup code).  The payload will be used to discover the device and
  * establish a PASE connection.
@@ -121,11 +115,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * for this controller.  That delegate is expected to call commissionDevice
  * after that point if it wants to commission the device.
  */
-- (BOOL)pairDevice:(uint64_t)deviceID
-    onboardingPayload:(NSString *)onboardingPayload
-                error:(NSError * __autoreleasing *)error
-    DEPRECATED_MSG_ATTRIBUTE("Use setupCommissioningSessionWithPayload method.");
-
+- (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error;
 - (BOOL)commissionDevice:(uint64_t)deviceId
      commissioningParams:(MTRCommissioningParameters *)commissioningParams
                    error:(NSError * __autoreleasing *)error;
