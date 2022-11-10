@@ -152,6 +152,7 @@ CHIP_ERROR AmebaConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
 
     if (success == 0)
     {
+        outLen -= 1; // Don't count trailing null
         return CHIP_NO_ERROR;
     }
     else
