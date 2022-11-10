@@ -20,48 +20,42 @@
 
 #include <cstdint>
 
-#include "LEDWidget.h"
+#include "EventTypes.h"
 
-struct AppEvent;
-typedef void (*EventHandler)(AppEvent *);
+class LEDWidget;
 
-struct AppEvent
-{
-    enum AppEventTypes
-    {
-        kEventType_Button = 0,
-        kEventType_Timer,
-        kEventType_Lock,
-        kEventType_Install,
-        kEventType_UpdateLedState,
-#ifdef CONFIG_MCUMGR_SMP_BT
-        kEventType_StartSMPAdvertising,
-#endif
-    };
+enum class AppEventType : uint8_t {
+	None = 0,
+	Button,
+	ButtonPushed,
+	ButtonReleased,
+	Timer,
+	UpdateLedState,
+	IdentifyStart,
+	IdentifyStop,
+	StartSMPAdvertising
+};
 
-    uint16_t Type;
+enum class FunctionEvent : uint8_t { NoneSelected = 0, SoftwareUpdate = 0, FactoryReset, AdvertisingStart };
 
-    union
-    {
-        struct
-        {
-            uint8_t PinNo;
-            uint8_t Action;
-        } ButtonEvent;
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-        struct
-        {
-            uint8_t Action;
-            int32_t Actor;
-        } LockEvent;
-        struct
-        {
-            LEDWidget * LedWidget;
-        } UpdateLedStateEvent;
-    };
+struct AppEvent {
+	union {
+		struct {
+			uint8_t PinNo;
+			uint8_t Action;
+		} ButtonEvent;
+		struct {
+			void *Context;
+		} TimerEvent;
+		struct {
+			uint8_t Action;
+			int32_t Actor;
+		} LockEvent;
+		struct {
+			LEDWidget *LedWidget;
+		} UpdateLedStateEvent;
+	};
 
-    EventHandler Handler;
+	AppEventType Type{ AppEventType::None };
+	EventHandler Handler;
 };
