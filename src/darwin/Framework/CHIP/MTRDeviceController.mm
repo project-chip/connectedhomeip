@@ -567,10 +567,8 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
                                                     salt:(NSData *)salt
                                                    error:(NSError * __autoreleasing *)error
 {
-    // Spake2pVerifier::Generate takes the passcode by non-const reference for some reason.
-    uint32_t unboxedSetupPasscode = [setupPasscode unsignedIntValue];
     chip::Spake2pVerifier verifier;
-    CHIP_ERROR err = verifier.Generate([iterations unsignedIntValue], AsByteSpan(salt), unboxedSetupPasscode);
+    CHIP_ERROR err = verifier.Generate(iterations.unsignedIntValue, AsByteSpan(salt), setupPasscode.unsignedIntValue);
     if ([MTRDeviceController checkForError:err logMsg:kErrorSpake2pVerifierGenerationFailed error:error]) {
         return nil;
     }
