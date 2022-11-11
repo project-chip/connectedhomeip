@@ -19,64 +19,62 @@ import sys
 import optparse
 import tarfile
 import shutil
-import re
 import docker
 
 client = docker.from_env()
 
+_CREATE_DOCKER_SCRIPT_PATH = os.path.dirname(__file__)
+_SUPPORTED_PLATFORM = 'linux_x86'
+
 parser = optparse.OptionParser()
-parser.add_option("-c", "--commit_sha", type='string',
+parser.add_option('-c', '--commit_sha', type='string',
                   action='store',
-                  dest="commit_sha")
-parser.add_option("-s", "--short_sha", type='string',
+                  dest='commit_sha')
+parser.add_option('-s', '--short_sha', type='string',
                   action='store',
-                  dest="short_sha")
-parser.add_option("-r", "--revision_id", type='string',
+                  dest='short_sha')
+parser.add_option('-r', '--revision_id', type='string',
                   action='store',
-                  dest="revision_id")
-parser.add_option("-b", "--build_id", type='string',
+                  dest='revision_id')
+parser.add_option('-b', '--build_id', type='string',
                   action='store',
-                  dest="build_id")
-parser.add_option("-i", "--image_name", type='string',
+                  dest='build_id')
+parser.add_option('-i', '--image_name', type='string',
                   action='store',
-                  dest="image_name")
-parser.add_option("-w", "--working_dir", type='string',
+                  dest='image_name')
+parser.add_option('-t', '--tar_path', type='string',
                   action='store',
-                  dest="working_dir")
-parser.add_option("-t", "--tar_path", type='string',
-                  action='store',
-                  dest="tar_path")
-parser.add_option("-p", "--platform", type='string',
-                  action='store',
-                  dest="platform")
+                  dest='tar_path')
 
-options, _ = parser.parse_args(sys.argv[1:])
+options, args = parser.parse_args(sys.argv[1:])
 
-out_directory = f'{options.working_dir}/out'
+# Check that all options are set
+for option, value in options.__dict__.items():
+    if (value is None):
+        parser.error(f'--{option} is not set')
 
-# Fetch list of devices
-files = os.listdir(f'{options.working_dir}/devices')
-devices = []
-for file in files:
-    device = re.search("rootnode.+(?=.zap)", file)
-    if device is not None and device.group(0) not in devices:
-        devices.append(device.group(0))
+out_directory = f'{_CREATE_DOCKER_SCRIPT_PATH}/out'
 
-for device in devices:
+for device_file_name in os.listdir(options.tar_path):
     # Clean up the out directory before extracting device files
     shutil.rmtree(out_directory)
     os.mkdir(out_directory)
 
-    print(f'Extracting {options.platform} files of {device}')
-    my_tar = tarfile.open(
-        f'{options.tar_path}/{options.platform}-{device}.tar.gz')
+    platform, device = device_file_name.split('-')
+    if _SUPPORTED_PLATFORM not in platform:
+        continue
+
+    device = device.replace('.tar.gz', '')
+
+    print(f'Extracting {platform} files of {device}')
+    my_tar = tarfile.open(f'{options.tar_path}/{device_file_name}')
     my_tar.extractall(out_directory)
     my_tar.close()
 
-    docker_image_name = f'{options.image_name}/{options.platform}/{device}'.lower()
+    docker_image_name = f'{options.image_name}/{platform}/{device}'.lower()
 
-    print(f'Building {options.platform} docker image for {device}')
-    image = client.images.build(path=options.working_dir, buildargs={
+    print(f'Building {platform} docker image for {device}')
+    image = client.images.build(path=_CREATE_DOCKER_SCRIPT_PATH, buildargs={
         'DEVICE_NAME': f'{device}'})
     image[0].tag(docker_image_name, tag='latest')
     image[0].tag(docker_image_name, tag=f'short-sha_{options.short_sha}')
