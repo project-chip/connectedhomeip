@@ -124,6 +124,8 @@
         _subscriptionEstablishedCallbacks = [NSMutableDictionary dictionary];
         _subscriptionReadSuccessCallbacks = [NSMutableDictionary dictionary];
         _subscriptionReadFailureCallbacks = [NSMutableDictionary dictionary];
+        _readSuccessCallbacks = [NSMutableDictionary dictionary];
+        _readFailureCallbacks = [NSMutableDictionary dictionary];
 
         chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
     }
@@ -139,9 +141,14 @@
     dispatch_async(_chipWorkQueue, ^{
         bool initAppStatus = true;
 
+        CHIP_ERROR err = CHIP_NO_ERROR;
         AppParams appParams;
+        if (appParameters == nil) {
+            err = CastingServer::GetInstance()->Init();
+        } else if ((err = [ConversionUtils convertToCppAppParamsInfoFrom:appParameters outAppParams:appParams]) == CHIP_NO_ERROR) {
+            err = CastingServer::GetInstance()->Init(&appParams);
+        }
 
-        CHIP_ERROR err = CastingServer::GetInstance()->Init();
         if (err != CHIP_NO_ERROR) {
             ChipLogError(AppServer, "CastingServerBridge().initApp() failed: %" CHIP_ERROR_FORMAT, err.Format());
             initAppStatus = false;
@@ -151,8 +158,6 @@
             initAppStatusHandler(initAppStatus);
         });
     });
-
-    CastingServer::GetInstance()->Init();
 }
 
 - (void)discoverCommissioners:(dispatch_queue_t _Nonnull)clientQueue
@@ -870,7 +875,7 @@
 }
 
 - (void)mediaPlayback_seek:(ContentApp * _Nonnull)contentApp
-                  position:(uint8_t)position
+                  position:(uint64_t)position
           responseCallback:(void (^_Nonnull)(bool))responseCallback
                clientQueue:(dispatch_queue_t _Nonnull)clientQueue
         requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
@@ -1571,7 +1576,7 @@
                 chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType vendorName) {
                 void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
                     objectForKey:@"applicationBasic_subscribeVendorName"];
-                callback([NSString stringWithUTF8String:vendorName.data()]);
+                callback(vendorName.data() != nil ? [NSString stringWithUTF8String:vendorName.data()] : nil);
             },
             [](void * context, CHIP_ERROR err) {
                 void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
@@ -1800,13 +1805,13 @@
             &endpoint, nullptr,
             [](void * context,
                 chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType vendorName) {
-                void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"applicationBasic_readVendorName"];
+                void (^callback)(NSString * _Nonnull) =
+                    [[CastingServerBridge getSharedInstance].readSuccessCallbacks objectForKey:@"applicationBasic_readVendorName"];
                 callback([NSString stringWithUTF8String:vendorName.data()]);
             },
             [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"applicationBasic_readVendorName"];
+                void (^callback)(MatterError *) =
+                    [[CastingServerBridge getSharedInstance].readFailureCallbacks objectForKey:@"applicationBasic_readVendorName"];
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             });
         dispatch_async(clientQueue, ^{
@@ -1835,13 +1840,13 @@
         CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_ReadVendorID(
             &endpoint, nullptr,
             [](void * context, chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType vendorID) {
-                void (^callback)(NSNumber * _Nonnull) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"applicationBasic_readVendorID"];
+                void (^callback)(NSNumber * _Nonnull) =
+                    [[CastingServerBridge getSharedInstance].readSuccessCallbacks objectForKey:@"applicationBasic_readVendorID"];
                 callback(@(vendorID));
             },
             [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"applicationBasic_readVendorID"];
+                void (^callback)(MatterError *) =
+                    [[CastingServerBridge getSharedInstance].readFailureCallbacks objectForKey:@"applicationBasic_readVendorID"];
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             });
         dispatch_async(clientQueue, ^{
@@ -1872,12 +1877,12 @@
             &endpoint, nullptr,
             [](void * context,
                 chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableArgType applicationName) {
-                void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].readSuccessCallbacks
                     objectForKey:@"applicationBasic_readApplicationName"];
                 callback([NSString stringWithUTF8String:applicationName.data()]);
             },
             [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].readFailureCallbacks
                     objectForKey:@"applicationBasic_readApplicationName"];
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             });
@@ -1907,13 +1912,13 @@
         CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_ReadProductID(
             &endpoint, nullptr,
             [](void * context, chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType productID) {
-                void (^callback)(uint16_t) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"applicationBasic_readProductID"];
+                void (^callback)(uint16_t) =
+                    [[CastingServerBridge getSharedInstance].readSuccessCallbacks objectForKey:@"applicationBasic_readProductID"];
                 callback(productID);
             },
             [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"applicationBasic_readProductID"];
+                void (^callback)(MatterError *) =
+                    [[CastingServerBridge getSharedInstance].readFailureCallbacks objectForKey:@"applicationBasic_readProductID"];
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             });
         dispatch_async(clientQueue, ^{
@@ -1945,12 +1950,12 @@
             [](void * context,
                 chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableArgType
                     applicationVersion) {
-                void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].readSuccessCallbacks
                     objectForKey:@"applicationBasic_readApplicationVersion"];
                 callback([NSString stringWithUTF8String:applicationVersion.data()]);
             },
             [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].readFailureCallbacks
                     objectForKey:@"applicationBasic_readApplicationVersion"];
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             });

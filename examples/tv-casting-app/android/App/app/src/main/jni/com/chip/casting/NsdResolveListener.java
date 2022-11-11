@@ -20,6 +20,7 @@ package com.chip.casting;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.util.Log;
+import chip.platform.NsdManagerServiceResolver;
 import java.util.List;
 
 public class NsdResolveListener implements NsdManager.ResolveListener {
@@ -31,13 +32,15 @@ public class NsdResolveListener implements NsdManager.ResolveListener {
   private final List<VideoPlayer> preCommissionedVideoPlayers;
   private final SuccessCallback<DiscoveredNodeData> successCallback;
   private final FailureCallback failureCallback;
+  private final NsdManagerServiceResolver.NsdManagerResolverAvailState nsdManagerResolverAvailState;
 
   public NsdResolveListener(
       NsdManager nsdManager,
       List<Long> deviceTypeFilter,
       List<VideoPlayer> preCommissionedVideoPlayers,
       SuccessCallback<DiscoveredNodeData> successCallback,
-      FailureCallback failureCallback) {
+      FailureCallback failureCallback,
+      NsdManagerServiceResolver.NsdManagerResolverAvailState nsdManagerResolverAvailState) {
     this.nsdManager = nsdManager;
     this.deviceTypeFilter = deviceTypeFilter;
     this.preCommissionedVideoPlayers = preCommissionedVideoPlayers;
@@ -48,12 +51,17 @@ public class NsdResolveListener implements NsdManager.ResolveListener {
     }
     this.successCallback = successCallback;
     this.failureCallback = failureCallback;
+    this.nsdManagerResolverAvailState = nsdManagerResolverAvailState;
   }
 
   @Override
   public void onServiceResolved(NsdServiceInfo serviceInfo) {
     DiscoveredNodeData discoveredNodeData = new DiscoveredNodeData(serviceInfo);
     Log.d(TAG, "DiscoveredNodeData resolved: " + discoveredNodeData);
+
+    if (nsdManagerResolverAvailState != null) {
+      nsdManagerResolverAvailState.signalFree();
+    }
 
     if (isPassingDeviceTypeFilter(discoveredNodeData)) {
       addCommissioningInfo(discoveredNodeData);
@@ -68,6 +76,10 @@ public class NsdResolveListener implements NsdManager.ResolveListener {
 
   @Override
   public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
+    if (nsdManagerResolverAvailState != null) {
+      nsdManagerResolverAvailState.signalFree();
+    }
+
     switch (errorCode) {
       case NsdManager.FAILURE_ALREADY_ACTIVE:
         Log.e(TAG, "NsdResolveListener FAILURE_ALREADY_ACTIVE - Service: " + serviceInfo);

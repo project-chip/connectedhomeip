@@ -137,6 +137,9 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
 @property (nonatomic, copy, nullable) NSNumber * rendezvousInformation MTR_NEWLY_DEPRECATED("Please use discoveryCapabilities");
 @property (nonatomic, copy) NSNumber * setUpPINCode MTR_NEWLY_DEPRECATED("Please use setupPasscode");
 
+- (instancetype)init MTR_NEWLY_DEPRECATED("Please use initWithSetupPasscode or setupPayloadWithOnboardingPayload");
++ (instancetype)new MTR_NEWLY_DEPRECATED("Please use initWithSetupPasscode or setupPayloadWithOnboardingPayload");
+
 @end
 
 NS_ASSUME_NONNULL_END

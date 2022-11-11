@@ -181,7 +181,7 @@ class TargetListSuccessHandlerJNI
     : public SuccessHandlerJNI<chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo::DecodableArgType>
 {
 public:
-    TargetListSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/util/ArrayList;)V") {}
+    TargetListSuccessHandlerJNI() : SuccessHandlerJNI("(Ljava/lang/Object;)V") {}
     jobject ConvertToJObject(chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo::DecodableArgType responseData);
 };
 

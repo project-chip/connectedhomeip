@@ -62,8 +62,7 @@ using chip::SessionHandle;
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice *baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        new MTR{{>callbackName}}CallbackBridge(self.callbackQueue,
-          baseDevice,
+        auto * bridge = new MTR{{>callbackName}}CallbackBridge(self.callbackQueue,
           {{#if hasSpecificResponse}}
             {{! This treats completion as taking an id for the data.  This is
                 not great from a type-safety perspective, of course. }}
@@ -77,7 +76,7 @@ using chip::SessionHandle;
                   [workItem endWork];
             },
           {{/if}}
-          ^(ExchangeManager & exchangeManager, const SessionHandle & session, Cancelable * success, Cancelable * failure) {
+          ^(ExchangeManager & exchangeManager, const SessionHandle & session, {{>callbackName}}CallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
             ListFreer listFreer;
             {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
@@ -103,11 +102,10 @@ using chip::SessionHandle;
               {{/last}}
             {{/chip_cluster_command_arguments}}
 
-            auto successFn = Callback<{{>callbackName}}CallbackType>::FromCancelable(success);
-            auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
             chip::Controller::{{asUpperCamelCase parent.name}}Cluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
-      });
+            return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
+        });
+        std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];

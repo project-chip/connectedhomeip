@@ -82,12 +82,12 @@ static_library("shell") {
   } else if (chip_device_platform == "bl602") {
     sources += [
       "MainLoopDefault.cpp",
-      "streamer_bl602.cpp",
+      "streamer_bouffalolab.cpp",
     ]
   } else if (chip_device_platform == "bl702") {
     sources += [
       "MainLoopDefault.cpp",
-      "streamer_bl702.cpp",
+      "streamer_bouffalolab.cpp",
     ]
   } else if (chip_device_platform == "cc13x2_26x2") {
     sources += [

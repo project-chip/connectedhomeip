@@ -480,7 +480,7 @@
  @param requestSentHandler Handler to call on sending the request
  */
 - (void)mediaPlayback_seek:(ContentApp * _Nonnull)contentApp
-                  position:(uint8_t)position
+                  position:(uint64_t)position
           responseCallback:(void (^_Nonnull)(bool))responseCallback
                clientQueue:(dispatch_queue_t _Nonnull)clientQueue
         requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;

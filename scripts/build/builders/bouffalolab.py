@@ -101,11 +101,11 @@ class BouffalolabBuilder(GnBuilder):
 
         if bouffalo_chip == "bl702":
             self.argsOpt.append('module_type=\"{}\"'.format(module_type))
-            if enable_shell and not enable_rpcs:
-                self.argsOpt.append('chip_build_libshell=true')
 
         if enable_rpcs:
             self.argsOpt.append('import("//with_pw_rpc.gni")')
+        elif enable_shell:
+            self.argsOpt.append('chip_build_libshell=true')
 
     def GnBuildArgs(self):
         return self.argsOpt

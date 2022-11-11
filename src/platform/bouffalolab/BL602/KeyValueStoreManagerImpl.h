@@ -23,23 +23,6 @@
  */
 
 #pragma once
-
-/* ignore GCC Wconversion warnings for pigweed */
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#endif
-
-#include <pw_kvs/crc16_checksum.h>
-#include <pw_kvs/flash_memory.h>
-#include <pw_kvs/key_value_store.h>
-
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
-
-#pragma once
-
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {

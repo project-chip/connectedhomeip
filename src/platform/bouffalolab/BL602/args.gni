@@ -14,8 +14,6 @@
 
 import("//build_overrides/bouffalolab_iot_sdk.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
-
 import("${chip_root}/examples/platform/bouffalolab/bl602/args.gni")
 
 riscv_platform_config = "${bl602_sdk_build_root}/bl602_riscv.gni"
@@ -37,8 +35,3 @@ chip_inet_config_enable_dns_resolver = false
 chip_inet_config_enable_tun_endpoint = false
 chip_inet_config_enable_tcp_endpoint = true
 chip_inet_config_enable_udp_endpoint = true
-chip_detail_logging = false
-pw_build_LINK_DEPS = [
-  "$dir_pw_assert:impl",
-  "$dir_pw_log:impl",
-]

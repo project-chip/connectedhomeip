@@ -3234,10 +3234,10 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
 
     EndpointId endpoint     = commandPath.mEndpointId;
     DlOperationError reason = DlOperationError::kUnspecified;
-    uint16_t pinUserIdx     = 0;
-    uint16_t pinCredIdx     = 0;
-    bool success            = false;
-    bool sendEvent          = true;
+    Nullable<uint16_t> pinUserIdx; // Will get set to non-null if we find a user for the PIN.
+    Optional<uint16_t> pinCredIdx; // Will get set to a value if the PIN is one we know about.
+    bool success   = false;
+    bool sendEvent = true;
 
     auto currentTime = chip::System::SystemClock().GetMonotonicTimestamp();
 
@@ -3253,9 +3253,9 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
     VerifyOrExit(nullptr != endpointContext, ChipLogError(Zcl, "Failed to get endpoint index for cluster [endpoint=%d]", endpoint));
     if (endpointContext->lockoutEndTimestamp >= currentTime)
     {
-        emberAfDoorLockClusterPrintln("Rejecting unlock command -- lockout is in action [endpoint=%d,lockoutEnd=%u,currentTime=%u]",
-                                      endpoint, static_cast<unsigned>(endpointContext->lockoutEndTimestamp.count()),
-                                      static_cast<unsigned>(currentTime.count()));
+        emberAfDoorLockClusterPrintln(
+            "Rejecting remote lock operation -- lockout is in action [endpoint=%d,lockoutEnd=%u,currentTime=%u]", endpoint,
+            static_cast<unsigned>(endpointContext->lockoutEndTimestamp.count()), static_cast<unsigned>(currentTime.count()));
         sendEvent = false;
         goto exit;
     }
@@ -3272,14 +3272,27 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
 
         // Look up the user index and credential index -- it should be used in the Lock Operation event
         EmberAfPluginDoorLockUserInfo user;
-        findUserIndexByCredential(endpoint, DlCredentialType::kPin, pinCode.Value(), pinUserIdx, pinCredIdx, user);
+        uint16_t userIdx;
+        uint16_t credIdx;
+        if (findUserIndexByCredential(endpoint, DlCredentialType::kPin, pinCode.Value(), userIdx, credIdx, user))
+        {
+            pinUserIdx.SetNonNull(userIdx);
+            pinCredIdx.Emplace(credIdx);
+        }
+        else
+        {
+            emberAfDoorLockClusterPrintln("Rejecting lock operation: unknown PIN provided [endpoint=%d, lock_op=%d]", endpoint,
+                                          to_underlying(opType));
+            reason = DlOperationError::kInvalidCredential;
+            goto exit;
+        }
 
         // If the user status is OccupiedDisabled we should deny the access and send out the appropriate event
         VerifyOrExit(user.userStatus != DlUserStatus::kOccupiedDisabled, {
             reason = DlOperationError::kDisabledUserDenied;
             emberAfDoorLockClusterPrintln(
                 "Unable to perform remote lock operation: user is disabled [endpoint=%d, lock_op=%d, userIndex=%d]", endpoint,
-                to_underlying(opType), pinUserIdx);
+                to_underlying(opType), userIdx);
         });
     }
     else
@@ -3306,12 +3319,13 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
 
     // credentials check succeeded, try to lock/unlock door
     success = opHandler(endpoint, pinCode, reason);
+    // The app should trigger the lock state change as it may take a while before the lock actually locks/unlocks
+exit:
     if (!success && reason == DlOperationError::kInvalidCredential)
     {
         TrackWrongCodeEntry(endpoint);
     }
-    // The app should trigger the lock state change as it may take a while before the lock actually locks/unlocks
-exit:
+
     // Send command response
     emberAfSendImmediateDefaultResponse(success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
 
@@ -3321,20 +3335,22 @@ exit:
         return success;
     }
 
-    // Send LockOperation/LockOperationError event
-    LockOpCredentials foundCred[] = { { DlCredentialType::kPin, pinCredIdx } };
+    // Send LockOperation/LockOperationError event.  The credential index in
+    // foundCred will be filled in if we actually have a value to fill in.
+    LockOpCredentials foundCred[] = { { DlCredentialType::kPin, UINT16_MAX } };
     LockOpCredentials * credList  = nullptr;
     size_t credListSize           = 0;
 
     // appclusters.pdf 5.3.5.3, 5.3.5.4:
     // The list of credentials used in performing the lock operation. This SHALL be null if no credentials were involved.
-    if (pinCode.HasValue())
+    if (pinCode.HasValue() && pinCredIdx.HasValue())
     {
-        credList     = foundCred;
-        credListSize = 1;
+        foundCred[0].credentialIndex = pinCredIdx.Value();
+        credList                     = foundCred;
+        credListSize                 = 1;
     }
 
-    SendLockOperationEvent(endpoint, opType, DlOperationSource::kRemote, reason, Nullable<uint16_t>(pinUserIdx),
+    SendLockOperationEvent(endpoint, opType, DlOperationSource::kRemote, reason, pinUserIdx,
                            Nullable<chip::FabricIndex>(getFabricIndex(commandObj)), Nullable<chip::NodeId>(getNodeId(commandObj)),
                            credList, credListSize, success);
     return success;

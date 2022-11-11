@@ -28,6 +28,8 @@ assert(android_sdk_root != "", "android_sdk_root must be specified")
 #
 #   jar_path: A path to an existing JAR. Mutually exclusive with sources.
 #
+#   deps: List of dependent .jar files needed by this library.
+#
 #   output_name: File name for the output .jar (not including extension).
 #     Defaults to the input .jar file name.
 #
@@ -183,6 +185,8 @@ template("java_library") {
 #   sources: List of .java files included in this binary. Mutually exclusive with jar_path.
 #
 #   jar_path: A path to an existing JAR. Mutually exclusive with sources.
+#
+#   deps: List of dependent .jar files needed by this binary.
 #
 #   output_name: File name for the output binary under root_build_dir/bin.
 #

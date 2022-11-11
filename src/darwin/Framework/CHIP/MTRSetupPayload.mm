@@ -354,7 +354,7 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
     payload.commissioningFlow = [MTRSetupPayload unconvertCommissioningFlow:self.commissioningFlow];
     payload.rendezvousInformation = [MTRSetupPayload convertDiscoveryCapabilities:self.discoveryCapabilities];
     payload.discriminator.SetLongValue([self.discriminator unsignedShortValue]);
-    payload.setUpPINCode = [self.setUpPINCode unsignedIntValue];
+    payload.setUpPINCode = [self.setupPasscode unsignedIntValue];
 
     std::string outDecimalString;
     CHIP_ERROR err = chip::QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(outDecimalString);
@@ -430,6 +430,28 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
 - (void)setSetUpPINCode:(NSNumber *)setUpPINCode
 {
     self.setupPasscode = setUpPINCode;
+}
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _version = @(0); // Only supported Matter version so far.
+        _vendorID = @(0); // Not available.
+        _productID = @(0); // Not available.
+        _commissioningFlow = MTRCommissioningFlowStandard;
+        _discoveryCapabilities = MTRDiscoveryCapabilitiesUnknown;
+        _hasShortDiscriminator = NO;
+        _discriminator = @(0);
+        _setupPasscode = @(11111111); // Invalid passcode
+        _serialNumber = nil;
+    }
+
+    return self;
+}
+
++ (instancetype)new
+{
+    return [[self alloc] init];
 }
 
 @end

@@ -6,15 +6,6 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import chip.appserver.ChipAppServer;
-import chip.platform.AndroidBleManager;
-import chip.platform.AndroidChipPlatform;
-import chip.platform.ChipMdnsCallbackImpl;
-import chip.platform.DiagnosticDataProviderImpl;
-import chip.platform.NsdManagerServiceBrowser;
-import chip.platform.NsdManagerServiceResolver;
-import chip.platform.PreferencesConfigurationManager;
-import chip.platform.PreferencesKeyValueStoreManager;
 import com.chip.casting.AppParameters;
 import com.chip.casting.DACProviderStub;
 import com.chip.casting.DiscoveredNodeData;
@@ -29,7 +20,6 @@ public class MainActivity extends AppCompatActivity
 
   private static final String TAG = MainActivity.class.getSimpleName();
 
-  private ChipAppServer chipAppServer;
   private TvCastingApp tvCastingApp;
 
   @Override
@@ -79,30 +69,17 @@ public class MainActivity extends AppCompatActivity
   private void initJni() {
     tvCastingApp = new TvCastingApp();
 
-    tvCastingApp.setDACProvider(new DACProviderStub());
     Context applicationContext = this.getApplicationContext();
-    AndroidChipPlatform chipPlatform =
-        new AndroidChipPlatform(
-            new AndroidBleManager(),
-            new PreferencesKeyValueStoreManager(applicationContext),
-            new PreferencesConfigurationManager(applicationContext),
-            new NsdManagerServiceResolver(applicationContext),
-            new NsdManagerServiceBrowser(applicationContext),
-            new ChipMdnsCallbackImpl(),
-            new DiagnosticDataProviderImpl(applicationContext));
-
-    chipPlatform.updateCommissionableDataProviderData(
-        null, null, 0, GlobalCastingConstants.SetupPasscode, GlobalCastingConstants.Discriminator);
-
-    chipAppServer = new ChipAppServer();
-    chipAppServer.startApp();
 
     AppParameters appParameters = new AppParameters();
     byte[] rotatingDeviceIdUniqueId =
         new byte[AppParameters.MIN_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH];
     new Random().nextBytes(rotatingDeviceIdUniqueId);
     appParameters.setRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueId);
-    tvCastingApp.init(appParameters);
+    appParameters.setDacProvider(new DACProviderStub());
+    appParameters.setSetupPasscode(GlobalCastingConstants.SetupPasscode);
+    appParameters.setDiscriminator(GlobalCastingConstants.Discriminator);
+    tvCastingApp.initApp(applicationContext, appParameters);
   }
 
   private void showFragment(Fragment fragment, boolean showOnBack) {

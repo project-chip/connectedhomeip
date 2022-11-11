@@ -21,8 +21,8 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
 extern "C" {
-#include "platform/bootloader/api/btl_interface.h"
-#include "platform/emlib/inc/em_bus.h" // For CORE_CRITICAL_SECTION
+#include "btl_interface.h"
+#include "em_bus.h" // For CORE_CRITICAL_SECTION
 }
 
 #include "EFR32Config.h"

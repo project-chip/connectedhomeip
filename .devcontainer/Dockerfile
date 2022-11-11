@@ -72,6 +72,7 @@ RUN chown -R $USERNAME:$USERNAME /opt/android/sdk
 RUN chown -R $USERNAME:$USERNAME /opt/ameba/ambd_sdk_with_chip_non_NDA/
 
 # NXP uses a patch_sdk script to change SDK files
+RUN mkdir -p /opt/sdk/sdks/
 RUN chown -R $USERNAME:$USERNAME /opt/sdk/sdks/
 
 RUN chown -R $USERNAME:$USERNAME /opt/fsl-imx-xwayland/5.15-kirkstone/

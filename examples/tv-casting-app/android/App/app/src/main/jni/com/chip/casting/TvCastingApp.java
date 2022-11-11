@@ -17,10 +17,19 @@
  */
 package com.chip.casting;
 
+import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.net.wifi.WifiManager;
 import android.util.Log;
-import java.util.ArrayList;
+import chip.appserver.ChipAppServer;
+import chip.platform.AndroidBleManager;
+import chip.platform.AndroidChipPlatform;
+import chip.platform.ChipMdnsCallbackImpl;
+import chip.platform.DiagnosticDataProviderImpl;
+import chip.platform.NsdManagerServiceBrowser;
+import chip.platform.NsdManagerServiceResolver;
+import chip.platform.PreferencesConfigurationManager;
+import chip.platform.PreferencesKeyValueStoreManager;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -28,38 +37,71 @@ import java.util.concurrent.TimeUnit;
 
 public class TvCastingApp {
   private static final String TAG = TvCastingApp.class.getSimpleName();
+  private static final String DISCOVERY_TARGET_SERVICE_TYPE = "_matterd._udp.";
+  private static final List<Long> DISCOVERY_TARGET_DEVICE_TYPE_FILTER =
+      Arrays.asList(35L); // Video player = 35;
 
-  private final String TARGET_SERVICE_TYPE = "_matterd._udp.";
-  private final List<Long> DEVICE_TYPE_FILTER = Arrays.asList(35L); // Video player = 35;
+  private Context applicationContext;
+  private ChipAppServer chipAppServer;
+  private NsdManagerServiceResolver.NsdManagerResolverAvailState nsdManagerResolverAvailState;
 
-  public native boolean init(AppParameters appParameters);
+  public boolean initApp(Context applicationContext, AppParameters appParameters) {
+    this.applicationContext = applicationContext;
+    nsdManagerResolverAvailState = new NsdManagerServiceResolver.NsdManagerResolverAvailState();
+    NsdManagerServiceResolver nsdManagerServiceResolver =
+        new NsdManagerServiceResolver(applicationContext, nsdManagerResolverAvailState);
 
-  public native void setDACProvider(DACProvider provider);
+    AndroidChipPlatform chipPlatform =
+        new AndroidChipPlatform(
+            new AndroidBleManager(),
+            new PreferencesKeyValueStoreManager(applicationContext),
+            new PreferencesConfigurationManager(applicationContext),
+            nsdManagerServiceResolver,
+            new NsdManagerServiceBrowser(applicationContext),
+            new ChipMdnsCallbackImpl(),
+            new DiagnosticDataProviderImpl(applicationContext));
+
+    chipPlatform.updateCommissionableDataProviderData(
+        null, null, 0, appParameters.getSetupPasscode(), appParameters.getDiscriminator());
+
+    chipAppServer = new ChipAppServer();
+    chipAppServer.startApp();
+
+    setDACProvider(appParameters.getDacProvider());
+    return initJni(appParameters);
+  }
+
+  private native void setDACProvider(DACProvider provider);
+
+  private native boolean initJni(AppParameters appParameters);
 
   public void discoverVideoPlayerCommissioners(
-      WifiManager wifiManager,
-      NsdManager nsdManager,
       long discoveryDurationSeconds,
       SuccessCallback<DiscoveredNodeData> discoverySuccessCallback,
       FailureCallback discoveryFailureCallback) {
     Log.d(TAG, "TvCastingApp.discoverVideoPlayerCommissioners called");
+
+    List<VideoPlayer> preCommissionedVideoPlayers = readCachedVideoPlayers();
+
+    WifiManager wifiManager =
+        (WifiManager) applicationContext.getSystemService(Context.WIFI_SERVICE);
     WifiManager.MulticastLock multicastLock = wifiManager.createMulticastLock("multicastLock");
     multicastLock.setReferenceCounted(true);
     multicastLock.acquire();
 
-    List<VideoPlayer> preCommissionedVideoPlayers = readCachedVideoPlayers();
-
+    NsdManager nsdManager = (NsdManager) applicationContext.getSystemService(Context.NSD_SERVICE);
     NsdDiscoveryListener nsdDiscoveryListener =
         new NsdDiscoveryListener(
             nsdManager,
-            TARGET_SERVICE_TYPE,
-            DEVICE_TYPE_FILTER,
+            DISCOVERY_TARGET_SERVICE_TYPE,
+            DISCOVERY_TARGET_DEVICE_TYPE_FILTER,
             preCommissionedVideoPlayers,
             discoverySuccessCallback,
-            discoveryFailureCallback);
+            discoveryFailureCallback,
+            nsdManagerResolverAvailState);
 
     nsdManager.discoverServices(
-        TARGET_SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, nsdDiscoveryListener);
+        DISCOVERY_TARGET_SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, nsdDiscoveryListener);
 
     Executors.newSingleThreadScheduledExecutor()
         .schedule(
@@ -85,7 +127,8 @@ public class TvCastingApp {
 
   public native boolean sendCommissioningRequest(DiscoveredNodeData commissioner);
 
-  public native boolean sendUserDirectedCommissioningRequest(String address, int port);
+  /** @Deprecated Use sendCommissioningRequest(DiscoveredNodeData) instead */
+  private native boolean sendUserDirectedCommissioningRequest(String address, int port);
 
   public native List<VideoPlayer> readCachedVideoPlayers();
 
@@ -268,7 +311,7 @@ public class TvCastingApp {
 
   public native boolean targetNavigator_subscribeToTargetList(
       ContentApp contentApp,
-      SuccessCallback<ArrayList<TargetNavigatorTypes.TargetInfo>> readSuccessHandler,
+      SuccessCallback<Object> readSuccessHandler,
       FailureCallback readFailureHandler,
       int minInterval,
       int maxInterval,

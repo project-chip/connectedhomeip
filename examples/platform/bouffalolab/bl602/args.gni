@@ -19,6 +19,3 @@ chip_device_project_config_include = "<CHIPProjectConfig.h>"
 chip_project_config_include = "<CHIPProjectConfig.h>"
 chip_inet_project_config_include = "<CHIPProjectConfig.h>"
 chip_system_project_config_include = "<CHIPProjectConfig.h>"
-
-chip_project_config_include_dirs =
-    [ "${chip_root}/examples/lighting-app/bouffalolab/bl602/include" ]
