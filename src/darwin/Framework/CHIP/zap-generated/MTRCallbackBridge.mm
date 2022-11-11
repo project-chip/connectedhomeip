@@ -12789,6 +12789,80 @@ void MTRAccountLoginClusterGetSetupPINResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
+void MTRElectricalMeasurementClusterGetProfileInfoResponseCommandCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType & data)
+{
+    auto * response = [MTRElectricalMeasurementClusterGetProfileInfoResponseCommandParams new];
+    {
+        response.profileCount = [NSNumber numberWithUnsignedChar:data.profileCount];
+    }
+    {
+        response.profileIntervalPeriod = [NSNumber numberWithUnsignedChar:data.profileIntervalPeriod];
+    }
+    {
+        response.maxNumberOfIntervals = [NSNumber numberWithUnsignedChar:data.maxNumberOfIntervals];
+    }
+    {
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = data.listOfAttributes.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, err);
+                return;
+            }
+            response.listOfAttributes = array_0;
+        }
+    }
+    DispatchSuccess(context, response);
+};
+
+void MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType & data)
+{
+    auto * response = [MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams new];
+    {
+        response.startTime = [NSNumber numberWithUnsignedInt:data.startTime];
+    }
+    {
+        response.status = [NSNumber numberWithUnsignedChar:data.status];
+    }
+    {
+        response.profileIntervalPeriod = [NSNumber numberWithUnsignedChar:data.profileIntervalPeriod];
+    }
+    {
+        response.numberOfIntervalsDelivered = [NSNumber numberWithUnsignedChar:data.numberOfIntervalsDelivered];
+    }
+    {
+        response.attributeId = [NSNumber numberWithUnsignedShort:data.attributeId];
+    }
+    {
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = data.intervals.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, err);
+                return;
+            }
+            response.intervals = array_0;
+        }
+    }
+    DispatchSuccess(context, response);
+};
+
 void MTRTestClusterClusterTestSpecificResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType & data)
 {

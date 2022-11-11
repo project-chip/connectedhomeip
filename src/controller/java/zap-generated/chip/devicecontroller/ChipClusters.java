@@ -27245,12 +27245,12 @@ public class ChipClusters {
       readListInt8uAttribute(chipClusterPtr, callback);
     }
 
-    public void writeListInt8uAttribute(DefaultClusterCallback callback, ArrayList<Object> value) {
+    public void writeListInt8uAttribute(DefaultClusterCallback callback, ArrayList<Integer> value) {
       writeListInt8uAttribute(chipClusterPtr, callback, value, null);
     }
 
     public void writeListInt8uAttribute(
-        DefaultClusterCallback callback, ArrayList<Object> value, int timedWriteTimeoutMs) {
+        DefaultClusterCallback callback, ArrayList<Integer> value, int timedWriteTimeoutMs) {
       writeListInt8uAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
 
@@ -28593,7 +28593,7 @@ public class ChipClusters {
     private native void writeListInt8uAttribute(
         long chipClusterPtr,
         DefaultClusterCallback callback,
-        ArrayList<Object> value,
+        ArrayList<Integer> value,
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeListInt8uAttribute(

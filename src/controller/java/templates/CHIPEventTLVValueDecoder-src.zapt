@@ -37,7 +37,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
     
     switch (aPath.mClusterId)
     {
-        {{#chip_client_clusters}}
+        {{#all_user_clusters side='client'}}
         case app::Clusters::{{asUpperCamelCase name}}::Id: {
             using namespace app::Clusters::{{asUpperCamelCase name}};
             switch (aPath.mEventId)
@@ -82,7 +82,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
             break;
         }
-        {{/chip_client_clusters}}
+        {{/all_user_clusters}}
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;

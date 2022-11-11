@@ -23,7 +23,7 @@ using chip::Messaging::ExchangeManager;
 using chip::SessionHandle;
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
 @implementation MTRBaseCluster{{asUpperCamelCase name}}
 
 - (instancetype)initWithDevice:(MTRBaseDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
@@ -41,15 +41,16 @@ using chip::SessionHandle;
     return self;
 }
 
-{{#chip_cluster_commands}}
+{{#zcl_commands}}
+  {{#if (is_str_equal source 'client')}}
 {{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}{{else}}CommandSuccess{{/if}}{{/inline}}
-{{#unless (hasArguments)}}
+{{#unless commandArgCount}}
 - (void){{asLowerCamelCase name}}WithCompletion:({{>command_completion_type command=.}})completion
 {
   [self {{asLowerCamelCase name}}WithParams:nil completion:completion];
 }
 {{/unless}}
-- (void){{asLowerCamelCase name}}WithParams: (MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completion:({{>command_completion_type command=.}})completion
+- (void){{asLowerCamelCase name}}WithParams: (MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#if_command_has_required_argument id}}{{else}}_Nullable{{/if_command_has_required_argument}})params completion:({{>command_completion_type command=.}})completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -80,26 +81,29 @@ using chip::SessionHandle;
           timedInvokeTimeoutMs.SetValue(10000);
         }
         {{/if}}
-        {{#chip_cluster_command_arguments}}
+        {{#zcl_command_arguments}}
           {{#first}}
-            {{#unless (commandHasRequiredField parent)}}
+            {{#if_command_has_required_argument ../id}}
+            {{else}}
             if (params != nil) {
-            {{/unless}}
+            {{/if_command_has_required_argument}}
           {{/first}}
           {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(concat "params." (asStructPropertyName label)) cluster=parent.parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
           {{#last}}
-            {{#unless (commandHasRequiredField parent)}}
+            {{#if_command_has_required_argument ../id}}
+            {{else}}
             }
-           {{/unless}}
+           {{/if_command_has_required_argument}}
           {{/last}}
-        {{/chip_cluster_command_arguments}}
+        {{/zcl_command_arguments}}
 
         chip::Controller::{{asUpperCamelCase parent.name}}Cluster cppCluster(exchangeManager, session, self->_endpoint);
         return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
     });
     std::move(*bridge).DispatchAction(self.device);
 }
-{{/chip_cluster_commands}}
+  {{/if}}
+{{/zcl_commands}}
 
 {{#zcl_attributes_server}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
@@ -234,18 +238,20 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 
 @implementation MTRBaseCluster{{asUpperCamelCase name}} (Deprecated)
 
-{{#chip_cluster_commands}}
-- (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=.}})completionHandler
+{{#zcl_commands}}
+  {{#if (is_str_equal source 'client')}}
+- (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#if_command_has_required_argument id}}{{else}}_Nullable{{/if_command_has_required_argument}})params completionHandler:({{>command_completion_type command=.}})completionHandler
 {
   [self {{asLowerCamelCase name}}WithParams:params completion:completionHandler];
 }
-{{#unless (hasArguments)}}
+{{#unless commandArgCount}}
 - (void){{asLowerCamelCase name}}WithCompletionHandler:({{>command_completion_type command=.}})completionHandler
 {
   [self {{asLowerCamelCase name}}WithParams:nil completion:completionHandler];
 }
 {{/unless}}
-{{/chip_cluster_commands}}
+  {{/if}}
+{{/zcl_commands}}
 
 {{#zcl_attributes_server}}
 {{!Backwards compat for now: Treat DeviceTypeList as DeviceList.  Ideally we would have both, not just DeviceList. }}
@@ -301,5 +307,5 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 
 @end
 
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)

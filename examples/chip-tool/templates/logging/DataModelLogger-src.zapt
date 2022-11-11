@@ -46,7 +46,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const {{
 {{/zcl_events}}
 {{/zcl_clusters}}
 
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
 {{#zcl_commands_source_server}}
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & value)
 {
@@ -58,7 +58,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const {{
   return CHIP_NO_ERROR;
 }
 {{/zcl_commands_source_server}}
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 
 CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data)
 {
@@ -67,7 +67,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
 
     switch (path.mClusterId)
     {
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
 {{#zcl_attributes_server}}
 {{#first}}
         case {{asUpperCamelCase parent.name}}::Id:
@@ -87,7 +87,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
 {{/last}}
 {{/zcl_attributes_server}}
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
         default:
           break;
     }
@@ -102,7 +102,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
 
     switch (path.mClusterId)
     {
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
 {{#zcl_commands_source_server}}
 {{#first}}
         case {{asUpperCamelCase parent.name}}::Id:
@@ -122,7 +122,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         }
 {{/last}}
 {{/zcl_commands_source_server}}
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
         default:
           break;
     }
@@ -158,7 +158,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
 
     switch (header.mPath.mClusterId)
     {
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
 {{#chip_server_cluster_events}}
 {{#first}}
         case {{asUpperCamelCase parent.name}}::Id:
@@ -178,7 +178,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         }
 {{/last}}
 {{/chip_server_cluster_events}}
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
         default:
           break;
     }

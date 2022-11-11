@@ -7,11 +7,11 @@
 
 #include <controller-clusters/zap-generated/CHIPClusters.h>
 
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
 
 @interface MTRBaseCluster{{asUpperCamelCase name}} ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
-{{/chip_client_clusters}}
+{{/all_user_clusters}}

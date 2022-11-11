@@ -8043,7 +8043,7 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> groupsgetGroupMembershipCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo groupsgetGroupMembershipgroupListCommandParameterInfo =
-        new CommandParameterInfo("groupList", ArrayList.class, Object.class);
+        new CommandParameterInfo("groupList", ArrayList.class, Integer.class);
     groupsgetGroupMembershipCommandParams.put(
         "groupList", groupsgetGroupMembershipgroupListCommandParameterInfo);
 
@@ -9008,7 +9008,7 @@ public class ClusterInfoMapping {
         "softwareVersion", otaSoftwareUpdateProviderqueryImagesoftwareVersionCommandParameterInfo);
 
     CommandParameterInfo otaSoftwareUpdateProviderqueryImageprotocolsSupportedCommandParameterInfo =
-        new CommandParameterInfo("protocolsSupported", ArrayList.class, Object.class);
+        new CommandParameterInfo("protocolsSupported", ArrayList.class, Integer.class);
     otaSoftwareUpdateProviderqueryImageCommandParams.put(
         "protocolsSupported",
         otaSoftwareUpdateProviderqueryImageprotocolsSupportedCommandParameterInfo);
@@ -9914,7 +9914,7 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> groupKeyManagementkeySetReadAllIndicesCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo groupKeyManagementkeySetReadAllIndicesgroupKeySetIDsCommandParameterInfo =
-        new CommandParameterInfo("groupKeySetIDs", ArrayList.class, Object.class);
+        new CommandParameterInfo("groupKeySetIDs", ArrayList.class, Integer.class);
     groupKeyManagementkeySetReadAllIndicesCommandParams.put(
         "groupKeySetIDs", groupKeyManagementkeySetReadAllIndicesgroupKeySetIDsCommandParameterInfo);
 
@@ -12198,7 +12198,7 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> testClustertestListInt8UArgumentRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClustertestListInt8UArgumentRequestarg1CommandParameterInfo =
-        new CommandParameterInfo("arg1", ArrayList.class, Object.class);
+        new CommandParameterInfo("arg1", ArrayList.class, Integer.class);
     testClustertestListInt8UArgumentRequestCommandParams.put(
         "arg1", testClustertestListInt8UArgumentRequestarg1CommandParameterInfo);
 
@@ -12250,7 +12250,7 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> testClustertestListInt8UReverseRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClustertestListInt8UReverseRequestarg1CommandParameterInfo =
-        new CommandParameterInfo("arg1", ArrayList.class, Object.class);
+        new CommandParameterInfo("arg1", ArrayList.class, Integer.class);
     testClustertestListInt8UReverseRequestCommandParams.put(
         "arg1", testClustertestListInt8UReverseRequestarg1CommandParameterInfo);
 

@@ -7,10 +7,10 @@ typedef void (*CHIPDefaultSuccessCallbackType)(void *, const chip::app::DataMode
 typedef void (*CHIPDefaultWriteSuccessCallbackType)(void *);
 typedef void (*CHIPDefaultFailureCallbackType)(void *, CHIP_ERROR);
 
-{{#chip_client_clusters}}
-{{#chip_cluster_responses}}
+{{#all_user_clusters side='client'}}
+{{#all_incoming_commands_for_cluster name 'client'}}
 typedef void (*CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackType)(void *, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType &);
-{{/chip_cluster_responses}}
+{{/all_incoming_commands_for_cluster}}
 
 {{! TODO: global response types?}}
 
@@ -21,5 +21,5 @@ typedef void (*CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase nam
 typedef void (*CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallbackType)(void *, chip::app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo::DecodableArgType);
 {{/if}}
 {{/zcl_attributes_server}}
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 {{/if}}

@@ -10,12 +10,12 @@ class ChipClusters:
     SUCCESS_DELEGATE = ctypes.CFUNCTYPE(None)
     FAILURE_DELEGATE = ctypes.CFUNCTYPE(None, ctypes.c_uint8)
 
-{{#chip_client_clusters}}
+{{#all_user_clusters side='client'}}
     _{{asDelimitedMacro name}}_CLUSTER_INFO = {
             "clusterName": "{{asUpperCamelCase name}}",
             "clusterId": {{asHex code 8}},
             "commands": {
-{{#chip_cluster_commands}}
+{{#all_outgoing_commands_for_cluster name 'client'}}
             {{asHex code 8}}: {
                     "commandId": {{asHex code 8}},
                     "commandName": "{{asUpperCamelCase name}}",
@@ -25,14 +25,14 @@ class ChipClusters:
 {{/chip_cluster_command_arguments_with_structs_expanded}}
                     },
                 },
-{{/chip_cluster_commands}}
+{{/all_outgoing_commands_for_cluster}}
             },
             "attributes": {
 {{#zcl_attributes_server}}
                 {{asHex code 8}}: {
                     "attributeName": "{{asUpperCamelCase name}}",
                     "attributeId": {{asHex code 8}},
-                    "type": "{{get_underlying_language_specific_zcl_type type language="python" boolean="bool"}}",
+                    "type": "{{as_underlying_language_specific_zcl_type type language="python" boolean="bool"}}",
                     {{#if isReportableAttribute}}
                     "reportable": True,
                     {{/if}}
@@ -43,18 +43,18 @@ class ChipClusters:
 {{/zcl_attributes_server}}
             },
     }
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 
     _CLUSTER_ID_DICT = {
-{{#chip_client_clusters}}
+{{#all_user_clusters side='client'}}
     {{asHex code 8}}: _{{asDelimitedMacro name}}_CLUSTER_INFO,
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
     }
 
     _CLUSTER_NAME_DICT = {
-{{#chip_client_clusters}}
+{{#all_user_clusters side='client'}}
         "{{asUpperCamelCase name}}": _{{asDelimitedMacro name}}_CLUSTER_INFO,
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
     }
 
     def __init__(self, chipstack):

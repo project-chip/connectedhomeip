@@ -348,11 +348,11 @@ public class ChipEventStructs {
   }
 
   public static class GeneralDiagnosticsClusterHardwareFaultChangeEvent {
-    public ArrayList<Object> current;
-    public ArrayList<Object> previous;
+    public ArrayList<Integer> current;
+    public ArrayList<Integer> previous;
 
     public GeneralDiagnosticsClusterHardwareFaultChangeEvent(
-        ArrayList<Object> current, ArrayList<Object> previous) {
+        ArrayList<Integer> current, ArrayList<Integer> previous) {
       this.current = current;
       this.previous = previous;
     }
@@ -373,11 +373,11 @@ public class ChipEventStructs {
   }
 
   public static class GeneralDiagnosticsClusterRadioFaultChangeEvent {
-    public ArrayList<Object> current;
-    public ArrayList<Object> previous;
+    public ArrayList<Integer> current;
+    public ArrayList<Integer> previous;
 
     public GeneralDiagnosticsClusterRadioFaultChangeEvent(
-        ArrayList<Object> current, ArrayList<Object> previous) {
+        ArrayList<Integer> current, ArrayList<Integer> previous) {
       this.current = current;
       this.previous = previous;
     }
@@ -398,11 +398,11 @@ public class ChipEventStructs {
   }
 
   public static class GeneralDiagnosticsClusterNetworkFaultChangeEvent {
-    public ArrayList<Object> current;
-    public ArrayList<Object> previous;
+    public ArrayList<Integer> current;
+    public ArrayList<Integer> previous;
 
     public GeneralDiagnosticsClusterNetworkFaultChangeEvent(
-        ArrayList<Object> current, ArrayList<Object> previous) {
+        ArrayList<Integer> current, ArrayList<Integer> previous) {
       this.current = current;
       this.previous = previous;
     }
@@ -491,11 +491,11 @@ public class ChipEventStructs {
   }
 
   public static class ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent {
-    public ArrayList<Object> current;
-    public ArrayList<Object> previous;
+    public ArrayList<Integer> current;
+    public ArrayList<Integer> previous;
 
     public ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent(
-        ArrayList<Object> current, ArrayList<Object> previous) {
+        ArrayList<Integer> current, ArrayList<Integer> previous) {
       this.current = current;
       this.previous = previous;
     }
@@ -1233,7 +1233,7 @@ public class ChipEventStructs {
     public Boolean arg3;
     public ChipStructs.TestClusterClusterSimpleStruct arg4;
     public ArrayList<ChipStructs.TestClusterClusterSimpleStruct> arg5;
-    public ArrayList<Object> arg6;
+    public ArrayList<Integer> arg6;
 
     public TestClusterClusterTestEventEvent(
         Integer arg1,
@@ -1241,7 +1241,7 @@ public class ChipEventStructs {
         Boolean arg3,
         ChipStructs.TestClusterClusterSimpleStruct arg4,
         ArrayList<ChipStructs.TestClusterClusterSimpleStruct> arg5,
-        ArrayList<Object> arg6) {
+        ArrayList<Integer> arg6) {
       this.arg1 = arg1;
       this.arg2 = arg2;
       this.arg3 = arg3;

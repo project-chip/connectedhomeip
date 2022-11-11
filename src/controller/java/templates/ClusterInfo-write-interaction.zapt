@@ -13,7 +13,7 @@ import java.util.Map;
 public class ClusterWriteMapping {
   public Map<String, Map<String, InteractionInfo>> getWriteAttributeMap() {
     Map<String, Map<String, InteractionInfo>> writeAttributeMap = new HashMap<>();
-    {{#chip_client_clusters}}
+    {{#all_user_clusters side='client'}}
       Map<String, InteractionInfo> write{{asUpperCamelCase name}}InteractionInfo = new LinkedHashMap<>();
         {{#zcl_attributes_server}}
         {{! TODO: Add support for struct-typed attributes }}
@@ -42,7 +42,7 @@ public class ClusterWriteMapping {
         {{/if_unsupported_attribute_type}}
         {{/zcl_attributes_server}}
         writeAttributeMap.put("{{asLowerCamelCase name}}", write{{asUpperCamelCase name}}InteractionInfo);
-    {{/chip_client_clusters}}
+    {{/all_user_clusters}}
     return writeAttributeMap;
   }
 }

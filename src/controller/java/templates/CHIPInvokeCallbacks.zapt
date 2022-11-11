@@ -8,8 +8,8 @@
 
 namespace chip {
 
-{{#chip_client_clusters}}
-{{#chip_cluster_responses}}
+{{#all_user_clusters side='client'}}
+{{#all_incoming_commands_for_cluster name 'client'}}
 class CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback : public Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackType>
 {
 public:
@@ -23,7 +23,7 @@ private:
     jobject javaCallbackRef;
 };
 
-{{/chip_cluster_responses}}
-{{/chip_client_clusters}}
+{{/all_incoming_commands_for_cluster}}
+{{/all_user_clusters}}
 } // namespace chip
 {{/if}}

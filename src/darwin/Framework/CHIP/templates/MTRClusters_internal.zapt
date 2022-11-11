@@ -8,11 +8,11 @@
 
 #include <controller-clusters/zap-generated/CHIPClusters.h>
 
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
 
 @interface MTRCluster{{asUpperCamelCase name}} ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice *device;
 @end
 
-{{/chip_client_clusters}}
+{{/all_user_clusters}}

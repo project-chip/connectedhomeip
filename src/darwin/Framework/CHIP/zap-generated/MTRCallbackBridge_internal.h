@@ -113,6 +113,10 @@ typedef void (*ApplicationLauncherClusterLauncherResponseCallbackType)(
     void *, const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType &);
 typedef void (*AccountLoginClusterGetSetupPINResponseCallbackType)(
     void *, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &);
+typedef void (*ElectricalMeasurementClusterGetProfileInfoResponseCommandCallbackType)(
+    void *, const chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType &);
+typedef void (*ElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallbackType)(
+    void *, const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType &);
 typedef void (*TestClusterClusterTestSpecificResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType &);
 typedef void (*TestClusterClusterTestAddArgumentsResponseCallbackType)(
@@ -11300,6 +11304,47 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data);
+};
+
+class MTRElectricalMeasurementClusterGetProfileInfoResponseCommandCallbackBridge
+    : public MTRCallbackBridge<ElectricalMeasurementClusterGetProfileInfoResponseCommandCallbackType>
+{
+public:
+    MTRElectricalMeasurementClusterGetProfileInfoResponseCommandCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               bool keepAlive = false) :
+        MTRCallbackBridge<ElectricalMeasurementClusterGetProfileInfoResponseCommandCallbackType>(queue, handler, OnSuccessFn,
+                                                                                                 keepAlive){};
+
+    MTRElectricalMeasurementClusterGetProfileInfoResponseCommandCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<ElectricalMeasurementClusterGetProfileInfoResponseCommandCallbackType>(queue, handler, action,
+                                                                                                 OnSuccessFn, keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType & data);
+};
+
+class MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallbackBridge
+    : public MTRCallbackBridge<ElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallbackType>
+{
+public:
+    MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler,
+                                                                                      bool keepAlive = false) :
+        MTRCallbackBridge<ElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallbackType>(queue, handler, OnSuccessFn,
+                                                                                                        keepAlive){};
+
+    MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler,
+                                                                                      MTRActionBlock action,
+                                                                                      bool keepAlive = false) :
+        MTRCallbackBridge<ElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallbackType>(queue, handler, action,
+                                                                                                        OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType & data);
 };
 
 class MTRTestClusterClusterTestSpecificResponseCallbackBridge

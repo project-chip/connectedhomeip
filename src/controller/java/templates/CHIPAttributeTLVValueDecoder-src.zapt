@@ -37,7 +37,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
     
     switch (aPath.mClusterId)
     {
-        {{#chip_client_clusters}}
+        {{#all_user_clusters side='client'}}
         case app::Clusters::{{asUpperCamelCase name}}::Id: {
             using namespace app::Clusters::{{asUpperCamelCase name}};
             switch (aPath.mAttributeId)
@@ -61,7 +61,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             break;
         }
-        {{/chip_client_clusters}}
+        {{/all_user_clusters}}
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
             break;

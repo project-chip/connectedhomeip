@@ -13,7 +13,7 @@ public class ClusterReadMapping {
 
   public Map<String, Map<String, InteractionInfo>> getReadAttributeMap() {
     Map<String, Map<String, InteractionInfo>> readAttributeMap = new HashMap<>();
-    {{#chip_client_clusters}}
+    {{#all_user_clusters side='client'}}
        Map<String, InteractionInfo> read{{asUpperCamelCase name}}InteractionInfo = new LinkedHashMap<>();
         {{#zcl_attributes_server}}
         {{! TODO: Add support for struct-typed attributes }}
@@ -26,14 +26,14 @@ public class ClusterReadMapping {
               ({{#if_attribute_complex type}}
                 ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}AttributeCallback
               {{else}}
-                ChipClusters.{{get_underlying_language_specific_zcl_type type language="java" boolean="Boolean"}}AttributeCallback
+                ChipClusters.{{as_underlying_language_specific_zcl_type type language="java" boolean="Boolean"}}AttributeCallback
               {{/if_attribute_complex}}) callback
             );
           },
           {{#if isArray}}
             () -> new ClusterInfoMapping.Delegated{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback(),
           {{else}}
-            () -> new ClusterInfoMapping.Delegated{{get_underlying_language_specific_zcl_type type language="java" boolean="Boolean"}}AttributeCallback(),
+            () -> new ClusterInfoMapping.Delegated{{as_underlying_language_specific_zcl_type type language="java" boolean="Boolean"}}AttributeCallback(),
           {{/if}}
           read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams
         );
@@ -41,7 +41,7 @@ public class ClusterReadMapping {
         {{/if_unsupported_attribute_type}}
         {{/zcl_attributes_server}}
         readAttributeMap.put("{{asLowerCamelCase name}}", read{{asUpperCamelCase name}}InteractionInfo);
-        {{/chip_client_clusters}}
+        {{/all_user_clusters}}
         return readAttributeMap;
   }
 }

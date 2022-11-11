@@ -14,12 +14,12 @@
 #include <lib/support/Span.h>
 
 // List specific responses
-{{#chip_client_clusters}}
+{{#all_user_clusters side='client'}}
 {{#all_user_cluster_attributes_irrespective_of_manufatucuring_specification name 'server'}}
 {{#if isArray}}
 typedef void (*{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback)(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} data);
 {{/if}}
 {{/all_user_cluster_attributes_irrespective_of_manufatucuring_specification}}
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 
 {{/if}}

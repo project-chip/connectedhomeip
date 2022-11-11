@@ -14,11 +14,13 @@ typedef void (*DefaultSuccessCallbackType)(void *);
 typedef void (*VendorIdAttributeCallback)(void *, chip::VendorId);
 typedef void (*NullableVendorIdAttributeCallback)(void *, const chip::app::DataModel::Nullable<chip::VendorId> &);
 
-{{#chip_client_clusters includeAll=true}}
-{{#chip_cluster_responses}}
+{{#all_user_clusters side='client'}}
+{{#zcl_commands}}
+{{#if (is_str_equal source 'server')}}
 typedef void (*{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackType)(void *, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType &);
-{{/chip_cluster_responses}}
-{{/chip_client_clusters}}
+{{/if}}
+{{/zcl_commands}}
+{{/all_user_clusters}}
 
 {{#zcl_clusters}}
 {{#zcl_enums}}
@@ -27,7 +29,7 @@ typedef void (*Nullable{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase
 {{/zcl_enums}}
 {{/zcl_clusters}}
 
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
 {{#zcl_attributes_server hasIsOptional=false}}
 {{#if isArray}}
 typedef void (*{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback)(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} data);
@@ -40,7 +42,7 @@ typedef void (*{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Attribut
 {{/if_is_strongly_typed_bitmap}}
 {{/if}}
 {{/zcl_attributes_server}}
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 
 {{#>MTRCallbackBridge header="1" partial-type="Status"                         }}DefaultSuccessCallback{{/MTRCallbackBridge}}
 {{#>MTRCallbackBridge header="1" partial-type="CommandStatus"                  }}CommandSuccessCallback{{/MTRCallbackBridge}}
@@ -73,7 +75,7 @@ typedef void (*{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Attribut
 {{#>MTRCallbackBridge header="1" type="vendor_id"    isNullable=false ns="chip"}}VendorIdAttributeCallback{{/MTRCallbackBridge}}
 {{#>MTRCallbackBridge header="1" type="vendor_id"    isNullable=true  ns="chip"}}NullableVendorIdAttributeCallback{{/MTRCallbackBridge}}
 
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
 {{#zcl_attributes_server}}
 {{#if isArray}}
 {{#>MTRCallbackBridge header="1" ns=parent.name                                }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}ListAttributeCallback{{/MTRCallbackBridge}}
@@ -86,13 +88,15 @@ typedef void (*{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Attribut
   {{/if_is_strongly_typed_bitmap}}
 {{/if}}
 {{/zcl_attributes_server}}
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 
-{{#chip_client_clusters includeAll=true}}
-{{#chip_cluster_responses}}
+{{#all_user_clusters side='client'}}
+{{#zcl_commands}}
+{{#if (is_str_equal source 'server')}}
 {{#>MTRCallbackBridge header="1" partial-type="Command"                        }}{{asUpperCamelCase ../../name}}Cluster{{asUpperCamelCase ../name}}Callback{{/MTRCallbackBridge}}
-{{/chip_cluster_responses}}
-{{/chip_client_clusters}}
+{{/if}}
+{{/zcl_commands}}
+{{/all_user_clusters}}
 
 {{#zcl_clusters}}
 {{#zcl_enums}}

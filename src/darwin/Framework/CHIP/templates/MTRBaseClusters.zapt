@@ -9,7 +9,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
 
 
 /**
@@ -22,12 +22,14 @@ NS_ASSUME_NONNULL_BEGIN
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
-{{#chip_cluster_commands}}
-- (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completion:({{>command_completion_type command=.}})completion MTR_NEWLY_AVAILABLE;
-{{#unless (hasArguments)}}
+{{#zcl_commands}}
+  {{#if (is_str_equal source 'client')}}
+- (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#if_command_has_required_argument id}}{{else}}_Nullable{{/if_command_has_required_argument}})params completion:({{>command_completion_type command=.}})completion MTR_NEWLY_AVAILABLE;
+{{#unless commandArgCount}}
 - (void){{asLowerCamelCase name}}WithCompletion:({{>command_completion_type command=.}})completion MTR_NEWLY_AVAILABLE;
 {{/unless}}
-{{/chip_cluster_commands}}
+  {{/if}}
+{{/zcl_commands}}
 
 {{#zcl_attributes_server}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
@@ -58,7 +60,7 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 
 @end
 
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 
 {{#zcl_clusters}}
 {{#zcl_enums}}
@@ -91,21 +93,23 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 {{/zcl_bitmaps}}
 {{/zcl_clusters}}
 
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
 @interface MTRBaseCluster{{asUpperCamelCase name}} (Deprecated)
 
 - (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
                                endpoint:(uint16_t)endpoint
                                   queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
-{{#chip_cluster_commands}}
-- (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=.}})completionHandler
+{{#zcl_commands}}
+  {{#if (is_str_equal source 'client')}}
+- (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#if_command_has_required_argument id}}{{else}}_Nullable{{/if_command_has_required_argument}})params completionHandler:({{>command_completion_type command=.}})completionHandler
   MTR_NEWLY_DEPRECATED("Please use {{asLowerCamelCase name}}WithParams:completion:");
-{{#unless (hasArguments)}}
+{{#unless commandArgCount}}
 - (void){{asLowerCamelCase name}}WithCompletionHandler:({{>command_completion_type command=.}})completionHandler
   MTR_NEWLY_DEPRECATED("Please use {{asLowerCamelCase name}}WithCompletion:");
 {{/unless}}
-{{/chip_cluster_commands}}
+  {{/if}}
+{{/zcl_commands}}
 
 {{#zcl_attributes_server}}
 {{!Backwards compat for now: Treat DeviceTypeList as DeviceList.  Ideally we would have both, not just DeviceList. }}
@@ -138,6 +142,6 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 
 @end
 
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 
 NS_ASSUME_NONNULL_END

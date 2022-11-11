@@ -26,10 +26,10 @@ import javax.annotation.Nullable;
 public class ChipStructs {
   public static class ScenesClusterAttributeValuePair {
     public Optional<Long> attributeId;
-    public ArrayList<Object> attributeValue;
+    public ArrayList<Integer> attributeValue;
 
     public ScenesClusterAttributeValuePair(
-        Optional<Long> attributeId, ArrayList<Object> attributeValue) {
+        Optional<Long> attributeId, ArrayList<Integer> attributeValue) {
       this.attributeId = attributeId;
       this.attributeValue = attributeValue;
     }
@@ -175,14 +175,14 @@ public class ChipStructs {
   public static class AccessControlClusterAccessControlEntry {
     public Integer privilege;
     public Integer authMode;
-    public @Nullable ArrayList<Object> subjects;
+    public @Nullable ArrayList<Long> subjects;
     public @Nullable ArrayList<ChipStructs.AccessControlClusterTarget> targets;
     public Integer fabricIndex;
 
     public AccessControlClusterAccessControlEntry(
         Integer privilege,
         Integer authMode,
-        @Nullable ArrayList<Object> subjects,
+        @Nullable ArrayList<Long> subjects,
         @Nullable ArrayList<ChipStructs.AccessControlClusterTarget> targets,
         Integer fabricIndex) {
       this.privilege = privilege;
@@ -294,10 +294,10 @@ public class ChipStructs {
     public Integer endpointListID;
     public String name;
     public Integer type;
-    public ArrayList<Object> endpoints;
+    public ArrayList<Integer> endpoints;
 
     public ActionsClusterEndpointListStruct(
-        Integer endpointListID, String name, Integer type, ArrayList<Object> endpoints) {
+        Integer endpointListID, String name, Integer type, ArrayList<Integer> endpoints) {
       this.endpointListID = endpointListID;
       this.name = name;
       this.type = type;
@@ -381,11 +381,11 @@ public class ChipStructs {
   }
 
   public static class PowerSourceClusterBatChargeFaultChangeType {
-    public ArrayList<Object> current;
-    public ArrayList<Object> previous;
+    public ArrayList<Integer> current;
+    public ArrayList<Integer> previous;
 
     public PowerSourceClusterBatChargeFaultChangeType(
-        ArrayList<Object> current, ArrayList<Object> previous) {
+        ArrayList<Integer> current, ArrayList<Integer> previous) {
       this.current = current;
       this.previous = previous;
     }
@@ -406,11 +406,11 @@ public class ChipStructs {
   }
 
   public static class PowerSourceClusterBatFaultChangeType {
-    public ArrayList<Object> current;
-    public ArrayList<Object> previous;
+    public ArrayList<Integer> current;
+    public ArrayList<Integer> previous;
 
     public PowerSourceClusterBatFaultChangeType(
-        ArrayList<Object> current, ArrayList<Object> previous) {
+        ArrayList<Integer> current, ArrayList<Integer> previous) {
       this.current = current;
       this.previous = previous;
     }
@@ -431,11 +431,11 @@ public class ChipStructs {
   }
 
   public static class PowerSourceClusterWiredFaultChangeType {
-    public ArrayList<Object> current;
-    public ArrayList<Object> previous;
+    public ArrayList<Integer> current;
+    public ArrayList<Integer> previous;
 
     public PowerSourceClusterWiredFaultChangeType(
-        ArrayList<Object> current, ArrayList<Object> previous) {
+        ArrayList<Integer> current, ArrayList<Integer> previous) {
       this.current = current;
       this.previous = previous;
     }
@@ -1086,13 +1086,13 @@ public class ChipStructs {
 
   public static class GroupKeyManagementClusterGroupInfoMapStruct {
     public Integer groupId;
-    public ArrayList<Object> endpoints;
+    public ArrayList<Integer> endpoints;
     public Optional<String> groupName;
     public Integer fabricIndex;
 
     public GroupKeyManagementClusterGroupInfoMapStruct(
         Integer groupId,
-        ArrayList<Object> endpoints,
+        ArrayList<Integer> endpoints,
         Optional<String> groupName,
         Integer fabricIndex) {
       this.groupId = groupId;
@@ -1889,7 +1889,7 @@ public class ChipStructs {
     public @Nullable Optional<Integer> nullableOptionalFabricSensitiveInt8u;
     public String fabricSensitiveCharString;
     public ChipStructs.TestClusterClusterSimpleStruct fabricSensitiveStruct;
-    public ArrayList<Object> fabricSensitiveInt8uList;
+    public ArrayList<Integer> fabricSensitiveInt8uList;
     public Integer fabricIndex;
 
     public TestClusterClusterTestFabricScoped(
@@ -1899,7 +1899,7 @@ public class ChipStructs {
         @Nullable Optional<Integer> nullableOptionalFabricSensitiveInt8u,
         String fabricSensitiveCharString,
         ChipStructs.TestClusterClusterSimpleStruct fabricSensitiveStruct,
-        ArrayList<Object> fabricSensitiveInt8uList,
+        ArrayList<Integer> fabricSensitiveInt8uList,
         Integer fabricIndex) {
       this.fabricSensitiveInt8u = fabricSensitiveInt8u;
       this.optionalFabricSensitiveInt8u = optionalFabricSensitiveInt8u;
@@ -1954,9 +1954,9 @@ public class ChipStructs {
     public @Nullable ChipStructs.TestClusterClusterSimpleStruct nullableStruct;
     public Optional<ChipStructs.TestClusterClusterSimpleStruct> optionalStruct;
     public @Nullable Optional<ChipStructs.TestClusterClusterSimpleStruct> nullableOptionalStruct;
-    public @Nullable ArrayList<Object> nullableList;
-    public Optional<ArrayList<Object>> optionalList;
-    public @Nullable Optional<ArrayList<Object>> nullableOptionalList;
+    public @Nullable ArrayList<Integer> nullableList;
+    public Optional<ArrayList<Integer>> optionalList;
+    public @Nullable Optional<ArrayList<Integer>> nullableOptionalList;
 
     public TestClusterClusterNullablesAndOptionalsStruct(
         @Nullable Integer nullableInt,
@@ -1968,9 +1968,9 @@ public class ChipStructs {
         @Nullable ChipStructs.TestClusterClusterSimpleStruct nullableStruct,
         Optional<ChipStructs.TestClusterClusterSimpleStruct> optionalStruct,
         @Nullable Optional<ChipStructs.TestClusterClusterSimpleStruct> nullableOptionalStruct,
-        @Nullable ArrayList<Object> nullableList,
-        Optional<ArrayList<Object>> optionalList,
-        @Nullable Optional<ArrayList<Object>> nullableOptionalList) {
+        @Nullable ArrayList<Integer> nullableList,
+        Optional<ArrayList<Integer>> optionalList,
+        @Nullable Optional<ArrayList<Integer>> nullableOptionalList) {
       this.nullableInt = nullableInt;
       this.optionalInt = optionalInt;
       this.nullableOptionalInt = nullableOptionalInt;
@@ -2065,18 +2065,18 @@ public class ChipStructs {
     public Boolean b;
     public ChipStructs.TestClusterClusterSimpleStruct c;
     public ArrayList<ChipStructs.TestClusterClusterSimpleStruct> d;
-    public ArrayList<Object> e;
+    public ArrayList<Long> e;
     public ArrayList<byte[]> f;
-    public ArrayList<Object> g;
+    public ArrayList<Integer> g;
 
     public TestClusterClusterNestedStructList(
         Integer a,
         Boolean b,
         ChipStructs.TestClusterClusterSimpleStruct c,
         ArrayList<ChipStructs.TestClusterClusterSimpleStruct> d,
-        ArrayList<Object> e,
+        ArrayList<Long> e,
         ArrayList<byte[]> f,
-        ArrayList<Object> g) {
+        ArrayList<Integer> g) {
       this.a = a;
       this.b = b;
       this.c = c;

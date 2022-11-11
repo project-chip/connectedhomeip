@@ -102,7 +102,7 @@ public class ChipClusters {
     }
   }
 
-  {{#chip_client_clusters}}
+  {{#all_user_clusters side='client'}}
   public static class {{asUpperCamelCase name}}Cluster extends BaseChipCluster {
     public static final long CLUSTER_ID = {{code}}L;
 
@@ -112,34 +112,34 @@ public class ChipClusters {
 
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
-  {{#chip_cluster_commands}}
+  {{#all_outgoing_commands_for_cluster name 'client'}}
 
     {{#unless mustUseTimedInvoke}}
     public void {{asLowerCamelCase name}}({{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} callback
-      {{#chip_cluster_command_arguments}}, {{asJavaType type chipType parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}) {
-      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#chip_cluster_command_arguments}}, {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}, null);
+      {{#zcl_command_arguments}}, {{asJavaType type null parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/zcl_command_arguments}}) {
+      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#zcl_command_arguments}}, {{asLowerCamelCase label}}{{/zcl_command_arguments}}, null);
     }
     {{/unless}}
 
     public void {{asLowerCamelCase name}}({{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} callback
-      {{#chip_cluster_command_arguments}}, {{asJavaType type chipType parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}
+      {{#zcl_command_arguments}}, {{asJavaType type null parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/zcl_command_arguments}}
       , int timedInvokeTimeoutMs) {
-      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#chip_cluster_command_arguments}}, {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}, timedInvokeTimeoutMs);
+      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#zcl_command_arguments}}, {{asLowerCamelCase label}}{{/zcl_command_arguments}}, timedInvokeTimeoutMs);
     }
-  {{/chip_cluster_commands}}
-  {{#chip_cluster_commands}}
+  {{/all_outgoing_commands_for_cluster}}
+  {{#all_outgoing_commands_for_cluster name 'client'}}
     private native void {{asLowerCamelCase name}}(long chipClusterPtr, {{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} Callback
-      {{#chip_cluster_command_arguments}}, {{asJavaType type chipType parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}
+      {{#zcl_command_arguments}}, {{asJavaType type null parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/zcl_command_arguments}}
       , @Nullable Integer timedInvokeTimeoutMs);
-  {{/chip_cluster_commands}}
-  {{#chip_cluster_responses}}
+  {{/all_outgoing_commands_for_cluster}}
+  {{#all_incoming_commands_for_cluster name 'client'}}
     public interface {{asUpperCamelCase name}}Callback {
-      void onSuccess({{#chip_cluster_response_arguments}}{{#not_first}}, {{/not_first}}{{asJavaType type chipType parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/chip_cluster_response_arguments}});
+      void onSuccess({{#zcl_command_arguments}}{{#not_first}}, {{/not_first}}{{asJavaType type null parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/zcl_command_arguments}});
       
       void onError(Exception error);
     }
 
-  {{/chip_cluster_responses}}
+  {{/all_incoming_commands_for_cluster}}
 
   {{#zcl_attributes_server}}
   {{#if_unsupported_attribute_type type isArray}}
@@ -173,19 +173,19 @@ public class ChipClusters {
     {{#if_attribute_complex type}}
       {{asUpperCamelCase name}}AttributeCallback callback
     {{else}}
-      {{get_underlying_language_specific_zcl_type type language="java" boolean="Boolean"}}AttributeCallback callback
+      {{as_underlying_language_specific_zcl_type type language="java" boolean="Boolean"}}AttributeCallback callback
     {{/if_attribute_complex}}
     ) {
       read{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback);
     }
   {{#if isWritableAttribute}}
     {{#unless mustUseTimedWrite}}
-    public void write{{asUpperCamelCase name}}Attribute(DefaultClusterCallback callback, {{asJavaType type chipType parent.name}} value) {
+    public void write{{asUpperCamelCase name}}Attribute(DefaultClusterCallback callback, {{asJavaType type null parent.name}} value) {
       write{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback, value, null);
     }
     {{/unless}}
 
-    public void write{{asUpperCamelCase name}}Attribute(DefaultClusterCallback callback, {{asJavaType type chipType parent.name}} value, int timedWriteTimeoutMs) {
+    public void write{{asUpperCamelCase name}}Attribute(DefaultClusterCallback callback, {{asJavaType type null parent.name}} value, int timedWriteTimeoutMs) {
       write{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
   {{/if}}
@@ -194,7 +194,7 @@ public class ChipClusters {
       {{#if_attribute_complex type}}
         {{asUpperCamelCase name}}AttributeCallback callback
       {{else}}
-        {{get_underlying_language_specific_zcl_type type language="java" boolean="Boolean"}}AttributeCallback callback
+        {{as_underlying_language_specific_zcl_type type language="java" boolean="Boolean"}}AttributeCallback callback
       {{/if_attribute_complex}},
       int minInterval, int maxInterval) {
       subscribe{{asCamelCased name false}}Attribute(chipClusterPtr, callback, minInterval, maxInterval);
@@ -211,19 +211,19 @@ public class ChipClusters {
       {{#if_attribute_complex type}}
         {{asUpperCamelCase name}}AttributeCallback callback
       {{else}}
-        {{get_underlying_language_specific_zcl_type type language="java" boolean="Boolean"}}AttributeCallback callback
+        {{as_underlying_language_specific_zcl_type type language="java" boolean="Boolean"}}AttributeCallback callback
       {{/if_attribute_complex}}
     );
   {{#if isWritableAttribute}}
 
-    private native void write{{asUpperCamelCase name}}Attribute(long chipClusterPtr, DefaultClusterCallback callback, {{asJavaType type chipType parent.name}} value, @Nullable Integer timedWriteTimeoutMs);
+    private native void write{{asUpperCamelCase name}}Attribute(long chipClusterPtr, DefaultClusterCallback callback, {{asJavaType type null parent.name}} value, @Nullable Integer timedWriteTimeoutMs);
   {{/if}}
   {{#if isReportableAttribute}}
     private native void subscribe{{asCamelCased name false}}Attribute(long chipClusterPtr,
       {{#if_attribute_complex type}}
         {{asUpperCamelCase name}}AttributeCallback callback
       {{else}}
-        {{get_underlying_language_specific_zcl_type type language="java" boolean="Boolean"}}AttributeCallback callback
+        {{as_underlying_language_specific_zcl_type type language="java" boolean="Boolean"}}AttributeCallback callback
       {{/if_attribute_complex}}, int minInterval, int maxInterval);
   {{/if}}
   {{/if_unsupported_attribute_type}}
@@ -232,6 +232,6 @@ public class ChipClusters {
   {{#not_last}}
 
   {{/not_last}}
-  {{/chip_client_clusters}}
+  {{/all_user_clusters}}
 }
 {{/if}}
