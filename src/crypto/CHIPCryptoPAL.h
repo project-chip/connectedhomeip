@@ -1351,7 +1351,7 @@ public:
      *
      * @return CHIP_ERROR     The result of Spake2+ verifier generation
      */
-    CHIP_ERROR Generate(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin);
+    CHIP_ERROR Generate(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t setupPin);
 
     /**
      * @brief Compute the initiator values (w0, w1) used for PAKE input.
@@ -1364,8 +1364,7 @@ public:
      *
      * @return CHIP_ERROR     The result from running PBKDF2
      */
-    static CHIP_ERROR ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin, uint8_t * ws,
-                                uint32_t ws_len);
+    static CHIP_ERROR ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t setupPin, uint8_t * ws, uint32_t ws_len);
 };
 
 /**
