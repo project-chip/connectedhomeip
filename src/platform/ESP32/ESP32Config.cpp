@@ -77,6 +77,7 @@ const ESP32Config::Key ESP32Config::kConfigKey_ProductURL            = { kConfig
 const ESP32Config::Key ESP32Config::kConfigKey_SupportedCalTypes     = { kConfigNamespace_ChipFactory, "cal-types" };
 const ESP32Config::Key ESP32Config::kConfigKey_SupportedLocaleSize   = { kConfigNamespace_ChipFactory, "locale-sz" };
 const ESP32Config::Key ESP32Config::kConfigKey_RotatingDevIdUniqueId = { kConfigNamespace_ChipFactory, "rd-id-uid" };
+const ESP32Config::Key ESP32Config::kConfigKey_LocationCapability    = { kConfigNamespace_ChipFactory, "loc-capability" };
 
 // Keys stored in the chip-config namespace
 const ESP32Config::Key ESP32Config::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };
@@ -86,7 +87,6 @@ const ESP32Config::Key ESP32Config::kConfigKey_LastUsedEpochKeyId = { kConfigNam
 const ESP32Config::Key ESP32Config::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
 const ESP32Config::Key ESP32Config::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const ESP32Config::Key ESP32Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "reg-location" };
-const ESP32Config::Key ESP32Config::kConfigKey_LocationCapability = { kConfigNamespace_ChipConfig, "loc-capability"};
 const ESP32Config::Key ESP32Config::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
 const ESP32Config::Key ESP32Config::kConfigKey_UniqueId           = { kConfigNamespace_ChipConfig, "unique-id" };
 
