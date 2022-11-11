@@ -19,7 +19,9 @@
 #import "MTRCluster_internal.h"
 #import "zap-generated/MTRCallbackBridge_internal.h"
 
+#include <app/CommandSender.h>
 #include <app/ReadClient.h>
+#include <app/data-model/NullObject.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPMem.h>
@@ -259,5 +261,146 @@ void MTRReadAttribute(MTRReadParams * _Nonnull params,
         });
     std::move(*callbackBridge).DispatchAction(device);
 }
+
+/**
+ * Utility functions base clusters use for doing commands.
+ */
+template <typename InvokeBridgeType, typename ResponseType> class MTRInvokeCallback : public chip::app::CommandSender::Callback {
+public:
+    MTRInvokeCallback(InvokeBridgeType * _Nonnull bridge, typename InvokeBridgeType::SuccessCallbackType _Nonnull onResponse,
+        MTRErrorCallback _Nonnull onError)
+        : mBridge(bridge)
+        , mOnResponse(onResponse)
+        , mOnError(onError)
+    {
+    }
+
+    ~MTRInvokeCallback() {}
+
+    void AdoptCommandSender(chip::Platform::UniquePtr<chip::app::CommandSender> commandSender)
+    {
+        mCommandSender = std::move(commandSender);
+    }
+
+protected:
+    // We need to have different OnResponse implementations depending on whether
+    // ResponseType is DataModel::NullObjectType or not.  Since template class methods
+    // can't be partially specialized (either you have to partially specialize
+    // the class template, or you have to fully specialize the method), use
+    // enable_if to deal with this.
+    void OnResponse(chip::app::CommandSender * commandSender, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::StatusIB & status, chip::TLV::TLVReader * reader) override
+    {
+        HandleResponse(commandSender, commandPath, status, reader);
+    }
+
+    /**
+     * Response handler for data responses.
+     */
+    template <typename T = ResponseType, std::enable_if_t<!std::is_same<T, chip::app::DataModel::NullObjectType>::value, int> = 0>
+    void HandleResponse(chip::app::CommandSender * commandSender, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::StatusIB & status, chip::TLV::TLVReader * reader)
+    {
+        if (mCalledCallback) {
+            return;
+        }
+        mCalledCallback = true;
+
+        ResponseType response;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        //
+        // We're expecting response data in this variant of OnResponse. Consequently, reader should always be
+        // non-null. If it is, it means we received a success status code instead, which is not what was expected.
+        //
+        VerifyOrExit(reader != nullptr, err = CHIP_ERROR_SCHEMA_MISMATCH);
+
+        //
+        // Validate that the data response we received matches what we expect in terms of its cluster and command IDs.
+        //
+        VerifyOrExit(
+            commandPath.mClusterId == ResponseType::GetClusterId() && commandPath.mCommandId == ResponseType::GetCommandId(),
+            err = CHIP_ERROR_SCHEMA_MISMATCH);
+
+        err = chip::app::DataModel::Decode(*reader, response);
+        SuccessOrExit(err);
+
+        mOnResponse(mBridge, response);
+
+    exit:
+        if (err != CHIP_NO_ERROR) {
+            mOnError(mBridge, err);
+        }
+    }
+
+    /**
+     * Response handler for status responses.
+     */
+    template <typename T = ResponseType, std::enable_if_t<std::is_same<T, chip::app::DataModel::NullObjectType>::value, int> = 0>
+    void HandleResponse(chip::app::CommandSender * commandSender, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::StatusIB & status, chip::TLV::TLVReader * reader)
+    {
+        if (mCalledCallback) {
+            return;
+        }
+        mCalledCallback = true;
+
+        //
+        // If we got a valid reader, it means we received response data that we were not expecting to receive.
+        //
+        if (reader != nullptr) {
+            mOnError(mBridge, CHIP_ERROR_SCHEMA_MISMATCH);
+            return;
+        }
+
+        chip::app::DataModel::NullObjectType nullResp;
+        mOnResponse(mBridge, nullResp);
+    }
+
+    void OnError(const chip::app::CommandSender * commandSender, CHIP_ERROR error) override
+    {
+        if (mCalledCallback) {
+            return;
+        }
+        mCalledCallback = true;
+
+        mOnError(mBridge, error);
+    }
+
+    void OnDone(chip::app::CommandSender * commandSender) override { chip::Platform::Delete(this); }
+
+    InvokeBridgeType * _Nonnull mBridge;
+
+    typename InvokeBridgeType::SuccessCallbackType mOnResponse;
+    MTRErrorCallback mOnError;
+    chip::Platform::UniquePtr<chip::app::CommandSender> mCommandSender;
+    // For reads, we ensure that we make only one data/error callback to our consumer.
+    bool mCalledCallback = false;
+};
+
+template <typename BridgeType, typename RequestDataType>
+CHIP_ERROR MTRStartInvokeInteraction(BridgeType * _Nonnull bridge, const RequestDataType & requestData,
+    chip::Messaging::ExchangeManager & exchangeManager, const chip::SessionHandle & session,
+    typename BridgeType::SuccessCallbackType successCb, MTRErrorCallback failureCb, chip::EndpointId endpoint,
+    chip::Optional<uint16_t> timedInvokeTimeoutMs)
+{
+    auto callback = chip::Platform::MakeUnique<MTRInvokeCallback<BridgeType, typename RequestDataType::ResponseType>>(
+        bridge, successCb, failureCb);
+    VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    auto commandSender
+        = chip::Platform::MakeUnique<chip::app::CommandSender>(callback.get(), &exchangeManager, timedInvokeTimeoutMs.HasValue());
+    VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    chip::app::CommandPathParams commandPath(endpoint, 0, RequestDataType::GetClusterId(), RequestDataType::GetCommandId(),
+        chip::app::CommandPathFlags::kEndpointIdValid);
+    ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestData, timedInvokeTimeoutMs));
+    ReturnErrorOnFailure(commandSender->SendCommandRequest(session));
+
+    callback->AdoptCommandSender(std::move(commandSender));
+    callback.release();
+
+    return CHIP_NO_ERROR;
+};
 
 NS_ASSUME_NONNULL_END

@@ -67,6 +67,7 @@ using chip::SessionHandle;
         },
       {{/if}}
       ^(ExchangeManager & exchangeManager, const SessionHandle & session, {{>callbackName}}CallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+        auto * typedBridge = static_cast<MTR{{>callbackName}}CallbackBridge *>(bridge);
         chip::Optional<uint16_t> timedInvokeTimeoutMs;
         ListFreer listFreer;
         {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
@@ -94,8 +95,7 @@ using chip::SessionHandle;
           {{/last}}
         {{/chip_cluster_command_arguments}}
 
-        chip::Controller::{{asUpperCamelCase parent.name}}Cluster cppCluster(exchangeManager, session, self->_endpoint);
-        return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
+        return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb, self->_endpoint, timedInvokeTimeoutMs);
     });
     std::move(*bridge).DispatchAction(self.device);
 }
