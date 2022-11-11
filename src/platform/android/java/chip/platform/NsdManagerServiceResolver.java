@@ -35,7 +35,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class NsdManagerServiceResolver implements ServiceResolver {
   private static final String TAG = NsdManagerServiceResolver.class.getSimpleName();
-  private static final long RESOLVE_SERVICE_TIMEOUT = 30000;
+  // TODO: Mitigation till the bug "Pre-commissioned Android tv-casting-app takes 30 secs to
+  // discover TVs" is fixed
+  // private static final long RESOLVE_SERVICE_TIMEOUT = 30000;
+  private static final long RESOLVE_SERVICE_TIMEOUT = 5000;
   private final NsdManager nsdManager;
   private MulticastLock multicastLock;
   private Handler mainThreadHandler;
