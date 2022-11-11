@@ -159,6 +159,20 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     // TODO: Initialize the global GroupKeyStore object here (#1266)
 
+     if (!ESP32Config::ConfigValueExists(ESP32Config::kConfigKey_RegulatoryLocation))
+    {
+        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+        err = WriteConfigValue(ESP32Config::kConfigKey_RegulatoryLocation, location);
+        SuccessOrExit(err);
+    }
+
+    if (!ESP32Config::ConfigValueExists(ESP32Config::kConfigKey_LocationCapability))
+    {
+        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+        err = WriteConfigValue(ESP32Config::kConfigKey_LocationCapability, location);
+        SuccessOrExit(err);
+    }
+
     err = CHIP_NO_ERROR;
 
 exit:
@@ -199,6 +213,40 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint32_t & softwareVer)
 {
     softwareVer = CHIP_CONFIG_SOFTWARE_VERSION_NUMBER;
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetRegulatoryLocation(uint8_t & location)
+{
+#if CHIP_DISABLE_PLATFORM_KVS
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else  // CHIP_DISABLE_PLATFORM_KVS
+    uint32_t value = 0;
+
+    CHIP_ERROR err = ReadConfigValue(ESP32Config::kConfigKey_RegulatoryLocation, value);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        location = static_cast<uint8_t>(value);
+    }
+
+    return err;
+#endif // CHIP_DISABLE_PLATFORM_KVS
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
+{
+    uint32_t value = 0;
+
+    CHIP_ERROR err = ReadConfigValue(ESP32Config::kConfigKey_LocationCapability, value);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        location = static_cast<uint8_t>(value);
+    }
+
+    return err;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
