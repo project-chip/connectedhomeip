@@ -190,8 +190,8 @@ if (current_os == "android" || build_java_matter_controller) {
       include_dirs = [
         "/usr/local/buildtools/java/jdk/include/",
         "/usr/local/buildtools/java/jdk/include/linux",
-        "/usr/lib/jvm/java-8-openjdk-amd64/include",
-        "/usr/lib/jvm/java-8-openjdk-amd64/include/linux/",
+        "/usr/lib/jvm/default-java/include",
+        "/usr/lib/jvm/default-java/include/linux/",
         ]
       deps += [
         "${chip_root}/src/platform/Linux",

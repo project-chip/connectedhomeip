@@ -22,6 +22,6 @@ chip_system_project_config_include = "<SystemProjectConfig.h>"
 
 chip_project_config_include_dirs =
     [ "${chip_root}/examples/java-matter-controller/include",
-     "/usr/lib/jvm/java-8-openjdk-amd64/include/"]
+     "/usr/lib/jvm/default-java/include/"]
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 chip_enable_openthread = false
