@@ -195,12 +195,18 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
           using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
 
           chip::Controller::{{asUpperCamelCase parent.name}}Cluster cppCluster(exchangeManager, session, self->_endpoint);
-          return cppCluster.SubscribeAttribute<TypeInfo>(bridge, successCb, failureCb, [params.minInterval unsignedShortValue], [params.maxInterval unsignedShortValue], MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge::OnSubscriptionEstablished, nil,
+          CHIP_ERROR err = cppCluster.SubscribeAttribute<TypeInfo>(bridge, successCb, failureCb, [params.minInterval unsignedShortValue], [params.maxInterval unsignedShortValue], MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge::OnSubscriptionEstablished, nil,
               params.filterByFabric,
               !params.replaceExistingSubscriptions,
               chip::NullOptional,
-              [typedBridge](void) { delete typedBridge; }
+              [typedBridge](void) { typedBridge->OnDone(); }
           );
+          if (err == CHIP_NO_ERROR) {
+              // Now that we kicked off the subscribe, flag our callback bridge
+              // to stay alive until we get an OnDone.
+              typedBridge->KeepAliveOnCallback();
+          }
+          return err;
       }, subscriptionEstablished);
     std::move(*bridge).DispatchAction(self.device);
 }

@@ -72,10 +72,9 @@ public:
      * Construct a callback bridge, which can then have DispatcLocalAction() called
      * on it.
      */
-    MTRCallbackBridge(dispatch_queue_t queue, MTRResponseHandler handler, T OnSuccessFn, bool keepAlive)
+    MTRCallbackBridge(dispatch_queue_t queue, MTRResponseHandler handler, T OnSuccessFn)
         : mQueue(queue)
         , mHandler(handler)
-        , mKeepAlive(keepAlive)
         , mSuccess(OnSuccessFn)
         , mFailure(OnFailureFn)
     {
@@ -85,11 +84,10 @@ public:
      * Construct a callback bridge, which can then have DispatchAction() called
      * on it.
      */
-    MTRCallbackBridge(dispatch_queue_t queue, MTRResponseHandler handler, MTRActionBlock action, T OnSuccessFn, bool keepAlive)
+    MTRCallbackBridge(dispatch_queue_t queue, MTRResponseHandler handler, MTRActionBlock action, T OnSuccessFn)
         : mQueue(queue)
         , mHandler(handler)
         , mAction(action)
-        , mKeepAlive(keepAlive)
         , mSuccess(OnSuccessFn)
         , mFailure(OnFailureFn)
     {
@@ -219,6 +217,26 @@ public:
     static void DispatchFailure(void * context, NSError * error) { DispatchCallbackResult(context, error, nil); }
 
 protected:
+    // OnDone and KeepAliveOnCallback really only make sense for subscription
+    // bridges, but we put them here to avoid many copies of this code in
+    // generated bits.
+    void OnDone()
+    {
+        if (!mQueue) {
+            delete this;
+            return;
+        }
+
+        // Delete ourselves async, so that any error/data reports we
+        // queued up before getting OnDone have a chance to run.
+        auto * self = this;
+        dispatch_async(mQueue, ^{
+            delete self;
+        });
+    }
+
+    void KeepAliveOnCallback() { mKeepAlive = true; }
+
     dispatch_queue_t mQueue;
 
 private:
@@ -230,13 +248,10 @@ private:
         }
 
         if (!callbackBridge->mQueue) {
-            delete callbackBridge;
+            if (!callbackBridge->mKeepAlive) {
+                delete callbackBridge;
+            }
             return;
-        }
-
-        if (error) {
-            // We should delete ourselves; there will be no more callbacks.
-            callbackBridge->mKeepAlive = false;
         }
 
         dispatch_async(callbackBridge->mQueue, ^{
@@ -252,7 +267,7 @@ private:
 
     MTRResponseHandler mHandler;
     MTRActionBlock mAction;
-    bool mKeepAlive;
+    bool mKeepAlive = false;
 
     T mSuccess;
     MTRErrorCallback mFailure;
