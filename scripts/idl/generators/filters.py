@@ -14,6 +14,7 @@
 
 import stringcase
 
+
 def normalize_acronyms(s: str) -> str:
     """Replaces variatiosn of acronyms when converting various words.
 

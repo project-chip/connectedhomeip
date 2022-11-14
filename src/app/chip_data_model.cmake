@@ -93,6 +93,7 @@ function(chip_configure_data_model APP_TARGET)
           GENERATOR "cpp-app"
           OUTPUTS
                 "app/PluginApplicationCallbacks.h"
+                "app/callback-stub.cpp"
           OUTPUT_PATH   APP_GEN_DIR
           OUTPUT_FILES  APP_GEN_FILES
         )
