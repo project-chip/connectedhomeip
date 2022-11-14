@@ -217,8 +217,27 @@ public:
     static void DispatchFailure(void * context, NSError * error) { DispatchCallbackResult(context, error, nil); }
 
 protected:
+    // OnDone and KeepAliveOnCallback really only make sense for subscription
+    // bridges, but we put them here to avoid many copies of this code in
+    // generated bits.
+    void OnDone()
+    {
+        if (!mQueue) {
+            delete this;
+            return;
+        }
+
+        // Delete ourselves async, so that any error/data reports we
+        // queued up before getting OnDone have a chance to run.
+        auto * self = this;
+        dispatch_async(mQueue, ^{
+            delete self;
+        });
+    }
+
+    void KeepAliveOnCallback() { mKeepAlive = true; }
+
     dispatch_queue_t mQueue;
-    bool mKeepAlive = false;
 
 private:
     static void DispatchCallbackResult(void * context, NSError * error, id value)
@@ -248,6 +267,7 @@ private:
 
     MTRResponseHandler mHandler;
     MTRActionBlock mAction;
+    bool mKeepAlive = false;
 
     T mSuccess;
     MTRErrorCallback mFailure;

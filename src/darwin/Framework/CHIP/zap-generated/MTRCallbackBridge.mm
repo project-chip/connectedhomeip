@@ -51,21 +51,6 @@ void MTROctetStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablishe
     }
 }
 
-void MTROctetStringAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRNullableOctetStringAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
 {
@@ -94,21 +79,6 @@ void MTRNullableOctetStringAttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void MTRNullableOctetStringAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRCharStringAttributeCallbackBridge::OnSuccessFn(void * context, chip::CharSpan value)
 {
     NSString * _Nonnull objCValue;
@@ -130,21 +100,6 @@ void MTRCharStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRCharStringAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableCharStringAttributeCallbackBridge::OnSuccessFn(
@@ -175,21 +130,6 @@ void MTRNullableCharStringAttributeCallbackSubscriptionBridge::OnSubscriptionEst
     }
 }
 
-void MTRNullableCharStringAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRBooleanAttributeCallbackBridge::OnSuccessFn(void * context, bool value)
 {
     NSNumber * _Nonnull objCValue;
@@ -211,21 +151,6 @@ void MTRBooleanAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(vo
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRBooleanAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableBooleanAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<bool> & value)
@@ -255,21 +180,6 @@ void MTRNullableBooleanAttributeCallbackSubscriptionBridge::OnSubscriptionEstabl
     }
 }
 
-void MTRNullableBooleanAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRInt8uAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
@@ -291,21 +201,6 @@ void MTRInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRInt8uAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableInt8uAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
@@ -335,21 +230,6 @@ void MTRNullableInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablis
     }
 }
 
-void MTRNullableInt8uAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRInt8sAttributeCallbackBridge::OnSuccessFn(void * context, int8_t value)
 {
     NSNumber * _Nonnull objCValue;
@@ -371,21 +251,6 @@ void MTRInt8sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRInt8sAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableInt8sAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int8_t> & value)
@@ -415,21 +280,6 @@ void MTRNullableInt8sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablis
     }
 }
 
-void MTRNullableInt8sAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRInt16uAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t value)
 {
     NSNumber * _Nonnull objCValue;
@@ -451,21 +301,6 @@ void MTRInt16uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(voi
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRInt16uAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableInt16uAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
@@ -495,21 +330,6 @@ void MTRNullableInt16uAttributeCallbackSubscriptionBridge::OnSubscriptionEstabli
     }
 }
 
-void MTRNullableInt16uAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRInt16sAttributeCallbackBridge::OnSuccessFn(void * context, int16_t value)
 {
     NSNumber * _Nonnull objCValue;
@@ -531,21 +351,6 @@ void MTRInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(voi
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRInt16sAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableInt16sAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value)
@@ -575,21 +380,6 @@ void MTRNullableInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstabli
     }
 }
 
-void MTRNullableInt16sAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRInt32uAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
@@ -611,21 +401,6 @@ void MTRInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(voi
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRInt32uAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableInt32uAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
@@ -655,21 +430,6 @@ void MTRNullableInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstabli
     }
 }
 
-void MTRNullableInt32uAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRInt32sAttributeCallbackBridge::OnSuccessFn(void * context, int32_t value)
 {
     NSNumber * _Nonnull objCValue;
@@ -691,21 +451,6 @@ void MTRInt32sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(voi
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRInt32sAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableInt32sAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int32_t> & value)
@@ -735,21 +480,6 @@ void MTRNullableInt32sAttributeCallbackSubscriptionBridge::OnSubscriptionEstabli
     }
 }
 
-void MTRNullableInt32sAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRInt64uAttributeCallbackBridge::OnSuccessFn(void * context, uint64_t value)
 {
     NSNumber * _Nonnull objCValue;
@@ -771,21 +501,6 @@ void MTRInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(voi
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRInt64uAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableInt64uAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
@@ -815,21 +530,6 @@ void MTRNullableInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstabli
     }
 }
 
-void MTRNullableInt64uAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRInt64sAttributeCallbackBridge::OnSuccessFn(void * context, int64_t value)
 {
     NSNumber * _Nonnull objCValue;
@@ -851,21 +551,6 @@ void MTRInt64sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(voi
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRInt64sAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableInt64sAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
@@ -895,21 +580,6 @@ void MTRNullableInt64sAttributeCallbackSubscriptionBridge::OnSubscriptionEstabli
     }
 }
 
-void MTRNullableInt64sAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRFloatAttributeCallbackBridge::OnSuccessFn(void * context, float value)
 {
     NSNumber * _Nonnull objCValue;
@@ -931,21 +601,6 @@ void MTRFloatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRFloatAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableFloatAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<float> & value)
@@ -975,21 +630,6 @@ void MTRNullableFloatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablis
     }
 }
 
-void MTRNullableFloatAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoubleAttributeCallbackBridge::OnSuccessFn(void * context, double value)
 {
     NSNumber * _Nonnull objCValue;
@@ -1011,21 +651,6 @@ void MTRDoubleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(voi
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoubleAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoubleAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<double> & value)
@@ -1055,21 +680,6 @@ void MTRNullableDoubleAttributeCallbackSubscriptionBridge::OnSubscriptionEstabli
     }
 }
 
-void MTRNullableDoubleAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRVendorIdAttributeCallbackBridge::OnSuccessFn(void * context, chip::VendorId value)
 {
     NSNumber * _Nonnull objCValue;
@@ -1091,21 +701,6 @@ void MTRVendorIdAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(v
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRVendorIdAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableVendorIdAttributeCallbackBridge::OnSuccessFn(
@@ -1134,21 +729,6 @@ void MTRNullableVendorIdAttributeCallbackSubscriptionBridge::OnSubscriptionEstab
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRNullableVendorIdAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRIdentifyGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -1190,21 +770,6 @@ void MTRIdentifyGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRIdentifyGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRIdentifyAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -1242,21 +807,6 @@ void MTRIdentifyAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSu
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRIdentifyAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRIdentifyAttributeListListAttributeCallbackBridge::OnSuccessFn(
@@ -1298,21 +848,6 @@ void MTRIdentifyAttributeListListAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void MTRIdentifyAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRGroupsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -1350,21 +885,6 @@ void MTRGroupsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSub
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRGroupsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRGroupsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -1406,21 +926,6 @@ void MTRGroupsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRGroupsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRGroupsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -1458,21 +963,6 @@ void MTRGroupsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscripti
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRGroupsAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRScenesGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -1514,21 +1004,6 @@ void MTRScenesGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRScenesGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRScenesAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -1566,21 +1041,6 @@ void MTRScenesAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubs
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRScenesAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRScenesAttributeListListAttributeCallbackBridge::OnSuccessFn(
@@ -1622,21 +1082,6 @@ void MTRScenesAttributeListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void MTRScenesAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROnOffGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -1674,21 +1119,6 @@ void MTROnOffGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubs
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROnOffGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTROnOffAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -1730,21 +1160,6 @@ void MTROnOffAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTROnOffAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROnOffAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -1782,21 +1197,6 @@ void MTROnOffAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptio
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROnOffAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -1839,21 +1239,6 @@ void MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackSubscri
     }
 }
 
-void MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -1892,21 +1277,6 @@ void MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackSubscrip
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTROnOffSwitchConfigurationAttributeListListAttributeCallbackBridge::OnSuccessFn(
@@ -1948,21 +1318,6 @@ void MTROnOffSwitchConfigurationAttributeListListAttributeCallbackSubscriptionBr
     }
 }
 
-void MTROnOffSwitchConfigurationAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRLevelControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -2000,21 +1355,6 @@ void MTRLevelControlGeneratedCommandListListAttributeCallbackSubscriptionBridge:
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRLevelControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRLevelControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -2056,21 +1396,6 @@ void MTRLevelControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRLevelControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRLevelControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -2108,21 +1433,6 @@ void MTRLevelControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRLevelControlAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -2164,21 +1474,6 @@ void MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -2218,21 +1513,6 @@ void MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRBinaryInputBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -2270,21 +1550,6 @@ void MTRBinaryInputBasicAttributeListListAttributeCallbackSubscriptionBridge::On
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRBinaryInputBasicAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRDescriptorDeviceTypeListListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -2328,21 +1593,6 @@ void MTRDescriptorDeviceTypeListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRDescriptorDeviceTypeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDescriptorServerListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
 {
@@ -2380,21 +1630,6 @@ void MTRDescriptorServerListListAttributeCallbackSubscriptionBridge::OnSubscript
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDescriptorServerListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRDescriptorClientListListAttributeCallbackBridge::OnSuccessFn(
@@ -2436,21 +1671,6 @@ void MTRDescriptorClientListListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRDescriptorClientListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDescriptorPartsListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & value)
 {
@@ -2488,21 +1708,6 @@ void MTRDescriptorPartsListListAttributeCallbackSubscriptionBridge::OnSubscripti
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDescriptorPartsListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRDescriptorGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -2544,21 +1749,6 @@ void MTRDescriptorGeneratedCommandListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRDescriptorGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDescriptorAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -2598,21 +1788,6 @@ void MTRDescriptorAcceptedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRDescriptorAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDescriptorAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -2650,21 +1825,6 @@ void MTRDescriptorAttributeListListAttributeCallbackSubscriptionBridge::OnSubscr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDescriptorAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRBindingBindingListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -2727,21 +1887,6 @@ void MTRBindingBindingListAttributeCallbackSubscriptionBridge::OnSubscriptionEst
     }
 }
 
-void MTRBindingBindingListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRBindingGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -2779,21 +1924,6 @@ void MTRBindingGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSu
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRBindingGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRBindingAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -2835,21 +1965,6 @@ void MTRBindingAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRBindingAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRBindingAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -2887,21 +2002,6 @@ void MTRBindingAttributeListListAttributeCallbackSubscriptionBridge::OnSubscript
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRBindingAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRAccessControlAclListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -3002,21 +2102,6 @@ void MTRAccessControlAclListAttributeCallbackSubscriptionBridge::OnSubscriptionE
     }
 }
 
-void MTRAccessControlAclListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRAccessControlExtensionListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & value)
 {
@@ -3058,21 +2143,6 @@ void MTRAccessControlExtensionListAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRAccessControlExtensionListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRAccessControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -3110,21 +2180,6 @@ void MTRAccessControlGeneratedCommandListListAttributeCallbackSubscriptionBridge
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRAccessControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRAccessControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -3166,21 +2221,6 @@ void MTRAccessControlAcceptedCommandListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRAccessControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRAccessControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -3218,21 +2258,6 @@ void MTRAccessControlAttributeListListAttributeCallbackSubscriptionBridge::OnSub
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRAccessControlAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRActionsActionListListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -3280,21 +2305,6 @@ void MTRActionsActionListListAttributeCallbackSubscriptionBridge::OnSubscription
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRActionsActionListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRActionsEndpointListsListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -3357,21 +2367,6 @@ void MTRActionsEndpointListsListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRActionsEndpointListsListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRActionsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -3409,21 +2404,6 @@ void MTRActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSu
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRActionsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -3465,21 +2445,6 @@ void MTRActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRActionsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -3519,21 +2484,6 @@ void MTRActionsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRActionsAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRBasicCapabilityMinimaStructAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType & value)
 {
@@ -3558,21 +2508,6 @@ void MTRBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge::OnSubscr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRBasicGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -3614,21 +2549,6 @@ void MTRBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRBasicAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -3668,21 +2588,6 @@ void MTRBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -3720,21 +2625,6 @@ void MTRBasicAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptio
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRBasicAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -3777,21 +2667,6 @@ void MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackSubscr
     }
 }
 
-void MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -3832,21 +2707,6 @@ void MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackSubscri
     }
 }
 
-void MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -3884,21 +2744,6 @@ void MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionB
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -3945,21 +2790,6 @@ void MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscr
     }
 }
 
-void MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -3998,21 +2828,6 @@ void MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackSubsc
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -4055,21 +2870,6 @@ void MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackSubscr
     }
 }
 
-void MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -4109,21 +2909,6 @@ void MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackSubscription
     }
 }
 
-void MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
 {
@@ -4161,21 +2946,6 @@ void MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackSubscripti
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -4218,21 +2988,6 @@ void MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackSubscr
     }
 }
 
-void MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -4273,21 +3028,6 @@ void MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackSubscri
     }
 }
 
-void MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRLocalizationConfigurationAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -4325,21 +3065,6 @@ void MTRLocalizationConfigurationAttributeListListAttributeCallbackSubscriptionB
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRLocalizationConfigurationAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge::OnSuccessFn(
@@ -4382,21 +3107,6 @@ void MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscri
     }
 }
 
-void MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -4434,21 +3144,6 @@ void MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackSubscript
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -4490,21 +3185,6 @@ void MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackSubscripti
     }
 }
 
-void MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTimeFormatLocalizationAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -4542,21 +3222,6 @@ void MTRTimeFormatLocalizationAttributeListListAttributeCallbackSubscriptionBrid
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTimeFormatLocalizationAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRUnitLocalizationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -4598,21 +3263,6 @@ void MTRUnitLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRUnitLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRUnitLocalizationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -4650,21 +3300,6 @@ void MTRUnitLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBrid
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRUnitLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRUnitLocalizationAttributeListListAttributeCallbackBridge::OnSuccessFn(
@@ -4706,21 +3341,6 @@ void MTRUnitLocalizationAttributeListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRUnitLocalizationAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRPowerSourceConfigurationSourcesListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
@@ -4758,21 +3378,6 @@ void MTRPowerSourceConfigurationSourcesListAttributeCallbackSubscriptionBridge::
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRPowerSourceConfigurationSourcesListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -4815,21 +3420,6 @@ void MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackSubscri
     }
 }
 
-void MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -4868,21 +3458,6 @@ void MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackSubscrip
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRPowerSourceConfigurationAttributeListListAttributeCallbackBridge::OnSuccessFn(
@@ -4924,21 +3499,6 @@ void MTRPowerSourceConfigurationAttributeListListAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRPowerSourceConfigurationAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRPowerSourceActiveWiredFaultsListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFault> & value)
 {
@@ -4976,21 +3536,6 @@ void MTRPowerSourceActiveWiredFaultsListAttributeCallbackSubscriptionBridge::OnS
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRPowerSourceActiveWiredFaultsListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRPowerSourceActiveBatFaultsListAttributeCallbackBridge::OnSuccessFn(
@@ -5032,21 +3577,6 @@ void MTRPowerSourceActiveBatFaultsListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRPowerSourceActiveBatFaultsListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFault> & value)
 {
@@ -5084,21 +3614,6 @@ void MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackSubscriptionBridge:
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRPowerSourceGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -5140,21 +3655,6 @@ void MTRPowerSourceGeneratedCommandListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRPowerSourceGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRPowerSourceAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -5192,21 +3692,6 @@ void MTRPowerSourceAcceptedCommandListListAttributeCallbackSubscriptionBridge::O
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRPowerSourceAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRPowerSourceAttributeListListAttributeCallbackBridge::OnSuccessFn(
@@ -5248,21 +3733,6 @@ void MTRPowerSourceAttributeListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRPowerSourceAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType & value)
 {
@@ -5288,21 +3758,6 @@ void MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackSubscri
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -5344,21 +3799,6 @@ void MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackSubscriptio
     }
 }
 
-void MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -5398,21 +3838,6 @@ void MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackSubscription
     }
 }
 
-void MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRGeneralCommissioningAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -5450,21 +3875,6 @@ void MTRGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridge
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNetworkCommissioningNetworksListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -5509,21 +3919,6 @@ void MTRNetworkCommissioningNetworksListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRNetworkCommissioningNetworksListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -5561,21 +3956,6 @@ void MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackSubscriptio
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -5617,21 +3997,6 @@ void MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackSubscription
     }
 }
 
-void MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRNetworkCommissioningAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -5669,21 +4034,6 @@ void MTRNetworkCommissioningAttributeListListAttributeCallbackSubscriptionBridge
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRNetworkCommissioningAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -5725,21 +4075,6 @@ void MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -5779,21 +4114,6 @@ void MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDiagnosticLogsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -5831,21 +4151,6 @@ void MTRDiagnosticLogsAttributeListListAttributeCallbackSubscriptionBridge::OnSu
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDiagnosticLogsAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -5939,21 +4244,6 @@ void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
@@ -5991,21 +4281,6 @@ void MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackSubscriptionB
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge::OnSuccessFn(
@@ -6047,21 +4322,6 @@ void MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
@@ -6099,21 +4359,6 @@ void MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackSubscriptionBr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -6155,21 +4400,6 @@ void MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -6209,21 +4439,6 @@ void MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRGeneralDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -6261,21 +4476,6 @@ void MTRGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -6341,21 +4541,6 @@ void MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -6393,21 +4578,6 @@ void MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackSubscription
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -6449,21 +4619,6 @@ void MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRSoftwareDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -6501,21 +4656,6 @@ void MTRSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge:
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -6580,21 +4720,6 @@ void MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackSubscripti
     }
 }
 
-void MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
         value)
@@ -6645,21 +4770,6 @@ void MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> &
         value)
@@ -6689,21 +4799,6 @@ void MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscriptio
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -6749,21 +4844,6 @@ void MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallb
     }
 }
 
-void MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value)
 {
@@ -6802,21 +4882,6 @@ void MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackSubs
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -6859,21 +4924,6 @@ void MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscri
     }
 }
 
-void MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -6912,21 +4962,6 @@ void MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscrip
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(
@@ -6968,21 +5003,6 @@ void MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -7020,21 +5040,6 @@ void MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscript
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -7076,21 +5081,6 @@ void MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscripti
     }
 }
 
-void MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -7128,21 +5118,6 @@ void MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBrid
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -7185,21 +5160,6 @@ void MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubsc
     }
 }
 
-void MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -7238,21 +5198,6 @@ void MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(
@@ -7294,21 +5239,6 @@ void MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackSubscription
     }
 }
 
-void MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -7346,21 +5276,6 @@ void MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackSubscriptionB
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -7402,21 +5317,6 @@ void MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -7454,21 +5354,6 @@ void MTRBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge::
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRSwitchGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -7510,21 +5395,6 @@ void MTRSwitchGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRSwitchGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRSwitchAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -7564,21 +5434,6 @@ void MTRSwitchAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRSwitchAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRSwitchAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -7616,21 +5471,6 @@ void MTRSwitchAttributeListListAttributeCallbackSubscriptionBridge::OnSubscripti
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRSwitchAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -7673,21 +5513,6 @@ void MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackSubsc
     }
 }
 
-void MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -7728,21 +5553,6 @@ void MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackSubscr
     }
 }
 
-void MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRAdministratorCommissioningAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -7780,21 +5590,6 @@ void MTRAdministratorCommissioningAttributeListListAttributeCallbackSubscription
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTROperationalCredentialsNOCsListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -7842,21 +5637,6 @@ void MTROperationalCredentialsNOCsListAttributeCallbackSubscriptionBridge::OnSub
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROperationalCredentialsNOCsListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTROperationalCredentialsFabricsListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -7907,21 +5687,6 @@ void MTROperationalCredentialsFabricsListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTROperationalCredentialsFabricsListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
 {
@@ -7960,21 +5725,6 @@ void MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackSubscr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTROperationalCredentialsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -8016,21 +5766,6 @@ void MTROperationalCredentialsGeneratedCommandListListAttributeCallbackSubscript
     }
 }
 
-void MTROperationalCredentialsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROperationalCredentialsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -8070,21 +5805,6 @@ void MTROperationalCredentialsAcceptedCommandListListAttributeCallbackSubscripti
     }
 }
 
-void MTROperationalCredentialsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROperationalCredentialsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -8122,21 +5842,6 @@ void MTROperationalCredentialsAttributeListListAttributeCallbackSubscriptionBrid
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROperationalCredentialsAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRGroupKeyManagementGroupKeyMapListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -8180,21 +5885,6 @@ void MTRGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge::On
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -8262,21 +5952,6 @@ void MTRGroupKeyManagementGroupTableListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRGroupKeyManagementGroupTableListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -8314,21 +5989,6 @@ void MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackSubscriptionB
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -8370,21 +6030,6 @@ void MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRGroupKeyManagementAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -8422,21 +6067,6 @@ void MTRGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge::
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRFixedLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -8484,21 +6114,6 @@ void MTRFixedLabelLabelListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void MTRFixedLabelLabelListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRFixedLabelGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -8536,21 +6151,6 @@ void MTRFixedLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge::O
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRFixedLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRFixedLabelAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -8592,21 +6192,6 @@ void MTRFixedLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRFixedLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRFixedLabelAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -8644,21 +6229,6 @@ void MTRFixedLabelAttributeListListAttributeCallbackSubscriptionBridge::OnSubscr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRFixedLabelAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRUserLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -8706,21 +6276,6 @@ void MTRUserLabelLabelListListAttributeCallbackSubscriptionBridge::OnSubscriptio
     }
 }
 
-void MTRUserLabelLabelListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRUserLabelGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -8758,21 +6313,6 @@ void MTRUserLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge::On
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRUserLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRUserLabelAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -8814,21 +6354,6 @@ void MTRUserLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRUserLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRUserLabelAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -8866,21 +6391,6 @@ void MTRUserLabelAttributeListListAttributeCallbackSubscriptionBridge::OnSubscri
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRUserLabelAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRBooleanStateGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -8922,21 +6432,6 @@ void MTRBooleanStateGeneratedCommandListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRBooleanStateGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRBooleanStateAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -8976,21 +6471,6 @@ void MTRBooleanStateAcceptedCommandListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRBooleanStateAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRBooleanStateAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -9028,21 +6508,6 @@ void MTRBooleanStateAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRBooleanStateAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -9106,21 +6571,6 @@ void MTRModeSelectSupportedModesListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRModeSelectSupportedModesListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRModeSelectGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -9158,21 +6608,6 @@ void MTRModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge::O
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRModeSelectAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -9214,21 +6649,6 @@ void MTRModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRModeSelectAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -9268,21 +6688,6 @@ void MTRModeSelectAttributeListListAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRModeSelectAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockCredentialRulesSupportAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value)
 {
@@ -9305,21 +6710,6 @@ void MTRDoorLockCredentialRulesSupportAttributeCallbackSubscriptionBridge::OnSub
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockCredentialRulesSupportAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRDoorLockSupportedOperatingModesAttributeCallbackBridge::OnSuccessFn(
@@ -9346,21 +6736,6 @@ void MTRDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockDefaultConfigurationRegisterAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value)
 {
@@ -9385,21 +6760,6 @@ void MTRDoorLockDefaultConfigurationRegisterAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRDoorLockDefaultConfigurationRegisterAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockLocalProgrammingFeaturesAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value)
 {
@@ -9422,21 +6782,6 @@ void MTRDoorLockLocalProgrammingFeaturesAttributeCallbackSubscriptionBridge::OnS
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockLocalProgrammingFeaturesAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRDoorLockGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -9478,21 +6823,6 @@ void MTRDoorLockGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRDoorLockGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -9530,21 +6860,6 @@ void MTRDoorLockAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSu
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRDoorLockAttributeListListAttributeCallbackBridge::OnSuccessFn(
@@ -9586,21 +6901,6 @@ void MTRDoorLockAttributeListListAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void MTRDoorLockAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRWindowCoveringConfigStatusAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value)
 {
@@ -9623,21 +6923,6 @@ void MTRWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge::OnSubscri
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRWindowCoveringOperationalStatusAttributeCallbackBridge::OnSuccessFn(
@@ -9664,21 +6949,6 @@ void MTRWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRWindowCoveringModeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value)
 {
@@ -9703,21 +6973,6 @@ void MTRWindowCoveringModeAttributeCallbackSubscriptionBridge::OnSubscriptionEst
     }
 }
 
-void MTRWindowCoveringModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRWindowCoveringSafetyStatusAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus> value)
 {
@@ -9740,21 +6995,6 @@ void MTRWindowCoveringSafetyStatusAttributeCallbackSubscriptionBridge::OnSubscri
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRWindowCoveringSafetyStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRWindowCoveringGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -9796,21 +7036,6 @@ void MTRWindowCoveringGeneratedCommandListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRWindowCoveringGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRWindowCoveringAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -9848,21 +7073,6 @@ void MTRWindowCoveringAcceptedCommandListListAttributeCallbackSubscriptionBridge
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRWindowCoveringAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRWindowCoveringAttributeListListAttributeCallbackBridge::OnSuccessFn(
@@ -9904,21 +7114,6 @@ void MTRWindowCoveringAttributeListListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRWindowCoveringAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRBarrierControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -9956,21 +7151,6 @@ void MTRBarrierControlGeneratedCommandListListAttributeCallbackSubscriptionBridg
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRBarrierControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRBarrierControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -10012,21 +7192,6 @@ void MTRBarrierControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRBarrierControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRBarrierControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -10066,21 +7231,6 @@ void MTRBarrierControlAttributeListListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRBarrierControlAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRPumpConfigurationAndControlPumpStatusAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value)
 {
@@ -10103,21 +7253,6 @@ void MTRPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridge
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -10160,21 +7295,6 @@ void MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackSubs
     }
 }
 
-void MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -10213,21 +7333,6 @@ void MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackSubsc
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRPumpConfigurationAndControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
@@ -10269,21 +7374,6 @@ void MTRPumpConfigurationAndControlAttributeListListAttributeCallbackSubscriptio
     }
 }
 
-void MTRPumpConfigurationAndControlAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRThermostatGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -10321,21 +7411,6 @@ void MTRThermostatGeneratedCommandListListAttributeCallbackSubscriptionBridge::O
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRThermostatGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRThermostatAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -10377,21 +7452,6 @@ void MTRThermostatAcceptedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRThermostatAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRThermostatAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -10429,21 +7489,6 @@ void MTRThermostatAttributeListListAttributeCallbackSubscriptionBridge::OnSubscr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRThermostatAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRFanControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -10485,21 +7530,6 @@ void MTRFanControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRFanControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRFanControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -10539,21 +7569,6 @@ void MTRFanControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRFanControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRFanControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -10591,21 +7606,6 @@ void MTRFanControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRFanControlAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -10649,21 +7649,6 @@ void MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCal
     }
 }
 
-void MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -10703,21 +7688,6 @@ void MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCall
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge::OnSuccessFn(
@@ -10761,21 +7731,6 @@ void MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackSu
     }
 }
 
-void MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRColorControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -10813,21 +7768,6 @@ void MTRColorControlGeneratedCommandListListAttributeCallbackSubscriptionBridge:
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRColorControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRColorControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -10869,21 +7809,6 @@ void MTRColorControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRColorControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRColorControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -10921,21 +7846,6 @@ void MTRColorControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRColorControlAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -10977,21 +7887,6 @@ void MTRBallastConfigurationGeneratedCommandListListAttributeCallbackSubscriptio
     }
 }
 
-void MTRBallastConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -11029,21 +7924,6 @@ void MTRBallastConfigurationAcceptedCommandListListAttributeCallbackSubscription
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRBallastConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRBallastConfigurationAttributeListListAttributeCallbackBridge::OnSuccessFn(
@@ -11085,21 +7965,6 @@ void MTRBallastConfigurationAttributeListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRBallastConfigurationAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -11137,21 +8002,6 @@ void MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackSubscript
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -11193,21 +8043,6 @@ void MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackSubscripti
     }
 }
 
-void MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRIlluminanceMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -11245,21 +8080,6 @@ void MTRIlluminanceMeasurementAttributeListListAttributeCallbackSubscriptionBrid
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRIlluminanceMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -11301,21 +8121,6 @@ void MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackSubscript
     }
 }
 
-void MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -11353,21 +8158,6 @@ void MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackSubscripti
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRTemperatureMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
@@ -11409,21 +8199,6 @@ void MTRTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRPressureMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -11461,21 +8236,6 @@ void MTRPressureMeasurementGeneratedCommandListListAttributeCallbackSubscription
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRPressureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRPressureMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -11517,21 +8277,6 @@ void MTRPressureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRPressureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRPressureMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -11569,21 +8314,6 @@ void MTRPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge:
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRFlowMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -11625,21 +8355,6 @@ void MTRFlowMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRFlowMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRFlowMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -11679,21 +8394,6 @@ void MTRFlowMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRFlowMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRFlowMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -11731,21 +8431,6 @@ void MTRFlowMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnS
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRFlowMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -11788,21 +8473,6 @@ void MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackSubs
     }
 }
 
-void MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -11841,21 +8511,6 @@ void MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackSubsc
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
@@ -11897,21 +8552,6 @@ void MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackSubscriptio
     }
 }
 
-void MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROccupancySensingGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -11949,21 +8589,6 @@ void MTROccupancySensingGeneratedCommandListListAttributeCallbackSubscriptionBri
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROccupancySensingGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTROccupancySensingAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -12005,21 +8630,6 @@ void MTROccupancySensingAcceptedCommandListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTROccupancySensingAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROccupancySensingAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -12057,21 +8667,6 @@ void MTROccupancySensingAttributeListListAttributeCallbackSubscriptionBridge::On
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROccupancySensingAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRWakeOnLanGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -12113,21 +8708,6 @@ void MTRWakeOnLanGeneratedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRWakeOnLanGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRWakeOnLanAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -12167,21 +8747,6 @@ void MTRWakeOnLanAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRWakeOnLanAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRWakeOnLanAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -12219,21 +8784,6 @@ void MTRWakeOnLanAttributeListListAttributeCallbackSubscriptionBridge::OnSubscri
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRWakeOnLanAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRChannelChannelListListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -12298,21 +8848,6 @@ void MTRChannelChannelListListAttributeCallbackSubscriptionBridge::OnSubscriptio
     }
 }
 
-void MTRChannelChannelListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRChannelLineupStructAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> & value)
 {
@@ -12357,21 +8892,6 @@ void MTRChannelLineupStructAttributeCallbackSubscriptionBridge::OnSubscriptionEs
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRChannelLineupStructAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRChannelCurrentChannelStructAttributeCallbackBridge::OnSuccessFn(
@@ -12425,21 +8945,6 @@ void MTRChannelCurrentChannelStructAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRChannelCurrentChannelStructAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRChannelGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -12477,21 +8982,6 @@ void MTRChannelGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSu
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRChannelGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRChannelAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -12533,21 +9023,6 @@ void MTRChannelAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRChannelAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRChannelAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -12585,21 +9060,6 @@ void MTRChannelAttributeListListAttributeCallbackSubscriptionBridge::OnSubscript
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRChannelAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRTargetNavigatorTargetListListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -12645,21 +9105,6 @@ void MTRTargetNavigatorTargetListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRTargetNavigatorTargetListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTargetNavigatorGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -12697,21 +9142,6 @@ void MTRTargetNavigatorGeneratedCommandListListAttributeCallbackSubscriptionBrid
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTargetNavigatorGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRTargetNavigatorAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -12753,21 +9183,6 @@ void MTRTargetNavigatorAcceptedCommandListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRTargetNavigatorAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTargetNavigatorAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -12807,21 +9222,6 @@ void MTRTargetNavigatorAttributeListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRTargetNavigatorAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRMediaPlaybackSampledPositionStructAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> & value)
 {
@@ -12854,21 +9254,6 @@ void MTRMediaPlaybackSampledPositionStructAttributeCallbackSubscriptionBridge::O
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRMediaPlaybackSampledPositionStructAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRMediaPlaybackGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -12910,21 +9295,6 @@ void MTRMediaPlaybackGeneratedCommandListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRMediaPlaybackGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRMediaPlaybackAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -12964,21 +9334,6 @@ void MTRMediaPlaybackAcceptedCommandListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRMediaPlaybackAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRMediaPlaybackAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -13016,21 +9371,6 @@ void MTRMediaPlaybackAttributeListListAttributeCallbackSubscriptionBridge::OnSub
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRMediaPlaybackAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRMediaInputInputListListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -13080,21 +9420,6 @@ void MTRMediaInputInputListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void MTRMediaInputInputListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRMediaInputGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -13132,21 +9457,6 @@ void MTRMediaInputGeneratedCommandListListAttributeCallbackSubscriptionBridge::O
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRMediaInputGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRMediaInputAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -13188,21 +9498,6 @@ void MTRMediaInputAcceptedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRMediaInputAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRMediaInputAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -13240,21 +9535,6 @@ void MTRMediaInputAttributeListListAttributeCallbackSubscriptionBridge::OnSubscr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRMediaInputAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRLowPowerGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -13296,21 +9576,6 @@ void MTRLowPowerGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRLowPowerGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRLowPowerAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -13348,21 +9613,6 @@ void MTRLowPowerAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSu
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRLowPowerAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRLowPowerAttributeListListAttributeCallbackBridge::OnSuccessFn(
@@ -13404,21 +9654,6 @@ void MTRLowPowerAttributeListListAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void MTRLowPowerAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRKeypadInputGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -13456,21 +9691,6 @@ void MTRKeypadInputGeneratedCommandListListAttributeCallbackSubscriptionBridge::
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRKeypadInputGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRKeypadInputAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -13512,21 +9732,6 @@ void MTRKeypadInputAcceptedCommandListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRKeypadInputAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRKeypadInputAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -13564,21 +9769,6 @@ void MTRKeypadInputAttributeListListAttributeCallbackSubscriptionBridge::OnSubsc
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRKeypadInputAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRContentLauncherAcceptHeaderListAttributeCallbackBridge::OnSuccessFn(
@@ -13620,21 +9810,6 @@ void MTRContentLauncherAcceptHeaderListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRContentLauncherAcceptHeaderListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRContentLauncherGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -13672,21 +9847,6 @@ void MTRContentLauncherGeneratedCommandListListAttributeCallbackSubscriptionBrid
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRContentLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRContentLauncherAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -13728,21 +9888,6 @@ void MTRContentLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRContentLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRContentLauncherAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -13780,21 +9925,6 @@ void MTRContentLauncherAttributeListListAttributeCallbackSubscriptionBridge::OnS
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRContentLauncherAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRAudioOutputOutputListListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -13841,21 +9971,6 @@ void MTRAudioOutputOutputListListAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void MTRAudioOutputOutputListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRAudioOutputGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -13893,21 +10008,6 @@ void MTRAudioOutputGeneratedCommandListListAttributeCallbackSubscriptionBridge::
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRAudioOutputGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRAudioOutputAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -13949,21 +10049,6 @@ void MTRAudioOutputAcceptedCommandListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRAudioOutputAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRAudioOutputAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -14001,21 +10086,6 @@ void MTRAudioOutputAttributeListListAttributeCallbackSubscriptionBridge::OnSubsc
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRAudioOutputAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRApplicationLauncherCatalogListListAttributeCallbackBridge::OnSuccessFn(
@@ -14057,21 +10127,6 @@ void MTRApplicationLauncherCatalogListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRApplicationLauncherCatalogListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> & value)
 {
@@ -14108,21 +10163,6 @@ void MTRApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge::
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRApplicationLauncherGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -14164,21 +10204,6 @@ void MTRApplicationLauncherGeneratedCommandListListAttributeCallbackSubscription
     }
 }
 
-void MTRApplicationLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRApplicationLauncherAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -14216,21 +10241,6 @@ void MTRApplicationLauncherAcceptedCommandListListAttributeCallbackSubscriptionB
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRApplicationLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRApplicationLauncherAttributeListListAttributeCallbackBridge::OnSuccessFn(
@@ -14272,21 +10282,6 @@ void MTRApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRApplicationBasicApplicationStructAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType & value)
 {
@@ -14313,21 +10308,6 @@ void MTRApplicationBasicApplicationStructAttributeCallbackSubscriptionBridge::On
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRApplicationBasicApplicationStructAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRApplicationBasicAllowedVendorListListAttributeCallbackBridge::OnSuccessFn(
@@ -14369,21 +10349,6 @@ void MTRApplicationBasicAllowedVendorListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRApplicationBasicAllowedVendorListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRApplicationBasicGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -14421,21 +10386,6 @@ void MTRApplicationBasicGeneratedCommandListListAttributeCallbackSubscriptionBri
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRApplicationBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRApplicationBasicAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -14477,21 +10427,6 @@ void MTRApplicationBasicAcceptedCommandListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRApplicationBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRApplicationBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -14529,21 +10464,6 @@ void MTRApplicationBasicAttributeListListAttributeCallbackSubscriptionBridge::On
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRApplicationBasicAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRAccountLoginGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -14585,21 +10505,6 @@ void MTRAccountLoginGeneratedCommandListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRAccountLoginGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRAccountLoginAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -14637,21 +10542,6 @@ void MTRAccountLoginAcceptedCommandListListAttributeCallbackSubscriptionBridge::
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRAccountLoginAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRAccountLoginAttributeListListAttributeCallbackBridge::OnSuccessFn(
@@ -14693,21 +10583,6 @@ void MTRAccountLoginAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRAccountLoginAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -14745,21 +10620,6 @@ void MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackSubscripti
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -14801,21 +10661,6 @@ void MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackSubscriptio
     }
 }
 
-void MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRElectricalMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -14855,21 +10700,6 @@ void MTRElectricalMeasurementAttributeListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRElectricalMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTestClusterBitmap8AttributeCallbackBridge::OnSuccessFn(
     void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value)
 {
@@ -14892,21 +10722,6 @@ void MTRTestClusterBitmap8AttributeCallbackSubscriptionBridge::OnSubscriptionEst
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTestClusterBitmap8AttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRTestClusterBitmap16AttributeCallbackBridge::OnSuccessFn(
@@ -14933,21 +10748,6 @@ void MTRTestClusterBitmap16AttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void MTRTestClusterBitmap16AttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTestClusterBitmap32AttributeCallbackBridge::OnSuccessFn(
     void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value)
 {
@@ -14972,21 +10772,6 @@ void MTRTestClusterBitmap32AttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void MTRTestClusterBitmap32AttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTestClusterBitmap64AttributeCallbackBridge::OnSuccessFn(
     void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value)
 {
@@ -15009,21 +10794,6 @@ void MTRTestClusterBitmap64AttributeCallbackSubscriptionBridge::OnSubscriptionEs
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTestClusterBitmap64AttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRTestClusterListInt8uListAttributeCallbackBridge::OnSuccessFn(
@@ -15065,21 +10835,6 @@ void MTRTestClusterListInt8uListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRTestClusterListInt8uListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTestClusterListOctetStringListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
 {
@@ -15117,21 +10872,6 @@ void MTRTestClusterListOctetStringListAttributeCallbackSubscriptionBridge::OnSub
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTestClusterListOctetStringListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRTestClusterListStructOctetStringListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -15174,21 +10914,6 @@ void MTRTestClusterListStructOctetStringListAttributeCallbackSubscriptionBridge:
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTestClusterListStructOctetStringListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -15403,21 +11128,6 @@ void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackSubscript
     }
 }
 
-void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTestClusterStructAttrStructAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType & value)
 {
@@ -15448,21 +11158,6 @@ void MTRTestClusterStructAttrStructAttributeCallbackSubscriptionBridge::OnSubscr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTestClusterStructAttrStructAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRTestClusterListLongOctetStringListAttributeCallbackBridge::OnSuccessFn(
@@ -15502,21 +11197,6 @@ void MTRTestClusterListLongOctetStringListAttributeCallbackSubscriptionBridge::O
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTestClusterListLongOctetStringListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRTestClusterListFabricScopedListAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -15614,21 +11294,6 @@ void MTRTestClusterListFabricScopedListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRTestClusterListFabricScopedListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTestClusterNullableBitmap8AttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value)
 {
@@ -15655,21 +11320,6 @@ void MTRTestClusterNullableBitmap8AttributeCallbackSubscriptionBridge::OnSubscri
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTestClusterNullableBitmap8AttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRTestClusterNullableBitmap16AttributeCallbackBridge::OnSuccessFn(
@@ -15700,21 +11350,6 @@ void MTRTestClusterNullableBitmap16AttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRTestClusterNullableBitmap16AttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTestClusterNullableBitmap32AttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value)
 {
@@ -15743,21 +11378,6 @@ void MTRTestClusterNullableBitmap32AttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRTestClusterNullableBitmap32AttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTestClusterNullableBitmap64AttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value)
 {
@@ -15784,21 +11404,6 @@ void MTRTestClusterNullableBitmap64AttributeCallbackSubscriptionBridge::OnSubscr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTestClusterNullableBitmap64AttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRTestClusterNullableStructStructAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -15837,21 +11442,6 @@ void MTRTestClusterNullableStructStructAttributeCallbackSubscriptionBridge::OnSu
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTestClusterNullableStructStructAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRTestClusterGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
@@ -15893,21 +11483,6 @@ void MTRTestClusterGeneratedCommandListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRTestClusterGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTestClusterAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -15947,21 +11522,6 @@ void MTRTestClusterAcceptedCommandListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRTestClusterAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTestClusterAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -15999,21 +11559,6 @@ void MTRTestClusterAttributeListListAttributeCallbackSubscriptionBridge::OnSubsc
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTestClusterAttributeListListAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRGroupsClusterAddGroupResponseCallbackBridge::OnSuccessFn(
@@ -17842,21 +13387,6 @@ void MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyEffectIdentifier> & value)
 {
@@ -17886,21 +13416,6 @@ void MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::Identify::IdentifyEffectVariant value)
 {
@@ -17923,21 +13438,6 @@ void MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge:
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::OnSuccessFn(
@@ -17968,21 +13468,6 @@ void MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptio
     }
 }
 
-void MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::Identify::IdentifyIdentifyType value)
 {
@@ -18005,21 +13490,6 @@ void MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge::
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::OnSuccessFn(
@@ -18050,21 +13520,6 @@ void MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscription
     }
 }
 
-void MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant value)
 {
@@ -18087,21 +13542,6 @@ void MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscription
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::OnSuccessFn(
@@ -18133,21 +13573,6 @@ void MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubs
     }
 }
 
-void MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OnOff::OnOffDyingLightEffectVariant value)
 {
@@ -18170,21 +13595,6 @@ void MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBri
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::OnSuccessFn(
@@ -18216,21 +13626,6 @@ void MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscri
     }
 }
 
-void MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OnOff::OnOffEffectIdentifier value)
 {
@@ -18253,21 +13648,6 @@ void MTROnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge::On
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
@@ -18298,21 +13678,6 @@ void MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OnOff::OnOffStartUpOnOff value)
 {
@@ -18335,21 +13700,6 @@ void MTROnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge::OnSubs
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::OnSuccessFn(
@@ -18380,21 +13730,6 @@ void MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRLevelControlClusterMoveModeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::LevelControl::MoveMode value)
 {
@@ -18417,21 +13752,6 @@ void MTRLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge::OnSubscr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableLevelControlClusterMoveModeAttributeCallbackBridge::OnSuccessFn(
@@ -18462,21 +13782,6 @@ void MTRNullableLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRNullableLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRLevelControlClusterStepModeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::LevelControl::StepMode value)
 {
@@ -18499,21 +13804,6 @@ void MTRLevelControlClusterStepModeAttributeCallbackSubscriptionBridge::OnSubscr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRLevelControlClusterStepModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableLevelControlClusterStepModeAttributeCallbackBridge::OnSuccessFn(
@@ -18544,21 +13834,6 @@ void MTRNullableLevelControlClusterStepModeAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRNullableLevelControlClusterStepModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRAccessControlClusterAuthModeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::AccessControl::AuthMode value)
 {
@@ -18581,21 +13856,6 @@ void MTRAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge::OnSubsc
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge::OnSuccessFn(
@@ -18626,21 +13886,6 @@ void MTRNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::AccessControl::ChangeTypeEnum value)
 {
@@ -18663,21 +13908,6 @@ void MTRAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge::O
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnSuccessFn(
@@ -18708,21 +13938,6 @@ void MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionB
     }
 }
 
-void MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRAccessControlClusterPrivilegeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::AccessControl::Privilege value)
 {
@@ -18745,21 +13960,6 @@ void MTRAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge::OnSubs
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge::OnSuccessFn(
@@ -18790,21 +13990,6 @@ void MTRNullableAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRNullableAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRActionsClusterActionErrorEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::Actions::ActionErrorEnum value)
 {
@@ -18827,21 +14012,6 @@ void MTRActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge::OnSubs
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge::OnSuccessFn(
@@ -18872,21 +14042,6 @@ void MTRNullableActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRNullableActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRActionsClusterActionStateEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::Actions::ActionStateEnum value)
 {
@@ -18909,21 +14064,6 @@ void MTRActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge::OnSubs
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge::OnSuccessFn(
@@ -18954,21 +14094,6 @@ void MTRNullableActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRNullableActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRActionsClusterActionTypeEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::Actions::ActionTypeEnum value)
 {
@@ -18991,21 +14116,6 @@ void MTRActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge::OnSubsc
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge::OnSuccessFn(
@@ -19036,21 +14146,6 @@ void MTRNullableActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullableActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::Actions::EndpointListTypeEnum value)
 {
@@ -19073,21 +14168,6 @@ void MTRActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge::O
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnSuccessFn(
@@ -19118,21 +14198,6 @@ void MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionB
     }
 }
 
-void MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction value)
 {
@@ -19157,21 +14222,6 @@ void MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSub
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -19204,21 +14254,6 @@ void MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCal
     }
 }
 
-void MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol value)
 {
@@ -19242,21 +14277,6 @@ void MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubs
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -19289,21 +14309,6 @@ void MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCall
     }
 }
 
-void MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus value)
 {
@@ -19326,21 +14331,6 @@ void MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscript
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnSuccessFn(
@@ -19373,21 +14363,6 @@ void MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackS
     }
 }
 
-void MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason value)
 {
@@ -19412,21 +14387,6 @@ void MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackS
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -19460,21 +14420,6 @@ void MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeC
     }
 }
 
-void MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum value)
 {
@@ -19499,21 +14444,6 @@ void MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSub
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -19546,21 +14476,6 @@ void MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCal
     }
 }
 
-void MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value)
 {
@@ -19584,21 +14499,6 @@ void MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubs
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -19631,21 +14531,6 @@ void MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCall
     }
 }
 
-void MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::TimeFormatLocalization::CalendarType value)
 {
@@ -19668,21 +14553,6 @@ void MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::OnSuccessFn(
@@ -19714,21 +14584,6 @@ void MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscr
     }
 }
 
-void MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::TimeFormatLocalization::HourFormat value)
 {
@@ -19751,21 +14606,6 @@ void MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBrid
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::OnSuccessFn(
@@ -19797,21 +14637,6 @@ void MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::UnitLocalization::TempUnit value)
 {
@@ -19834,21 +14659,6 @@ void MTRUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge::OnSu
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnSuccessFn(
@@ -19879,21 +14689,6 @@ void MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRPowerSourceClusterBatChargeFaultAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::PowerSource::BatChargeFault value)
 {
@@ -19916,21 +14711,6 @@ void MTRPowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge::OnS
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRPowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackBridge::OnSuccessFn(
@@ -19961,21 +14741,6 @@ void MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRPowerSourceClusterBatChargeLevelAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::PowerSource::BatChargeLevel value)
 {
@@ -19998,21 +14763,6 @@ void MTRPowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge::OnS
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRPowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge::OnSuccessFn(
@@ -20043,21 +14793,6 @@ void MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRPowerSourceClusterBatChargeStateAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::PowerSource::BatChargeState value)
 {
@@ -20080,21 +14815,6 @@ void MTRPowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge::OnS
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRPowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge::OnSuccessFn(
@@ -20125,21 +14845,6 @@ void MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRPowerSourceClusterBatFaultAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::PowerSource::BatFault value)
 {
@@ -20162,21 +14867,6 @@ void MTRPowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge::OnSubscri
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRPowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullablePowerSourceClusterBatFaultAttributeCallbackBridge::OnSuccessFn(
@@ -20207,21 +14897,6 @@ void MTRNullablePowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRNullablePowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRPowerSourceClusterBatReplaceabilityAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::PowerSource::BatReplaceability value)
 {
@@ -20244,21 +14919,6 @@ void MTRPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge::
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge::OnSuccessFn(
@@ -20289,21 +14949,6 @@ void MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackSubscription
     }
 }
 
-void MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRPowerSourceClusterPowerSourceStatusAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::PowerSource::PowerSourceStatus value)
 {
@@ -20326,21 +14971,6 @@ void MTRPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge::
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge::OnSuccessFn(
@@ -20371,21 +15001,6 @@ void MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackSubscription
     }
 }
 
-void MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::PowerSource::WiredCurrentType value)
 {
@@ -20408,21 +15023,6 @@ void MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge::O
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::OnSuccessFn(
@@ -20453,21 +15053,6 @@ void MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionB
     }
 }
 
-void MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRPowerSourceClusterWiredFaultAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::PowerSource::WiredFault value)
 {
@@ -20490,21 +15075,6 @@ void MTRPowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge::OnSubsc
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRPowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullablePowerSourceClusterWiredFaultAttributeCallbackBridge::OnSuccessFn(
@@ -20535,21 +15105,6 @@ void MTRNullablePowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullablePowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::GeneralCommissioning::CommissioningError value)
 {
@@ -20572,21 +15127,6 @@ void MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscripti
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::OnSuccessFn(
@@ -20619,21 +15159,6 @@ void MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackSu
     }
 }
 
-void MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType value)
 {
@@ -20657,21 +15182,6 @@ void MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::OnSuccessFn(
@@ -20704,21 +15214,6 @@ void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallba
     }
 }
 
-void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus value)
 {
@@ -20743,21 +15238,6 @@ void MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSu
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -20791,21 +15271,6 @@ void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCa
     }
 }
 
-void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::NetworkCommissioning::WiFiBand value)
 {
@@ -20828,21 +15293,6 @@ void MTRNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge::
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnSuccessFn(
@@ -20873,21 +15323,6 @@ void MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackSubscription
     }
 }
 
-void MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DiagnosticLogs::LogsIntent value)
 {
@@ -20910,21 +15345,6 @@ void MTRDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge::OnSu
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::OnSuccessFn(
@@ -20955,21 +15375,6 @@ void MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DiagnosticLogs::LogsStatus value)
 {
@@ -20992,21 +15397,6 @@ void MTRDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge::OnSu
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::OnSuccessFn(
@@ -21037,21 +15427,6 @@ void MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DiagnosticLogs::LogsTransferProtocol value)
 {
@@ -21074,21 +15449,6 @@ void MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::OnSuccessFn(
@@ -21120,21 +15480,6 @@ void MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscr
     }
 }
 
-void MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::GeneralDiagnostics::BootReasonType value)
 {
@@ -21157,21 +15502,6 @@ void MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBrid
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge::OnSuccessFn(
@@ -21203,21 +15533,6 @@ void MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::GeneralDiagnostics::HardwareFaultType value)
 {
@@ -21240,21 +15555,6 @@ void MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscriptionB
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge::OnSuccessFn(
@@ -21286,21 +15586,6 @@ void MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubsc
     }
 }
 
-void MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::GeneralDiagnostics::InterfaceType value)
 {
@@ -21323,21 +15608,6 @@ void MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridg
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::OnSuccessFn(
@@ -21368,21 +15638,6 @@ void MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscript
     }
 }
 
-void MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::GeneralDiagnostics::NetworkFaultType value)
 {
@@ -21405,21 +15660,6 @@ void MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::OnSuccessFn(
@@ -21451,21 +15691,6 @@ void MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscr
     }
 }
 
-void MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::GeneralDiagnostics::RadioFaultType value)
 {
@@ -21488,21 +15713,6 @@ void MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBrid
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge::OnSuccessFn(
@@ -21534,21 +15744,6 @@ void MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault value)
 {
@@ -21571,21 +15766,6 @@ void MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscription
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::OnSuccessFn(
@@ -21617,21 +15797,6 @@ void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubs
     }
 }
 
-void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole value)
 {
@@ -21654,21 +15819,6 @@ void MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionB
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::OnSuccessFn(
@@ -21700,21 +15850,6 @@ void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubsc
     }
 }
 
-void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::ThreadNetworkDiagnostics::ThreadConnectionStatus value)
 {
@@ -21739,21 +15874,6 @@ void MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSu
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -21787,21 +15907,6 @@ void MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCa
     }
 }
 
-void MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause value)
 {
@@ -21826,21 +15931,6 @@ void MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSub
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -21873,21 +15963,6 @@ void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCal
     }
 }
 
-void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType value)
 {
@@ -21910,21 +15985,6 @@ void MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge::OnSuccessFn(
@@ -21956,21 +16016,6 @@ void MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscr
     }
 }
 
-void MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus value)
 {
@@ -21994,21 +16039,6 @@ void MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge::OnSuccessFn(
@@ -22041,21 +16071,6 @@ void MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallba
     }
 }
 
-void MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType value)
 {
@@ -22078,21 +16093,6 @@ void MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptio
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge::OnSuccessFn(
@@ -22125,21 +16125,6 @@ void MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSub
     }
 }
 
-void MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType value)
 {
@@ -22162,21 +16147,6 @@ void MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptio
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge::OnSuccessFn(
@@ -22209,21 +16179,6 @@ void MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSub
     }
 }
 
-void MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::TimeSynchronization::GranularityEnum value)
 {
@@ -22246,21 +16201,6 @@ void MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge::OnSuccessFn(
@@ -22292,21 +16232,6 @@ void MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscr
     }
 }
 
-void MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::TimeSynchronization::TimeSourceEnum value)
 {
@@ -22329,21 +16254,6 @@ void MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBri
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge::OnSuccessFn(
@@ -22375,21 +16285,6 @@ void MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscri
     }
 }
 
-void MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus value)
 {
@@ -22414,21 +16309,6 @@ void MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallb
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -22462,21 +16342,6 @@ void MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttrib
     }
 }
 
-void MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::AdministratorCommissioning::StatusCode value)
 {
@@ -22499,21 +16364,6 @@ void MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscription
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(
@@ -22545,21 +16395,6 @@ void MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackSubs
     }
 }
 
-void MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OperationalCredentials::OperationalCertStatus value)
 {
@@ -22583,21 +16418,6 @@ void MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubsc
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -22630,21 +16450,6 @@ void MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallb
     }
 }
 
-void MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy value)
 {
@@ -22668,21 +16473,6 @@ void MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscrip
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::OnSuccessFn(
@@ -22715,21 +16505,6 @@ void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback
     }
 }
 
-void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DoorLock::DlAlarmCode value)
 {
@@ -22752,21 +16527,6 @@ void MTRDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge::OnSubscri
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge::OnSuccessFn(
@@ -22797,21 +16557,6 @@ void MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDlCredentialRuleAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DoorLock::DlCredentialRule value)
 {
@@ -22834,21 +16579,6 @@ void MTRDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge::OnSu
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge::OnSuccessFn(
@@ -22879,21 +16609,6 @@ void MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDlCredentialTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DoorLock::DlCredentialType value)
 {
@@ -22916,21 +16631,6 @@ void MTRDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge::OnSu
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge::OnSuccessFn(
@@ -22961,21 +16661,6 @@ void MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DoorLock::DlDataOperationType value)
 {
@@ -22998,21 +16683,6 @@ void MTRDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge::O
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::OnSuccessFn(
@@ -23043,21 +16713,6 @@ void MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionB
     }
 }
 
-void MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDlDoorStateAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DoorLock::DlDoorState value)
 {
@@ -23080,21 +16735,6 @@ void MTRDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge::OnSubscri
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDlDoorStateAttributeCallbackBridge::OnSuccessFn(
@@ -23125,21 +16765,6 @@ void MTRNullableDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRNullableDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDlLockDataTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DoorLock::DlLockDataType value)
 {
@@ -23162,21 +16787,6 @@ void MTRDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge::OnSubs
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge::OnSuccessFn(
@@ -23207,21 +16817,6 @@ void MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DoorLock::DlLockOperationType value)
 {
@@ -23244,21 +16839,6 @@ void MTRDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge::O
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::OnSuccessFn(
@@ -23289,21 +16869,6 @@ void MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionB
     }
 }
 
-void MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDlLockStateAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DoorLock::DlLockState value)
 {
@@ -23326,21 +16891,6 @@ void MTRDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge::OnSubscri
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDlLockStateAttributeCallbackBridge::OnSuccessFn(
@@ -23371,21 +16921,6 @@ void MTRNullableDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRNullableDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDlLockTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DoorLock::DlLockType value)
 {
@@ -23408,21 +16943,6 @@ void MTRDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge::OnSubscrip
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDlLockTypeAttributeCallbackBridge::OnSuccessFn(
@@ -23453,21 +16973,6 @@ void MTRNullableDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRNullableDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDlOperatingModeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DoorLock::DlOperatingMode value)
 {
@@ -23490,21 +16995,6 @@ void MTRDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge::OnSub
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge::OnSuccessFn(
@@ -23535,21 +17025,6 @@ void MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDlOperationErrorAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DoorLock::DlOperationError value)
 {
@@ -23572,21 +17047,6 @@ void MTRDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge::OnSu
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge::OnSuccessFn(
@@ -23617,21 +17077,6 @@ void MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDlOperationSourceAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DoorLock::DlOperationSource value)
 {
@@ -23654,21 +17099,6 @@ void MTRDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge::OnS
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge::OnSuccessFn(
@@ -23699,21 +17129,6 @@ void MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDlStatusAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlStatus value)
 {
     NSNumber * _Nonnull objCValue;
@@ -23735,21 +17150,6 @@ void MTRDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge::OnSubscripti
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDlStatusAttributeCallbackBridge::OnSuccessFn(
@@ -23780,21 +17180,6 @@ void MTRNullableDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRNullableDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDlUserStatusAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DoorLock::DlUserStatus value)
 {
@@ -23817,21 +17202,6 @@ void MTRDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge::OnSubscr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge::OnSuccessFn(
@@ -23862,21 +17232,6 @@ void MTRNullableDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRNullableDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDlUserTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DoorLock::DlUserType value)
 {
@@ -23899,21 +17254,6 @@ void MTRDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge::OnSubscrip
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDlUserTypeAttributeCallbackBridge::OnSuccessFn(
@@ -23944,21 +17284,6 @@ void MTRNullableDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRNullableDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DoorLock::DoorLockOperationEventCode value)
 {
@@ -23981,21 +17306,6 @@ void MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::OnSuccessFn(
@@ -24027,21 +17337,6 @@ void MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscr
     }
 }
 
-void MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DoorLock::DoorLockProgrammingEventCode value)
 {
@@ -24064,21 +17359,6 @@ void MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscription
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::OnSuccessFn(
@@ -24110,21 +17390,6 @@ void MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubs
     }
 }
 
-void MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DoorLock::DoorLockSetPinOrIdStatus value)
 {
@@ -24147,21 +17412,6 @@ void MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBrid
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::OnSuccessFn(
@@ -24193,21 +17443,6 @@ void MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DoorLock::DoorLockUserStatus value)
 {
@@ -24230,21 +17465,6 @@ void MTRDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge::On
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::OnSuccessFn(
@@ -24275,21 +17495,6 @@ void MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::DoorLock::DoorLockUserType value)
 {
@@ -24312,21 +17517,6 @@ void MTRDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge::OnSu
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::OnSuccessFn(
@@ -24357,21 +17547,6 @@ void MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRWindowCoveringClusterEndProductTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::WindowCovering::EndProductType value)
 {
@@ -24394,21 +17569,6 @@ void MTRWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge::
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackBridge::OnSuccessFn(
@@ -24439,21 +17599,6 @@ void MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackSubscription
     }
 }
 
-void MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRWindowCoveringClusterTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::WindowCovering::Type value)
 {
@@ -24476,21 +17621,6 @@ void MTRWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge::OnSubscrip
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableWindowCoveringClusterTypeAttributeCallbackBridge::OnSuccessFn(
@@ -24521,21 +17651,6 @@ void MTRNullableWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRNullableWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value)
 {
@@ -24559,21 +17674,6 @@ void MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscr
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::OnSuccessFn(
@@ -24606,21 +17706,6 @@ void MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallba
     }
 }
 
-void MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value)
 {
@@ -24644,21 +17729,6 @@ void MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubs
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -24691,21 +17761,6 @@ void MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCall
     }
 }
 
-void MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRThermostatClusterSetpointAdjustModeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::Thermostat::SetpointAdjustMode value)
 {
@@ -24728,21 +17783,6 @@ void MTRThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge::
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackBridge::OnSuccessFn(
@@ -24773,21 +17813,6 @@ void MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackSubscription
     }
 }
 
-void MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRThermostatClusterThermostatControlSequenceAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::Thermostat::ThermostatControlSequence value)
 {
@@ -24810,21 +17835,6 @@ void MTRThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionB
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackBridge::OnSuccessFn(
@@ -24856,21 +17866,6 @@ void MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackSubsc
     }
 }
 
-void MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRThermostatClusterThermostatRunningModeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::Thermostat::ThermostatRunningMode value)
 {
@@ -24893,21 +17888,6 @@ void MTRThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridg
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackBridge::OnSuccessFn(
@@ -24938,21 +17918,6 @@ void MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackSubscript
     }
 }
 
-void MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::Thermostat::ThermostatSystemMode value)
 {
@@ -24975,21 +17940,6 @@ void MTRThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge::OnSuccessFn(
@@ -25020,21 +17970,6 @@ void MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::FanControl::FanModeSequenceType value)
 {
@@ -25057,21 +17992,6 @@ void MTRFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge:
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::OnSuccessFn(
@@ -25102,21 +18022,6 @@ void MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptio
     }
 }
 
-void MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRFanControlClusterFanModeTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::FanControl::FanModeType value)
 {
@@ -25139,21 +18044,6 @@ void MTRFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge::OnSubsc
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableFanControlClusterFanModeTypeAttributeCallbackBridge::OnSuccessFn(
@@ -25184,21 +18074,6 @@ void MTRNullableFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullableFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRColorControlClusterColorLoopActionAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::ColorControl::ColorLoopAction value)
 {
@@ -25221,21 +18096,6 @@ void MTRColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge::O
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableColorControlClusterColorLoopActionAttributeCallbackBridge::OnSuccessFn(
@@ -25266,21 +18126,6 @@ void MTRNullableColorControlClusterColorLoopActionAttributeCallbackSubscriptionB
     }
 }
 
-void MTRNullableColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRColorControlClusterColorLoopDirectionAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::ColorControl::ColorLoopDirection value)
 {
@@ -25303,21 +18148,6 @@ void MTRColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackBridge::OnSuccessFn(
@@ -25348,21 +18178,6 @@ void MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRColorControlClusterColorModeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::ColorControl::ColorMode value)
 {
@@ -25385,21 +18200,6 @@ void MTRColorControlClusterColorModeAttributeCallbackSubscriptionBridge::OnSubsc
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRColorControlClusterColorModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableColorControlClusterColorModeAttributeCallbackBridge::OnSuccessFn(
@@ -25430,21 +18230,6 @@ void MTRNullableColorControlClusterColorModeAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullableColorControlClusterColorModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRColorControlClusterHueDirectionAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::ColorControl::HueDirection value)
 {
@@ -25467,21 +18252,6 @@ void MTRColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge::OnSu
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableColorControlClusterHueDirectionAttributeCallbackBridge::OnSuccessFn(
@@ -25512,21 +18282,6 @@ void MTRNullableColorControlClusterHueDirectionAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRColorControlClusterHueMoveModeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::ColorControl::HueMoveMode value)
 {
@@ -25549,21 +18304,6 @@ void MTRColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge::OnSub
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableColorControlClusterHueMoveModeAttributeCallbackBridge::OnSuccessFn(
@@ -25594,21 +18334,6 @@ void MTRNullableColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRNullableColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRColorControlClusterHueStepModeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::ColorControl::HueStepMode value)
 {
@@ -25631,21 +18356,6 @@ void MTRColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge::OnSub
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableColorControlClusterHueStepModeAttributeCallbackBridge::OnSuccessFn(
@@ -25676,21 +18386,6 @@ void MTRNullableColorControlClusterHueStepModeAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRNullableColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRColorControlClusterSaturationMoveModeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::ColorControl::SaturationMoveMode value)
 {
@@ -25713,21 +18408,6 @@ void MTRColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackBridge::OnSuccessFn(
@@ -25758,21 +18438,6 @@ void MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRColorControlClusterSaturationStepModeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::ColorControl::SaturationStepMode value)
 {
@@ -25795,21 +18460,6 @@ void MTRColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableColorControlClusterSaturationStepModeAttributeCallbackBridge::OnSuccessFn(
@@ -25840,21 +18490,6 @@ void MTRNullableColorControlClusterSaturationStepModeAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::IlluminanceMeasurement::LightSensorType value)
 {
@@ -25877,21 +18512,6 @@ void MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptio
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::OnSuccessFn(
@@ -25924,21 +18544,6 @@ void MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSub
     }
 }
 
-void MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRChannelClusterChannelStatusEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::Channel::ChannelStatusEnum value)
 {
@@ -25961,21 +18566,6 @@ void MTRChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBridge::OnSu
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableChannelClusterChannelStatusEnumAttributeCallbackBridge::OnSuccessFn(
@@ -26006,21 +18596,6 @@ void MTRNullableChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::Channel::LineupInfoTypeEnum value)
 {
@@ -26043,21 +18618,6 @@ void MTRChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge::OnS
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::OnSuccessFn(
@@ -26088,21 +18648,6 @@ void MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::TargetNavigator::TargetNavigatorStatusEnum value)
 {
@@ -26126,21 +18671,6 @@ void MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscrip
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::OnSuccessFn(
@@ -26173,21 +18703,6 @@ void MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallback
     }
 }
 
-void MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::MediaPlayback::MediaPlaybackStatusEnum value)
 {
@@ -26210,21 +18725,6 @@ void MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscription
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge::OnSuccessFn(
@@ -26256,21 +18756,6 @@ void MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubs
     }
 }
 
-void MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum value)
 {
@@ -26293,21 +18778,6 @@ void MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnSuccessFn(
@@ -26338,21 +18808,6 @@ void MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRMediaInputClusterInputTypeEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::MediaInput::InputTypeEnum value)
 {
@@ -26375,21 +18830,6 @@ void MTRMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge::OnSub
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackBridge::OnSuccessFn(
@@ -26420,21 +18860,6 @@ void MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRKeypadInputClusterCecKeyCodeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::KeypadInput::CecKeyCode value)
 {
@@ -26457,21 +18882,6 @@ void MTRKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge::OnSubsc
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackBridge::OnSuccessFn(
@@ -26502,21 +18912,6 @@ void MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::KeypadInput::KeypadInputStatusEnum value)
 {
@@ -26539,21 +18934,6 @@ void MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBrid
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::OnSuccessFn(
@@ -26585,21 +18965,6 @@ void MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum value)
 {
@@ -26622,21 +18987,6 @@ void MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscripti
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::OnSuccessFn(
@@ -26669,21 +19019,6 @@ void MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSu
     }
 }
 
-void MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::ContentLauncher::MetricTypeEnum value)
 {
@@ -26706,21 +19041,6 @@ void MTRContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge:
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::OnSuccessFn(
@@ -26751,21 +19071,6 @@ void MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptio
     }
 }
 
-void MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRContentLauncherClusterParameterEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::ContentLauncher::ParameterEnum value)
 {
@@ -26788,21 +19093,6 @@ void MTRContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge::
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableContentLauncherClusterParameterEnumAttributeCallbackBridge::OnSuccessFn(
@@ -26833,21 +19123,6 @@ void MTRNullableContentLauncherClusterParameterEnumAttributeCallbackSubscription
     }
 }
 
-void MTRNullableContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::AudioOutput::OutputTypeEnum value)
 {
@@ -26870,21 +19145,6 @@ void MTRAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge::OnS
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::OnSuccessFn(
@@ -26915,21 +19175,6 @@ void MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum value)
 {
@@ -26954,21 +19199,6 @@ void MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context,
@@ -27002,21 +19232,6 @@ void MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttribute
     }
 }
 
-void MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value)
 {
@@ -27039,21 +19254,6 @@ void MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptio
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::OnSuccessFn(
@@ -27086,21 +19286,6 @@ void MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackSub
     }
 }
 
-void MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRTestClusterClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::TestCluster::SimpleEnum value)
 {
@@ -27123,21 +19308,6 @@ void MTRTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnSubsc
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableTestClusterClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(
@@ -27168,21 +19338,6 @@ void MTRNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
-}
-
 void MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::FaultInjection::FaultType value)
 {
@@ -27205,21 +19360,6 @@ void MTRFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge::OnSub
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }
 
 void MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge::OnSuccessFn(
@@ -27248,19 +19388,4 @@ void MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridg
         // establishment.
         self->mEstablishedHandler = nil;
     }
-}
-
-void MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge::OnDone()
-{
-    if (!mQueue) {
-        delete this;
-        return;
-    }
-
-    // Delete ourselves async, so that any error/data reports we
-    // queued up before getting OnDone have a chance to run.
-    auto * self = this;
-    dispatch_async(mQueue, ^{
-        delete self;
-    });
 }

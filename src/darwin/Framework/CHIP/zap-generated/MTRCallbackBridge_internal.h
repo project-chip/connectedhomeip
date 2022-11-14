@@ -1157,8 +1157,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROctetStringAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROctetStringAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1187,8 +1187,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableOctetStringAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOctetStringAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1216,8 +1216,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRCharStringAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCharStringAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1245,8 +1245,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableCharStringAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableCharStringAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1274,8 +1274,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBooleanAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBooleanAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1303,8 +1303,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableBooleanAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableBooleanAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1332,8 +1332,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRInt8uAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRInt8uAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1361,8 +1361,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableInt8uAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableInt8uAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1390,8 +1390,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRInt8sAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRInt8sAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1419,8 +1419,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableInt8sAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableInt8sAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1448,8 +1448,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRInt16uAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRInt16uAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1477,8 +1477,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableInt16uAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableInt16uAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1506,8 +1506,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRInt16sAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRInt16sAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1535,8 +1535,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableInt16sAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableInt16sAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1564,8 +1564,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRInt32uAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRInt32uAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1593,8 +1593,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableInt32uAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableInt32uAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1622,8 +1622,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRInt32sAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRInt32sAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1651,8 +1651,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableInt32sAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableInt32sAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1680,8 +1680,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRInt64uAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRInt64uAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1709,8 +1709,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableInt64uAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableInt64uAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1738,8 +1738,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRInt64sAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRInt64sAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1767,8 +1767,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableInt64sAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableInt64sAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1796,8 +1796,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRFloatAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFloatAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1825,8 +1825,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableFloatAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableFloatAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1854,8 +1854,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoubleAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoubleAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1883,8 +1883,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoubleAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoubleAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1912,8 +1912,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRVendorIdAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRVendorIdAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1941,8 +1941,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableVendorIdAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableVendorIdAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -1974,8 +1974,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRIdentifyGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRIdentifyGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2007,8 +2007,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRIdentifyAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRIdentifyAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2037,8 +2037,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRIdentifyAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRIdentifyAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2070,8 +2070,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGroupsGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGroupsGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2103,8 +2103,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGroupsAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGroupsAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2133,8 +2133,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGroupsAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGroupsAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2166,8 +2166,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRScenesGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRScenesGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2199,8 +2199,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRScenesAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRScenesAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2229,8 +2229,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRScenesAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRScenesAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2262,8 +2262,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROnOffGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROnOffGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2294,8 +2294,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROnOffAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROnOffAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2324,8 +2324,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROnOffAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROnOffAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2357,8 +2357,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2390,8 +2390,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2423,8 +2423,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROnOffSwitchConfigurationAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROnOffSwitchConfigurationAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2456,8 +2456,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRLevelControlGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLevelControlGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2489,8 +2489,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRLevelControlAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLevelControlAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2522,8 +2522,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRLevelControlAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLevelControlAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2555,8 +2555,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2588,8 +2588,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2621,8 +2621,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBinaryInputBasicAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBinaryInputBasicAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2656,8 +2656,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDescriptorDeviceTypeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDescriptorDeviceTypeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2686,8 +2686,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDescriptorServerListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDescriptorServerListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2716,8 +2716,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDescriptorClientListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDescriptorClientListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2746,8 +2746,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDescriptorPartsListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDescriptorPartsListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2779,8 +2779,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDescriptorGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDescriptorGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2812,8 +2812,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDescriptorAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDescriptorAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2843,8 +2843,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDescriptorAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDescriptorAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2874,8 +2874,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBindingBindingListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBindingBindingListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2907,8 +2907,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBindingGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBindingGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2940,8 +2940,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBindingAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBindingAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -2970,8 +2970,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBindingAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBindingAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3003,8 +3003,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAccessControlAclListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAccessControlAclListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3036,8 +3036,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAccessControlExtensionListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAccessControlExtensionListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3069,8 +3069,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAccessControlGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAccessControlGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3102,8 +3102,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAccessControlAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAccessControlAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3135,8 +3135,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAccessControlAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAccessControlAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3167,8 +3167,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRActionsActionListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRActionsActionListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3200,8 +3200,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRActionsEndpointListsListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRActionsEndpointListsListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3233,8 +3233,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRActionsGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRActionsGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3266,8 +3266,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRActionsAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRActionsAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3296,8 +3296,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRActionsAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRActionsAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3328,8 +3328,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBasicCapabilityMinimaStructAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBasicCapabilityMinimaStructAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3361,8 +3361,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBasicGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBasicGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3393,8 +3393,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBasicAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBasicAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3423,8 +3423,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBasicAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBasicAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3457,8 +3457,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3490,8 +3490,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3523,8 +3523,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3559,8 +3559,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3593,8 +3593,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3627,8 +3627,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3660,8 +3660,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3693,8 +3693,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3727,8 +3727,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3760,8 +3760,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3793,8 +3793,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRLocalizationConfigurationAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLocalizationConfigurationAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3828,8 +3828,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3861,8 +3861,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3894,8 +3894,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3927,8 +3927,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTimeFormatLocalizationAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTimeFormatLocalizationAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3960,8 +3960,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRUnitLocalizationGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitLocalizationGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -3993,8 +3993,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRUnitLocalizationAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitLocalizationAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4026,8 +4026,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRUnitLocalizationAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitLocalizationAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4059,8 +4059,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPowerSourceConfigurationSourcesListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPowerSourceConfigurationSourcesListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4092,8 +4092,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4125,8 +4125,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4158,8 +4158,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPowerSourceConfigurationAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPowerSourceConfigurationAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4192,8 +4192,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPowerSourceActiveWiredFaultsListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPowerSourceActiveWiredFaultsListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4226,8 +4226,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPowerSourceActiveBatFaultsListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPowerSourceActiveBatFaultsListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4260,8 +4260,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4293,8 +4293,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPowerSourceGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPowerSourceGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4326,8 +4326,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPowerSourceAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPowerSourceAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4358,8 +4358,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPowerSourceAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPowerSourceAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4393,8 +4393,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4426,8 +4426,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4459,8 +4459,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4492,8 +4492,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGeneralCommissioningAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralCommissioningAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4528,8 +4528,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNetworkCommissioningNetworksListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNetworkCommissioningNetworksListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4561,8 +4561,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4594,8 +4594,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4627,8 +4627,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNetworkCommissioningAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNetworkCommissioningAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4660,8 +4660,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4693,8 +4693,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4726,8 +4726,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDiagnosticLogsAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDiagnosticLogsAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4761,8 +4761,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4794,8 +4794,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4827,8 +4827,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4860,8 +4860,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4893,8 +4893,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4926,8 +4926,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4959,8 +4959,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGeneralDiagnosticsAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralDiagnosticsAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -4995,8 +4995,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5028,8 +5028,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5061,8 +5061,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5094,8 +5094,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRSoftwareDiagnosticsAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSoftwareDiagnosticsAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5129,8 +5129,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5164,8 +5164,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5199,8 +5199,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5239,8 +5239,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5275,8 +5275,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5308,8 +5308,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5341,8 +5341,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5374,8 +5374,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5407,8 +5407,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5440,8 +5440,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5473,8 +5473,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5507,8 +5507,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5541,8 +5541,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5574,8 +5574,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5607,8 +5607,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5640,8 +5640,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5673,8 +5673,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5706,8 +5706,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRSwitchGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSwitchGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5739,8 +5739,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRSwitchAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSwitchAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5769,8 +5769,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRSwitchAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSwitchAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5803,8 +5803,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5837,8 +5837,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5870,8 +5870,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAdministratorCommissioningAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAdministratorCommissioningAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5906,8 +5906,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROperationalCredentialsNOCsListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROperationalCredentialsNOCsListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5941,8 +5941,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROperationalCredentialsFabricsListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROperationalCredentialsFabricsListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5975,8 +5975,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6008,8 +6008,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROperationalCredentialsGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROperationalCredentialsGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6041,8 +6041,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROperationalCredentialsAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROperationalCredentialsAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6074,8 +6074,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROperationalCredentialsAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROperationalCredentialsAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6109,8 +6109,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGroupKeyManagementGroupKeyMapListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGroupKeyManagementGroupKeyMapListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6144,8 +6144,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGroupKeyManagementGroupTableListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGroupKeyManagementGroupTableListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6177,8 +6177,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6210,8 +6210,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6243,8 +6243,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGroupKeyManagementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGroupKeyManagementAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6275,8 +6275,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRFixedLabelLabelListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFixedLabelLabelListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6308,8 +6308,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRFixedLabelGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFixedLabelGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6341,8 +6341,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRFixedLabelAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFixedLabelAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6372,8 +6372,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRFixedLabelAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFixedLabelAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6404,8 +6404,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRUserLabelLabelListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUserLabelLabelListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6437,8 +6437,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRUserLabelGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUserLabelGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6470,8 +6470,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRUserLabelAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUserLabelAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6500,8 +6500,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRUserLabelAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUserLabelAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6533,8 +6533,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBooleanStateGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBooleanStateGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6566,8 +6566,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBooleanStateAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBooleanStateAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6599,8 +6599,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBooleanStateAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBooleanStateAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6634,8 +6634,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRModeSelectSupportedModesListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRModeSelectSupportedModesListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6667,8 +6667,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRModeSelectGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRModeSelectGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6700,8 +6700,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRModeSelectAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRModeSelectAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6731,8 +6731,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRModeSelectAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRModeSelectAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6764,8 +6764,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockCredentialRulesSupportAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockCredentialRulesSupportAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6797,8 +6797,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockSupportedOperatingModesAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockSupportedOperatingModesAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6830,8 +6830,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockDefaultConfigurationRegisterAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockDefaultConfigurationRegisterAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6863,8 +6863,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockLocalProgrammingFeaturesAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockLocalProgrammingFeaturesAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6896,8 +6896,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6929,8 +6929,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6959,8 +6959,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -6989,8 +6989,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRWindowCoveringConfigStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRWindowCoveringConfigStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7022,8 +7022,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRWindowCoveringOperationalStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRWindowCoveringOperationalStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7051,8 +7051,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRWindowCoveringModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRWindowCoveringModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7081,8 +7081,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRWindowCoveringSafetyStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRWindowCoveringSafetyStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7114,8 +7114,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRWindowCoveringGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRWindowCoveringGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7147,8 +7147,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRWindowCoveringAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRWindowCoveringAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7180,8 +7180,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRWindowCoveringAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRWindowCoveringAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7213,8 +7213,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBarrierControlGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBarrierControlGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7246,8 +7246,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBarrierControlAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBarrierControlAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7279,8 +7279,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBarrierControlAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBarrierControlAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7312,8 +7312,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPumpConfigurationAndControlPumpStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPumpConfigurationAndControlPumpStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7346,8 +7346,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7380,8 +7380,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7413,8 +7413,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPumpConfigurationAndControlAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPumpConfigurationAndControlAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7446,8 +7446,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThermostatGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThermostatGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7479,8 +7479,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThermostatAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThermostatAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7510,8 +7510,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThermostatAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThermostatAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7543,8 +7543,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRFanControlGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFanControlGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7576,8 +7576,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRFanControlAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFanControlAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7607,8 +7607,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRFanControlAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFanControlAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7644,8 +7644,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7681,8 +7681,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7716,8 +7716,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7749,8 +7749,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRColorControlGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRColorControlGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7782,8 +7782,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRColorControlAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRColorControlAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7815,8 +7815,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRColorControlAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRColorControlAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7848,8 +7848,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7881,8 +7881,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7914,8 +7914,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRBallastConfigurationAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBallastConfigurationAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7947,8 +7947,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -7980,8 +7980,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8013,8 +8013,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRIlluminanceMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRIlluminanceMeasurementAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8046,8 +8046,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8079,8 +8079,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8112,8 +8112,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTemperatureMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTemperatureMeasurementAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8145,8 +8145,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPressureMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPressureMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8178,8 +8178,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPressureMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPressureMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8211,8 +8211,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPressureMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPressureMeasurementAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8244,8 +8244,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRFlowMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFlowMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8277,8 +8277,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRFlowMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFlowMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8310,8 +8310,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRFlowMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFlowMeasurementAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8344,8 +8344,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8378,8 +8378,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8411,8 +8411,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8444,8 +8444,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROccupancySensingGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROccupancySensingGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8477,8 +8477,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROccupancySensingAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROccupancySensingAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8510,8 +8510,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROccupancySensingAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROccupancySensingAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8543,8 +8543,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRWakeOnLanGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRWakeOnLanGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8576,8 +8576,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRWakeOnLanAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRWakeOnLanAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8606,8 +8606,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRWakeOnLanAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRWakeOnLanAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8638,8 +8638,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRChannelChannelListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChannelChannelListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8670,8 +8670,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRChannelLineupStructAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChannelLineupStructAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8703,8 +8703,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRChannelCurrentChannelStructAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChannelCurrentChannelStructAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8736,8 +8736,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRChannelGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChannelGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8769,8 +8769,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRChannelAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChannelAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8799,8 +8799,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRChannelAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChannelAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8835,8 +8835,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTargetNavigatorTargetListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTargetNavigatorTargetListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8868,8 +8868,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTargetNavigatorGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTargetNavigatorGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8901,8 +8901,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTargetNavigatorAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTargetNavigatorAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8934,8 +8934,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTargetNavigatorAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTargetNavigatorAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -8969,8 +8969,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRMediaPlaybackSampledPositionStructAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRMediaPlaybackSampledPositionStructAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9002,8 +9002,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRMediaPlaybackGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRMediaPlaybackGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9035,8 +9035,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRMediaPlaybackAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRMediaPlaybackAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9068,8 +9068,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRMediaPlaybackAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRMediaPlaybackAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9100,8 +9100,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRMediaInputInputListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRMediaInputInputListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9133,8 +9133,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRMediaInputGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRMediaInputGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9166,8 +9166,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRMediaInputAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRMediaInputAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9197,8 +9197,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRMediaInputAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRMediaInputAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9230,8 +9230,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRLowPowerGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLowPowerGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9263,8 +9263,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRLowPowerAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLowPowerAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9293,8 +9293,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRLowPowerAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLowPowerAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9326,8 +9326,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRKeypadInputGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRKeypadInputGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9359,8 +9359,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRKeypadInputAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRKeypadInputAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9391,8 +9391,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRKeypadInputAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRKeypadInputAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9424,8 +9424,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRContentLauncherAcceptHeaderListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRContentLauncherAcceptHeaderListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9457,8 +9457,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRContentLauncherGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRContentLauncherGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9490,8 +9490,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRContentLauncherAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRContentLauncherAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9523,8 +9523,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRContentLauncherAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRContentLauncherAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9555,8 +9555,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAudioOutputOutputListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAudioOutputOutputListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9588,8 +9588,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAudioOutputGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAudioOutputGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9621,8 +9621,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAudioOutputAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAudioOutputAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9653,8 +9653,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAudioOutputAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAudioOutputAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9686,8 +9686,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRApplicationLauncherCatalogListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRApplicationLauncherCatalogListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9722,8 +9722,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9755,8 +9755,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRApplicationLauncherGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRApplicationLauncherGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9788,8 +9788,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRApplicationLauncherAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRApplicationLauncherAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9821,8 +9821,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRApplicationLauncherAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRApplicationLauncherAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9856,8 +9856,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRApplicationBasicApplicationStructAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRApplicationBasicApplicationStructAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9889,8 +9889,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRApplicationBasicAllowedVendorListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRApplicationBasicAllowedVendorListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9922,8 +9922,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRApplicationBasicGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRApplicationBasicGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9955,8 +9955,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRApplicationBasicAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRApplicationBasicAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -9988,8 +9988,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRApplicationBasicAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRApplicationBasicAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10021,8 +10021,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAccountLoginGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAccountLoginGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10054,8 +10054,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAccountLoginAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAccountLoginAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10087,8 +10087,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAccountLoginAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAccountLoginAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10120,8 +10120,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10153,8 +10153,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10186,8 +10186,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRElectricalMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRElectricalMeasurementAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10215,8 +10215,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterBitmap8AttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterBitmap8AttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10245,8 +10245,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterBitmap16AttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterBitmap16AttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10275,8 +10275,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterBitmap32AttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterBitmap32AttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10305,8 +10305,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterBitmap64AttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterBitmap64AttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10335,8 +10335,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterListInt8uListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterListInt8uListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10368,8 +10368,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterListOctetStringListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterListOctetStringListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10404,8 +10404,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterListStructOctetStringListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterListStructOctetStringListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10439,8 +10439,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10470,8 +10470,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterStructAttrStructAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterStructAttrStructAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10503,8 +10503,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterListLongOctetStringListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterListLongOctetStringListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10539,8 +10539,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterListFabricScopedListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterListFabricScopedListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10571,8 +10571,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterNullableBitmap8AttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterNullableBitmap8AttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10604,8 +10604,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterNullableBitmap16AttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterNullableBitmap16AttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10637,8 +10637,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterNullableBitmap32AttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterNullableBitmap32AttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10670,8 +10670,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterNullableBitmap64AttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterNullableBitmap64AttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10705,8 +10705,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterNullableStructStructAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterNullableStructStructAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10738,8 +10738,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10771,8 +10771,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -10803,8 +10803,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -11621,8 +11621,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -11655,8 +11655,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -11688,8 +11688,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -11722,8 +11722,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -11755,8 +11755,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -11789,8 +11789,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -11822,8 +11822,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -11858,8 +11858,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -11891,8 +11891,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -11925,8 +11925,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -11958,8 +11958,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -11992,8 +11992,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12025,8 +12025,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12059,8 +12059,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12090,8 +12090,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRLevelControlClusterMoveModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLevelControlClusterMoveModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12124,8 +12124,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableLevelControlClusterMoveModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableLevelControlClusterMoveModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12155,8 +12155,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRLevelControlClusterStepModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLevelControlClusterStepModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12189,8 +12189,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableLevelControlClusterStepModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableLevelControlClusterStepModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12221,8 +12221,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAccessControlClusterAuthModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAccessControlClusterAuthModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12255,8 +12255,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12288,8 +12288,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAccessControlClusterChangeTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12322,8 +12322,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12355,8 +12355,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAccessControlClusterPrivilegeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAccessControlClusterPrivilegeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12389,8 +12389,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12422,8 +12422,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRActionsClusterActionErrorEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRActionsClusterActionErrorEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12456,8 +12456,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12489,8 +12489,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRActionsClusterActionStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRActionsClusterActionStateEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12523,8 +12523,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12555,8 +12555,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRActionsClusterActionTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRActionsClusterActionTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12589,8 +12589,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12622,8 +12622,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRActionsClusterEndpointListTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12656,8 +12656,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12691,8 +12691,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12730,8 +12730,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12764,8 +12764,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12803,8 +12803,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12836,8 +12836,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12874,8 +12874,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12910,8 +12910,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12949,8 +12949,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12984,8 +12984,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13023,8 +13023,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13057,8 +13057,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13096,8 +13096,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13129,8 +13129,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13165,8 +13165,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13198,8 +13198,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13232,8 +13232,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13265,8 +13265,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13299,8 +13299,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13332,8 +13332,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPowerSourceClusterBatChargeFaultAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPowerSourceClusterBatChargeFaultAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13366,8 +13366,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13399,8 +13399,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPowerSourceClusterBatChargeLevelAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPowerSourceClusterBatChargeLevelAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13433,8 +13433,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13466,8 +13466,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPowerSourceClusterBatChargeStateAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPowerSourceClusterBatChargeStateAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13500,8 +13500,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13530,8 +13530,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPowerSourceClusterBatFaultAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPowerSourceClusterBatFaultAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13564,8 +13564,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullablePowerSourceClusterBatFaultAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePowerSourceClusterBatFaultAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13597,8 +13597,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPowerSourceClusterBatReplaceabilityAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPowerSourceClusterBatReplaceabilityAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13631,8 +13631,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13664,8 +13664,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPowerSourceClusterPowerSourceStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPowerSourceClusterPowerSourceStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13698,8 +13698,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13731,8 +13731,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13765,8 +13765,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13797,8 +13797,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPowerSourceClusterWiredFaultAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPowerSourceClusterWiredFaultAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13831,8 +13831,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullablePowerSourceClusterWiredFaultAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePowerSourceClusterWiredFaultAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13864,8 +13864,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13901,8 +13901,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13935,8 +13935,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13974,8 +13974,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14009,8 +14009,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14048,8 +14048,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14081,8 +14081,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14115,8 +14115,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14148,8 +14148,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14182,8 +14182,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14215,8 +14215,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14249,8 +14249,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14282,8 +14282,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14318,8 +14318,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14351,8 +14351,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14385,8 +14385,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14418,8 +14418,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14454,8 +14454,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14487,8 +14487,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14521,8 +14521,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14554,8 +14554,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14590,8 +14590,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14623,8 +14623,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14657,8 +14657,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14690,8 +14690,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14726,8 +14726,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14759,8 +14759,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14795,8 +14795,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14830,8 +14830,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14869,8 +14869,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14904,8 +14904,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14943,8 +14943,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14976,8 +14976,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15012,8 +15012,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15046,8 +15046,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15085,8 +15085,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15118,8 +15118,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15155,8 +15155,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15188,8 +15188,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15225,8 +15225,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15258,8 +15258,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15294,8 +15294,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15327,8 +15327,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15361,8 +15361,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15398,8 +15398,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15437,8 +15437,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15470,8 +15470,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15506,8 +15506,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15540,8 +15540,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15579,8 +15579,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15612,8 +15612,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15650,8 +15650,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15680,8 +15680,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15714,8 +15714,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15747,8 +15747,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDlCredentialRuleAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDlCredentialRuleAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15781,8 +15781,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15814,8 +15814,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDlCredentialTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDlCredentialTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15848,8 +15848,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15881,8 +15881,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15915,8 +15915,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15945,8 +15945,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDlDoorStateAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDlDoorStateAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -15979,8 +15979,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDlDoorStateAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDlDoorStateAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16012,8 +16012,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDlLockDataTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDlLockDataTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16046,8 +16046,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16079,8 +16079,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16113,8 +16113,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16143,8 +16143,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDlLockStateAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDlLockStateAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16177,8 +16177,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDlLockStateAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDlLockStateAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16207,8 +16207,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDlLockTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDlLockTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16241,8 +16241,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDlLockTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDlLockTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16274,8 +16274,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDlOperatingModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDlOperatingModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16308,8 +16308,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16341,8 +16341,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDlOperationErrorAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDlOperationErrorAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16375,8 +16375,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16408,8 +16408,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDlOperationSourceAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDlOperationSourceAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16442,8 +16442,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16472,8 +16472,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDlStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDlStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16505,8 +16505,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDlStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDlStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16536,8 +16536,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDlUserStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDlUserStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16570,8 +16570,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16600,8 +16600,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDlUserTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDlUserTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16634,8 +16634,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDlUserTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDlUserTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16667,8 +16667,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16703,8 +16703,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16736,8 +16736,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16772,8 +16772,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16805,8 +16805,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16839,8 +16839,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16872,8 +16872,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16906,8 +16906,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16939,8 +16939,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -16973,8 +16973,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17006,8 +17006,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRWindowCoveringClusterEndProductTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRWindowCoveringClusterEndProductTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17040,8 +17040,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17070,8 +17070,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRWindowCoveringClusterTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRWindowCoveringClusterTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17104,8 +17104,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableWindowCoveringClusterTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableWindowCoveringClusterTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17138,8 +17138,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17177,8 +17177,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17211,8 +17211,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17250,8 +17250,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17283,8 +17283,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThermostatClusterSetpointAdjustModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThermostatClusterSetpointAdjustModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17317,8 +17317,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17350,8 +17350,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThermostatClusterThermostatControlSequenceAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThermostatClusterThermostatControlSequenceAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17386,8 +17386,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17419,8 +17419,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThermostatClusterThermostatRunningModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThermostatClusterThermostatRunningModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17453,8 +17453,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17486,8 +17486,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17520,8 +17520,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17553,8 +17553,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17587,8 +17587,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17619,8 +17619,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRFanControlClusterFanModeTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFanControlClusterFanModeTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17653,8 +17653,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableFanControlClusterFanModeTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableFanControlClusterFanModeTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17686,8 +17686,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRColorControlClusterColorLoopActionAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRColorControlClusterColorLoopActionAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17720,8 +17720,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableColorControlClusterColorLoopActionAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableColorControlClusterColorLoopActionAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17753,8 +17753,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRColorControlClusterColorLoopDirectionAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRColorControlClusterColorLoopDirectionAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17787,8 +17787,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17819,8 +17819,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRColorControlClusterColorModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRColorControlClusterColorModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17853,8 +17853,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableColorControlClusterColorModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableColorControlClusterColorModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17886,8 +17886,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRColorControlClusterHueDirectionAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRColorControlClusterHueDirectionAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17920,8 +17920,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableColorControlClusterHueDirectionAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableColorControlClusterHueDirectionAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17953,8 +17953,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRColorControlClusterHueMoveModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRColorControlClusterHueMoveModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17987,8 +17987,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableColorControlClusterHueMoveModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableColorControlClusterHueMoveModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18020,8 +18020,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRColorControlClusterHueStepModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRColorControlClusterHueStepModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18054,8 +18054,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableColorControlClusterHueStepModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableColorControlClusterHueStepModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18087,8 +18087,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRColorControlClusterSaturationMoveModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRColorControlClusterSaturationMoveModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18121,8 +18121,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18154,8 +18154,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRColorControlClusterSaturationStepModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRColorControlClusterSaturationStepModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18188,8 +18188,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableColorControlClusterSaturationStepModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableColorControlClusterSaturationStepModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18221,8 +18221,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18258,8 +18258,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18291,8 +18291,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRChannelClusterChannelStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChannelClusterChannelStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18325,8 +18325,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableChannelClusterChannelStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableChannelClusterChannelStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18358,8 +18358,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18392,8 +18392,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18425,8 +18425,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18463,8 +18463,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18496,8 +18496,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18532,8 +18532,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18565,8 +18565,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18599,8 +18599,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18632,8 +18632,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRMediaInputClusterInputTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRMediaInputClusterInputTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18666,8 +18666,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18698,8 +18698,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRKeypadInputClusterCecKeyCodeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRKeypadInputClusterCecKeyCodeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18732,8 +18732,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18765,8 +18765,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18799,8 +18799,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18832,8 +18832,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18869,8 +18869,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18902,8 +18902,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18936,8 +18936,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18969,8 +18969,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRContentLauncherClusterParameterEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRContentLauncherClusterParameterEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -19003,8 +19003,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableContentLauncherClusterParameterEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableContentLauncherClusterParameterEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -19036,8 +19036,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -19070,8 +19070,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -19106,8 +19106,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -19145,8 +19145,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -19178,8 +19178,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -19215,8 +19215,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -19247,8 +19247,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRTestClusterClusterSimpleEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTestClusterClusterSimpleEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -19281,8 +19281,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableTestClusterClusterSimpleEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableTestClusterClusterSimpleEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -19314,8 +19314,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -19348,8 +19348,8 @@ public:
     {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() { mKeepAlive = true; }
+    using MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

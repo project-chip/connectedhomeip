@@ -48,10 +48,8 @@ public:
       {}
 
     static void OnSubscriptionEstablished(void * context);
-    void OnDone();
-    void KeepAliveOnCallback() {
-      mKeepAlive = true;
-    }
+    using MTR{{> @partial-block}}Bridge::OnDone;
+    using MTR{{> @partial-block}}Bridge::KeepAliveOnCallback;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -115,19 +113,5 @@ void MTR{{> @partial-block}}SubscriptionBridge::OnSubscriptionEstablished(void *
      }
 }
 
-void MTR{{> @partial-block}}SubscriptionBridge::OnDone()
-{
-     if (!mQueue) {
-         delete this;
-         return;
-     }
-
-     // Delete ourselves async, so that any error/data reports we
-     // queued up before getting OnDone have a chance to run.
-     auto * self = this;
-     dispatch_async(mQueue, ^{
-         delete self;
-     });
-}
 {{/unless}}
 {{/if}}
