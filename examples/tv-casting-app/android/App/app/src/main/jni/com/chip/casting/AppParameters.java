@@ -25,6 +25,9 @@ public class AppParameters {
 
   private byte[] rotatingDeviceIdUniqueId;
   private DACProvider dacProvider = TEST_DAC_PROVIDER;
+  private String spake2pVerifierBase64;
+  private String Spake2pSaltBase64;
+  private int spake2pIterationCount;
   private int setupPasscode = TEST_SETUP_PASSCODE;
   private int discriminator = TEST_DISCRIMINATOR;
 
@@ -42,6 +45,30 @@ public class AppParameters {
 
   public void setDacProvider(DACProvider dacProvider) {
     this.dacProvider = dacProvider;
+  }
+
+  public String getSpake2pVerifierBase64() {
+    return spake2pVerifierBase64;
+  }
+
+  public void setSpake2pVerifierBase64(String spake2pVerifierBase64) {
+    this.spake2pVerifierBase64 = spake2pVerifierBase64;
+  }
+
+  public String getSpake2pSaltBase64() {
+    return Spake2pSaltBase64;
+  }
+
+  public void setSpake2pSaltBase64(String spake2pSaltBase64) {
+    Spake2pSaltBase64 = spake2pSaltBase64;
+  }
+
+  public int getSpake2pIterationCount() {
+    return spake2pIterationCount;
+  }
+
+  public void setSpake2pIterationCount(int spake2pIterationCount) {
+    this.spake2pIterationCount = spake2pIterationCount;
   }
 
   public int getSetupPasscode() {
