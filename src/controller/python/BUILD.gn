@@ -304,10 +304,7 @@ chip_python_wheel_action("chip-core") {
   if (current_os == "mac") {
     py_package_reqs += [ "pyobjc-framework-corebluetooth" ]
   } else if (current_os == "linux") {
-    py_package_reqs += [
-      "dbus-python==1.2.18",
-      "pygobject",
-    ]
+    py_package_reqs += [ "pygobject" ]
   }
 
   if (current_cpu == "x64") {
