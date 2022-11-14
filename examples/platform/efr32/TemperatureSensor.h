@@ -22,17 +22,7 @@
 #include "sl_status.h"
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-class TemperatureSensor
-{
-public:
-    static sl_status_t Init(void);
-    static sl_status_t GetTemp(uint32_t * rh, int16_t * t);
-};
-
-#ifdef __cplusplus
-}
-#endif
+namespace TemperatureSensor {
+sl_status_t Init();
+sl_status_t GetTemp(uint32_t * relativeHumidity, int16_t * temperature);
+}; // namespace TemperatureSensor

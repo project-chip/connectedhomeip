@@ -17,30 +17,33 @@
  *    limitations under the License.
  */
 
+#include "TemperatureSensor.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "TemperatureSensor.h"
+// This is a C implementation. Need the ifdef __cplusplus else we get linking issues
 #include "sl_sensor_rht.h"
 
-#define SENSOR_TEMP_OFFSET 800
+#ifdef __cplusplus
+}
+#endif
 
-sl_status_t TemperatureSensor::Init(void)
+namespace TemperatureSensor {
+constexpr uint16_t kSensorTemperatureOffset = 800;
+
+sl_status_t Init()
 {
     return sl_sensor_rht_init();
 }
 
-sl_status_t TemperatureSensor::GetTemp(uint32_t * rh, int16_t * t)
+sl_status_t GetTemp(uint32_t * relativeHumidity, int16_t * temperature)
 {
     // Sensor resolution 0.001 C
     // DataModel resolution 0.01 C
     int32_t temp;
-    sl_status_t status = sl_sensor_rht_get(rh, &temp);
-    *t                 = static_cast<int16_t>(temp / 10) - SENSOR_TEMP_OFFSET;
+    sl_status_t status = sl_sensor_rht_get(relativeHumidity, &temp);
+    *temperature       = static_cast<int16_t>(temp / 10) - kSensorTemperatureOffset;
     return status;
 }
-
-#ifdef __cplusplus
-}
-#endif
+}; // namespace TemperatureSensor

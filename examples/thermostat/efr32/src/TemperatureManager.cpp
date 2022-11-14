@@ -31,11 +31,11 @@
  * Defines and Constants
  *********************************************************/
 
-#define TEMP_TIMER_ms 3000
-#define ENDPOINT_ID 1
-
 using namespace chip;
 using namespace ::chip::DeviceLayer;
+
+constexpr EndpointId kThermostatEndpoint = 1;
+
 namespace ThermAttr = chip::app::Clusters::Thermostat::Attributes;
 /**********************************************************
  * Variable declarations
@@ -50,16 +50,16 @@ CHIP_ERROR TemperatureManager::Init()
     uint8_t systemMode;
 
     PlatformMgr().LockChipStack();
-    ThermAttr::LocalTemperature::Get(ENDPOINT_ID, temp);
-    ThermAttr::OccupiedCoolingSetpoint::Get(ENDPOINT_ID, &coolingSetpoint);
-    ThermAttr::OccupiedHeatingSetpoint::Get(ENDPOINT_ID, &heatingSetpoint);
-    ThermAttr::SystemMode::Get(ENDPOINT_ID, &systemMode);
+    ThermAttr::LocalTemperature::Get(kThermostatEndpoint, temp);
+    ThermAttr::OccupiedCoolingSetpoint::Get(kThermostatEndpoint, &coolingSetpoint);
+    ThermAttr::OccupiedHeatingSetpoint::Get(kThermostatEndpoint, &heatingSetpoint);
+    ThermAttr::SystemMode::Get(kThermostatEndpoint, &systemMode);
     PlatformMgr().UnlockChipStack();
 
-    mCurrentTemp     = ConvertToPrintableTemp(temp.Value());
-    mHeatingSetPoint = ConvertToPrintableTemp(coolingSetpoint);
-    mCoolingSetPoint = ConvertToPrintableTemp(heatingSetpoint);
-    mThermMode       = systemMode;
+    mCurrentTempCelsius     = ConvertToPrintableTemp(temp.Value());
+    mHeatingCelsiusSetPoint = ConvertToPrintableTemp(coolingSetpoint);
+    mCoolingCelsiusSetPoint = ConvertToPrintableTemp(heatingSetpoint);
+    mThermMode              = systemMode;
 
     AppTask::GetAppTask().UpdateThermoStatUI();
 
@@ -91,21 +91,21 @@ void TemperatureManager::AttributeChangeHandler(EndpointId endpointId, Attribute
     case ThermAttr::LocalTemperature::Id: {
         int8_t Temp = ConvertToPrintableTemp(*((int16_t *) value));
         EFR32_LOG("Local temp %d", Temp);
-        mCurrentTemp = Temp;
+        mCurrentTempCelsius = Temp;
     }
     break;
 
     case ThermAttr::OccupiedCoolingSetpoint::Id: {
         int8_t coolingTemp = ConvertToPrintableTemp(*((int16_t *) value));
         EFR32_LOG("CoolingSetpoint %d", coolingTemp);
-        mCoolingSetPoint = coolingTemp;
+        mCoolingCelsiusSetPoint = coolingTemp;
     }
     break;
 
     case ThermAttr::OccupiedHeatingSetpoint::Id: {
         int8_t heatingTemp = ConvertToPrintableTemp(*((int16_t *) value));
         EFR32_LOG("HeatingSetpoint %d", heatingTemp);
-        mHeatingSetPoint = heatingTemp;
+        mHeatingCelsiusSetPoint = heatingTemp;
     }
     break;
 
@@ -129,21 +129,21 @@ void TemperatureManager::AttributeChangeHandler(EndpointId endpointId, Attribute
     AppTask::GetAppTask().UpdateThermoStatUI();
 }
 
-uint8_t TemperatureManager::GetMode(void)
+uint8_t TemperatureManager::GetMode()
 {
     return mThermMode;
 }
 
-int8_t TemperatureManager::GetCurrentTemp(void)
+int8_t TemperatureManager::GetCurrentTemp()
 {
-    return mCurrentTemp;
+    return mCurrentTempCelsius;
 }
-int8_t TemperatureManager::GetHeatingSetPoint(void)
+int8_t TemperatureManager::GetHeatingSetPoint()
 {
-    return mHeatingSetPoint;
+    return mHeatingCelsiusSetPoint;
 }
 
-int8_t TemperatureManager::GetCoolingSetPoint(void)
+int8_t TemperatureManager::GetCoolingSetPoint()
 {
-    return mCoolingSetPoint;
+    return mCoolingCelsiusSetPoint;
 }

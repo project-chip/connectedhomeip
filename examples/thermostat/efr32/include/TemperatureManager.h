@@ -29,9 +29,6 @@
 
 #include <lib/core/CHIPError.h>
 
-#define TEMPERATURE_OFFSET 100 // Offset taken into account before switching thermostat states
-#define TEMP_INCREMENT 10
-
 using namespace chip;
 
 // AppCluster Spec Table 85.
@@ -49,24 +46,24 @@ class TemperatureManager
 public:
     CHIP_ERROR Init();
     void AttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value, uint16_t size);
-    uint8_t GetMode(void);
-    int8_t GetCurrentTemp(void);
-    int8_t GetHeatingSetPoint(void);
-    int8_t GetCoolingSetPoint(void);
+    uint8_t GetMode();
+    int8_t GetCurrentTemp();
+    int8_t GetHeatingSetPoint();
+    int8_t GetCoolingSetPoint();
 
 private:
-    friend TemperatureManager & TempMgr(void);
+    friend TemperatureManager & TempMgr();
 
-    int8_t mCurrentTemp;     // in Celsius
-    int8_t mCoolingSetPoint; // in Celsius
-    int8_t mHeatingSetPoint; // in Celsius
+    int8_t mCurrentTempCelsius;
+    int8_t mCoolingCelsiusSetPoint;
+    int8_t mHeatingCelsiusSetPoint;
     uint8_t mThermMode;
 
     int8_t ConvertToPrintableTemp(int16_t temperature);
     static TemperatureManager sTempMgr;
 };
 
-inline TemperatureManager & TempMgr(void)
+inline TemperatureManager & TempMgr()
 {
     return TemperatureManager::sTempMgr;
 }

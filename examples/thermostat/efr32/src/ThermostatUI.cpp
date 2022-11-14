@@ -26,7 +26,7 @@
 #include "lcd.h"
 
 // LCD line define
-#define TEMPERATURE_LCD_X 30
+constexpr uint8_t kTempLcdInitialX = 30;
 
 // Bitmap
 static const uint8_t silabsLogo[]       = { SILABS_LOGO_SMALL };
@@ -41,9 +41,9 @@ static const unsigned char heating_bits[]         = { HEATING_BITMAP };
 static const unsigned char cooling_bits[]         = { COOLING_BITMAP };
 static const unsigned char heating_cooling_bits[] = { HEATING_COOLING_BITMAP };
 
-static int8_t mHeatingSetPoint;
-static int8_t mCoolingSetPoint;
-static int8_t mCurrentTemp;
+static int8_t mHeatingCelsiusSetPoint;
+static int8_t mCoolingCelsiusSetPoint;
+static int8_t mCurrentTempCelsius;
 static uint8_t mMode;
 
 #ifdef SL_WIFI
@@ -62,7 +62,7 @@ void ThermostatUI::DrawUI(GLIB_Context_t * glibContext)
 
     GLIB_clear(glibContext);
     DrawHeader(glibContext);
-    DrawCurrentTemp(glibContext, mCurrentTemp);
+    DrawCurrentTemp(glibContext, mCurrentTempCelsius);
     DrawFooter(glibContext, false);
 
     DMD_updateDisplay();
@@ -70,17 +70,17 @@ void ThermostatUI::DrawUI(GLIB_Context_t * glibContext)
 
 void ThermostatUI::SetHeatingSetPoint(int8_t temp)
 {
-    mHeatingSetPoint = temp;
+    mHeatingCelsiusSetPoint = temp;
 }
 
 void ThermostatUI::SetCoolingSetPoint(int8_t temp)
 {
-    mCoolingSetPoint = temp;
+    mCoolingCelsiusSetPoint = temp;
 }
 
 void ThermostatUI::SetCurrentTemp(int8_t temp)
 {
-    mCurrentTemp = temp;
+    mCurrentTempCelsius = temp;
 }
 void ThermostatUI::SetMode(uint8_t mode)
 {
@@ -108,18 +108,18 @@ void ThermostatUI::DrawFooter(GLIB_Context_t * glibContext, bool autoMode)
     case HVACMode::HEATING:
         GLIB_drawStringOnLine(glibContext, "Mode : Heating", 11, GLIB_ALIGN_LEFT, 0, 0, true);
         GLIB_drawBitmap(glibContext, HEATING_COOLING_X, HEATING_COOLING_Y, COOLING_WIDTH, COOLING_HEIGHT, heating_bits);
-        DrawSetPoint(glibContext, mHeatingSetPoint, false);
+        DrawSetPoint(glibContext, mHeatingCelsiusSetPoint, false);
         break;
     case HVACMode::COOLING:
         GLIB_drawStringOnLine(glibContext, "Mode : Cooling", 11, GLIB_ALIGN_LEFT, 0, 0, true);
         GLIB_drawBitmap(glibContext, HEATING_COOLING_X, HEATING_COOLING_Y, COOLING_WIDTH, COOLING_HEIGHT, cooling_bits);
-        DrawSetPoint(glibContext, mCoolingSetPoint, false);
+        DrawSetPoint(glibContext, mCoolingCelsiusSetPoint, false);
         break;
     case HVACMode::HEATING_COOLING:
         GLIB_drawStringOnLine(glibContext, "Mode : Auto", 11, GLIB_ALIGN_LEFT, 0, 0, true);
         GLIB_drawBitmap(glibContext, HEATING_COOLING_X, HEATING_COOLING_Y, COOLING_WIDTH, COOLING_HEIGHT, heating_cooling_bits);
-        DrawSetPoint(glibContext, mHeatingSetPoint, false);
-        DrawSetPoint(glibContext, mCoolingSetPoint, true);
+        DrawSetPoint(glibContext, mHeatingCelsiusSetPoint, false);
+        DrawSetPoint(glibContext, mCoolingCelsiusSetPoint, true);
         break;
     case HVACMode::MODE_OFF:
         DrawSetPoint(glibContext, 0, false);
@@ -168,16 +168,16 @@ void ThermostatUI::DrawCurrentTemp(GLIB_Context_t * glibContext, int8_t temp, bo
     if (isCelsius)
     {
         data = (uint8_t *) &monaco_48pt[DEGREE_INDEX];
-        DrawFont(glibContext, 65, TEMPERATURE_LCD_X, 15, data, MONACO_FONT_CH_LENGTH);
+        DrawFont(glibContext, 65, kTempLcdInitialX, 15, data, MONACO_FONT_CH_LENGTH);
         data = (uint8_t *) &monaco_48pt[CELSIUS_INDEX];
-        DrawFont(glibContext, 70, TEMPERATURE_LCD_X, 15, data, MONACO_FONT_CH_LENGTH);
+        DrawFont(glibContext, 70, kTempLcdInitialX, 15, data, MONACO_FONT_CH_LENGTH);
     }
     else
     {
         data = (uint8_t *) &monaco_48pt[DEGREE_INDEX];
         DrawFont(glibContext, 65, 25, 15, data, MONACO_FONT_CH_LENGTH); // 25 to fit with f of fahrenheint
         data = (uint8_t *) &monaco_48pt[FAHRENHEIT_INDEX];
-        DrawFont(glibContext, 70, TEMPERATURE_LCD_X, 15, data, MONACO_FONT_CH_LENGTH);
+        DrawFont(glibContext, 70, kTempLcdInitialX, 15, data, MONACO_FONT_CH_LENGTH);
     }
 
     // Print Current temp
@@ -187,7 +187,7 @@ void ThermostatUI::DrawCurrentTemp(GLIB_Context_t * glibContext, int8_t temp, bo
     for (uint8_t ch = 0; ch < 2; ch++)
     {
         data = (uint8_t *) &monaco_48pt[tempArray[ch] * MONACO_FONT_NB_LENGTH];
-        DrawFont(glibContext, position_x, TEMPERATURE_LCD_X, MONACO_FONT_WIDTH, data, MONACO_FONT_NB_LENGTH);
+        DrawFont(glibContext, position_x, kTempLcdInitialX, MONACO_FONT_WIDTH, data, MONACO_FONT_NB_LENGTH);
         position_x += MONACO_FONT_WIDTH;
     }
 }

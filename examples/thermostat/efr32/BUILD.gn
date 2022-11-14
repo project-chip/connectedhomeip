@@ -62,7 +62,8 @@ declare_args() {
   chip_enable_wifi_ipv4 = false
 
   # Enable the temperature sensor
-  use_temp_sensor = true
+  # Some boards do not have a temperature sensor
+  use_temp_sensor = silabs_board != "BRD2703A" && silabs_board != "BRD4319A"
 }
 
 declare_args() {
@@ -88,11 +89,6 @@ if (silabs_board == "BRD4166A" || silabs_board == "BRD2601B" ||
     silabs_board == "BRD2703A" || silabs_board == "BRD4319A") {
   show_qr_code = false
   disable_lcd = true
-}
-
-# Boards that do not support temperature sensor
-if (silabs_board == "BRD2703A" || silabs_board == "BRD4319A") {
-  use_temp_sensor = false
 }
 
 # WiFi settings

@@ -33,13 +33,12 @@
  * Defines and Constants
  *********************************************************/
 
-#define ENDPOINT_ID 1
-
-#define SENSOR_TIMER_PERIOD_ms 30000                                  // 5s timer period
-#define SIMULATED_READING_REPETITION (60000 / SENSOR_TIMER_PERIOD_ms) // Change Simulated number at each minutes
-
 using namespace chip;
 using namespace ::chip::DeviceLayer;
+
+constexpr EndpointId kThermostatEndpoint = 1;
+constexpr uint16_t kSensorTImerPeriodMs  = 30000; // 30s timer period
+constexpr uint16_t kMinTemperatureDelta  = 50;    // 0.5 degree Celcius
 
 /**********************************************************
  * Variable declarations
@@ -48,18 +47,17 @@ using namespace ::chip::DeviceLayer;
 TimerHandle_t sSensorTimer;
 StaticTimer_t sStaticSensorTimerStruct;
 
-constexpr uint16_t kMinTemperatureDelta = 50; // 0.5 degree Celcius
-
 SensorManager SensorManager::sSensorManager;
 
 #ifndef USE_TEMP_SENSOR
-static int16_t mSimulatedTemp[] = { SIMULATED_TEMP };
+constexpr uint16_t kSimulatedReadingFrequency = (60000 / kSensorTImerPeriodMs); // Change Simulated number at each minutes
+static int16_t mSimulatedTemp[]               = { 2300, 2400, 2800, 2550, 2200, 2125, 2100, 2600, 1800, 2700 };
 #endif
 
 CHIP_ERROR SensorManager::Init()
 {
     // Create FreeRTOS sw timer for temp sensor timer.
-    sSensorTimer = xTimerCreateStatic("sensorTmr", pdMS_TO_TICKS(SENSOR_TIMER_PERIOD_ms), true, nullptr, SensorTimerEventHandler,
+    sSensorTimer = xTimerCreateStatic("sensorTmr", pdMS_TO_TICKS(kSensorTImerPeriodMs), true, nullptr, SensorTimerEventHandler,
                                       &sStaticSensorTimerStruct);
 
     if (sSensorTimer == NULL)
@@ -113,7 +111,7 @@ void SensorManager::SensorTimerEventHandler(TimerHandle_t xTimer)
     temperature = mSimulatedTemp[simulatedIndex];
 
     nbOfRepetition++;
-    if (nbOfRepetition >= SIMULATED_READING_REPETITION)
+    if (nbOfRepetition >= kSimulatedReadingFrequency)
     {
         simulatedIndex++;
         nbOfRepetition = 0;
@@ -129,7 +127,7 @@ void SensorManager::SensorTimerEventHandler(TimerHandle_t xTimer)
         // The SensorMagager shouldn't be aware of the Endpoint ID TODO Fix this.
         // TODO Per Spec we should also apply the Offset stored in the same cluster before saving the temp
 
-        app::Clusters::Thermostat::Attributes::LocalTemperature::Set(ENDPOINT_ID, temperature);
+        app::Clusters::Thermostat::Attributes::LocalTemperature::Set(kThermostatEndpoint, temperature);
         PlatformMgr().UnlockChipStack();
     }
 }

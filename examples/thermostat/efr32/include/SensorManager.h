@@ -28,15 +28,13 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <lib/core/CHIPError.h>
 
-#define SIMULATED_TEMP 2300, 2400, 2800, 2550, 2200, 2125, 2100, 2600, 1800, 2700
-
 class SensorManager
 {
 public:
     CHIP_ERROR Init();
 
 private:
-    friend SensorManager & SensorMgr(void);
+    friend SensorManager & SensorMgr();
 
     // Reads new generated sensor value, stores it, and updates local temperature attribute
     static void SensorTimerEventHandler(TimerHandle_t xTimer);
@@ -44,7 +42,7 @@ private:
     static SensorManager sSensorManager;
 };
 
-inline SensorManager & SensorMgr(void)
+inline SensorManager & SensorMgr()
 {
     return SensorManager::sSensorManager;
 }
