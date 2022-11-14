@@ -843,32 +843,48 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
     return self;
 }
 
+- (BOOL)respondsToSelector:(SEL)selector
+{
+    // This logic will need to change a bit when the MTRDeviceControllerDelegate
+    // signatures change.  It's shaped the way it is to make those changes
+    // easier.
+    if (selector == @selector(onStatusUpdate:)) {
+        return [self.delegate respondsToSelector:@selector(onStatusUpdate:)];
+    }
+
+    if (selector == @selector(onPairingComplete:)) {
+        return [self.delegate respondsToSelector:@selector(onPairingComplete:)];
+    }
+
+    if (selector == @selector(onCommissioningComplete:)) {
+        return [self.delegate respondsToSelector:@selector(onCommissioningComplete:)];
+    }
+
+    if (selector == @selector(onPairingDeleted:)) {
+        return [self.delegate respondsToSelector:@selector(onPairingDeleted:)];
+    }
+
+    return [super respondsToSelector:selector];
+}
+
 - (void)onStatusUpdate:(MTRCommissioningStatus)status
 {
-    if ([self.delegate respondsToSelector:@selector(onStatusUpdate:)]) {
-        [self.delegate onStatusUpdate:static_cast<MTRPairingStatus>(status)];
-    }
+    [self.delegate onStatusUpdate:static_cast<MTRPairingStatus>(status)];
 }
 
 - (void)onPairingComplete:(NSError * _Nullable)error
 {
-    if ([self.delegate respondsToSelector:@selector(onPairingComplete:)]) {
-        [self.delegate onPairingComplete:error];
-    }
+    [self.delegate onPairingComplete:error];
 }
 
 - (void)onCommissioningComplete:(NSError * _Nullable)error
 {
-    if ([self.delegate respondsToSelector:@selector(onCommissioningComplete:)]) {
-        [self.delegate onCommissioningComplete:error];
-    }
+    [self.delegate onCommissioningComplete:error];
 }
 
 - (void)onPairingDeleted:(NSError * _Nullable)error
 {
-    if ([self.delegate respondsToSelector:@selector(onPairingDeleted:)]) {
-        [self.delegate onPairingDeleted:error];
-    }
+    [self.delegate onPairingDeleted:error];
 }
 
 @end

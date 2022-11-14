@@ -19,7 +19,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSUInteger, MTRCommissioningStatus) {
+typedef NS_ENUM(NSInteger, MTRCommissioningStatus) {
     MTRCommissioningStatusUnknown = 0,
     MTRCommissioningStatusSuccess = 1,
     MTRCommissioningStatusFailed = 2,
