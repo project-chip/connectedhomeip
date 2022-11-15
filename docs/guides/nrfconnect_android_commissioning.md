@@ -70,19 +70,17 @@ accessory using Android CHIPTool:
     Thread, and nRF7002 DK can be used to test Matter over Wi-Fi.
 -   1x nRF52840 DK for running the
     [OpenThread Radio Co-Processor](https://openthread.io/platforms/co-processor)
-    firmware. You can replace this DK with another compatible device, such
-    as the nRF52840 Dongle.
+    firmware. You can replace this DK with another compatible device, such as
+    the nRF52840 Dongle.
 
-    > *Note:*
-    > This piece of hardware is only needed if you're testing a Thread device.
-    > Skip it if the tested device operates in a Wi-Fi network.
+    > _Note:_ This piece of hardware is only needed if you're testing a Thread
+    > device. Skip it if the tested device operates in a Wi-Fi network.
 
 -   1x Raspberry Pi Model 3B+ or newer (along with an SD card with at least 8 GB
     of memory)
 
-    > *Note:*
-    > This piece of hardware is only needed if you're testing a Thread device.
-    > Skip it if the tested device operates in a Wi-Fi network.
+    > _Note:_ This piece of hardware is only needed if you're testing a Thread
+    > device. Skip it if the tested device operates in a Wi-Fi network.
 
 <hr>
 
@@ -90,9 +88,8 @@ accessory using Android CHIPTool:
 
 ## Setting up Thread Border Router
 
-> *Note:*
-> This step is only needed if you're testing a Thread device. Skip it if the
-> tested device operates in a Wi-Fi network.
+> _Note:_ This step is only needed if you're testing a Thread device. Skip it if
+> the tested device operates in a Wi-Fi network.
 
 Follow the [OpenThread Border Router](openthread_border_router_pi.md) article to
 set up OpenThread Border Router on the Raspberry Pi, with either the nRF52840 DK
@@ -185,18 +182,18 @@ following steps:
 1.  Enable **Bluetooth** and **Location** services on your smartphone.
 2.  Connect the smartphone to your Wi-Fi Access Point.
 3.  Open the CHIPTool application on your smartphone.
-4.  Depending on your testing scenario, tap one of the following buttons and scan the
-    commissioning QR code:
+4.  Depending on your testing scenario, tap one of the following buttons and
+    scan the commissioning QR code:
 
-    - **PROVISION CHIP DEVICE WITH THREAD** for Matter over Thread
-    - **PROVISION CHIP DEVICE WITH WI-FI** for Matter over Wi-Fi
+    -   **PROVISION CHIP DEVICE WITH THREAD** for Matter over Thread
+    -   **PROVISION CHIP DEVICE WITH WI-FI** for Matter over Wi-Fi
 
     The network credentials screen appears.
+
 5.  In the network credentials screen, specify parameters of network and tap the
     **SAVE NETWORK** button. Several notifications appear, informing you of the
     progress of scanning, connecting, and pairing with the device. At the end of
     this process, the application returns to the main menu.
-
 
 <hr>
 
@@ -216,7 +213,7 @@ Check the IPv6 connectivity with the device using the following steps:
     last commissioned device.
 
 2. Tap the following buttons to change the lighting state of the Matter nRF
-    Connect Lighting Example Application referenced in this guide:
+   Connect Lighting Example Application referenced in this guide:
 
     - **ON** and **OFF** buttons turn on and off the light, respectively.
     - **TOGGLE** changes the lighting state to the opposite.
