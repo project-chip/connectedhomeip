@@ -323,7 +323,7 @@ static constexpr EventId Id = 0x00000010;
 } // namespace Events
 } // namespace PumpConfigurationAndControl
 
-namespace TestCluster {
+namespace UnitTesting {
 namespace Events {
 
 namespace TestEvent {
@@ -335,7 +335,7 @@ static constexpr EventId Id = 0x00000002;
 } // namespace TestFabricScopedEvent
 
 } // namespace Events
-} // namespace TestCluster
+} // namespace UnitTesting
 
 } // namespace Clusters
 } // namespace app

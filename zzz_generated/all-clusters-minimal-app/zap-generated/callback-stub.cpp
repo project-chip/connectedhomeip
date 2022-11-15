@@ -176,9 +176,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_TEMPERATURE_MEASUREMENT_CLUSTER_ID:
         emberAfTemperatureMeasurementClusterInitCallback(endpoint);
         break;
-    case ZCL_TEST_CLUSTER_ID:
-        emberAfTestClusterClusterInitCallback(endpoint);
-        break;
     case ZCL_THERMOSTAT_CLUSTER_ID:
         emberAfThermostatClusterInitCallback(endpoint);
         break;
@@ -193,6 +190,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_UNIT_LOCALIZATION_CLUSTER_ID:
         emberAfUnitLocalizationClusterInitCallback(endpoint);
+        break;
+    case ZCL_UNIT_TESTING_CLUSTER_ID:
+        emberAfUnitTestingClusterInitCallback(endpoint);
         break;
     case ZCL_USER_LABEL_CLUSTER_ID:
         emberAfUserLabelClusterInitCallback(endpoint);
@@ -457,11 +457,6 @@ void __attribute__((weak)) emberAfTemperatureMeasurementClusterInitCallback(Endp
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfTestClusterClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
 void __attribute__((weak)) emberAfThermostatClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -483,6 +478,11 @@ void __attribute__((weak)) emberAfTimeFormatLocalizationClusterInitCallback(Endp
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfUnitLocalizationClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfUnitTestingClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

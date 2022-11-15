@@ -19,6 +19,7 @@
 #include <lib/core/OTAImageHeader.h>
 #include <lib/support/Span.h>
 #include <platform/OTAImageProcessor.h>
+#include <platform/nrfconnect/ExternalFlashManager.h>
 
 namespace chip {
 
@@ -26,27 +27,15 @@ class OTADownloader;
 
 namespace DeviceLayer {
 
-class FlashHandler
-{
-public:
-    enum class Action : uint8_t
-    {
-        WAKE_UP,
-        SLEEP
-    };
-    virtual ~FlashHandler() {}
-    virtual void DoAction(Action aAction);
-};
-
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
 {
 public:
     static constexpr size_t kBufferSize = CONFIG_CHIP_OTA_REQUESTOR_BUFFER_SIZE;
 
-    explicit OTAImageProcessorImpl(FlashHandler * flashHandler = nullptr) : mFlashHandler(flashHandler) {}
+    explicit OTAImageProcessorImpl(ExternalFlashManager * flashHandler = nullptr) : mFlashHandler(flashHandler) {}
 
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; };
-    void TriggerFlashAction(FlashHandler::Action action);
+    void TriggerFlashAction(ExternalFlashManager::Action action);
 
     CHIP_ERROR PrepareDownload() override;
     CHIP_ERROR Finalize() override;
@@ -63,7 +52,7 @@ protected:
     OTADownloader * mDownloader = nullptr;
     OTAImageHeaderParser mHeaderParser;
     uint8_t mBuffer[kBufferSize];
-    FlashHandler * mFlashHandler;
+    ExternalFlashManager * mFlashHandler;
 };
 
 } // namespace DeviceLayer

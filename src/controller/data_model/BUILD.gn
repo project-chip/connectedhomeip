@@ -163,8 +163,8 @@ if (current_os == "android") {
       "jni/AccountLoginClient-InvokeSubscribeImpl.cpp",
       "jni/ElectricalMeasurementClient-ReadImpl.cpp",
       "jni/ElectricalMeasurementClient-InvokeSubscribeImpl.cpp",
-      "jni/TestClusterClient-ReadImpl.cpp",
-      "jni/TestClusterClient-InvokeSubscribeImpl.cpp",
+      "jni/UnitTestingClient-ReadImpl.cpp",
+      "jni/UnitTestingClient-InvokeSubscribeImpl.cpp",
     ]
   }
 
