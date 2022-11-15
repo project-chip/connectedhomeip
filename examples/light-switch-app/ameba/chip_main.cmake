@@ -149,7 +149,6 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/zzz_generated/light-switch-app/zap-generated/callback-stub.cpp
     ${chip_dir}/zzz_generated/light-switch-app/zap-generated/IMClusterCommandHandler.cpp
 
     ${chip_dir}/examples/light-switch-app/ameba/main/chipinterface.cpp

@@ -498,7 +498,6 @@ else()
                            ${GEN_DIR}/ota-requestor-app
     )
     target_sources(${APP_TARGET} PRIVATE
-               ${GEN_DIR}//ota-requestor-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp
     )
 endif()
