@@ -15,6 +15,31 @@
  *    limitations under the License.
  */
 
+/***************************************************************************
+ * @file
+ * @brief WFX FMAC driver main bus communication task
+ *******************************************************************************
+ * # License
+ * <b>Copyright 2019 Silicon Laboratories Inc.
+ *www.silabs.com</b>
+ *******************************************************************************
+ *
+ * Licensed under the Apache License, Version 2.0 (the
+ *"License"); you may not use this file except in
+ *compliance with the License. You may obtain a copy
+ *of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in
+ *writing, software distributed under the License is
+ *distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+ *OR CONDITIONS OF ANY KIND, either express or
+ *implied. See the License for the specific language
+ *governing permissions and limitations under the
+ *License.
+ *****************************************************************************/
+
 /* Includes */
 
 #include <stdio.h>
@@ -60,6 +85,7 @@ EventGroupHandle_t sl_wfx_event_group;
 TaskHandle_t wfx_events_task_handle;
 static sl_wfx_mac_address_t ap_mac;
 static uint32_t sta_ip;
+static wfx_wifi_scan_result_t ap_info;
 
 // Set Scan Parameters
 #define ACTIVE_CHANNEL_TIME 110
@@ -88,6 +114,9 @@ uint8_t softap_channel                 = SOFTAP_CHANNEL_DEFAULT;
 /* station network interface structures */
 struct netif * sta_netif;
 wfx_wifi_provision_t wifi_provision;
+sl_wfx_get_counters_cnf_t *counters;
+sl_wfx_get_counters_cnf_t *Tempcounters;
+#define PUT_COUNTER(name) EFR32_LOG("%-24s %lu\r\n", #name, (unsigned long)counters->body.count_##name);
 
 bool hasNotifiedIPV6             = false;
 bool hasNotifiedIPV4             = false;
@@ -111,7 +140,7 @@ static void sl_wfx_scan_complete_callback(uint32_t status);
 static void wfx_events_task(void * p_arg);
 
 /* WF200 host callbacks */
-static void sl_wfx_connect_callback(uint8_t * mac, uint32_t status);
+static void sl_wfx_connect_callback(sl_wfx_connect_ind_body_t connect_indication_body);
 static void sl_wfx_disconnect_callback(uint8_t * mac, uint16_t reason);
 static void sl_wfx_generic_status_callback(sl_wfx_generic_ind_t * frame);
 
@@ -122,6 +151,8 @@ static void sl_wfx_client_connected_callback(uint8_t * mac);
 static void sl_wfx_ap_client_disconnected_callback(uint32_t status, uint8_t * mac);
 static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac);
 #endif
+
+extern uint32_t overrun_count;
 
 /***************************************************************************
  * @fn  static void wfx_events_task_start()
@@ -163,7 +194,7 @@ sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload)
     }
     case SL_WFX_CONNECT_IND_ID: {
         sl_wfx_connect_ind_t * connect_indication = (sl_wfx_connect_ind_t *) event_payload;
-        sl_wfx_connect_callback(connect_indication->body.mac, connect_indication->body.status);
+        sl_wfx_connect_callback(connect_indication->body);
         break;
     }
     case SL_WFX_DISCONNECT_IND_ID: {
@@ -282,18 +313,26 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
 {
     struct scan_result_holder * ap;
 
-    EFR32_LOG("# %2d %2d  %03d %02X:%02X:%02X:%02X:%02X:%02X  %s", scan_count, scan_result->channel,
-              ((int16_t)(scan_result->rcpi - 220) / 2), scan_result->mac[0], scan_result->mac[1], scan_result->mac[2],
-              scan_result->mac[3], scan_result->mac[4], scan_result->mac[5], scan_result->ssid_def.ssid);
+    EFR32_LOG("# %2d %2d  %03d %02X:%02X:%02X:%02X:%02X:%02X  %s",
+            scan_count,
+            scan_result->channel,
+            ((int16_t)(scan_result->rcpi - 220) / 2),
+            scan_result->mac[0],
+            scan_result->mac[1],
+            scan_result->mac[2],
+            scan_result->mac[3],
+            scan_result->mac[4],
+            scan_result->mac[5],
+            scan_result->ssid_def.ssid);
     /*Report one AP information*/
     EFR32_LOG("\r\n");
     /* don't save if filter only wants specific ssid */
     if (scan_ssid != (char *) 0)
     {
-        if (strcmp(scan_ssid, (char *) &scan_result->ssid_def.ssid[0]) != CMP_SUCCESS)
+        if (strcmp(scan_ssid, (char *)&scan_result->ssid_def.ssid[0]) != CMP_SUCCESS)
             return;
     }
-    if ((ap = (struct scan_result_holder *) pvPortMalloc(sizeof(*ap))) == (struct scan_result_holder *) 0)
+    if ((ap = (struct scan_result_holder *)pvPortMalloc(sizeof(*ap))) == (struct scan_result_holder *)0) 
     {
         EFR32_LOG("*ERR*Scan: No Mem");
     }
@@ -357,42 +396,43 @@ static void sl_wfx_scan_complete_callback(uint32_t status)
  * @param[in]  status:
  * @return None
  *****************************************************************************/
-static void sl_wfx_connect_callback(uint8_t * mac, uint32_t status)
+static void sl_wfx_connect_callback(sl_wfx_connect_ind_body_t connect_indication_body)
 {
-    (void) (mac);
-    switch (status)
+    uint8_t *mac    = connect_indication_body.mac;
+    uint32_t status = connect_indication_body.status;
+    switch (status) 
     {
-    case WFM_STATUS_SUCCESS: {
-        EFR32_LOG("STA-Connected\r\n");
-        memcpy(&ap_mac.octet[0], mac, MAC_ADDRESS_FIRST_OCTET);
-        sl_wfx_context->state =
-            static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) | static_cast<int>(SL_WFX_STA_INTERFACE_CONNECTED));
-        xEventGroupSetBits(sl_wfx_event_group, SL_WFX_CONNECT);
-        break;
-    }
-    case WFM_STATUS_NO_MATCHING_AP: {
-        EFR32_LOG("WFX Connection failed, access point not found\r\n");
-        break;
-    }
-    case WFM_STATUS_CONNECTION_ABORTED: {
-        EFR32_LOG("WFX Connection aborted\r\n");
-        break;
-    }
-    case WFM_STATUS_CONNECTION_TIMEOUT: {
-        EFR32_LOG("WFX Connection timeout\r\n");
-        break;
-    }
-    case WFM_STATUS_CONNECTION_REJECTED_BY_AP: {
-        EFR32_LOG("WFX Connection rejected by the access point\r\n");
-        break;
-    }
-    case WFM_STATUS_CONNECTION_AUTH_FAILURE: {
-        EFR32_LOG("WFX Connection authentication failure\r\n");
-        break;
-    }
-    default: {
-        EFR32_LOG("WF Connection attempt error\r\n");
-    }
+        case WFM_STATUS_SUCCESS: {
+            EFR32_LOG("STA-Connected\r\n");
+            memcpy(&ap_mac.octet[0], mac, MAC_ADDRESS_FIRST_OCTET);
+            sl_wfx_context->state =
+                static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) | static_cast<int>(SL_WFX_STA_INTERFACE_CONNECTED));
+            xEventGroupSetBits(sl_wfx_event_group, SL_WFX_CONNECT);
+            break;
+        }
+        case WFM_STATUS_NO_MATCHING_AP: {
+            EFR32_LOG("WFX Connection failed, access point not found\r\n");
+            break;
+        }
+        case WFM_STATUS_CONNECTION_ABORTED: {
+            EFR32_LOG("WFX Connection aborted\r\n");
+            break;
+        }
+        case WFM_STATUS_CONNECTION_TIMEOUT: {
+            EFR32_LOG("WFX Connection timeout\r\n");
+            break;
+        }
+        case WFM_STATUS_CONNECTION_REJECTED_BY_AP: {
+            EFR32_LOG("WFX Connection rejected by the access point\r\n");
+            break;
+        }
+        case WFM_STATUS_CONNECTION_AUTH_FAILURE: {
+            EFR32_LOG("WFX Connection authentication failure\r\n");
+            break;
+        }
+        default: {
+            EFR32_LOG("WF Connection attempt error\r\n");
+        }
     }
 
     if ((status != WFM_STATUS_SUCCESS) && retryJoin < MAX_JOIN_RETRIES_COUNT)
@@ -488,11 +528,15 @@ static void sl_wfx_client_connected_callback(uint8_t * mac)
  *****************************************************************************/
 static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac)
 {
-    {
-        // TODO
-        EFR32_LOG("Client rejected, reason: %d, MAC: %02X:%02X:%02X:%02X:%02X:%02X\r\n", (int) status, mac[0], mac[1], mac[2],
-                  mac[3], mac[4], mac[5]);
-    }
+        EFR32_LOG("Client rejected, reason: %d, MAC: %02X:%02X:%02X:%02X:%02X:%02X\r\n",
+                    (int)status,
+                    mac[0],
+                    mac[1],
+                    mac[2],
+                    mac[3],
+                    mac[4],
+                    mac[5]);
+}
 
     /****************************************************************************
      * @fn  static void sl_wfx_ap_client_disconnected_callback(uint32_t status, uint8_t *mac)
@@ -505,8 +549,14 @@ static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac)
     static void sl_wfx_ap_client_disconnected_callback(uint32_t status, uint8_t * mac)
     {
         // TODO
-        EFR32_LOG("Client disconnected, reason: %d, MAC: %02X:%02X:%02X:%02X:%02X:%02X\r\n", (int) status, mac[0], mac[1], mac[2],
-                  mac[3], mac[4], mac[5]);
+        EFR32_LOG("Client disconnected, reason: %d, MAC: %02X:%02X:%02X:%02X:%02X:%02X\r\n",
+                (int)status,
+                mac[0],
+                mac[1],
+                mac[2],
+                mac[3],
+                mac[4],
+                mac[5]);
     }
 #endif /* SL_WFX_CONFIG_SOFTAP */
 
@@ -565,7 +615,7 @@ static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac)
                 if ((now = xTaskGetTickCount()) > (last_dhcp_poll + pdMS_TO_TICKS(250)))
                 {
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-                    uint8_t dhcp_state = dhcpclient_poll(sta_netif);
+                    uint8_t dhcp_state = dhcpclient_poll(&sta_netif);
 
                     if ((dhcp_state == DHCP_ADDRESS_ASSIGNED) && !hasNotifiedIPV4)
                     {
@@ -586,7 +636,7 @@ static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
                     if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !hasNotifiedIPV6)
                     {
-                        wfx_ipv6_notify(GET_IPV6_SUCCESS);
+                        wfx_ipv6_notify(1);
                         hasNotifiedIPV6 = true;
                         if (!hasNotifiedWifiConnectivity)
                         {
@@ -783,8 +833,31 @@ static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac)
      **************************************************************************/
     int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap)
     {
-        /* TODO */
-        return -1;
+        int32_t signal_strength;
+        EFR32_LOG("WIFI:SSID:: %s", &ap_info.ssid[0]);
+        memcpy(ap->ssid, ap_info.ssid, sizeof(ap_info.ssid));
+        EFR32_LOG("WIFI:Mac addr:: %02x:%02x:%02x:%02x:%02x:%02x",
+                    ap_info.bssid[0],
+                    ap_info.bssid[1],
+                    ap_info.bssid[2],
+                    ap_info.bssid[3],
+                    ap_info.bssid[4],
+                    ap_info.bssid[5]);
+        memcpy(ap->bssid, ap_info.bssid, sizeof(ap_info.bssid));
+        ap->security = ap_info.security;
+        EFR32_LOG("WIFI:security:: %d", ap->security);
+        ap->chan = ap_info.chan;
+        EFR32_LOG("WIFI:Channel:: to %d", ap->chan);
+
+        sl_status_t status = sl_wfx_get_signal_strength((uint32_t*)&signal_strength);
+
+        if (status == SL_STATUS_OK) 
+        {
+            EFR32_LOG("status SL_STATUS_OK & signal_strength:: %d", signal_strength);
+            ap->rssi = (signal_strength - 220)/2;
+            
+        }
+        return status;
     }
 
     /************************************************************************
@@ -796,8 +869,93 @@ static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac)
      **************************************************************************/
     int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
     {
-        /* TODO */
-        return -1;
+        int32_t status;
+        status = get_all_counters();
+        if (status != SL_STATUS_OK) 
+        {
+            EFR32_LOG("Failed to get the couters");
+        } 
+        else
+        {
+            extra_info->beacon_lost_count = counters->body.count_miss_beacon;
+            extra_info->beacon_rx_count   = counters->body.count_rx_beacon;
+            extra_info->mcast_rx_count    = counters->body.count_rx_multicast_frames;
+            extra_info->mcast_tx_count    = counters->body.count_tx_multicast_frames;
+            extra_info->ucast_rx_count    = counters->body.count_rx_packets;
+            extra_info->ucast_tx_count    = counters->body.count_tx_packets;
+            extra_info->overrun_count     = overrun_count;
+        }
+        return status;
+    }
+
+    sl_status_t get_all_counters(void)
+    {
+        sl_status_t result;
+        uint8_t command_id        = 0x05;
+        uint16_t mib_id           = 0x2035;
+        sl_wfx_mib_req_t *request = NULL;
+        uint32_t request_length   = SL_WFX_ROUND_UP_EVEN(sizeof(sl_wfx_header_mib_t) + sizeof(sl_wfx_mib_req_body_t));
+
+        result = sl_wfx_allocate_command_buffer((sl_wfx_generic_message_t **)&request,
+                                                command_id,
+                                                SL_WFX_CONTROL_BUFFER,
+                                                request_length);
+
+        if(request == NULL)
+        {
+        }
+
+        request->body.mib_id = mib_id;
+        request->header.interface = 0x2;
+        request->header.encrypted = 0x0;
+
+        result = sl_wfx_send_request(command_id, (sl_wfx_generic_message_t *)request, request_length);
+        SL_WFX_ERROR_CHECK(result);
+
+        result = sl_wfx_host_wait_for_confirmation(command_id, SL_WFX_DEFAULT_REQUEST_TIMEOUT_MS, (void **)&counters);
+        SL_WFX_ERROR_CHECK(result);
+
+        EFR32_LOG("%-24s %12s \r\n", "", "Debug Counters Content");
+        EFR32_LOG("%-24s %lu\r\n", "rcpi", (unsigned long)counters->body.rcpi);
+        PUT_COUNTER(plcp_errors);
+        PUT_COUNTER(fcs_errors);
+        PUT_COUNTER(tx_packets);
+        PUT_COUNTER(rx_packets);
+        PUT_COUNTER(rx_packet_errors);
+        PUT_COUNTER(rx_decryption_failures);
+        PUT_COUNTER(rx_mic_failures);
+        PUT_COUNTER(rx_no_key_failures);
+        PUT_COUNTER(tx_multicast_frames);
+        PUT_COUNTER(tx_frames_success);
+        PUT_COUNTER(tx_frame_failures);
+        PUT_COUNTER(tx_frames_retried);
+        PUT_COUNTER(tx_frames_multi_retried);
+        PUT_COUNTER(rx_frame_duplicates);
+        PUT_COUNTER(rts_success);
+        PUT_COUNTER(rts_failures);
+        PUT_COUNTER(ack_failures);
+        PUT_COUNTER(rx_multicast_frames);
+        PUT_COUNTER(rx_frames_success);
+        PUT_COUNTER(rx_cmacicv_errors);
+        PUT_COUNTER(rx_cmac_replays);
+        PUT_COUNTER(rx_mgmt_ccmp_replays);
+        PUT_COUNTER(rx_bipmic_errors);
+        PUT_COUNTER(rx_beacon);
+        PUT_COUNTER(miss_beacon);
+
+
+        error_handler:
+
+        if (result == SL_STATUS_TIMEOUT) {
+            if (sl_wfx_context->used_buffers > 0) {
+                sl_wfx_context->used_buffers--;
+            }
+        }
+        if (request != NULL) {
+            sl_wfx_free_command_buffer((sl_wfx_generic_message_t *)request, command_id, SL_WFX_CONTROL_BUFFER);
+        }
+        
+        return result;
     }
 
     /************************************************************************
@@ -997,11 +1155,17 @@ static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac)
 #ifdef SL_WFX_CONFIG_SOFTAP
         mac = (interface == SL_WFX_SOFTAP_INTERFACE) ? &wifiContext.mac_addr_1 : &wifiContext.mac_addr_0;
 #else
-    mac = &wifiContext.mac_addr_0;
+        mac = &wifiContext.mac_addr_0;
 #endif
         *addr = *mac;
-        EFR32_LOG("WLAN:Get WiFi Mac addr %02x:%02x:%02x:%02x:%02x:%02x", mac->octet[0], mac->octet[1], mac->octet[2],
-                  mac->octet[3], mac->octet[4], mac->octet[5]);
+        EFR32_LOG("WLAN:Get WiFi Mac addr %02x:%02x:%02x:%02x:%02x:%02x",
+                    mac->octet[0],
+                    mac->octet[1],
+                    mac->octet[2],
+                    mac->octet[3],
+                    mac->octet[4],
+                    mac->octet[5]);
+        memcpy(&ap_info.bssid[0], &mac->octet[0], 6);
     }
 
     /****************************************************************************
