@@ -416,12 +416,6 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
         System::PacketBufferTLVReader reader;
         bool keepExistingSubscriptions = true;
 
-        if (apExchangeContext->GetSessionHandle()->GetFabricIndex() == kUndefinedFabricIndex)
-        {
-            // Subscriptions must be associated to a fabric.
-            return Status::UnsupportedAccess;
-        }
-
         reader.Init(aPayload.Retain());
 
         SubscribeRequestMessage::Parser subscribeRequestParser;
