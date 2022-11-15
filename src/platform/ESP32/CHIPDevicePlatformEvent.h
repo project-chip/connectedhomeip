@@ -87,7 +87,7 @@ struct ChipDevicePlatformEvent final
                 wifi_event_ap_probe_req_rx_t WiFiApProbeReqRecved;
             } Data;
         } ESPSystemEvent;
-	struct
+        struct
         {
             BLE_CONNECTION_OBJECT mConnection;
         } BLECentralConnected;
@@ -97,22 +97,21 @@ struct ChipDevicePlatformEvent final
         } BLECentralConnectFailed;
         struct
         {
-        //    BLE_CONNECTION_OBJECT mConnection;
+            //    BLE_CONNECTION_OBJECT mConnection;
             uint16_t mConnection;
         } BLEWriteComplete;
         struct
         {
-      //      BLE_CONNECTION_OBJECT mConnection;
+            //      BLE_CONNECTION_OBJECT mConnection;
             uint16_t mConnection;
             bool mIsSubscribed;
         } BLESubscribeOpComplete;
         struct
         {
-    //        BLE_CONNECTION_OBJECT mConnection;
+            //        BLE_CONNECTION_OBJECT mConnection;
             uint16_t mConnection;
             chip::System::PacketBuffer * mData;
         } BLEIndicationReceived;
-
     };
 };
 

@@ -31,8 +31,10 @@
 
 #if CONFIG_BT_BLUEDROID_ENABLED
 
+#include "bluedroid/ChipDeviceScanner.h"
 #include "esp_bt.h"
 #include "esp_gap_ble_api.h"
+#include "esp_gattc_api.h"
 #include "esp_gatts_api.h"
 #include <lib/core/CHIPCallback.h>
 #elif CONFIG_BT_NIMBLE_ENABLED
@@ -54,17 +56,19 @@ struct ble_gatt_char_context
     void * arg;
 };
 
+#include "nimble/ChipDeviceScanner.h"
+#include "nimble/blecent.h"
 #endif
 
 #include "ble/Ble.h"
 #include <ble/BleLayer.h>
 #include <ble/BleUUID.h>
-#include "nimble/ChipDeviceScanner.h"
-#include "nimble/blecent.h"
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+void HandleIncomingBleConnection(Ble::BLEEndPoint * bleEP);
 
 enum class BleScanState : uint8_t
 {
@@ -112,11 +116,14 @@ class BLEManagerImpl final : public BLEManager,
                              private Ble::BlePlatformDelegate,
                              private Ble::BleApplicationDelegate,
                              private Ble::BleConnectionDelegate,
-			     private ChipDeviceScannerDelegate
+                             private ChipDeviceScannerDelegate
 {
 public:
     BLEManagerImpl() {}
     CHIP_ERROR ConfigureBle(uint32_t aAdapterId, bool aIsCentral);
+#if CONFIG_BT_BLUEDROID_ENABLED
+    static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_if, esp_ble_gattc_cb_param_t * param);
+#endif
 
 private:
     // Allow the BLEManager interface class to delegate method calls to
@@ -126,7 +133,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
-    void _Shutdown(){}
+    void _Shutdown() {}
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
@@ -164,11 +171,15 @@ private:
     CHIP_ERROR CancelConnection() override;
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
-    virtual void OnDeviceScanned(const struct ble_hs_adv_fields & fields,
-                                 const ble_addr_t & addr,
+#if CONFIG_BT_NIMBLE_ENABLED
+    virtual void OnDeviceScanned(const struct ble_hs_adv_fields & fields, const ble_addr_t & addr,
                                  const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
-    void OnScanComplete() override;
+#elif CONFIG_BT_BLUEDROID_ENABLED
+    virtual void OnDeviceScanned(esp_ble_addr_type_t & addr_type, esp_bd_addr_t & addr,
+                                 const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
+#endif
 
+    void OnScanComplete() override;
     // ===== Members for internal use by the following friends.
 
     friend BLEManager & BLEMgr(void);
@@ -275,9 +286,15 @@ private:
     void HandleDisconnect(esp_ble_gatts_cb_param_t * param);
     CHIPoBLEConState * GetConnectionState(uint16_t conId, bool allocate = false);
     bool ReleaseConnectionState(uint16_t conId);
+    CHIP_ERROR HandleGAPConnect(esp_ble_gattc_cb_param_t p_data);
+    CHIP_ERROR HandleGAPCentralConnect(esp_ble_gattc_cb_param_t p_data);
 
+    static void HandleConnectFailed(CHIP_ERROR error);
     static void HandleGATTEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);
     static void HandleGAPEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t * param);
+    static void ConnectDevice(esp_bd_addr_t & addr, esp_ble_addr_type_t addr_type, uint16_t timeout);
+    void HandleGAPConnectionFailed();
+    CHIP_ERROR HandleRXNotify(esp_ble_gattc_cb_param_t p_data);
 
 #elif CONFIG_BT_NIMBLE_ENABLED
     void HandleRXCharRead(struct ble_gatt_char_context * param);
@@ -292,6 +309,9 @@ private:
     CHIP_ERROR SetSubscribed(uint16_t conId);
     bool UnsetSubscribed(uint16_t conId);
     bool IsSubscribed(uint16_t conId);
+    static void ConnectDevice(const ble_addr_t & addr, uint16_t timeout);
+    CHIP_ERROR HandleGAPCentralConnect(struct ble_gap_event * gapEvent);
+    void HandleGAPConnectionFailed(struct ble_gap_event * gapEvent, CHIP_ERROR error);
 
     static CHIP_ERROR bleprph_set_random_addr(void);
     static void bleprph_host_task(void * param);
@@ -307,29 +327,23 @@ private:
 
 #endif /* CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING */
 
-    static int btshell_on_mtu(uint16_t conn_handle, const struct ble_gatt_error *error, uint16_t mtu, void *arg);
+    static int btshell_on_mtu(uint16_t conn_handle, const struct ble_gatt_error * error, uint16_t mtu, void * arg);
     void HandleC3CharRead(struct ble_gatt_char_context * param);
 
-    // int OnUnsubscribeCharComplete(uint16_t conn_handle, const struct ble_gatt_error *error, struct ble_gatt_attr *attr, void *arg);
-    // int OnSubscribeCharComplete(uint16_t conn_handle, const struct ble_gatt_error *error, struct ble_gatt_attr *attr, void *arg);
-    bool SubOrUnsubChar(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId, bool subscribe);
-    // bool OnWriteComplete(uint16_t conn_handle, const struct ble_gatt_error *error, struct ble_gatt_attr *attr, void * arg);
+    bool SubOrUnsubChar(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                        bool subscribe);
 
-    void HandleGAPConnectionFailed(struct ble_gap_event *gapEvent, CHIP_ERROR error);
+    CHIP_ERROR HandleGAPPeripheralConnect(struct ble_gap_event * gapEvent);
 
-    CHIP_ERROR HandleGAPCentralConnect(struct ble_gap_event *gapEvent);
-    CHIP_ERROR HandleGAPPeripheralConnect(struct ble_gap_event *gapEvent);
-
-    static void OnGattDiscComplete(const struct peer * peer, int status, void *arg);
-    static void HandleConnectTimeout(chip::System::Layer *, void * context);
+    static void OnGattDiscComplete(const struct peer * peer, int status, void * arg);
     static void HandleConnectFailed(CHIP_ERROR error);
-    static void ConnectDevice(const ble_addr_t & addr, uint16_t timeout);
-    static void CancelConnect(void);
     CHIP_ERROR HandleRXNotify(struct ble_gap_event * event);
 #endif
+    static void CancelConnect(void);
+    static void HandleConnectTimeout(chip::System::Layer *, void * context);
     void InitiateScan(BleScanState scanType);
     static void InitiateScan(intptr_t arg);
-    void HandleAdvertisementTimer(System::Layer * systemLayer, void* context);
+    void HandleAdvertisementTimer(System::Layer * systemLayer, void * context);
     void HandleAdvertisementTimer();
     void CleanScanConfig();
     BLEScanConfig mBLEScanConfig;

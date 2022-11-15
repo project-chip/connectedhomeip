@@ -107,7 +107,6 @@ CHIP_ERROR BLEBase::SendMessage(const Transport::PeerAddress & address, System::
     }
     else
     {
-
         ReturnErrorOnFailure(SendAfterConnect(std::move(msgBuf)));
     }
 
@@ -122,13 +121,12 @@ CHIP_ERROR BLEBase::SendAfterConnect(System::PacketBufferHandle && msg)
     {
         if (mPendingPackets[i].IsNull())
         {
-        ChipLogProgress(Inet, "Message appended to BLE send queue");
+            ChipLogDetail(Inet, "Message appended to BLE send queue");
             mPendingPackets[i] = std::move(msg);
             err                = CHIP_NO_ERROR;
             break;
         }
     }
-        ChipLogError(Inet, "Return from SendAfterConnect: %" CHIP_ERROR_FORMAT, err.Format());
 
     return err;
 }
@@ -189,7 +187,7 @@ void BLEBase::OnEndPointConnectComplete(BLEEndPoint * endPoint, CHIP_ERROR err)
             }
         }
     }
-    ChipLogProgress(Inet, "BLE EndPoint %p Connection Complete", endPoint);
+    ChipLogDetail(Inet, "BLE EndPoint %p Connection Complete", endPoint);
 }
 
 void BLEBase::OnEndPointConnectionClosed(BLEEndPoint * endPoint, CHIP_ERROR err)
@@ -201,7 +199,7 @@ void BLEBase::OnEndPointConnectionClosed(BLEEndPoint * endPoint, CHIP_ERROR err)
 
 void BLEBase::ClearPendingPackets()
 {
-    ChipLogProgress(Inet, "Clearing BLE pending packets.");
+    ChipLogDetail(Inet, "Clearing BLE pending packets.");
     for (size_t i = 0; i < mPendingPacketsSize; i++)
     {
         mPendingPackets[i] = nullptr;

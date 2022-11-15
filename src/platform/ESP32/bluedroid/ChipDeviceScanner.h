@@ -17,11 +17,18 @@
 
 #pragma once
 
+#include "esp_bt.h"
+#include "esp_bt_main.h"
+#include "esp_gap_ble_api.h"
+#include "esp_gatt_common_api.h"
+#include "esp_gatt_defs.h"
+#include "esp_gattc_api.h"
+#include "esp_gatts_api.h"
+#include "esp_log.h"
+#include "freertos/FreeRTOS.h"
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
 #include <system/SystemLayer.h>
-
-#include <host/ble_hs.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -34,8 +41,9 @@ public:
     virtual ~ChipDeviceScannerDelegate() {}
 
     // Called when a CHIP device was found
-    virtual void OnDeviceScanned(const struct ble_hs_adv_fields & fields, const ble_addr_t & addr,
+    virtual void OnDeviceScanned(esp_ble_addr_type_t & addr_type, esp_bd_addr_t & addr,
                                  const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
+
     // Called when a scan was completed (stopped or timed out)
     virtual void OnScanComplete() = 0;
 };
@@ -71,15 +79,16 @@ public:
     /// Stop any currently running scan
     CHIP_ERROR StopScan();
 
+    bool mIsScanning = false;
+    void ReportDevice(esp_ble_gap_cb_param_t & fields, esp_bd_addr_t & addr);
+
 private:
     ChipDeviceScanner() = default;
 
     /// Check if a given device is a CHIP device and if yes, report it as discovered
-    void ReportDevice(const struct ble_hs_adv_fields & fields, const ble_addr_t & addr);
     static int OnBleCentralEvent(struct ble_gap_event * event, void * arg);
     void RemoveDevice();
     ChipDeviceScannerDelegate * mDelegate = nullptr;
-    bool mIsScanning                      = false;
 };
 
 } // namespace Internal

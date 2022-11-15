@@ -232,7 +232,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
             //
             mFlags.Clear(Flags::kFlagWillSendMessage);
             MessageHandled();
- 	}
+        }
 
         return err;
     }

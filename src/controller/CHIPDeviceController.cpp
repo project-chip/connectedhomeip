@@ -703,7 +703,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         if (params.HasConnectionObject())
         {
             SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByObject(params.GetConnectionObject()));
-	}
+        }
         else if (params.HasDiscriminator())
         {
             // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
@@ -743,7 +743,7 @@ exit:
         if (device != nullptr)
         {
             ReleaseCommissioneeDevice(device);
-	}
+        }
     }
 
     return err;

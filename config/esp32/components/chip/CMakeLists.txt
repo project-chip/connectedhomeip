@@ -143,6 +143,14 @@ else()
     chip_gn_arg_append("chip_enable_wifi"                       "false")
 endif()
 
+if (CONFIG_BT_NIMBLE_ENABLED)
+    chip_gn_arg_append("chip_bt_nimble_enabled"                "true")
+endif()
+
+if (CONFIG_BT_BLUEDROID_ENABLED)
+    chip_gn_arg_append("chip_bt_bluedroid_enabled"                "true")
+endif()
+
 if (CONFIG_OPENTHREAD_ENABLED)
     chip_gn_arg_append("chip_enable_openthread"                 "true")
 endif()
