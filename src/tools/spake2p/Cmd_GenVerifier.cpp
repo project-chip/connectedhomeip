@@ -52,6 +52,7 @@ OptionDef gCmdOptionDefs[] =
 {
     { "count",           kArgumentRequired, 'c' },
     { "pin-code",        kArgumentRequired, 'p' },
+    { "pin-code-file",   kArgumentRequired, 'f' },
     { "iteration-count", kArgumentRequired, 'i' },
     { "salt-len",        kArgumentRequired, 'l' },
     { "salt",            kArgumentRequired, 's' },
@@ -84,6 +85,11 @@ const char * const gCmdOptionHelp =
     "          * 99999999\n"
     "          * 12345678\n"
     "          * 87654321\n"
+    "\n"
+    "   -f, --pin-code-file <file>\n"
+    "\n"
+    "       A file which contains all the PIN codes to generate verifiers.\n"
+    "       Each line in this file should be a valid PIN code.\n"
     "\n"
     "   -i, --iteration-count <int>\n"
     "\n"
@@ -143,6 +149,27 @@ uint8_t gSalt[BASE64_MAX_DECODED_LEN(BASE64_ENCODED_LEN(chip::kSpake2p_Max_PBKDF
 uint8_t gSaltDecodedLen   = 0;
 uint8_t gSaltLen          = 0;
 const char * gOutFileName = nullptr;
+FILE *gPinCodeFile        = nullptr;
+
+static uint32_t GetNextPinCode()
+{
+    if (!gPinCodeFile) {
+        return chip::kSetupPINCodeUndefinedValue;
+    }
+    char pinCodeStr[9] = {0};
+    if (fgets(pinCodeStr, 8, gPinCodeFile) != nullptr)
+    {
+        uint32_t pinCode = atoi(pinCodeStr);
+        if (pinCode == 11111111 || pinCode == 22222222 || pinCode == 33333333 || pinCode == 44444444 ||
+            pinCode == 55555555 || pinCode == 66666666 || pinCode == 77777777 || pinCode == 88888888 ||
+            pinCode == 99999999 || pinCode == 12345678 || pinCode == 87654321)
+        {
+            return chip::kSetupPINCodeUndefinedValue;
+        }
+        return pinCode;
+    }
+    return chip::kSetupPINCodeUndefinedValue;
+}
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
@@ -166,6 +193,16 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
             PrintArgError("%s: Invalid value specified for pin-code parameter: %s\n", progName, arg);
             return false;
         }
+        break;
+
+    case 'f':
+        gPinCodeFile = fopen(arg, "r");
+        if (!gPinCodeFile)
+        {
+            PrintArgError("%s: Failed to open the PIN code file: %s\n", progName, arg);
+            return false;
+        }
+        gPinCode = GetNextPinCode();
         break;
 
     case 'i':
@@ -334,10 +371,14 @@ bool Cmd_GenVerifier(int argc, char * argv[])
             return false;
         }
 
-        // On the next iteration the PIN Code and Salt will be randomly generated.
-        gPinCode        = chip::kSetupPINCodeUndefinedValue;
+        gPinCode = GetNextPinCode();
+        // On the next iteration the Salt will be randomly generated.
         gSaltDecodedLen = 0;
     }
 
+    if (gPinCodeFile)
+    {
+        fclose(gPinCodeFile);
+    }
     return true;
 }

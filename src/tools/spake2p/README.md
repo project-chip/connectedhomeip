@@ -31,3 +31,11 @@ random Salts and corresponding Verifiers):
 ```
 ./spake2p gen-verifier --count 100 --iteration-count 15000 --salt-len 32 --out spake2p-provisioning-data.csv
 ```
+
+Example command that generates 100 sets of spake2p parameters (Specific PIN Codes,
+random Salts and corresponding Verifiers):
+
+```
+./spake2p gen-verifier --count 100 --pin-code-file pincodes.txt --iteration-count 15000 --salt-len 32 --out spake2p-provisioning-data.csv
+```
+Notes: Each line of the `pincodes.txt` should be a valid PIN code.
