@@ -149,20 +149,21 @@ uint8_t gSalt[BASE64_MAX_DECODED_LEN(BASE64_ENCODED_LEN(chip::kSpake2p_Max_PBKDF
 uint8_t gSaltDecodedLen   = 0;
 uint8_t gSaltLen          = 0;
 const char * gOutFileName = nullptr;
-FILE *gPinCodeFile        = nullptr;
+FILE * gPinCodeFile       = nullptr;
 
 static uint32_t GetNextPinCode()
 {
-    if (!gPinCodeFile) {
+    if (!gPinCodeFile)
+    {
         return chip::kSetupPINCodeUndefinedValue;
     }
-    char pinCodeStr[9] = {0};
+    char pinCodeStr[9] = { 0 };
     if (fgets(pinCodeStr, 8, gPinCodeFile) != nullptr)
     {
         uint32_t pinCode = atoi(pinCodeStr);
-        if (pinCode == 11111111 || pinCode == 22222222 || pinCode == 33333333 || pinCode == 44444444 ||
-            pinCode == 55555555 || pinCode == 66666666 || pinCode == 77777777 || pinCode == 88888888 ||
-            pinCode == 99999999 || pinCode == 12345678 || pinCode == 87654321)
+        if (pinCode == 11111111 || pinCode == 22222222 || pinCode == 33333333 || pinCode == 44444444 || pinCode == 55555555 ||
+            pinCode == 66666666 || pinCode == 77777777 || pinCode == 88888888 || pinCode == 99999999 || pinCode == 12345678 ||
+            pinCode == 87654321)
         {
             return chip::kSetupPINCodeUndefinedValue;
         }
