@@ -16082,8 +16082,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
         }
         break;
     }
-    case Clusters::TestCluster::Id: {
-        using namespace Clusters::TestCluster;
+    case Clusters::UnitTesting::Id: {
+        using namespace Clusters::UnitTesting;
         switch (aPath.mAttributeId) {
         case Attributes::Boolean::Id: {
             using TypeInfo = Attributes::Boolean::TypeInfo;
@@ -16436,8 +16436,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTRTestClusterClusterTestListStructOctet * newElement_0;
-                    newElement_0 = [MTRTestClusterClusterTestListStructOctet new];
+                    MTRUnitTestingClusterTestListStructOctet * newElement_0;
+                    newElement_0 = [MTRUnitTestingClusterTestListStructOctet new];
                     newElement_0.member1 = [NSNumber numberWithUnsignedLongLong:entry_0.member1];
                     newElement_0.member2 = [NSData dataWithBytes:entry_0.member2.data() length:entry_0.member2.size()];
                     [array_0 addObject:newElement_0];
@@ -16530,8 +16530,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTRTestClusterClusterNullablesAndOptionalsStruct * newElement_0;
-                    newElement_0 = [MTRTestClusterClusterNullablesAndOptionalsStruct new];
+                    MTRUnitTestingClusterNullablesAndOptionalsStruct * newElement_0;
+                    newElement_0 = [MTRUnitTestingClusterNullablesAndOptionalsStruct new];
                     if (entry_0.nullableInt.IsNull()) {
                         newElement_0.nullableInt = nil;
                     } else {
@@ -16581,7 +16581,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                     if (entry_0.nullableStruct.IsNull()) {
                         newElement_0.nullableStruct = nil;
                     } else {
-                        newElement_0.nullableStruct = [MTRTestClusterClusterSimpleStruct new];
+                        newElement_0.nullableStruct = [MTRUnitTestingClusterSimpleStruct new];
                         newElement_0.nullableStruct.a = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().a];
                         newElement_0.nullableStruct.b = [NSNumber numberWithBool:entry_0.nullableStruct.Value().b];
                         newElement_0.nullableStruct.c =
@@ -16596,7 +16596,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                         newElement_0.nullableStruct.h = [NSNumber numberWithDouble:entry_0.nullableStruct.Value().h];
                     }
                     if (entry_0.optionalStruct.HasValue()) {
-                        newElement_0.optionalStruct = [MTRTestClusterClusterSimpleStruct new];
+                        newElement_0.optionalStruct = [MTRUnitTestingClusterSimpleStruct new];
                         newElement_0.optionalStruct.a = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().a];
                         newElement_0.optionalStruct.b = [NSNumber numberWithBool:entry_0.optionalStruct.Value().b];
                         newElement_0.optionalStruct.c =
@@ -16616,7 +16616,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                         if (entry_0.nullableOptionalStruct.Value().IsNull()) {
                             newElement_0.nullableOptionalStruct = nil;
                         } else {
-                            newElement_0.nullableOptionalStruct = [MTRTestClusterClusterSimpleStruct new];
+                            newElement_0.nullableOptionalStruct = [MTRUnitTestingClusterSimpleStruct new];
                             newElement_0.nullableOptionalStruct.a =
                                 [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().a];
                             newElement_0.nullableOptionalStruct.b =
@@ -16733,8 +16733,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            MTRTestClusterClusterSimpleStruct * _Nonnull value;
-            value = [MTRTestClusterClusterSimpleStruct new];
+            MTRUnitTestingClusterSimpleStruct * _Nonnull value;
+            value = [MTRUnitTestingClusterSimpleStruct new];
             value.a = [NSNumber numberWithUnsignedChar:cppValue.a];
             value.b = [NSNumber numberWithBool:cppValue.b];
             value.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.c)];
@@ -16828,8 +16828,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTRTestClusterClusterTestFabricScoped * newElement_0;
-                    newElement_0 = [MTRTestClusterClusterTestFabricScoped new];
+                    MTRUnitTestingClusterTestFabricScoped * newElement_0;
+                    newElement_0 = [MTRUnitTestingClusterTestFabricScoped new];
                     newElement_0.fabricSensitiveInt8u = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveInt8u];
                     if (entry_0.optionalFabricSensitiveInt8u.HasValue()) {
                         newElement_0.optionalFabricSensitiveInt8u =
@@ -16857,7 +16857,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                         [[NSString alloc] initWithBytes:entry_0.fabricSensitiveCharString.data()
                                                  length:entry_0.fabricSensitiveCharString.size()
                                                encoding:NSUTF8StringEncoding];
-                    newElement_0.fabricSensitiveStruct = [MTRTestClusterClusterSimpleStruct new];
+                    newElement_0.fabricSensitiveStruct = [MTRUnitTestingClusterSimpleStruct new];
                     newElement_0.fabricSensitiveStruct.a = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveStruct.a];
                     newElement_0.fabricSensitiveStruct.b = [NSNumber numberWithBool:entry_0.fabricSensitiveStruct.b];
                     newElement_0.fabricSensitiveStruct.c =
@@ -17371,11 +17371,11 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            MTRTestClusterClusterSimpleStruct * _Nullable value;
+            MTRUnitTestingClusterSimpleStruct * _Nullable value;
             if (cppValue.IsNull()) {
                 value = nil;
             } else {
-                value = [MTRTestClusterClusterSimpleStruct new];
+                value = [MTRUnitTestingClusterSimpleStruct new];
                 value.a = [NSNumber numberWithUnsignedChar:cppValue.Value().a];
                 value.b = [NSNumber numberWithBool:cppValue.Value().b];
                 value.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().c)];

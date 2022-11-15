@@ -82,19 +82,19 @@ struct AttributeInstruction
         switch (mAttributeType)
         {
         case kAttributeA:
-            return Clusters::TestCluster::Attributes::Int16u::Id;
+            return Clusters::UnitTesting::Attributes::Int16u::Id;
             break;
 
         case kAttributeB:
-            return Clusters::TestCluster::Attributes::OctetString::Id;
+            return Clusters::UnitTesting::Attributes::OctetString::Id;
             break;
 
         case kAttributeC:
-            return Clusters::TestCluster::Attributes::StructAttr::Id;
+            return Clusters::UnitTesting::Attributes::StructAttr::Id;
             break;
 
         default:
-            return Clusters::TestCluster::Attributes::ListStructOctetString::Id;
+            return Clusters::UnitTesting::Attributes::ListStructOctetString::Id;
             break;
         }
     }
@@ -184,7 +184,7 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
     uint8_t index = 0;
     for (auto & instruction : mInstructionList)
     {
-        ConcreteDataAttributePath path(instruction.mEndpointId, Clusters::TestCluster::Id, 0);
+        ConcreteDataAttributePath path(instruction.mEndpointId, Clusters::UnitTesting::Id, 0);
         Platform::ScopedMemoryBufferWithSize<uint8_t> handle;
         handle.Calloc(3000);
         TLV::ScopedBufferTLVWriter writer(std::move(handle), 3000);
@@ -202,7 +202,7 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
             case AttributeInstruction::kAttributeA: {
                 ChipLogProgress(DataManagement, "\t -- Generating A");
 
-                Clusters::TestCluster::Attributes::Int16u::TypeInfo::Type value = instruction.mInstructionId;
+                Clusters::UnitTesting::Attributes::Int16u::TypeInfo::Type value = instruction.mInstructionId;
                 NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
                 break;
             }
@@ -210,7 +210,7 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
             case AttributeInstruction::kAttributeB: {
                 ChipLogProgress(DataManagement, "\t -- Generating B");
 
-                Clusters::TestCluster::Attributes::OctetString::TypeInfo::Type value;
+                Clusters::UnitTesting::Attributes::OctetString::TypeInfo::Type value;
                 uint8_t buf[] = { 'h', 'e', 'l', 'l', 'o' };
                 value         = buf;
 
@@ -221,7 +221,7 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
             case AttributeInstruction::kAttributeC: {
                 ChipLogProgress(DataManagement, "\t -- Generating C");
 
-                Clusters::TestCluster::Attributes::StructAttr::TypeInfo::Type value;
+                Clusters::UnitTesting::Attributes::StructAttr::TypeInfo::Type value;
                 value.a = instruction.mInstructionId;
                 value.b = true;
                 NL_TEST_ASSERT(gSuite, DataModel::Encode(writer, TLV::AnonymousTag(), value) == CHIP_NO_ERROR);
@@ -232,14 +232,14 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
                 ChipLogProgress(DataManagement, "\t -- Generating D");
 
                 // buf[200] is 1.6k
-                Clusters::TestCluster::Structs::TestListStructOctet::Type buf[200];
+                Clusters::UnitTesting::Structs::TestListStructOctet::Type buf[200];
 
                 for (auto & i : buf)
                 {
                     i.member1 = instruction.mInstructionId;
                 }
 
-                Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
+                Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::Type value;
                 path.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
 
                 value = buf;
@@ -278,7 +278,7 @@ class CacheValidator : public ClusterStateCache::Callback
 public:
     CacheValidator(AttributeInstructionListType & instructionList, ForwardedDataCallbackValidator & dataCallbackValidator);
 
-    Clusters::TestCluster::Attributes::TypeInfo::DecodableType clusterValue;
+    Clusters::UnitTesting::Attributes::TypeInfo::DecodableType clusterValue;
 
 private:
     void OnDone(ReadClient *) override {}
@@ -316,8 +316,8 @@ private:
         case AttributeInstruction::kAttributeA: {
             ChipLogProgress(DataManagement, "\t\t -- Validating A");
 
-            Clusters::TestCluster::Attributes::Int16u::TypeInfo::DecodableType v = 0;
-            err = cache->Get<Clusters::TestCluster::Attributes::Int16u::TypeInfo>(path, v);
+            Clusters::UnitTesting::Attributes::Int16u::TypeInfo::DecodableType v = 0;
+            err = cache->Get<Clusters::UnitTesting::Attributes::Int16u::TypeInfo>(path, v);
             if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
             {
                 gotStatus = true;
@@ -335,8 +335,8 @@ private:
         case AttributeInstruction::kAttributeB: {
             ChipLogProgress(DataManagement, "\t\t -- Validating B");
 
-            Clusters::TestCluster::Attributes::OctetString::TypeInfo::DecodableType v;
-            err = cache->Get<Clusters::TestCluster::Attributes::OctetString::TypeInfo>(path, v);
+            Clusters::UnitTesting::Attributes::OctetString::TypeInfo::DecodableType v;
+            err = cache->Get<Clusters::UnitTesting::Attributes::OctetString::TypeInfo>(path, v);
             if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
             {
                 gotStatus = true;
@@ -354,8 +354,8 @@ private:
         case AttributeInstruction::kAttributeC: {
             ChipLogProgress(DataManagement, "\t\t -- Validating C");
 
-            Clusters::TestCluster::Attributes::StructAttr::TypeInfo::DecodableType v;
-            err = cache->Get<Clusters::TestCluster::Attributes::StructAttr::TypeInfo>(path, v);
+            Clusters::UnitTesting::Attributes::StructAttr::TypeInfo::DecodableType v;
+            err = cache->Get<Clusters::UnitTesting::Attributes::StructAttr::TypeInfo>(path, v);
             if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
             {
                 gotStatus = true;
@@ -373,8 +373,8 @@ private:
         case AttributeInstruction::kAttributeD: {
             ChipLogProgress(DataManagement, "\t\t -- Validating D");
 
-            Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo::DecodableType v;
-            err = cache->Get<Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo>(path, v);
+            Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::DecodableType v;
+            err = cache->Get<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(path, v);
             if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
             {
                 gotStatus = true;
@@ -452,7 +452,7 @@ private:
 
             auto status = statusList.front();
             NL_TEST_ASSERT(gSuite, status.mPath.mEndpointId == instruction.mEndpointId);
-            NL_TEST_ASSERT(gSuite, status.mPath.mClusterId == Clusters::TestCluster::Id);
+            NL_TEST_ASSERT(gSuite, status.mPath.mClusterId == Clusters::UnitTesting::Id);
             NL_TEST_ASSERT(gSuite, status.mPath.mAttributeId == instruction.GetAttributeId());
             NL_TEST_ASSERT(gSuite, status.mStatus.mStatus == Protocols::InteractionModel::Status::Failure);
         }
@@ -473,7 +473,7 @@ private:
         for (auto & instruction : mInstructionSet)
         {
             if (instruction.mEndpointId == path.mEndpointId && instruction.GetAttributeId() == path.mAttributeId &&
-                path.mClusterId == Clusters::TestCluster::Id)
+                path.mClusterId == Clusters::UnitTesting::Id)
             {
 
                 //
@@ -532,8 +532,8 @@ CacheValidator::CacheValidator(AttributeInstructionListType & instructionList,
         mInstructionSet.erase(instruction);
         mInstructionSet.insert(instruction);
         mExpectedAttributes.insert(
-            ConcreteAttributePath(instruction.mEndpointId, Clusters::TestCluster::Id, instruction.GetAttributeId()));
-        mExpectedClusters.insert(std::make_tuple(instruction.mEndpointId, Clusters::TestCluster::Id));
+            ConcreteAttributePath(instruction.mEndpointId, Clusters::UnitTesting::Id, instruction.GetAttributeId()));
+        mExpectedClusters.insert(std::make_tuple(instruction.mEndpointId, Clusters::UnitTesting::Id));
         mExpectedEndpoints.insert(instruction.mEndpointId);
     }
 }

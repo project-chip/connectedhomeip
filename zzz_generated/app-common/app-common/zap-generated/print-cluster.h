@@ -453,10 +453,10 @@
 #define CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER
 #endif
 
-#if defined(ZCL_USING_TEST_CLUSTER_SERVER) || defined(ZCL_USING_TEST_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_TEST_CLUSTER { ZCL_TEST_CLUSTER_ID, "Test Cluster" },
+#if defined(ZCL_USING_UNIT_TESTING_CLUSTER_SERVER) || defined(ZCL_USING_UNIT_TESTING_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_UNIT_TESTING_CLUSTER { ZCL_UNIT_TESTING_CLUSTER_ID, "Unit Testing" },
 #else
-#define CHIP_PRINTCLUSTER_TEST_CLUSTER
+#define CHIP_PRINTCLUSTER_UNIT_TESTING_CLUSTER
 #endif
 
 #if defined(ZCL_USING_FAULT_INJECTION_CLUSTER_SERVER) || defined(ZCL_USING_FAULT_INJECTION_CLUSTER_CLIENT)
@@ -535,7 +535,7 @@
     CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                               \
-    CHIP_PRINTCLUSTER_TEST_CLUSTER                                                                                                 \
+    CHIP_PRINTCLUSTER_UNIT_TESTING_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_FAULT_INJECTION_CLUSTER
 
 #define MAX_CLUSTER_NAME_LENGTH 39
