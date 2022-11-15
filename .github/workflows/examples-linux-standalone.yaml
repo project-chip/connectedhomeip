@@ -34,12 +34,12 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.6.02
+            image: connectedhomeip/chip-build:0.6.06
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.15
+            - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -60,7 +60,7 @@ jobs:
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs
@@ -71,7 +71,11 @@ jobs:
               timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
-                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob '*-chip-cert' build"
+                  "./scripts/build/build_examples.py --no-log-timestamps \
+                      --target linux-x64-chip-cert \
+                      --target linux-arm64-chip-cert \
+                      build \
+                  "
             - name: Build minmdns example with platform dns
               timeout-minutes: 10
               run: |
@@ -174,7 +178,7 @@ jobs:
                     out/linux-x64-lock/chip-lock-app \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ !env.ACT }}
               with:
                   name: Size,Linux-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}

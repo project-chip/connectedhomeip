@@ -28,6 +28,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.NetworkCredentials
+import com.google.chip.chiptool.NetworkCredentialsParcelable
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
@@ -46,7 +47,7 @@ class DeviceProvisioningFragment : Fragment() {
 
   private var gatt: BluetoothGatt? = null
 
-  private val networkCredentials: NetworkCredentials?
+  private val networkCredentialsParcelable: NetworkCredentialsParcelable?
     get() = arguments?.getParcelable(ARG_NETWORK_CREDENTIALS)
 
   private lateinit var scope: CoroutineScope
@@ -120,7 +121,19 @@ class DeviceProvisioningFragment : Fragment() {
 
       val deviceId = DeviceIdUtil.getNextAvailableId(requireContext())
       val connId = bluetoothManager.connectionId
-      deviceController.pairDevice(gatt, connId, deviceId, deviceInfo.setupPinCode, networkCredentials)
+      var network: NetworkCredentials? = null
+      var networkParcelable = checkNotNull(networkCredentialsParcelable)
+
+      val wifi = networkParcelable.wiFiCredentials
+      if (wifi != null) {
+        network = NetworkCredentials.forWiFi(NetworkCredentials.WiFiCredentials(wifi.ssid, wifi.password))
+      }
+      val thread = networkParcelable.threadCredentials
+      if (thread != null) {
+        network = NetworkCredentials.forThread(NetworkCredentials.ThreadCredentials(thread.operationalDataset))
+      }
+
+      deviceController.pairDevice(gatt, connId, deviceId, deviceInfo.setupPinCode, network)
       DeviceIdUtil.setNextAvailableId(requireContext(), deviceId + 1)
     }
   }
@@ -191,17 +204,17 @@ class DeviceProvisioningFragment : Fragment() {
     private const val STATUS_PAIRING_SUCCESS = 0
 
     /**
-     * Return a new instance of [DeviceProvisioningFragment]. [networkCredentials] can be null for
+     * Return a new instance of [DeviceProvisioningFragment]. [networkCredentialsParcelable] can be null for
      * IP commissioning.
      */
     fun newInstance(
       deviceInfo: CHIPDeviceInfo,
-      networkCredentials: NetworkCredentials?,
+      networkCredentialsParcelable: NetworkCredentialsParcelable?,
     ): DeviceProvisioningFragment {
       return DeviceProvisioningFragment().apply {
         arguments = Bundle(2).apply {
           putParcelable(ARG_DEVICE_INFO, deviceInfo)
-          putParcelable(ARG_NETWORK_CREDENTIALS, networkCredentials)
+          putParcelable(ARG_NETWORK_CREDENTIALS, networkCredentialsParcelable)
         }
       }
     }

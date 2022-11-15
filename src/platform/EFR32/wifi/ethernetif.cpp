@@ -121,10 +121,30 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
     {
         return;
     }
-    if (len < 60)
+    if (len < LWIP_FRAME_ALIGNMENT)
     { /* 60 : LWIP frame alignment */
-        len = 60;
+        len = LWIP_FRAME_ALIGNMENT;
     }
+
+    /* Drop packets originated from the same interface and is not destined for the said interface */
+    const uint8_t * src_mac = b + netif->hwaddr_len;
+    const uint8_t * dst_mac = b;
+
+    if (!(ip6_addr_ispreferred(netif_ip6_addr_state(netif, 0))) && (memcmp(netif->hwaddr, src_mac, netif->hwaddr_len) == 0) &&
+        (memcmp(netif->hwaddr, dst_mac, netif->hwaddr_len) != 0))
+    {
+#ifdef WIFI_DEBUG_ENABLED
+        EFR32_LOG("%s: DROP, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x", __func__,
+
+                  dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],
+
+                  src_mac[0], src_mac[1], src_mac[2], src_mac[3], src_mac[4], src_mac[5],
+
+                  b[12], b[13]);
+#endif
+        return;
+    }
+
     /* We allocate a pbuf chain of pbufs from the Lwip buffer pool
      * and copy the data to the pbuf chain
      */
@@ -135,10 +155,15 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
             memcpy((uint8_t *) q->payload, (uint8_t *) b + bufferoffset, q->len);
             bufferoffset += q->len;
         }
-
 #ifdef WIFI_DEBUG_ENABLED
-        EFR32_LOG("EN:IN %d,[%02x:%02x:%02x:%02x:%02x%02x][%02x:%02x:%02x:%02x:%02x:%02x]type=%02x%02x", bufferoffset, b[0], b[1],
-                  b[2], b[3], b[4], b[5], b[6], b[7], b[8], b[9], b[10], b[11], b[12], b[13]);
+        EFR32_LOG("%s: ACCEPT %d, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x", __func__,
+                  bufferoffset,
+
+                  dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],
+
+                  src_mac[0], src_mac[1], src_mac[2], src_mac[3], src_mac[4], src_mac[5],
+
+                  b[12], b[13]);
 #endif
 
         if (netif->input(p, netif) != ERR_OK)
@@ -406,8 +431,12 @@ err_t sta_ethernetif_init(struct netif * netif)
     netif->name[0] = STATION_NETIF0;
     netif->name[1] = STATION_NETIF1;
 
-    netif->output     = etharp_output;
+#if LWIP_IPV4 && LWIP_ARP
+    netif->output = etharp_output;
+#endif /* #if LWIP_IPV4 && LWIP_ARP */
+#if LWIP_IPV6 && LWIP_ETHERNET
     netif->output_ip6 = ethip6_output;
+#endif /* LWIP_IPV6 && LWIP_ETHERNET */
     netif->linkoutput = low_level_output;
 
     /* initialize the hardware */

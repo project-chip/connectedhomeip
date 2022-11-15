@@ -272,11 +272,6 @@ const FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
 CHIP_ERROR DeleteFabricFromTable(FabricIndex fabricIndex)
 {
     ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().Delete(fabricIndex));
-
-    // We need to withdraw the advertisement for the now-removed fabric, so need
-    // to restart advertising altogether.
-    app::DnssdServer::Instance().StartServer();
-
     return CHIP_NO_ERROR;
 }
 
@@ -361,6 +356,10 @@ public:
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
         ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
+
+        // We need to withdraw the advertisement for the now-removed fabric, so need
+        // to restart advertising altogether.
+        app::DnssdServer::Instance().StartServer();
 
         EventManagement::GetInstance().FabricRemoved(fabricIndex);
 

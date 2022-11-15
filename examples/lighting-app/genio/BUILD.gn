@@ -64,10 +64,14 @@ mt793x_sdk("sdk") {
 mt793x_executable("lighting_app") {
   output_name = "chip-mt793x-lighting-app-example.out"
   include_dirs = [ "include" ]
-  defines = []
+  defines = [
+    #"__PWM_DIMMABLE_LED__"
+  ]
 
   sources = [
     "src/AppTask.cpp",
+    "src/ColorFormat.cpp",
+    "src/DimmableLEDWidget.cpp",
     "src/LEDWidget.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",

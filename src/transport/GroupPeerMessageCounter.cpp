@@ -272,10 +272,9 @@ CHIP_ERROR GroupOutgoingCounters::Init(chip::PersistentStorageDelegate * storage
     // Spec 4.5.1.3
     mStorage      = storage_delegate;
     uint16_t size = static_cast<uint16_t>(sizeof(uint32_t));
-    DefaultStorageKeyAllocator key;
     uint32_t temp;
     CHIP_ERROR err;
-    err = mStorage->SyncGetKeyValue(key.GroupControlCounter(), &temp, size);
+    err = mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::GroupControlCounter().KeyName(), &temp, size);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         // might be the first time we retrieve the value
@@ -291,7 +290,7 @@ CHIP_ERROR GroupOutgoingCounters::Init(chip::PersistentStorageDelegate * storage
         mGroupControlCounter = temp;
     }
 
-    err = mStorage->SyncGetKeyValue(key.GroupDataCounter(), &temp, size);
+    err = mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::GroupDataCounter().KeyName(), &temp, size);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         // might be the first time we retrieve the value
@@ -309,11 +308,11 @@ CHIP_ERROR GroupOutgoingCounters::Init(chip::PersistentStorageDelegate * storage
 
     temp = mGroupControlCounter + GROUP_MSG_COUNTER_MIN_INCREMENT;
     size = static_cast<uint16_t>(sizeof(temp));
-    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(key.GroupControlCounter(), &temp, size));
+    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::GroupControlCounter().KeyName(), &temp, size));
 
     temp = mGroupDataCounter + GROUP_MSG_COUNTER_MIN_INCREMENT;
 
-    return mStorage->SyncSetKeyValue(key.GroupDataCounter(), &temp, size);
+    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::GroupDataCounter().KeyName(), &temp, size);
 }
 
 uint32_t GroupOutgoingCounters::GetCounter(bool isControl)
@@ -326,18 +325,19 @@ CHIP_ERROR GroupOutgoingCounters::IncrementCounter(bool isControl)
     uint32_t temp  = 0;
     uint16_t size  = static_cast<uint16_t>(sizeof(uint32_t));
     uint32_t value = 0;
-    DefaultStorageKeyAllocator key;
+
+    StorageKeyName key = StorageKeyName::Uninitialized();
 
     if (isControl)
     {
         mGroupControlCounter++;
-        key.GroupControlCounter();
+        key   = DefaultStorageKeyAllocator::GroupControlCounter();
         value = mGroupControlCounter;
     }
     else
     {
         mGroupDataCounter++;
-        key.GroupDataCounter();
+        key   = DefaultStorageKeyAllocator::GroupDataCounter();
         value = mGroupDataCounter;
     }
 

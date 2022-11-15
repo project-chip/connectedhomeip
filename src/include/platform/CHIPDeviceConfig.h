@@ -92,18 +92,6 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
- *
- * Compute and log a hash of the device's provisioning data on boot.
- *
- * The generated hash value confirms to the form described in the CHIP: Factory
- * Provisioning Specification.
- */
-#ifndef CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
-#define CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH 1
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_ENABLE_SED
  *
  * Enable support for sleepy end device behavior.
@@ -559,56 +547,6 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME
 #define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME 30000
-#endif
-
-// -------------------- Time Sync Configuration --------------------
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
- *
- * Enables synchronizing the device's real time clock with a remote chip Time service
- * using the chip Time Sync protocol.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_CHIP_TIME_SERVICE_ENDPOINT_ID
- *
- * Specifies the service endpoint id of the chip Time Sync service to be used to synchronize time.
- *
- * This value is only meaningful if CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC has
- * been enabled.
- */
-#ifndef CHIP_DEVICE_CONFIG_CHIP_TIME_SERVICE_ENDPOINT_ID
-#define CHIP_DEVICE_CONFIG_CHIP_TIME_SERVICE_ENDPOINT_ID 0x18B4300200000005ULL
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_DEFAULT_TIME_SYNC_INTERVAL
- *
- * Specifies the minimum interval (in seconds) at which the device should synchronize its real time
- * clock with the configured chip Time Sync server.
- *
- * This value is only meaningful if CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC has
- * been enabled.
- */
-#ifndef CHIP_DEVICE_CONFIG_DEFAULT_TIME_SYNC_INTERVAL
-#define CHIP_DEVICE_CONFIG_DEFAULT_TIME_SYNC_INTERVAL 180
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_TIME_SYNC_TIMEOUT
- *
- * Specifies the maximum amount of time (in milliseconds) to wait for a response from a
- * chip Time Sync server.
- *
- * This value is only meaningful if CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC has
- * been enabled.
- */
-#ifndef CHIP_DEVICE_CONFIG_TIME_SYNC_TIMEOUT
-#define CHIP_DEVICE_CONFIG_TIME_SYNC_TIMEOUT 10000
 #endif
 
 // -------------------- Service Provisioning Configuration --------------------

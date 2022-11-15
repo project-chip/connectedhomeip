@@ -142,6 +142,15 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 
     mSystemState = params.systemState->Retain();
     mState       = State::Initialized;
+
+    if (GetFabricIndex() != kUndefinedFabricIndex)
+    {
+        ChipLogProgress(Controller,
+                        "Joined the fabric at index %d. Fabric ID is 0x" ChipLogFormatX64
+                        " (Compressed Fabric ID: " ChipLogFormatX64 ")",
+                        GetFabricIndex(), ChipLogValueX64(GetFabricId()), ChipLogValueX64(GetCompressedFabricId()));
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -310,9 +319,6 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     VerifyOrReturnError(fabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INTERNAL);
 
     mFabricIndex = fabricIndex;
-
-    ChipLogProgress(Controller, "Joined the fabric at index %d. Compressed fabric ID is: 0x" ChipLogFormatX64, GetFabricIndex(),
-                    ChipLogValueX64(GetCompressedFabricId()));
 
     return CHIP_NO_ERROR;
 }
@@ -686,6 +692,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
     mDeviceInPASEEstablishment = device;
     device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress);
+    device->UpdateDeviceData(params.GetPeerAddress(), params.GetMRPConfig());
 
 #if CONFIG_NETWORK_LAYER_BLE
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
@@ -706,8 +713,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         }
     }
 #endif
-    // TODO: In some cases like PASE over IP, SAI and SII values from commissionable node service should be used
-    session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress(), device->GetRemoteMRPConfig());
+    session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress(), params.GetMRPConfig());
     VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NO_MEMORY);
 
     // Allocate the exchange immediately before calling PASESession::Pair.

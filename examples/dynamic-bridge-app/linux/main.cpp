@@ -204,7 +204,7 @@ int AddDeviceEndpoint(Device * dev)
         {
             gDevices[index] = dev;
             EmberAfStatus ret;
-            while (1)
+            while (true)
             {
                 // Todo: Update this to schedule the work rather than use this lock
                 dev->SetEndpointId(gCurrentEndpointId);
@@ -294,8 +294,12 @@ int main(int argc, char * argv[])
     clusterAccess.reserve(std::extent<decltype(clusters::kKnownClusters)>::value);
     for (auto & entry : clusters::kKnownClusters)
     {
-        clusterAccess.emplace_back(chip::Optional<EndpointId>(), entry.id);
-        registerAttributeAccessOverride(&clusterAccess.back());
+        // Desciptor clusters should not be overridden.
+        if (entry.id != chip::app::Clusters::Descriptor::Id)
+        {
+            clusterAccess.emplace_back(chip::Optional<EndpointId>(), entry.id);
+            registerAttributeAccessOverride(&clusterAccess.back());
+        }
     }
 
     ChipLinuxAppMainLoop();

@@ -48,10 +48,11 @@
 #define CHIP_PRINTCLUSTER_ON_OFF_CLUSTER
 #endif
 
-#if defined(ZCL_USING_ON_OFF_SWITCH_CONFIG_CLUSTER_SERVER) || defined(ZCL_USING_ON_OFF_SWITCH_CONFIG_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIG_CLUSTER { ZCL_ON_OFF_SWITCH_CONFIG_CLUSTER_ID, "On/off Switch Configuration" },
+#if defined(ZCL_USING_ON_OFF_SWITCH_CONFIGURATION_CLUSTER_SERVER) || defined(ZCL_USING_ON_OFF_SWITCH_CONFIGURATION_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIGURATION_CLUSTER                                                                      \
+    { ZCL_ON_OFF_SWITCH_CONFIGURATION_CLUSTER_ID, "On/off Switch Configuration" },
 #else
-#define CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIG_CLUSTER
+#define CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIGURATION_CLUSTER
 #endif
 
 #if defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_CLIENT)
@@ -102,16 +103,19 @@
 #define CHIP_PRINTCLUSTER_BASIC_CLUSTER
 #endif
 
-#if defined(ZCL_USING_OTA_PROVIDER_CLUSTER_SERVER) || defined(ZCL_USING_OTA_PROVIDER_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_OTA_PROVIDER_CLUSTER { ZCL_OTA_PROVIDER_CLUSTER_ID, "OTA Software Update Provider" },
+#if defined(ZCL_USING_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER) || defined(ZCL_USING_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER                                                                     \
+    { ZCL_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_ID, "OTA Software Update Provider" },
 #else
-#define CHIP_PRINTCLUSTER_OTA_PROVIDER_CLUSTER
+#define CHIP_PRINTCLUSTER_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER
 #endif
 
-#if defined(ZCL_USING_OTA_REQUESTOR_CLUSTER_SERVER) || defined(ZCL_USING_OTA_REQUESTOR_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER { ZCL_OTA_REQUESTOR_CLUSTER_ID, "OTA Software Update Requestor" },
+#if defined(ZCL_USING_OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_SERVER) ||                                                             \
+    defined(ZCL_USING_OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER                                                                    \
+    { ZCL_OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_ID, "OTA Software Update Requestor" },
 #else
-#define CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER
+#define CHIP_PRINTCLUSTER_OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER
 #endif
 
 #if defined(ZCL_USING_LOCALIZATION_CONFIGURATION_CLUSTER_SERVER) || defined(ZCL_USING_LOCALIZATION_CONFIGURATION_CLUSTER_CLIENT)
@@ -293,10 +297,12 @@
 #define CHIP_PRINTCLUSTER_BARRIER_CONTROL_CLUSTER
 #endif
 
-#if defined(ZCL_USING_PUMP_CONFIG_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_PUMP_CONFIG_CONTROL_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_PUMP_CONFIG_CONTROL_CLUSTER { ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID, "Pump Configuration and Control" },
+#if defined(ZCL_USING_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER) ||                                                            \
+    defined(ZCL_USING_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER                                                                   \
+    { ZCL_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_ID, "Pump Configuration and Control" },
 #else
-#define CHIP_PRINTCLUSTER_PUMP_CONFIG_CONTROL_CLUSTER
+#define CHIP_PRINTCLUSTER_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER
 #endif
 
 #if defined(ZCL_USING_THERMOSTAT_CLUSTER_SERVER) || defined(ZCL_USING_THERMOSTAT_CLUSTER_CLIENT)
@@ -311,11 +317,12 @@
 #define CHIP_PRINTCLUSTER_FAN_CONTROL_CLUSTER
 #endif
 
-#if defined(ZCL_USING_THERMOSTAT_UI_CONFIG_CLUSTER_SERVER) || defined(ZCL_USING_THERMOSTAT_UI_CONFIG_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_THERMOSTAT_UI_CONFIG_CLUSTER                                                                             \
-    { ZCL_THERMOSTAT_UI_CONFIG_CLUSTER_ID, "Thermostat User Interface Configuration" },
+#if defined(ZCL_USING_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_SERVER) ||                                                   \
+    defined(ZCL_USING_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER                                                          \
+    { ZCL_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_ID, "Thermostat User Interface Configuration" },
 #else
-#define CHIP_PRINTCLUSTER_THERMOSTAT_UI_CONFIG_CLUSTER
+#define CHIP_PRINTCLUSTER_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER
 #endif
 
 #if defined(ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_COLOR_CONTROL_CLUSTER_CLIENT)
@@ -336,10 +343,10 @@
 #define CHIP_PRINTCLUSTER_ILLUMINANCE_MEASUREMENT_CLUSTER
 #endif
 
-#if defined(ZCL_USING_TEMP_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_TEMP_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_TEMP_MEASUREMENT_CLUSTER { ZCL_TEMP_MEASUREMENT_CLUSTER_ID, "Temperature Measurement" },
+#if defined(ZCL_USING_TEMPERATURE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_TEMPERATURE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TEMPERATURE_MEASUREMENT_CLUSTER { ZCL_TEMPERATURE_MEASUREMENT_CLUSTER_ID, "Temperature Measurement" },
 #else
-#define CHIP_PRINTCLUSTER_TEMP_MEASUREMENT_CLUSTER
+#define CHIP_PRINTCLUSTER_TEMPERATURE_MEASUREMENT_CLUSTER
 #endif
 
 #if defined(ZCL_USING_PRESSURE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_PRESSURE_MEASUREMENT_CLUSTER_CLIENT)
@@ -410,10 +417,10 @@
 #define CHIP_PRINTCLUSTER_KEYPAD_INPUT_CLUSTER
 #endif
 
-#if defined(ZCL_USING_CONTENT_LAUNCH_CLUSTER_SERVER) || defined(ZCL_USING_CONTENT_LAUNCH_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER { ZCL_CONTENT_LAUNCH_CLUSTER_ID, "Content Launcher" },
+#if defined(ZCL_USING_CONTENT_LAUNCHER_CLUSTER_SERVER) || defined(ZCL_USING_CONTENT_LAUNCHER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_CONTENT_LAUNCHER_CLUSTER { ZCL_CONTENT_LAUNCHER_CLUSTER_ID, "Content Launcher" },
 #else
-#define CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER
+#define CHIP_PRINTCLUSTER_CONTENT_LAUNCHER_CLUSTER
 #endif
 
 #if defined(ZCL_USING_AUDIO_OUTPUT_CLUSTER_SERVER) || defined(ZCL_USING_AUDIO_OUTPUT_CLUSTER_CLIENT)
@@ -446,10 +453,10 @@
 #define CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER
 #endif
 
-#if defined(ZCL_USING_TEST_CLUSTER_SERVER) || defined(ZCL_USING_TEST_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_TEST_CLUSTER { ZCL_TEST_CLUSTER_ID, "Test Cluster" },
+#if defined(ZCL_USING_UNIT_TESTING_CLUSTER_SERVER) || defined(ZCL_USING_UNIT_TESTING_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_UNIT_TESTING_CLUSTER { ZCL_UNIT_TESTING_CLUSTER_ID, "Unit Testing" },
 #else
-#define CHIP_PRINTCLUSTER_TEST_CLUSTER
+#define CHIP_PRINTCLUSTER_UNIT_TESTING_CLUSTER
 #endif
 
 #if defined(ZCL_USING_FAULT_INJECTION_CLUSTER_SERVER) || defined(ZCL_USING_FAULT_INJECTION_CLUSTER_CLIENT)
@@ -463,7 +470,7 @@
     CHIP_PRINTCLUSTER_GROUPS_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_SCENES_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_ON_OFF_CLUSTER                                                                                               \
-    CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIG_CLUSTER                                                                                 \
+    CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIGURATION_CLUSTER                                                                          \
     CHIP_PRINTCLUSTER_LEVEL_CONTROL_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_BINARY_INPUT_BASIC_CLUSTER                                                                                   \
     CHIP_PRINTCLUSTER_PWM_CLUSTER                                                                                                  \
@@ -472,8 +479,8 @@
     CHIP_PRINTCLUSTER_ACCESS_CONTROL_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_ACTIONS_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_BASIC_CLUSTER                                                                                                \
-    CHIP_PRINTCLUSTER_OTA_PROVIDER_CLUSTER                                                                                         \
-    CHIP_PRINTCLUSTER_OTA_REQUESTOR_CLUSTER                                                                                        \
+    CHIP_PRINTCLUSTER_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER                                                                         \
+    CHIP_PRINTCLUSTER_OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER                                                                        \
     CHIP_PRINTCLUSTER_LOCALIZATION_CONFIGURATION_CLUSTER                                                                           \
     CHIP_PRINTCLUSTER_TIME_FORMAT_LOCALIZATION_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_UNIT_LOCALIZATION_CLUSTER                                                                                    \
@@ -503,14 +510,14 @@
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BARRIER_CONTROL_CLUSTER                                                                                      \
-    CHIP_PRINTCLUSTER_PUMP_CONFIG_CONTROL_CLUSTER                                                                                  \
+    CHIP_PRINTCLUSTER_PUMP_CONFIGURATION_AND_CONTROL_CLUSTER                                                                       \
     CHIP_PRINTCLUSTER_THERMOSTAT_CLUSTER                                                                                           \
     CHIP_PRINTCLUSTER_FAN_CONTROL_CLUSTER                                                                                          \
-    CHIP_PRINTCLUSTER_THERMOSTAT_UI_CONFIG_CLUSTER                                                                                 \
+    CHIP_PRINTCLUSTER_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER                                                              \
     CHIP_PRINTCLUSTER_COLOR_CONTROL_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_BALLAST_CONFIGURATION_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_ILLUMINANCE_MEASUREMENT_CLUSTER                                                                              \
-    CHIP_PRINTCLUSTER_TEMP_MEASUREMENT_CLUSTER                                                                                     \
+    CHIP_PRINTCLUSTER_TEMPERATURE_MEASUREMENT_CLUSTER                                                                              \
     CHIP_PRINTCLUSTER_PRESSURE_MEASUREMENT_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_FLOW_MEASUREMENT_CLUSTER                                                                                     \
     CHIP_PRINTCLUSTER_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER                                                                        \
@@ -522,13 +529,13 @@
     CHIP_PRINTCLUSTER_MEDIA_INPUT_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_LOW_POWER_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_KEYPAD_INPUT_CLUSTER                                                                                         \
-    CHIP_PRINTCLUSTER_CONTENT_LAUNCH_CLUSTER                                                                                       \
+    CHIP_PRINTCLUSTER_CONTENT_LAUNCHER_CLUSTER                                                                                     \
     CHIP_PRINTCLUSTER_AUDIO_OUTPUT_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_APPLICATION_LAUNCHER_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                               \
-    CHIP_PRINTCLUSTER_TEST_CLUSTER                                                                                                 \
+    CHIP_PRINTCLUSTER_UNIT_TESTING_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_FAULT_INJECTION_CLUSTER
 
 #define MAX_CLUSTER_NAME_LENGTH 39

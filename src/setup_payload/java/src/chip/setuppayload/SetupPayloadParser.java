@@ -1,7 +1,12 @@
 package chip.setuppayload;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /** Parser for scanned QR code or manual entry code. */
 public class SetupPayloadParser {
+
+  private static final Logger LOGGER = Logger.getLogger(SetupPayloadParser.class.getSimpleName());
 
   /**
    * Returns {@link SetupPayload} parsed from the QR code string. If an invalid element is included
@@ -69,7 +74,11 @@ public class SetupPayloadParser {
       throws InvalidEntryCodeFormatException, SetupPayloadException;
 
   static {
-    System.loadLibrary("SetupPayloadParser");
+    try {
+      System.loadLibrary("SetupPayloadParser");
+    } catch (UnsatisfiedLinkError e) {
+      LOGGER.log(Level.SEVERE, "Cannot load library.", e);
+    }
   }
 
   public static class UnrecognizedQrCodeException extends Exception {

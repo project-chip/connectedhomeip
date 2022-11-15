@@ -565,7 +565,7 @@ static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac)
                 if ((now = xTaskGetTickCount()) > (last_dhcp_poll + pdMS_TO_TICKS(250)))
                 {
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-                    uint8_t dhcp_state = dhcpclient_poll(&sta_netif);
+                    uint8_t dhcp_state = dhcpclient_poll(sta_netif);
 
                     if ((dhcp_state == DHCP_ADDRESS_ASSIGNED) && !hasNotifiedIPV4)
                     {
@@ -1132,6 +1132,7 @@ static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac)
      ******************************************************************************/
     bool wfx_hw_ready(void) { return (wifiContext.state & SL_WFX_STARTED) ? true : false; }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
     /*****************************************************************************
      * @fn  void wfx_dhcp_got_ipv4(uint32_t ip)
      * @brief
@@ -1146,6 +1147,7 @@ static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac)
         sta_ip = ip;
         wfx_ip_changed_notify(IP_STATUS_SUCCESS);
     }
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
     /*****************************************************************************
      * @fn  wfx_enable_sta_mode(void)

@@ -41,7 +41,8 @@ using namespace chip::DeviceLayer::Internal;
 
 namespace {
 
-constexpr uint8_t kDnssdKeyMaxSize = 32;
+constexpr uint8_t kDnssdKeyMaxSize       = 32;
+constexpr const char * kEmptyAddressIpv6 = "0000:0000:0000:0000:0000:0000:0000:0000";
 
 // The number of miliseconds which must elapse without a new "found" event before
 // mDNS browsing is considered finished. We need this timeout because Tizen Native
@@ -325,7 +326,7 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_ip() failed. ret: %d", ret));
 
     // If both IPv4 and IPv6 are set, IPv6 address has higher priority.
-    if (ipv6 != nullptr)
+    if (ipv6 != nullptr && strcmp(ipv6, kEmptyAddressIpv6) != 0)
     {
         if (!chip::Inet::IPAddress::FromString(ipv6, ipAddr) || ipAddr.Type() != chip::Inet::IPAddressType::kIPv6)
         {
@@ -671,10 +672,7 @@ CHIP_ERROR DnssdTizen::Resolve(const DnssdService & browseResult, chip::Inet::In
 
 exit:
     if (err != CHIP_NO_ERROR)
-    { // Notify caller about error
-        callback(context, nullptr, chip::Span<chip::Inet::IPAddress>(), err);
         RemoveContext(resolveCtx);
-    }
     return err;
 }
 
@@ -824,6 +822,11 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 
     return DnssdTizen::GetInstance().Resolve(*browseResult, interface, callback, context);
+}
+
+CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 } // namespace Dnssd

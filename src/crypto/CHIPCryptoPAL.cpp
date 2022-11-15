@@ -540,7 +540,7 @@ CHIP_ERROR Spake2pVerifier::Deserialize(const ByteSpan & inSerialized)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2pVerifier::Generate(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin)
+CHIP_ERROR Spake2pVerifier::Generate(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t setupPin)
 {
     uint8_t serializedWS[kSpake2p_WS_Length * 2] = { 0 };
     ReturnErrorOnFailure(ComputeWS(pbkdf2IterCount, salt, setupPin, serializedWS, sizeof(serializedWS)));
@@ -572,7 +572,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR Spake2pVerifier::ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin, uint8_t * ws,
+CHIP_ERROR Spake2pVerifier::ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t setupPin, uint8_t * ws,
                                       uint32_t ws_len)
 {
 #ifdef ENABLE_HSM_PBKDF2

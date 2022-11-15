@@ -155,11 +155,20 @@ private:
 
         auto strongDelegate = mDelegate;
         dispatch_async(mWorkQueue, ^{
-            [strongDelegate handleBDXTransferSessionBeginForNodeID:nodeId
-                                                        controller:controller
-                                                    fileDesignator:fileDesignator
-                                                            offset:offset
-                                                        completion:completionHandler];
+            if ([strongDelegate respondsToSelector:@selector
+                                (handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:)]) {
+                [strongDelegate handleBDXTransferSessionBeginForNodeID:nodeId
+                                                            controller:controller
+                                                        fileDesignator:fileDesignator
+                                                                offset:offset
+                                                            completion:completionHandler];
+            } else {
+                [strongDelegate handleBDXTransferSessionBeginForNodeID:nodeId
+                                                            controller:controller
+                                                        fileDesignator:fileDesignator
+                                                                offset:offset
+                                                     completionHandler:completionHandler];
+            }
         });
 
         return CHIP_NO_ERROR;
@@ -233,12 +242,22 @@ private:
 
         auto strongDelegate = mDelegate;
         dispatch_async(mWorkQueue, ^{
-            [strongDelegate handleBDXQueryForNodeID:nodeId
-                                         controller:controller
-                                          blockSize:blockSize
-                                         blockIndex:blockIndex
-                                        bytesToSkip:bytesToSkip
-                                         completion:completionHandler];
+            if ([strongDelegate respondsToSelector:@selector
+                                (handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completion:)]) {
+                [strongDelegate handleBDXQueryForNodeID:nodeId
+                                             controller:controller
+                                              blockSize:blockSize
+                                             blockIndex:blockIndex
+                                            bytesToSkip:bytesToSkip
+                                             completion:completionHandler];
+            } else {
+                [strongDelegate handleBDXQueryForNodeID:nodeId
+                                             controller:controller
+                                              blockSize:blockSize
+                                             blockIndex:blockIndex
+                                            bytesToSkip:bytesToSkip
+                                      completionHandler:completionHandler];
+            }
         });
 
         return CHIP_NO_ERROR;
@@ -443,7 +462,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
         return;
     }
 
-    auto * commandParams = [[MTROTASoftwareUpdateProviderClusterQueryImageParams alloc] init];
+    auto * commandParams = [[MTROtaSoftwareUpdateProviderClusterQueryImageParams alloc] init];
     CHIP_ERROR err = ConvertToQueryImageParams(commandData, commandParams);
     if (err != CHIP_NO_ERROR) {
         commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
@@ -455,7 +474,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
     __block ConcreteCommandPath cachedCommandPath(commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId);
 
     auto completionHandler = ^(
-        MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error) {
+        MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error) {
         dispatch_async(mWorkQueue, ^{
             CommandHandler * handler = EnsureValidState(handle, cachedCommandPath, "QueryImage", data, error);
             VerifyOrReturn(handler != nullptr);
@@ -466,9 +485,9 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
             Commands::QueryImageResponse::Type response;
             ConvertFromQueryImageResponseParms(data, response);
 
-            auto hasUpdate = [data.status isEqual:@(MTROTASoftwareUpdateProviderOTAQueryStatusUpdateAvailable)];
+            auto hasUpdate = [data.status isEqual:@(MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable)];
             auto isBDXProtocolSupported =
-                [commandParams.protocolsSupported containsObject:@(MTROTASoftwareUpdateProviderOTADownloadProtocolBDXSynchronous)];
+                [commandParams.protocolsSupported containsObject:@(MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXSynchronous)];
 
             if (hasUpdate && isBDXProtocolSupported) {
                 auto fabricIndex = handler->GetSubjectDescriptor().fabricIndex;
@@ -506,10 +525,17 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
 
     auto strongDelegate = mDelegate;
     dispatch_async(mWorkQueue, ^{
-        [strongDelegate handleQueryImageForNodeID:@(nodeId)
-                                       controller:controller
-                                           params:commandParams
-                                       completion:completionHandler];
+        if ([strongDelegate respondsToSelector:@selector(handleQueryImageForNodeID:controller:params:completion:)]) {
+            [strongDelegate handleQueryImageForNodeID:@(nodeId)
+                                           controller:controller
+                                               params:commandParams
+                                           completion:completionHandler];
+        } else {
+            [strongDelegate handleQueryImageForNodeID:@(nodeId)
+                                           controller:controller
+                                               params:commandParams
+                                    completionHandler:completionHandler];
+        }
     });
 }
 
@@ -527,7 +553,7 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * com
     __block ConcreteCommandPath cachedCommandPath(commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId);
 
     auto completionHandler
-        = ^(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error) {
+        = ^(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error) {
               dispatch_async(mWorkQueue, ^{
                   CommandHandler * handler = EnsureValidState(handle, cachedCommandPath, "ApplyUpdateRequest", data, error);
                   VerifyOrReturn(handler != nullptr);
@@ -542,15 +568,22 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * com
               });
           };
 
-    auto * commandParams = [[MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams alloc] init];
+    auto * commandParams = [[MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams alloc] init];
     ConvertToApplyUpdateRequestParams(commandData, commandParams);
 
     auto strongDelegate = mDelegate;
     dispatch_async(mWorkQueue, ^{
-        [strongDelegate handleApplyUpdateRequestForNodeID:@(nodeId)
-                                               controller:controller
-                                                   params:commandParams
-                                               completion:completionHandler];
+        if ([strongDelegate respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completion:)]) {
+            [strongDelegate handleApplyUpdateRequestForNodeID:@(nodeId)
+                                                   controller:controller
+                                                       params:commandParams
+                                                   completion:completionHandler];
+        } else {
+            [strongDelegate handleApplyUpdateRequestForNodeID:@(nodeId)
+                                                   controller:controller
+                                                       params:commandParams
+                                            completionHandler:completionHandler];
+        }
     });
 }
 
@@ -577,20 +610,27 @@ void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * co
         });
     };
 
-    auto * commandParams = [[MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams alloc] init];
+    auto * commandParams = [[MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams alloc] init];
     ConvertToNotifyUpdateAppliedParams(commandData, commandParams);
 
     auto strongDelegate = mDelegate;
     dispatch_async(mWorkQueue, ^{
-        [strongDelegate handleNotifyUpdateAppliedForNodeID:@(nodeId)
-                                                controller:controller
-                                                    params:commandParams
-                                                completion:completionHandler];
+        if ([strongDelegate respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:controller:params:completion:)]) {
+            [strongDelegate handleNotifyUpdateAppliedForNodeID:@(nodeId)
+                                                    controller:controller
+                                                        params:commandParams
+                                                    completion:completionHandler];
+        } else {
+            [strongDelegate handleNotifyUpdateAppliedForNodeID:@(nodeId)
+                                                    controller:controller
+                                                        params:commandParams
+                                             completionHandler:completionHandler];
+        }
     });
 }
 
 CHIP_ERROR MTROTAProviderDelegateBridge::ConvertToQueryImageParams(
-    const Commands::QueryImage::DecodableType & commandData, MTROTASoftwareUpdateProviderClusterQueryImageParams * commandParams)
+    const Commands::QueryImage::DecodableType & commandData, MTROtaSoftwareUpdateProviderClusterQueryImageParams * commandParams)
 {
     commandParams.vendorId = [NSNumber numberWithUnsignedShort:commandData.vendorId];
     commandParams.productId = [NSNumber numberWithUnsignedShort:commandData.productId];
@@ -623,7 +663,7 @@ CHIP_ERROR MTROTAProviderDelegateBridge::ConvertToQueryImageParams(
 }
 
 void MTROTAProviderDelegateBridge::ConvertFromQueryImageResponseParms(
-    const MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * responseParams,
+    const MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * responseParams,
     Commands::QueryImageResponse::Type & response)
 {
     response.status = static_cast<OTAQueryStatus>([responseParams.status intValue]);
@@ -659,14 +699,14 @@ void MTROTAProviderDelegateBridge::ConvertFromQueryImageResponseParms(
 
 void MTROTAProviderDelegateBridge::ConvertToApplyUpdateRequestParams(
     const Commands::ApplyUpdateRequest::DecodableType & commandData,
-    MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams * commandParams)
+    MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams * commandParams)
 {
     commandParams.updateToken = AsData(commandData.updateToken);
     commandParams.newVersion = [NSNumber numberWithUnsignedLong:commandData.newVersion];
 }
 
 void MTROTAProviderDelegateBridge::ConvertFromApplyUpdateRequestResponseParms(
-    const MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * responseParams,
+    const MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * responseParams,
     Commands::ApplyUpdateResponse::Type & response)
 {
     response.action = static_cast<OTAApplyUpdateAction>([responseParams.action intValue]);
@@ -675,7 +715,7 @@ void MTROTAProviderDelegateBridge::ConvertFromApplyUpdateRequestResponseParms(
 
 void MTROTAProviderDelegateBridge::ConvertToNotifyUpdateAppliedParams(
     const Commands::NotifyUpdateApplied::DecodableType & commandData,
-    MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams * commandParams)
+    MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * commandParams)
 {
     commandParams.updateToken = AsData(commandData.updateToken);
     commandParams.softwareVersion = [NSNumber numberWithUnsignedLong:commandData.softwareVersion];

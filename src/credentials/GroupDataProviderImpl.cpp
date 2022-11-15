@@ -40,18 +40,17 @@ struct PersistentData
 {
     virtual ~PersistentData() = default;
 
-    virtual CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) = 0;
-    virtual CHIP_ERROR Serialize(TLV::TLVWriter & writer) const    = 0;
-    virtual CHIP_ERROR Deserialize(TLV::TLVReader & reader)        = 0;
-    virtual void Clear()                                           = 0;
+    virtual CHIP_ERROR UpdateKey(StorageKeyName & key)          = 0;
+    virtual CHIP_ERROR Serialize(TLV::TLVWriter & writer) const = 0;
+    virtual CHIP_ERROR Deserialize(TLV::TLVReader & reader)     = 0;
+    virtual void Clear()                                        = 0;
 
     virtual CHIP_ERROR Save(PersistentStorageDelegate * storage)
     {
         VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
 
         uint8_t buffer[kMaxSerializedSize] = { 0 };
-        DefaultStorageKeyAllocator key;
-        // Update storage key
+        StorageKeyName key                 = StorageKeyName::Uninitialized();
         ReturnErrorOnFailure(UpdateKey(key));
 
         // Serialize the data
@@ -68,12 +67,10 @@ struct PersistentData
         VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
 
         uint8_t buffer[kMaxSerializedSize] = { 0 };
-        DefaultStorageKeyAllocator key;
+        StorageKeyName key                 = StorageKeyName::Uninitialized();
 
         // Set data to defaults
         Clear();
-
-        // Update storage key
         ReturnErrorOnFailure(UpdateKey(key));
 
         // Load the serialized data
@@ -92,10 +89,9 @@ struct PersistentData
     {
         VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
 
-        DefaultStorageKeyAllocator key;
-        // Update storage key
+        StorageKeyName key = StorageKeyName::Uninitialized();
         ReturnErrorOnFailure(UpdateKey(key));
-        // Delete stored data
+
         return storage->SyncDeleteKeyValue(key.KeyName());
     }
 };
@@ -125,9 +121,9 @@ struct FabricList : public PersistentData<kPersistentBufferMax>
     FabricList() = default;
     FabricList(chip::FabricIndex first) : first_fabric(first), fabric_count(1) {}
 
-    CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
+    CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
-        key.GroupFabricList();
+        key = DefaultStorageKeyAllocator::GroupFabricList();
         return CHIP_NO_ERROR;
     }
 
@@ -189,10 +185,10 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
     FabricData() = default;
     FabricData(chip::FabricIndex fabric) : fabric_index(fabric) {}
 
-    CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
+    CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
-        key.FabricGroups(fabric_index);
+        key = DefaultStorageKeyAllocator::FabricGroups(fabric_index);
         return CHIP_NO_ERROR;
     }
 
@@ -387,10 +383,10 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistentData<kPersiste
     GroupData(chip::FabricIndex fabric) : fabric_index(fabric) {}
     GroupData(chip::FabricIndex fabric, chip::GroupId group) : GroupInfo(group, nullptr), fabric_index(fabric) {}
 
-    CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
+    CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
-        key.FabricGroup(fabric_index, group_id);
+        key = DefaultStorageKeyAllocator::FabricGroup(fabric_index, group_id);
         return CHIP_NO_ERROR;
     }
 
@@ -511,10 +507,10 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
         GroupKey(group, keyset), LinkedData(link_id), fabric_index(fabric)
     {}
 
-    CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
+    CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
-        key.FabricGroupKey(fabric_index, id);
+        key = DefaultStorageKeyAllocator::FabricGroupKey(fabric_index, id);
         return CHIP_NO_ERROR;
     }
 
@@ -631,10 +627,10 @@ struct EndpointData : GroupDataProvider::GroupEndpoint, PersistentData<kPersiste
         fabric_index(fabric)
     {}
 
-    CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
+    CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
-        key.FabricGroupEndpoint(fabric_index, group_id, endpoint_id);
+        key = DefaultStorageKeyAllocator::FabricGroupEndpoint(fabric_index, group_id, endpoint_id);
         return CHIP_NO_ERROR;
     }
 
@@ -724,11 +720,11 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
         fabric_index(fabric), keyset_id(id), policy(policy_id), keys_count(num_keys)
     {}
 
-    CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
+    CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
         VerifyOrReturnError(kInvalidKeysetId != keyset_id, CHIP_ERROR_INVALID_KEY_ID);
-        key.FabricKeyset(fabric_index, keyset_id);
+        key = DefaultStorageKeyAllocator::FabricKeyset(fabric_index, keyset_id);
         return CHIP_NO_ERROR;
     }
 

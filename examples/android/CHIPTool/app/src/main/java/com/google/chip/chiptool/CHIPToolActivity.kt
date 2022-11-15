@@ -28,7 +28,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import chip.devicecontroller.NetworkCredentials
+import com.google.chip.chiptool.NetworkCredentialsParcelable
 import chip.setuppayload.SetupPayload
 import chip.setuppayload.SetupPayloadParser
 import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
@@ -133,7 +133,7 @@ class CHIPToolActivity :
     showFragment(AddressCommissioningFragment.newInstance(), false)
   }
 
-  override fun onNetworkCredentialsEntered(networkCredentials: NetworkCredentials) {
+  override fun onNetworkCredentialsEntered(networkCredentials: NetworkCredentialsParcelable) {
     showFragment(DeviceProvisioningFragment.newInstance(deviceInfo!!, networkCredentials))
   }
 

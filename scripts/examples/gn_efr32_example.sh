@@ -94,7 +94,10 @@ if [ "$#" == "0" ]; then
         Presets
         --sed
             enable sleepy end device, set thread mtd
-            For minimum consumption, disable openthread cli and qr code
+            For minimum consumption, add --low-power
+        --low-power
+            disables all power consuming features for the most power efficient build
+            This flag is to be used with --sed
         --wifi <wf200 | rs911x>
             build wifi example variant for given exansion board
         --additional_data_advertising
@@ -138,6 +141,10 @@ else
                 ;;
             --sed)
                 optArgs+="enable_sleepy_device=true chip_openthread_ftd=false "
+                shift
+                ;;
+            --low-power)
+                optArgs+="chip_build_libshell=false enable_openthread_cli=false show_qr_code=false disable_lcd=true "
                 shift
                 ;;
             --chip_enable_wifi_ipv4)

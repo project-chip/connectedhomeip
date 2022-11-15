@@ -55,10 +55,28 @@
             "type": "string",
             "maxLength": 32
         },
+        "product_label": {
+            "description": "more user-friendly human-readable product name",
+            "type": "string",
+            "maxLength": 64
+        },
+        "product_url": {
+            "description": "link to product-specific web page",
+            "type": "string",
+            "maxLength": 256
+        },
+        "part_number": {
+            "description": "human-readable vendor assigned part number",
+            "type": "string",
+            "maxLength": 32
+        },
         "date": {
             "description": "Manufacturing date according to ISO 8601 in notation YYYY-MM-DD",
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "minLength": 10,
+            "maxLength": 10,
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
         },
         "hw_ver": {
             "description": "Hardware version - integer",
@@ -75,30 +93,29 @@
         "rd_uid": {
             "description": "A randomly-generated 128-bit or longer octet string. Length has been expanded with 'hex:' prefix",
             "type": "string",
-            "pattern:": "^hex:{1}",
+            "pattern": "^hex:([0-9A-Fa-f]{2}){16,}$",
             "minLength": 20,
-            "minLength": 5,
-            "maxLength": 36
+            "minLength": 36
         },
         "dac_cert": {
             "description": "DAC certificate in hex-string format",
             "type": "string",
-            "pattern:": "^hex:{1}([0-9A-Fa-f]){2,}",
-            "minLength": 5,
+            "pattern": "^hex:([0-9A-Fa-f]{2})+$",
+            "minLength": 6,
             "maxLength": 1204
         },
         "dac_key": {
             "description": "DAC Private Key in hex-string format",
             "type": "string",
-            "pattern:": "^hex:{1}([0-9A-Fa-f]){2,}",
+            "pattern": "^hex:([0-9A-Fa-f]{2}){32}$",
             "minLength": 68,
             "maxLength": 68
         },
         "pai_cert": {
             "description": "PAI certificate in hex-string format",
             "type": "string",
-            "pattern:": "^hex:{1}([0-9A-Fa-f]){2,}",
-            "minLength": 5,
+            "pattern": "^hex:([0-9A-Fa-f]{2})+$",
+            "minLength": 6,
             "maxLength": 1204
         },
         "passcode": {
@@ -116,14 +133,14 @@
         "spake2_salt": {
             "description": "A key-derivation function for the Symmetric Password-Authenticated Key Exchange.",
             "type": "string",
-            "pattern:": "^hex:{1}([0-9A-Fa-f]){2,}",
+            "pattern": "^hex:([0-9A-Fa-f]{2})+$",
             "minLength": 36,
             "maxLength": 68
         },
         "spake2_verifier": {
             "description": "A verifier for the Symmetric Password-Authenticated Key Exchange",
             "type": "string",
-            "pattern:": "^hex:{1}([0-9A-Fa-f]){2,}",
+            "pattern": "^hex:([0-9A-Fa-f]{2})+$",
             "minLength": 97
         },
         "discriminator": {
@@ -135,7 +152,7 @@
         "enable_key": {
             "description": "The Enable Key is a 128-bit value that triggers manufacturer-specific action while invoking the TestEventTrigger Command",
             "type": "string",
-            "pattern": "^hex:{1}([0-9A-Fa-f]){32}",
+            "pattern": "^hex:([0-9A-Fa-f]{2}){16}$",
             "minLength": 36, 
             "maxLength": 36
         },

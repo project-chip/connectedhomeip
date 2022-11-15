@@ -20,8 +20,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^MTRFetchControllerIDCompletion)(
-    id _Nullable controllerID, MTRDeviceControllerXPCProxyHandle * _Nullable handle, NSError * _Nullable error);
+typedef void (^MTRFetchControllerIDCompletion)(id _Nullable controllerID, NSError * _Nullable error);
 
 @interface MTRDeviceControllerOverXPC ()
 

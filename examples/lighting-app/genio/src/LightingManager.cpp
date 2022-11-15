@@ -18,14 +18,22 @@
  */
 
 #include "LightingManager.h"
-
 #include "AppConfig.h"
 #include "AppTask.h"
+#include "ColorFormat.h"
 #include <FreeRTOS.h>
+
+#ifdef __PWM_DIMMABLE_LED__
+#include "DimmableLEDWidget.h"
+DimmableLEDWidget sDimLED;
+#else
+#include "LEDWidget.h"
+LEDWidget sDimLED;
+#endif /* __PWM_DIMMABLE_LED__ */
 
 LightingManager LightingManager::sLight;
 
-TimerHandle_t sLightTimer;
+TimerHandle_t sLightTimer = NULL;
 
 CHIP_ERROR LightingManager::Init()
 {
@@ -47,6 +55,12 @@ CHIP_ERROR LightingManager::Init()
     mAutoTurnOffTimerArmed = false;
     mAutoTurnOff           = false;
     mAutoTurnOffDuration   = 0;
+
+#ifdef __PWM_DIMMABLE_LED__
+    sDimLED.Init(HAL_GPIO_35);
+#else
+    sDimLED.Init(LED_LIGHT);
+#endif
 
     return CHIP_NO_ERROR;
 }
@@ -77,23 +91,74 @@ void LightingManager::SetAutoTurnOffDuration(uint32_t aDurationInSecs)
     mAutoTurnOffDuration = aDurationInSecs;
 }
 
-bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
+bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction, uint8_t * aValue)
 {
     bool action_initiated = false;
     State_t new_state;
+    RgbColor_t rgb;
 
-    // Initiate Turn On/Off Action only when the previous one is complete.
-    if (mState == kState_OffCompleted && aAction == ON_ACTION)
+    if (sLightTimer == NULL)
+        return action_initiated;
+
+    switch (aAction)
     {
-        action_initiated = true;
-
-        new_state = kState_OnInitiated;
+    case ON_ACTION:
+        if (mState == kState_OffCompleted)
+        {
+            action_initiated = true;
+            new_state        = kState_OnInitiated;
+        }
+        if (*aValue == 0)
+            break;
+    case LEVEL_ACTION:
+        if (mState == kState_OnCompleted && *aValue >= sDimLED.GetMinLevel() && *aValue <= sDimLED.GetMaxLevel())
+        {
+            action_initiated = true;
+            /**
+             * NEST HUB uses minimal as off state.
+             */
+            new_state = ((*aValue == sDimLED.GetMinLevel()) ? kState_OffInitiated : kState_LevelInitiated);
+        }
+        break;
+    case OFF_ACTION:
+        if (mState == kState_OnCompleted)
+        {
+            action_initiated = true;
+            new_state        = kState_OffInitiated;
+        }
+        break;
+    case COLOR_ACTION: {
+        rgb = *reinterpret_cast<RgbColor_t *>(aValue);
     }
-    else if (mState == kState_OnCompleted && aAction == OFF_ACTION)
-    {
-        action_initiated = true;
+    break;
+    case COLOR_ACTION_XY: {
+        XyColor_t xy = *reinterpret_cast<XyColor_t *>(aValue);
+        rgb          = XYToRgb(sDimLED.GetLevel(), xy.x, xy.y);
+    }
+    break;
+    case COLOR_ACTION_HSV: {
+        HsvColor_t hsv = *reinterpret_cast<HsvColor_t *>(aValue);
+        hsv.v          = sDimLED.GetLevel();
+        rgb            = HsvToRgb(hsv);
+        MT793X_LOG("LightingManager HSV(%d,%d) to RGB(%d,%d,%d)", hsv.h, hsv.s, rgb.r, rgb.g, rgb.b);
+    }
+    break;
+    case COLOR_ACTION_CT: {
+        CtColor_t ct;
+        ct.ctMireds = *reinterpret_cast<uint16_t *>(aValue);
+        rgb         = CTToRgb(ct);
+    }
+    break;
+    default:
+        ChipLogProgress(NotSpecified, "LightMgr:Unknown");
+        break;
+    }
 
-        new_state = kState_OffInitiated;
+    if (aAction == COLOR_ACTION_XY || aAction == COLOR_ACTION_HSV || aAction == COLOR_ACTION_CT || aAction == COLOR_ACTION)
+    {
+        new_state        = kState_ColorInitiated;
+        action_initiated = true;
+        aAction          = COLOR_ACTION;
     }
 
     if (action_initiated)
@@ -116,6 +181,25 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
         {
             mActionInitiated_CB(aAction, aActor);
         }
+
+        if (mState == kState_OnInitiated)
+        {
+            sDimLED.Set(true);
+        }
+        else if (mState == kState_OffInitiated)
+        {
+            sDimLED.Set(false);
+        }
+        else if (mState == kState_LevelInitiated)
+        {
+            MT793X_LOG("LightingManager: set level %d", *aValue);
+            sDimLED.SetLevel(*aValue);
+        }
+        else if (mState == kState_ColorInitiated)
+        {
+            MT793X_LOG("LightingManager: set color(%d,%d,%d)", rgb.r, rgb.g, rgb.b);
+            sDimLED.Color(rgb);
+        }
     }
 
     return action_initiated;
@@ -123,6 +207,9 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
 
 void LightingManager::StartTimer(uint32_t aTimeoutMs)
 {
+    if (sLightTimer == NULL)
+        return;
+
     if (xTimerIsTimerActive(sLightTimer))
     {
         MT793X_LOG("app timer already started!");
@@ -185,7 +272,7 @@ void LightingManager::AutoTurnOffTimerEventHandler(AppEvent * aEvent)
 
     MT793X_LOG("Auto Turn Off has been triggered!");
 
-    light->InitiateAction(actor, OFF_ACTION);
+    light->InitiateAction(actor, OFF_ACTION, 0);
 }
 
 void LightingManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
@@ -204,6 +291,16 @@ void LightingManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
         light->mState   = kState_OnCompleted;
         actionCompleted = ON_ACTION;
     }
+    else if (light->mState == kState_LevelInitiated)
+    {
+        light->mState   = kState_OnCompleted;
+        actionCompleted = LEVEL_ACTION;
+    }
+    else if (light->mState == kState_ColorInitiated)
+    {
+        light->mState   = kState_OnCompleted;
+        actionCompleted = COLOR_ACTION;
+    }
 
     if (actionCompleted != INVALID_ACTION)
     {
@@ -212,7 +309,8 @@ void LightingManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
             light->mActionCompleted_CB(actionCompleted);
         }
 
-        if (light->mAutoTurnOff && actionCompleted == ON_ACTION)
+        if (light->mAutoTurnOff &&
+            (actionCompleted == ON_ACTION || actionCompleted == LEVEL_ACTION || actionCompleted == COLOR_ACTION))
         {
             // Start the timer for auto turn off
             light->StartTimer(light->mAutoTurnOffDuration * 1000);

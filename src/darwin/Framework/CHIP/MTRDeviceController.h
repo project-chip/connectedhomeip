@@ -23,9 +23,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+MTR_NEWLY_DEPRECATED("Please use MTRBaseDevice deviceWithNodeID")
+typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NSError * _Nullable error);
+
 @class MTRCommissioningParameters;
-@protocol MTRDeviceControllerDelegate;
 @class MTRSetupPayload;
+@protocol MTRDevicePairingDelegate;
 
 @interface MTRDeviceController : NSObject
 
@@ -38,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Return the Node ID assigned to the controller.  Will return nil if the
  * controller is not running (and hence does not know its node id).
  */
-@property (readonly, nonatomic, nullable) NSNumber * controllerNodeID;
+@property (readonly, nonatomic, nullable) NSNumber * controllerNodeID MTR_NEWLY_AVAILABLE;
 
 /**
  * Set up a commissioning session for a device, using the provided setup payload
@@ -54,23 +57,24 @@ NS_ASSUME_NONNULL_BEGIN
  * provided discriminator.
  *
  * Then a PASE session will be established with the device, unless an error
- * occurs.  MTRDeviceControllerDelegate will be notified as follows:
+ * occurs.  MTRDevicePairingDelegate will be notified as follows:
  *
- * * Discovery fails: onStatusUpdate with MTRCommissioningStatusFailed.
+ * * Discovery fails: onStatusUpdate with MTRPairingStatusFailed.
  *
  * * Discovery succeeds but commissioning session setup fails: onPairingComplete
  *   with an error.
  *
  * * Commissioning session setup succeeds: onPairingComplete with no error.
  *
- * Once a commissioning session is set up, deviceBeingCommissionedWithNodeID
+ * Once a commissioning session is set up, getDeviceBeingCommissioned
  * can be used to get an MTRBaseDevice and discover what sort of network
- * credentials the device might need, and commissionNodeWithID can be used to
+ * credentials the device might need, and commissionDevice can be used to
  * commission the device.
  */
 - (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
                                    newNodeID:(NSNumber *)newNodeID
-                                       error:(NSError * __autoreleasing *)error;
+                                       error:(NSError * __autoreleasing *)error
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 /**
  * Commission the node with the given node ID.  The node ID must match the node
@@ -78,7 +82,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)commissionNodeWithID:(NSNumber *)nodeID
          commissioningParams:(MTRCommissioningParameters *)commissioningParams
-                       error:(NSError * __autoreleasing *)error;
+                       error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (BOOL)continueCommissioningDevice:(void *)device
            ignoreAttestationFailure:(BOOL)ignoreAttestationFailure
@@ -88,13 +92,14 @@ NS_ASSUME_NONNULL_BEGIN
  * Cancel commissioning for the given node id.  This will shut down any existing
  * commissioning session for that node id.
  */
-- (BOOL)cancelCommissioningForNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error;
+- (BOOL)cancelCommissioningForNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 /**
  * Get an MTRBaseDevice for a commissioning session that was set up for the
  * given node ID.  Returns nil if no such commissioning session is available.
  */
-- (nullable MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error;
+- (nullable MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID
+                                                        error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 /**
  * Controllers are created via the MTRDeviceControllerFactory object.
@@ -103,13 +108,13 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * Set the Delegate for the device controller  as well as the Queue on which the Delegate callbacks will be triggered
+ * Set the Delegate for the Device Pairing  as well as the Queue on which the Delegate callbacks will be triggered
  *
- * @param[in] delegate The delegate the commissioning process should use
+ * @param[in] delegate The delegate the pairing process should use
  *
  * @param[in] queue The queue on which the callbacks will be delivered
  */
-- (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue;
+- (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue;
 
 /**
  * Sets this MTRDeviceController to use the given issuer for issuing operational certs. By default, the MTRDeviceController uses an
@@ -131,7 +136,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Attempts to retrieve the attestation challenge for a commissionee with the given Device ID.
  * Returns nil if given Device ID does not match an active commissionee, or if a Secure Session is not availale.
  */
-- (NSData * _Nullable)fetchAttestationChallengeForDeviceID:(NSNumber *)deviceID;
+- (NSData * _Nullable)attestationChallengeForDeviceID:(NSNumber *)deviceID MTR_NEWLY_AVAILABLE;
 
 /**
  * Compute a PASE verifier for the desired setup passcode.
@@ -146,7 +151,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSData *)computePASEVerifierForSetupPasscode:(NSNumber *)setupPasscode
                                               iterations:(NSNumber *)iterations
                                                     salt:(NSData *)salt
-                                                   error:(NSError * __autoreleasing *)error;
+                                                   error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 /**
  * Shut down the controller. Calls to shutdown after the first one are NO-OPs.
@@ -154,6 +159,63 @@ NS_ASSUME_NONNULL_BEGIN
  * MTRDeviceControllerFactory, to avoid leaking the controller.
  */
 - (void)shutdown;
+
+@end
+
+@interface MTRDeviceController (Deprecated)
+
+@property (readonly, nonatomic, nullable) NSNumber * controllerNodeId MTR_NEWLY_DEPRECATED("Please use controllerNodeID");
+
+- (nullable NSData *)fetchAttestationChallengeForDeviceId:(uint64_t)deviceId
+    MTR_NEWLY_DEPRECATED("Please use attestationChallengeForDeviceID");
+
+- (BOOL)getBaseDevice:(uint64_t)deviceID
+                queue:(dispatch_queue_t)queue
+    completionHandler:(MTRDeviceConnectionCallback)completionHandler
+    MTR_NEWLY_DEPRECATED("Please use [MTRBaseDevice deviceWithNodeID:controller:]");
+
+- (BOOL)pairDevice:(uint64_t)deviceID
+     discriminator:(uint16_t)discriminator
+      setupPINCode:(uint32_t)setupPINCode
+             error:(NSError * __autoreleasing *)error
+    MTR_NEWLY_DEPRECATED("Please use setupCommissioningSessionWithPayload:newNodeID:error:");
+- (BOOL)pairDevice:(uint64_t)deviceID
+           address:(NSString *)address
+              port:(uint16_t)port
+      setupPINCode:(uint32_t)setupPINCode
+             error:(NSError * __autoreleasing *)error
+    MTR_NEWLY_DEPRECATED("Please use setupCommissioningSessionWithPayload:newNodeID:error:");
+- (BOOL)pairDevice:(uint64_t)deviceID
+    onboardingPayload:(NSString *)onboardingPayload
+                error:(NSError * __autoreleasing *)error
+    MTR_NEWLY_DEPRECATED("Please use setupCommissioningSessionWithPayload:newNodeID:error:");
+- (BOOL)commissionDevice:(uint64_t)deviceId
+     commissioningParams:(MTRCommissioningParameters *)commissioningParams
+                   error:(NSError * __autoreleasing *)error
+    MTR_NEWLY_DEPRECATED("Please use commissionNodeWithID:commissioningParams:error:");
+
+- (BOOL)stopDevicePairing:(uint64_t)deviceID
+                    error:(NSError * __autoreleasing *)error MTR_NEWLY_DEPRECATED("Please use cancelCommissioningForNodeID:error:");
+
+- (nullable MTRBaseDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId
+                                                 error:(NSError * __autoreleasing *)error
+    MTR_NEWLY_DEPRECATED("Please use deviceBeingCommissionedWithNodeID:error:");
+
+- (BOOL)openPairingWindow:(uint64_t)deviceID
+                 duration:(NSUInteger)duration
+                    error:(NSError * __autoreleasing *)error
+    MTR_NEWLY_DEPRECATED("Please use MTRDevice or MTRBaseDevice openCommissioningWindowWithSetupPasscode");
+- (nullable NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
+                                       duration:(NSUInteger)duration
+                                  discriminator:(NSUInteger)discriminator
+                                       setupPIN:(NSUInteger)setupPIN
+                                          error:(NSError * __autoreleasing *)error
+    MTR_NEWLY_DEPRECATED("Please use MTRDevice or MTRBaseDevice openCommissioningWindowWithSetupPasscode");
+
+- (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode
+                              iterations:(uint32_t)iterations
+                                    salt:(NSData *)salt
+    MTR_NEWLY_DEPRECATED("Please use computePASEVerifierForSetupPasscode:iterations:salt:error:");
 
 @end
 

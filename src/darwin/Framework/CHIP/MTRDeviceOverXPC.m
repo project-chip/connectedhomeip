@@ -17,8 +17,8 @@
 
 #import "MTRDeviceOverXPC.h"
 
+#import "MTRAttributeCacheContainer+XPC.h"
 #import "MTRCluster.h"
-#import "MTRClusterStateCacheContainer+XPC.h"
 #import "MTRDeviceController+XPC.h"
 #import "MTRDeviceControllerOverXPC_Internal.h"
 #import "MTRDeviceControllerXPCConnection.h"
@@ -27,16 +27,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle * _Nullable handle, NSError * _Nullable error);
-
 @interface MTRDeviceOverXPC ()
 
 @property (nonatomic, strong, readonly, nullable) id<NSCopying> controllerID;
 @property (nonatomic, strong, readonly) MTRDeviceControllerOverXPC * controller;
 @property (nonatomic, readonly) NSNumber * nodeID;
 @property (nonatomic, strong, readonly) MTRDeviceControllerXPCConnection * xpcConnection;
-
-- (void)fetchProxyHandleWithQueue:(dispatch_queue_t)queue completion:(MTRFetchProxyHandleCompletion)completion;
 
 @end
 
@@ -54,81 +50,118 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
 }
 
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                        params:(MTRSubscribeParams *)params
-    clusterStateCacheContainer:(MTRClusterStateCacheContainer * _Nullable)clusterStateCacheContainer
-        attributeReportHandler:(void (^_Nullable)(NSArray * value))attributeReportHandler
-            eventReportHandler:(void (^_Nullable)(NSArray * value))eventReportHandler
-                  errorHandler:(void (^)(NSError * error))errorHandler
-       subscriptionEstablished:(void (^_Nullable)(void))subscriptionEstablishedHandler
-       resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
+                     params:(MTRSubscribeParams *)params
+    attributeCacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
+     attributeReportHandler:(void (^_Nullable)(NSArray * value))attributeReportHandler
+         eventReportHandler:(void (^_Nullable)(NSArray * value))eventReportHandler
+               errorHandler:(void (^)(NSError * error))errorHandler
+    subscriptionEstablished:(void (^_Nullable)(void))subscriptionEstablishedHandler
+    resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
 {
     MTR_LOG_DEBUG("Subscribing all attributes... Note that attributeReportHandler, eventReportHandler, and resubscriptionScheduled "
                   "are not supported.");
-
-    __auto_type workBlock = ^(MTRDeviceControllerXPCProxyHandle * _Nullable handle, NSError * _Nullable error) {
-        if (error != nil) {
-            errorHandler(error);
-            return;
+    __auto_type workBlock = ^{
+        if (attributeCacheContainer) {
+            [attributeCacheContainer setXPCConnection:self->_xpcConnection controllerID:self.controllerID deviceID:self.nodeID];
         }
-
-        if (clusterStateCacheContainer) {
-            [clusterStateCacheContainer setXPCConnection:self->_xpcConnection controllerID:self.controllerID deviceID:self.nodeID];
-        }
-
-        [handle.proxy subscribeWithController:self.controllerID
-                                       nodeID:self.nodeID
-                                       params:[MTRDeviceController encodeXPCSubscribeParams:params]
-                                  shouldCache:(clusterStateCacheContainer != nil)
-                                   completion:^(NSError * _Nullable error) {
-                                       dispatch_async(queue, ^{
-                                           if (error) {
-                                               errorHandler(error);
-                                           } else {
-                                               subscriptionEstablishedHandler();
-                                           }
-                                       });
-                                       __auto_type handleRetainer = handle;
-                                       (void) handleRetainer;
-                                   }];
-    };
-
-    [self fetchProxyHandleWithQueue:queue completion:workBlock];
-}
-
-- (void)readAttributePathWithEndpointID:(NSNumber * _Nullable)endpointID
-                              clusterID:(NSNumber * _Nullable)clusterID
-                            attributeID:(NSNumber * _Nullable)attributeID
-                                 params:(MTRReadParams * _Nullable)params
-                                  queue:(dispatch_queue_t)queue
-                             completion:(MTRDeviceResponseHandler)completion
-{
-    MTR_LOG_DEBUG("Reading attribute ...");
-
-    __auto_type workBlock = ^(MTRDeviceControllerXPCProxyHandle * _Nullable handle, NSError * _Nullable error) {
-        if (error != nil) {
-            completion(nil, error);
-            return;
-        }
-
-        [handle.proxy readAttributeWithController:self.controllerID
-                                           nodeID:self.nodeID
-                                       endpointID:endpointID
-                                        clusterID:clusterID
-                                      attributeID:attributeID
-                                           params:[MTRDeviceController encodeXPCReadParams:params]
-                                       completion:^(id _Nullable values, NSError * _Nullable error) {
-                                           dispatch_async(queue, ^{
-                                               MTR_LOG_DEBUG("Attribute read");
-                                               completion([MTRDeviceController decodeXPCResponseValues:values], error);
-                                               // The following captures the proxy handle in the closure so that the
-                                               // handle won't be released prior to block call.
+        [self->_xpcConnection getProxyHandleWithCompletion:^(
+            dispatch_queue_t _Nonnull proxyQueue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
+            if (handle) {
+                [handle.proxy subscribeWithController:self.controllerID
+                                               nodeId:self.nodeID.unsignedLongLongValue
+                                          minInterval:params.minInterval
+                                          maxInterval:params.maxInterval
+                                               params:[MTRDeviceController encodeXPCSubscribeParams:params]
+                                          shouldCache:(attributeCacheContainer != nil)
+                                           completion:^(NSError * _Nullable error) {
+                                               dispatch_async(queue, ^{
+                                                   if (error) {
+                                                       errorHandler(error);
+                                                   } else {
+                                                       subscriptionEstablishedHandler();
+                                                   }
+                                               });
                                                __auto_type handleRetainer = handle;
                                                (void) handleRetainer;
-                                           });
-                                       }];
+                                           }];
+            } else {
+                MTR_LOG_ERROR("Failed to obtain XPC connection to write attribute");
+                dispatch_async(queue, ^{
+                    errorHandler([NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+                });
+            }
+        }];
     };
 
-    [self fetchProxyHandleWithQueue:queue completion:workBlock];
+    if (self.controllerID != nil) {
+        workBlock();
+    } else {
+        [self.controller fetchControllerIdWithQueue:queue
+                                         completion:^(id _Nullable controllerID, NSError * _Nullable error) {
+                                             if (error != nil) {
+                                                 // We're already running on the right queue.
+                                                 errorHandler(error);
+                                                 return;
+                                             }
+
+                                             self->_controllerID = controllerID;
+                                             workBlock();
+                                         }];
+    }
+}
+
+- (void)readAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
+                           clusterID:(NSNumber * _Nullable)clusterID
+                         attributeID:(NSNumber * _Nullable)attributeID
+                              params:(MTRReadParams * _Nullable)params
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
+{
+    MTR_LOG_DEBUG("Reading attribute ...");
+    __auto_type workBlock = ^{
+        [self->_xpcConnection getProxyHandleWithCompletion:^(
+            dispatch_queue_t _Nonnull proxyQueue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
+            if (handle) {
+                [handle.proxy readAttributeWithController:self.controllerID
+                                                   nodeId:self.nodeID.unsignedLongLongValue
+                                               endpointId:endpointID
+                                                clusterId:clusterID
+                                              attributeId:attributeID
+                                                   params:[MTRDeviceController encodeXPCReadParams:params]
+                                               completion:^(id _Nullable values, NSError * _Nullable error) {
+                                                   dispatch_async(queue, ^{
+                                                       MTR_LOG_DEBUG("Attribute read");
+                                                       completion([MTRDeviceController decodeXPCResponseValues:values], error);
+                                                       // The following captures the proxy handle in the closure so that the
+                                                       // handle won't be released prior to block call.
+                                                       __auto_type handleRetainer = handle;
+                                                       (void) handleRetainer;
+                                                   });
+                                               }];
+            } else {
+                dispatch_async(queue, ^{
+                    MTR_LOG_ERROR("Failed to obtain XPC connection to read attribute");
+                    completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+                });
+            }
+        }];
+    };
+
+    if (self.controllerID != nil) {
+        workBlock();
+    } else {
+        [self.controller fetchControllerIdWithQueue:queue
+                                         completion:^(id _Nullable controllerID, NSError * _Nullable error) {
+                                             if (error != nil) {
+                                                 // We're already running on the right queue.
+                                                 completion(nil, error);
+                                                 return;
+                                             }
+
+                                             self->_controllerID = controllerID;
+                                             workBlock();
+                                         }];
+    }
 }
 
 - (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
@@ -140,33 +173,51 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
                           completion:(MTRDeviceResponseHandler)completion
 {
     MTR_LOG_DEBUG("Writing attribute ...");
-
-    __auto_type workBlock = ^(MTRDeviceControllerXPCProxyHandle * _Nullable handle, NSError * _Nullable error) {
-        if (error != nil) {
-            completion(nil, error);
-            return;
-        }
-
-        [handle.proxy writeAttributeWithController:self.controllerID
-                                            nodeID:self.nodeID
-                                        endpointID:endpointID
-                                         clusterID:clusterID
-                                       attributeID:attributeID
-                                             value:value
-                                 timedWriteTimeout:timeoutMs
-                                        completion:^(id _Nullable values, NSError * _Nullable error) {
-                                            dispatch_async(queue, ^{
-                                                MTR_LOG_DEBUG("Attribute written");
-                                                completion([MTRDeviceController decodeXPCResponseValues:values], error);
-                                                // The following captures the proxy handle in the closure so that the
-                                                // handle won't be released prior to block call.
-                                                __auto_type handleRetainer = handle;
-                                                (void) handleRetainer;
-                                            });
-                                        }];
+    __auto_type workBlock = ^{
+        [self->_xpcConnection getProxyHandleWithCompletion:^(
+            dispatch_queue_t _Nonnull proxyQueue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
+            if (handle) {
+                [handle.proxy writeAttributeWithController:self.controllerID
+                                                    nodeId:self.nodeID.unsignedLongLongValue
+                                                endpointId:endpointID
+                                                 clusterId:clusterID
+                                               attributeId:attributeID
+                                                     value:value
+                                         timedWriteTimeout:timeoutMs
+                                                completion:^(id _Nullable values, NSError * _Nullable error) {
+                                                    dispatch_async(queue, ^{
+                                                        MTR_LOG_DEBUG("Attribute written");
+                                                        completion([MTRDeviceController decodeXPCResponseValues:values], error);
+                                                        // The following captures the proxy handle in the closure so that the
+                                                        // handle won't be released prior to block call.
+                                                        __auto_type handleRetainer = handle;
+                                                        (void) handleRetainer;
+                                                    });
+                                                }];
+            } else {
+                dispatch_async(queue, ^{
+                    MTR_LOG_ERROR("Failed to obtain XPC connection to write attribute");
+                    completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+                });
+            }
+        }];
     };
 
-    [self fetchProxyHandleWithQueue:queue completion:workBlock];
+    if (self.controllerID != nil) {
+        workBlock();
+    } else {
+        [self.controller fetchControllerIdWithQueue:queue
+                                         completion:^(id _Nullable controllerID, NSError * _Nullable error) {
+                                             if (error != nil) {
+                                                 // We're already running on the right queue.
+                                                 completion(nil, error);
+                                                 return;
+                                             }
+
+                                             self->_controllerID = controllerID;
+                                             workBlock();
+                                         }];
+    }
 }
 
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
@@ -178,108 +229,148 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
                          completion:(MTRDeviceResponseHandler)completion
 {
     MTR_LOG_DEBUG("Invoking command ...");
-
-    __auto_type workBlock = ^(MTRDeviceControllerXPCProxyHandle * _Nullable handle, NSError * _Nullable error) {
-        if (error != nil) {
-            completion(nil, error);
-            return;
-        }
-
-        [handle.proxy invokeCommandWithController:self.controllerID
-                                           nodeID:self.nodeID
-                                       endpointID:endpointID
-                                        clusterID:clusterID
-                                        commandID:commandID
-                                           fields:commandFields
-                               timedInvokeTimeout:timeoutMs
-                                       completion:^(id _Nullable values, NSError * _Nullable error) {
-                                           dispatch_async(queue, ^{
-                                               MTR_LOG_DEBUG("Command invoked");
-                                               completion([MTRDeviceController decodeXPCResponseValues:values], error);
-                                               // The following captures the proxy handle in the closure so that the
-                                               // handle won't be released prior to block call.
-                                               __auto_type handleRetainer = handle;
-                                               (void) handleRetainer;
-                                           });
-                                       }];
+    __auto_type workBlock = ^{
+        [self->_xpcConnection getProxyHandleWithCompletion:^(
+            dispatch_queue_t _Nonnull proxyQueue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
+            if (handle) {
+                [handle.proxy invokeCommandWithController:self.controllerID
+                                                   nodeId:self.nodeID.unsignedLongLongValue
+                                               endpointId:endpointID
+                                                clusterId:clusterID
+                                                commandId:commandID
+                                                   fields:commandFields
+                                       timedInvokeTimeout:timeoutMs
+                                               completion:^(id _Nullable values, NSError * _Nullable error) {
+                                                   dispatch_async(queue, ^{
+                                                       MTR_LOG_DEBUG("Command invoked");
+                                                       completion([MTRDeviceController decodeXPCResponseValues:values], error);
+                                                       // The following captures the proxy handle in the closure so that the
+                                                       // handle won't be released prior to block call.
+                                                       __auto_type handleRetainer = handle;
+                                                       (void) handleRetainer;
+                                                   });
+                                               }];
+            } else {
+                dispatch_async(queue, ^{
+                    MTR_LOG_ERROR("Failed to obtain XPC connection to invoke command");
+                    completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+                });
+            }
+        }];
     };
 
-    [self fetchProxyHandleWithQueue:queue completion:workBlock];
+    if (self.controllerID != nil) {
+        workBlock();
+    } else {
+        [self.controller fetchControllerIdWithQueue:queue
+                                         completion:^(id _Nullable controllerID, NSError * _Nullable error) {
+                                             if (error != nil) {
+                                                 // We're already running on the right queue.
+                                                 completion(nil, error);
+                                                 return;
+                                             }
+
+                                             self->_controllerID = controllerID;
+                                             workBlock();
+                                         }];
+    }
 }
 
-- (void)subscribeAttributePathWithEndpointID:(NSNumber * _Nullable)endpointID
-                                   clusterID:(NSNumber * _Nullable)clusterID
-                                 attributeID:(NSNumber * _Nullable)attributeID
-                                      params:(MTRSubscribeParams *)params
-                                       queue:(dispatch_queue_t)queue
-                               reportHandler:(MTRDeviceResponseHandler)reportHandler
-                     subscriptionEstablished:(void (^_Nullable)(void))subscriptionEstablishedHandler
+- (void)subscribeToAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
+                                  clusterID:(NSNumber * _Nullable)clusterID
+                                attributeID:(NSNumber * _Nullable)attributeID
+                                     params:(MTRSubscribeParams * _Nullable)params
+                                      queue:(dispatch_queue_t)queue
+                              reportHandler:(MTRDeviceResponseHandler)reportHandler
+                    subscriptionEstablished:(void (^_Nullable)(void))subscriptionEstablishedHandler
 {
     MTR_LOG_DEBUG("Subscribing attribute ...");
+    __auto_type workBlock = ^{
+        [self->_xpcConnection getProxyHandleWithCompletion:^(
+            dispatch_queue_t _Nonnull proxyQueue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
+            if (handle) {
+                MTR_LOG_DEBUG("Setup report handler");
+                [self.xpcConnection
+                    registerReportHandlerWithController:self.controllerID
+                                                 nodeID:self.nodeID
+                                                handler:^(id _Nullable values, NSError * _Nullable error) {
+                                                    if (values && ![values isKindOfClass:[NSArray class]]) {
+                                                        MTR_LOG_ERROR("Unsupported report format");
+                                                        return;
+                                                    }
+                                                    if (!values) {
+                                                        MTR_LOG_DEBUG("Error report received");
+                                                        dispatch_async(queue, ^{
+                                                            reportHandler(values, error);
+                                                        });
+                                                        return;
+                                                    }
+                                                    __auto_type decodedValues =
+                                                        [MTRDeviceController decodeXPCResponseValues:values];
+                                                    NSMutableArray<NSDictionary<NSString *, id> *> * filteredValues =
+                                                        [NSMutableArray arrayWithCapacity:[decodedValues count]];
+                                                    for (NSDictionary<NSString *, id> * decodedValue in decodedValues) {
+                                                        MTRAttributePath * attributePath = decodedValue[MTRAttributePathKey];
+                                                        if ((endpointID == nil ||
+                                                                [attributePath.endpoint isEqualToNumber:endpointID])
+                                                            && (clusterID == nil ||
+                                                                [attributePath.cluster isEqualToNumber:clusterID])
+                                                            && (attributeID == nil ||
+                                                                [attributePath.attribute isEqualToNumber:attributeID])) {
+                                                            [filteredValues addObject:decodedValue];
+                                                        }
+                                                    }
+                                                    if ([filteredValues count] > 0) {
+                                                        MTR_LOG_DEBUG("Report received");
+                                                        dispatch_async(queue, ^{
+                                                            reportHandler(filteredValues, error);
+                                                        });
+                                                    }
+                                                }];
 
-    __auto_type workBlock = ^(MTRDeviceControllerXPCProxyHandle * _Nullable handle, NSError * _Nullable error) {
-        MTR_LOG_DEBUG("Setup report handler");
-
-        if (error != nil) {
-            subscriptionEstablishedHandler();
-            reportHandler(nil, error);
-            return;
-        }
-
-        [self.xpcConnection
-            registerReportHandlerWithController:self.controllerID
-                                         nodeID:self.nodeID
-                                        handler:^(id _Nullable values, NSError * _Nullable error) {
-                                            if (values && ![values isKindOfClass:[NSArray class]]) {
-                                                MTR_LOG_ERROR("Unsupported report format");
-                                                return;
-                                            }
-                                            if (!values) {
-                                                MTR_LOG_DEBUG("Error report received");
+                [handle.proxy subscribeAttributeWithController:self.controllerID
+                                                        nodeId:self.nodeID.unsignedLongLongValue
+                                                    endpointId:endpointID
+                                                     clusterId:clusterID
+                                                   attributeId:attributeID
+                                                   minInterval:params.minInterval
+                                                   maxInterval:params.maxInterval
+                                                        params:[MTRDeviceController encodeXPCSubscribeParams:params]
+                                            establishedHandler:^{
                                                 dispatch_async(queue, ^{
-                                                    reportHandler(values, error);
+                                                    MTR_LOG_DEBUG("Subscription established");
+                                                    subscriptionEstablishedHandler();
+                                                    // The following captures the proxy handle in the closure so that the handle
+                                                    // won't be released prior to block call.
+                                                    __auto_type handleRetainer = handle;
+                                                    (void) handleRetainer;
                                                 });
-                                                return;
-                                            }
-                                            __auto_type decodedValues = [MTRDeviceController decodeXPCResponseValues:values];
-                                            NSMutableArray<NSDictionary<NSString *, id> *> * filteredValues =
-                                                [NSMutableArray arrayWithCapacity:[decodedValues count]];
-                                            for (NSDictionary<NSString *, id> * decodedValue in decodedValues) {
-                                                MTRAttributePath * attributePath = decodedValue[MTRAttributePathKey];
-                                                if ((endpointID == nil || [attributePath.endpoint isEqualToNumber:endpointID])
-                                                    && (clusterID == nil || [attributePath.cluster isEqualToNumber:clusterID])
-                                                    && (attributeID == nil ||
-                                                        [attributePath.attribute isEqualToNumber:attributeID])) {
-                                                    [filteredValues addObject:decodedValue];
-                                                }
-                                            }
-                                            if ([filteredValues count] > 0) {
-                                                MTR_LOG_DEBUG("Report received");
-                                                dispatch_async(queue, ^{
-                                                    reportHandler(filteredValues, error);
-                                                });
-                                            }
-                                        }];
-
-        [handle.proxy subscribeAttributeWithController:self.controllerID
-                                                nodeID:self.nodeID
-                                            endpointID:endpointID
-                                             clusterID:clusterID
-                                           attributeID:attributeID
-                                                params:[MTRDeviceController encodeXPCSubscribeParams:params]
-                                    establishedHandler:^{
-                                        dispatch_async(queue, ^{
-                                            MTR_LOG_DEBUG("Subscription established");
-                                            subscriptionEstablishedHandler();
-                                            // The following captures the proxy handle in the closure so that the handle
-                                            // won't be released prior to block call.
-                                            __auto_type handleRetainer = handle;
-                                            (void) handleRetainer;
-                                        });
-                                    }];
+                                            }];
+            } else {
+                dispatch_async(queue, ^{
+                    MTR_LOG_ERROR("Failed to obtain XPC connection to subscribe to attribute");
+                    subscriptionEstablishedHandler();
+                    reportHandler(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+                });
+            }
+        }];
     };
 
-    [self fetchProxyHandleWithQueue:queue completion:workBlock];
+    if (self.controllerID != nil) {
+        workBlock();
+    } else {
+        [self.controller fetchControllerIdWithQueue:queue
+                                         completion:^(id _Nullable controllerID, NSError * _Nullable error) {
+                                             if (error != nil) {
+                                                 // We're already running on the right queue.
+                                                 reportHandler(nil, error);
+                                                 return;
+                                             }
+
+                                             self->_controllerID = controllerID;
+                                             workBlock();
+                                         }];
+    }
 }
 
 - (void)deregisterReportHandlersWithQueue:(dispatch_queue_t)queue completion:(void (^)(void))completion
@@ -297,8 +388,7 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
         workBlock();
     } else {
         [self.controller fetchControllerIdWithQueue:queue
-                                         completion:^(id _Nullable controllerID,
-                                             MTRDeviceControllerXPCProxyHandle * _Nullable handle, NSError * _Nullable error) {
+                                         completion:^(id _Nullable controllerID, NSError * _Nullable error) {
                                              if (error != nil) {
                                                  // We're already running on the right queue.
                                                  completion();
@@ -321,35 +411,6 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
     dispatch_async(queue, ^{
         completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil]);
     });
-}
-
-- (void)fetchProxyHandleWithQueue:(dispatch_queue_t)queue completion:(MTRFetchProxyHandleCompletion)completion
-{
-    if (self.controllerID != nil) {
-        [self->_xpcConnection getProxyHandleWithCompletion:^(
-            dispatch_queue_t _Nonnull proxyQueue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
-            dispatch_async(queue, ^{
-                if (handle == nil) {
-                    MTR_LOG_ERROR("Failed to obtain XPC connection");
-                    completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
-                } else {
-                    completion(handle, nil);
-                }
-            });
-        }];
-    } else {
-        [self.controller fetchControllerIdWithQueue:queue
-                                         completion:^(id _Nullable controllerID,
-                                             MTRDeviceControllerXPCProxyHandle * _Nullable handle, NSError * _Nullable error) {
-                                             // We're already running on the right queue.
-                                             if (error != nil) {
-                                                 completion(nil, error);
-                                             } else {
-                                                 self->_controllerID = controllerID;
-                                                 completion(handle, nil);
-                                             }
-                                         }];
-    }
 }
 
 @end

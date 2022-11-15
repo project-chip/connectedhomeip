@@ -22,21 +22,21 @@
 @implementation MTRTestOTAProvider
 - (void)handleQueryImageForNodeID:(NSNumber *)nodeID
                        controller:(MTRDeviceController *)controller
-                           params:(MTROTASoftwareUpdateProviderClusterQueryImageParams *)params
+                           params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
                        completion:(MTRQueryImageCompletionHandler)completion
 {
 }
 
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber *)nodeID
                                controller:(MTRDeviceController *)controller
-                                   params:(MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
+                                   params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
                                completion:(MTRApplyUpdateRequestCompletionHandler)completion
 {
 }
 
 - (void)handleNotifyUpdateAppliedForNodeID:(NSNumber *)nodeID
                                 controller:(MTRDeviceController *)controller
-                                    params:(MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
+                                    params:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
                                 completion:(MTRStatusCompletion)completion
 {
 }

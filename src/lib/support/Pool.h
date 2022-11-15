@@ -291,13 +291,30 @@ private:
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
+class HeapObjectPoolExitHandling
+{
+public:
+    // If IgnoreLeaksOnExit is called, some time after all static initializers have
+    // run, HeapObjectPool will not assert that everything in it has been
+    // released if its destructor runs under exit() (i.e. when the application
+    // is quitting anyway).
+    static void IgnoreLeaksOnExit();
+
+protected:
+    static bool sIgnoringLeaksOnExit;
+
+private:
+    static void ExitHandler();
+    static bool sExitHandlerRegistered;
+};
+
 /**
  * A class template used for allocating objects from the heap.
  *
  *  @tparam     T   type to be allocated.
  */
 template <class T>
-class HeapObjectPool : public internal::Statistics, public internal::PoolCommon<T>
+class HeapObjectPool : public internal::Statistics, public internal::PoolCommon<T>, public HeapObjectPoolExitHandling
 {
 public:
     HeapObjectPool() {}
@@ -314,8 +331,11 @@ public:
         // Free all remaining objects so that ASAN can catch specific use-after-free cases.
         ReleaseAll();
 #else  // __SANITIZE_ADDRESS__
-       // Verify that no live objects remain, to prevent potential use-after-free.
-        VerifyOrDie(Allocated() == 0);
+        if (!sIgnoringLeaksOnExit)
+        {
+            // Verify that no live objects remain, to prevent potential use-after-free.
+            VerifyOrDie(Allocated() == 0);
+        }
 #endif // __SANITIZE_ADDRESS__
     }
 

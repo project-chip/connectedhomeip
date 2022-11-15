@@ -73,6 +73,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#if CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
+
 using namespace chip;
 using namespace chip::Crypto;
 using namespace chip::TLV;
@@ -200,8 +204,6 @@ const AesCtrTestEntry theAesCtrTestVector[] = {
     }
 };
 
-constexpr size_t kAesCtrTestVectorSize = sizeof(theAesCtrTestVector) / sizeof(theAesCtrTestVector[0]);
-
 constexpr size_t KEY_LENGTH   = Crypto::kAES_CCM128_Key_Length;
 constexpr size_t NONCE_LENGTH = Crypto::kAES_CCM128_Nonce_Length;
 
@@ -245,14 +247,13 @@ static void TestAES_CTR_128CryptTestVectors(nlTestSuite * inSuite, void * inCont
 {
     HeapChecker heapChecker(inSuite);
     int numOfTestsRan = 0;
-    for (size_t vectorIndex = 0; vectorIndex < kAesCtrTestVectorSize; vectorIndex++)
+    for (const auto & vector : theAesCtrTestVector)
     {
-        const AesCtrTestEntry * vector = &theAesCtrTestVector[vectorIndex];
-        if (vector->plaintextLen > 0)
+        if (vector.plaintextLen > 0)
         {
             numOfTestsRan++;
-            TestAES_CTR_128_Encrypt(inSuite, vector);
-            TestAES_CTR_128_Decrypt(inSuite, vector);
+            TestAES_CTR_128_Encrypt(inSuite, &vector);
+            TestAES_CTR_128_Decrypt(inSuite, &vector);
         }
     }
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
@@ -1077,6 +1078,10 @@ static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
     }
     NL_TEST_ASSERT(inSuite, gs_test_entropy_source_called > test_entropy_source_call_count);
 }
+#endif
+
+#if CHIP_CRYPTO_PSA
+static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext) {}
 #endif
 
 #if CHIP_CRYPTO_BORINGSSL
@@ -2471,6 +2476,11 @@ int TestCHIPCryptoPAL_Setup(void * inContext)
     CHIP_ERROR error = chip::Platform::MemoryInit();
     if (error != CHIP_NO_ERROR)
         return FAILURE;
+
+#if CHIP_CRYPTO_PSA
+    psa_crypto_init();
+#endif
+
     return SUCCESS;
 }
 

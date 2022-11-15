@@ -57,7 +57,7 @@ void MemMonitoring::HeapMonitoring(void * pvParameter)
     TaskHandle_t lwipHandle = xTaskGetHandle(TCPIP_THREAD_NAME);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    while (1)
+    while (true)
     {
         appTaskValue        = uxTaskGetStackHighWaterMark(appTaskHandle);
         bleEventTaskValue   = uxTaskGetStackHighWaterMark(bleEventTaskHandle);

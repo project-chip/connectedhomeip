@@ -7,33 +7,36 @@
 
 typedef NS_ENUM(uint32_t, MTRClusterIDType) {
 {{#zcl_clusters}}
-{{~#*inline "cluster"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
-MTRClusterIDType{{>cluster}}ID = {{asMEI manufacturerCode code}},
+MTRCluster{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
 {{/zcl_clusters}}
 };
 
 #pragma mark - Attributes IDs
 
-typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
+typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
 // Global attributes
 {{#zcl_attributes_server}}
-{{~#*inline "attribute"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
 {{#unless clusterRef}}
-MTRAttributeIDTypeGlobalAttribute{{>attribute}}ID = {{asMEI manufacturerCode code}},
+MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
 {{/unless}}
 {{/zcl_attributes_server}}
 
 {{#zcl_clusters}}
 {{#zcl_attributes_server}}
-{{~#*inline "cluster"}}{{asUpperCamelCase parent.label preserveAcronyms=true}}{{/inline~}}
-{{~#*inline "attribute"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
 {{#first}}
-// Cluster {{>cluster}} attributes
+// Cluster {{asUpperCamelCase parent.label}} attributes
 {{/first}}
 {{#if clusterRef}}
-MTRAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID = {{asMEI manufacturerCode code}},
+{{! TODO: We need a better setup for the API_AVALABLE annotations here; this does not scale at all sanely. }}
+MTRCluster{{asUpperCamelCase parent.label}}Attribute{{asUpperCamelCase label}}ID {{#if (isStrEqual (asUpperCamelCase parent.label) "Descriptor")}} {{#if (isStrEqual (asUpperCamelCase label) "DeviceTypeList")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}} = {{asMEI manufacturerCode code}},
+{{!Backwards compat for now: DeviceList as an alias for DeviceTypeList}}
+{{#if (isStrEqual (asUpperCamelCase parent.label) "Descriptor")}}
+{{#if (isStrEqual (asUpperCamelCase label) "DeviceTypeList")}}
+MTRClusterDescriptorAttributeDeviceListID = {{asMEI manufacturerCode code}},
+{{/if}}
+{{/if}}
 {{else}}
-MTRAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID = MTRAttributeIDTypeGlobalAttribute{{>attribute}}ID,
+MTRCluster{{asUpperCamelCase parent.label}}Attribute{{asUpperCamelCase label}}ID = MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID,
 {{/if}}
 {{#last}}
 
@@ -44,15 +47,13 @@ MTRAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID = MTRAttributeIDT
 
 #pragma mark - Commands IDs
 
-typedef NS_ENUM(uint32_t, MTRCommandIDType) {
+typedef NS_ENUM(uint32_t, MTRClusterCommandIDType) {
 {{#zcl_clusters}}
 {{#zcl_commands}}
-{{~#*inline "cluster"}}{{asUpperCamelCase parent.label preserveAcronyms=true}}{{/inline~}}
-{{~#*inline "command"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
 {{#first}}
-// Cluster {{>cluster}} commands
+// Cluster {{asUpperCamelCase parent.label}} commands
 {{/first}}
-MTRCommandIDTypeCluster{{>cluster}}Command{{>command}}ID = {{asMEI manufacturerCode code}},
+MTRCluster{{asUpperCamelCase parent.label}}Command{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
 {{#last}}
 
 {{/last}}
@@ -62,15 +63,13 @@ MTRCommandIDTypeCluster{{>cluster}}Command{{>command}}ID = {{asMEI manufacturerC
 
 #pragma mark - Events IDs
 
-typedef NS_ENUM(uint32_t, MTREventIDType) {
+typedef NS_ENUM(uint32_t, MTRClusterEventIDType) {
 {{#zcl_clusters}}
 {{#zcl_events}}
-{{~#*inline "cluster"}}{{asUpperCamelCase parent.label preserveAcronyms=true}}{{/inline~}}
-{{~#*inline "event"}}{{asUpperCamelCase name preserveAcronyms=true}}{{/inline~}}
 {{#first}}
-// Cluster {{>cluster}} events
+// Cluster {{asUpperCamelCase parent.label}} events
 {{/first}}
-MTREventIDTypeCluster{{>cluster}}Event{{>event}}ID = {{asMEI manufacturerCode code}},
+MTRCluster{{asUpperCamelCase parent.label}}Event{{asUpperCamelCase name}}ID = {{asMEI manufacturerCode code}},
 {{#last}}
 
 {{/last}}

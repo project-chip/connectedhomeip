@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <lib/support/DefaultStorageKeyAllocator.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
@@ -23,8 +23,6 @@
 // DefaultSessionResumptionStorage is a partial implementation.
 // Use SimpleSessionResumptionStorage, which extends it, to test.
 #include <protocols/secure_channel/SimpleSessionResumptionStorage.h>
-
-#define ARRAY_SIZE(_array) ((sizeof(_array) / sizeof(_array[0])))
 
 void TestSave(nlTestSuite * inSuite, void * inContext)
 {
@@ -40,7 +38,7 @@ void TestSave(nlTestSuite * inSuite, void * inContext)
     } vectors[CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE + 1];
 
     // Populate test vectors.
-    for (size_t i = 0; i < ARRAY_SIZE(vectors); ++i)
+    for (size_t i = 0; i < ArraySize(vectors); ++i)
     {
         NL_TEST_ASSERT(
             inSuite, CHIP_NO_ERROR == chip::Crypto::DRBG_get_bytes(vectors[i].resumptionId.data(), vectors[i].resumptionId.size()));
@@ -70,7 +68,7 @@ void TestSave(nlTestSuite * inSuite, void * inContext)
     // If more sophisticated LRU behavior is implemented, this test
     // case should be modified to match.
     {
-        size_t last = ARRAY_SIZE(vectors) - 1;
+        size_t last = ArraySize(vectors) - 1;
         NL_TEST_ASSERT(inSuite,
                        sessionStorage.Save(vectors[last].node, vectors[last].resumptionId, vectors[last].sharedSecret,
                                            vectors[last].cats) == CHIP_NO_ERROR);
@@ -99,7 +97,7 @@ void TestSave(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, vector.cats.values[1] == outCats.values[1]);
         NL_TEST_ASSERT(inSuite, vector.cats.values[2] == outCats.values[2]);
 
-        // Validate retreiveal by resumption ID.
+        // Validate retrieval by resumption ID.
         NL_TEST_ASSERT(inSuite,
                        sessionStorage.FindByResumptionId(vector.resumptionId, outNode, outSharedSecret, outCats) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, vector.node == outNode);
@@ -123,12 +121,12 @@ void TestInPlaceSave(nlTestSuite * inSuite, void * inContext)
         chip::CATValues cats;
     } vectors[CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE + 10];
 
-    // Construct only a few unique node identities to simiulate talking to a
+    // Construct only a few unique node identities to simulate talking to a
     // couple peers.
     chip::ScopedNodeId nodes[3];
-    static_assert(ARRAY_SIZE(nodes) < CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE,
+    static_assert(ArraySize(nodes) < CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE,
                   "must have fewer nodes than slots in session resumption storage");
-    for (size_t i = 0; i < ARRAY_SIZE(nodes); ++i)
+    for (size_t i = 0; i < ArraySize(nodes); ++i)
     {
         do
         {
@@ -137,7 +135,7 @@ void TestInPlaceSave(nlTestSuite * inSuite, void * inContext)
     }
 
     // Populate test vectors.
-    for (size_t i = 0; i < ARRAY_SIZE(vectors); ++i)
+    for (size_t i = 0; i < ArraySize(vectors); ++i)
     {
         NL_TEST_ASSERT(
             inSuite, CHIP_NO_ERROR == chip::Crypto::DRBG_get_bytes(vectors[i].resumptionId.data(), vectors[i].resumptionId.size()));
@@ -147,14 +145,14 @@ void TestInPlaceSave(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite,
                        CHIP_NO_ERROR ==
                            chip::Crypto::DRBG_get_bytes(vectors[i].sharedSecret.Bytes(), vectors[i].sharedSecret.Length()));
-        vectors[i].node           = nodes[i % ARRAY_SIZE(nodes)];
+        vectors[i].node           = nodes[i % ArraySize(nodes)];
         vectors[i].cats.values[0] = static_cast<chip::CASEAuthTag>(rand());
         vectors[i].cats.values[1] = static_cast<chip::CASEAuthTag>(rand());
         vectors[i].cats.values[2] = static_cast<chip::CASEAuthTag>(rand());
     }
 
     // Add one entry for each node.
-    for (size_t i = 0; i < ARRAY_SIZE(nodes); ++i)
+    for (size_t i = 0; i < ArraySize(nodes); ++i)
     {
         NL_TEST_ASSERT(inSuite,
                        sessionStorage.Save(vectors[i].node, vectors[i].resumptionId, vectors[i].sharedSecret, vectors[i].cats) ==
@@ -162,7 +160,7 @@ void TestInPlaceSave(nlTestSuite * inSuite, void * inContext)
     }
 
     // Read back and verify values.
-    for (size_t i = 0; i < ARRAY_SIZE(nodes); ++i)
+    for (size_t i = 0; i < ArraySize(nodes); ++i)
     {
         chip::ScopedNodeId outNode;
         chip::SessionResumptionStorage::ResumptionIdStorage outResumptionId;
@@ -180,7 +178,7 @@ void TestInPlaceSave(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, vectors[i].cats.values[1] == outCats.values[1]);
         NL_TEST_ASSERT(inSuite, vectors[i].cats.values[2] == outCats.values[2]);
 
-        // Validate retreiveal by resumption ID.
+        // Validate retrieval by resumption ID.
         NL_TEST_ASSERT(inSuite,
                        sessionStorage.FindByResumptionId(vectors[i].resumptionId, outNode, outSharedSecret, outCats) ==
                            CHIP_NO_ERROR);
@@ -200,7 +198,7 @@ void TestInPlaceSave(nlTestSuite * inSuite, void * inContext)
     }
 
     // Read back and verify that only the last record for each node was retained.
-    for (size_t i = ARRAY_SIZE(vectors) - ARRAY_SIZE(nodes); i < ARRAY_SIZE(vectors); ++i)
+    for (size_t i = ArraySize(vectors) - ArraySize(nodes); i < ArraySize(vectors); ++i)
     {
         chip::ScopedNodeId outNode;
         chip::SessionResumptionStorage::ResumptionIdStorage outResumptionId;
@@ -218,7 +216,7 @@ void TestInPlaceSave(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, vectors[i].cats.values[1] == outCats.values[1]);
         NL_TEST_ASSERT(inSuite, vectors[i].cats.values[2] == outCats.values[2]);
 
-        // Validate retreiveal by resumption ID.
+        // Validate retrieval by resumption ID.
         NL_TEST_ASSERT(inSuite,
                        sessionStorage.FindByResumptionId(vectors[i].resumptionId, outNode, outSharedSecret, outCats) ==
                            CHIP_NO_ERROR);
@@ -258,17 +256,15 @@ void TestInPlaceSave(nlTestSuite * inSuite, void * inContext)
     for (const auto & node : nodes)
     {
         uint16_t size = 0;
-        chip::DefaultStorageKeyAllocator keyAlloc;
-        auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, node), nullptr, size);
+        auto rv       = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(node).KeyName(), nullptr, size);
         NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     }
     // Verify no link table persistent storage entries were leaked.
     for (auto & vector : vectors)
     {
         uint16_t size = 0;
-        chip::DefaultStorageKeyAllocator keyAlloc;
-        auto rv =
-            storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, vector.resumptionId), nullptr, size);
+        auto rv       = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(vector.resumptionId).KeyName(),
+                                          nullptr, size);
         NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     }
 }
@@ -290,7 +286,7 @@ void TestDelete(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == chip::Crypto::DRBG_get_bytes(sharedSecret.Bytes(), sharedSecret.Length()));
 
     // Populate test vectors.
-    for (size_t i = 0; i < ARRAY_SIZE(vectors); ++i)
+    for (size_t i = 0; i < ArraySize(vectors); ++i)
     {
         NL_TEST_ASSERT(
             inSuite, CHIP_NO_ERROR == chip::Crypto::DRBG_get_bytes(vectors[i].resumptionId.data(), vectors[i].resumptionId.size()));
@@ -300,41 +296,37 @@ void TestDelete(nlTestSuite * inSuite, void * inContext)
     }
 
     // Fill storage.
-    for (size_t i = 0; i < sizeof(vectors) / sizeof(vectors[0]); ++i)
+    for (auto & vector : vectors)
     {
         NL_TEST_ASSERT(inSuite,
-                       sessionStorage.Save(vectors[i].node, vectors[i].resumptionId, sharedSecret, chip::CATValues{}) ==
-                           CHIP_NO_ERROR);
+                       sessionStorage.Save(vector.node, vector.resumptionId, sharedSecret, chip::CATValues{}) == CHIP_NO_ERROR);
     }
 
     // Delete values in turn from storage and verify they are removed.
-    for (size_t i = 0; i < ARRAY_SIZE(vectors); ++i)
+    for (auto & vector : vectors)
     {
         chip::ScopedNodeId outNode;
         chip::SessionResumptionStorage::ResumptionIdStorage outResumptionId;
         chip::Crypto::P256ECDHDerivedSecret outSharedSecret;
         chip::CATValues outCats;
-        NL_TEST_ASSERT(inSuite, sessionStorage.Delete(vectors[i].node) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, sessionStorage.Delete(vector.node) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite,
-                       sessionStorage.FindByScopedNodeId(vectors[i].node, outResumptionId, outSharedSecret, outCats) !=
-                           CHIP_NO_ERROR);
+                       sessionStorage.FindByScopedNodeId(vector.node, outResumptionId, outSharedSecret, outCats) != CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite,
-                       sessionStorage.FindByResumptionId(vectors[i].resumptionId, outNode, outSharedSecret, outCats) !=
-                           CHIP_NO_ERROR);
+                       sessionStorage.FindByResumptionId(vector.resumptionId, outNode, outSharedSecret, outCats) != CHIP_NO_ERROR);
     }
 
     // Verify no state or link table persistent storage entries were leaked.
     for (auto & vector : vectors)
     {
         uint16_t size = 0;
-        chip::DefaultStorageKeyAllocator keyAlloc;
         {
             auto rv =
-                storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, vector.node), nullptr, size);
+                storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(vector.node).KeyName(), nullptr, size);
             NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         }
         {
-            auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, vector.resumptionId),
+            auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(vector.resumptionId).KeyName(),
                                               nullptr, size);
             NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         }
@@ -413,14 +405,13 @@ void TestDeleteAll(nlTestSuite * inSuite, void * inContext)
         for (auto & node : vector.nodes)
         {
             uint16_t size = 0;
-            chip::DefaultStorageKeyAllocator keyAlloc;
             {
-                auto rv =
-                    storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, node.node), nullptr, size);
+                auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(node.node).KeyName(), nullptr,
+                                                  size);
                 NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
             }
             {
-                auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, node.resumptionId),
+                auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(node.resumptionId).KeyName(),
                                                   nullptr, size);
                 NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
             }

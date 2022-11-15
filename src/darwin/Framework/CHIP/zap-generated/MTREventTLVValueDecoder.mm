@@ -136,7 +136,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRAccessControlClusterAccessControlEntryChangedEvent new];
+            MTRAccessControlClusterAccessControlEntryChangedEvent * value =
+                [MTRAccessControlClusterAccessControlEntryChangedEvent new];
 
             do {
                 NSNumber * _Nullable memberValue;
@@ -246,7 +247,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRAccessControlClusterAccessControlExtensionChangedEvent new];
+            MTRAccessControlClusterAccessControlExtensionChangedEvent * value =
+                [MTRAccessControlClusterAccessControlExtensionChangedEvent new];
 
             do {
                 NSNumber * _Nullable memberValue;
@@ -309,7 +311,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRActionsClusterStateChangedEvent new];
+            MTRActionsClusterStateChangedEvent * value = [MTRActionsClusterStateChangedEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -337,7 +339,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRActionsClusterActionFailedEvent new];
+            MTRActionsClusterActionFailedEvent * value = [MTRActionsClusterActionFailedEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -380,7 +382,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBasicClusterStartUpEvent new];
+            MTRBasicClusterStartUpEvent * value = [MTRBasicClusterStartUpEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -398,7 +400,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBasicClusterShutDownEvent new];
+            MTRBasicClusterShutDownEvent * value = [MTRBasicClusterShutDownEvent new];
 
             return value;
         }
@@ -410,7 +412,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBasicClusterLeaveEvent new];
+            MTRBasicClusterLeaveEvent * value = [MTRBasicClusterLeaveEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -428,7 +430,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBasicClusterReachableChangedEvent new];
+            MTRBasicClusterReachableChangedEvent * value = [MTRBasicClusterReachableChangedEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -466,7 +468,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTROTASoftwareUpdateRequestorClusterStateTransitionEvent new];
+            MTROtaSoftwareUpdateRequestorClusterStateTransitionEvent * value =
+                [MTROtaSoftwareUpdateRequestorClusterStateTransitionEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -503,7 +506,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent new];
+            MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent * value =
+                [MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -526,7 +530,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent new];
+            MTROtaSoftwareUpdateRequestorClusterDownloadErrorEvent * value =
+                [MTROtaSoftwareUpdateRequestorClusterDownloadErrorEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -657,7 +662,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRGeneralDiagnosticsClusterHardwareFaultChangeEvent new];
+            MTRGeneralDiagnosticsClusterHardwareFaultChangeEvent * value =
+                [MTRGeneralDiagnosticsClusterHardwareFaultChangeEvent new];
 
             do {
                 NSArray * _Nonnull memberValue;
@@ -710,7 +716,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRGeneralDiagnosticsClusterRadioFaultChangeEvent new];
+            MTRGeneralDiagnosticsClusterRadioFaultChangeEvent * value = [MTRGeneralDiagnosticsClusterRadioFaultChangeEvent new];
 
             do {
                 NSArray * _Nonnull memberValue;
@@ -763,7 +769,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRGeneralDiagnosticsClusterNetworkFaultChangeEvent new];
+            MTRGeneralDiagnosticsClusterNetworkFaultChangeEvent * value = [MTRGeneralDiagnosticsClusterNetworkFaultChangeEvent new];
 
             do {
                 NSArray * _Nonnull memberValue;
@@ -816,7 +822,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRGeneralDiagnosticsClusterBootReasonEvent new];
+            MTRGeneralDiagnosticsClusterBootReasonEvent * value = [MTRGeneralDiagnosticsClusterBootReasonEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -844,7 +850,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRSoftwareDiagnosticsClusterSoftwareFaultEvent new];
+            MTRSoftwareDiagnosticsClusterSoftwareFaultEvent * value = [MTRSoftwareDiagnosticsClusterSoftwareFaultEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -893,7 +899,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRThreadNetworkDiagnosticsClusterConnectionStatusEvent new];
+            MTRThreadNetworkDiagnosticsClusterConnectionStatusEvent * value =
+                [MTRThreadNetworkDiagnosticsClusterConnectionStatusEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -911,7 +918,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent new];
+            MTRThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent * value =
+                [MTRThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent new];
 
             do {
                 NSArray * _Nonnull memberValue;
@@ -974,7 +982,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRWiFiNetworkDiagnosticsClusterDisconnectionEvent new];
+            MTRWiFiNetworkDiagnosticsClusterDisconnectionEvent * value = [MTRWiFiNetworkDiagnosticsClusterDisconnectionEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -992,7 +1000,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRWiFiNetworkDiagnosticsClusterAssociationFailureEvent new];
+            MTRWiFiNetworkDiagnosticsClusterAssociationFailureEvent * value =
+                [MTRWiFiNetworkDiagnosticsClusterAssociationFailureEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -1015,7 +1024,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRWiFiNetworkDiagnosticsClusterConnectionStatusEvent new];
+            MTRWiFiNetworkDiagnosticsClusterConnectionStatusEvent * value =
+                [MTRWiFiNetworkDiagnosticsClusterConnectionStatusEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -1053,7 +1063,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBridgedDeviceBasicClusterStartUpEvent new];
+            MTRBridgedDeviceBasicClusterStartUpEvent * value = [MTRBridgedDeviceBasicClusterStartUpEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -1071,7 +1081,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBridgedDeviceBasicClusterShutDownEvent new];
+            MTRBridgedDeviceBasicClusterShutDownEvent * value = [MTRBridgedDeviceBasicClusterShutDownEvent new];
 
             return value;
         }
@@ -1083,7 +1093,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBridgedDeviceBasicClusterLeaveEvent new];
+            MTRBridgedDeviceBasicClusterLeaveEvent * value = [MTRBridgedDeviceBasicClusterLeaveEvent new];
 
             return value;
         }
@@ -1095,7 +1105,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBridgedDeviceBasicClusterReachableChangedEvent new];
+            MTRBridgedDeviceBasicClusterReachableChangedEvent * value = [MTRBridgedDeviceBasicClusterReachableChangedEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -1123,7 +1133,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRSwitchClusterSwitchLatchedEvent new];
+            MTRSwitchClusterSwitchLatchedEvent * value = [MTRSwitchClusterSwitchLatchedEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -1141,7 +1151,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRSwitchClusterInitialPressEvent new];
+            MTRSwitchClusterInitialPressEvent * value = [MTRSwitchClusterInitialPressEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -1159,7 +1169,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRSwitchClusterLongPressEvent new];
+            MTRSwitchClusterLongPressEvent * value = [MTRSwitchClusterLongPressEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -1177,7 +1187,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRSwitchClusterShortReleaseEvent new];
+            MTRSwitchClusterShortReleaseEvent * value = [MTRSwitchClusterShortReleaseEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -1195,7 +1205,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRSwitchClusterLongReleaseEvent new];
+            MTRSwitchClusterLongReleaseEvent * value = [MTRSwitchClusterLongReleaseEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -1213,7 +1223,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRSwitchClusterMultiPressOngoingEvent new];
+            MTRSwitchClusterMultiPressOngoingEvent * value = [MTRSwitchClusterMultiPressOngoingEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -1236,7 +1246,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRSwitchClusterMultiPressCompleteEvent new];
+            MTRSwitchClusterMultiPressCompleteEvent * value = [MTRSwitchClusterMultiPressCompleteEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -1319,7 +1329,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBooleanStateClusterStateChangeEvent new];
+            MTRBooleanStateClusterStateChangeEvent * value = [MTRBooleanStateClusterStateChangeEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -1357,7 +1367,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRDoorLockClusterDoorLockAlarmEvent new];
+            MTRDoorLockClusterDoorLockAlarmEvent * value = [MTRDoorLockClusterDoorLockAlarmEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -1375,7 +1385,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRDoorLockClusterDoorStateChangeEvent new];
+            MTRDoorLockClusterDoorStateChangeEvent * value = [MTRDoorLockClusterDoorStateChangeEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -1393,7 +1403,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRDoorLockClusterLockOperationEvent new];
+            MTRDoorLockClusterLockOperationEvent * value = [MTRDoorLockClusterLockOperationEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -1474,7 +1484,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRDoorLockClusterLockOperationErrorEvent new];
+            MTRDoorLockClusterLockOperationErrorEvent * value = [MTRDoorLockClusterLockOperationErrorEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -1560,7 +1570,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRDoorLockClusterLockUserChangeEvent new];
+            MTRDoorLockClusterLockUserChangeEvent * value = [MTRDoorLockClusterLockUserChangeEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -1654,7 +1664,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRPumpConfigurationAndControlClusterSupplyVoltageLowEvent new];
+            MTRPumpConfigurationAndControlClusterSupplyVoltageLowEvent * value =
+                [MTRPumpConfigurationAndControlClusterSupplyVoltageLowEvent new];
 
             return value;
         }
@@ -1666,7 +1677,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRPumpConfigurationAndControlClusterSupplyVoltageHighEvent new];
+            MTRPumpConfigurationAndControlClusterSupplyVoltageHighEvent * value =
+                [MTRPumpConfigurationAndControlClusterSupplyVoltageHighEvent new];
 
             return value;
         }
@@ -1678,7 +1690,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRPumpConfigurationAndControlClusterPowerMissingPhaseEvent new];
+            MTRPumpConfigurationAndControlClusterPowerMissingPhaseEvent * value =
+                [MTRPumpConfigurationAndControlClusterPowerMissingPhaseEvent new];
 
             return value;
         }
@@ -1690,7 +1703,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRPumpConfigurationAndControlClusterSystemPressureLowEvent new];
+            MTRPumpConfigurationAndControlClusterSystemPressureLowEvent * value =
+                [MTRPumpConfigurationAndControlClusterSystemPressureLowEvent new];
 
             return value;
         }
@@ -1702,7 +1716,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRPumpConfigurationAndControlClusterSystemPressureHighEvent new];
+            MTRPumpConfigurationAndControlClusterSystemPressureHighEvent * value =
+                [MTRPumpConfigurationAndControlClusterSystemPressureHighEvent new];
 
             return value;
         }
@@ -1714,7 +1729,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRPumpConfigurationAndControlClusterDryRunningEvent new];
+            MTRPumpConfigurationAndControlClusterDryRunningEvent * value =
+                [MTRPumpConfigurationAndControlClusterDryRunningEvent new];
 
             return value;
         }
@@ -1726,7 +1742,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRPumpConfigurationAndControlClusterMotorTemperatureHighEvent new];
+            MTRPumpConfigurationAndControlClusterMotorTemperatureHighEvent * value =
+                [MTRPumpConfigurationAndControlClusterMotorTemperatureHighEvent new];
 
             return value;
         }
@@ -1738,7 +1755,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRPumpConfigurationAndControlClusterPumpMotorFatalFailureEvent new];
+            MTRPumpConfigurationAndControlClusterPumpMotorFatalFailureEvent * value =
+                [MTRPumpConfigurationAndControlClusterPumpMotorFatalFailureEvent new];
 
             return value;
         }
@@ -1750,7 +1768,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRPumpConfigurationAndControlClusterElectronicTemperatureHighEvent new];
+            MTRPumpConfigurationAndControlClusterElectronicTemperatureHighEvent * value =
+                [MTRPumpConfigurationAndControlClusterElectronicTemperatureHighEvent new];
 
             return value;
         }
@@ -1762,7 +1781,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRPumpConfigurationAndControlClusterPumpBlockedEvent new];
+            MTRPumpConfigurationAndControlClusterPumpBlockedEvent * value =
+                [MTRPumpConfigurationAndControlClusterPumpBlockedEvent new];
 
             return value;
         }
@@ -1774,7 +1794,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRPumpConfigurationAndControlClusterSensorFailureEvent new];
+            MTRPumpConfigurationAndControlClusterSensorFailureEvent * value =
+                [MTRPumpConfigurationAndControlClusterSensorFailureEvent new];
 
             return value;
         }
@@ -1786,7 +1807,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRPumpConfigurationAndControlClusterElectronicNonFatalFailureEvent new];
+            MTRPumpConfigurationAndControlClusterElectronicNonFatalFailureEvent * value =
+                [MTRPumpConfigurationAndControlClusterElectronicNonFatalFailureEvent new];
 
             return value;
         }
@@ -1798,7 +1820,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRPumpConfigurationAndControlClusterElectronicFatalFailureEvent new];
+            MTRPumpConfigurationAndControlClusterElectronicFatalFailureEvent * value =
+                [MTRPumpConfigurationAndControlClusterElectronicFatalFailureEvent new];
 
             return value;
         }
@@ -1810,7 +1833,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRPumpConfigurationAndControlClusterGeneralFaultEvent new];
+            MTRPumpConfigurationAndControlClusterGeneralFaultEvent * value =
+                [MTRPumpConfigurationAndControlClusterGeneralFaultEvent new];
 
             return value;
         }
@@ -1822,7 +1846,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRPumpConfigurationAndControlClusterLeakageEvent new];
+            MTRPumpConfigurationAndControlClusterLeakageEvent * value = [MTRPumpConfigurationAndControlClusterLeakageEvent new];
 
             return value;
         }
@@ -1834,7 +1858,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRPumpConfigurationAndControlClusterAirDetectionEvent new];
+            MTRPumpConfigurationAndControlClusterAirDetectionEvent * value =
+                [MTRPumpConfigurationAndControlClusterAirDetectionEvent new];
 
             return value;
         }
@@ -1846,7 +1871,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRPumpConfigurationAndControlClusterTurbineOperationEvent new];
+            MTRPumpConfigurationAndControlClusterTurbineOperationEvent * value =
+                [MTRPumpConfigurationAndControlClusterTurbineOperationEvent new];
 
             return value;
         }
@@ -2097,8 +2123,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
         }
         break;
     }
-    case Clusters::TestCluster::Id: {
-        using namespace Clusters::TestCluster;
+    case Clusters::UnitTesting::Id: {
+        using namespace Clusters::UnitTesting;
         switch (aPath.mEventId) {
 
         case Events::TestEvent::Id: {
@@ -2108,7 +2134,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRTestClusterClusterTestEventEvent new];
+            MTRUnitTestingClusterTestEventEvent * value = [MTRUnitTestingClusterTestEventEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -2126,8 +2152,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 value.arg3 = memberValue;
             } while (0);
             do {
-                MTRTestClusterClusterSimpleStruct * _Nonnull memberValue;
-                memberValue = [MTRTestClusterClusterSimpleStruct new];
+                MTRUnitTestingClusterSimpleStruct * _Nonnull memberValue;
+                memberValue = [MTRUnitTestingClusterSimpleStruct new];
                 memberValue.a = [NSNumber numberWithUnsignedChar:cppValue.arg4.a];
                 memberValue.b = [NSNumber numberWithBool:cppValue.arg4.b];
                 memberValue.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.arg4.c)];
@@ -2147,8 +2173,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                     auto iter_0 = cppValue.arg5.begin();
                     while (iter_0.Next()) {
                         auto & entry_0 = iter_0.GetValue();
-                        MTRTestClusterClusterSimpleStruct * newElement_0;
-                        newElement_0 = [MTRTestClusterClusterSimpleStruct new];
+                        MTRUnitTestingClusterSimpleStruct * newElement_0;
+                        newElement_0 = [MTRUnitTestingClusterSimpleStruct new];
                         newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
                         newElement_0.b = [NSNumber numberWithBool:entry_0.b];
                         newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
@@ -2201,7 +2227,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRTestClusterClusterTestFabricScopedEventEvent new];
+            MTRUnitTestingClusterTestFabricScopedEventEvent * value = [MTRUnitTestingClusterTestFabricScopedEventEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;

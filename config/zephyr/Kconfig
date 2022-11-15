@@ -196,6 +196,23 @@ config CHIP_OPERATIONAL_TIME_SAVE_INTERVAL
 	  precisely operation time in case of device reboot and maximizing flash memory
 	  lifetime.
 
+config CHIP_CRYPTO_PSA
+	bool "Use PSA crypto API for cryptographic operations"
+	help
+	  Use the backend for the Matter crypto layer that is based on PSA crypto
+	  API instead of the default, based on legacy mbedTLS APIs.
+
+config CHIP_FACTORY_RESET_ERASE_NVS
+	bool "Erase NVS flash pages on factory reset"
+	depends on SETTINGS_NVS
+	help
+	  When factory reset is requested, erase flash pages occupied by non-volatile storage
+	  instead of removing Matter-related settings only. This provides a more robust
+	  factory reset mechanism and allows to regain the original storage performance if any
+	  firmware issue has brought it to an unexpected state. For this reason, it is
+	  advisable to set this option if all configuration, including device-specific
+	  entries, is supposed to be cleared on a factory reset.
+
 config CHIP_MALLOC_SYS_HEAP
 	bool "Memory allocator based on Zephyr sys_heap"
 	imply SYS_HEAP_RUNTIME_STATS

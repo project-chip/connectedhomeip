@@ -167,7 +167,7 @@
                 if (handle) {
                     MTR_LOG_DEBUG("CHIP XPC connection requests to stop reports");
                     [handle.proxy stopReportsWithController:controller
-                                                     nodeID:nodeID
+                                                     nodeId:nodeID.unsignedLongLongValue
                                                  completion:^{
                                                      __auto_type handleRetainer = handle;
                                                      (void) handleRetainer;
@@ -182,7 +182,7 @@
 }
 
 - (void)handleReportWithController:(id)controller
-                            nodeID:(NSNumber *)nodeID
+                            nodeId:(uint64_t)nodeId
                             values:(id _Nullable)values
                              error:(NSError * _Nullable)error
 {
@@ -191,7 +191,8 @@
         if (!controllerDictionary) {
             return;
         }
-        NSMutableArray * nodeArray = controllerDictionary[nodeID];
+        NSNumber * nodeIdKey = [NSNumber numberWithUnsignedInteger:nodeId];
+        NSMutableArray * nodeArray = controllerDictionary[nodeIdKey];
         if (!nodeArray) {
             return;
         }

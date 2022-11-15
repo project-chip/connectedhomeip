@@ -1,6 +1,6 @@
 package chip.devicecontroller;
 
-import androidx.annotation.Nullable;
+import javax.annotation.Nullable;
 
 /** Parameters representing initialization arguments for {@link ChipDeviceController}. */
 public final class ControllerParams {

@@ -253,7 +253,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = NULL;
-    long result                              = 0;
+    jlong result                             = 0;
 
     ChipLogProgress(Controller, "newDeviceController() called");
 
@@ -439,8 +439,14 @@ JNI_METHOD(void, pairDevice)
 
     ChipLogProgress(Controller, "pairDevice() called with device ID, connection object, and pincode");
 
+    if (!chip::CanCastTo<uint32_t>(pinCode))
+    {
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
+        return;
+    }
+
     RendezvousParameters rendezvousParams = RendezvousParameters()
-                                                .SetSetupPINCode(pinCode)
+                                                .SetSetupPINCode(static_cast<uint32_t>(pinCode))
 #if CONFIG_NETWORK_LAYER_BLE
                                                 .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
 #endif
@@ -473,12 +479,18 @@ JNI_METHOD(void, pairDeviceWithAddress)
 
     ChipLogProgress(Controller, "pairDeviceWithAddress() called");
 
+    if (!chip::CanCastTo<uint32_t>(pinCode))
+    {
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
+        return;
+    }
+
     JniUtfString addrJniString(env, address);
 
     RendezvousParameters rendezvousParams =
         RendezvousParameters()
             .SetDiscriminator(discriminator)
-            .SetSetupPINCode(pinCode)
+            .SetSetupPINCode(static_cast<uint32_t>(pinCode))
             .SetPeerAddress(Transport::PeerAddress::UDP(const_cast<char *>(addrJniString.c_str()), port));
 
     CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
@@ -502,8 +514,14 @@ JNI_METHOD(void, establishPaseConnection)(JNIEnv * env, jobject self, jlong hand
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
+    if (!chip::CanCastTo<uint32_t>(pinCode))
+    {
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
+        return;
+    }
+
     RendezvousParameters rendezvousParams = RendezvousParameters()
-                                                .SetSetupPINCode(pinCode)
+                                                .SetSetupPINCode(static_cast<uint32_t>(pinCode))
 #if CONFIG_NETWORK_LAYER_BLE
                                                 .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
 #endif
@@ -525,10 +543,18 @@ JNI_METHOD(void, establishPaseConnectionByAddress)
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
+    if (!chip::CanCastTo<uint32_t>(pinCode))
+    {
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
+        return;
+    }
+
     JniUtfString addrJniString(env, address);
 
-    RendezvousParameters rendezvousParams = RendezvousParameters().SetSetupPINCode(pinCode).SetPeerAddress(
-        Transport::PeerAddress::UDP(const_cast<char *>(addrJniString.c_str()), port));
+    RendezvousParameters rendezvousParams =
+        RendezvousParameters()
+            .SetSetupPINCode(static_cast<uint32_t>(pinCode))
+            .SetPeerAddress(Transport::PeerAddress::UDP(const_cast<char *>(addrJniString.c_str()), port));
 
     err = wrapper->Controller()->EstablishPASEConnection(deviceId, rendezvousParams);
 
@@ -615,7 +641,9 @@ JNI_METHOD(jbyteArray, convertX509CertToMatterCert)
         err = chip::Credentials::ConvertX509CertToChipCert(x509CertBytes.byteSpan(), outBytes);
         SuccessOrExit(err);
 
-        err = JniReferences::GetInstance().N2J_ByteArray(env, outBytes.data(), outBytes.size(), outJbytes);
+        VerifyOrExit(chip::CanCastTo<uint32_t>(outBytes.size()), err = CHIP_ERROR_INTERNAL);
+
+        err = JniReferences::GetInstance().N2J_ByteArray(env, outBytes.data(), static_cast<uint32_t>(outBytes.size()), outJbytes);
         SuccessOrExit(err);
     }
 
@@ -886,6 +914,8 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
 JNI_METHOD(jboolean, openPairingWindowWithPIN)
 (JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator, jlong setupPinCode)
 {
+    VerifyOrReturnValue(chip::CanCastTo<uint32_t>(iteration), false);
+
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -900,8 +930,8 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
 
     chip::SetupPayload setupPayload;
     err = AutoCommissioningWindowOpener::OpenCommissioningWindow(
-        wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), iteration, discriminator,
-        MakeOptional(static_cast<uint32_t>(setupPinCode)), NullOptional, setupPayload);
+        wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), static_cast<uint32_t>(iteration),
+        discriminator, MakeOptional(static_cast<uint32_t>(setupPinCode)), NullOptional, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -943,6 +973,8 @@ JNI_METHOD(jboolean, openPairingWindowWithPINCallback)
 (JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator, jlong setupPinCode,
  jobject jcallback)
 {
+    VerifyOrReturnValue(chip::CanCastTo<uint32_t>(iteration), false);
+
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -957,8 +989,8 @@ JNI_METHOD(jboolean, openPairingWindowWithPINCallback)
 
     chip::SetupPayload setupPayload;
     err = AndroidCommissioningWindowOpener::OpenCommissioningWindow(
-        wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), iteration, discriminator,
-        MakeOptional(static_cast<uint32_t>(setupPinCode)), NullOptional, jcallback, setupPayload);
+        wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), static_cast<uint32_t>(iteration),
+        discriminator, MakeOptional(static_cast<uint32_t>(setupPinCode)), NullOptional, jcallback, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -996,8 +1028,8 @@ JNI_METHOD(jbyteArray, getAttestationChallenge)
     SuccessOrExit(err);
     VerifyOrExit(attestationChallenge.size() == 16, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = JniReferences::GetInstance().N2J_ByteArray(env, attestationChallenge.data(), attestationChallenge.size(),
-                                                     attestationChallengeJbytes);
+    err = JniReferences::GetInstance().N2J_ByteArray(
+        env, attestationChallenge.data(), static_cast<uint32_t>(attestationChallenge.size()), attestationChallengeJbytes);
     SuccessOrExit(err);
 
 exit:
@@ -1037,7 +1069,12 @@ JNI_METHOD(jobject, computePaseVerifier)
     ChipLogProgress(Controller, "computePaseVerifier() called");
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    err = wrapper->Controller()->ComputePASEVerifier(iterations, setupPincode, jniSalt.byteSpan(), verifier);
+
+    VerifyOrExit(chip::CanCastTo<uint32_t>(iterations), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(chip::CanCastTo<uint32_t>(setupPincode), err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    err = wrapper->Controller()->ComputePASEVerifier(static_cast<uint32_t>(iterations), static_cast<uint32_t>(setupPincode),
+                                                     jniSalt.byteSpan(), verifier);
     SuccessOrExit(err);
 
     err = verifier.Serialize(serializedVerifierSpan);
@@ -1130,6 +1167,8 @@ JNI_METHOD(void, read)
     err = ParseEventPathList(eventPathList, eventPathParamsList);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error parsing Java event paths: %s", ErrorStr(err)));
 
+    VerifyOrReturn(attributePathParamsList.size() != 0 || eventPathParamsList.size() != 0,
+                   ChipLogError(Controller, "Error parsing Java both event paths and attribute paths"));
     app::ReadPrepareParams params(device->GetSecureSession().Value());
     params.mpAttributePathParamsList    = attributePathParamsList.data();
     params.mAttributePathParamsListSize = attributePathParamsList.size();
@@ -1163,6 +1202,12 @@ JNI_METHOD(void, read)
 CHIP_ERROR ParseAttributePathList(jobject attributePathList, std::vector<app::AttributePathParams> & outAttributePathParamsList)
 {
     jint listSize;
+
+    if (attributePathList == nullptr)
+    {
+        return CHIP_NO_ERROR;
+    }
+
     ReturnErrorOnFailure(JniReferences::GetInstance().GetListSize(attributePathList, listSize));
 
     for (uint8_t i = 0; i < listSize; i++)
@@ -1222,6 +1267,12 @@ CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndpointId,
 CHIP_ERROR ParseEventPathList(jobject eventPathList, std::vector<app::EventPathParams> & outEventPathParamsList)
 {
     jint listSize;
+
+    if (eventPathList == nullptr)
+    {
+        return CHIP_NO_ERROR;
+    }
+
     ReturnErrorOnFailure(JniReferences::GetInstance().GetListSize(eventPathList, listSize));
 
     for (uint8_t i = 0; i < listSize; i++)
@@ -1290,7 +1341,7 @@ CHIP_ERROR GetChipPathIdValue(jobject chipPathId, uint32_t wildcardValue, uint32
 
     jmethodID getIdMethod = nullptr;
     ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, chipPathId, "getId", "()J", &getIdMethod));
-    outValue = env->CallLongMethod(chipPathId, getIdMethod);
+    outValue = static_cast<uint32_t>(env->CallLongMethod(chipPathId, getIdMethod));
     VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
     return CHIP_NO_ERROR;

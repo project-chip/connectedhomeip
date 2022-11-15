@@ -16,7 +16,7 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NSData MTRCertificateDERBytes;
+typedef NSData * MTRCertificateDERBytes;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -45,7 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
  *   key of the nocSigner keypair, since in this case we are not using an
  *   intermediate certificate.
  */
-@property (nonatomic, copy, readonly) NSNumber * fabricID;
+@property (nonatomic, copy, readonly) NSNumber * fabricID MTR_NEWLY_AVAILABLE;
 /**
  * IPK to use for the controller's fabric.  Allowed to change from the last time
  * a controller was started on this fabric if a new IPK has been distributed to
@@ -68,7 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
  * * Will override existing value if not nil. Otherwise existing value will be
  *   used.
  */
-@property (nonatomic, copy, nullable) NSNumber * vendorID;
+@property (nonatomic, copy, nullable) NSNumber * vendorID MTR_NEWLY_AVAILABLE;
 
 /**
  * Node id for this controller.
@@ -98,7 +98,7 @@ NS_ASSUME_NONNULL_BEGIN
  *    generated operational key.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * nodeID;
+@property (nonatomic, copy, nullable) NSNumber * nodeID MTR_NEWLY_AVAILABLE;
 
 /**
  * Root certificate, in X.509 DER form, to use.
@@ -131,7 +131,7 @@ NS_ASSUME_NONNULL_BEGIN
  *   2) The subject DN must match the subject DN of the existing root
  *      certificate.
  */
-@property (nonatomic, copy, nullable) MTRCertificateDERBytes * rootCertificate;
+@property (nonatomic, copy, nullable) MTRCertificateDERBytes rootCertificate;
 
 /**
  * Intermediate certificate, in X.509 DER form, to use.
@@ -163,7 +163,7 @@ NS_ASSUME_NONNULL_BEGIN
  *     allows switching from using an intermediate CA to not using one.
  *
  */
-@property (nonatomic, copy, nullable) MTRCertificateDERBytes * intermediateCertificate;
+@property (nonatomic, copy, nullable) MTRCertificateDERBytes intermediateCertificate;
 
 /**
  * Operational certificate, in X.509 DER form, to use.
@@ -174,7 +174,7 @@ NS_ASSUME_NONNULL_BEGIN
  * If nil, an operational certificate will be determined as described in the
  * documentation for nodeID.
  */
-@property (nonatomic, copy, readonly, nullable) MTRCertificateDERBytes * operationalCertificate;
+@property (nonatomic, copy, readonly, nullable) MTRCertificateDERBytes operationalCertificate;
 
 /**
  * Operational keypair to use.  If operationalCertificate is not nil, the public
@@ -197,7 +197,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * ipk must be 16 bytes in length
  */
-- (instancetype)initWithIPK:(NSData *)ipk fabricID:(NSNumber *)fabricID nocSigner:(id<MTRKeypair>)nocSigner;
+- (instancetype)initWithIPK:(NSData *)ipk fabricID:(NSNumber *)fabricID nocSigner:(id<MTRKeypair>)nocSigner MTR_NEWLY_AVAILABLE;
 
 /**
  * Prepare to initialize a controller with a complete operational certificate
@@ -214,9 +214,28 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithIPK:(NSData *)ipk
          operationalKeypair:(id<MTRKeypair>)operationalKeypair
-     operationalCertificate:(MTRCertificateDERBytes *)operationalCertificate
-    intermediateCertificate:(MTRCertificateDERBytes * _Nullable)intermediateCertificate
-            rootCertificate:(MTRCertificateDERBytes *)rootCertificate;
+     operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
+    intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
+            rootCertificate:(MTRCertificateDERBytes)rootCertificate MTR_NEWLY_AVAILABLE;
+
+@end
+
+@interface MTRDeviceControllerStartupParams (Deprecated)
+
+@property (nonatomic, assign, readonly) uint64_t fabricId MTR_NEWLY_DEPRECATED("Please use fabricID");
+@property (nonatomic, copy, nullable) NSNumber * vendorId MTR_NEWLY_DEPRECATED("Please use vendorID");
+@property (nonatomic, copy, nullable) NSNumber * nodeId MTR_NEWLY_DEPRECATED("Please use nodeID");
+
+- (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner
+                              fabricId:(uint64_t)fabricId
+                                   ipk:(NSData *)ipk MTR_NEWLY_DEPRECATED("Please use initWithIPK:fabricID:nocSigner:");
+- (instancetype)initWithOperationalKeypair:(id<MTRKeypair>)operationalKeypair
+                    operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
+                   intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
+                           rootCertificate:(MTRCertificateDERBytes)rootCertificate
+                                       ipk:(NSData *)ipk
+    MTR_NEWLY_DEPRECATED(
+        "Please use initWithIPK:operationalKeypair:operationalCertificate:intermediateCertificate:rootCertificate:");
 
 @end
 

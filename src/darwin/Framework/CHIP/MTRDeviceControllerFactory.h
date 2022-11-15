@@ -25,19 +25,21 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MTRStorage;
+@protocol MTRPersistentStorageDelegate;
 @protocol MTROTAProviderDelegate;
 @protocol MTRKeypair;
 
 @class MTRDeviceController;
 @class MTRDeviceControllerStartupParams;
 
+MTR_NEWLY_AVAILABLE
 @interface MTRDeviceControllerFactoryParams : NSObject
 /*
  * Storage delegate must be provided for correct functioning of Matter
  * controllers.  It is used to store persistent information for the fabrics the
  * controllers ends up interacting with.
  */
-@property (nonatomic, strong, readonly) id<MTRStorage> storage;
+@property (nonatomic, strong, readonly) id<MTRStorage> storage MTR_NEWLY_AVAILABLE;
 
 /*
  * OTA Provider delegate to be called when an OTA Requestor is requesting a software update.
@@ -66,7 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Whether to run a server capable of accepting incoming CASE
  * connections.  Defaults to NO.
  */
-@property (nonatomic, assign) BOOL shouldStartServer;
+@property (nonatomic, assign) BOOL shouldStartServer MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithStorage:(id<MTRStorage>)storage;
@@ -134,6 +136,25 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
+@end
+
+MTR_NEWLY_DEPRECATED("Please use MTRDeviceControllerFactoryParams")
+@interface MTRControllerFactoryParams : MTRDeviceControllerFactoryParams
+@property (nonatomic, strong, readonly) id<MTRPersistentStorageDelegate> storageDelegate MTR_NEWLY_DEPRECATED(
+    "Please use the storage property");
+@property (nonatomic, assign) BOOL startServer;
+@end
+
+MTR_NEWLY_DEPRECATED("Please use MTRDeviceControllerFactory")
+@interface MTRControllerFactory : NSObject
+@property (readonly, nonatomic) BOOL isRunning;
++ (instancetype)sharedInstance;
+- (BOOL)startup:(MTRControllerFactoryParams *)startupParams;
+- (void)shutdown;
+- (MTRDeviceController * _Nullable)startControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams;
+- (MTRDeviceController * _Nullable)startControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams;
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 @end
 
 NS_ASSUME_NONNULL_END

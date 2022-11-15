@@ -63,7 +63,12 @@ static MTRCommandPath * _Nullable decodeCommandPath(NSArray * _Nullable pathArra
 
 static void decodeReadParams(NSDictionary<NSString *, id> * inParams, MTRReadParams * outParams)
 {
-    outParams.fabricFiltered = [inParams[kFabricFilteredKey] boolValue];
+    NSNumber * _Nullable fabricFiltered = inParams[kFabricFilteredKey];
+    if (fabricFiltered == nil) {
+        outParams.filterByFabric = YES;
+    } else {
+        outParams.filterByFabric = [fabricFiltered boolValue];
+    }
 }
 
 @implementation MTRDeviceController (XPC)
@@ -129,7 +134,7 @@ static void decodeReadParams(NSDictionary<NSString *, id> * inParams, MTRReadPar
         return nil;
     }
     NSMutableDictionary<NSString *, id> * result = [NSMutableDictionary dictionary];
-    result[kFabricFilteredKey] = @(params.fabricFiltered);
+    result[kFabricFilteredKey] = @(params.filterByFabric);
     return result;
 }
 
@@ -143,25 +148,56 @@ static void decodeReadParams(NSDictionary<NSString *, id> * inParams, MTRReadPar
     return result;
 }
 
-+ (NSDictionary<NSString *, id> *)encodeXPCSubscribeParams:(MTRSubscribeParams *)params
++ (NSDictionary<NSString *, id> * _Nullable)encodeXPCSubscribeParams:(MTRSubscribeParams * _Nullable)params
 {
+    if (!params) {
+        return nil;
+    }
+
     NSMutableDictionary<NSString *, id> * result =
         [NSMutableDictionary dictionaryWithDictionary:[MTRDeviceController encodeXPCReadParams:params]];
-    result[kKeepPreviousSubscriptionsKey] = @(params.keepPreviousSubscriptions);
-    result[kAutoResubscribeKey] = @(params.autoResubscribe);
+    result[kKeepPreviousSubscriptionsKey] = @(!params.replaceExistingSubscriptions);
+    result[kAutoResubscribeKey] = @(params.resubscribeIfLost);
     result[kMinIntervalKey] = params.minInterval;
     result[kMaxIntervalKey] = params.maxInterval;
     return result;
 }
 
-+ (MTRSubscribeParams *)decodeXPCSubscribeParams:(NSDictionary<NSString *, id> *)params
++ (MTRSubscribeParams * _Nullable)decodeXPCSubscribeParams:(NSDictionary<NSString *, id> * _Nullable)params
 {
+    if (!params) {
+        return nil;
+    }
+
     MTRSubscribeParams * result = [[MTRSubscribeParams alloc] initWithMinInterval:params[kMinIntervalKey]
                                                                       maxInterval:params[kMaxIntervalKey]];
     decodeReadParams(params, result);
-    result.keepPreviousSubscriptions = [params[kKeepPreviousSubscriptionsKey] boolValue];
-    result.autoResubscribe = [params[kAutoResubscribeKey] boolValue];
+
+    NSNumber * _Nullable keepPreviousSubscriptions = params[kKeepPreviousSubscriptionsKey];
+    if (keepPreviousSubscriptions == nil) {
+        result.replaceExistingSubscriptions = YES;
+    } else {
+        result.replaceExistingSubscriptions = ![keepPreviousSubscriptions boolValue];
+    }
+
+    NSNumber * _Nullable autoResubscribe = params[kAutoResubscribeKey];
+    if (autoResubscribe == nil) {
+        result.resubscribeIfLost = YES;
+    } else {
+        result.resubscribeIfLost = [autoResubscribe boolValue];
+    }
+
     return result;
+}
+
+@end
+
+@implementation MTRDeviceController (Deprecated_XPC)
+
++ (MTRDeviceController *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerID
+                                xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock
+{
+    return [MTRDeviceController sharedControllerWithID:controllerID xpcConnectBlock:xpcConnectBlock];
 }
 
 @end

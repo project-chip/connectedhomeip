@@ -42,23 +42,25 @@ def build_darwin_framework(args):
     if not os.path.exists(abs_path):
         os.mkdir(abs_path)
 
-    sdk = 'macosx' if os.environ.get('SDKROOT') == None else os.environ.get('SDKROOT')
-    arch = platform.machine() if sdk.startswith('macosx') else 'arm64'
-
     command = [
         'xcodebuild',
         '-scheme',
         args.target,
         '-sdk',
-        sdk,
+        args.target_sdk,
         '-project',
         args.project_path,
         '-derivedDataPath',
         abs_path,
-        "PLATFORM_PREFERRED_ARCH={}".format(arch),
+        "PLATFORM_PREFERRED_ARCH={}".format(args.target_arch),
+        # For now disable unguarded-availability-new warnings because we
+        # internally use APIs that we are annotating as only available on
+        # new enough versions.  Maybe we should change out deployment
+        # target versions instead?
+        "OTHER_CFLAGS=${inherited} -Wno-unguarded-availability-new",
     ]
 
-    if sdk != "macosx":
+    if args.target_sdk != "macosx":
         command += [
             # Build Matter.framework as a static library
             "SUPPORTS_TEXT_BASED_API=NO",
@@ -89,6 +91,16 @@ if __name__ == "__main__":
                         default="Matter",
                         help="Name of target to build",
                         required=True)
+    parser.add_argument("--target_sdk",
+                        default="macosx",
+                        help="Set the target sdk",
+                        required=False,
+                        )
+    parser.add_argument("--target_arch",
+                        default=platform.machine(),
+                        help="Set the target architecture",
+                        required=False,
+                        )
     parser.add_argument("--log_path",
                         help="Output log file destination",
                         required=True)

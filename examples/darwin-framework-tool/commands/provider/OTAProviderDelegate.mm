@@ -35,26 +35,26 @@ constexpr uint8_t kUpdateTokenLen = 32;
 {
     if (self = [super init]) {
         _selectedCandidate = [[DeviceSoftwareVersionModel alloc] init];
-        _action = MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed;
+        _action = MTROtaSoftwareUpdateProviderOTAApplyUpdateActionProceed;
         _userConsentState = OTAProviderUserUnknown;
         _delayedActionTime = nil;
         _timedInvokeTimeoutMs = nil;
         _userConsentNeeded = nil;
-        _queryImageStatus = MTROTASoftwareUpdateProviderOTAQueryStatusNotAvailable;
+        _queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable;
     }
     return self;
 }
 
 - (void)handleQueryImageForNodeID:(NSNumber * _Nonnull)nodeID
                        controller:(MTRDeviceController * _Nonnull)controller
-                           params:(MTROTASoftwareUpdateProviderClusterQueryImageParams * _Nonnull)params
-                       completion:(void (^_Nonnull)(MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                           params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams * _Nonnull)params
+                       completion:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
                                       NSError * _Nullable error))completion
 {
     auto isBDXProtocolSupported =
-        [params.protocolsSupported containsObject:@(MTROTASoftwareUpdateProviderOTADownloadProtocolBDXSynchronous)];
+        [params.protocolsSupported containsObject:@(MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXSynchronous)];
     if (!isBDXProtocolSupported) {
-        _selectedCandidate.status = @(MTROTASoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported);
+        _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported);
         completion(_selectedCandidate, nil);
         return;
     }
@@ -62,7 +62,7 @@ constexpr uint8_t kUpdateTokenLen = 32;
     auto hasCandidate = [self SelectOTACandidate:params.vendorId rPID:params.productId rSV:params.softwareVersion];
     if (!hasCandidate) {
         NSLog(@"Unable to select OTA Image.");
-        _selectedCandidate.status = @(MTROTASoftwareUpdateProviderOTAQueryStatusNotAvailable);
+        _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable);
         completion(_selectedCandidate, nil);
         return;
     }
@@ -80,13 +80,13 @@ constexpr uint8_t kUpdateTokenLen = 32;
 
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber * _Nonnull)nodeID
                                controller:(MTRDeviceController * _Nonnull)controller
-                                   params:(MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams * _Nonnull)params
+                                   params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams * _Nonnull)params
                                completion:
-                                   (void (^_Nonnull)(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                   (void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
                                        NSError * _Nullable error))completion
 {
-    MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * applyUpdateResponseParams =
-        [[MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
+    MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * applyUpdateResponseParams =
+        [[MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
     applyUpdateResponseParams.action = @(_action);
     if (_delayedActionTime) {
         applyUpdateResponseParams.delayedActionTime = _delayedActionTime;
@@ -100,7 +100,7 @@ constexpr uint8_t kUpdateTokenLen = 32;
 
 - (void)handleNotifyUpdateAppliedForNodeID:(NSNumber * _Nonnull)nodeID
                                 controller:(MTRDeviceController * _Nonnull)controller
-                                    params:(MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams * _Nonnull)params
+                                    params:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * _Nonnull)params
                                 completion:(MTRStatusCompletion _Nonnull)completion
 {
     completion(nil);

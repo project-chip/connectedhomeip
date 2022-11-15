@@ -218,7 +218,7 @@ public final class ChipIdLookup {
       return "ElectricalMeasurement";
     }
     if (clusterId == 4294048773L) {
-      return "TestCluster";
+      return "UnitTesting";
     }
     return "";
   }

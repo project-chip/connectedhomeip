@@ -57,6 +57,70 @@ static void SetupXPCQueue(void)
     return NO;
 }
 
+- (BOOL)pairDevice:(uint64_t)deviceID
+     discriminator:(uint16_t)discriminator
+      setupPINCode:(uint32_t)setupPINCode
+             error:(NSError * __autoreleasing *)error
+{
+    MTR_LOG_ERROR("MTRDevice doesn't support pairDevice over XPC");
+    if (error != nil) {
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil];
+    }
+    return NO;
+}
+
+- (BOOL)pairDevice:(uint64_t)deviceID
+           address:(NSString *)address
+              port:(uint16_t)port
+     discriminator:(uint16_t)discriminator
+      setupPINCode:(uint32_t)setupPINCode
+             error:(NSError * __autoreleasing *)error
+{
+    MTR_LOG_ERROR("MTRDevice doesn't support pairDevice over XPC");
+    if (error != nil) {
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil];
+    }
+    return NO;
+}
+
+- (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error
+{
+    MTR_LOG_ERROR("MTRDevice doesn't support pairDevice over XPC");
+    if (error != nil) {
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil];
+    }
+    return NO;
+}
+
+- (BOOL)commissionDevice:(uint64_t)deviceID
+     commissioningParams:(MTRCommissioningParameters *)commissioningParams
+                   error:(NSError * __autoreleasing *)error
+{
+    MTR_LOG_ERROR("MTRDevice doesn't support commissionDevice over XPC");
+    if (error != nil) {
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil];
+    }
+    return NO;
+}
+
+- (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
+{
+    MTR_LOG_ERROR("MTRDevice doesn't support stopDevicePairing over XPC");
+    if (error != nil) {
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil];
+    }
+    return NO;
+}
+
+- (nullable MTRBaseDevice *)getDeviceBeingCommissioned:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
+{
+    MTR_LOG_ERROR("MTRDevice doesn't support getDeviceBeingCommissioned over XPC");
+    if (error != nil) {
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil];
+    }
+    return nil;
+}
+
 - (BOOL)commissionNodeWithID:(NSNumber *)nodeID
          commissioningParams:(MTRCommissioningParameters *)commissioningParams
                        error:(NSError * __autoreleasing *)error;
@@ -86,11 +150,28 @@ static void SetupXPCQueue(void)
     return nil;
 }
 
+- (BOOL)getBaseDevice:(uint64_t)deviceID
+                queue:(dispatch_queue_t)queue
+    completionHandler:(MTRDeviceConnectionCallback)completionHandler
+{
+    // Consumers expect their getAnyDeviceControllerWithCompletion to be called
+    // under here if we don't have a controller id aleady, so make sure we do
+    // that.
+    [self fetchControllerIdWithQueue:queue
+                          completion:^(id _Nullable controllerID, NSError * _Nullable error) {
+                              if (error != nil) {
+                                  completionHandler(nil, error);
+                                  return;
+                              }
+
+                              __auto_type * device = [self baseDeviceForNodeID:@(deviceID)];
+                              completionHandler(device, nil);
+                          }];
+    return YES;
+}
+
 - (void)fetchControllerIdWithQueue:(dispatch_queue_t)queue completion:(MTRFetchControllerIDCompletion)completion
 {
-    // Capture the proxy handle so that it won't be released prior to block call.
-    __block MTRDeviceControllerXPCProxyHandle * handleRetainer = nil;
-
     dispatch_async(_workQueue, ^{
         dispatch_group_t group = dispatch_group_create();
         if (!self.controllerID) {
@@ -103,9 +184,10 @@ static void SetupXPCQueue(void)
                             MTR_LOG_ERROR("Failed to fetch any shared remote controller");
                         } else {
                             self.controllerID = controller;
-                            handleRetainer = handle;
                         }
                         dispatch_group_leave(group);
+                        __auto_type handleRetainer = handle;
+                        (void) handleRetainer;
                     }];
                 } else {
                     MTR_LOG_ERROR("XPC disconnected while retrieving any shared remote controller");
@@ -115,9 +197,9 @@ static void SetupXPCQueue(void)
         }
         dispatch_group_notify(group, queue, ^{
             if (self.controllerID) {
-                completion(self.controllerID, handleRetainer, nil);
+                completion(self.controllerID, nil);
             } else {
-                completion(nil, nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+                completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
             }
         });
     });
@@ -126,6 +208,22 @@ static void SetupXPCQueue(void)
 - (MTRBaseDevice *)baseDeviceForNodeID:(NSNumber *)nodeID
 {
     return [[MTRDeviceOverXPC alloc] initWithControllerOverXPC:self deviceID:nodeID xpcConnection:self.xpcConnection];
+}
+
+- (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error
+{
+    MTR_LOG_ERROR("MTRDevice doesn't support openPairingWindow over XPC");
+    return NO;
+}
+
+- (nullable NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
+                                       duration:(NSUInteger)duration
+                                  discriminator:(NSUInteger)discriminator
+                                       setupPIN:(NSUInteger)setupPIN
+                                          error:(NSError * __autoreleasing *)error
+{
+    MTR_LOG_ERROR("MTRDevice doesn't support openPairingWindow over XPC");
+    return nil;
 }
 
 - (instancetype)initWithControllerID:(id)controllerID

@@ -40,6 +40,7 @@
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#include <lib/support/Pool.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <platform/PlatformManager.h>
 
@@ -239,6 +240,49 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         }
 
         if (startupParams.otaProviderDelegate) {
+            if (![startupParams.otaProviderDelegate respondsToSelector:@selector(handleQueryImageForNodeID:
+                                                                                                controller:params:completion:)]
+                && ![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleQueryImageForNodeID:controller:params:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleQueryImageForNodeID");
+                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
+                return;
+            }
+            if (![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completion:)]
+                && ![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleApplyUpdateRequestForNodeID");
+                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
+                return;
+            }
+            if (![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:controller:params:completion:)]
+                && ![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:controller:params:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleNotifyUpdateAppliedForNodeID");
+                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
+                return;
+            }
+            if (![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleBDXTransferSessionBeginForNodeID:
+                                                                             controller:fileDesignator:offset:completion:)]
+                && ![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector
+                    (handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleBDXTransferSessionBeginForNodeID");
+                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
+                return;
+            }
+            if (![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completion:)]
+                && ![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleBDXQueryForNodeID:
+                                                              controller:blockSize:blockIndex:bytesToSkip:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleBDXQueryForNodeID");
+                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
+                return;
+            }
             _otaProviderDelegateBridge = new MTROTAProviderDelegateBridge(startupParams.otaProviderDelegate);
             if (_otaProviderDelegateBridge == nil) {
                 MTR_LOG_ERROR("Error: %@", kErrorOtaProviderInit);
@@ -330,6 +374,19 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
             MTR_LOG_ERROR("Error: %@", kErrorControllerFactoryInit);
             return;
         }
+
+        // This needs to happen after DeviceControllerFactory::Init,
+        // because that creates (lazily, by calling functions with
+        // static variables in them) some static-lifetime objects.
+        chip::HeapObjectPoolExitHandling::IgnoreLeaksOnExit();
+
+        // Make sure we don't leave a system state running while we have no
+        // controllers started.  This is working around the fact that a system
+        // state is brought up live on factory init, and not when it comes time
+        // to actually start a controller, and does not actually clean itself up
+        // until its refcount (which starts as 0) goes to 0.
+        _controllerFactory->RetainSystemState();
+        _controllerFactory->ReleaseSystemState();
 
         self->_running = YES;
     });
@@ -600,7 +657,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         }
     }
 
-    *fabric = fabricTable.FindFabric(pubKey, [params.fabricID unsignedLongLongValue]);
+    *fabric = fabricTable.FindFabric(pubKey, params.fabricID.unsignedLongLongValue);
     return YES;
 }
 
@@ -710,6 +767,72 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     _shouldStartServer = NO;
 
     return self;
+}
+
+@end
+
+@implementation MTRControllerFactory
+- (BOOL)isRunning
+{
+    return [[MTRDeviceControllerFactory sharedInstance] isRunning];
+}
+
++ (instancetype)sharedInstance
+{
+    // We could try to delegate to MTRDeviceControllerFactory's sharedInstance
+    // here, but then we would have to add the backwards-compar selectors to
+    // MTRDeviceControllerFactory, etc.  Just forward things along instead.
+    // This works because we never accept an MTRControllerFactory as an argument
+    // in any of our public APIs.
+    static MTRControllerFactory * factory = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        // initialize the factory.
+        factory = [[MTRControllerFactory alloc] init];
+    });
+    return factory;
+}
+
+- (BOOL)startup:(MTRControllerFactoryParams *)startupParams
+{
+    return [[MTRDeviceControllerFactory sharedInstance] startControllerFactory:startupParams error:nil];
+}
+
+- (void)shutdown
+{
+    return [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+}
+
+- (MTRDeviceController * _Nullable)startControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams
+{
+    return [[MTRDeviceControllerFactory sharedInstance] createControllerOnExistingFabric:startupParams error:nil];
+}
+
+- (MTRDeviceController * _Nullable)startControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams
+{
+    return [[MTRDeviceControllerFactory sharedInstance] createControllerOnNewFabric:startupParams error:nil];
+}
+
+@end
+
+@implementation MTRControllerFactoryParams
+
+- (id<MTRPersistentStorageDelegate>)storageDelegate
+{
+    // Cast is safe, because MTRPersistentStorageDelegate doesn't add
+    // any selectors to MTRStorage, so anything implementing
+    // MTRStorage also implements MTRPersistentStorageDelegate.
+    return static_cast<id<MTRPersistentStorageDelegate>>(self.storage);
+}
+
+- (BOOL)startServer
+{
+    return self.shouldStartServer;
+}
+
+- (void)setStartServer:(BOOL)startServer
+{
+    self.shouldStartServer = startServer;
 }
 
 @end

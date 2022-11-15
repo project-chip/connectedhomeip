@@ -216,7 +216,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID, INT16S, 2, 0),  
 //   - Descriptor
 //   - Bridged Device Basic
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedTempSensorClusters)
-DECLARE_DYNAMIC_CLUSTER(ZCL_TEMP_MEASUREMENT_CLUSTER_ID, tempSensorAttrs, nullptr, nullptr),
+DECLARE_DYNAMIC_CLUSTER(ZCL_TEMPERATURE_MEASUREMENT_CLUSTER_ID, tempSensorAttrs, nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER(ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, bridgedDeviceBasicAttrs, nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER_LIST_END;
@@ -270,7 +270,7 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
         {
             gDevices[index] = dev;
             EmberAfStatus ret;
-            while (1)
+            while (true)
             {
                 // Todo: Update this to schedule the work rather than use this lock
                 DeviceLayer::StackLock lock;
@@ -754,7 +754,7 @@ void * bridge_polling_thread(void * context)
 {
     bool light1_added = true;
     bool light2_added = false;
-    while (1)
+    while (true)
     {
         if (kbhit())
         {

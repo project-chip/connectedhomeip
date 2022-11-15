@@ -33,11 +33,11 @@
       auto * listHolder_{{depth}} = new ListHolder<ListMemberType_{{depth}}>({{source}}Size);
       listFreer.add(listHolder_{{depth}});
 
-      for (size_t i_{{depth}} = 0; i_{{depth}} < static_cast<size_t>({{source}}Size); ++i_{{depth}}) {
+      for (jint i_{{depth}} = 0; i_{{depth}} < {{source}}Size; ++i_{{depth}}) {
         jobject element_{{depth}};
         chip::JniReferences::GetInstance().GetListItem({{source}}, i_{{depth}}, element_{{depth}});
         {{encode_value(
-           "listHolder_{}->mList[i_{}]".format(depth, depth),
+           "listHolder_{}->mList[static_cast<uint32_t>(i_{})]".format(depth, depth),
            "element_{}".format(depth),
            depth+1, encodable.without_list()
         )}}
