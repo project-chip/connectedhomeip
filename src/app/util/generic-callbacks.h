@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af-types.h>
+#include <app/util/attribute-metadata.h>
 #include <app/util/basic-types.h>
 
 #include <app/CommandHandler.h>

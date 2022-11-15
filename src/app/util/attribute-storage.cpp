@@ -26,8 +26,15 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/LockTracker.h>
 
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/ids/Attributes.h>
+// Attribute storage depends on knowing the current layout/setup of attributes
+// and corresponding callbacks. Specifically:
+//   - zap-generated/callback.h is needed because endpoint_config will call the
+//     corresponding callbacks and the include for it is:
+//       util/common.h
+//           -> util/af.h
+//           -> util/config.h
+//           -> zap-generated/endpoint_config.h
+#include <app-common/zap-generated/callback.h>
 
 using namespace chip;
 
