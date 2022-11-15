@@ -2266,7 +2266,7 @@ namespace AccountLogin {
 namespace ElectricalMeasurement {
 } // namespace ElectricalMeasurement
 
-namespace TestCluster {
+namespace UnitTesting {
 
 // Enum for SimpleEnum
 enum class SimpleEnum : uint8_t
@@ -2321,7 +2321,7 @@ enum class SimpleBitmap : uint8_t
     kValueB = 0x2,
     kValueC = 0x4,
 };
-} // namespace TestCluster
+} // namespace UnitTesting
 
 namespace FaultInjection {
 

@@ -3528,7 +3528,7 @@ server cluster ElectricalMeasurement = 2820 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-server cluster TestCluster = 4294048773 {
+server cluster UnitTesting = 4294048773 {
   enum SimpleEnum : ENUM8 {
     kUnspecified = 0;
     kValueA = 1;
@@ -4705,7 +4705,7 @@ endpoint 1 {
     ram      attribute clusterRevision default = 3;
   }
 
-  server cluster TestCluster {
+  server cluster UnitTesting {
     ram      attribute boolean;
     ram      attribute bitmap8;
     ram      attribute bitmap16;

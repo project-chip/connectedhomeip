@@ -10700,17 +10700,17 @@ void MTRElectricalMeasurementAttributeListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRTestClusterBitmap8AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value)
+void MTRUnitTestingBitmap8AttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterBitmap8AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingBitmap8AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterBitmap8AttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingBitmap8AttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10724,17 +10724,17 @@ void MTRTestClusterBitmap8AttributeCallbackSubscriptionBridge::OnSubscriptionEst
     }
 }
 
-void MTRTestClusterBitmap16AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value)
+void MTRUnitTestingBitmap16AttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterBitmap16AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingBitmap16AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterBitmap16AttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingBitmap16AttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10748,17 +10748,17 @@ void MTRTestClusterBitmap16AttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void MTRTestClusterBitmap32AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value)
+void MTRUnitTestingBitmap32AttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterBitmap32AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingBitmap32AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterBitmap32AttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingBitmap32AttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10772,17 +10772,17 @@ void MTRTestClusterBitmap32AttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void MTRTestClusterBitmap64AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value)
+void MTRUnitTestingBitmap64AttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedLongLong:value.Raw()];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterBitmap64AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingBitmap64AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterBitmap64AttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingBitmap64AttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10796,7 +10796,7 @@ void MTRTestClusterBitmap64AttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void MTRTestClusterListInt8uListAttributeCallbackBridge::OnSuccessFn(
+void MTRUnitTestingListInt8uListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -10819,9 +10819,9 @@ void MTRTestClusterListInt8uListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterListInt8uListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingListInt8uListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterListInt8uListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingListInt8uListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10835,7 +10835,7 @@ void MTRTestClusterListInt8uListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRTestClusterListOctetStringListAttributeCallbackBridge::OnSuccessFn(
+void MTRUnitTestingListOctetStringListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -10858,9 +10858,9 @@ void MTRTestClusterListOctetStringListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterListOctetStringListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingListOctetStringListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterListOctetStringListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingListOctetStringListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10874,8 +10874,8 @@ void MTRTestClusterListOctetStringListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRTestClusterListStructOctetStringListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
+void MTRUnitTestingListStructOctetStringListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestListStructOctet::DecodableType> &
         value)
 {
     NSArray * _Nonnull objCValue;
@@ -10884,8 +10884,8 @@ void MTRTestClusterListStructOctetStringListAttributeCallbackBridge::OnSuccessFn
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRTestClusterClusterTestListStructOctet * newElement_0;
-            newElement_0 = [MTRTestClusterClusterTestListStructOctet new];
+            MTRUnitTestingClusterTestListStructOctet * newElement_0;
+            newElement_0 = [MTRUnitTestingClusterTestListStructOctet new];
             newElement_0.member1 = [NSNumber numberWithUnsignedLongLong:entry_0.member1];
             newElement_0.member2 = [NSData dataWithBytes:entry_0.member2.data() length:entry_0.member2.size()];
             [array_0 addObject:newElement_0];
@@ -10900,9 +10900,9 @@ void MTRTestClusterListStructOctetStringListAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterListStructOctetStringListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingListStructOctetStringListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterListStructOctetStringListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingListStructOctetStringListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10916,9 +10916,9 @@ void MTRTestClusterListStructOctetStringListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::OnSuccessFn(void * context,
+void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & value)
+        chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10926,8 +10926,8 @@ void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::O
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRTestClusterClusterNullablesAndOptionalsStruct * newElement_0;
-            newElement_0 = [MTRTestClusterClusterNullablesAndOptionalsStruct new];
+            MTRUnitTestingClusterNullablesAndOptionalsStruct * newElement_0;
+            newElement_0 = [MTRUnitTestingClusterNullablesAndOptionalsStruct new];
             if (entry_0.nullableInt.IsNull()) {
                 newElement_0.nullableInt = nil;
             } else {
@@ -10977,7 +10977,7 @@ void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::O
             if (entry_0.nullableStruct.IsNull()) {
                 newElement_0.nullableStruct = nil;
             } else {
-                newElement_0.nullableStruct = [MTRTestClusterClusterSimpleStruct new];
+                newElement_0.nullableStruct = [MTRUnitTestingClusterSimpleStruct new];
                 newElement_0.nullableStruct.a = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().a];
                 newElement_0.nullableStruct.b = [NSNumber numberWithBool:entry_0.nullableStruct.Value().b];
                 newElement_0.nullableStruct.c =
@@ -10992,7 +10992,7 @@ void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                 newElement_0.nullableStruct.h = [NSNumber numberWithDouble:entry_0.nullableStruct.Value().h];
             }
             if (entry_0.optionalStruct.HasValue()) {
-                newElement_0.optionalStruct = [MTRTestClusterClusterSimpleStruct new];
+                newElement_0.optionalStruct = [MTRUnitTestingClusterSimpleStruct new];
                 newElement_0.optionalStruct.a = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().a];
                 newElement_0.optionalStruct.b = [NSNumber numberWithBool:entry_0.optionalStruct.Value().b];
                 newElement_0.optionalStruct.c =
@@ -11012,7 +11012,7 @@ void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                 if (entry_0.nullableOptionalStruct.Value().IsNull()) {
                     newElement_0.nullableOptionalStruct = nil;
                 } else {
-                    newElement_0.nullableOptionalStruct = [MTRTestClusterClusterSimpleStruct new];
+                    newElement_0.nullableOptionalStruct = [MTRUnitTestingClusterSimpleStruct new];
                     newElement_0.nullableOptionalStruct.a =
                         [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().a];
                     newElement_0.nullableOptionalStruct.b =
@@ -11112,9 +11112,9 @@ void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11128,11 +11128,11 @@ void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackSubscript
     }
 }
 
-void MTRTestClusterStructAttrStructAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType & value)
+void MTRUnitTestingStructAttrStructAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType & value)
 {
-    MTRTestClusterClusterSimpleStruct * _Nonnull objCValue;
-    objCValue = [MTRTestClusterClusterSimpleStruct new];
+    MTRUnitTestingClusterSimpleStruct * _Nonnull objCValue;
+    objCValue = [MTRUnitTestingClusterSimpleStruct new];
     objCValue.a = [NSNumber numberWithUnsignedChar:value.a];
     objCValue.b = [NSNumber numberWithBool:value.b];
     objCValue.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.c)];
@@ -11144,9 +11144,9 @@ void MTRTestClusterStructAttrStructAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterStructAttrStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingStructAttrStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterStructAttrStructAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingStructAttrStructAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11160,7 +11160,7 @@ void MTRTestClusterStructAttrStructAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRTestClusterListLongOctetStringListAttributeCallbackBridge::OnSuccessFn(
+void MTRUnitTestingListLongOctetStringListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -11183,9 +11183,9 @@ void MTRTestClusterListLongOctetStringListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterListLongOctetStringListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingListLongOctetStringListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterListLongOctetStringListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingListLongOctetStringListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11199,8 +11199,8 @@ void MTRTestClusterListLongOctetStringListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRTestClusterListFabricScopedListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType> & value)
+void MTRUnitTestingListFabricScopedListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestFabricScoped::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11208,8 +11208,8 @@ void MTRTestClusterListFabricScopedListAttributeCallbackBridge::OnSuccessFn(void
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRTestClusterClusterTestFabricScoped * newElement_0;
-            newElement_0 = [MTRTestClusterClusterTestFabricScoped new];
+            MTRUnitTestingClusterTestFabricScoped * newElement_0;
+            newElement_0 = [MTRUnitTestingClusterTestFabricScoped new];
             newElement_0.fabricSensitiveInt8u = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveInt8u];
             if (entry_0.optionalFabricSensitiveInt8u.HasValue()) {
                 newElement_0.optionalFabricSensitiveInt8u =
@@ -11236,7 +11236,7 @@ void MTRTestClusterListFabricScopedListAttributeCallbackBridge::OnSuccessFn(void
             newElement_0.fabricSensitiveCharString = [[NSString alloc] initWithBytes:entry_0.fabricSensitiveCharString.data()
                                                                               length:entry_0.fabricSensitiveCharString.size()
                                                                             encoding:NSUTF8StringEncoding];
-            newElement_0.fabricSensitiveStruct = [MTRTestClusterClusterSimpleStruct new];
+            newElement_0.fabricSensitiveStruct = [MTRUnitTestingClusterSimpleStruct new];
             newElement_0.fabricSensitiveStruct.a = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveStruct.a];
             newElement_0.fabricSensitiveStruct.b = [NSNumber numberWithBool:entry_0.fabricSensitiveStruct.b];
             newElement_0.fabricSensitiveStruct.c =
@@ -11278,9 +11278,9 @@ void MTRTestClusterListFabricScopedListAttributeCallbackBridge::OnSuccessFn(void
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterListFabricScopedListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingListFabricScopedListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterListFabricScopedListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingListFabricScopedListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11294,8 +11294,8 @@ void MTRTestClusterListFabricScopedListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRTestClusterNullableBitmap8AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value)
+void MTRUnitTestingNullableBitmap8AttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -11306,9 +11306,9 @@ void MTRTestClusterNullableBitmap8AttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterNullableBitmap8AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingNullableBitmap8AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterNullableBitmap8AttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingNullableBitmap8AttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11322,8 +11322,8 @@ void MTRTestClusterNullableBitmap8AttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRTestClusterNullableBitmap16AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value)
+void MTRUnitTestingNullableBitmap16AttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -11334,9 +11334,9 @@ void MTRTestClusterNullableBitmap16AttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterNullableBitmap16AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingNullableBitmap16AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterNullableBitmap16AttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingNullableBitmap16AttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11350,8 +11350,8 @@ void MTRTestClusterNullableBitmap16AttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRTestClusterNullableBitmap32AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value)
+void MTRUnitTestingNullableBitmap32AttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -11362,9 +11362,9 @@ void MTRTestClusterNullableBitmap32AttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterNullableBitmap32AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingNullableBitmap32AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterNullableBitmap32AttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingNullableBitmap32AttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11378,8 +11378,8 @@ void MTRTestClusterNullableBitmap32AttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRTestClusterNullableBitmap64AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value)
+void MTRUnitTestingNullableBitmap64AttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -11390,9 +11390,9 @@ void MTRTestClusterNullableBitmap64AttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterNullableBitmap64AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingNullableBitmap64AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterNullableBitmap64AttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingNullableBitmap64AttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11406,14 +11406,14 @@ void MTRTestClusterNullableBitmap64AttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRTestClusterNullableStructStructAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> & value)
+void MTRUnitTestingNullableStructStructAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType> & value)
 {
-    MTRTestClusterClusterSimpleStruct * _Nullable objCValue;
+    MTRUnitTestingClusterSimpleStruct * _Nullable objCValue;
     if (value.IsNull()) {
         objCValue = nil;
     } else {
-        objCValue = [MTRTestClusterClusterSimpleStruct new];
+        objCValue = [MTRUnitTestingClusterSimpleStruct new];
         objCValue.a = [NSNumber numberWithUnsignedChar:value.Value().a];
         objCValue.b = [NSNumber numberWithBool:value.Value().b];
         objCValue.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value().c)];
@@ -11428,9 +11428,9 @@ void MTRTestClusterNullableStructStructAttributeCallbackBridge::OnSuccessFn(void
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterNullableStructStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingNullableStructStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterNullableStructStructAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingNullableStructStructAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11444,7 +11444,7 @@ void MTRTestClusterNullableStructStructAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRTestClusterGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRUnitTestingGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -11467,9 +11467,9 @@ void MTRTestClusterGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11483,7 +11483,7 @@ void MTRTestClusterGeneratedCommandListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRTestClusterAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRUnitTestingAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -11506,9 +11506,9 @@ void MTRTestClusterAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11522,7 +11522,7 @@ void MTRTestClusterAcceptedCommandListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRTestClusterAttributeListListAttributeCallbackBridge::OnSuccessFn(
+void MTRUnitTestingAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -11545,9 +11545,9 @@ void MTRTestClusterAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingAttributeListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -12789,50 +12789,50 @@ void MTRAccountLoginClusterGetSetupPINResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void MTRTestClusterClusterTestSpecificResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType & data)
+void MTRUnitTestingClusterTestSpecificResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType & data)
 {
-    auto * response = [MTRTestClusterClusterTestSpecificResponseParams new];
+    auto * response = [MTRUnitTestingClusterTestSpecificResponseParams new];
     {
         response.returnValue = [NSNumber numberWithUnsignedChar:data.returnValue];
     }
     DispatchSuccess(context, response);
 };
 
-void MTRTestClusterClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType & data)
+void MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType & data)
 {
-    auto * response = [MTRTestClusterClusterTestAddArgumentsResponseParams new];
+    auto * response = [MTRUnitTestingClusterTestAddArgumentsResponseParams new];
     {
         response.returnValue = [NSNumber numberWithUnsignedChar:data.returnValue];
     }
     DispatchSuccess(context, response);
 };
 
-void MTRTestClusterClusterTestSimpleArgumentResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::TestCluster::Commands::TestSimpleArgumentResponse::DecodableType & data)
+void MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType & data)
 {
-    auto * response = [MTRTestClusterClusterTestSimpleArgumentResponseParams new];
+    auto * response = [MTRUnitTestingClusterTestSimpleArgumentResponseParams new];
     {
         response.returnValue = [NSNumber numberWithBool:data.returnValue];
     }
     DispatchSuccess(context, response);
 };
 
-void MTRTestClusterClusterTestStructArrayArgumentResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType & data)
+void MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType & data)
 {
-    auto * response = [MTRTestClusterClusterTestStructArrayArgumentResponseParams new];
+    auto * response = [MTRUnitTestingClusterTestStructArrayArgumentResponseParams new];
     { { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
     auto iter_0 = data.arg1.begin();
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
-        MTRTestClusterClusterNestedStructList * newElement_0;
-        newElement_0 = [MTRTestClusterClusterNestedStructList new];
+        MTRUnitTestingClusterNestedStructList * newElement_0;
+        newElement_0 = [MTRUnitTestingClusterNestedStructList new];
         newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
         newElement_0.b = [NSNumber numberWithBool:entry_0.b];
-        newElement_0.c = [MTRTestClusterClusterSimpleStruct new];
+        newElement_0.c = [MTRUnitTestingClusterSimpleStruct new];
         newElement_0.c.a = [NSNumber numberWithUnsignedChar:entry_0.c.a];
         newElement_0.c.b = [NSNumber numberWithBool:entry_0.c.b];
         newElement_0.c.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c.c)];
@@ -12848,8 +12848,8 @@ void MTRTestClusterClusterTestStructArrayArgumentResponseCallbackBridge::OnSucce
             auto iter_2 = entry_0.d.begin();
             while (iter_2.Next()) {
                 auto & entry_2 = iter_2.GetValue();
-                MTRTestClusterClusterSimpleStruct * newElement_2;
-                newElement_2 = [MTRTestClusterClusterSimpleStruct new];
+                MTRUnitTestingClusterSimpleStruct * newElement_2;
+                newElement_2 = [MTRUnitTestingClusterSimpleStruct new];
                 newElement_2.a = [NSNumber numberWithUnsignedChar:entry_2.a];
                 newElement_2.b = [NSNumber numberWithBool:entry_2.b];
                 newElement_2.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.c)];
@@ -12932,8 +12932,8 @@ void MTRTestClusterClusterTestStructArrayArgumentResponseCallbackBridge::OnSucce
 auto iter_0 = data.arg2.begin();
 while (iter_0.Next()) {
     auto & entry_0 = iter_0.GetValue();
-    MTRTestClusterClusterSimpleStruct * newElement_0;
-    newElement_0 = [MTRTestClusterClusterSimpleStruct new];
+    MTRUnitTestingClusterSimpleStruct * newElement_0;
+    newElement_0 = [MTRUnitTestingClusterSimpleStruct new];
     newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
     newElement_0.b = [NSNumber numberWithBool:entry_0.b];
     newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
@@ -12996,10 +12996,10 @@ DispatchSuccess(context, response);
 }
 ;
 
-void MTRTestClusterClusterTestListInt8UReverseResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType & data)
+void MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType & data)
 {
-    auto * response = [MTRTestClusterClusterTestListInt8UReverseResponseParams new];
+    auto * response = [MTRUnitTestingClusterTestListInt8UReverseResponseParams new];
     {
         { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
@@ -13021,10 +13021,10 @@ void MTRTestClusterClusterTestListInt8UReverseResponseCallbackBridge::OnSuccessF
     DispatchSuccess(context, response);
 };
 
-void MTRTestClusterClusterTestEnumsResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType & data)
+void MTRUnitTestingClusterTestEnumsResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::UnitTesting::Commands::TestEnumsResponse::DecodableType & data)
 {
-    auto * response = [MTRTestClusterClusterTestEnumsResponseParams new];
+    auto * response = [MTRUnitTestingClusterTestEnumsResponseParams new];
     {
         response.arg1 = [NSNumber numberWithUnsignedShort:chip::to_underlying(data.arg1)];
     }
@@ -13034,10 +13034,10 @@ void MTRTestClusterClusterTestEnumsResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void MTRTestClusterClusterTestNullableOptionalResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType & data)
+void MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalResponse::DecodableType & data)
 {
-    auto * response = [MTRTestClusterClusterTestNullableOptionalResponseParams new];
+    auto * response = [MTRUnitTestingClusterTestNullableOptionalResponseParams new];
     {
         response.wasPresent = [NSNumber numberWithBool:data.wasPresent];
     }
@@ -13069,10 +13069,10 @@ void MTRTestClusterClusterTestNullableOptionalResponseCallbackBridge::OnSuccessF
     DispatchSuccess(context, response);
 };
 
-void MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::TestCluster::Commands::TestComplexNullableOptionalResponse::DecodableType & data)
+void MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType & data)
 {
-    auto * response = [MTRTestClusterClusterTestComplexNullableOptionalResponseParams new];
+    auto * response = [MTRUnitTestingClusterTestComplexNullableOptionalResponseParams new];
     {
         response.nullableIntWasNull = [NSNumber numberWithBool:data.nullableIntWasNull];
     }
@@ -13158,7 +13158,7 @@ void MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge::OnS
     }
     {
         if (data.nullableStructValue.HasValue()) {
-            response.nullableStructValue = [MTRTestClusterClusterSimpleStruct new];
+            response.nullableStructValue = [MTRUnitTestingClusterSimpleStruct new];
             response.nullableStructValue.a = [NSNumber numberWithUnsignedChar:data.nullableStructValue.Value().a];
             response.nullableStructValue.b = [NSNumber numberWithBool:data.nullableStructValue.Value().b];
             response.nullableStructValue.c =
@@ -13180,7 +13180,7 @@ void MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge::OnS
     }
     {
         if (data.optionalStructValue.HasValue()) {
-            response.optionalStructValue = [MTRTestClusterClusterSimpleStruct new];
+            response.optionalStructValue = [MTRUnitTestingClusterSimpleStruct new];
             response.optionalStructValue.a = [NSNumber numberWithUnsignedChar:data.optionalStructValue.Value().a];
             response.optionalStructValue.b = [NSNumber numberWithBool:data.optionalStructValue.Value().b];
             response.optionalStructValue.c =
@@ -13209,7 +13209,7 @@ void MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge::OnS
     }
     {
         if (data.nullableOptionalStructValue.HasValue()) {
-            response.nullableOptionalStructValue = [MTRTestClusterClusterSimpleStruct new];
+            response.nullableOptionalStructValue = [MTRUnitTestingClusterSimpleStruct new];
             response.nullableOptionalStructValue.a = [NSNumber numberWithUnsignedChar:data.nullableOptionalStructValue.Value().a];
             response.nullableOptionalStructValue.b = [NSNumber numberWithBool:data.nullableOptionalStructValue.Value().b];
             response.nullableOptionalStructValue.c =
@@ -13313,22 +13313,22 @@ void MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge::OnS
     DispatchSuccess(context, response);
 };
 
-void MTRTestClusterClusterBooleanResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType & data)
+void MTRUnitTestingClusterBooleanResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::UnitTesting::Commands::BooleanResponse::DecodableType & data)
 {
-    auto * response = [MTRTestClusterClusterBooleanResponseParams new];
+    auto * response = [MTRUnitTestingClusterBooleanResponseParams new];
     {
         response.value = [NSNumber numberWithBool:data.value];
     }
     DispatchSuccess(context, response);
 };
 
-void MTRTestClusterClusterSimpleStructResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType & data)
+void MTRUnitTestingClusterSimpleStructResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::UnitTesting::Commands::SimpleStructResponse::DecodableType & data)
 {
-    auto * response = [MTRTestClusterClusterSimpleStructResponseParams new];
+    auto * response = [MTRUnitTestingClusterSimpleStructResponseParams new];
     {
-        response.arg1 = [MTRTestClusterClusterSimpleStruct new];
+        response.arg1 = [MTRUnitTestingClusterSimpleStruct new];
         response.arg1.a = [NSNumber numberWithUnsignedChar:data.arg1.a];
         response.arg1.b = [NSNumber numberWithBool:data.arg1.b];
         response.arg1.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg1.c)];
@@ -13343,20 +13343,20 @@ void MTRTestClusterClusterSimpleStructResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void MTRTestClusterClusterTestEmitTestEventResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType & data)
+void MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType & data)
 {
-    auto * response = [MTRTestClusterClusterTestEmitTestEventResponseParams new];
+    auto * response = [MTRUnitTestingClusterTestEmitTestEventResponseParams new];
     {
         response.value = [NSNumber numberWithUnsignedLongLong:data.value];
     }
     DispatchSuccess(context, response);
 };
 
-void MTRTestClusterClusterTestEmitTestFabricScopedEventResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & data)
+void MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & data)
 {
-    auto * response = [MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams new];
+    auto * response = [MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams new];
     {
         response.value = [NSNumber numberWithUnsignedLongLong:data.value];
     }
@@ -19286,17 +19286,17 @@ void MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackSub
     }
 }
 
-void MTRTestClusterClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TestCluster::SimpleEnum value)
+void MTRUnitTestingClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::UnitTesting::SimpleEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -19310,8 +19310,8 @@ void MTRTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRNullableTestClusterClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> & value)
+void MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19322,9 +19322,9 @@ void MTRNullableTestClusterClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
