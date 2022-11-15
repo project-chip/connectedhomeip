@@ -29,7 +29,8 @@
 // Attribute storage depends on knowing the current layout/setup of attributes
 // and corresponding callbacks. Specifically:
 //   - zap-generated/callback.h is needed because endpoint_config will call the
-//     corresponding callbacks and the include for it is:
+//     corresponding callbacks (via GENERATED_FUNCTION_ARRAYS) and the include
+//     for it is:
 //       util/common.h
 //           -> util/af.h
 //           -> util/config.h
