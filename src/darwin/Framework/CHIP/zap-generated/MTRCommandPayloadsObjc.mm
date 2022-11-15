@@ -6978,7 +6978,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestParams
+@implementation MTRUnitTestingClusterTestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6989,7 +6989,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
@@ -7003,7 +7003,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestSpecificResponseParams
+@implementation MTRUnitTestingClusterTestSpecificResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7016,7 +7016,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestSpecificResponseParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestSpecificResponseParams alloc] init];
 
     other.returnValue = self.returnValue;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7032,7 +7032,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestNotHandledParams
+@implementation MTRUnitTestingClusterTestNotHandledParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7043,7 +7043,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestNotHandledParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestNotHandledParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
@@ -7057,7 +7057,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestAddArgumentsResponseParams
+@implementation MTRUnitTestingClusterTestAddArgumentsResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7070,7 +7070,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestAddArgumentsResponseParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestAddArgumentsResponseParams alloc] init];
 
     other.returnValue = self.returnValue;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7086,7 +7086,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestSpecificParams
+@implementation MTRUnitTestingClusterTestSpecificParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7097,7 +7097,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestSpecificParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestSpecificParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
@@ -7111,7 +7111,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestSimpleArgumentResponseParams
+@implementation MTRUnitTestingClusterTestSimpleArgumentResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7124,7 +7124,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestSimpleArgumentResponseParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestSimpleArgumentResponseParams alloc] init];
 
     other.returnValue = self.returnValue;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7140,7 +7140,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestUnknownCommandParams
+@implementation MTRUnitTestingClusterTestUnknownCommandParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7151,7 +7151,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestUnknownCommandParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestUnknownCommandParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
@@ -7165,7 +7165,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestStructArrayArgumentResponseParams
+@implementation MTRUnitTestingClusterTestStructArrayArgumentResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7188,7 +7188,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestStructArrayArgumentResponseParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestStructArrayArgumentResponseParams alloc] init];
 
     other.arg1 = self.arg1;
     other.arg2 = self.arg2;
@@ -7209,7 +7209,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestAddArgumentsParams
+@implementation MTRUnitTestingClusterTestAddArgumentsParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7224,7 +7224,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestAddArgumentsParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestAddArgumentsParams alloc] init];
 
     other.arg1 = self.arg1;
     other.arg2 = self.arg2;
@@ -7241,7 +7241,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestListInt8UReverseResponseParams
+@implementation MTRUnitTestingClusterTestListInt8UReverseResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7254,7 +7254,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestListInt8UReverseResponseParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestListInt8UReverseResponseParams alloc] init];
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7269,7 +7269,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestSimpleArgumentRequestParams
+@implementation MTRUnitTestingClusterTestSimpleArgumentRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7282,7 +7282,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestSimpleArgumentRequestParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestSimpleArgumentRequestParams alloc] init];
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7297,7 +7297,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestEnumsResponseParams
+@implementation MTRUnitTestingClusterTestEnumsResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7312,7 +7312,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestEnumsResponseParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestEnumsResponseParams alloc] init];
 
     other.arg1 = self.arg1;
     other.arg2 = self.arg2;
@@ -7329,7 +7329,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestStructArrayArgumentRequestParams
+@implementation MTRUnitTestingClusterTestStructArrayArgumentRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7352,7 +7352,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestStructArrayArgumentRequestParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestStructArrayArgumentRequestParams alloc] init];
 
     other.arg1 = self.arg1;
     other.arg2 = self.arg2;
@@ -7373,7 +7373,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestNullableOptionalResponseParams
+@implementation MTRUnitTestingClusterTestNullableOptionalResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7392,7 +7392,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestNullableOptionalResponseParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestNullableOptionalResponseParams alloc] init];
 
     other.wasPresent = self.wasPresent;
     other.wasNull = self.wasNull;
@@ -7411,12 +7411,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestStructArgumentRequestParams
+@implementation MTRUnitTestingClusterTestStructArgumentRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _arg1 = [MTRTestClusterClusterSimpleStruct new];
+        _arg1 = [MTRUnitTestingClusterSimpleStruct new];
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -7424,7 +7424,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestStructArgumentRequestParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestStructArgumentRequestParams alloc] init];
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7439,7 +7439,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestComplexNullableOptionalResponseParams
+@implementation MTRUnitTestingClusterTestComplexNullableOptionalResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7506,7 +7506,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestComplexNullableOptionalResponseParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestComplexNullableOptionalResponseParams alloc] init];
 
     other.nullableIntWasNull = self.nullableIntWasNull;
     other.nullableIntValue = self.nullableIntValue;
@@ -7563,12 +7563,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestNestedStructArgumentRequestParams
+@implementation MTRUnitTestingClusterTestNestedStructArgumentRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _arg1 = [MTRTestClusterClusterNestedStruct new];
+        _arg1 = [MTRUnitTestingClusterNestedStruct new];
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -7576,7 +7576,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestNestedStructArgumentRequestParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestNestedStructArgumentRequestParams alloc] init];
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7591,7 +7591,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterBooleanResponseParams
+@implementation MTRUnitTestingClusterBooleanResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7604,7 +7604,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterBooleanResponseParams alloc] init];
+    auto other = [[MTRUnitTestingClusterBooleanResponseParams alloc] init];
 
     other.value = self.value;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7619,7 +7619,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestListStructArgumentRequestParams
+@implementation MTRUnitTestingClusterTestListStructArgumentRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7632,7 +7632,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestListStructArgumentRequestParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestListStructArgumentRequestParams alloc] init];
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7647,12 +7647,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterSimpleStructResponseParams
+@implementation MTRUnitTestingClusterSimpleStructResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _arg1 = [MTRTestClusterClusterSimpleStruct new];
+        _arg1 = [MTRUnitTestingClusterSimpleStruct new];
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -7660,7 +7660,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterSimpleStructResponseParams alloc] init];
+    auto other = [[MTRUnitTestingClusterSimpleStructResponseParams alloc] init];
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7675,7 +7675,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestListInt8UArgumentRequestParams
+@implementation MTRUnitTestingClusterTestListInt8UArgumentRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7688,7 +7688,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestListInt8UArgumentRequestParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestListInt8UArgumentRequestParams alloc] init];
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7703,7 +7703,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestEmitTestEventResponseParams
+@implementation MTRUnitTestingClusterTestEmitTestEventResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7716,7 +7716,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestEmitTestEventResponseParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestEmitTestEventResponseParams alloc] init];
 
     other.value = self.value;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7731,12 +7731,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestNestedStructListArgumentRequestParams
+@implementation MTRUnitTestingClusterTestNestedStructListArgumentRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _arg1 = [MTRTestClusterClusterNestedStructList new];
+        _arg1 = [MTRUnitTestingClusterNestedStructList new];
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -7744,7 +7744,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestNestedStructListArgumentRequestParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestNestedStructListArgumentRequestParams alloc] init];
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7759,7 +7759,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams
+@implementation MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7772,7 +7772,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams alloc] init];
 
     other.value = self.value;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7787,7 +7787,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestListNestedStructListArgumentRequestParams
+@implementation MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7800,7 +7800,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestListNestedStructListArgumentRequestParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams alloc] init];
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7815,7 +7815,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestListInt8UReverseRequestParams
+@implementation MTRUnitTestingClusterTestListInt8UReverseRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7828,7 +7828,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestListInt8UReverseRequestParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestListInt8UReverseRequestParams alloc] init];
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7843,7 +7843,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestEnumsRequestParams
+@implementation MTRUnitTestingClusterTestEnumsRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7858,7 +7858,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestEnumsRequestParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestEnumsRequestParams alloc] init];
 
     other.arg1 = self.arg1;
     other.arg2 = self.arg2;
@@ -7875,7 +7875,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestNullableOptionalRequestParams
+@implementation MTRUnitTestingClusterTestNullableOptionalRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7888,7 +7888,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestNullableOptionalRequestParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestNullableOptionalRequestParams alloc] init];
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7903,7 +7903,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestComplexNullableOptionalRequestParams
+@implementation MTRUnitTestingClusterTestComplexNullableOptionalRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7938,7 +7938,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestComplexNullableOptionalRequestParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestComplexNullableOptionalRequestParams alloc] init];
 
     other.nullableInt = self.nullableInt;
     other.optionalInt = self.optionalInt;
@@ -7970,12 +7970,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterSimpleStructEchoRequestParams
+@implementation MTRUnitTestingClusterSimpleStructEchoRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _arg1 = [MTRTestClusterClusterSimpleStruct new];
+        _arg1 = [MTRUnitTestingClusterSimpleStruct new];
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -7983,7 +7983,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterSimpleStructEchoRequestParams alloc] init];
+    auto other = [[MTRUnitTestingClusterSimpleStructEchoRequestParams alloc] init];
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7998,7 +7998,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTimedInvokeRequestParams
+@implementation MTRUnitTestingClusterTimedInvokeRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -8009,7 +8009,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTimedInvokeRequestParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTimedInvokeRequestParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
@@ -8023,7 +8023,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams
+@implementation MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -8036,7 +8036,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams alloc] init];
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -8051,7 +8051,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestEmitTestEventRequestParams
+@implementation MTRUnitTestingClusterTestEmitTestEventRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -8068,7 +8068,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestEmitTestEventRequestParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestEmitTestEventRequestParams alloc] init];
 
     other.arg1 = self.arg1;
     other.arg2 = self.arg2;
@@ -8086,7 +8086,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams
+@implementation MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -8099,7 +8099,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams alloc] init];
+    auto other = [[MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams alloc] init];
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;

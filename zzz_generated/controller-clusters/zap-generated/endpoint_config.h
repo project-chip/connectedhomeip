@@ -788,7 +788,7 @@
       .generatedCommandList = nullptr ,\
     },\
   { \
-      /* Endpoint: 1, Cluster: Test Cluster (client) */ \
+      /* Endpoint: 1, Cluster: Unit Testing (client) */ \
       .clusterId = 0xFFF1FC05,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \

@@ -40,13 +40,6 @@
 #pragma GCC diagnostic pop
 #endif
 
-// KVS is only available for Genio when these macros are defined.
-//#if defined(CHIP_KVS_SECTOR_COUNT) && defined(CHIP_KVS_BASE_SECTOR_INDEX)
-//#define CHIP_KVS_AVAILABLE 1
-//#else // defined(CHIP_KVS_SECTOR_COUNT) && defined(CHIP_KVS_BASE_ADDRESS)
-//#define CHIP_KVS_AVAILABLE 0
-//#endif // defined(CHIP_KVS_SECTOR_COUNT) && defined(CHIP_KVS_BASE_ADDRESS)
-
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {

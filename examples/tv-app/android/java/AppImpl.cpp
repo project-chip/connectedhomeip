@@ -403,6 +403,19 @@ Access::Privilege ContentAppFactoryImpl::GetVendorPrivilege(uint16_t vendorId)
     return Access::Privilege::kOperate;
 }
 
+std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoint(EndpointId endpointId, uint16_t vendorId,
+                                                                                   uint16_t productId)
+{
+    if (endpointId == kLocalVideoPlayerEndpointId)
+    {
+        return { chip::app::Clusters::Descriptor::Id,      chip::app::Clusters::OnOff::Id,
+                 chip::app::Clusters::WakeOnLan::Id,       chip::app::Clusters::MediaPlayback::Id,
+                 chip::app::Clusters::LowPower::Id,        chip::app::Clusters::KeypadInput::Id,
+                 chip::app::Clusters::ContentLauncher::Id, chip::app::Clusters::AudioOutput::Id };
+    }
+    return {};
+}
+
 } // namespace AppPlatform
 } // namespace chip
 

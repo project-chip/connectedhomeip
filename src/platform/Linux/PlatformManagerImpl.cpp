@@ -288,6 +288,14 @@ CHIP_ERROR PlatformManagerImpl::RunOnGLibMainLoopThread(GSourceFunc callback, vo
     VerifyOrReturnError(context != nullptr,
                         (ChipLogDetail(DeviceLayer, "Failed to get GLib main loop context"), CHIP_ERROR_INTERNAL));
 
+    // If we've been called from the GLib main loop thread itself, there is no reason to wait
+    // for the callback, as it will be executed immediately by the g_main_context_invoke() call
+    // below. Using a callback indirection in this case would cause a deadlock.
+    if (g_main_context_is_owner(context))
+    {
+        wait = false;
+    }
+
     if (wait)
     {
         std::unique_lock<std::mutex> lock(mGLibMainLoopCallbackIndirectionMutex);

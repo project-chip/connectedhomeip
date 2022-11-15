@@ -76,12 +76,7 @@ const BL602Config::Key BL602Config::kCounterKey_TotalOperationalHours = { "total
 
 CHIP_ERROR BL602Config::Init()
 {
-    EfErrCode err = easyflash_init();
-    if (EF_NO_ERR == err)
-        return CHIP_NO_ERROR;
-
-    log_error("easyflash_init() failed. err: %d\r\n", err);
-    return CHIP_ERROR_NO_MEMORY;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BL602Config::ReadConfigValue(Key key, bool & val)

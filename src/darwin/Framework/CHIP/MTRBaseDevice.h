@@ -20,6 +20,7 @@
 #import <Matter/MTRCluster.h>
 
 @class MTRSetupPayload;
+@class MTRDeviceController;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -126,6 +127,14 @@ extern NSString * const MTRArrayValueType;
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
+ * Create a device object with the given node id and controller.  This
+ * will always succeed, even if there is no such node id on the controller's
+ * fabric, but attempts to actually use the MTRBaseDevice will fail
+ * (asynchronously) in that case.
+ */
++ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller MTR_NEWLY_AVAILABLE;
+
+/**
  * Subscribe to receive attribute reports for everything (all endpoints, all
  * clusters, all attributes, all events) on the device.
  *
@@ -165,9 +174,7 @@ extern NSString * const MTRArrayValueType;
  * attempts fail.
  */
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                minInterval:(NSNumber *)minInterval
-                maxInterval:(NSNumber *)maxInterval
-                     params:(MTRSubscribeParams * _Nullable)params
+                     params:(MTRSubscribeParams *)params
     attributeCacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
      attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
          eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
@@ -258,8 +265,6 @@ extern NSString * const MTRArrayValueType;
 - (void)subscribeToAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
                                   clusterID:(NSNumber * _Nullable)clusterID
                                 attributeID:(NSNumber * _Nullable)attributeID
-                                minInterval:(NSNumber *)minInterval
-                                maxInterval:(NSNumber *)maxInterval
                                      params:(MTRSubscribeParams * _Nullable)params
                                       queue:(dispatch_queue_t)queue
                               reportHandler:(MTRDeviceResponseHandler)reportHandler
@@ -439,7 +444,7 @@ MTR_NEWLY_AVAILABLE
                            reportHandler:(MTRDeviceResponseHandler)reportHandler
                  subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
     MTR_NEWLY_DEPRECATED("Please use "
-                         "subscribeToAttributesWithEndpointID:clusterID:attributeID:params:minInterval:maxInterval:queue:"
+                         "subscribeToAttributesWithEndpointID:clusterID:attributeID:params:queue:"
                          "reportHandler:subscriptionEstablished:");
 
 - (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)queue
