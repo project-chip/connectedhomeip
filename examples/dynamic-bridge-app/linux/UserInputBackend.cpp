@@ -120,7 +120,7 @@ void AddCluster(const std::vector<std::string> & tokens)
     auto c = CreateCluster(cluster_name.c_str());
     if (c)
     {
-        g_pending->AddCluster(std::make_unique<DynamicCluster>(std::move(c)));
+        g_pending->AddCluster(std::make_unique<DynamicCluster>(std::move(c), c->GetIncomingCommandList(), c->GetOutgoingCommandList()));
     }
     else
     {
