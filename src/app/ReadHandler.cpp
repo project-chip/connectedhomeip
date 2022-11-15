@@ -46,6 +46,7 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
     VerifyOrDie(apExchangeContext != nullptr);
 
     mExchangeCtx.Grab(apExchangeContext);
+    mExchangeMgr = apExchangeContext->GetExchangeMgr();
 
     mInteractionType            = aInteractionType;
     mLastWrittenEventsBytes     = 0;
@@ -185,7 +186,7 @@ CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aSt
     {
         VerifyOrReturnLogError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
-        auto exchange = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
+        auto exchange = mExchangeMgr->NewContext(mSessionHandle.Get().Value(), this);
         VerifyOrReturnLogError(exchange != nullptr, CHIP_ERROR_INCORRECT_STATE);
         mExchangeCtx.Grab(exchange);
     }
@@ -205,7 +206,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     {
         VerifyOrReturnLogError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
-        auto exchange = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
+        auto exchange = mExchangeMgr->NewContext(mSessionHandle.Get().Value(), this);
         VerifyOrReturnLogError(exchange != nullptr, CHIP_ERROR_INCORRECT_STATE);
         mExchangeCtx.Grab(exchange);
     }

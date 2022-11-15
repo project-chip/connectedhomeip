@@ -436,6 +436,7 @@ private:
     SessionHolder mSessionHandle;
 
     Messaging::ExchangeHolder mExchangeCtx;
+    Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
     ObjectList<AttributePathParams> * mpAttributePathList   = nullptr;
     ObjectList<EventPathParams> * mpEventPathList           = nullptr;

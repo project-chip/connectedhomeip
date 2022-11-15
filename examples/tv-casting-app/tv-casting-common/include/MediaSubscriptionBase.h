@@ -39,6 +39,6 @@ public:
                                  mTvEndpoint);
 
         return cluster.template SubscribeAttribute<TypeInfo>(context, successFn, failureFn, minInterval, maxInterval,
-                                                             onSubscriptionEstablished);
+                                                             onSubscriptionEstablished, nullptr, true, true);
     }
 };
