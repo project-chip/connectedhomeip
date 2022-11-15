@@ -199,26 +199,26 @@
 
 
 /**
- * @def BTP_CONN_RSP_TIMEOUT
+ * @def BTP_CONN_RSP_TIMEOUT_MS
  *
  * @brief
  *   Maximum amount of time, in milliseconds, after sending or receiving a BTP Session Handshake
  *   request to wait for connection establishment.
  */
-#ifndef BTP_CONN_RSP_TIMEOUT
-#define BTP_CONN_RSP_TIMEOUT 15000 // 15 seconds
-#endif // BTP_CONN_RSP_TIMEOUT
+#ifndef BTP_CONN_RSP_TIMEOUT_MS
+#define BTP_CONN_RSP_TIMEOUT_MS 15000 // 15 seconds
+#endif // BTP_CONN_RSP_TIMEOUT_MS
 
 /**
- * @def BTP_ACK_TIMEOUT
+ * @def BTP_ACK_TIMEOUT_MS
  *
  * @brief
  *   Maximum amount of time, in milliseconds, after sending a BTP packet to wait for
  *   an acknowledgement. When the ack is not received within this period the BTP session is closed.
  */
-#ifndef BTP_ACK_TIMEOUT
-#define BTP_ACK_TIMEOUT 15000 // 15 seconds
-#endif // BTP_ACK_TIMEOUT
+#ifndef BTP_ACK_TIMEOUT_MS
+#define BTP_ACK_TIMEOUT_MS 15000 // 15 seconds
+#endif // BTP_ACK_TIMEOUT_MS
 
 // clang-format on
 

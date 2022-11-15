@@ -93,7 +93,7 @@ public:
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
         case Transport::Type::kBle:
-            return System::Clock::Milliseconds32(BTP_ACK_TIMEOUT);
+            return System::Clock::Milliseconds32(BTP_ACK_TIMEOUT_MS);
         default:
             break;
         }

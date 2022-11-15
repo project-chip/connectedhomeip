@@ -1407,7 +1407,7 @@ bool BLEEndPoint::SendIndication(PacketBufferHandle && buf)
 CHIP_ERROR BLEEndPoint::StartConnectTimer()
 {
     const CHIP_ERROR timerErr =
-        mBle->mSystemLayer->StartTimer(System::Clock::Milliseconds32(BTP_CONN_RSP_TIMEOUT), HandleConnectTimeout, this);
+        mBle->mSystemLayer->StartTimer(System::Clock::Milliseconds32(BTP_CONN_RSP_TIMEOUT_MS), HandleConnectTimeout, this);
     ReturnErrorOnFailure(timerErr);
     mTimerStateFlags.Set(TimerStateFlag::kConnectTimerRunning);
 
@@ -1416,8 +1416,8 @@ CHIP_ERROR BLEEndPoint::StartConnectTimer()
 
 CHIP_ERROR BLEEndPoint::StartReceiveConnectionTimer()
 {
-    const CHIP_ERROR timerErr =
-        mBle->mSystemLayer->StartTimer(System::Clock::Milliseconds32(BTP_CONN_RSP_TIMEOUT), HandleReceiveConnectionTimeout, this);
+    const CHIP_ERROR timerErr = mBle->mSystemLayer->StartTimer(System::Clock::Milliseconds32(BTP_CONN_RSP_TIMEOUT_MS),
+                                                               HandleReceiveConnectionTimeout, this);
     ReturnErrorOnFailure(timerErr);
     mTimerStateFlags.Set(TimerStateFlag::kReceiveConnectionTimerRunning);
 
@@ -1429,7 +1429,7 @@ CHIP_ERROR BLEEndPoint::StartAckReceivedTimer()
     if (!mTimerStateFlags.Has(TimerStateFlag::kAckReceivedTimerRunning))
     {
         const CHIP_ERROR timerErr =
-            mBle->mSystemLayer->StartTimer(System::Clock::Milliseconds32(BTP_ACK_TIMEOUT), HandleAckReceivedTimeout, this);
+            mBle->mSystemLayer->StartTimer(System::Clock::Milliseconds32(BTP_ACK_TIMEOUT_MS), HandleAckReceivedTimeout, this);
         ReturnErrorOnFailure(timerErr);
 
         mTimerStateFlags.Set(TimerStateFlag::kAckReceivedTimerRunning);
