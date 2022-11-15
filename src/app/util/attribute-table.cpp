@@ -21,8 +21,8 @@
 
 // for pulling in defines dealing with EITHER server or client
 #include "app/util/common.h"
-#include <app-common/zap-generated/callback.h>
 #include <app/util/error-mapping.h>
+#include <app/util/generic-callbacks.h>
 #include <app/util/odd-sized-integers.h>
 
 #include <app/reporting/reporting.h>
@@ -394,7 +394,7 @@ EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, Attribut
     record.clusterId   = cluster;
     record.attributeId = attributeID;
     status             = emAfReadOrWriteAttribute(&record, &metadata, dataPtr, readLength,
-                                      false); // write?
+                                                  false); // write?
 
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {

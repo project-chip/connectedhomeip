@@ -18,13 +18,13 @@
 #include "app/util/common.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/print-cluster.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/ember-compatibility-functions.h>
+#include <app/util/generic-callbacks.h>
 
 // TODO: figure out a clear path for compile-time codegen
 #include <app/PluginApplicationCallbacks.h>
@@ -380,23 +380,23 @@ EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberA
 
 void emberAfCopyInt16u(uint8_t * data, uint16_t index, uint16_t x)
 {
-    data[index]     = (uint8_t)(((x)) & 0xFF);
-    data[index + 1] = (uint8_t)(((x) >> 8) & 0xFF);
+    data[index]     = (uint8_t) (((x)) & 0xFF);
+    data[index + 1] = (uint8_t) (((x) >> 8) & 0xFF);
 }
 
 void emberAfCopyInt24u(uint8_t * data, uint16_t index, uint32_t x)
 {
-    data[index]     = (uint8_t)(((x)) & 0xFF);
-    data[index + 1] = (uint8_t)(((x) >> 8) & 0xFF);
-    data[index + 2] = (uint8_t)(((x) >> 16) & 0xFF);
+    data[index]     = (uint8_t) (((x)) & 0xFF);
+    data[index + 1] = (uint8_t) (((x) >> 8) & 0xFF);
+    data[index + 2] = (uint8_t) (((x) >> 16) & 0xFF);
 }
 
 void emberAfCopyInt32u(uint8_t * data, uint16_t index, uint32_t x)
 {
-    data[index]     = (uint8_t)(((x)) & 0xFF);
-    data[index + 1] = (uint8_t)(((x) >> 8) & 0xFF);
-    data[index + 2] = (uint8_t)(((x) >> 16) & 0xFF);
-    data[index + 3] = (uint8_t)(((x) >> 24) & 0xFF);
+    data[index]     = (uint8_t) (((x)) & 0xFF);
+    data[index + 1] = (uint8_t) (((x) >> 8) & 0xFF);
+    data[index + 2] = (uint8_t) (((x) >> 16) & 0xFF);
+    data[index + 3] = (uint8_t) (((x) >> 24) & 0xFF);
 }
 
 void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size)
@@ -621,8 +621,7 @@ void slabAssert(const char * file, int line)
     (void) line; // Unused parameter
     // Wait forever until the watchdog fires
     while (true)
-    {
-    }
+    {}
 }
 
 #define ENCODED_8BIT_CHANPG_PAGE_MASK 0xE0         // top 3 bits
