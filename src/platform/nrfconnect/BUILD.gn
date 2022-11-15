@@ -42,6 +42,8 @@ static_library("nrfconnect") {
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
     "ExternalFlashManager.h",
+    "DiagnosticDataProviderImplNrf.cpp",
+    "DiagnosticDataProviderImplNrf.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.h",
     "PlatformManagerImpl.h",
@@ -78,6 +80,19 @@ static_library("nrfconnect") {
       sources += [ "../OpenThread/DnssdImpl.cpp" ]
       deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
+  }
+
+  if (chip_enable_wifi) {
+    sources += [
+      "../Zephyr/InetUtils.cpp",
+      "../Zephyr/InetUtils.h",
+      "wifi/ConnectivityManagerImplWiFi.cpp",
+      "wifi/ConnectivityManagerImplWiFi.h",
+      "wifi/NrfWiFiDriver.cpp",
+      "wifi/NrfWiFiDriver.h",
+      "wifi/WiFiManager.cpp",
+      "wifi/WiFiManager.h",
+    ]
   }
 
   if (chip_enable_nfc) {

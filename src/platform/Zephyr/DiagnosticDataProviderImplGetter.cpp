@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,26 +15,15 @@
  *    limitations under the License.
  */
 
-/ {
-	chosen {
-		nordic,pm-ext-flash = &mx25r64;
-	};
+#include "DiagnosticDataProviderImpl.h"
 
-};
+namespace chip {
+namespace DeviceLayer {
 
-/* Disable unused peripherals to reduce power consumption */
-&adc {
-	status = "disabled";
-};
-&i2c1 {
-	status = "disabled";
-};
-&pwm0 {
-	status = "disabled";
-};
-&spi2 {
-	status = "disabled";
-};
-&usbd {
-	status = "disabled";
-};
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
+}
+
+} // namespace DeviceLayer
+} // namespace chip
