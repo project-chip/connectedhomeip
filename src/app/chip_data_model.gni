@@ -173,8 +173,6 @@ template("chip_data_model") {
     }
 
     if (defined(invoker.zap_pregenerated_dir)) {
-      sources += [ "${invoker.zap_pregenerated_dir}/callback-stub.cpp" ]
-
       if (chip_controller) {
         sources += [ "${invoker.zap_pregenerated_dir}/CHIPClusters.h" ]
       }
