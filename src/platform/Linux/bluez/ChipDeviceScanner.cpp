@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -259,7 +259,7 @@ void ChipDeviceScanner::RemoveDevice(BluezDevice1 * device)
 
     if (!bluez_adapter1_call_remove_device_sync(mAdapter, devicePath, nullptr, &error))
     {
-        ChipLogDetail(Ble, "Failed to remove device %s: %s", devicePath, error->message);
+        ChipLogDetail(Ble, "Failed to remove device %s: %s", StringOrNullMarker(devicePath), error->message);
         g_error_free(error);
     }
 }
