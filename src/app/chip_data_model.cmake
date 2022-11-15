@@ -100,6 +100,8 @@ function(chip_configure_data_model APP_TARGET)
 
         target_include_directories(${APP_TARGET} PRIVATE "${APP_GEN_DIR}")
         add_dependencies(${APP_TARGET} ${APP_TARGET}-codegen)
+    else()
+        set(APP_GEN_FILES)
     endif()
 
     target_sources(${APP_TARGET} PRIVATE
