@@ -13,12 +13,12 @@
 class MTR{{> @partial-block}}Bridge : public MTRCallbackBridge<{{>callbackType}}>
 {
 public:
-    MTR{{> @partial-block}}Bridge(dispatch_queue_t queue, ResponseHandler handler, bool keepAlive = false)
-      : MTRCallbackBridge<{{>callbackType}}>(queue, handler, OnSuccessFn, keepAlive)
+    MTR{{> @partial-block}}Bridge(dispatch_queue_t queue, ResponseHandler handler)
+      : MTRCallbackBridge<{{>callbackType}}>(queue, handler, OnSuccessFn)
       {};
 
-    MTR{{> @partial-block}}Bridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, bool keepAlive = false)
-      : MTRCallbackBridge<{{>callbackType}}>(queue, handler, action, OnSuccessFn, keepAlive)
+    MTR{{> @partial-block}}Bridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action)
+      : MTRCallbackBridge<{{>callbackType}}>(queue, handler, action, OnSuccessFn)
       {};
 
     static void OnSuccessFn(void * context
@@ -43,11 +43,13 @@ class MTR{{> @partial-block}}SubscriptionBridge : public MTR{{> @partial-block}}
 {
 public:
     MTR{{> @partial-block}}SubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, MTRSubscriptionEstablishedHandler establishedHandler)
-      : MTR{{> @partial-block}}Bridge(queue, handler, action, true),
+      : MTR{{> @partial-block}}Bridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
       {}
 
     static void OnSubscriptionEstablished(void * context);
+    using MTR{{> @partial-block}}Bridge::OnDone;
+    using MTR{{> @partial-block}}Bridge::KeepAliveOnCallback;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -110,5 +112,6 @@ void MTR{{> @partial-block}}SubscriptionBridge::OnSubscriptionEstablished(void *
          self->mEstablishedHandler = nil;
      }
 }
+
 {{/unless}}
 {{/if}}
