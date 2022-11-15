@@ -5196,6 +5196,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -5216,6 +5217,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestParams")
+@interface MTRTestClusterClusterTestParams : MTRUnitTestingClusterTestParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestSpecificResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull returnValue;
@@ -5238,6 +5245,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSpecificResponseParams")
+@interface MTRTestClusterClusterTestSpecificResponseParams : MTRUnitTestingClusterTestSpecificResponseParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestNotHandledParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -5258,6 +5271,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNotHandledParams")
+@interface MTRTestClusterClusterTestNotHandledParams : MTRUnitTestingClusterTestNotHandledParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestAddArgumentsResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull returnValue;
@@ -5280,6 +5299,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestAddArgumentsResponseParams")
+@interface MTRTestClusterClusterTestAddArgumentsResponseParams : MTRUnitTestingClusterTestAddArgumentsResponseParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestSpecificParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -5300,6 +5325,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSpecificParams")
+@interface MTRTestClusterClusterTestSpecificParams : MTRUnitTestingClusterTestSpecificParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestSimpleArgumentResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull returnValue;
@@ -5322,6 +5353,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleArgumentResponseParams")
+@interface MTRTestClusterClusterTestSimpleArgumentResponseParams : MTRUnitTestingClusterTestSimpleArgumentResponseParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestUnknownCommandParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -5342,6 +5379,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestUnknownCommandParams")
+@interface MTRTestClusterClusterTestUnknownCommandParams : MTRUnitTestingClusterTestUnknownCommandParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestStructArrayArgumentResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSArray * _Nonnull arg1;
@@ -5374,6 +5417,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentResponseParams")
+@interface MTRTestClusterClusterTestStructArrayArgumentResponseParams : MTRUnitTestingClusterTestStructArrayArgumentResponseParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestAddArgumentsParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull arg1;
@@ -5398,6 +5447,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestAddArgumentsParams")
+@interface MTRTestClusterClusterTestAddArgumentsParams : MTRUnitTestingClusterTestAddArgumentsParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestListInt8UReverseResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSArray * _Nonnull arg1;
@@ -5420,6 +5475,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseResponseParams")
+@interface MTRTestClusterClusterTestListInt8UReverseResponseParams : MTRUnitTestingClusterTestListInt8UReverseResponseParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestSimpleArgumentRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull arg1;
@@ -5442,6 +5503,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleArgumentRequestParams")
+@interface MTRTestClusterClusterTestSimpleArgumentRequestParams : MTRUnitTestingClusterTestSimpleArgumentRequestParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestEnumsResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull arg1;
@@ -5466,6 +5533,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsResponseParams")
+@interface MTRTestClusterClusterTestEnumsResponseParams : MTRUnitTestingClusterTestEnumsResponseParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestStructArrayArgumentRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSArray * _Nonnull arg1;
@@ -5498,6 +5571,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentRequestParams")
+@interface MTRTestClusterClusterTestStructArrayArgumentRequestParams : MTRUnitTestingClusterTestStructArrayArgumentRequestParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestNullableOptionalResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull wasPresent;
@@ -5526,6 +5605,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalResponseParams")
+@interface MTRTestClusterClusterTestNullableOptionalResponseParams : MTRUnitTestingClusterTestNullableOptionalResponseParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestStructArgumentRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull arg1;
@@ -5548,6 +5633,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestStructArgumentRequestParams")
+@interface MTRTestClusterClusterTestStructArgumentRequestParams : MTRUnitTestingClusterTestStructArgumentRequestParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestComplexNullableOptionalResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull nullableIntWasNull;
@@ -5624,6 +5715,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptionalResponseParams")
+@interface MTRTestClusterClusterTestComplexNullableOptionalResponseParams
+    : MTRUnitTestingClusterTestComplexNullableOptionalResponseParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestNestedStructArgumentRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) MTRUnitTestingClusterNestedStruct * _Nonnull arg1;
@@ -5646,6 +5744,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructArgumentRequestParams")
+@interface MTRTestClusterClusterTestNestedStructArgumentRequestParams : MTRUnitTestingClusterTestNestedStructArgumentRequestParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterBooleanResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull value;
@@ -5668,6 +5772,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterBooleanResponseParams")
+@interface MTRTestClusterClusterBooleanResponseParams : MTRUnitTestingClusterBooleanResponseParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestListStructArgumentRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSArray * _Nonnull arg1;
@@ -5690,6 +5800,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListStructArgumentRequestParams")
+@interface MTRTestClusterClusterTestListStructArgumentRequestParams : MTRUnitTestingClusterTestListStructArgumentRequestParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterSimpleStructResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull arg1;
@@ -5712,6 +5828,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterSimpleStructResponseParams")
+@interface MTRTestClusterClusterSimpleStructResponseParams : MTRUnitTestingClusterSimpleStructResponseParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestListInt8UArgumentRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSArray * _Nonnull arg1;
@@ -5734,6 +5856,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UArgumentRequestParams")
+@interface MTRTestClusterClusterTestListInt8UArgumentRequestParams : MTRUnitTestingClusterTestListInt8UArgumentRequestParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestEmitTestEventResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull value;
@@ -5756,6 +5884,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventResponseParams")
+@interface MTRTestClusterClusterTestEmitTestEventResponseParams : MTRUnitTestingClusterTestEmitTestEventResponseParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestNestedStructListArgumentRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) MTRUnitTestingClusterNestedStructList * _Nonnull arg1;
@@ -5778,6 +5912,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructListArgumentRequestParams")
+@interface MTRTestClusterClusterTestNestedStructListArgumentRequestParams
+    : MTRUnitTestingClusterTestNestedStructListArgumentRequestParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull value;
@@ -5800,6 +5941,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams")
+@interface MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams
+    : MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSArray * _Nonnull arg1;
@@ -5822,6 +5970,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams")
+@interface MTRTestClusterClusterTestListNestedStructListArgumentRequestParams
+    : MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestListInt8UReverseRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSArray * _Nonnull arg1;
@@ -5844,6 +5999,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseRequestParams")
+@interface MTRTestClusterClusterTestListInt8UReverseRequestParams : MTRUnitTestingClusterTestListInt8UReverseRequestParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestEnumsRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull arg1;
@@ -5868,6 +6029,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsRequestParams")
+@interface MTRTestClusterClusterTestEnumsRequestParams : MTRUnitTestingClusterTestEnumsRequestParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestNullableOptionalRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nullable arg1;
@@ -5890,6 +6057,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalRequestParams")
+@interface MTRTestClusterClusterTestNullableOptionalRequestParams : MTRUnitTestingClusterTestNullableOptionalRequestParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestComplexNullableOptionalRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nullable nullableInt;
@@ -5934,6 +6107,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptionalRequestParams")
+@interface MTRTestClusterClusterTestComplexNullableOptionalRequestParams
+    : MTRUnitTestingClusterTestComplexNullableOptionalRequestParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterSimpleStructEchoRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull arg1;
@@ -5956,6 +6136,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterSimpleStructEchoRequestParams")
+@interface MTRTestClusterClusterSimpleStructEchoRequestParams : MTRUnitTestingClusterSimpleStructEchoRequestParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTimedInvokeRequestParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -5976,6 +6162,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTimedInvokeRequestParams")
+@interface MTRTestClusterClusterTimedInvokeRequestParams : MTRUnitTestingClusterTimedInvokeRequestParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nullable arg1;
@@ -5998,6 +6190,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams")
+@interface MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams
+    : MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestEmitTestEventRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull arg1;
@@ -6024,6 +6223,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventRequestParams")
+@interface MTRTestClusterClusterTestEmitTestEventRequestParams : MTRUnitTestingClusterTestEmitTestEventRequestParams
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull arg1;
@@ -6046,6 +6251,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams")
+@interface MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams
+    : MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams
+@end
+
 @interface MTRFaultInjectionClusterFailAtFaultParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull type;

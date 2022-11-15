@@ -4598,6 +4598,7 @@ labels.
  * Cluster Unit Testing
  *    The Test Cluster is meant to validate the generated code
  */
+MTR_NEWLY_AVAILABLE
 @interface MTRClusterUnitTesting : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
@@ -5304,12 +5305,15 @@ labels.
                                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                                       params:(MTRWriteParams * _Nullable)params;
 
-- (NSDictionary<NSString *, id> *)readAttributeWriteOnlyInt8uWithParams:(MTRReadParams * _Nullable)params;
-- (void)writeAttributeWriteOnlyInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
-                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs;
+- (NSDictionary<NSString *, id> *)readAttributeWriteOnlyInt8uWithParams:(MTRReadParams * _Nullable)params
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 - (void)writeAttributeWriteOnlyInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                       params:(MTRWriteParams * _Nullable)params;
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+- (void)writeAttributeWriteOnlyInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                       params:(MTRWriteParams * _Nullable)params
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params;
 
@@ -5324,6 +5328,10 @@ labels.
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
+@end
+
+MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
+@interface MTRClusterTestCluster : MTRClusterUnitTesting
 @end
 
 @interface MTRClusterIdentify (Deprecated)
@@ -6850,13 +6858,13 @@ labels.
     MTR_NEWLY_DEPRECATED("Please use getMeasurementProfileCommandWithParams:expectedValues:expectedValueIntervalMs:completion:");
 @end
 
-@interface MTRClusterUnitTesting (Deprecated)
+@interface MTRClusterTestCluster (Deprecated)
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                                endpoint:(uint16_t)endpoint
                                   queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
 
-- (void)testWithParams:(MTRUnitTestingClusterTestParams * _Nullable)params
+- (void)testWithParams:(MTRTestClusterClusterTestParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(MTRStatusCompletion)completionHandler
@@ -6865,7 +6873,7 @@ labels.
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
              completionHandler:(MTRStatusCompletion)completionHandler
     MTR_NEWLY_DEPRECATED("Please use testWithExpectedValues:expectedValueIntervalMs:completion:");
-- (void)testNotHandledWithParams:(MTRUnitTestingClusterTestNotHandledParams * _Nullable)params
+- (void)testNotHandledWithParams:(MTRTestClusterClusterTestNotHandledParams * _Nullable)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completionHandler:(MTRStatusCompletion)completionHandler
@@ -6874,18 +6882,18 @@ labels.
                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completionHandler:(MTRStatusCompletion)completionHandler
     MTR_NEWLY_DEPRECATED("Please use testNotHandledWithExpectedValues:expectedValueIntervalMs:completion:");
-- (void)testSpecificWithParams:(MTRUnitTestingClusterTestSpecificParams * _Nullable)params
+- (void)testSpecificWithParams:(MTRTestClusterClusterTestSpecificParams * _Nullable)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-             completionHandler:(void (^)(MTRUnitTestingClusterTestSpecificResponseParams * _Nullable data,
+             completionHandler:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testSpecificWithParams:expectedValues:expectedValueIntervalMs:completion:");
 - (void)testSpecificWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                     completionHandler:(void (^)(MTRUnitTestingClusterTestSpecificResponseParams * _Nullable data,
+                     completionHandler:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
                                            NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testSpecificWithExpectedValues:expectedValueIntervalMs:completion:");
-- (void)testUnknownCommandWithParams:(MTRUnitTestingClusterTestUnknownCommandParams * _Nullable)params
+- (void)testUnknownCommandWithParams:(MTRTestClusterClusterTestUnknownCommandParams * _Nullable)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(MTRStatusCompletion)completionHandler
@@ -6894,100 +6902,100 @@ labels.
                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completionHandler:(MTRStatusCompletion)completionHandler
     MTR_NEWLY_DEPRECATED("Please use testUnknownCommandWithExpectedValues:expectedValueIntervalMs:completion:");
-- (void)testAddArgumentsWithParams:(MTRUnitTestingClusterTestAddArgumentsParams *)params
+- (void)testAddArgumentsWithParams:(MTRTestClusterClusterTestAddArgumentsParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                 completionHandler:(void (^)(MTRUnitTestingClusterTestAddArgumentsResponseParams * _Nullable data,
+                 completionHandler:(void (^)(MTRTestClusterClusterTestAddArgumentsResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testAddArgumentsWithParams:expectedValues:expectedValueIntervalMs:completion:");
-- (void)testSimpleArgumentRequestWithParams:(MTRUnitTestingClusterTestSimpleArgumentRequestParams *)params
+- (void)testSimpleArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleArgumentRequestParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                          completionHandler:(void (^)(MTRUnitTestingClusterTestSimpleArgumentResponseParams * _Nullable data,
+                          completionHandler:(void (^)(MTRTestClusterClusterTestSimpleArgumentResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testSimpleArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
-- (void)testStructArrayArgumentRequestWithParams:(MTRUnitTestingClusterTestStructArrayArgumentRequestParams *)params
+- (void)testStructArrayArgumentRequestWithParams:(MTRTestClusterClusterTestStructArrayArgumentRequestParams *)params
                                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                completionHandler:
-                                   (void (^)(MTRUnitTestingClusterTestStructArrayArgumentResponseParams * _Nullable data,
+                                   (void (^)(MTRTestClusterClusterTestStructArrayArgumentResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testStructArrayArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
-- (void)testStructArgumentRequestWithParams:(MTRUnitTestingClusterTestStructArgumentRequestParams *)params
+- (void)testStructArgumentRequestWithParams:(MTRTestClusterClusterTestStructArgumentRequestParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                          completionHandler:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+                          completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testStructArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
-- (void)testNestedStructArgumentRequestWithParams:(MTRUnitTestingClusterTestNestedStructArgumentRequestParams *)params
+- (void)testNestedStructArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructArgumentRequestParams *)params
                                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                                completionHandler:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+                                completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                       NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testNestedStructArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
-- (void)testListStructArgumentRequestWithParams:(MTRUnitTestingClusterTestListStructArgumentRequestParams *)params
+- (void)testListStructArgumentRequestWithParams:(MTRTestClusterClusterTestListStructArgumentRequestParams *)params
                                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                              completionHandler:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+                              completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                     NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testListStructArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
-- (void)testListInt8UArgumentRequestWithParams:(MTRUnitTestingClusterTestListInt8UArgumentRequestParams *)params
+- (void)testListInt8UArgumentRequestWithParams:(MTRTestClusterClusterTestListInt8UArgumentRequestParams *)params
                                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                             completionHandler:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+                             completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                    NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testListInt8UArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
-- (void)testNestedStructListArgumentRequestWithParams:(MTRUnitTestingClusterTestNestedStructListArgumentRequestParams *)params
+- (void)testNestedStructListArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructListArgumentRequestParams *)params
                                        expectedValues:
                                            (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                                    completionHandler:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+                                    completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                           NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED(
         "Please use testNestedStructListArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
 - (void)testListNestedStructListArgumentRequestWithParams:
-            (MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams *)params
+            (MTRTestClusterClusterTestListNestedStructListArgumentRequestParams *)params
                                            expectedValues:
                                                (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                                        completionHandler:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+                                        completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                               NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED(
         "Please use testListNestedStructListArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
-- (void)testListInt8UReverseRequestWithParams:(MTRUnitTestingClusterTestListInt8UReverseRequestParams *)params
+- (void)testListInt8UReverseRequestWithParams:(MTRTestClusterClusterTestListInt8UReverseRequestParams *)params
                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                            completionHandler:(void (^)(MTRUnitTestingClusterTestListInt8UReverseResponseParams * _Nullable data,
+                            completionHandler:(void (^)(MTRTestClusterClusterTestListInt8UReverseResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testListInt8UReverseRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
-- (void)testEnumsRequestWithParams:(MTRUnitTestingClusterTestEnumsRequestParams *)params
+- (void)testEnumsRequestWithParams:(MTRTestClusterClusterTestEnumsRequestParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                 completionHandler:(void (^)(MTRUnitTestingClusterTestEnumsResponseParams * _Nullable data,
+                 completionHandler:(void (^)(MTRTestClusterClusterTestEnumsResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testEnumsRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
-- (void)testNullableOptionalRequestWithParams:(MTRUnitTestingClusterTestNullableOptionalRequestParams * _Nullable)params
+- (void)testNullableOptionalRequestWithParams:(MTRTestClusterClusterTestNullableOptionalRequestParams * _Nullable)params
                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                            completionHandler:(void (^)(MTRUnitTestingClusterTestNullableOptionalResponseParams * _Nullable data,
+                            completionHandler:(void (^)(MTRTestClusterClusterTestNullableOptionalResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testNullableOptionalRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
-- (void)testComplexNullableOptionalRequestWithParams:(MTRUnitTestingClusterTestComplexNullableOptionalRequestParams *)params
+- (void)testComplexNullableOptionalRequestWithParams:(MTRTestClusterClusterTestComplexNullableOptionalRequestParams *)params
                                       expectedValues:
                                           (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                    completionHandler:
-                                       (void (^)(MTRUnitTestingClusterTestComplexNullableOptionalResponseParams * _Nullable data,
+                                       (void (^)(MTRTestClusterClusterTestComplexNullableOptionalResponseParams * _Nullable data,
                                            NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED(
         "Please use testComplexNullableOptionalRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
-- (void)simpleStructEchoRequestWithParams:(MTRUnitTestingClusterSimpleStructEchoRequestParams *)params
+- (void)simpleStructEchoRequestWithParams:(MTRTestClusterClusterSimpleStructEchoRequestParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                        completionHandler:(void (^)(MTRUnitTestingClusterSimpleStructResponseParams * _Nullable data,
+                        completionHandler:(void (^)(MTRTestClusterClusterSimpleStructResponseParams * _Nullable data,
                                               NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use simpleStructEchoRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
-- (void)timedInvokeRequestWithParams:(MTRUnitTestingClusterTimedInvokeRequestParams * _Nullable)params
+- (void)timedInvokeRequestWithParams:(MTRTestClusterClusterTimedInvokeRequestParams * _Nullable)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(MTRStatusCompletion)completionHandler
@@ -6996,26 +7004,26 @@ labels.
                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completionHandler:(MTRStatusCompletion)completionHandler
     MTR_NEWLY_DEPRECATED("Please use timedInvokeRequestWithExpectedValues:expectedValueIntervalMs:completion:");
-- (void)testSimpleOptionalArgumentRequestWithParams:(MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
+- (void)testSimpleOptionalArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
                                      expectedValues:
                                          (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                   completionHandler:(MTRStatusCompletion)completionHandler
     MTR_NEWLY_DEPRECATED(
         "Please use testSimpleOptionalArgumentRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
-- (void)testEmitTestEventRequestWithParams:(MTRUnitTestingClusterTestEmitTestEventRequestParams *)params
+- (void)testEmitTestEventRequestWithParams:(MTRTestClusterClusterTestEmitTestEventRequestParams *)params
                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                         completionHandler:(void (^)(MTRUnitTestingClusterTestEmitTestEventResponseParams * _Nullable data,
+                         completionHandler:(void (^)(MTRTestClusterClusterTestEmitTestEventResponseParams * _Nullable data,
                                                NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testEmitTestEventRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");
-- (void)testEmitTestFabricScopedEventRequestWithParams:(MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams *)params
+- (void)testEmitTestFabricScopedEventRequestWithParams:(MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams *)params
                                         expectedValues:
                                             (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                      completionHandler:
                                          (void (^)(
-                                             MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
+                                             MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
                                              NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED(
         "Please use testEmitTestFabricScopedEventRequestWithParams:expectedValues:expectedValueIntervalMs:completion:");

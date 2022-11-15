@@ -21,6 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 {{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeStruct")}}
 API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 {{/if}}
+{{else if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}
+MTR_NEWLY_AVAILABLE
 {{/if}}
 @interface MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}} : NSObject <NSCopying>
 {{> interfaceDecl}}
@@ -33,10 +35,17 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 {{> interfaceDecl}}
 @end
 {{/if}}
+{{else if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingCluster{{asUpperCamelCase name}}")
+@interface MTRTestClusterCluster{{asUpperCamelCase name}} : MTRUnitTestingCluster{{asUpperCamelCase name}}
+@end
 {{/if}}
 {{/zcl_structs}}
 
 {{#zcl_events}}
+{{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}
+MTR_NEWLY_AVAILABLE
+{{/if}}
 @interface MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event : NSObject <NSCopying>
 {{#zcl_event_fields}}
 @property (nonatomic, copy{{#unless (isStrEqual (asGetterName name) (asStructPropertyName name))}}, getter={{asGetterName name}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName name}};
@@ -45,6 +54,12 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+{{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingCluster{{asUpperCamelCase name}}Event")
+@interface MTRTestClusterCluster{{asUpperCamelCase name}}Event : MTRUnitTestingCluster{{asUpperCamelCase name}}Event
+@end
+{{/if}}
 
 {{/zcl_events}}
 

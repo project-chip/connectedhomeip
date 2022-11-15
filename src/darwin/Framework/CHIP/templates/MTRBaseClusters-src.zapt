@@ -237,18 +237,32 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 {{/chip_server_cluster_attributes}}
 
 @end
+{{#if (isStrEqual (asUpperCamelCase name) "UnitTesting")}}
 
-@implementation MTRBaseCluster{{asUpperCamelCase name}} (Deprecated)
+@implementation MTRBaseClusterTestCluster
+@end
+{{/if}}
+
+@implementation MTRBaseCluster{{compatClusterNameRemapping name}} (Deprecated)
 
 {{#chip_cluster_commands}}
-- (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=.}})completionHandler
+- (void){{asLowerCamelCase name}}WithParams:(MTR{{compatClusterNameRemapping parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=. compatRemapClusterName=true}})completionHandler
 {
-  [self {{asLowerCamelCase name}}WithParams:params completion:completionHandler];
+  [self {{asLowerCamelCase name}}WithParams:params completion:
+    {{#if hasSpecificResponse}}
+    ^(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}Params * _Nullable data, NSError * _Nullable error) {
+      // Cast is safe because subclass does not add any selectors.
+      completionHandler(static_cast<MTR{{compatClusterNameRemapping parent.name}}Cluster{{asUpperCamelCase responseName}}Params *>(data), error);
+    }
+    {{else}}
+    completionHandler
+    {{/if}}
+    ];
 }
 {{#unless (hasArguments)}}
-- (void){{asLowerCamelCase name}}WithCompletionHandler:({{>command_completion_type command=.}})completionHandler
+- (void){{asLowerCamelCase name}}WithCompletionHandler:({{>command_completion_type command=. compatRemapClusterName=true}})completionHandler
 {
-  [self {{asLowerCamelCase name}}WithParams:nil completion:completionHandler];
+  [self {{asLowerCamelCase name}}WithParams:nil completionHandler:completionHandler];
 }
 {{/unless}}
 {{/chip_cluster_commands}}
@@ -263,16 +277,20 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 {{~else~}}
   CompletionHandler:
 {{~/if_is_fabric_scoped_struct~}}
-(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler
+(void (^)({{asObjectiveCClass type parent.name compatRemapClusterName=true}} * _Nullable value, NSError * _Nullable error))completionHandler
 {
-  [self readAttribute{{asUpperCamelCase name}}With{{#if_is_fabric_scoped_struct type}}Params:params completion:{{else}}Completion:{{/if_is_fabric_scoped_struct}}completionHandler];
+  [self readAttribute{{asUpperCamelCase name}}With{{#if_is_fabric_scoped_struct type}}Params:params completion:{{else}}Completion:{{/if_is_fabric_scoped_struct}}
+      ^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
+        // Cast is safe because subclass does not add any selectors.
+        completionHandler(static_cast<{{asObjectiveCClass type parent.name compatRemapClusterName=true}} *>(value), error);
+      }];
 }
 {{#if isWritableAttribute}}
-- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(MTRStatusCompletion)completionHandler
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name compatRemapClusterName=true}})value completionHandler:(MTRStatusCompletion)completionHandler
 {
   [self writeAttribute{{asUpperCamelCase name}}WithValue:value params:nil completion:completionHandler];
 }
-- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name compatRemapClusterName=true}})value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler
 {
   [self writeAttribute{{asUpperCamelCase name}}WithValue:value params:params completion:completionHandler];
 }
@@ -280,7 +298,7 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 {{#if isReportableAttribute}}
 - (void) subscribe{{>attribute}}WithMinInterval:(NSNumber * _Nonnull)minInterval  maxInterval:(NSNumber * _Nonnull)maxInterval
        params:(MTRSubscribeParams * _Nullable)params
-subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
+subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name compatRemapClusterName=true}} * _Nullable value, NSError * _Nullable error))reportHandler
 {
   MTRSubscribeParams * _Nullable subscribeParams = [params copy];
   if (subscribeParams == nil) {
@@ -289,11 +307,19 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
       subscribeParams.minInterval = minInterval;
       subscribeParams.maxInterval = maxInterval;
   }
-  [self subscribeAttribute{{asUpperCamelCase name}}WithParams:subscribeParams subscriptionEstablished:subscriptionEstablishedHandler reportHandler:reportHandler];
+  [self subscribeAttribute{{asUpperCamelCase name}}WithParams:subscribeParams subscriptionEstablished:subscriptionEstablishedHandler reportHandler:
+     ^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
+       // Cast is safe because subclass does not add any selectors.
+       reportHandler(static_cast<{{asObjectiveCClass type parent.name compatRemapClusterName=true}} *>(value), error)     ;
+     }];
 }
-+ (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler
++ (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)({{asObjectiveCClass type parent.name compatRemapClusterName=true}} * _Nullable value, NSError * _Nullable error))completionHandler
 {
-  [self readAttribute{{asUpperCamelCase name}}WithAttributeCache:attributeCacheContainer endpoint:endpoint queue:queue completion:completionHandler];
+  [self readAttribute{{asUpperCamelCase name}}WithAttributeCache:attributeCacheContainer endpoint:endpoint queue:queue completion:
+      ^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
+        // Cast is safe because subclass does not add any selectors.
+        completionHandler(static_cast<{{asObjectiveCClass type parent.name compatRemapClusterName=true}} *>(value), error);
+      }];
 }
 {{/if}}
 {{/chip_server_cluster_attributes}}
@@ -308,4 +334,5 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 @end
 
 {{/chip_client_clusters}}
+
 // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)

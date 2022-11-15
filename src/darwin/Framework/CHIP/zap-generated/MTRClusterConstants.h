@@ -90,7 +90,8 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterApplicationBasicID = 0x0000050D,
     MTRClusterAccountLoginID = 0x0000050E,
     MTRClusterElectricalMeasurementID = 0x00000B04,
-    MTRClusterUnitTestingID = 0xFFF1FC05,
+    MTRClusterUnitTestingID MTR_NEWLY_AVAILABLE = 0xFFF1FC05,
+    MTRClusterTestClusterID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingID") = 0xFFF1FC05,
     MTRClusterFaultInjectionID = 0xFFF1FC06,
 };
 
@@ -1279,93 +1280,269 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterElectricalMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster UnitTesting attributes
-    MTRClusterUnitTestingAttributeBooleanID = 0x00000000,
-    MTRClusterUnitTestingAttributeBitmap8ID = 0x00000001,
-    MTRClusterUnitTestingAttributeBitmap16ID = 0x00000002,
-    MTRClusterUnitTestingAttributeBitmap32ID = 0x00000003,
-    MTRClusterUnitTestingAttributeBitmap64ID = 0x00000004,
-    MTRClusterUnitTestingAttributeInt8uID = 0x00000005,
-    MTRClusterUnitTestingAttributeInt16uID = 0x00000006,
-    MTRClusterUnitTestingAttributeInt24uID = 0x00000007,
-    MTRClusterUnitTestingAttributeInt32uID = 0x00000008,
-    MTRClusterUnitTestingAttributeInt40uID = 0x00000009,
-    MTRClusterUnitTestingAttributeInt48uID = 0x0000000A,
-    MTRClusterUnitTestingAttributeInt56uID = 0x0000000B,
-    MTRClusterUnitTestingAttributeInt64uID = 0x0000000C,
-    MTRClusterUnitTestingAttributeInt8sID = 0x0000000D,
-    MTRClusterUnitTestingAttributeInt16sID = 0x0000000E,
-    MTRClusterUnitTestingAttributeInt24sID = 0x0000000F,
-    MTRClusterUnitTestingAttributeInt32sID = 0x00000010,
-    MTRClusterUnitTestingAttributeInt40sID = 0x00000011,
-    MTRClusterUnitTestingAttributeInt48sID = 0x00000012,
-    MTRClusterUnitTestingAttributeInt56sID = 0x00000013,
-    MTRClusterUnitTestingAttributeInt64sID = 0x00000014,
-    MTRClusterUnitTestingAttributeEnum8ID = 0x00000015,
-    MTRClusterUnitTestingAttributeEnum16ID = 0x00000016,
-    MTRClusterUnitTestingAttributeFloatSingleID = 0x00000017,
-    MTRClusterUnitTestingAttributeFloatDoubleID = 0x00000018,
-    MTRClusterUnitTestingAttributeOctetStringID = 0x00000019,
-    MTRClusterUnitTestingAttributeListInt8uID = 0x0000001A,
-    MTRClusterUnitTestingAttributeListOctetStringID = 0x0000001B,
-    MTRClusterUnitTestingAttributeListStructOctetStringID = 0x0000001C,
-    MTRClusterUnitTestingAttributeLongOctetStringID = 0x0000001D,
-    MTRClusterUnitTestingAttributeCharStringID = 0x0000001E,
-    MTRClusterUnitTestingAttributeLongCharStringID = 0x0000001F,
-    MTRClusterUnitTestingAttributeEpochUsID = 0x00000020,
-    MTRClusterUnitTestingAttributeEpochSID = 0x00000021,
-    MTRClusterUnitTestingAttributeVendorIdID = 0x00000022,
-    MTRClusterUnitTestingAttributeListNullablesAndOptionalsStructID = 0x00000023,
-    MTRClusterUnitTestingAttributeEnumAttrID = 0x00000024,
-    MTRClusterUnitTestingAttributeStructAttrID = 0x00000025,
-    MTRClusterUnitTestingAttributeRangeRestrictedInt8uID = 0x00000026,
-    MTRClusterUnitTestingAttributeRangeRestrictedInt8sID = 0x00000027,
-    MTRClusterUnitTestingAttributeRangeRestrictedInt16uID = 0x00000028,
-    MTRClusterUnitTestingAttributeRangeRestrictedInt16sID = 0x00000029,
-    MTRClusterUnitTestingAttributeListLongOctetStringID = 0x0000002A,
-    MTRClusterUnitTestingAttributeListFabricScopedID = 0x0000002B,
-    MTRClusterUnitTestingAttributeTimedWriteBooleanID = 0x00000030,
-    MTRClusterUnitTestingAttributeGeneralErrorBooleanID = 0x00000031,
-    MTRClusterUnitTestingAttributeClusterErrorBooleanID = 0x00000032,
-    MTRClusterUnitTestingAttributeUnsupportedID = 0x000000FF,
-    MTRClusterUnitTestingAttributeNullableBooleanID = 0x00004000,
-    MTRClusterUnitTestingAttributeNullableBitmap8ID = 0x00004001,
-    MTRClusterUnitTestingAttributeNullableBitmap16ID = 0x00004002,
-    MTRClusterUnitTestingAttributeNullableBitmap32ID = 0x00004003,
-    MTRClusterUnitTestingAttributeNullableBitmap64ID = 0x00004004,
-    MTRClusterUnitTestingAttributeNullableInt8uID = 0x00004005,
-    MTRClusterUnitTestingAttributeNullableInt16uID = 0x00004006,
-    MTRClusterUnitTestingAttributeNullableInt24uID = 0x00004007,
-    MTRClusterUnitTestingAttributeNullableInt32uID = 0x00004008,
-    MTRClusterUnitTestingAttributeNullableInt40uID = 0x00004009,
-    MTRClusterUnitTestingAttributeNullableInt48uID = 0x0000400A,
-    MTRClusterUnitTestingAttributeNullableInt56uID = 0x0000400B,
-    MTRClusterUnitTestingAttributeNullableInt64uID = 0x0000400C,
-    MTRClusterUnitTestingAttributeNullableInt8sID = 0x0000400D,
-    MTRClusterUnitTestingAttributeNullableInt16sID = 0x0000400E,
-    MTRClusterUnitTestingAttributeNullableInt24sID = 0x0000400F,
-    MTRClusterUnitTestingAttributeNullableInt32sID = 0x00004010,
-    MTRClusterUnitTestingAttributeNullableInt40sID = 0x00004011,
-    MTRClusterUnitTestingAttributeNullableInt48sID = 0x00004012,
-    MTRClusterUnitTestingAttributeNullableInt56sID = 0x00004013,
-    MTRClusterUnitTestingAttributeNullableInt64sID = 0x00004014,
-    MTRClusterUnitTestingAttributeNullableEnum8ID = 0x00004015,
-    MTRClusterUnitTestingAttributeNullableEnum16ID = 0x00004016,
-    MTRClusterUnitTestingAttributeNullableFloatSingleID = 0x00004017,
-    MTRClusterUnitTestingAttributeNullableFloatDoubleID = 0x00004018,
-    MTRClusterUnitTestingAttributeNullableOctetStringID = 0x00004019,
-    MTRClusterUnitTestingAttributeNullableCharStringID = 0x0000401E,
-    MTRClusterUnitTestingAttributeNullableEnumAttrID = 0x00004024,
-    MTRClusterUnitTestingAttributeNullableStructID = 0x00004025,
-    MTRClusterUnitTestingAttributeNullableRangeRestrictedInt8uID = 0x00004026,
-    MTRClusterUnitTestingAttributeNullableRangeRestrictedInt8sID = 0x00004027,
-    MTRClusterUnitTestingAttributeNullableRangeRestrictedInt16uID = 0x00004028,
-    MTRClusterUnitTestingAttributeNullableRangeRestrictedInt16sID = 0x00004029,
-    MTRClusterUnitTestingAttributeWriteOnlyInt8uID = 0x0000402A,
+    MTRClusterUnitTestingAttributeBooleanID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRClusterUnitTestingAttributeBitmap8ID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRClusterUnitTestingAttributeBitmap16ID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRClusterUnitTestingAttributeBitmap32ID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRClusterUnitTestingAttributeBitmap64ID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRClusterUnitTestingAttributeInt8uID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRClusterUnitTestingAttributeInt16uID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRClusterUnitTestingAttributeInt24uID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRClusterUnitTestingAttributeInt32uID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRClusterUnitTestingAttributeInt40uID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRClusterUnitTestingAttributeInt48uID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRClusterUnitTestingAttributeInt56uID MTR_NEWLY_AVAILABLE = 0x0000000B,
+    MTRClusterUnitTestingAttributeInt64uID MTR_NEWLY_AVAILABLE = 0x0000000C,
+    MTRClusterUnitTestingAttributeInt8sID MTR_NEWLY_AVAILABLE = 0x0000000D,
+    MTRClusterUnitTestingAttributeInt16sID MTR_NEWLY_AVAILABLE = 0x0000000E,
+    MTRClusterUnitTestingAttributeInt24sID MTR_NEWLY_AVAILABLE = 0x0000000F,
+    MTRClusterUnitTestingAttributeInt32sID MTR_NEWLY_AVAILABLE = 0x00000010,
+    MTRClusterUnitTestingAttributeInt40sID MTR_NEWLY_AVAILABLE = 0x00000011,
+    MTRClusterUnitTestingAttributeInt48sID MTR_NEWLY_AVAILABLE = 0x00000012,
+    MTRClusterUnitTestingAttributeInt56sID MTR_NEWLY_AVAILABLE = 0x00000013,
+    MTRClusterUnitTestingAttributeInt64sID MTR_NEWLY_AVAILABLE = 0x00000014,
+    MTRClusterUnitTestingAttributeEnum8ID MTR_NEWLY_AVAILABLE = 0x00000015,
+    MTRClusterUnitTestingAttributeEnum16ID MTR_NEWLY_AVAILABLE = 0x00000016,
+    MTRClusterUnitTestingAttributeFloatSingleID MTR_NEWLY_AVAILABLE = 0x00000017,
+    MTRClusterUnitTestingAttributeFloatDoubleID MTR_NEWLY_AVAILABLE = 0x00000018,
+    MTRClusterUnitTestingAttributeOctetStringID MTR_NEWLY_AVAILABLE = 0x00000019,
+    MTRClusterUnitTestingAttributeListInt8uID MTR_NEWLY_AVAILABLE = 0x0000001A,
+    MTRClusterUnitTestingAttributeListOctetStringID MTR_NEWLY_AVAILABLE = 0x0000001B,
+    MTRClusterUnitTestingAttributeListStructOctetStringID MTR_NEWLY_AVAILABLE = 0x0000001C,
+    MTRClusterUnitTestingAttributeLongOctetStringID MTR_NEWLY_AVAILABLE = 0x0000001D,
+    MTRClusterUnitTestingAttributeCharStringID MTR_NEWLY_AVAILABLE = 0x0000001E,
+    MTRClusterUnitTestingAttributeLongCharStringID MTR_NEWLY_AVAILABLE = 0x0000001F,
+    MTRClusterUnitTestingAttributeEpochUsID MTR_NEWLY_AVAILABLE = 0x00000020,
+    MTRClusterUnitTestingAttributeEpochSID MTR_NEWLY_AVAILABLE = 0x00000021,
+    MTRClusterUnitTestingAttributeVendorIdID MTR_NEWLY_AVAILABLE = 0x00000022,
+    MTRClusterUnitTestingAttributeListNullablesAndOptionalsStructID MTR_NEWLY_AVAILABLE = 0x00000023,
+    MTRClusterUnitTestingAttributeEnumAttrID MTR_NEWLY_AVAILABLE = 0x00000024,
+    MTRClusterUnitTestingAttributeStructAttrID MTR_NEWLY_AVAILABLE = 0x00000025,
+    MTRClusterUnitTestingAttributeRangeRestrictedInt8uID MTR_NEWLY_AVAILABLE = 0x00000026,
+    MTRClusterUnitTestingAttributeRangeRestrictedInt8sID MTR_NEWLY_AVAILABLE = 0x00000027,
+    MTRClusterUnitTestingAttributeRangeRestrictedInt16uID MTR_NEWLY_AVAILABLE = 0x00000028,
+    MTRClusterUnitTestingAttributeRangeRestrictedInt16sID MTR_NEWLY_AVAILABLE = 0x00000029,
+    MTRClusterUnitTestingAttributeListLongOctetStringID MTR_NEWLY_AVAILABLE = 0x0000002A,
+    MTRClusterUnitTestingAttributeListFabricScopedID MTR_NEWLY_AVAILABLE = 0x0000002B,
+    MTRClusterUnitTestingAttributeTimedWriteBooleanID MTR_NEWLY_AVAILABLE = 0x00000030,
+    MTRClusterUnitTestingAttributeGeneralErrorBooleanID MTR_NEWLY_AVAILABLE = 0x00000031,
+    MTRClusterUnitTestingAttributeClusterErrorBooleanID MTR_NEWLY_AVAILABLE = 0x00000032,
+    MTRClusterUnitTestingAttributeUnsupportedID MTR_NEWLY_AVAILABLE = 0x000000FF,
+    MTRClusterUnitTestingAttributeNullableBooleanID MTR_NEWLY_AVAILABLE = 0x00004000,
+    MTRClusterUnitTestingAttributeNullableBitmap8ID MTR_NEWLY_AVAILABLE = 0x00004001,
+    MTRClusterUnitTestingAttributeNullableBitmap16ID MTR_NEWLY_AVAILABLE = 0x00004002,
+    MTRClusterUnitTestingAttributeNullableBitmap32ID MTR_NEWLY_AVAILABLE = 0x00004003,
+    MTRClusterUnitTestingAttributeNullableBitmap64ID MTR_NEWLY_AVAILABLE = 0x00004004,
+    MTRClusterUnitTestingAttributeNullableInt8uID MTR_NEWLY_AVAILABLE = 0x00004005,
+    MTRClusterUnitTestingAttributeNullableInt16uID MTR_NEWLY_AVAILABLE = 0x00004006,
+    MTRClusterUnitTestingAttributeNullableInt24uID MTR_NEWLY_AVAILABLE = 0x00004007,
+    MTRClusterUnitTestingAttributeNullableInt32uID MTR_NEWLY_AVAILABLE = 0x00004008,
+    MTRClusterUnitTestingAttributeNullableInt40uID MTR_NEWLY_AVAILABLE = 0x00004009,
+    MTRClusterUnitTestingAttributeNullableInt48uID MTR_NEWLY_AVAILABLE = 0x0000400A,
+    MTRClusterUnitTestingAttributeNullableInt56uID MTR_NEWLY_AVAILABLE = 0x0000400B,
+    MTRClusterUnitTestingAttributeNullableInt64uID MTR_NEWLY_AVAILABLE = 0x0000400C,
+    MTRClusterUnitTestingAttributeNullableInt8sID MTR_NEWLY_AVAILABLE = 0x0000400D,
+    MTRClusterUnitTestingAttributeNullableInt16sID MTR_NEWLY_AVAILABLE = 0x0000400E,
+    MTRClusterUnitTestingAttributeNullableInt24sID MTR_NEWLY_AVAILABLE = 0x0000400F,
+    MTRClusterUnitTestingAttributeNullableInt32sID MTR_NEWLY_AVAILABLE = 0x00004010,
+    MTRClusterUnitTestingAttributeNullableInt40sID MTR_NEWLY_AVAILABLE = 0x00004011,
+    MTRClusterUnitTestingAttributeNullableInt48sID MTR_NEWLY_AVAILABLE = 0x00004012,
+    MTRClusterUnitTestingAttributeNullableInt56sID MTR_NEWLY_AVAILABLE = 0x00004013,
+    MTRClusterUnitTestingAttributeNullableInt64sID MTR_NEWLY_AVAILABLE = 0x00004014,
+    MTRClusterUnitTestingAttributeNullableEnum8ID MTR_NEWLY_AVAILABLE = 0x00004015,
+    MTRClusterUnitTestingAttributeNullableEnum16ID MTR_NEWLY_AVAILABLE = 0x00004016,
+    MTRClusterUnitTestingAttributeNullableFloatSingleID MTR_NEWLY_AVAILABLE = 0x00004017,
+    MTRClusterUnitTestingAttributeNullableFloatDoubleID MTR_NEWLY_AVAILABLE = 0x00004018,
+    MTRClusterUnitTestingAttributeNullableOctetStringID MTR_NEWLY_AVAILABLE = 0x00004019,
+    MTRClusterUnitTestingAttributeNullableCharStringID MTR_NEWLY_AVAILABLE = 0x0000401E,
+    MTRClusterUnitTestingAttributeNullableEnumAttrID MTR_NEWLY_AVAILABLE = 0x00004024,
+    MTRClusterUnitTestingAttributeNullableStructID MTR_NEWLY_AVAILABLE = 0x00004025,
+    MTRClusterUnitTestingAttributeNullableRangeRestrictedInt8uID MTR_NEWLY_AVAILABLE = 0x00004026,
+    MTRClusterUnitTestingAttributeNullableRangeRestrictedInt8sID MTR_NEWLY_AVAILABLE = 0x00004027,
+    MTRClusterUnitTestingAttributeNullableRangeRestrictedInt16uID MTR_NEWLY_AVAILABLE = 0x00004028,
+    MTRClusterUnitTestingAttributeNullableRangeRestrictedInt16sID MTR_NEWLY_AVAILABLE = 0x00004029,
+    MTRClusterUnitTestingAttributeWriteOnlyInt8uID MTR_NEWLY_AVAILABLE = 0x0000402A,
     MTRClusterUnitTestingAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
     MTRClusterUnitTestingAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
     MTRClusterUnitTestingAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterUnitTestingAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterUnitTestingAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
+
+    // Cluster TestCluster attributes
+    MTRClusterTestClusterAttributeBooleanID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeBooleanID") = 0x00000000,
+    MTRClusterTestClusterAttributeBitmap8ID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeBitmap8ID") = 0x00000001,
+    MTRClusterTestClusterAttributeBitmap16ID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeBitmap16ID")
+    = 0x00000002,
+    MTRClusterTestClusterAttributeBitmap32ID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeBitmap32ID")
+    = 0x00000003,
+    MTRClusterTestClusterAttributeBitmap64ID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeBitmap64ID")
+    = 0x00000004,
+    MTRClusterTestClusterAttributeInt8uID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeInt8uID") = 0x00000005,
+    MTRClusterTestClusterAttributeInt16uID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeInt16uID") = 0x00000006,
+    MTRClusterTestClusterAttributeInt24uID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeInt24uID") = 0x00000007,
+    MTRClusterTestClusterAttributeInt32uID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeInt32uID") = 0x00000008,
+    MTRClusterTestClusterAttributeInt40uID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeInt40uID") = 0x00000009,
+    MTRClusterTestClusterAttributeInt48uID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeInt48uID") = 0x0000000A,
+    MTRClusterTestClusterAttributeInt56uID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeInt56uID") = 0x0000000B,
+    MTRClusterTestClusterAttributeInt64uID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeInt64uID") = 0x0000000C,
+    MTRClusterTestClusterAttributeInt8sID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeInt8sID") = 0x0000000D,
+    MTRClusterTestClusterAttributeInt16sID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeInt16sID") = 0x0000000E,
+    MTRClusterTestClusterAttributeInt24sID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeInt24sID") = 0x0000000F,
+    MTRClusterTestClusterAttributeInt32sID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeInt32sID") = 0x00000010,
+    MTRClusterTestClusterAttributeInt40sID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeInt40sID") = 0x00000011,
+    MTRClusterTestClusterAttributeInt48sID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeInt48sID") = 0x00000012,
+    MTRClusterTestClusterAttributeInt56sID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeInt56sID") = 0x00000013,
+    MTRClusterTestClusterAttributeInt64sID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeInt64sID") = 0x00000014,
+    MTRClusterTestClusterAttributeEnum8ID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeEnum8ID") = 0x00000015,
+    MTRClusterTestClusterAttributeEnum16ID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeEnum16ID") = 0x00000016,
+    MTRClusterTestClusterAttributeFloatSingleID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeFloatSingleID")
+    = 0x00000017,
+    MTRClusterTestClusterAttributeFloatDoubleID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeFloatDoubleID")
+    = 0x00000018,
+    MTRClusterTestClusterAttributeOctetStringID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeOctetStringID")
+    = 0x00000019,
+    MTRClusterTestClusterAttributeListInt8uID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeListInt8uID")
+    = 0x0000001A,
+    MTRClusterTestClusterAttributeListOctetStringID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeListOctetStringID")
+    = 0x0000001B,
+    MTRClusterTestClusterAttributeListStructOctetStringID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeListStructOctetStringID")
+    = 0x0000001C,
+    MTRClusterTestClusterAttributeLongOctetStringID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeLongOctetStringID")
+    = 0x0000001D,
+    MTRClusterTestClusterAttributeCharStringID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeCharStringID")
+    = 0x0000001E,
+    MTRClusterTestClusterAttributeLongCharStringID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeLongCharStringID")
+    = 0x0000001F,
+    MTRClusterTestClusterAttributeEpochUsID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeEpochUsID") = 0x00000020,
+    MTRClusterTestClusterAttributeEpochSID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeEpochSID") = 0x00000021,
+    MTRClusterTestClusterAttributeVendorIdID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeVendorIdID")
+    = 0x00000022,
+    MTRClusterTestClusterAttributeListNullablesAndOptionalsStructID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeListNullablesAndOptionalsStructID")
+    = 0x00000023,
+    MTRClusterTestClusterAttributeEnumAttrID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeEnumAttrID")
+    = 0x00000024,
+    MTRClusterTestClusterAttributeStructAttrID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeStructAttrID")
+    = 0x00000025,
+    MTRClusterTestClusterAttributeRangeRestrictedInt8uID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeRangeRestrictedInt8uID")
+    = 0x00000026,
+    MTRClusterTestClusterAttributeRangeRestrictedInt8sID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeRangeRestrictedInt8sID")
+    = 0x00000027,
+    MTRClusterTestClusterAttributeRangeRestrictedInt16uID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeRangeRestrictedInt16uID")
+    = 0x00000028,
+    MTRClusterTestClusterAttributeRangeRestrictedInt16sID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeRangeRestrictedInt16sID")
+    = 0x00000029,
+    MTRClusterTestClusterAttributeListLongOctetStringID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeListLongOctetStringID")
+    = 0x0000002A,
+    MTRClusterTestClusterAttributeListFabricScopedID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeListFabricScopedID")
+    = 0x0000002B,
+    MTRClusterTestClusterAttributeTimedWriteBooleanID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeTimedWriteBooleanID")
+    = 0x00000030,
+    MTRClusterTestClusterAttributeGeneralErrorBooleanID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeGeneralErrorBooleanID")
+    = 0x00000031,
+    MTRClusterTestClusterAttributeClusterErrorBooleanID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeClusterErrorBooleanID")
+    = 0x00000032,
+    MTRClusterTestClusterAttributeUnsupportedID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeUnsupportedID")
+    = 0x000000FF,
+    MTRClusterTestClusterAttributeNullableBooleanID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeNullableBooleanID")
+    = 0x00004000,
+    MTRClusterTestClusterAttributeNullableBitmap8ID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeNullableBitmap8ID")
+    = 0x00004001,
+    MTRClusterTestClusterAttributeNullableBitmap16ID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeNullableBitmap16ID")
+    = 0x00004002,
+    MTRClusterTestClusterAttributeNullableBitmap32ID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeNullableBitmap32ID")
+    = 0x00004003,
+    MTRClusterTestClusterAttributeNullableBitmap64ID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeNullableBitmap64ID")
+    = 0x00004004,
+    MTRClusterTestClusterAttributeNullableInt8uID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeNullableInt8uID")
+    = 0x00004005,
+    MTRClusterTestClusterAttributeNullableInt16uID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeNullableInt16uID")
+    = 0x00004006,
+    MTRClusterTestClusterAttributeNullableInt24uID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeNullableInt24uID")
+    = 0x00004007,
+    MTRClusterTestClusterAttributeNullableInt32uID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeNullableInt32uID")
+    = 0x00004008,
+    MTRClusterTestClusterAttributeNullableInt40uID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeNullableInt40uID")
+    = 0x00004009,
+    MTRClusterTestClusterAttributeNullableInt48uID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeNullableInt48uID")
+    = 0x0000400A,
+    MTRClusterTestClusterAttributeNullableInt56uID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeNullableInt56uID")
+    = 0x0000400B,
+    MTRClusterTestClusterAttributeNullableInt64uID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeNullableInt64uID")
+    = 0x0000400C,
+    MTRClusterTestClusterAttributeNullableInt8sID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeNullableInt8sID")
+    = 0x0000400D,
+    MTRClusterTestClusterAttributeNullableInt16sID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeNullableInt16sID")
+    = 0x0000400E,
+    MTRClusterTestClusterAttributeNullableInt24sID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeNullableInt24sID")
+    = 0x0000400F,
+    MTRClusterTestClusterAttributeNullableInt32sID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeNullableInt32sID")
+    = 0x00004010,
+    MTRClusterTestClusterAttributeNullableInt40sID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeNullableInt40sID")
+    = 0x00004011,
+    MTRClusterTestClusterAttributeNullableInt48sID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeNullableInt48sID")
+    = 0x00004012,
+    MTRClusterTestClusterAttributeNullableInt56sID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeNullableInt56sID")
+    = 0x00004013,
+    MTRClusterTestClusterAttributeNullableInt64sID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeNullableInt64sID")
+    = 0x00004014,
+    MTRClusterTestClusterAttributeNullableEnum8ID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeNullableEnum8ID")
+    = 0x00004015,
+    MTRClusterTestClusterAttributeNullableEnum16ID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeNullableEnum16ID")
+    = 0x00004016,
+    MTRClusterTestClusterAttributeNullableFloatSingleID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeNullableFloatSingleID")
+    = 0x00004017,
+    MTRClusterTestClusterAttributeNullableFloatDoubleID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeNullableFloatDoubleID")
+    = 0x00004018,
+    MTRClusterTestClusterAttributeNullableOctetStringID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeNullableOctetStringID")
+    = 0x00004019,
+    MTRClusterTestClusterAttributeNullableCharStringID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeNullableCharStringID")
+    = 0x0000401E,
+    MTRClusterTestClusterAttributeNullableEnumAttrID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeNullableEnumAttrID")
+    = 0x00004024,
+    MTRClusterTestClusterAttributeNullableStructID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeNullableStructID")
+    = 0x00004025,
+    MTRClusterTestClusterAttributeNullableRangeRestrictedInt8uID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeNullableRangeRestrictedInt8uID")
+    = 0x00004026,
+    MTRClusterTestClusterAttributeNullableRangeRestrictedInt8sID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeNullableRangeRestrictedInt8sID")
+    = 0x00004027,
+    MTRClusterTestClusterAttributeNullableRangeRestrictedInt16uID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeNullableRangeRestrictedInt16uID")
+    = 0x00004028,
+    MTRClusterTestClusterAttributeNullableRangeRestrictedInt16sID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingAttributeNullableRangeRestrictedInt16sID")
+    = 0x00004029,
+    MTRClusterTestClusterAttributeWriteOnlyInt8uID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttributeWriteOnlyInt8uID")
+    = 0x0000402A,
+    MTRClusterTestClusterAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
+    MTRClusterTestClusterAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
+    MTRClusterTestClusterAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
+    MTRClusterTestClusterAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
+    MTRClusterTestClusterAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster FaultInjection attributes
     MTRClusterFaultInjectionAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
@@ -1379,6 +1556,7 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
 #pragma mark - Commands IDs
 
 typedef NS_ENUM(uint32_t, MTRClusterCommandIDType) {
+
     // Cluster Identify commands
     MTRClusterIdentifyCommandIdentifyID = 0x00000000,
     MTRClusterIdentifyCommandTriggerEffectID = 0x00000040,
@@ -1665,40 +1843,137 @@ typedef NS_ENUM(uint32_t, MTRClusterCommandIDType) {
     MTRClusterElectricalMeasurementCommandGetMeasurementProfileCommandID = 0x00000001,
 
     // Cluster UnitTesting commands
-    MTRClusterUnitTestingCommandTestID = 0x00000000,
-    MTRClusterUnitTestingCommandTestSpecificResponseID = 0x00000000,
-    MTRClusterUnitTestingCommandTestNotHandledID = 0x00000001,
-    MTRClusterUnitTestingCommandTestAddArgumentsResponseID = 0x00000001,
-    MTRClusterUnitTestingCommandTestSpecificID = 0x00000002,
-    MTRClusterUnitTestingCommandTestSimpleArgumentResponseID = 0x00000002,
-    MTRClusterUnitTestingCommandTestUnknownCommandID = 0x00000003,
-    MTRClusterUnitTestingCommandTestStructArrayArgumentResponseID = 0x00000003,
-    MTRClusterUnitTestingCommandTestAddArgumentsID = 0x00000004,
-    MTRClusterUnitTestingCommandTestListInt8UReverseResponseID = 0x00000004,
-    MTRClusterUnitTestingCommandTestSimpleArgumentRequestID = 0x00000005,
-    MTRClusterUnitTestingCommandTestEnumsResponseID = 0x00000005,
-    MTRClusterUnitTestingCommandTestStructArrayArgumentRequestID = 0x00000006,
-    MTRClusterUnitTestingCommandTestNullableOptionalResponseID = 0x00000006,
-    MTRClusterUnitTestingCommandTestStructArgumentRequestID = 0x00000007,
-    MTRClusterUnitTestingCommandTestComplexNullableOptionalResponseID = 0x00000007,
-    MTRClusterUnitTestingCommandTestNestedStructArgumentRequestID = 0x00000008,
-    MTRClusterUnitTestingCommandBooleanResponseID = 0x00000008,
-    MTRClusterUnitTestingCommandTestListStructArgumentRequestID = 0x00000009,
-    MTRClusterUnitTestingCommandSimpleStructResponseID = 0x00000009,
-    MTRClusterUnitTestingCommandTestListInt8UArgumentRequestID = 0x0000000A,
-    MTRClusterUnitTestingCommandTestEmitTestEventResponseID = 0x0000000A,
-    MTRClusterUnitTestingCommandTestNestedStructListArgumentRequestID = 0x0000000B,
-    MTRClusterUnitTestingCommandTestEmitTestFabricScopedEventResponseID = 0x0000000B,
-    MTRClusterUnitTestingCommandTestListNestedStructListArgumentRequestID = 0x0000000C,
-    MTRClusterUnitTestingCommandTestListInt8UReverseRequestID = 0x0000000D,
-    MTRClusterUnitTestingCommandTestEnumsRequestID = 0x0000000E,
-    MTRClusterUnitTestingCommandTestNullableOptionalRequestID = 0x0000000F,
-    MTRClusterUnitTestingCommandTestComplexNullableOptionalRequestID = 0x00000010,
-    MTRClusterUnitTestingCommandSimpleStructEchoRequestID = 0x00000011,
-    MTRClusterUnitTestingCommandTimedInvokeRequestID = 0x00000012,
-    MTRClusterUnitTestingCommandTestSimpleOptionalArgumentRequestID = 0x00000013,
-    MTRClusterUnitTestingCommandTestEmitTestEventRequestID = 0x00000014,
-    MTRClusterUnitTestingCommandTestEmitTestFabricScopedEventRequestID = 0x00000015,
+    MTRClusterUnitTestingCommandTestID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRClusterUnitTestingCommandTestSpecificResponseID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRClusterUnitTestingCommandTestNotHandledID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRClusterUnitTestingCommandTestAddArgumentsResponseID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRClusterUnitTestingCommandTestSpecificID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRClusterUnitTestingCommandTestSimpleArgumentResponseID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRClusterUnitTestingCommandTestUnknownCommandID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRClusterUnitTestingCommandTestStructArrayArgumentResponseID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRClusterUnitTestingCommandTestAddArgumentsID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRClusterUnitTestingCommandTestListInt8UReverseResponseID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRClusterUnitTestingCommandTestSimpleArgumentRequestID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRClusterUnitTestingCommandTestEnumsResponseID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRClusterUnitTestingCommandTestStructArrayArgumentRequestID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRClusterUnitTestingCommandTestNullableOptionalResponseID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRClusterUnitTestingCommandTestStructArgumentRequestID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRClusterUnitTestingCommandTestComplexNullableOptionalResponseID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRClusterUnitTestingCommandTestNestedStructArgumentRequestID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRClusterUnitTestingCommandBooleanResponseID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRClusterUnitTestingCommandTestListStructArgumentRequestID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRClusterUnitTestingCommandSimpleStructResponseID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRClusterUnitTestingCommandTestListInt8UArgumentRequestID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRClusterUnitTestingCommandTestEmitTestEventResponseID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRClusterUnitTestingCommandTestNestedStructListArgumentRequestID MTR_NEWLY_AVAILABLE = 0x0000000B,
+    MTRClusterUnitTestingCommandTestEmitTestFabricScopedEventResponseID MTR_NEWLY_AVAILABLE = 0x0000000B,
+    MTRClusterUnitTestingCommandTestListNestedStructListArgumentRequestID MTR_NEWLY_AVAILABLE = 0x0000000C,
+    MTRClusterUnitTestingCommandTestListInt8UReverseRequestID MTR_NEWLY_AVAILABLE = 0x0000000D,
+    MTRClusterUnitTestingCommandTestEnumsRequestID MTR_NEWLY_AVAILABLE = 0x0000000E,
+    MTRClusterUnitTestingCommandTestNullableOptionalRequestID MTR_NEWLY_AVAILABLE = 0x0000000F,
+    MTRClusterUnitTestingCommandTestComplexNullableOptionalRequestID MTR_NEWLY_AVAILABLE = 0x00000010,
+    MTRClusterUnitTestingCommandSimpleStructEchoRequestID MTR_NEWLY_AVAILABLE = 0x00000011,
+    MTRClusterUnitTestingCommandTimedInvokeRequestID MTR_NEWLY_AVAILABLE = 0x00000012,
+    MTRClusterUnitTestingCommandTestSimpleOptionalArgumentRequestID MTR_NEWLY_AVAILABLE = 0x00000013,
+    MTRClusterUnitTestingCommandTestEmitTestEventRequestID MTR_NEWLY_AVAILABLE = 0x00000014,
+    MTRClusterUnitTestingCommandTestEmitTestFabricScopedEventRequestID MTR_NEWLY_AVAILABLE = 0x00000015,
+
+    // Cluster TestCluster commands
+    MTRClusterTestClusterCommandTestID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingCommandTestID") = 0x00000000,
+    MTRClusterTestClusterCommandTestSpecificResponseID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestSpecificResponseID")
+    = 0x00000000,
+    MTRClusterTestClusterCommandTestNotHandledID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingCommandTestNotHandledID")
+    = 0x00000001,
+    MTRClusterTestClusterCommandTestAddArgumentsResponseID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestAddArgumentsResponseID")
+    = 0x00000001,
+    MTRClusterTestClusterCommandTestSpecificID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingCommandTestSpecificID")
+    = 0x00000002,
+    MTRClusterTestClusterCommandTestSimpleArgumentResponseID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestSimpleArgumentResponseID")
+    = 0x00000002,
+    MTRClusterTestClusterCommandTestUnknownCommandID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestUnknownCommandID")
+    = 0x00000003,
+    MTRClusterTestClusterCommandTestStructArrayArgumentResponseID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestStructArrayArgumentResponseID")
+    = 0x00000003,
+    MTRClusterTestClusterCommandTestAddArgumentsID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingCommandTestAddArgumentsID")
+    = 0x00000004,
+    MTRClusterTestClusterCommandTestListInt8UReverseResponseID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestListInt8UReverseResponseID")
+    = 0x00000004,
+    MTRClusterTestClusterCommandTestSimpleArgumentRequestID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestSimpleArgumentRequestID")
+    = 0x00000005,
+    MTRClusterTestClusterCommandTestEnumsResponseID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestEnumsResponseID")
+    = 0x00000005,
+    MTRClusterTestClusterCommandTestStructArrayArgumentRequestID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestStructArrayArgumentRequestID")
+    = 0x00000006,
+    MTRClusterTestClusterCommandTestNullableOptionalResponseID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestNullableOptionalResponseID")
+    = 0x00000006,
+    MTRClusterTestClusterCommandTestStructArgumentRequestID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestStructArgumentRequestID")
+    = 0x00000007,
+    MTRClusterTestClusterCommandTestComplexNullableOptionalResponseID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestComplexNullableOptionalResponseID")
+    = 0x00000007,
+    MTRClusterTestClusterCommandTestNestedStructArgumentRequestID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestNestedStructArgumentRequestID")
+    = 0x00000008,
+    MTRClusterTestClusterCommandBooleanResponseID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingCommandBooleanResponseID")
+    = 0x00000008,
+    MTRClusterTestClusterCommandTestListStructArgumentRequestID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestListStructArgumentRequestID")
+    = 0x00000009,
+    MTRClusterTestClusterCommandSimpleStructResponseID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandSimpleStructResponseID")
+    = 0x00000009,
+    MTRClusterTestClusterCommandTestListInt8UArgumentRequestID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestListInt8UArgumentRequestID")
+    = 0x0000000A,
+    MTRClusterTestClusterCommandTestEmitTestEventResponseID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestEmitTestEventResponseID")
+    = 0x0000000A,
+    MTRClusterTestClusterCommandTestNestedStructListArgumentRequestID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestNestedStructListArgumentRequestID")
+    = 0x0000000B,
+    MTRClusterTestClusterCommandTestEmitTestFabricScopedEventResponseID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestEmitTestFabricScopedEventResponseID")
+    = 0x0000000B,
+    MTRClusterTestClusterCommandTestListNestedStructListArgumentRequestID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestListNestedStructListArgumentRequestID")
+    = 0x0000000C,
+    MTRClusterTestClusterCommandTestListInt8UReverseRequestID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestListInt8UReverseRequestID")
+    = 0x0000000D,
+    MTRClusterTestClusterCommandTestEnumsRequestID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingCommandTestEnumsRequestID")
+    = 0x0000000E,
+    MTRClusterTestClusterCommandTestNullableOptionalRequestID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestNullableOptionalRequestID")
+    = 0x0000000F,
+    MTRClusterTestClusterCommandTestComplexNullableOptionalRequestID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestComplexNullableOptionalRequestID")
+    = 0x00000010,
+    MTRClusterTestClusterCommandSimpleStructEchoRequestID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandSimpleStructEchoRequestID")
+    = 0x00000011,
+    MTRClusterTestClusterCommandTimedInvokeRequestID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTimedInvokeRequestID")
+    = 0x00000012,
+    MTRClusterTestClusterCommandTestSimpleOptionalArgumentRequestID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestSimpleOptionalArgumentRequestID")
+    = 0x00000013,
+    MTRClusterTestClusterCommandTestEmitTestEventRequestID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestEmitTestEventRequestID")
+    = 0x00000014,
+    MTRClusterTestClusterCommandTestEmitTestFabricScopedEventRequestID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingCommandTestEmitTestFabricScopedEventRequestID")
+    = 0x00000015,
 
     // Cluster FaultInjection commands
     MTRClusterFaultInjectionCommandFailAtFaultID = 0x00000000,
@@ -1709,6 +1984,7 @@ typedef NS_ENUM(uint32_t, MTRClusterCommandIDType) {
 #pragma mark - Events IDs
 
 typedef NS_ENUM(uint32_t, MTRClusterEventIDType) {
+
     // Cluster AccessControl events
     MTRClusterAccessControlEventAccessControlEntryChangedID = 0x00000000,
     MTRClusterAccessControlEventAccessControlExtensionChangedID = 0x00000001,
@@ -1791,7 +2067,13 @@ typedef NS_ENUM(uint32_t, MTRClusterEventIDType) {
     MTRClusterPumpConfigurationAndControlEventTurbineOperationID = 0x00000010,
 
     // Cluster UnitTesting events
-    MTRClusterUnitTestingEventTestEventID = 0x00000001,
-    MTRClusterUnitTestingEventTestFabricScopedEventID = 0x00000002,
+    MTRClusterUnitTestingEventTestEventID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRClusterUnitTestingEventTestFabricScopedEventID MTR_NEWLY_AVAILABLE = 0x00000002,
+
+    // Cluster TestCluster events
+    MTRClusterTestClusterEventTestEventID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingEventTestEventID") = 0x00000001,
+    MTRClusterTestClusterEventTestFabricScopedEventID MTR_NEWLY_DEPRECATED(
+        "Please use MTRClusterUnitTestingEventTestFabricScopedEventID")
+    = 0x00000002,
 
 };
