@@ -34,6 +34,7 @@ macro(chip_app_component_codegen IDL_NAME)
       GENERATOR "cpp-app"
       OUTPUTS
             "app/PluginApplicationCallbacks.h"
+            "app/callback-stub.cpp"
       OUTPUT_PATH   APP_GEN_DIR
       OUTPUT_FILES  APP_GEN_FILES
     )
@@ -41,5 +42,7 @@ macro(chip_app_component_codegen IDL_NAME)
     target_include_directories(${COMPONENT_LIB} PUBLIC "${APP_GEN_DIR}")
 
     add_dependencies(${COMPONENT_LIB} app-codegen)
+
+    target_sources(${COMPONENT_LIB} PRIVATE ${APP_GEN_FILES})
   endif()
 endmacro()
