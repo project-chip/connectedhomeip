@@ -548,9 +548,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
         err = writer->StartContainer(TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kThreadScanResults)),
                                      TLV::TLVType::kTLVType_Array, listContainerType));
 
-    VerifyOrExit(
-        scanResponseArray.Alloc(networks->Count() > kMaxNetworksInScanResponse ? kMaxNetworksInScanResponse : networks->Count()),
-        err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(scanResponseArray.Alloc(chip::min(networks->Count(), kMaxNetworksInScanResponse)), err = CHIP_ERROR_NO_MEMORY);
     for (; networks != nullptr && networks->Next(scanResponse);)
     {
         if ((scanResponseArrayLength == kMaxNetworksInScanResponse) &&
