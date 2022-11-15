@@ -74,6 +74,8 @@ static NSString * const kErrorKeyAllocation = @"Generating new operational key f
 static NSString * const kErrorCSRValidation = @"Extracting public key from CSR failed";
 static NSString * const kErrorGetCommissionee = @"Failure obtaining device being commissioned";
 static NSString * const kErrorGetAttestationChallenge = @"Failure getting attestation challenge";
+static NSString * const kErrorSpake2pVerifierGenerationFailed = @"PASE verifier generation failed";
+static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifier serialization failed";
 
 @interface MTRDeviceController ()
 
@@ -379,91 +381,22 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
             pairingCode = [payload manualEntryCode];
         }
         if (pairingCode == nil) {
-            success = ![self checkForError:CHIP_ERROR_INVALID_ARGUMENT logMsg:kErrorSetupCodeGen error:error];
+            success = ![MTRDeviceController checkForError:CHIP_ERROR_INVALID_ARGUMENT logMsg:kErrorSetupCodeGen error:error];
             return;
         }
 
         chip::NodeId nodeId = [newNodeID unsignedLongLongValue];
         _operationalCredentialsDelegate->SetDeviceID(nodeId);
         CHIP_ERROR errorCode = self.cppCommissioner->EstablishPASEConnection(nodeId, [pairingCode UTF8String]);
-        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
+        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
 
     return success;
 }
 
-- (BOOL)pairDevice:(uint64_t)deviceID
-     discriminator:(uint16_t)discriminator
-      setupPINCode:(uint32_t)setupPINCode
-             error:(NSError * __autoreleasing *)error
-{
-    VerifyOrReturnValue([self checkIsRunning:error], NO);
-
-    __block BOOL success = NO;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-
-        std::string manualPairingCode;
-        chip::SetupPayload payload;
-        payload.discriminator.SetLongValue(discriminator);
-        payload.setUpPINCode = setupPINCode;
-
-        auto errorCode = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);
-        success = ![self checkForError:errorCode logMsg:kErrorSetupCodeGen error:error];
-        VerifyOrReturn(success);
-
-        _operationalCredentialsDelegate->SetDeviceID(deviceID);
-        errorCode = self.cppCommissioner->EstablishPASEConnection(deviceID, manualPairingCode.c_str());
-        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
-    });
-
-    return success;
-}
-
-- (BOOL)pairDevice:(uint64_t)deviceID
-           address:(NSString *)address
-              port:(uint16_t)port
-      setupPINCode:(uint32_t)setupPINCode
-             error:(NSError * __autoreleasing *)error
-{
-    VerifyOrReturnValue([self checkIsRunning:error], NO);
-
-    __block BOOL success = NO;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-
-        chip::Inet::IPAddress addr;
-        chip::Inet::IPAddress::FromString([address UTF8String], addr);
-        chip::Transport::PeerAddress peerAddress = chip::Transport::PeerAddress::UDP(addr, port);
-
-        _operationalCredentialsDelegate->SetDeviceID(deviceID);
-
-        auto params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetPeerAddress(peerAddress);
-        auto errorCode = self.cppCommissioner->EstablishPASEConnection(deviceID, params);
-        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
-    });
-
-    return success;
-}
-
-- (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error
-{
-    VerifyOrReturnValue([self checkIsRunning:error], NO);
-
-    __block BOOL success = NO;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-
-        _operationalCredentialsDelegate->SetDeviceID(deviceID);
-        auto errorCode = self.cppCommissioner->EstablishPASEConnection(deviceID, [onboardingPayload UTF8String]);
-        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
-    });
-    return success;
-}
-
-- (BOOL)commissionDevice:(uint64_t)deviceID
-     commissioningParams:(MTRCommissioningParameters *)commissioningParams
-                   error:(NSError * __autoreleasing *)error
+- (BOOL)commissionNodeWithID:(NSNumber *)nodeID
+         commissioningParams:(MTRCommissioningParameters *)commissioningParams
+                       error:(NSError * __autoreleasing *)error
 {
     VerifyOrReturnValue([self checkIsRunning:error], NO);
 
@@ -508,9 +441,10 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
             params.SetDeviceAttestationDelegate(_deviceAttestationDelegateBridge);
         }
 
-        _operationalCredentialsDelegate->SetDeviceID(deviceID);
-        auto errorCode = self.cppCommissioner->Commission(deviceID, params);
-        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
+        chip::NodeId deviceId = [nodeID unsignedLongLongValue];
+        _operationalCredentialsDelegate->SetDeviceID(deviceId);
+        auto errorCode = self.cppCommissioner->Commission(deviceId, params);
+        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
     return success;
 }
@@ -532,12 +466,12 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
         auto deviceProxy = static_cast<chip::DeviceProxy *>(device);
         auto errorCode = self.cppCommissioner->ContinueCommissioningAfterDeviceAttestation(deviceProxy,
             ignoreAttestationFailure ? chip::Credentials::AttestationVerificationResult::kSuccess : lastAttestationResult);
-        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
+        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
     return success;
 }
 
-- (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
+- (BOOL)cancelCommissioningForNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
 {
     VerifyOrReturnValue([self checkIsRunning:error], NO);
 
@@ -546,14 +480,13 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
         VerifyOrReturn([self checkIsRunning:error]);
 
         _operationalCredentialsDelegate->ResetDeviceID();
-        auto errorCode = self.cppCommissioner->StopPairing(deviceID);
-        success = ![self checkForError:errorCode logMsg:kErrorStopPairing error:error];
+        auto errorCode = self.cppCommissioner->StopPairing([nodeID unsignedLongLongValue]);
+        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error];
     });
-
     return success;
 }
 
-- (MTRBaseDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error
+- (MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
 {
     VerifyOrReturnValue([self checkIsRunning:error], nil);
 
@@ -563,8 +496,8 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
         VerifyOrReturn([self checkIsRunning:error]);
 
         chip::CommissioneeDeviceProxy * deviceProxy;
-        auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(deviceId, &deviceProxy);
-        success = ![self checkForError:errorCode logMsg:kErrorStopPairing error:error];
+        auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(nodeID.unsignedLongLongValue, &deviceProxy);
+        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error];
         device = [[MTRBaseDevice alloc] initWithPASEDevice:deviceProxy controller:self];
     });
     VerifyOrReturnValue(success, nil);
@@ -572,10 +505,9 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     return device;
 }
 
-- (BOOL)getBaseDevice:(uint64_t)deviceID queue:(dispatch_queue_t)queue completion:(MTRDeviceConnectionCallback)completion
+- (MTRBaseDevice *)baseDeviceForNodeID:(NSNumber *)nodeID
 {
-    // Will get removed once deviceWithNodeID exists.
-    return [self getBaseDevice:deviceID queue:queue completionHandler:completion];
+    return [[MTRBaseDevice alloc] initWithNodeID:nodeID controller:self];
 }
 
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
@@ -601,90 +533,6 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
         MTR_LOG_ERROR("Error: Cannot remove device %p with nodeID %llu", device, device.nodeID.unsignedLongLongValue);
     }
     os_unfair_lock_unlock(&_deviceMapLock);
-}
-
-- (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error
-{
-    VerifyOrReturnValue([self checkIsRunning:error], NO);
-
-    if (duration > UINT16_MAX) {
-        MTR_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
-        }
-        return NO;
-    }
-
-    __block BOOL success = NO;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-
-        auto errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(
-            self.cppCommissioner, deviceID, chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)));
-        success = ![self checkForError:errorCode logMsg:kErrorOpenPairingWindow error:error];
-    });
-
-    return success;
-}
-
-- (NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
-                              duration:(NSUInteger)duration
-                         discriminator:(NSUInteger)discriminator
-                              setupPIN:(NSUInteger)setupPIN
-                                 error:(NSError * __autoreleasing *)error
-{
-    __block NSString * rv = nil;
-
-    VerifyOrReturnValue([self checkIsRunning:error], rv);
-
-    if (duration > UINT16_MAX) {
-        MTR_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
-        }
-        return rv;
-    }
-
-    if (discriminator > 0xfff) {
-        MTR_LOG_ERROR("Error: Discriminator %tu is too large. Max value %d", discriminator, 0xfff);
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
-        }
-        return rv;
-    }
-
-    if (!chip::CanCastTo<uint32_t>(setupPIN) || !chip::SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(setupPIN))) {
-        MTR_LOG_ERROR("Error: Setup pin %lu is not valid", static_cast<unsigned long>(setupPIN));
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
-        }
-        return rv;
-    }
-
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-
-        chip::SetupPayload setupPayload;
-        auto errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(self.cppCommissioner, deviceID,
-            chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)), chip::Crypto::kSpake2p_Min_PBKDF_Iterations,
-            static_cast<uint16_t>(discriminator), chip::MakeOptional(static_cast<uint32_t>(setupPIN)), chip::NullOptional,
-            setupPayload);
-
-        auto success = ![self checkForError:errorCode logMsg:kErrorOpenPairingWindow error:error];
-        VerifyOrReturn(success);
-
-        chip::ManualSetupPayloadGenerator generator(setupPayload);
-        std::string outCode;
-
-        if (generator.payloadDecimalStringRepresentation(outCode) == CHIP_NO_ERROR) {
-            MTR_LOG_ERROR("Setup code is %s", outCode.c_str());
-            rv = [NSString stringWithCString:outCode.c_str() encoding:[NSString defaultCStringEncoding]];
-        } else {
-            MTR_LOG_ERROR("Failed to get decimal setup code");
-        }
-    });
-
-    return rv;
 }
 
 - (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue
@@ -714,20 +562,21 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     });
 }
 
-- (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode iterations:(uint32_t)iterations salt:(NSData *)salt
++ (nullable NSData *)computePASEVerifierForSetupPasscode:(NSNumber *)setupPasscode
+                                              iterations:(NSNumber *)iterations
+                                                    salt:(NSData *)salt
+                                                   error:(NSError * __autoreleasing *)error
 {
     chip::Spake2pVerifier verifier;
-    CHIP_ERROR err = verifier.Generate(iterations, AsByteSpan(salt), setupPincode);
-    if (err != CHIP_NO_ERROR) {
-        MTR_LOG_ERROR("computePaseVerifier generation failed: %s", chip::ErrorStr(err));
+    CHIP_ERROR err = verifier.Generate(iterations.unsignedIntValue, AsByteSpan(salt), setupPasscode.unsignedIntValue);
+    if ([MTRDeviceController checkForError:err logMsg:kErrorSpake2pVerifierGenerationFailed error:error]) {
         return nil;
     }
 
     uint8_t serializedBuffer[chip::Crypto::kSpake2p_VerifierSerialized_Length];
     chip::MutableByteSpan serializedBytes(serializedBuffer);
     err = verifier.Serialize(serializedBytes);
-    if (err != CHIP_NO_ERROR) {
-        MTR_LOG_ERROR("computePaseVerifier serialization failed: %s", chip::ErrorStr(err));
+    if ([MTRDeviceController checkForError:err logMsg:kErrorSpake2pVerifierSerializationFailed error:error]) {
         return nil;
     }
 
@@ -744,14 +593,14 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
 
         chip::CommissioneeDeviceProxy * deviceProxy;
         auto errorCode = self.cppCommissioner->GetDeviceBeingCommissioned([deviceID unsignedLongLongValue], &deviceProxy);
-        auto success = ![self checkForError:errorCode logMsg:kErrorGetCommissionee error:nil];
+        auto success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorGetCommissionee error:nil];
         VerifyOrReturn(success);
 
         uint8_t challengeBuffer[chip::Crypto::kAES_CCM128_Key_Length];
         chip::ByteSpan challenge(challengeBuffer);
 
         errorCode = deviceProxy->GetAttestationChallenge(challenge);
-        success = ![self checkForError:errorCode logMsg:kErrorGetAttestationChallenge error:nil];
+        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorGetAttestationChallenge error:nil];
         VerifyOrReturn(success);
 
         attestationChallenge = AsData(challenge);
@@ -792,7 +641,7 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
     return YES;
 }
 
-- (BOOL)checkForError:(CHIP_ERROR)errorCode logMsg:(NSString *)logMsg error:(NSError * __autoreleasing *)error
++ (BOOL)checkForError:(CHIP_ERROR)errorCode logMsg:(NSString *)logMsg error:(NSError * __autoreleasing *)error
 {
     if (CHIP_NO_ERROR == errorCode) {
         return NO;
@@ -1014,6 +863,181 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
                                 completion(device, error);
                             });
                         }];
+}
+
+- (BOOL)pairDevice:(uint64_t)deviceID
+     discriminator:(uint16_t)discriminator
+      setupPINCode:(uint32_t)setupPINCode
+             error:(NSError * __autoreleasing *)error
+{
+    VerifyOrReturnValue([self checkIsRunning:error], NO);
+
+    __block BOOL success = NO;
+    dispatch_sync(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning:error]);
+
+        std::string manualPairingCode;
+        chip::SetupPayload payload;
+        payload.discriminator.SetLongValue(discriminator);
+        payload.setUpPINCode = setupPINCode;
+
+        auto errorCode = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);
+        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorSetupCodeGen error:error];
+        VerifyOrReturn(success);
+
+        _operationalCredentialsDelegate->SetDeviceID(deviceID);
+        errorCode = self.cppCommissioner->EstablishPASEConnection(deviceID, manualPairingCode.c_str());
+        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
+    });
+
+    return success;
+}
+
+- (BOOL)pairDevice:(uint64_t)deviceID
+           address:(NSString *)address
+              port:(uint16_t)port
+      setupPINCode:(uint32_t)setupPINCode
+             error:(NSError * __autoreleasing *)error
+{
+    VerifyOrReturnValue([self checkIsRunning:error], NO);
+
+    __block BOOL success = NO;
+    dispatch_sync(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning:error]);
+
+        chip::Inet::IPAddress addr;
+        chip::Inet::IPAddress::FromString([address UTF8String], addr);
+        chip::Transport::PeerAddress peerAddress = chip::Transport::PeerAddress::UDP(addr, port);
+
+        _operationalCredentialsDelegate->SetDeviceID(deviceID);
+
+        auto params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetPeerAddress(peerAddress);
+        auto errorCode = self.cppCommissioner->EstablishPASEConnection(deviceID, params);
+        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
+    });
+
+    return success;
+}
+
+- (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error
+{
+    VerifyOrReturnValue([self checkIsRunning:error], NO);
+
+    __block BOOL success = NO;
+    dispatch_sync(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning:error]);
+
+        _operationalCredentialsDelegate->SetDeviceID(deviceID);
+        auto errorCode = self.cppCommissioner->EstablishPASEConnection(deviceID, [onboardingPayload UTF8String]);
+        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
+    });
+    return success;
+}
+
+- (BOOL)commissionDevice:(uint64_t)deviceID
+     commissioningParams:(MTRCommissioningParameters *)commissioningParams
+                   error:(NSError * __autoreleasing *)error
+{
+    return [self commissionNodeWithID:@(deviceID) commissioningParams:commissioningParams error:error];
+}
+
+- (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
+{
+    return [self cancelCommissioningForNodeID:@(deviceID) error:error];
+}
+
+- (MTRBaseDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error
+{
+    return [self deviceBeingCommissionedWithNodeID:@(deviceId) error:error];
+}
+
+- (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error
+{
+    VerifyOrReturnValue([self checkIsRunning:error], NO);
+
+    if (duration > UINT16_MAX) {
+        MTR_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+        }
+        return NO;
+    }
+
+    __block BOOL success = NO;
+    dispatch_sync(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning:error]);
+
+        auto errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(
+            self.cppCommissioner, deviceID, chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)));
+        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorOpenPairingWindow error:error];
+    });
+
+    return success;
+}
+
+- (NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
+                              duration:(NSUInteger)duration
+                         discriminator:(NSUInteger)discriminator
+                              setupPIN:(NSUInteger)setupPIN
+                                 error:(NSError * __autoreleasing *)error
+{
+    __block NSString * rv = nil;
+
+    VerifyOrReturnValue([self checkIsRunning:error], rv);
+
+    if (duration > UINT16_MAX) {
+        MTR_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+        }
+        return rv;
+    }
+
+    if (discriminator > 0xfff) {
+        MTR_LOG_ERROR("Error: Discriminator %tu is too large. Max value %d", discriminator, 0xfff);
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+        }
+        return rv;
+    }
+
+    if (!chip::CanCastTo<uint32_t>(setupPIN) || !chip::SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(setupPIN))) {
+        MTR_LOG_ERROR("Error: Setup pin %lu is not valid", static_cast<unsigned long>(setupPIN));
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+        }
+        return rv;
+    }
+
+    dispatch_sync(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning:error]);
+
+        chip::SetupPayload setupPayload;
+        auto errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(self.cppCommissioner, deviceID,
+            chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)), chip::Crypto::kSpake2p_Min_PBKDF_Iterations,
+            static_cast<uint16_t>(discriminator), chip::MakeOptional(static_cast<uint32_t>(setupPIN)), chip::NullOptional,
+            setupPayload);
+
+        auto success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorOpenPairingWindow error:error];
+        VerifyOrReturn(success);
+
+        chip::ManualSetupPayloadGenerator generator(setupPayload);
+        std::string outCode;
+
+        if (generator.payloadDecimalStringRepresentation(outCode) == CHIP_NO_ERROR) {
+            MTR_LOG_ERROR("Setup code is %s", outCode.c_str());
+            rv = [NSString stringWithCString:outCode.c_str() encoding:[NSString defaultCStringEncoding]];
+        } else {
+            MTR_LOG_ERROR("Failed to get decimal setup code");
+        }
+    });
+
+    return rv;
+}
+
+- (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode iterations:(uint32_t)iterations salt:(NSData *)salt
+{
+    return [MTRDeviceController computePASEVerifierForSetupPasscode:@(setupPincode) iterations:@(iterations) salt:salt error:nil];
 }
 
 @end
