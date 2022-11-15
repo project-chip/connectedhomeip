@@ -55,7 +55,7 @@ declare_args() {
   sl_wfx_config_scan = true
 
   # Disable LCD on supported devices
-  disable_lcd = false
+  disable_lcd = true
 
   # Argument to Disable IPv4 for wifi(rs911)
   chip_enable_wifi_ipv4 = false
@@ -79,7 +79,7 @@ assert(!(use_wf200 && chip_enable_openthread))
 if (chip_enable_wifi) {
   assert(use_rs911x || use_wf200)
   enable_openthread_cli = false
-  import("${chip_root}/src/platform/Silabs/SiWx917/wifi_args.gni")
+  import("${chip_root}/src/platform/silabs/SiWx917/wifi_args.gni")
 }
 
 # ThunderBoards, Explorer Kit and MGM240L do not support LCD (No LCD)
@@ -96,7 +96,7 @@ if (chip_enable_wifi) {
     show_qr_code = false
     disable_lcd = true
   }
-  wifi_sdk_dir = "${chip_root}/src/platform/Silabs/SiWx917/wifi"
+  wifi_sdk_dir = "${chip_root}/src/platform/silabs/SiWx917/wifi"
   efr32_lwip_defs = [ "LWIP_NETIF_API=1" ]
   if (lwip_ipv4) {
     efr32_lwip_defs += [
@@ -122,7 +122,7 @@ if (chip_enable_wifi) {
   }
 
     wiseconnect_sdk_root =
-        "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
+        "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
     import("${examples_plat_dir}/SiWx917/rs911x.gni")
 }
 
@@ -133,10 +133,12 @@ efr32_sdk("sdk") {
   ]
 
   include_dirs = [
-    "${chip_root}/src/platform/Silabs/SiWx917",
+    "${chip_root}/src/platform/silabs/SiWx917",
+    "${chip_root}/third_party/mbedtls/repo/library",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
+    "${chip_root}/examples/platform/silabs",
   ]
 
   defines = [
@@ -185,23 +187,22 @@ efr32_executable("lighting_app") {
 
   sources = [
     "${examples_plat_dir}/BaseApplication.cpp",
-    "${examples_plat_dir}/efr32_utils.cpp",
-    "${examples_plat_dir}/heap_4_silabs.c",
-    "${examples_plat_dir}/init_efrPlatform.cpp",
+    "${examples_plat_dir}/siwx917_utils.cpp",
+    "${examples_plat_dir}/../heap_4_silabs.c",
+    "${examples_plat_dir}/init_ccpPlatform.cpp",
     "${examples_plat_dir}/matter_config.cpp",
+    "src/main.cpp",
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
-    "src/main.cpp",
   ]
 
   if (use_wstk_leds) {
-    sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
+    #sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
   }
 
-  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
-      use_wf200 || use_rs911x) {
-    sources += [ "${examples_plat_dir}/uart.cpp" ]
+  if (chip_enable_pw_rpc || chip_build_libshell || use_rs911x) {
+    #sources += [ "${examples_plat_dir}/uart.cpp" ]
   }
 
   deps = [
@@ -221,10 +222,6 @@ efr32_executable("lighting_app") {
     ]
   }
 
-  if (chip_enable_ota_requestor) {
-    defines += [ "EFR32_OTA_ENABLED" ]
-    sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
-  }
 
   # WiFi Settings
   if (chip_enable_wifi) {
@@ -298,8 +295,8 @@ efr32_executable("lighting_app") {
     sources += [
       "${chip_root}/examples/common/pigweed/RpcService.cpp",
       "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-      "${examples_plat_dir}/PigweedLogger.cpp",
-      "${examples_plat_dir}/Rpc.cpp",
+      "${examples_plat_dir}/../PigweedLogger.cpp",
+      "${examples_plat_dir}/../Rpc.cpp",
     ]
 
     deps += [
@@ -316,7 +313,7 @@ efr32_executable("lighting_app") {
       "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
-      "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
+      "${examples_plat_dir}/pw_sys_io:pw_sys_io_siwx917",
     ]
 
     deps += pw_build_LINK_DEPS
@@ -328,7 +325,7 @@ efr32_executable("lighting_app") {
   }
 
   if (enable_heap_monitoring) {
-    sources += [ "${examples_plat_dir}/MemMonitoring.cpp" ]
+    sources += [ "${examples_plat_dir}/../MemMonitoring.cpp" ]
     defines += [ "HEAP_MONITORING" ]
   }
 
@@ -355,7 +352,7 @@ efr32_executable("lighting_app") {
 
   # Attestation Credentials
   if (chip_build_platform_attestation_credentials_provider) {
-    deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
+    deps += [ "${examples_plat_dir}:siwx917-attestation-credentials" ]
   }
 
   # Factory Data Provider

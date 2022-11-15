@@ -3,23 +3,32 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
-wifi_sdk_dir = "${chip_root}/src/platform/Silabs/SiWx917/wifi"
-wiseconnect_sdk_root = "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
+wifi_sdk_dir = "${chip_root}/src/platform/silabs/SiWx917/wifi"
+wiseconnect_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
 rs911x_cflags = []
 
 rs911x_src_plat = [
   "${examples_plat_dir}/SiWx917/rsi_if.c",
   "${examples_plat_dir}/SiWx917/wfx_rsi_host.c",
   "${wifi_sdk_dir}/wfx_notify.cpp",
-  "${examples_plat_dir}/SiWx917/hal/rsi_hal_mcu_interrupt.c",
-  "${examples_plat_dir}/SiWx917/hal/rsi_hal_mcu_ioports.c",
+
+
   "${examples_plat_dir}/SiWx917/hal/rsi_hal_mcu_timer.c",
-  "${examples_plat_dir}/SiWx917/hal/efx_spi.c",
+  "${wiseconnect_sdk_root}/platforms/si91x/hal/src/rsi_bootup_config.c",
+  "${wiseconnect_sdk_root}/platforms/si91x/hal/src/rsi_hal_mcu_m4.c",
+  "${wiseconnect_sdk_root}/platforms/si91x/hal/src/rsi_hal_mcu_platform_init.c",
+  "${wiseconnect_sdk_root}/platforms/si91x/hal/src/rsi_hal_mcu_m4_rom.c",
+  "${wiseconnect_sdk_root}/platforms/si91x/hal/src/rsi_hal_mcu_interrupt.c",
 ]
 rs911x_plat_incs = [
   "${wifi_sdk_dir}",
   "${wifi_sdk_dir}/hal",
-  "${chip_root}/src/platform/Silabs/SiWx917",
+  "${wiseconnect_sdk_root}/platforms/si91x/hal/inc",
+#  "${wiseconnect_sdk_root}/sapi/include",
+  "${chip_root}/src/platform/silabs/SiWx917",
+  "${chip_root}/src/platform/silabs/SiWx917/bluetooth",
+  "${examples_plat_dir}/SiWx917",
+  "${wiseconnect_sdk_root}/platforms/si91x/hal/inc",
 ]
 
 #
@@ -31,6 +40,7 @@ rs911x_src_sapi = [
   "${wiseconnect_sdk_root}/sapi/common/rsi_apis_rom.c",
   "${wiseconnect_sdk_root}/sapi/common/rsi_common_apis.c",
   "${wiseconnect_sdk_root}/sapi/common/rsi_device_init_apis.c",
+#  "${wiseconnect_sdk_root}/sapi/common/rsi_wisemcu_hardware_setup.c",
   "${wiseconnect_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_frame_rd_wr.c",
   "${wiseconnect_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_functs.c",
   "${wiseconnect_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_iface_init.c",
@@ -60,7 +70,13 @@ rs911x_src_sapi = [
 ]
 
 foreach(src_file, rs911x_src_sapi) {
-  rs911x_cflags += [ "-Wno-empty-body" ]
+  rs911x_cflags += [ "-Wno-empty-body" ,
+                     "-Wno-ccp" ,
+                     "-Wno-error",
+                     "-Wno-unknown-warning-option",
+                     "-Wno-unused-variable",
+                     "-Wno-implicit-function-declaration",
+                     "-Wno-unused-function"]
 }
 
 rs911x_inc_plat = [
@@ -68,6 +84,21 @@ rs911x_inc_plat = [
   "${examples_plat_dir}/SiWx917",
   "${examples_plat_dir}/SiWx917/hal",
   "${wiseconnect_sdk_root}/sapi/include",
+
+   #CCP Platfrom
+  "${wiseconnect_sdk_root}/platforms/si91x/hal/inc",
+  "${wiseconnect_sdk_root}/platforms/si91x/boards/brd4325a/inc",
+  "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/inc",
+  "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/inc",
+  "${wiseconnect_sdk_root}/platforms/si91x/core/chip/inc",
+  "${wiseconnect_sdk_root}/platforms/si91x/core/config",
+  "${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver/config",
+  "${wiseconnect_sdk_root}/platforms/si91x/drivers/rom_driver/inc",
+  "${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver",
+  "${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver/CMSIS/Driver/Include",
+
+  "${wiseconnect_sdk_root}/platforms/si91x/core/cmsis",
+  "${wiseconnect_sdk_root}/platforms/si91x/service/system/inc",
 ]
 
 # Apparently - the rsi library needs this
@@ -86,14 +117,19 @@ rs911x_src_lwip = [
   "${wifi_sdk_dir}/lwip_netif.cpp",
 ]
 rs911x_defs = [
+  "CCP_SI917_BRINGUP=1",
   "SL_HEAP_SIZE=32768",
   "SL_WIFI=1",
-  "SL_WFX_USE_SPI",
-  "EFX32_RS911X=1",
   "RS911X_WIFI",
   "RSI_WLAN_ENABLE",
-  "RSI_SPI_INTERFACE",
   "RSI_WITH_OS",
+  "RSI_M4_INTERFACE", #Enable CCP bus Interface
+  "RSI_WLAN_API_ENABLE",
+  "HMAC_512",
+  "LITTLE_ENDIAN_ORDER",
+  "_CHIP_9118",
+#  "ROM_WIRELESS"
+  #__CC_ARM DEBUG_UART _CHIP_9118   LITTLE_ENDIAN_ORDER HMAC_512
 ]
 rs911x_sock_defs = [
   "RS911X_SOCKETS",

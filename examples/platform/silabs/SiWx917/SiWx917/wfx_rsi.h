@@ -21,9 +21,9 @@
  * Interface to RSI Sapis
  */
 
-#define WFX_RSI_WLAN_TASK_SZ (1024 + 512 + 256) /* Unknown how big this should be 	*/
-#define WFX_RSI_TASK_SZ (1024 + 1024)           /* Stack for the WFX/RSI task		*/
-#define WFX_RSI_BUF_SZ (1024 * 10)              /* May need tweak 			*/
+#define WFX_RSI_WLAN_TASK_SZ (1024 + 512 + 256 + 1024 + 512) /* Unknown how big this should be 	*/
+#define WFX_RSI_TASK_SZ (1024 + 1024 + 1024)           /* Stack for the WFX/RSI task		*/
+#define WFX_RSI_BUF_SZ (1024 * 15)              /* May need tweak 			*/
 #define WFX_RSI_CONFIG_MAX_JOIN 5               /* Max join retries			*/
 #define WFX_RSI_NUM_TIMERS 2                    /* Number of RSI timers to alloc	*/
 
@@ -57,6 +57,8 @@ struct wfx_rsi
     EventGroupHandle_t events;
     TaskHandle_t drv_task;
     TaskHandle_t wlan_task;
+    TaskHandle_t init_task;
+    TaskHandle_t ble_task;
     uint16_t dev_state;
     uint16_t ap_chan; /* The chan our STA is using	*/
     wfx_wifi_provision_t sec;

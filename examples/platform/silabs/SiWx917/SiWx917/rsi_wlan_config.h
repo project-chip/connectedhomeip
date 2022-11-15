@@ -25,9 +25,6 @@
 //! Disable feature
 #define RSI_DISABLE 0
 
-//! To enable wlan opermode
-#define RSI_OPERMODE_WLAN 0
-
 //! To enable concurrent mode
 #define CONCURRENT_MODE RSI_DISABLE
 
@@ -37,49 +34,30 @@
 #define RSI_FEATURE_BIT_MAP (FEAT_SECURITY_OPEN)
 
 //! TCP IP BYPASS feature check
-#ifdef RS911X_SOCKETS
-#define RSI_TCP_IP_BYPASS RSI_DISABLE
+//#define RSI_TCP_IP_BYPASS RSI_DISABLE
+//! TCP/IP feature select bitmap for selecting TCP/IP features
+//#define RSI_TCP_IP_FEATURE_BIT_MAP (TCP_IP_FEAT_DHCPV4_CLIENT | TCP_IP_FEAT_ICMP)
 
-#define RSI_TCP_IP_FEATURE_BIT_MAP                                                                                                 \
-    (TCP_IP_FEAT_DHCPV4_CLIENT |                             /*TCP_IP_FEAT_HTTP_CLIENT | */                                        \
-     TCP_IP_FEAT_EXTENSION_VALID | /*TCP_IP_FEAT_SSL     |*/ /*TCP_IP_FEAT_DNS_CLIENT |*/                                          \
-     0)
+#define RSI_TCP_IP_BYPASS RSI_ENABLE
+//#define RSI_TCP_IP_FEATURE_BIT_MAP (TCP_IP_FEAT_DHCPV4_CLIENT | TCP_IP_FEAT_ICMP)
+#define RSI_TCP_IP_FEATURE_BIT_MAP (TCP_IP_FEAT_BYPASS /*| TCP_IP_FEAT_EXTENSION_VALID*/)
+
 //! To set custom feature select bit map
 #define RSI_CUSTOM_FEATURE_BIT_MAP FEAT_CUSTOM_FEAT_EXTENTION_VALID
 
-#else /* Don't use RSI_SOCKETS */
-#define RSI_TCP_IP_BYPASS RSI_ENABLE
-#define RSI_TCP_IP_FEATURE_BIT_MAP (TCP_IP_FEAT_BYPASS /*| TCP_IP_FEAT_EXTENSION_VALID*/)
-#endif
-
 //! To set Extended custom feature select bit map
-#if WIFI_ENABLE_SECURITY_WPA3
-#ifdef RSI_M4_INTERFACE
-#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP (EXT_FEAT_256K_MODE | EXT_FEAT_IEEE_80211W)
-#else
-#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP (EXT_FEAT_384K_MODE | EXT_FEAT_IEEE_80211W)
-#endif
-#else
-#ifdef RSI_M4_INTERFACE
-#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP EXT_FEAT_256K_MODE
-#else
-#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP EXT_FEAT_384K_MODE
-#endif
-#endif
+#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP EXT_FEAT_UART_SEL_FOR_DEBUG_PRINTS
 
-//! To set Extended TCPIP feature select bit map
-#define RSI_EXT_TCPIP_FEATURE_BITMAP (/*EXT_FEAT_HTTP_OTAF_SUPPORT |*/ EXT_TCP_IP_SSL_16K_RECORD)
-//! Extended custom feature is selected internally
-//! CCP         -- EXT_FEAT_256K_MODE
-//! Wiseconnect -- EXT_FEAT_384K_MODE
+#define RSI_EXT_TCPIP_FEATURE_BITMAP 0
+
 /*=======================================================================*/
 //! Feature frame parameters
 /*=======================================================================*/
-#define PLL_MODE 0
-#define RF_TYPE 1 //! 0 - External RF 1- Internal RF
-#define WIRELESS_MODE 0
-#define ENABLE_PPP 0
-#define AFE_TYPE 1
+#define PLL_MODE        0
+#define RF_TYPE         1 //! 0 - External RF 1- Internal RF
+#define WIRELESS_MODE   0
+#define ENABLE_PPP      0
+#define AFE_TYPE        1
 #define FEATURE_ENABLES 0
 /*=======================================================================*/
 //! Band command paramters
@@ -98,7 +76,7 @@
 #define RSI_SET_REGION_FROM_USER_OR_BEACON 1
 
 //! 0-Default Region domain ,1-US, 2-EUROPE, 3-JAPAN
-#define RSI_REGION_CODE 1
+#define RSI_REGION_CODE 3
 
 //! 0- Without On Board Antenna , 1- With On Board Antenna
 #define RSI_MODULE_TYPE 1
@@ -114,20 +92,21 @@
 #define RSI_SET_REGION_AP_FROM_USER RSI_DISABLE
 
 //! "US" or "EU" or "JP" or other region codes
-#define RSI_COUNTRY_CODE "US"
+#define RSI_COUNTRY_CODE "US "
+
 /*=======================================================================*/
 
 //! Rejoin parameters
 /*=======================================================================*/
 
 //! RSI_ENABLE or RSI_DISABLE rejoin params
-#define RSI_REJOIN_PARAMS_SUPPORT RSI_ENABLE
+#define RSI_REJOIN_PARAMS_SUPPORT RSI_DISABLE
 
 //! Rejoin retry count. If 0 retries infinity times
-#define RSI_REJOIN_MAX_RETRY 5
+#define RSI_REJOIN_MAX_RETRY 0
 
 //! Periodicity of rejoin attempt
-#define RSI_REJOIN_SCAN_INTERVAL 1
+#define RSI_REJOIN_SCAN_INTERVAL 4
 
 //! Beacon missed count
 #define RSI_REJOIN_BEACON_MISSED_COUNT 40
@@ -141,13 +120,13 @@
 /*=======================================================================*/
 
 //! RSI_ENABLE or RSI_DISABLE BG Scan support
-#define RSI_BG_SCAN_SUPPORT RSI_ENABLE
+#define RSI_BG_SCAN_SUPPORT RSI_DISABLE
 
 //! RSI_ENABLE or RSI_DISABLE BG scan
 #define RSI_BG_SCAN_ENABLE RSI_ENABLE
 
 //! RSI_ENABLE or RSI_DISABLE instant BG scan
-#define RSI_INSTANT_BG RSI_ENABLE
+#define RSI_INSTANT_BG 1 //RSI_DISABLE
 
 //! BG scan threshold value
 #define RSI_BG_SCAN_THRESHOLD 63
@@ -165,7 +144,7 @@
 #define RSI_PASSIVE_SCAN_DURATION 50
 
 //! Multi probe
-#define RSI_MULTIPROBE RSI_ENABLE
+#define RSI_MULTIPROBE RSI_DISABLE
 
 /*=======================================================================*/
 
@@ -197,15 +176,8 @@
 //! RSI_ENABLE or RSI_DISABLE 11n mode in AP mode
 #define RSI_MODE_11N_ENABLE RSI_DISABLE
 
-//! HT caps supported
-#define RSI_HT_CAPS_NUM_RX_STBC (1 << 8)
-#define RSI_HT_CAPS_SHORT_GI_20MHZ BIT(5)
-#define RSI_HT_CAPS_GREENFIELD_EN BIT(4)
-#define RSI_HT_CAPS_SUPPORT_CH_WIDTH BIT(1)
-
 //! HT caps bit map.
-#define RSI_HT_CAPS_BIT_MAP                                                                                                        \
-    (RSI_HT_CAPS_NUM_RX_STBC | RSI_HT_CAPS_SHORT_GI_20MHZ | RSI_HT_CAPS_GREENFIELD_EN | RSI_HT_CAPS_SUPPORT_CH_WIDTH)
+#define RSI_HT_CAPS_BIT_MAP 10
 
 /*=======================================================================*/
 //! Scan command parameters
@@ -253,12 +225,9 @@
 #define RSI_POWER_LEVEL RSI_POWER_LEVEL_HIGH
 
 //! RSI_JOIN_FEAT_STA_BG_ONLY_MODE_ENABLE or RSI_JOIN_FEAT_LISTEN_INTERVAL_VALID
-#if WIFI_ENABLE_SECURITY_WPA3
-#define RSI_JOIN_FEAT_BIT_MAP RSI_JOIN_FEAT_MFP_CAPABLE_REQUIRED
-#else
 #define RSI_JOIN_FEAT_BIT_MAP 0
-#endif
 
+//!
 #define RSI_LISTEN_INTERVAL 0
 
 //! Transmission data rate. Physical rate at which data has to be transmitted.
@@ -269,7 +238,7 @@
 /*=======================================================================*/
 
 //! DHCP client host name
-#define RSI_DHCP_HOST_NAME "efr_9116"
+#define RSI_DHCP_HOST_NAME "dhcp_client"
 
 //! Transmit test command parameters
 /*=======================================================================*/
@@ -345,16 +314,17 @@
 /*=======================================================================*/
 //! RSI_ENABLE or RSI_DISABLE High performance socket
 #define HIGH_PERFORMANCE_ENABLE RSI_ENABLE //@ RSI_ENABLE or RSI_DISABLE High performance socket
-#define TOTAL_SOCKETS 10                   //@ Total number of sockets. TCP TX + TCP RX + UDP TX + UDP RX
-#define TOTAL_TCP_SOCKETS 4                //@ Total TCP sockets. TCP TX + TCP RX
-#define TOTAL_UDP_SOCKETS 4                //@ Total UDP sockets. UDP TX + UDP RX
-#define TCP_TX_ONLY_SOCKETS 0              //@ Total TCP TX only sockets. TCP TX
-#define TCP_RX_ONLY_SOCKETS 0              //@ Total TCP RX only sockets. TCP RX
-#define UDP_TX_ONLY_SOCKETS 0              //@ Total UDP TX only sockets. UDP TX
-#define UDP_RX_ONLY_SOCKETS 0              //@ Total UDP RX only sockets. UDP RX
+
+#define TOTAL_SOCKETS                   1  //@ Total number of sockets. TCP TX + TCP RX + UDP TX + UDP RX
+#define TOTAL_TCP_SOCKETS               1  //@ Total TCP sockets. TCP TX + TCP RX
+#define TOTAL_UDP_SOCKETS               0  //@ Total UDP sockets. UDP TX + UDP RX
+#define TCP_TX_ONLY_SOCKETS             0  //@ Total TCP TX only sockets. TCP TX
+#define TCP_RX_ONLY_SOCKETS             1  //@ Total TCP RX only sockets. TCP RX
+#define UDP_TX_ONLY_SOCKETS             0  //@ Total UDP TX only sockets. UDP TX
+#define UDP_RX_ONLY_SOCKETS             0  //@ Total UDP RX only sockets. UDP RX
 #define TCP_RX_HIGH_PERFORMANCE_SOCKETS 1  //@ Total TCP RX High Performance sockets
-#define TCP_RX_WINDOW_SIZE_CAP 10          //@ TCP RX Window size
-#define TCP_RX_WINDOW_DIV_FACTOR 10        //@ TCP RX Window division factor
+#define TCP_RX_WINDOW_SIZE_CAP          10 //@ TCP RX Window size
+#define TCP_RX_WINDOW_DIV_FACTOR        10 //@ TCP RX Window division factor
 /*=======================================================================*/
 
 //! Socket Create parameters
@@ -383,12 +353,6 @@
 
 //! Timeout for PING_REQUEST
 #define RSI_PING_REQ_TIMEOUT_MS 1000
-
-//! Provide HTTP/HTTPS response status code indication to application e.g 200, 404 etc
-/*=======================================================================*/
-//! Enable or Diable feature
-#define RSI_HTTP_STATUS_INDICATION_EN RSI_DISABLE
-/*=======================================================================*/
 
 //! Store Config Profile parameters
 /*=======================================================================*/
@@ -470,13 +434,13 @@
 //! To configure listen interval
 #define RSI_CONFIG_CLIENT_LISTEN_INTERVAL 0
 //! To configure SSID
-#define RSI_CONFIG_CLIENT_SSID "Matter_9116"
+#define RSI_CONFIG_CLIENT_SSID "SILABS_AP"
 //! RSI_BAND_2P4GHZ(2.4GHz) or RSI_BAND_5GHZ(5GHz) or RSI_DUAL_BAND
 #define RSI_CONFIG_CLIENT_BAND RSI_BAND_2P4GHZ
 //! To configure channel number
 #define RSI_CONFIG_CLIENT_CHANNEL 0
 //! To configure security type
-#define RSI_CONFIG_CLIENT_SECURITY_TYPE 0 // RSI_WPA
+#define RSI_CONFIG_CLIENT_SECURITY_TYPE 0 //RSI_WPA
 //! To configure encryption type
 #define RSI_CONFIG_CLIENT_ENCRYPTION_TYPE 0
 //! To configure PSK
@@ -523,7 +487,7 @@
 //! To Configure scan channel feature bitmap
 #define RSI_CONFIG_EAP_SCAN_FEAT_BITMAP 0
 //! scan channel bit map in 2.4GHz band,valid if given channel to scan is 0
-#define RSI_CONFIG_EAP_CHAN_MAGIC_CODE 0 // 0x4321
+#define RSI_CONFIG_EAP_CHAN_MAGIC_CODE 0 //0x4321
 //! scan channel bit map in 2.4GHz band,valid if given channel to scan is 0
 #define RSI_CONFIG_EAP_SCAN_CHAN_BITMAP_2_4_GHZ 0
 //! scan channle bit map in 5GHz band ,valid if given channel to scan is 0

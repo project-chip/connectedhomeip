@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "efr32_utils.h"
+#include "siwx917_utils.h"
 
 // ---- Lighting Example App Config ----
 

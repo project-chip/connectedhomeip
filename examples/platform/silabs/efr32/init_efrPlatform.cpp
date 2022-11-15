@@ -63,8 +63,8 @@ void init_efrPlatform(void)
     sl_system_init();
     sl_mbedtls_init();
 
-#if EFR32_LOG_ENABLED
-    efr32InitLog();
+#if SILABS_LOG_ENABLED
+    silabsInitLog();
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD

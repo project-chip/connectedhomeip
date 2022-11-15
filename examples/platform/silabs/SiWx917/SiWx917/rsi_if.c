@@ -19,12 +19,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "em_bus.h"
-#include "em_cmu.h"
-#include "em_gpio.h"
-#include "em_ldma.h"
-#include "em_usart.h"
-
 #include "sl_status.h"
 
 #include "FreeRTOS.h"
@@ -38,6 +32,7 @@
 
 #include "rsi_common_apis.h"
 #include "rsi_data_types.h"
+#include "rsi_error.h"
 #include "rsi_nwk.h"
 #include "rsi_socket.h"
 #include "rsi_utils.h"
@@ -46,10 +41,8 @@
 #include "rsi_wlan_config.h"
 //#include "rsi_wlan_non_rom.h"
 #include "rsi_bootup_config.h"
-#include "rsi_error.h"
 
 #include "dhcp_client.h"
-#include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
 /* Rsi driver Task will use as its stack */
@@ -107,24 +100,10 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
  *********************************************************************/
 int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
 {
-    int32_t status;
-    uint8_t buff[RSI_RESPONSE_MAX_SIZE] = { 0 };
-    status                              = rsi_wlan_get(RSI_WLAN_EXT_STATS, buff, sizeof(buff));
-    if (status != RSI_SUCCESS)
-    {
-        WFX_RSI_LOG("\r\n Failed, Error Code : 0x%lX\r\n", status);
-    }
-    else
-    {
-        rsi_wlan_ext_stats_t * test   = (rsi_wlan_ext_stats_t *) buff;
-        extra_info->beacon_lost_count = test->beacon_lost_count - temp_reset->beacon_lost_count;
-        extra_info->beacon_rx_count   = test->beacon_rx_count - temp_reset->beacon_rx_count;
-        extra_info->mcast_rx_count    = test->mcast_rx_count - temp_reset->mcast_rx_count;
-        extra_info->mcast_tx_count    = test->mcast_tx_count - temp_reset->mcast_tx_count;
-        extra_info->ucast_rx_count    = test->ucast_rx_count - temp_reset->ucast_rx_count;
-        extra_info->ucast_tx_count    = test->ucast_tx_count - temp_reset->ucast_tx_count;
-        extra_info->overrun_count     = test->overrun_count - temp_reset->overrun_count;
-    }
+    /* TODO : Place holder untill we have similar functionality
+     *        available for SiWx917
+     */
+    int32_t status = 0;
     return status;
 }
 
@@ -138,24 +117,10 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
  *********************************************************************/
 int32_t wfx_rsi_reset_count()
 {
-    int32_t status;
-    uint8_t buff[RSI_RESPONSE_MAX_SIZE] = { 0 };
-    status                              = rsi_wlan_get(RSI_WLAN_EXT_STATS, buff, sizeof(buff));
-    if (status != RSI_SUCCESS)
-    {
-        WFX_RSI_LOG("\r\n Failed, Error Code : 0x%lX\r\n", status);
-    }
-    else
-    {
-        rsi_wlan_ext_stats_t * test   = (rsi_wlan_ext_stats_t *) buff;
-        temp_reset->beacon_lost_count = test->beacon_lost_count;
-        temp_reset->beacon_rx_count   = test->beacon_rx_count;
-        temp_reset->mcast_rx_count    = test->mcast_rx_count;
-        temp_reset->mcast_tx_count    = test->mcast_tx_count;
-        temp_reset->ucast_rx_count    = test->ucast_rx_count;
-        temp_reset->ucast_tx_count    = test->ucast_tx_count;
-        temp_reset->overrun_count     = test->overrun_count;
-    }
+    /* TODO : Place holder untill we have similar functionality
+     *        available for SiWx917
+     */
+    int32_t status = 0;
     return status;
 }
 
@@ -187,8 +152,6 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
 {
     WFX_RSI_LOG("%s: status: %02x", __func__, status);
     wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;
-    temp_reset = (wfx_wifi_scan_ext_t *) malloc(sizeof(wfx_wifi_scan_ext_t));
-    memset(temp_reset, 0, sizeof(wfx_wifi_scan_ext_t));
     if (status != RSI_SUCCESS)
     {
         /*
@@ -294,24 +257,7 @@ static int32_t wfx_rsi_init(void)
 {
     int32_t status;
     uint8_t buf[RSI_RESPONSE_HOLD_BUFF_SIZE];
-    extern void rsi_hal_board_init(void);
 
-    WFX_RSI_LOG("%s: starting(HEAP_SZ = %d)", __func__, SL_HEAP_SIZE);
-    //! Driver initialization
-    status = rsi_driver_init(wfx_rsi_drv_buf, WFX_RSI_BUF_SZ);
-    if ((status < RSI_DRIVER_STATUS) || (status > WFX_RSI_BUF_SZ))
-    {
-        WFX_RSI_LOG("%s: error: RSI drv init failed with status: %02x", __func__, status);
-        return status;
-    }
-
-    WFX_RSI_LOG("%s: rsi_device_init", __func__);
-    /* ! Redpine module intialisation */
-    if ((status = rsi_device_init(LOAD_NWP_FW)) != RSI_SUCCESS)
-    {
-        WFX_RSI_LOG("%s: error: rsi_device_init failed with status: %02x", __func__, status);
-        return status;
-    }
     WFX_RSI_LOG("%s: start wireless drv task", __func__);
     /*
      * Create the driver task
@@ -478,14 +424,15 @@ static void wfx_rsi_do_join(void)
             /* Call rsi connect call with given ssid and password
              * And check there is a success
              */
-            if ((status = rsi_wlan_connect_async((int8_t *) &wfx_rsi.sec.ssid[0], (rsi_security_mode_t) wfx_rsi.sec.security,
-                                                 &wfx_rsi.sec.passkey[0], wfx_rsi_join_cb)) != RSI_SUCCESS)
+
+            if ((status = rsi_wlan_connect_async((int8_t *) "matter_mi", (rsi_security_mode_t) 2,
+                                                 "matter@123",wfx_rsi_join_cb)) != RSI_SUCCESS)
             {
 
                 wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;
                 WFX_RSI_LOG("%s: rsi_wlan_connect_async failed with status: %02x on try %d", __func__, status,
                             wfx_rsi.join_retries);
-                vTaskDelay(4000);
+                vTaskDelay(400);
                 /* TODO - Start a timer.. to retry */
             }
             else
@@ -501,6 +448,7 @@ static void wfx_rsi_do_join(void)
         {
             WFX_RSI_LOG("%s: starting JOIN to %s after %d tries\n", __func__, (char *) &wfx_rsi.sec.ssid[0], wfx_rsi.join_retries);
         }
+        WFX_RSI_LOG("Returning the do join");
     }
 }
 
@@ -518,6 +466,8 @@ static void wfx_rsi_do_join(void)
 void wfx_rsi_task(void * arg)
 {
     EventBits_t flags;
+    int32_t status = 0;
+    int a = 1;
 #ifndef RS911X_SOCKETS
     TickType_t last_dhcp_poll, now;
     struct netif * sta_netif;
@@ -537,6 +487,7 @@ void wfx_rsi_task(void * arg)
     wfx_started_notify();
 
     WFX_RSI_LOG("%s: starting event wait", __func__);
+    xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
     for (;;)
     {
         /*
@@ -623,15 +574,16 @@ void wfx_rsi_task(void * arg)
         if (flags & WFX_EVT_STA_START_JOIN)
         {
             // saving the AP related info
-            wfx_rsi_save_ap_info();
+            // wfx_rsi_save_ap_info();
             // Joining to the network
             wfx_rsi_do_join();
         }
-        if (flags & WFX_EVT_STA_CONN)
+        if ((flags & WFX_EVT_STA_CONN) && (a == 1))
         {
             /*
              * Initiate the Join command (assuming we have been provisioned)
              */
+             a += 1;
             WFX_RSI_LOG("%s: starting LwIP STA", __func__);
             wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTED;
 #ifndef RS911X_SOCKETS
@@ -847,6 +799,30 @@ int32_t wfx_rsi_send_data(void * p, uint16_t len)
         return RSI_ERROR_RESPONSE_TIMEOUT;
     }
     status = rsi_wlan_get_status();
+
+    return status;
+}
+
+int32_t wfx_rsi_init_platform()
+{
+    int32_t status;
+    /*init task - RS911x*/
+    WFX_RSI_LOG("RSI_INIT");
+    WFX_RSI_LOG("%s: starting(HEAP_SZ = %d)", __func__, SL_HEAP_SIZE);
+    //! Driver initialization
+    status = rsi_driver_init(wfx_rsi_drv_buf, WFX_RSI_BUF_SZ);
+    if ((status < RSI_DRIVER_STATUS) || (status > WFX_RSI_BUF_SZ))
+    {
+        WFX_RSI_LOG("%s: error: RSI drv init failed with status: %02x", __func__, status);
+    }
+
+    WFX_RSI_LOG("%s: rsi_device_init", __func__);
+    /* ! Redpine module intialisation */
+    if ((status = rsi_device_init(LOAD_NWP_FW)) != RSI_SUCCESS)
+    {
+        WFX_RSI_LOG("%s: error: rsi_device_init failed with status: %02x", __func__, status);
+        return status;
+    }
 
     return status;
 }

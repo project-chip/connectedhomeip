@@ -1,0 +1,1 @@
+../ConnectivityManagerImpl.h

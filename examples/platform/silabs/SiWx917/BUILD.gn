@@ -40,21 +40,6 @@ config("chip_examples_project_config") {
   ]
 }
 
-source_set("openthread_core_config_efr32_chip_examples") {
-  if (chip_enable_openthread) {
-    sources = [ "project_include/OpenThreadConfig.h" ]
-
-    public_deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
-
-    if (use_silabs_thread_lib) {
-      public_deps += [ "${efr32_sdk_build_root}:openthread_core_config_efr32" ]
-    } else {
-      public_deps += [ "${chip_root}/third_party/openthread/platforms/efr32:openthread_core_config_efr32" ]
-    }
-
-    public_configs = [ ":chip_examples_project_config" ]
-  }
-}
 
 source_set("efr-matter-shell") {
   if (chip_build_libshell) {
@@ -75,15 +60,15 @@ config("attestation-credentials-config") {
   include_dirs = [ "${chip_root}" ]
 
   defines = [
-    # Set to 1 to enable EFR32 attestation credentials
-    "EFR32_ATTESTATION_CREDENTIALS",
+    # Set to 1 to enable SI917 attestation credentials
+    "SI917_ATTESTATION_CREDENTIALS",
   ]
 }
 
 source_set("efr32-attestation-credentials") {
   sources = [
-    "EFR32DeviceAttestationCreds.cpp",
-    "EFR32DeviceAttestationCreds.h",
+    "../SilabsDeviceAttestationCreds.cpp",
+    "../SilabsDeviceAttestationCreds.h",
   ]
 
   public_deps = [
@@ -96,8 +81,8 @@ source_set("efr32-attestation-credentials") {
 
 source_set("efr32-factory-data-provider") {
   sources = [
-    "EFR32DeviceDataProvider.cpp",
-    "EFR32DeviceDataProvider.h",
+    "SIWx917DeviceDataProvider.cpp",
+    "SIWx917DeviceDataProvider.h",
   ]
 
   public_deps = [

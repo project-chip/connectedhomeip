@@ -21,10 +21,7 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 
-#ifdef ENABLE_WSTK_LEDS
-#include "LEDWidget.h"
-#include "sl_simple_led_instances.h"
-#endif // ENABLE_WSTK_LEDS
+
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -44,10 +41,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#ifdef ENABLE_WSTK_LEDS
-#define SYSTEM_STATE_LED &sl_led_led0
-#define LIGHT_LED &sl_led_led1
-#endif // ENABLE_WSTK_LEDS
+
 
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_LIGHT_SWITCH &sl_button_btn1
@@ -57,9 +51,7 @@ using namespace ::chip::DeviceLayer;
 
 namespace {
 
-#ifdef ENABLE_WSTK_LEDS
-LEDWidget sLightLED;
-#endif // ENABLE_WSTK_LEDS
+
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 
@@ -141,23 +133,20 @@ CHIP_ERROR AppTask::Init()
     err = BaseApplication::Init(&gIdentify);
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("BaseApplication::Init() failed");
+        SILABS_LOG("BaseApplication::Init() failed");
         appError(err);
     }
 
+/* TODO 
     err = LightMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("LightMgr::Init() failed");
+        SILABS_LOG("LightMgr::Init() failed");
         appError(err);
     }
 
     LightMgr().SetCallbacks(ActionInitiated, ActionCompleted);
-
-#ifdef ENABLE_WSTK_LEDS
-    sLightLED.Init(LIGHT_LED);
-    sLightLED.Set(LightMgr().IsLightOn());
-#endif // ENABLE_WSTK_LEDS
+*/
 
     return err;
 }
@@ -171,11 +160,11 @@ void AppTask::AppTaskMain(void * pvParameter)
 {
     AppEvent event;
     QueueHandle_t sAppEventQueue = *(static_cast<QueueHandle_t *>(pvParameter));
-
+    SILABS_LOG("AppTaskMain");
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("AppTask.Init() failed");
+        SILABS_LOG("AppTask.Init() failed");
         appError(err);
     }
 
@@ -183,7 +172,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     sAppTask.StartStatusLEDTimer();
 #endif
 
-    EFR32_LOG("App Task started");
+    SILABS_LOG("App Task started");
 
     while (true)
     {
@@ -242,43 +231,17 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
 
         if (!initiated)
         {
-            EFR32_LOG("Action is already in progress or active.");
+            SILABS_LOG("Action is already in progress or active.");
         }
     }
 }
 
-void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)
-{
-    if (buttonHandle == NULL)
-    {
-        return;
-    }
-
-    AppEvent button_event           = {};
-    button_event.Type               = AppEvent::kEventType_Button;
-    button_event.ButtonEvent.Action = btnAction;
-
-    if (buttonHandle == APP_LIGHT_SWITCH && btnAction == SL_SIMPLE_BUTTON_PRESSED)
-    {
-        button_event.Handler = LightActionEventHandler;
-        sAppTask.PostEvent(&button_event);
-    }
-    else if (buttonHandle == APP_FUNCTION_BUTTON)
-    {
-        button_event.Handler = BaseApplication::ButtonHandler;
-        sAppTask.PostEvent(&button_event);
-    }
-}
 
 void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {
     // Action initiated, update the light led
     bool lightOn = aAction == LightingManager::ON_ACTION;
-    EFR32_LOG("Turning light %s", (lightOn) ? "On" : "Off")
-
-#ifdef ENABLE_WSTK_LEDS
-    sLightLED.Set(lightOn);
-#endif // ENABLE_WSTK_LEDS
+    SILABS_LOG("Turning light %s", (lightOn) ? "On" : "Off")
 
 #ifdef DISPLAY_ENABLED
     sAppTask.GetLCD().WriteDemoUI(lightOn);
@@ -295,11 +258,11 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
     // action has been completed bon the light
     if (aAction == LightingManager::ON_ACTION)
     {
-        EFR32_LOG("Light ON")
+        SILABS_LOG("Light ON")
     }
     else if (aAction == LightingManager::OFF_ACTION)
     {
-        EFR32_LOG("Light OFF")
+        SILABS_LOG("Light OFF")
     }
 
     if (sAppTask.mSyncClusterToButtonAction)
@@ -328,6 +291,6 @@ void AppTask::UpdateClusterState(intptr_t context)
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        EFR32_LOG("ERR: updating on/off %x", status);
+        SILABS_LOG("ERR: updating on/off %x", status);
     }
 }

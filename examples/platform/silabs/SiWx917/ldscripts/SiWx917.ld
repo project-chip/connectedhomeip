@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,40 +14,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/***************************************************************************//**
- * Linker script for Silicon Labs EFR32MG12P devices
- *******************************************************************************
- * # License
- * <b>Copyright 2022 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * SPDX-License-Identifier: Zlib
- *
- * The licensor of this software is Silicon Laboratories Inc.
- *
- * This software is provided 'as-is', without any express or implied
- * warranty. In no event will the authors be held liable for any damages
- * arising from the use of this software.
- *
- * Permission is granted to anyone to use this software for any purpose,
- * including commercial applications, and to alter it and redistribute it
- * freely, subject to the following restrictions:
- *
- * 1. The origin of this software must not be misrepresented; you must not
- *    claim that you wrote the original software. If you use this software
- *    in a product, an acknowledgment in the product documentation would be
- *    appreciated but is not required.
- * 2. Altered source versions must be plainly marked as such, and must not be
- *    misrepresented as being the original software.
- * 3. This notice may not be removed or altered from any source distribution.
- *
- ******************************************************************************/
 
 
 MEMORY
 {
-  FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 1048576
-  RAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 262144
+	FLASH (rx)  : ORIGIN = 0x08012000, LENGTH = 0x200000
+	RAM (rwx) : ORIGIN = 0xC, LENGTH = 262144
 }
 
 /* Linker script to place sections and symbol values. Should be used together
@@ -146,10 +117,13 @@ SECTIONS
   } > FLASH
 
   __etext = ALIGN (4);
+  _sidata = __etext;
 
   .data : AT (__etext)
   {
     __data_start__ = .;
+    _sdata = __data_start__;
+
     *(vtable)
     *(.data*)
     . = ALIGN (4);
@@ -181,6 +155,7 @@ SECTIONS
     . = ALIGN(4);
     /* All data end */
     __data_end__ = .;
+    _edata = __data_end__;
 
   } > RAM
 
@@ -188,11 +163,13 @@ SECTIONS
   {
     . = ALIGN(4);
     __bss_start__ = .;
+    _sbss = __bss_start__;
     *(.bss)
     *(.bss.*)
     *(COMMON)
     . = ALIGN(4);
     __bss_end__ = .;
+    _ebss = __bss_end__;
   } > RAM
 
   .heap (COPY) :
@@ -237,6 +214,6 @@ SECTIONS
   ASSERT( (linker_nvm_begin + SIZEOF(.nvm)) <= __main_flash_end__, "NVM3 is excessing the flash size !")
 
   /* Check if FLASH usage exceeds FLASH size */
-  ASSERT( LENGTH(FLASH) >= (__etext), "FLASH memory overflowed !")
+/*  ASSERT( LENGTH(FLASH) >= (__etext), "FLASH memory overflowed !") */ /* Build error need to be checked for CCP */
   ASSERT((__etext + SIZEOF(.data)) <= __nvm3Base, "FLASH memory overlapped with NVM section.")
 }

@@ -44,11 +44,11 @@
  *
  ******************************************************************************/
 
-
+/* CCP memory map */
 MEMORY
 {
-  FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 1048576
-  RAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 262144
+	FLASH (rx)  : ORIGIN = 0x08012000, LENGTH = 0x200000
+	RAM (rwx) : ORIGIN = 0xC, LENGTH = 262144
 }
 
 /* Linker script to place sections and symbol values. Should be used together
@@ -146,10 +146,13 @@ SECTIONS
   } > FLASH
 
   __etext = ALIGN (4);
+  _sidata = __etext;
 
   .data : AT (__etext)
   {
     __data_start__ = .;
+    _sdata = __data_start__;
+
     *(vtable)
     *(.data*)
     . = ALIGN (4);
@@ -181,6 +184,7 @@ SECTIONS
     . = ALIGN(4);
     /* All data end */
     __data_end__ = .;
+    _edata = __data_end__;
 
   } > RAM
 
@@ -188,11 +192,13 @@ SECTIONS
   {
     . = ALIGN(4);
     __bss_start__ = .;
+    _sbss = __bss_start__;
     *(.bss)
     *(.bss.*)
     *(COMMON)
     . = ALIGN(4);
     __bss_end__ = .;
+    _ebss = __bss_end__;
   } > RAM
 
   .heap (COPY) :

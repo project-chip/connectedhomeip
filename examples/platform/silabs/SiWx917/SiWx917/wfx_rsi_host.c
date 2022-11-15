@@ -18,12 +18,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "stdbool.h"
 
-#include "em_bus.h"
-#include "em_cmu.h"
-#include "em_gpio.h"
-#include "em_ldma.h"
-#include "em_usart.h"
 #include "sl_status.h"
 
 #include "FreeRTOS.h"
@@ -69,6 +65,10 @@ sl_status_t wfx_wifi_start(void)
         return SL_STATUS_FAIL;
     }
     return SL_STATUS_OK;
+}
+
+int32_t wfx_rsi_platform(){
+    return wfx_rsi_init_platform();
 }
 
 /*********************************************************************

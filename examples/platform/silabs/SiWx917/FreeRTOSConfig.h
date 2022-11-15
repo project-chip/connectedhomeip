@@ -107,15 +107,6 @@ extern "C" {
 
 #include <stdint.h>
 
-#include "RTE_Components.h"
-#include CMSIS_device_header
-
-#include "em_assert.h"
-#include "em_device.h"
-
-#if defined(SL_COMPONENT_CATALOG_PRESENT)
-#include "sl_component_catalog.h"
-#endif
 
 /*-----------------------------------------------------------
  * Application specific definitions.
@@ -144,7 +135,7 @@ extern "C" {
 #define configUSE_TICK_HOOK (1)
 #define configCHECK_FOR_STACK_OVERFLOW (2)
 #define configUSE_MALLOC_FAILED_HOOK (1)
-#define configUSE_IDLE_HOOK (1)
+#define configUSE_IDLE_HOOK (0)
 
 /* Main functions*/
 /* Run time stats gathering related definitions. */
@@ -204,7 +195,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 
 #ifndef configTOTAL_HEAP_SIZE
 #ifdef SL_WIFI
-#define configTOTAL_HEAP_SIZE ((size_t)(34 * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t)(50 * 1024))
 #else
 #define configTOTAL_HEAP_SIZE ((size_t)(20 * 1024))
 #endif
