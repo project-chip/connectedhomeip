@@ -597,119 +597,119 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPTestClusterClusterTestSpecificResponseCallback
-    : public Callback::Callback<CHIPTestClusterClusterTestSpecificResponseCallbackType>
+class CHIPUnitTestingClusterTestSpecificResponseCallback
+    : public Callback::Callback<CHIPUnitTestingClusterTestSpecificResponseCallbackType>
 {
 public:
-    CHIPTestClusterClusterTestSpecificResponseCallback(jobject javaCallback);
+    CHIPUnitTestingClusterTestSpecificResponseCallback(jobject javaCallback);
 
-    ~CHIPTestClusterClusterTestSpecificResponseCallback();
+    ~CHIPUnitTestingClusterTestSpecificResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType & data);
+                           const chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
 };
 
-class CHIPTestClusterClusterTestAddArgumentsResponseCallback
-    : public Callback::Callback<CHIPTestClusterClusterTestAddArgumentsResponseCallbackType>
+class CHIPUnitTestingClusterTestAddArgumentsResponseCallback
+    : public Callback::Callback<CHIPUnitTestingClusterTestAddArgumentsResponseCallbackType>
 {
 public:
-    CHIPTestClusterClusterTestAddArgumentsResponseCallback(jobject javaCallback);
+    CHIPUnitTestingClusterTestAddArgumentsResponseCallback(jobject javaCallback);
 
-    ~CHIPTestClusterClusterTestAddArgumentsResponseCallback();
+    ~CHIPUnitTestingClusterTestAddArgumentsResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType & data);
+                           const chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
 };
 
-class CHIPTestClusterClusterTestListInt8UReverseResponseCallback
-    : public Callback::Callback<CHIPTestClusterClusterTestListInt8UReverseResponseCallbackType>
+class CHIPUnitTestingClusterTestListInt8UReverseResponseCallback
+    : public Callback::Callback<CHIPUnitTestingClusterTestListInt8UReverseResponseCallbackType>
 {
 public:
-    CHIPTestClusterClusterTestListInt8UReverseResponseCallback(jobject javaCallback);
+    CHIPUnitTestingClusterTestListInt8UReverseResponseCallback(jobject javaCallback);
 
-    ~CHIPTestClusterClusterTestListInt8UReverseResponseCallback();
+    ~CHIPUnitTestingClusterTestListInt8UReverseResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType & data);
+                           const chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
 };
 
-class CHIPTestClusterClusterTestEnumsResponseCallback
-    : public Callback::Callback<CHIPTestClusterClusterTestEnumsResponseCallbackType>
+class CHIPUnitTestingClusterTestEnumsResponseCallback
+    : public Callback::Callback<CHIPUnitTestingClusterTestEnumsResponseCallbackType>
 {
 public:
-    CHIPTestClusterClusterTestEnumsResponseCallback(jobject javaCallback);
+    CHIPUnitTestingClusterTestEnumsResponseCallback(jobject javaCallback);
 
-    ~CHIPTestClusterClusterTestEnumsResponseCallback();
+    ~CHIPUnitTestingClusterTestEnumsResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType & data);
+                           const chip::app::Clusters::UnitTesting::Commands::TestEnumsResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
 };
 
-class CHIPTestClusterClusterTestNullableOptionalResponseCallback
-    : public Callback::Callback<CHIPTestClusterClusterTestNullableOptionalResponseCallbackType>
+class CHIPUnitTestingClusterTestNullableOptionalResponseCallback
+    : public Callback::Callback<CHIPUnitTestingClusterTestNullableOptionalResponseCallbackType>
 {
 public:
-    CHIPTestClusterClusterTestNullableOptionalResponseCallback(jobject javaCallback);
+    CHIPUnitTestingClusterTestNullableOptionalResponseCallback(jobject javaCallback);
 
-    ~CHIPTestClusterClusterTestNullableOptionalResponseCallback();
+    ~CHIPUnitTestingClusterTestNullableOptionalResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType & data);
+                           const chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
 };
 
-class CHIPTestClusterClusterBooleanResponseCallback : public Callback::Callback<CHIPTestClusterClusterBooleanResponseCallbackType>
+class CHIPUnitTestingClusterBooleanResponseCallback : public Callback::Callback<CHIPUnitTestingClusterBooleanResponseCallbackType>
 {
 public:
-    CHIPTestClusterClusterBooleanResponseCallback(jobject javaCallback);
+    CHIPUnitTestingClusterBooleanResponseCallback(jobject javaCallback);
 
-    ~CHIPTestClusterClusterBooleanResponseCallback();
+    ~CHIPUnitTestingClusterBooleanResponseCallback();
 
-    static void CallbackFn(void * context, const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType & data);
+    static void CallbackFn(void * context, const chip::app::Clusters::UnitTesting::Commands::BooleanResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
 };
 
-class CHIPTestClusterClusterSimpleStructResponseCallback
-    : public Callback::Callback<CHIPTestClusterClusterSimpleStructResponseCallbackType>
+class CHIPUnitTestingClusterSimpleStructResponseCallback
+    : public Callback::Callback<CHIPUnitTestingClusterSimpleStructResponseCallbackType>
 {
 public:
-    CHIPTestClusterClusterSimpleStructResponseCallback(jobject javaCallback);
+    CHIPUnitTestingClusterSimpleStructResponseCallback(jobject javaCallback);
 
-    ~CHIPTestClusterClusterSimpleStructResponseCallback();
+    ~CHIPUnitTestingClusterSimpleStructResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType & data);
+                           const chip::app::Clusters::UnitTesting::Commands::SimpleStructResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
 };
 
-class CHIPTestClusterClusterTestEmitTestEventResponseCallback
-    : public Callback::Callback<CHIPTestClusterClusterTestEmitTestEventResponseCallbackType>
+class CHIPUnitTestingClusterTestEmitTestEventResponseCallback
+    : public Callback::Callback<CHIPUnitTestingClusterTestEmitTestEventResponseCallbackType>
 {
 public:
-    CHIPTestClusterClusterTestEmitTestEventResponseCallback(jobject javaCallback);
+    CHIPUnitTestingClusterTestEmitTestEventResponseCallback(jobject javaCallback);
 
-    ~CHIPTestClusterClusterTestEmitTestEventResponseCallback();
+    ~CHIPUnitTestingClusterTestEmitTestEventResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType & data);
+                           const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

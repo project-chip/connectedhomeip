@@ -43,6 +43,7 @@
 #include <nlunit-test.h>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
@@ -126,7 +127,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(0x00000001, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE(0x
     DECLARE_DYNAMIC_ATTRIBUTE(0x00000005, INT8U, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
-DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(Clusters::UnitTesting::Id, testClusterAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 
@@ -134,7 +135,7 @@ DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint4)
 DECLARE_DYNAMIC_ATTRIBUTE(kTestListLargeAttribute, ARRAY, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint4Clusters)
-DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint4, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(Clusters::UnitTesting::Id, testClusterAttrsOnEndpoint4, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint4, testEndpoint4Clusters);
 
@@ -229,7 +230,7 @@ class TestAttrAccess : public app::AttributeAccessInterface
 {
 public:
     // Register for the Test Cluster cluster on all endpoints.
-    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), TestCluster::Id)
+    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id)
     {
         registerAttributeAccessOverride(this);
     }
@@ -270,7 +271,7 @@ void GenerateEvents(nlTestSuite * apSuite, chip::EventNumber & firstEventNumber,
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    TestCluster::Events::TestEvent::Type content;
+    Clusters::UnitTesting::Events::TestEvent::Type content;
     content.arg1 = static_cast<uint8_t>(gIterationCount);
 
     for (int i = 0; i < 5; i++)
@@ -322,7 +323,7 @@ void TestReadEvents::TestEventChunking(nlTestSuite * apSuite, void * apContext)
 
     app::EventPathParams eventPath;
     eventPath.mEndpointId = kTestEndpointId;
-    eventPath.mClusterId  = app::Clusters::TestCluster::Id;
+    eventPath.mClusterId  = app::Clusters::UnitTesting::Id;
     app::ReadPrepareParams readParams(sessionHandle);
 
     readParams.mpEventPathParamsList    = &eventPath;
@@ -389,9 +390,9 @@ void TestReadEvents::TestMixedEventsAndAttributesChunking(nlTestSuite * apSuite,
     GenerateEvents(apSuite, firstEventNumber, lastEventNumber);
 
     app::EventPathParams eventPath;
-    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id);
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id);
     eventPath.mEndpointId = kTestEndpointId;
-    eventPath.mClusterId  = app::Clusters::TestCluster::Id;
+    eventPath.mClusterId  = app::Clusters::UnitTesting::Id;
     app::ReadPrepareParams readParams(sessionHandle);
 
     readParams.mpAttributePathParamsList    = &attributePath;
@@ -468,9 +469,9 @@ void TestReadEvents::TestMixedEventsAndLargeAttributesChunking(nlTestSuite * apS
     GenerateEvents(apSuite, firstEventNumber, lastEventNumber);
 
     app::EventPathParams eventPath;
-    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id, kTestListLargeAttribute);
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListLargeAttribute);
     eventPath.mEndpointId = kTestEndpointId;
-    eventPath.mClusterId  = app::Clusters::TestCluster::Id;
+    eventPath.mClusterId  = app::Clusters::UnitTesting::Id;
     app::ReadPrepareParams readParams(sessionHandle);
 
     readParams.mpAttributePathParamsList    = &attributePath;
