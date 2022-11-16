@@ -42,7 +42,7 @@ static ENFORCE_FORMAT(3, 0) void cpp_log_redirect_callback(const char * module, 
 
     // Delegate the log to the MTRLogging system
     dispatch_async([MTRLoggingConfiguration getLogWorkQueue], ^{
-        switch(category) {
+        switch (category) {
         case chip::Logging::LogCategory::kLogCategory_Error:
             [custom_logger logAtLevel:MTRLogLevelError message:msg_string];
             break;

@@ -41,7 +41,7 @@ typedef NS_ENUM(NSUInteger, MTRLogLevel) { MTRLogLevelError = 0, MTRLogLevelProg
  *
  * @note Messages will only be passed to this method if `isLoggingEnabledAtLevel` is `true` for the given log level.
  */
-- (void)logAtLevel: (MTRLogLevel)level message: (NSString *)message;
+- (void)logAtLevel:(MTRLogLevel)level message:(NSString *)message;
 
 @end
 
