@@ -33,9 +33,12 @@ config("unify-config") {
     "include",
     "zap-handlers/gen"
   ]
+  ldflags = [ "-lboost_system" ] 
+}
 
-  ldflags = [ "-lboost_system" ]
-  
+config("coverage") {
+  cflags = [ "-fprofile-arcs", "-ftest-coverage" ]
+  ldflags = cflags
 }
 
 static_library("unify-matter-bridge-lib") {
@@ -71,6 +74,10 @@ static_library("unify-matter-bridge-lib") {
   output_dir = root_out_dir
 
   public_configs = [ ":unify-config" , ":unify" ]
+
+  if (use_coverage) {
+    configs += [ ":coverage" ]
+  }
 
 }
 

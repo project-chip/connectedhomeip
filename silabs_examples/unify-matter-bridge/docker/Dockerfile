@@ -15,7 +15,7 @@ ARG TARGET_DEPS="libavahi-client-dev libssl-dev libsystemd-dev libwrap0-dev utha
   libboost-log-dev procps libmbedtls-dev libglib2.0-dev"
 
 ARG HOST_DEPS="ninja-build git git-lfs curl pkg-config \
-  ruby ruby-dev \
+  ruby ruby-dev lcov \
   gcc g++ gdb-multiarch \
   build-essential \
   clang nlohmann-json3-dev \
@@ -47,6 +47,9 @@ RUN curl -L https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86
   && /usr/local/miniconda/condabin/conda init bash \
   && ln -sf /usr/local/miniconda/bin/python3.9 /usr/bin/python3 \
   && ln -sf /usr/local/miniconda/bin/pip3 /usr/bin/pip3
+
+# Install gcvor
+RUN pip3 install gcovr==5.2
 
 # Rust Version to install
 ENV RUST_VERSION=1.64.0
