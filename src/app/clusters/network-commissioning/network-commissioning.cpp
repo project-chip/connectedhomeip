@@ -564,13 +564,13 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
             if ((scanResponseArray[i].panId == scanResponse.panId) &&
                 (scanResponseArray[i].extendedPanId == scanResponse.extendedPanId))
             {
-                isDuplicated = true;
                 if (scanResponseArray[i].rssi < scanResponse.rssi)
                 {
-                    scanResponseArray[i] = scanResponse;
-                    Sorting::InsertionSort(
-                        scanResponseArray.Get(), scanResponseArrayLength,
-                        [](const ThreadScanResponse & a, const ThreadScanResponse & b) -> bool { return a.rssi > b.rssi; });
+                    scanResponseArray[i] = scanResponseArray[--scanResponseArrayLength];
+                }
+                else
+                {
+                    isDuplicated = true;
                 }
                 break;
             }
