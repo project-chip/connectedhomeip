@@ -436,6 +436,8 @@ private:
     SessionHolder mSessionHandle;
 
     Messaging::ExchangeHolder mExchangeCtx;
+    // TODO: this should be replaced by a pointer to the InteractionModelEngine that created the ReadHandler
+    // once InteractionModelEngine is no longer a singleton (see issue 23625)
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
     ObjectList<AttributePathParams> * mpAttributePathList   = nullptr;

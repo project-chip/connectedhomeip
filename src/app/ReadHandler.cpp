@@ -46,6 +46,8 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
     VerifyOrDie(apExchangeContext != nullptr);
 
     mExchangeCtx.Grab(apExchangeContext);
+    // TODO: this should be replaced by a pointer to the InteractionModelEngine that created the ReadHandler
+    // once InteractionModelEngine is no longer a singleton (see issue 23625)
     mExchangeMgr = apExchangeContext->GetExchangeMgr();
 
     mInteractionType            = aInteractionType;
