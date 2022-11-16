@@ -541,8 +541,8 @@ void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatus aN
     mWindowStatus                              = aNewStatus;
     if (CommissioningWindowStatusForCluster() != oldClusterStatus)
     {
-        // The Administrator Commissioning cluster is always on endpoint 0.
-        MatterReportingAttributeChangeCallback(0, AdministratorCommissioning::Id,
+        // The Administrator Commissioning cluster is always on the root endpoint.
+        MatterReportingAttributeChangeCallback(kRootEndpointId, AdministratorCommissioning::Id,
                                                AdministratorCommissioning::Attributes::WindowStatus::Id);
     }
 }
@@ -555,8 +555,8 @@ void CommissioningWindowManager::UpdateOpenerVendorId(Nullable<VendorId> aNewOpe
 
     if (mOpenerVendorId != aNewOpenerVendorId)
     {
-        // The Administrator Commissioning cluster is always on endpoint 0.
-        MatterReportingAttributeChangeCallback(0, AdministratorCommissioning::Id,
+        // The Administrator Commissioning cluster is always on the root endpoint.
+        MatterReportingAttributeChangeCallback(kRootEndpointId, AdministratorCommissioning::Id,
                                                AdministratorCommissioning::Attributes::AdminVendorId::Id);
     }
 
@@ -564,8 +564,8 @@ void CommissioningWindowManager::UpdateOpenerVendorId(Nullable<VendorId> aNewOpe
 
     if (CommissioningWindowStatusForCluster() != oldClusterStatus)
     {
-        // The Administrator Commissioning cluster is always on endpoint 0.
-        MatterReportingAttributeChangeCallback(0, AdministratorCommissioning::Id,
+        // The Administrator Commissioning cluster is always on the root endpoint.
+        MatterReportingAttributeChangeCallback(kRootEndpointId, AdministratorCommissioning::Id,
                                                AdministratorCommissioning::Attributes::WindowStatus::Id);
     }
 }
@@ -574,8 +574,8 @@ void CommissioningWindowManager::UpdateOpenerFabricIndex(Nullable<FabricIndex> a
 {
     if (mOpenerFabricIndex != aNewOpenerFabricIndex)
     {
-        // The Administrator Commissioning cluster is always on endpoint 0.
-        MatterReportingAttributeChangeCallback(0, AdministratorCommissioning::Id,
+        // The Administrator Commissioning cluster is always on the root endpoint.
+        MatterReportingAttributeChangeCallback(kRootEndpointId, AdministratorCommissioning::Id,
                                                AdministratorCommissioning::Attributes::AdminFabricIndex::Id);
     }
 

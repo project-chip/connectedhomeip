@@ -55,7 +55,7 @@ void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::Clu
 {
     using namespace chip::app::Clusters;
     using namespace chip::app::Clusters::AdministratorCommissioning::Attributes;
-    if (endpoint != 0 || clusterId != AdministratorCommissioning::Id)
+    if (endpoint != chip::kRootEndpointId || clusterId != AdministratorCommissioning::Id)
     {
         return;
     }
