@@ -436,9 +436,11 @@ private:
     SessionHolder mSessionHandle;
 
     Messaging::ExchangeHolder mExchangeCtx;
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     // TODO: this should be replaced by a pointer to the InteractionModelEngine that created the ReadHandler
     // once InteractionModelEngine is no longer a singleton (see issue 23625)
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     ObjectList<AttributePathParams> * mpAttributePathList   = nullptr;
     ObjectList<EventPathParams> * mpEventPathList           = nullptr;
