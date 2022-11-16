@@ -28,6 +28,7 @@
 #include <lwip/ip_addr.h>
 #include <lwip/nd6.h>
 #include <lwip/netif.h>
+#include "sl_status.h"
 
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
 
@@ -262,7 +263,8 @@ void ConnectivityManagerImpl::DriveStationState()
         // If the WiFi station interface is no longer enabled, or no longer provisioned,
         // disconnect the station from the AP, unless the WiFi station mode is currently
         // under application control.
-        if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled &&
+#ifndef CHIP_ONNETWORK_PAIRING
+	if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled &&
             (mWiFiStationMode != kWiFiStationMode_Enabled || !IsWiFiStationProvisioned()))
         {
             ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
@@ -275,6 +277,7 @@ void ConnectivityManagerImpl::DriveStationState()
 
             ChangeWiFiStationState(kWiFiStationState_Disconnecting);
         }
+#endif
     }
     // Otherwise the station interface is NOT connected to an AP, so...
     else

@@ -45,6 +45,9 @@
 #include "dhcp_client.h"
 #include "wfx_rsi.h"
 
+#define VAL(str) #str
+#define TOSTRING(str) VAL(str)
+
 /* Rsi driver Task will use as its stack */
 StackType_t driverRsiTaskStack[WFX_RSI_WLAN_TASK_SZ] = { 0 };
 
@@ -425,8 +428,8 @@ static void wfx_rsi_do_join(void)
              * And check there is a success
              */
 
-            if ((status = rsi_wlan_connect_async((int8_t *) "matter_mi", (rsi_security_mode_t) 2,
-                                                 "matter@123",wfx_rsi_join_cb)) != RSI_SUCCESS)
+	    if ((status = rsi_wlan_connect_async((int8_t *) &wfx_rsi.sec.ssid[0], (rsi_security_mode_t) wfx_rsi.sec.security,
+                                                 &wfx_rsi.sec.passkey[0] ,wfx_rsi_join_cb)) != RSI_SUCCESS)
             {
 
                 wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;
@@ -467,7 +470,6 @@ void wfx_rsi_task(void * arg)
 {
     EventBits_t flags;
     int32_t status = 0;
-    int a = 1;
 #ifndef RS911X_SOCKETS
     TickType_t last_dhcp_poll, now;
     struct netif * sta_netif;
@@ -487,7 +489,12 @@ void wfx_rsi_task(void * arg)
     wfx_started_notify();
 
     WFX_RSI_LOG("%s: starting event wait", __func__);
+#ifdef CHIP_ONNETWORK_PAIRING
+    memcpy(&wfx_rsi.sec.ssid[0],TOSTRING(CHIP_WIFI_SSID),sizeof(TOSTRING(CHIP_WIFI_SSID)));
+    memcpy(&wfx_rsi.sec.passkey[0],TOSTRING(CHIP_WIFI_PSK),sizeof(TOSTRING(CHIP_WIFI_PSK)));
     xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
+#endif
+
     for (;;)
     {
         /*
@@ -574,16 +581,15 @@ void wfx_rsi_task(void * arg)
         if (flags & WFX_EVT_STA_START_JOIN)
         {
             // saving the AP related info
-            // wfx_rsi_save_ap_info();
+            wfx_rsi_save_ap_info();
             // Joining to the network
             wfx_rsi_do_join();
         }
-        if ((flags & WFX_EVT_STA_CONN) && (a == 1))
+        if ((flags & WFX_EVT_STA_CONN))
         {
             /*
              * Initiate the Join command (assuming we have been provisioned)
              */
-             a += 1;
             WFX_RSI_LOG("%s: starting LwIP STA", __func__);
             wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTED;
 #ifndef RS911X_SOCKETS

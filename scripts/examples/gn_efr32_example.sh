@@ -92,7 +92,11 @@ if [ "$#" == "0" ]; then
         rs91x_wpa3_only
             Support for WPA3 only mode on RS91x
         Presets
-        --sed
+        ssid
+            The ssid of the WiFi network to which DUT should be connected
+        psk
+	    The psk of the WiFi network to which DUT should be connected
+	--sed
             enable sleepy end device, set thread mtd
             For minimum consumption, add --low-power
         --low-power
