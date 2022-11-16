@@ -144,6 +144,13 @@ CHIP_ERROR ReadClient::ScheduleResubscription(uint32_t aTimeTillNextResubscripti
     }
 
     mForceCaseOnNextResub = aReestablishCASE;
+    if (mForceCaseOnNextResub && mReadPrepareParams.mSessionHolder)
+    {
+        // Mark our existing session defunct, so that we will try to
+        // re-establish it when the timer fires (unless something re-establishes
+        // before then).
+        mReadPrepareParams.mSessionHolder->AsSecureSession()->MarkAsDefunct();
+    }
 
     ReturnErrorOnFailure(
         InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
@@ -1093,22 +1100,6 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void 
 
     ChipLogProgress(DataManagement, "OnResubscribeTimerCallback: ForceCASE = %d", _this->mForceCaseOnNextResub);
     _this->mNumRetries++;
-
-    if (_this->mForceCaseOnNextResub)
-    {
-        //
-        // We need to mark our session as defunct explicitly since the assessment of a liveness failure
-        // is usually triggered by the absence of any exchange activity that would have otherwise
-        // automatically marked the session as defunct on a response timeout.
-        //
-        // Doing so will ensure that the subsequent call to FindOrEstablishSession will not bind to
-        // an existing established session but rather trigger establishing a new one.
-        //
-        if (_this->mReadPrepareParams.mSessionHolder)
-        {
-            _this->mReadPrepareParams.mSessionHolder->AsSecureSession()->MarkAsDefunct();
-        }
-    }
 
     bool allowResubscribeOnError = true;
     if (!_this->mReadPrepareParams.mSessionHolder ||
