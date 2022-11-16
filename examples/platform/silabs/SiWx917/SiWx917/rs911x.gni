@@ -71,7 +71,9 @@ rs911x_src_sapi = [
 
 foreach(src_file, rs911x_src_sapi) {
   rs911x_cflags += [ "-Wno-empty-body" ,
-                     "-Wno-ccp" ,
+                     "-Wno-cpp" ,
+                     "-Wno-missing-braces",
+                     "-Wno-sign-compare",
                      "-Wno-error",
                      "-Wno-unknown-warning-option",
                      "-Wno-unused-variable",

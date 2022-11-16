@@ -157,7 +157,7 @@ CHIP_ERROR AppTask::Init()
     err = BaseApplication::Init(&gIdentify);
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("BaseApplication::Init() failed");
+        SILABS_LOG("BaseApplication::Init() failed");
         appError(err);
     }
     err = SensorMgr().Init();
@@ -189,7 +189,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("AppTask.Init() failed");
+        SILABS_LOG("AppTask.Init() failed");
         appError(err);
     }
 
@@ -197,7 +197,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     sAppTask.StartStatusLEDTimer();
 #endif
 
-    EFR32_LOG("App Task started");
+    SILABS_LOG("App Task started");
     while (true)
     {
         BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);

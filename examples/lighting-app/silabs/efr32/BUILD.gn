@@ -33,6 +33,7 @@ assert(current_os == "freertos")
 
 efr32_project_dir = "${chip_root}/examples/lighting-app/silabs/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
 declare_args() {
   # Dump memory usage at link time.
@@ -141,7 +142,7 @@ efr32_sdk("sdk") {
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
-    "${chip_root}/examples/platform/silabs",
+    "${examples_common_plat_dir}",
   ]
 
   defines = [
@@ -195,7 +196,7 @@ efr32_executable("lighting_app") {
   sources = [
     "${examples_plat_dir}/BaseApplication.cpp",
     "${examples_plat_dir}/efr32_utils.cpp",
-    "${examples_plat_dir}/../heap_4_silabs.c",
+    "${examples_common_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/matter_config.cpp",
     "src/AppTask.cpp",
@@ -307,8 +308,8 @@ efr32_executable("lighting_app") {
     sources += [
       "${chip_root}/examples/common/pigweed/RpcService.cpp",
       "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-      "${examples_plat_dir}/../PigweedLogger.cpp",
-      "${examples_plat_dir}/../Rpc.cpp",
+      "${examples_common_plat_dir}/PigweedLogger.cpp",
+      "${examples_common_plat_dir}/Rpc.cpp",
     ]
 
     deps += [
@@ -337,7 +338,7 @@ efr32_executable("lighting_app") {
   }
 
   if (enable_heap_monitoring) {
-    sources += [ "${examples_plat_dir}/../MemMonitoring.cpp" ]
+    sources += [ "${examples_common_plat_dir}/MemMonitoring.cpp" ]
     defines += [ "HEAP_MONITORING" ]
   }
 
