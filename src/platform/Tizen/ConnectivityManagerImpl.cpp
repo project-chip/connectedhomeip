@@ -209,29 +209,19 @@ void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val) 
 
 void ConnectivityManagerImpl::StartWiFiManagement()
 {
-    SystemLayer().ScheduleWork(ActivateWiFiManager, nullptr);
+    Internal::WiFiMgr().Activate();
 }
 
 void ConnectivityManagerImpl::StopWiFiManagement()
 {
-    SystemLayer().ScheduleWork(DeactivateWiFiManager, nullptr);
+    Internal::WiFiMgr().Deactivate();
 }
 
 bool ConnectivityManagerImpl::IsWiFiManagementStarted()
 {
     bool isActivated = false;
-    WiFiMgr().IsActivated(&isActivated);
+    Internal::WiFiMgr().IsActivated(&isActivated);
     return isActivated;
-}
-
-void ConnectivityManagerImpl::ActivateWiFiManager(System::Layer * aLayer, void * aAppState)
-{
-    Internal::WiFiMgr().Activate();
-}
-
-void ConnectivityManagerImpl::DeactivateWiFiManager(System::Layer * aLayer, void * aAppState)
-{
-    Internal::WiFiMgr().Deactivate();
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
