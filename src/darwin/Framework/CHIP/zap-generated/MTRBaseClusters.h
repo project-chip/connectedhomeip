@@ -18325,6 +18325,7 @@ labels.
  * Cluster Unit Testing
  *    The Test Cluster is meant to validate the generated code
  */
+MTR_NEWLY_AVAILABLE
 @interface MTRBaseClusterUnitTesting : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
@@ -20191,6 +20192,10 @@ labels.
 
 @end
 
+MTR_NEWLY_DEPRECATED("Please use MTRBaseClusterUnitTesting")
+@interface MTRBaseClusterTestCluster : MTRBaseClusterUnitTesting
+@end
+
 typedef NS_ENUM(uint8_t, MTRIdentifyEffectIdentifier) {
     MTRIdentifyEffectIdentifierBlink = 0x00,
     MTRIdentifyEffectIdentifierBreathe = 0x01,
@@ -21595,41 +21600,82 @@ typedef NS_ENUM(uint8_t, MTRUnitTestingSimple) {
     MTRUnitTestingSimpleValueA = 0x01,
     MTRUnitTestingSimpleValueB = 0x02,
     MTRUnitTestingSimpleValueC = 0x03,
-};
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRTestClusterSimple) {
+    MTRTestClusterSimpleUnspecified = 0x00,
+    MTRTestClusterSimpleValueA = 0x01,
+    MTRTestClusterSimpleValueB = 0x02,
+    MTRTestClusterSimpleValueC = 0x03,
+} MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingSimple");
 
 typedef NS_OPTIONS(uint16_t, MTRUnitTestingBitmap16MaskMap) {
     MTRUnitTestingBitmap16MaskMapMaskVal1 = 0x1,
     MTRUnitTestingBitmap16MaskMapMaskVal2 = 0x2,
     MTRUnitTestingBitmap16MaskMapMaskVal3 = 0x4,
     MTRUnitTestingBitmap16MaskMapMaskVal4 = 0x4000,
-};
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint16_t, MTRTestClusterBitmap16MaskMap) {
+    MTRTestClusterBitmap16MaskMapMaskVal1 = 0x1,
+    MTRTestClusterBitmap16MaskMapMaskVal2 = 0x2,
+    MTRTestClusterBitmap16MaskMapMaskVal3 = 0x4,
+    MTRTestClusterBitmap16MaskMapMaskVal4 = 0x4000,
+} MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap16MaskMap");
 
 typedef NS_OPTIONS(uint32_t, MTRUnitTestingBitmap32MaskMap) {
     MTRUnitTestingBitmap32MaskMapMaskVal1 = 0x1,
     MTRUnitTestingBitmap32MaskMapMaskVal2 = 0x2,
     MTRUnitTestingBitmap32MaskMapMaskVal3 = 0x4,
     MTRUnitTestingBitmap32MaskMapMaskVal4 = 0x40000000,
-};
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint32_t, MTRTestClusterBitmap32MaskMap) {
+    MTRTestClusterBitmap32MaskMapMaskVal1 = 0x1,
+    MTRTestClusterBitmap32MaskMapMaskVal2 = 0x2,
+    MTRTestClusterBitmap32MaskMapMaskVal3 = 0x4,
+    MTRTestClusterBitmap32MaskMapMaskVal4 = 0x40000000,
+} MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap32MaskMap");
 
 typedef NS_OPTIONS(uint64_t, MTRUnitTestingBitmap64MaskMap) {
     MTRUnitTestingBitmap64MaskMapMaskVal1 = 0x1,
     MTRUnitTestingBitmap64MaskMapMaskVal2 = 0x2,
     MTRUnitTestingBitmap64MaskMapMaskVal3 = 0x4,
     MTRUnitTestingBitmap64MaskMapMaskVal4 = 0x4000000000000000,
-};
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint64_t, MTRTestClusterBitmap64MaskMap) {
+    MTRTestClusterBitmap64MaskMapMaskVal1 = 0x1,
+    MTRTestClusterBitmap64MaskMapMaskVal2 = 0x2,
+    MTRTestClusterBitmap64MaskMapMaskVal3 = 0x4,
+    MTRTestClusterBitmap64MaskMapMaskVal4 = 0x4000000000000000,
+} MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap64MaskMap");
 
 typedef NS_OPTIONS(uint8_t, MTRUnitTestingBitmap8MaskMap) {
     MTRUnitTestingBitmap8MaskMapMaskVal1 = 0x1,
     MTRUnitTestingBitmap8MaskMapMaskVal2 = 0x2,
     MTRUnitTestingBitmap8MaskMapMaskVal3 = 0x4,
     MTRUnitTestingBitmap8MaskMapMaskVal4 = 0x40,
-};
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint8_t, MTRTestClusterBitmap8MaskMap) {
+    MTRTestClusterBitmap8MaskMapMaskVal1 = 0x1,
+    MTRTestClusterBitmap8MaskMapMaskVal2 = 0x2,
+    MTRTestClusterBitmap8MaskMapMaskVal3 = 0x4,
+    MTRTestClusterBitmap8MaskMapMaskVal4 = 0x40,
+} MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap8MaskMap");
 
 typedef NS_OPTIONS(uint8_t, MTRUnitTestingSimpleBitmap) {
     MTRUnitTestingSimpleBitmapValueA = 0x1,
     MTRUnitTestingSimpleBitmapValueB = 0x2,
     MTRUnitTestingSimpleBitmapValueC = 0x4,
-};
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint8_t, MTRTestClusterSimpleBitmap) {
+    MTRTestClusterSimpleBitmapValueA = 0x1,
+    MTRTestClusterSimpleBitmapValueB = 0x2,
+    MTRTestClusterSimpleBitmapValueC = 0x4,
+} MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingSimpleBitmap");
 
 typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
     MTRFaultInjectionFaultTypeUnspecified = 0x00,
@@ -40685,107 +40731,107 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
 
 @end
 
-@interface MTRBaseClusterUnitTesting (Deprecated)
+@interface MTRBaseClusterTestCluster (Deprecated)
 
 - (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
                                endpoint:(uint16_t)endpoint
                                   queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
 
-- (void)testWithParams:(MTRUnitTestingClusterTestParams * _Nullable)params
+- (void)testWithParams:(MTRTestClusterClusterTestParams * _Nullable)params
      completionHandler:(MTRStatusCompletion)completionHandler MTR_NEWLY_DEPRECATED("Please use testWithParams:completion:");
 - (void)testWithCompletionHandler:(MTRStatusCompletion)completionHandler MTR_NEWLY_DEPRECATED("Please use testWithCompletion:");
-- (void)testNotHandledWithParams:(MTRUnitTestingClusterTestNotHandledParams * _Nullable)params
+- (void)testNotHandledWithParams:(MTRTestClusterClusterTestNotHandledParams * _Nullable)params
                completionHandler:(MTRStatusCompletion)completionHandler
     MTR_NEWLY_DEPRECATED("Please use testNotHandledWithParams:completion:");
 - (void)testNotHandledWithCompletionHandler:(MTRStatusCompletion)completionHandler
     MTR_NEWLY_DEPRECATED("Please use testNotHandledWithCompletion:");
-- (void)testSpecificWithParams:(MTRUnitTestingClusterTestSpecificParams * _Nullable)params
-             completionHandler:(void (^)(MTRUnitTestingClusterTestSpecificResponseParams * _Nullable data,
+- (void)testSpecificWithParams:(MTRTestClusterClusterTestSpecificParams * _Nullable)params
+             completionHandler:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testSpecificWithParams:completion:");
 - (void)testSpecificWithCompletionHandler:
-    (void (^)(MTRUnitTestingClusterTestSpecificResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+    (void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testSpecificWithCompletion:");
-- (void)testUnknownCommandWithParams:(MTRUnitTestingClusterTestUnknownCommandParams * _Nullable)params
+- (void)testUnknownCommandWithParams:(MTRTestClusterClusterTestUnknownCommandParams * _Nullable)params
                    completionHandler:(MTRStatusCompletion)completionHandler
     MTR_NEWLY_DEPRECATED("Please use testUnknownCommandWithParams:completion:");
 - (void)testUnknownCommandWithCompletionHandler:(MTRStatusCompletion)completionHandler
     MTR_NEWLY_DEPRECATED("Please use testUnknownCommandWithCompletion:");
-- (void)testAddArgumentsWithParams:(MTRUnitTestingClusterTestAddArgumentsParams *)params
-                 completionHandler:(void (^)(MTRUnitTestingClusterTestAddArgumentsResponseParams * _Nullable data,
+- (void)testAddArgumentsWithParams:(MTRTestClusterClusterTestAddArgumentsParams *)params
+                 completionHandler:(void (^)(MTRTestClusterClusterTestAddArgumentsResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testAddArgumentsWithParams:completion:");
-- (void)testSimpleArgumentRequestWithParams:(MTRUnitTestingClusterTestSimpleArgumentRequestParams *)params
-                          completionHandler:(void (^)(MTRUnitTestingClusterTestSimpleArgumentResponseParams * _Nullable data,
+- (void)testSimpleArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleArgumentRequestParams *)params
+                          completionHandler:(void (^)(MTRTestClusterClusterTestSimpleArgumentResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testSimpleArgumentRequestWithParams:completion:");
-- (void)testStructArrayArgumentRequestWithParams:(MTRUnitTestingClusterTestStructArrayArgumentRequestParams *)params
+- (void)testStructArrayArgumentRequestWithParams:(MTRTestClusterClusterTestStructArrayArgumentRequestParams *)params
                                completionHandler:
-                                   (void (^)(MTRUnitTestingClusterTestStructArrayArgumentResponseParams * _Nullable data,
+                                   (void (^)(MTRTestClusterClusterTestStructArrayArgumentResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testStructArrayArgumentRequestWithParams:completion:");
-- (void)testStructArgumentRequestWithParams:(MTRUnitTestingClusterTestStructArgumentRequestParams *)params
-                          completionHandler:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+- (void)testStructArgumentRequestWithParams:(MTRTestClusterClusterTestStructArgumentRequestParams *)params
+                          completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testStructArgumentRequestWithParams:completion:");
-- (void)testNestedStructArgumentRequestWithParams:(MTRUnitTestingClusterTestNestedStructArgumentRequestParams *)params
-                                completionHandler:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+- (void)testNestedStructArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructArgumentRequestParams *)params
+                                completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                       NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testNestedStructArgumentRequestWithParams:completion:");
-- (void)testListStructArgumentRequestWithParams:(MTRUnitTestingClusterTestListStructArgumentRequestParams *)params
-                              completionHandler:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+- (void)testListStructArgumentRequestWithParams:(MTRTestClusterClusterTestListStructArgumentRequestParams *)params
+                              completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                     NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testListStructArgumentRequestWithParams:completion:");
-- (void)testListInt8UArgumentRequestWithParams:(MTRUnitTestingClusterTestListInt8UArgumentRequestParams *)params
-                             completionHandler:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+- (void)testListInt8UArgumentRequestWithParams:(MTRTestClusterClusterTestListInt8UArgumentRequestParams *)params
+                             completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                    NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testListInt8UArgumentRequestWithParams:completion:");
-- (void)testNestedStructListArgumentRequestWithParams:(MTRUnitTestingClusterTestNestedStructListArgumentRequestParams *)params
-                                    completionHandler:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+- (void)testNestedStructListArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructListArgumentRequestParams *)params
+                                    completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                           NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testNestedStructListArgumentRequestWithParams:completion:");
 - (void)testListNestedStructListArgumentRequestWithParams:
-            (MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams *)params
-                                        completionHandler:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+            (MTRTestClusterClusterTestListNestedStructListArgumentRequestParams *)params
+                                        completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                               NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testListNestedStructListArgumentRequestWithParams:completion:");
-- (void)testListInt8UReverseRequestWithParams:(MTRUnitTestingClusterTestListInt8UReverseRequestParams *)params
-                            completionHandler:(void (^)(MTRUnitTestingClusterTestListInt8UReverseResponseParams * _Nullable data,
+- (void)testListInt8UReverseRequestWithParams:(MTRTestClusterClusterTestListInt8UReverseRequestParams *)params
+                            completionHandler:(void (^)(MTRTestClusterClusterTestListInt8UReverseResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testListInt8UReverseRequestWithParams:completion:");
-- (void)testEnumsRequestWithParams:(MTRUnitTestingClusterTestEnumsRequestParams *)params
-                 completionHandler:(void (^)(MTRUnitTestingClusterTestEnumsResponseParams * _Nullable data,
+- (void)testEnumsRequestWithParams:(MTRTestClusterClusterTestEnumsRequestParams *)params
+                 completionHandler:(void (^)(MTRTestClusterClusterTestEnumsResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testEnumsRequestWithParams:completion:");
-- (void)testNullableOptionalRequestWithParams:(MTRUnitTestingClusterTestNullableOptionalRequestParams * _Nullable)params
-                            completionHandler:(void (^)(MTRUnitTestingClusterTestNullableOptionalResponseParams * _Nullable data,
+- (void)testNullableOptionalRequestWithParams:(MTRTestClusterClusterTestNullableOptionalRequestParams * _Nullable)params
+                            completionHandler:(void (^)(MTRTestClusterClusterTestNullableOptionalResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testNullableOptionalRequestWithParams:completion:");
-- (void)testComplexNullableOptionalRequestWithParams:(MTRUnitTestingClusterTestComplexNullableOptionalRequestParams *)params
+- (void)testComplexNullableOptionalRequestWithParams:(MTRTestClusterClusterTestComplexNullableOptionalRequestParams *)params
                                    completionHandler:
-                                       (void (^)(MTRUnitTestingClusterTestComplexNullableOptionalResponseParams * _Nullable data,
+                                       (void (^)(MTRTestClusterClusterTestComplexNullableOptionalResponseParams * _Nullable data,
                                            NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testComplexNullableOptionalRequestWithParams:completion:");
-- (void)simpleStructEchoRequestWithParams:(MTRUnitTestingClusterSimpleStructEchoRequestParams *)params
-                        completionHandler:(void (^)(MTRUnitTestingClusterSimpleStructResponseParams * _Nullable data,
+- (void)simpleStructEchoRequestWithParams:(MTRTestClusterClusterSimpleStructEchoRequestParams *)params
+                        completionHandler:(void (^)(MTRTestClusterClusterSimpleStructResponseParams * _Nullable data,
                                               NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use simpleStructEchoRequestWithParams:completion:");
-- (void)timedInvokeRequestWithParams:(MTRUnitTestingClusterTimedInvokeRequestParams * _Nullable)params
+- (void)timedInvokeRequestWithParams:(MTRTestClusterClusterTimedInvokeRequestParams * _Nullable)params
                    completionHandler:(MTRStatusCompletion)completionHandler
     MTR_NEWLY_DEPRECATED("Please use timedInvokeRequestWithParams:completion:");
 - (void)timedInvokeRequestWithCompletionHandler:(MTRStatusCompletion)completionHandler
     MTR_NEWLY_DEPRECATED("Please use timedInvokeRequestWithCompletion:");
-- (void)testSimpleOptionalArgumentRequestWithParams:(MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
+- (void)testSimpleOptionalArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
                                   completionHandler:(MTRStatusCompletion)completionHandler
     MTR_NEWLY_DEPRECATED("Please use testSimpleOptionalArgumentRequestWithParams:completion:");
-- (void)testEmitTestEventRequestWithParams:(MTRUnitTestingClusterTestEmitTestEventRequestParams *)params
-                         completionHandler:(void (^)(MTRUnitTestingClusterTestEmitTestEventResponseParams * _Nullable data,
+- (void)testEmitTestEventRequestWithParams:(MTRTestClusterClusterTestEmitTestEventRequestParams *)params
+                         completionHandler:(void (^)(MTRTestClusterClusterTestEmitTestEventResponseParams * _Nullable data,
                                                NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testEmitTestEventRequestWithParams:completion:");
-- (void)testEmitTestFabricScopedEventRequestWithParams:(MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams *)params
+- (void)testEmitTestFabricScopedEventRequestWithParams:(MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams *)params
                                      completionHandler:
                                          (void (^)(
-                                             MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
+                                             MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
                                              NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use testEmitTestFabricScopedEventRequestWithParams:completion:");
 
@@ -41596,12 +41642,12 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
     MTR_NEWLY_DEPRECATED("Please use readAttributeEnumAttrWithAttributeCache:endpoint:queue:completion:");
 
 - (void)readAttributeStructAttrWithCompletionHandler:
-    (void (^)(MTRUnitTestingClusterSimpleStruct * _Nullable value, NSError * _Nullable error))completionHandler
+    (void (^)(MTRTestClusterClusterSimpleStruct * _Nullable value, NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use readAttributeStructAttrWithCompletion:");
-- (void)writeAttributeStructAttrWithValue:(MTRUnitTestingClusterSimpleStruct * _Nonnull)value
+- (void)writeAttributeStructAttrWithValue:(MTRTestClusterClusterSimpleStruct * _Nonnull)value
                         completionHandler:(MTRStatusCompletion)completionHandler
     MTR_NEWLY_DEPRECATED("Please use writeAttributeStructAttrWithValue:completion:");
-- (void)writeAttributeStructAttrWithValue:(MTRUnitTestingClusterSimpleStruct * _Nonnull)value
+- (void)writeAttributeStructAttrWithValue:(MTRTestClusterClusterSimpleStruct * _Nonnull)value
                                    params:(MTRWriteParams * _Nullable)params
                         completionHandler:(MTRStatusCompletion)completionHandler
     MTR_NEWLY_DEPRECATED("Please use writeAttributeStructAttrWithValue:params:completion:");
@@ -41609,13 +41655,13 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(MTRSubscribeParams * _Nullable)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                      reportHandler:(void (^)(MTRUnitTestingClusterSimpleStruct * _Nullable value,
+                                      reportHandler:(void (^)(MTRTestClusterClusterSimpleStruct * _Nullable value,
                                                         NSError * _Nullable error))reportHandler
     MTR_NEWLY_DEPRECATED("Please use subscribeAttributeStructAttrWithParams:subscriptionEstablished:");
 + (void)readAttributeStructAttrWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                          endpoint:(NSNumber *)endpoint
                                             queue:(dispatch_queue_t)queue
-                                completionHandler:(void (^)(MTRUnitTestingClusterSimpleStruct * _Nullable value,
+                                completionHandler:(void (^)(MTRTestClusterClusterSimpleStruct * _Nullable value,
                                                       NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use readAttributeStructAttrWithAttributeCache:endpoint:queue:completion:");
 
@@ -42543,12 +42589,12 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
     MTR_NEWLY_DEPRECATED("Please use readAttributeNullableEnumAttrWithAttributeCache:endpoint:queue:completion:");
 
 - (void)readAttributeNullableStructWithCompletionHandler:
-    (void (^)(MTRUnitTestingClusterSimpleStruct * _Nullable value, NSError * _Nullable error))completionHandler
+    (void (^)(MTRTestClusterClusterSimpleStruct * _Nullable value, NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use readAttributeNullableStructWithCompletion:");
-- (void)writeAttributeNullableStructWithValue:(MTRUnitTestingClusterSimpleStruct * _Nullable)value
+- (void)writeAttributeNullableStructWithValue:(MTRTestClusterClusterSimpleStruct * _Nullable)value
                             completionHandler:(MTRStatusCompletion)completionHandler
     MTR_NEWLY_DEPRECATED("Please use writeAttributeNullableStructWithValue:completion:");
-- (void)writeAttributeNullableStructWithValue:(MTRUnitTestingClusterSimpleStruct * _Nullable)value
+- (void)writeAttributeNullableStructWithValue:(MTRTestClusterClusterSimpleStruct * _Nullable)value
                                        params:(MTRWriteParams * _Nullable)params
                             completionHandler:(MTRStatusCompletion)completionHandler
     MTR_NEWLY_DEPRECATED("Please use writeAttributeNullableStructWithValue:params:completion:");
@@ -42556,13 +42602,13 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(MTRSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                          reportHandler:(void (^)(MTRUnitTestingClusterSimpleStruct * _Nullable value,
+                                          reportHandler:(void (^)(MTRTestClusterClusterSimpleStruct * _Nullable value,
                                                             NSError * _Nullable error))reportHandler
     MTR_NEWLY_DEPRECATED("Please use subscribeAttributeNullableStructWithParams:subscriptionEstablished:");
 + (void)readAttributeNullableStructWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                              endpoint:(NSNumber *)endpoint
                                                 queue:(dispatch_queue_t)queue
-                                    completionHandler:(void (^)(MTRUnitTestingClusterSimpleStruct * _Nullable value,
+                                    completionHandler:(void (^)(MTRTestClusterClusterSimpleStruct * _Nullable value,
                                                           NSError * _Nullable error))completionHandler
     MTR_NEWLY_DEPRECATED("Please use readAttributeNullableStructWithAttributeCache:endpoint:queue:completion:");
 
@@ -42668,27 +42714,32 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
 
 - (void)readAttributeWriteOnlyInt8uWithCompletionHandler:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
-    MTR_NEWLY_DEPRECATED("Please use readAttributeWriteOnlyInt8uWithCompletion:");
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
+        MTR_NEWLY_DEPRECATED("Please use readAttributeWriteOnlyInt8uWithCompletion:");
 - (void)writeAttributeWriteOnlyInt8uWithValue:(NSNumber * _Nonnull)value
                             completionHandler:(MTRStatusCompletion)completionHandler
-    MTR_NEWLY_DEPRECATED("Please use writeAttributeWriteOnlyInt8uWithValue:completion:");
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
+        MTR_NEWLY_DEPRECATED("Please use writeAttributeWriteOnlyInt8uWithValue:completion:");
 - (void)writeAttributeWriteOnlyInt8uWithValue:(NSNumber * _Nonnull)value
                                        params:(MTRWriteParams * _Nullable)params
                             completionHandler:(MTRStatusCompletion)completionHandler
-    MTR_NEWLY_DEPRECATED("Please use writeAttributeWriteOnlyInt8uWithValue:params:completion:");
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
+        MTR_NEWLY_DEPRECATED("Please use writeAttributeWriteOnlyInt8uWithValue:params:completion:");
 - (void)subscribeAttributeWriteOnlyInt8uWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(MTRSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-    MTR_NEWLY_DEPRECATED("Please use subscribeAttributeWriteOnlyInt8uWithParams:subscriptionEstablished:");
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
+        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeWriteOnlyInt8uWithParams:subscriptionEstablished:");
 + (void)readAttributeWriteOnlyInt8uWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                              endpoint:(NSNumber *)endpoint
                                                 queue:(dispatch_queue_t)queue
                                     completionHandler:
                                         (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
-    MTR_NEWLY_DEPRECATED("Please use readAttributeWriteOnlyInt8uWithAttributeCache:endpoint:queue:completion:");
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
+        MTR_NEWLY_DEPRECATED("Please use readAttributeWriteOnlyInt8uWithAttributeCache:endpoint:queue:completion:");
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:
     (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler

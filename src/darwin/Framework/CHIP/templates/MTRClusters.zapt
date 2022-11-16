@@ -18,6 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster {{name}}
  *    {{description}}
  */
+{{#if (isStrEqual (asUpperCamelCase name) "UnitTesting")}}
+MTR_NEWLY_AVAILABLE
+{{/if}}
 @interface MTRCluster{{asUpperCamelCase name}} : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
@@ -35,10 +38,10 @@ NS_ASSUME_NONNULL_BEGIN
 {{!Backwards compat for now: Treat DeviceTypeList as DeviceList.  Ideally we would have both, not just DeviceList. }}
 {{#*inline "attribute"}}Attribute{{#if (isStrEqual (asUpperCamelCase parent.name) "Descriptor")}}{{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeList")}}DeviceList{{else}}{{asUpperCamelCase name}}{{/if}}{{else}}{{asUpperCamelCase name}}{{/if}}{{/inline}}
 {{! TODO: We need a better setup for the API_AVALABLE annotations here; this does not scale at all sanely. }}
-- (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {{#if (isStrEqual (asUpperCamelCase parent.name) "TestCluster")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}};
+- (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}};
 {{#if isWritableAttribute}}
-- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs {{#if (isStrEqual (asUpperCamelCase parent.name) "TestCluster")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}};
-- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params {{#if (isStrEqual (asUpperCamelCase parent.name) "TestCluster")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}};
+- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs {{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}};
+- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params {{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}};
 {{/if}}
 {{/chip_server_cluster_attributes}}
 
@@ -49,17 +52,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{/chip_client_clusters}}
 
+MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
+@interface MTRClusterTestCluster : MTRClusterUnitTesting
+@end
+
 {{#chip_client_clusters includeAll=true}}
-@interface MTRCluster{{asUpperCamelCase name}} (Deprecated)
+@interface MTRCluster{{compatClusterNameRemapping name}} (Deprecated)
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device
                                endpoint:(uint16_t)endpoint
                                   queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
 
 {{#chip_cluster_commands}}
-- (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=.}})completionHandler MTR_NEWLY_DEPRECATED("Please use {{asLowerCamelCase name}}WithParams:expectedValues:expectedValueIntervalMs:completion:");
+- (void){{asLowerCamelCase name}}WithParams:(MTR{{compatClusterNameRemapping parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapClusterName=true}})completionHandler MTR_NEWLY_DEPRECATED("Please use {{asLowerCamelCase name}}WithParams:expectedValues:expectedValueIntervalMs:completion:");
 {{#unless (hasArguments)}}
-- (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=.}})completionHandler MTR_NEWLY_DEPRECATED("Please use {{asLowerCamelCase name}}WithExpectedValues:expectedValueIntervalMs:completion:");
+- (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapClusterName=true}})completionHandler MTR_NEWLY_DEPRECATED("Please use {{asLowerCamelCase name}}WithExpectedValues:expectedValueIntervalMs:completion:");
 {{/unless}}
 {{/chip_cluster_commands}}
 @end

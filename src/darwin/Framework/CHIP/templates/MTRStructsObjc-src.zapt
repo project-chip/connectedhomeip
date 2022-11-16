@@ -45,6 +45,9 @@ NS_ASSUME_NONNULL_BEGIN
 {{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeStruct")}}
 {{> interfaceImpl interfaceName="MTRDescriptorClusterDeviceType"}}
 {{/if}}
+{{else if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}
+@implementation MTRTestClusterCluster{{asUpperCamelCase name}} : MTRUnitTestingCluster{{asUpperCamelCase name}}
+@end
 {{/if}}
 
 {{/zcl_structs}}
@@ -79,6 +82,11 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+{{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}
+
+@implementation MTRTestClusterCluster{{asUpperCamelCase name}}Event : MTRUnitTestingCluster{{asUpperCamelCase name}}Event
+@end
+{{/if}}
 
 {{/zcl_events}}
 

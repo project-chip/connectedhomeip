@@ -3619,6 +3619,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRTestClusterClusterSimpleStruct : MTRUnitTestingClusterSimpleStruct
+@end
+
 @implementation MTRUnitTestingClusterTestFabricScoped
 - (instancetype)init
 {
@@ -3671,6 +3674,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterTestFabricScoped : MTRUnitTestingClusterTestFabricScoped
 @end
 
 @implementation MTRUnitTestingClusterNullablesAndOptionalsStruct
@@ -3739,6 +3745,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRTestClusterClusterNullablesAndOptionalsStruct : MTRUnitTestingClusterNullablesAndOptionalsStruct
+@end
+
 @implementation MTRUnitTestingClusterNestedStruct
 - (instancetype)init
 {
@@ -3771,6 +3780,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterNestedStruct : MTRUnitTestingClusterNestedStruct
 @end
 
 @implementation MTRUnitTestingClusterNestedStructList
@@ -3819,6 +3831,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRTestClusterClusterNestedStructList : MTRUnitTestingClusterNestedStructList
+@end
+
 @implementation MTRUnitTestingClusterDoubleNestedStructList
 - (instancetype)init
 {
@@ -3844,6 +3859,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterDoubleNestedStructList : MTRUnitTestingClusterDoubleNestedStructList
 @end
 
 @implementation MTRUnitTestingClusterTestListStructOctet
@@ -3875,6 +3893,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterTestListStructOctet : MTRUnitTestingClusterTestListStructOctet
 @end
 
 @implementation MTRUnitTestingClusterTestEventEvent
@@ -3920,6 +3941,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRTestClusterClusterTestEventEvent : MTRUnitTestingClusterTestEventEvent
+@end
+
 @implementation MTRUnitTestingClusterTestFabricScopedEventEvent
 - (instancetype)init
 {
@@ -3946,6 +3970,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterTestFabricScopedEventEvent : MTRUnitTestingClusterTestFabricScopedEventEvent
 @end
 
 NS_ASSUME_NONNULL_END
