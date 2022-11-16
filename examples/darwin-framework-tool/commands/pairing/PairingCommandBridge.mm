@@ -19,8 +19,8 @@
 #import <Matter/Matter.h>
 
 #include "../common/CHIPCommandBridge.h"
+#include "DeviceControllerDelegateBridge.h"
 #include "PairingCommandBridge.h"
-#include "PairingDelegateBridge.h"
 #include <lib/support/logging/CHIPLogging.h>
 
 #import "MTRError_Utils.h"
@@ -28,14 +28,14 @@
 using namespace ::chip;
 using namespace ::chip::Controller;
 
-void PairingCommandBridge::SetUpPairingDelegate()
+void PairingCommandBridge::SetUpDeviceControllerDelegate()
 {
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
-    CHIPToolPairingDelegate * pairing = [[CHIPToolPairingDelegate alloc] init];
+    CHIPToolDeviceControllerDelegate * deviceControllerDelegate = [[CHIPToolDeviceControllerDelegate alloc] init];
     MTRCommissioningParameters * params = [[MTRCommissioningParameters alloc] init];
     MTRDeviceController * commissioner = CurrentCommissioner();
 
-    [pairing setDeviceID:mNodeId];
+    [deviceControllerDelegate setDeviceID:mNodeId];
     switch (mNetworkType) {
     case PairingNetworkType::None:
     case PairingNetworkType::Ethernet:
@@ -49,11 +49,11 @@ void PairingCommandBridge::SetUpPairingDelegate()
         break;
     }
 
-    [pairing setCommandBridge:this];
-    [pairing setParams:params];
-    [pairing setCommissioner:commissioner];
+    [deviceControllerDelegate setCommandBridge:this];
+    [deviceControllerDelegate setParams:params];
+    [deviceControllerDelegate setCommissioner:commissioner];
 
-    [commissioner setPairingDelegate:pairing queue:callbackQueue];
+    [commissioner setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];
 }
 
 CHIP_ERROR PairingCommandBridge::RunCommand()
@@ -79,7 +79,7 @@ CHIP_ERROR PairingCommandBridge::RunCommand()
 
 void PairingCommandBridge::PairWithCode(NSError * __autoreleasing * error)
 {
-    SetUpPairingDelegate();
+    SetUpDeviceControllerDelegate();
     auto * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:@(mSetupPINCode) discriminator:@(mDiscriminator)];
     MTRDeviceController * commissioner = CurrentCommissioner();
     [commissioner setupCommissioningSessionWithPayload:payload newNodeID:@(mNodeId) error:error];
@@ -88,7 +88,7 @@ void PairingCommandBridge::PairWithCode(NSError * __autoreleasing * error)
 void PairingCommandBridge::PairWithPayload(NSError * __autoreleasing * error)
 {
     NSString * onboardingPayload = [NSString stringWithUTF8String:mOnboardingPayload];
-    SetUpPairingDelegate();
+    SetUpDeviceControllerDelegate();
     auto * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:onboardingPayload error:error];
     if (payload == nil) {
         return;
