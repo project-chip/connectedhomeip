@@ -87,7 +87,7 @@ void InsertionSort(T * items, size_t n, CompareFunc f)
     for (size_t i = 1; i < n; i++)
     {
         const T key = items[i];
-        int j       = i - 1;
+        int j       = static_cast<int>(i) - 1;
 
         while (j >= 0 && f(key, items[j]))
         {
