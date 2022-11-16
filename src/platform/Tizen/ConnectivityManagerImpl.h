@@ -84,8 +84,9 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 
 public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    void StartWiFiManagement(void);
-    void StopWiFiManagement(void);
+    void StartWiFiManagement();
+    void StopWiFiManagement();
+    bool IsWiFiManagementStarted();
 #endif
 
 private:

@@ -217,6 +217,13 @@ void ConnectivityManagerImpl::StopWiFiManagement()
     SystemLayer().ScheduleWork(DeactivateWiFiManager, nullptr);
 }
 
+bool ConnectivityManagerImpl::IsWiFiManagementStarted()
+{
+    bool isActivated = false;
+    WiFiMgr().IsActivated(&isActivated);
+    return isActivated;
+}
+
 void ConnectivityManagerImpl::ActivateWiFiManager(System::Layer * aLayer, void * aAppState)
 {
     Internal::WiFiMgr().Activate();
@@ -226,6 +233,7 @@ void ConnectivityManagerImpl::DeactivateWiFiManager(System::Layer * aLayer, void
 {
     Internal::WiFiMgr().Deactivate();
 }
+
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 } // namespace DeviceLayer
