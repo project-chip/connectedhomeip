@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * An enumeration of the log levels supported by the Matter SDK.
  */
-typedef NS_ENUM(NSUInteger, MTRLogLevel) { MTRLogLevelError = 0, MTRLogLevelInfo, MTRLogLevelDebug };
+typedef NS_ENUM(NSUInteger, MTRLogLevel) { MTRLogLevelError = 0, MTRLogLevelProgress, MTRLogLevelDetail };
 
 // MARK: - MTRLogger
 
@@ -37,19 +37,11 @@ typedef NS_ENUM(NSUInteger, MTRLogLevel) { MTRLogLevelError = 0, MTRLogLevelInfo
 @protocol MTRLogger
 
 /**
- * Tests if logs may be emitted at the given log level.
- *
- * @param level The log level to test.
- * @returns `true` if logs may be emitted at the given log level; `false` otherwise.
- */
-- (BOOL)isLoggingEnabledAtLevel:(MTRLogLevel)level;
-
-/**
  * Logs a message at the given level. Logs will be written asynchronously using a logger dispatch queue.
  *
  * @note Messages will only be passed to this method if `isLoggingEnabledAtLevel` is `true` for the given log level.
  */
-- (void)logAtLevel:(MTRLogLevel)level message:(NSString *)message;
+- (void)logAtLevel: (MTRLogLevel)level message: (NSString *)message;
 
 @end
 
@@ -74,9 +66,8 @@ typedef NS_ENUM(NSUInteger, MTRLogLevel) { MTRLogLevelError = 0, MTRLogLevelInfo
 /**
  * Gets the `MTRLogger` that will be used to log messages from the Matter SDK.
  *
- * If no logger has been [set](@ref setLogger), the default logger (that logs to `os_log`) will be returned.
- *
- * @returns The `MTRLogger` that will be used to log messages from the Matter SDK.
+ * @returns The `MTRLogger` that will be used to log messages from the Matter SDK if it was previously set.
+ *          Will return null if the logger was never set.
  */
 + (id<MTRLogger>)getLogger;
 
