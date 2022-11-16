@@ -65,7 +65,7 @@ tests:
 
     - label: "Write TestFabricScoped list from alpha"
       identity: "alpha"
-      cluster: "Test Cluster"
+      cluster: "Unit Testing"
       command: "writeAttribute"
       attribute: "list_fabric_scoped"
       arguments:
@@ -118,7 +118,7 @@ tests:
 
     - label: "Write TestFabricScoped list from beta"
       identity: "beta"
-      cluster: "Test Cluster"
+      cluster: "Unit Testing"
       command: "writeAttribute"
       attribute: "list_fabric_scoped"
       arguments:
@@ -168,7 +168,7 @@ tests:
 
     - label: "Read back TestFabricScoped list from alpha"
       identity: "alpha"
-      cluster: "Test Cluster"
+      cluster: "Unit Testing"
       command: "readAttribute"
       attribute: "list_fabric_scoped"
       response:
@@ -218,7 +218,7 @@ tests:
 
     - label: "Read back TestFabricScoped list from beta"
       identity: "beta"
-      cluster: "Test Cluster"
+      cluster: "Unit Testing"
       command: "readAttribute"
       attribute: "list_fabric_scoped"
       response:
@@ -268,7 +268,7 @@ tests:
 
     - label: "Read back TestFabricScoped list from alpha (fabricFiltered false)"
       identity: "alpha"
-      cluster: "Test Cluster"
+      cluster: "Unit Testing"
       command: "readAttribute"
       fabricFiltered: false
       attribute: "list_fabric_scoped"
@@ -366,7 +366,7 @@ tests:
 
     - label: "Read back TestFabricScoped list from beta (fabricFiltered false)"
       identity: "beta"
-      cluster: "Test Cluster"
+      cluster: "Unit Testing"
       command: "readAttribute"
       fabricFiltered: false
       attribute: "list_fabric_scoped"
@@ -453,7 +453,7 @@ tests:
 
     - label: "Write smaller TestFabricScoped list from alpha (again)"
       identity: "alpha"
-      cluster: "Test Cluster"
+      cluster: "Unit Testing"
       command: "writeAttribute"
       attribute: "list_fabric_scoped"
       arguments:
@@ -483,7 +483,7 @@ tests:
 
     - label: "Read back unchanged TestFabricScoped list from beta (again)"
       identity: "beta"
-      cluster: "Test Cluster"
+      cluster: "Unit Testing"
       command: "readAttribute"
       attribute: "list_fabric_scoped"
       response:
@@ -533,7 +533,7 @@ tests:
 
     - label: "Read back TestFabricScoped list from alpha (again)"
       identity: "alpha"
-      cluster: "Test Cluster"
+      cluster: "Unit Testing"
       command: "readAttribute"
       attribute: "list_fabric_scoped"
       response:

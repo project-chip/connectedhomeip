@@ -382,7 +382,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     const uint8_t byteSpanData[] = { 0xde, 0xad, 0xbe, 0xef };
     const char charSpanData[]    = "a simple test string";
 
-    app::Clusters::TestCluster::Structs::SimpleStruct::Type dataTx;
+    app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataTx;
     dataTx.a = 12;
     dataTx.b = true;
     dataTx.d = chip::ByteSpan(byteSpanData);
@@ -402,7 +402,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 1);
 
     {
-        app::Clusters::TestCluster::Structs::SimpleStruct::Type dataRx;
+        app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataRx;
         TLV::TLVReader reader;
         reader.Init(attributeDataTLV, attributeDataTLVLen);
         reader.Next();
@@ -447,7 +447,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMatch(nlTe
     attributePathParams.mClusterId   = 3;
     attributePathParams.mAttributeId = 4;
 
-    DataModel::Nullable<app::Clusters::TestCluster::Structs::SimpleStruct::Type> dataTx;
+    DataModel::Nullable<app::Clusters::UnitTesting::Structs::SimpleStruct::Type> dataTx;
 
     Optional<DataVersion> version(kAcceptedDataVersion);
 
@@ -496,10 +496,10 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMismatch(n
     attributePathParams.mClusterId   = 3;
     attributePathParams.mAttributeId = 4;
 
-    app::Clusters::TestCluster::Structs::SimpleStruct::Type dataTxValue;
+    app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataTxValue;
     dataTxValue.a = 12;
     dataTxValue.b = true;
-    DataModel::Nullable<app::Clusters::TestCluster::Structs::SimpleStruct::Type> dataTx;
+    DataModel::Nullable<app::Clusters::UnitTesting::Structs::SimpleStruct::Type> dataTx;
     dataTx.SetNonNull(dataTxValue);
     Optional<DataVersion> version(kRejectedDataVersion);
     writeClient.EncodeAttribute(attributePathParams, dataTx, version);
