@@ -7,7 +7,6 @@ VOLUME "/var/source"
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --fix-missing \
-    && rm -rf /var/lib/apt/lists/ \
     autoconf \
     automake \
     bison \
