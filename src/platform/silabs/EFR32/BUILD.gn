@@ -97,14 +97,14 @@ static_library("EFR32") {
     deps += [ "${chip_root}/third_party/openthread:openthread_cli" ]
 
     sources += [
-      "../OpenThread/OpenThreadUtils.cpp",
+      "../../OpenThread/OpenThreadUtils.cpp",
       "ConnectivityManagerImpl.cpp",
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
 
     if (chip_mdns == "platform") {
-      sources += [ "../OpenThread/DnssdImpl.cpp" ]
+      sources += [ "../../OpenThread/DnssdImpl.cpp" ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
 
