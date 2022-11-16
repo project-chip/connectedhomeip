@@ -6,7 +6,8 @@ VOLUME "/var/source"
 # base build and check tools and libraries layer
 RUN set -x \
     && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --fix-missing \
+    && rm -rf /var/lib/apt/lists/ \
     autoconf \
     automake \
     bison \
@@ -19,12 +20,14 @@ RUN set -x \
     flex \
     g++ \
     git \
+    git-lfs \
     gperf \
     iproute2 \
     jq \
     lcov \
     libavahi-client-dev \
     libavahi-common-dev \
+    libcairo-dev \
     libcairo2-dev \
     libdbus-1-dev \
     libdbus-glib-1-dev \
@@ -42,6 +45,7 @@ RUN set -x \
     libpango1.0-dev \
     libpixman-1-dev \
     libreadline-dev \
+    libsdl-pango-dev \
     libssl-dev \
     libtool \
     libudev-dev \
@@ -64,7 +68,6 @@ RUN set -x \
     udev \
     unzip \
     wget \
-    git-lfs \
     zlib1g-dev \
     && rm -rf /var/lib/apt/lists/ \
     && git lfs install \
@@ -147,4 +150,16 @@ RUN set -x \
     && DESTDIR=../build-image ninja -C glib/build install \
     && mv glib/build-image/usr/local/lib/x86_64-linux-gnu/lib* $LD_LIBRARY_PATH_TSAN \
     && rm -rf glib \
+    && : # last line
+
+# Install a known ZAP release
+ENV ZAP_VERSION=v2022.11.16
+RUN set -x \
+    && mkdir -p /opt/zap-${ZAP_VERSION} \
+    && cd /opt/zap-${ZAP_VERSION} \
+    && wget https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-linux.zip \
+    && unzip zap-linux.zip \
+    && rm zap-linux.zip \
+    && ln -s /opt/zap-${ZAP_VERSION}/zap /usr/bin/ \
+    && ln -s /opt/zap-${ZAP_VERSION}/zap-cli /usr/bin/ \
     && : # last line
