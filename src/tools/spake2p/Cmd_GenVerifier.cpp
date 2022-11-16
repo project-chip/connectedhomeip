@@ -30,6 +30,7 @@
 #include "spake2p.h"
 
 #include <errno.h>
+#include <stdio.h>
 
 #include <CHIPVersion.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -89,7 +90,16 @@ const char * const gCmdOptionHelp =
     "   -f, --pin-code-file <file>\n"
     "\n"
     "       A file which contains all the PIN codes to generate verifiers.\n"
-    "       Each line in this file should be a valid PIN code.\n"
+    "       Each line in this file should be a valid PIN code in the decimal number format. If the row count\n"
+    "       of this file is less than the number of pin-code/verifier parameter sets to be generated, the\n"
+    "       first few verifier sets will be generated using the PIN codes in this file, and the next will\n"
+    "       use the random PIN codes.\n"
+    "       The following file is a example with 5 PIN codes:\n"
+    "       1234\n"
+    "       2345\n"
+    "       3456\n"
+    "       4567\n"
+    "       5678\n"
     "\n"
     "   -i, --iteration-count <int>\n"
     "\n"
@@ -157,19 +167,24 @@ static uint32_t GetNextPinCode()
     {
         return chip::kSetupPINCodeUndefinedValue;
     }
-    char pinCodeStr[9] = { 0 };
-    if (fgets(pinCodeStr, 8, gPinCodeFile) != nullptr)
+    char * pinCodeStr = nullptr;
+    size_t readSize   = 8;
+    uint32_t pinCode  = chip::kSetupPINCodeUndefinedValue;
+    if (getline(&pinCodeStr, &readSize, gPinCodeFile) != -1)
     {
-        uint32_t pinCode = atoi(pinCodeStr);
-        if (pinCode == 11111111 || pinCode == 22222222 || pinCode == 33333333 || pinCode == 44444444 || pinCode == 55555555 ||
-            pinCode == 66666666 || pinCode == 77777777 || pinCode == 88888888 || pinCode == 99999999 || pinCode == 12345678 ||
-            pinCode == 87654321)
+        if (readSize > 8)
         {
-            return chip::kSetupPINCodeUndefinedValue;
+            pinCodeStr[8] = 0;
         }
-        return pinCode;
+        pinCode = static_cast<uint32_t>(atoi(pinCodeStr));
+        if (!chip::SetupPayload::IsValidSetupPIN(pinCode))
+        {
+            fprintf(stderr, "The line %s in PIN codes file is invalid, using a random PIN code.\n", pinCodeStr);
+            pinCode = chip::kSetupPINCodeUndefinedValue;
+        }
+        free(pinCodeStr);
     }
-    return chip::kSetupPINCodeUndefinedValue;
+    return pinCode;
 }
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
@@ -185,11 +200,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
     case 'p':
         // Specifications sections 5.1.1.6 and 5.1.6.1
-        if (!ParseInt(arg, gPinCode) || (gPinCode > chip::kSetupPINCodeMaximumValue) ||
-            (gPinCode == chip::kSetupPINCodeUndefinedValue) || (gPinCode == 11111111) || (gPinCode == 22222222) ||
-            (gPinCode == 33333333) || (gPinCode == 44444444) || (gPinCode == 55555555) || (gPinCode == 66666666) ||
-            (gPinCode == 77777777) || (gPinCode == 88888888) || (gPinCode == 99999999) || (gPinCode == 12345678) ||
-            (gPinCode == 87654321))
+        if (!ParseInt(arg, gPinCode) || (!chip::SetupPayload::IsValidSetupPIN(gPinCode)))
         {
             PrintArgError("%s: Invalid value specified for pin-code parameter: %s\n", progName, arg);
             return false;
@@ -372,6 +383,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
             return false;
         }
 
+        // If the file with PIN codes is not provided, the PIN code on next iteration will be randomly generated.
         gPinCode = GetNextPinCode();
         // On the next iteration the Salt will be randomly generated.
         gSaltDecodedLen = 0;
