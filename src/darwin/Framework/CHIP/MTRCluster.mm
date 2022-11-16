@@ -51,7 +51,7 @@ using namespace ::chip;
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRWriteParams alloc] init];
     other.timedWriteTimeout = self.timedWriteTimeout;
@@ -65,37 +65,118 @@ using namespace ::chip;
 - (instancetype)init
 {
     if (self = [super init]) {
-        _fabricFiltered = nil;
+        _filterByFabric = YES;
     }
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRReadParams alloc] init];
-    other.fabricFiltered = self.fabricFiltered;
+    other.filterByFabric = self.filterByFabric;
     return other;
+}
+
+- (void)toReadPrepareParams:(chip::app::ReadPrepareParams &)readPrepareParams
+{
+    readPrepareParams.mIsFabricFiltered = self.filterByFabric;
 }
 
 @end
 
 @implementation MTRSubscribeParams
-- (instancetype)init
+- (instancetype)initWithMinInterval:(NSNumber *)minInterval maxInterval:(NSNumber *)maxInterval
 {
     if (self = [super init]) {
-        _keepPreviousSubscriptions = nil;
-        _autoResubscribe = nil;
+        _replaceExistingSubscriptions = YES;
+        _resubscribeIfLost = YES;
+        _minInterval = [minInterval copy];
+        _maxInterval = [maxInterval copy];
     }
     return self;
 }
 
-- (id)copyWithZone:(nullable NSZone *)zone
+- (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRSubscribeParams alloc] init];
-    other.fabricFiltered = self.fabricFiltered;
-    other.keepPreviousSubscriptions = self.keepPreviousSubscriptions;
-    other.autoResubscribe = self.autoResubscribe;
+    auto other = [[MTRSubscribeParams alloc] initWithMinInterval:self.minInterval maxInterval:self.maxInterval];
+    other.filterByFabric = self.filterByFabric;
+    other.replaceExistingSubscriptions = self.replaceExistingSubscriptions;
+    other.resubscribeIfLost = self.resubscribeIfLost;
     return other;
+}
+
+- (void)toReadPrepareParams:(chip::app::ReadPrepareParams &)readPrepareParams
+{
+    [super toReadPrepareParams:readPrepareParams];
+    readPrepareParams.mMinIntervalFloorSeconds = self.minInterval.unsignedShortValue;
+    readPrepareParams.mMaxIntervalCeilingSeconds = self.maxInterval.unsignedShortValue;
+    readPrepareParams.mKeepSubscriptions = !self.replaceExistingSubscriptions;
+}
+
+@end
+
+@implementation MTRReadParams (Deprecated)
+
+- (void)setFabricFiltered:(nullable NSNumber *)fabricFiltered
+{
+    if (fabricFiltered == nil) {
+        self.filterByFabric = YES;
+    } else {
+        self.filterByFabric = [fabricFiltered boolValue];
+    }
+}
+
+- (nullable NSNumber *)fabricFiltered
+{
+    return @(self.filterByFabric);
+}
+
+@end
+
+@implementation MTRSubscribeParams (Deprecated)
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _replaceExistingSubscriptions = YES;
+        _resubscribeIfLost = YES;
+        _minInterval = @(1);
+        _maxInterval = @(0);
+    }
+    return self;
+}
+
++ (instancetype)new
+{
+    return [[self alloc] init];
+}
+
+- (void)setKeepPreviousSubscriptions:(nullable NSNumber *)keepPreviousSubscriptions
+{
+    if (keepPreviousSubscriptions == nil) {
+        self.replaceExistingSubscriptions = YES;
+    } else {
+        self.replaceExistingSubscriptions = ![keepPreviousSubscriptions boolValue];
+    }
+}
+
+- (nullable NSNumber *)keepPreviousSubscriptions
+{
+    return @(!self.replaceExistingSubscriptions);
+}
+
+- (void)setAutoResubscribe:(nullable NSNumber *)autoResubscribe
+{
+    if (autoResubscribe == nil) {
+        self.resubscribeIfLost = YES;
+    } else {
+        self.resubscribeIfLost = [autoResubscribe boolValue];
+    }
+}
+
+- (nullable NSNumber *)autoResubscribe
+{
+    return @(self.resubscribeIfLost);
 }
 
 @end

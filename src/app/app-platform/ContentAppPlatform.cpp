@@ -510,27 +510,11 @@ CHIP_ERROR ContentAppPlatform::GetACLEntryIndex(size_t * foundIndex, FabricIndex
     return CHIP_ERROR_NOT_FOUND;
 }
 
-constexpr EndpointId kTargetBindingClusterEndpointId = 0;
-constexpr EndpointId kLocalVideoPlayerEndpointId     = 1;
-constexpr EndpointId kLocalSpeakerEndpointId         = 2;
-constexpr ClusterId kClusterIdDescriptor             = 0x001d;
-constexpr ClusterId kClusterIdOnOff                  = 0x0006;
-constexpr ClusterId kClusterIdWakeOnLAN              = 0x0503;
-// constexpr ClusterId kClusterIdChannel             = 0x0504;
-// constexpr ClusterId kClusterIdTargetNavigator     = 0x0505;
-constexpr ClusterId kClusterIdMediaPlayback = 0x0506;
-// constexpr ClusterId kClusterIdMediaInput          = 0x0507;
-constexpr ClusterId kClusterIdLowPower        = 0x0508;
-constexpr ClusterId kClusterIdKeypadInput     = 0x0509;
-constexpr ClusterId kClusterIdContentLauncher = 0x050a;
-constexpr ClusterId kClusterIdAudioOutput     = 0x050b;
-// constexpr ClusterId kClusterIdApplicationLauncher = 0x050c;
-// constexpr ClusterId kClusterIdAccountLogin        = 0x050e;
-
 // Add ACLs on this device for the given client,
 // and create bindings on the given client so that it knows what it has access to.
 CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle,
-                                                  uint16_t targetVendorId, NodeId localNodeId,
+                                                  uint16_t targetVendorId, uint16_t targetProductId, NodeId localNodeId,
+                                                  std::vector<Binding::Structs::TargetStruct::Type> bindings,
                                                   Controller::WriteResponseSuccessCallback successCb,
                                                   Controller::WriteResponseFailureCallback failureCb)
 {
@@ -564,8 +548,6 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
     ReturnErrorOnFailure(entry.SetPrivilege(vendorPrivilege));
     ReturnErrorOnFailure(entry.AddSubject(nullptr, subjectNodeId));
 
-    std::vector<Binding::Structs::TargetStruct::Type> bindings;
-
     /**
      * Here we are creating a single ACL entry containing:
      * a) selection of clusters on video player endpoint (8 targets)
@@ -588,6 +570,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
 
     ChipLogProgress(Controller, "Create video player endpoint ACL and binding");
     {
+        bool hasClusterAccess = false;
         if (vendorPrivilege == Access::Privilege::kAdminister)
         {
             ChipLogProgress(Controller, "ContentAppPlatform::ManageClientAccess Admin privilege granted");
@@ -595,14 +578,14 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
             Access::AccessControl::Entry::Target target = { .flags    = Access::AccessControl::Entry::Target::kEndpoint,
                                                             .endpoint = kLocalVideoPlayerEndpointId };
             ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
+            hasClusterAccess = true;
         }
         else
         {
             ChipLogProgress(Controller, "ContentAppPlatform::ManageClientAccess non-Admin privilege granted");
             // a vendor with non-admin privilege gets access to select clusters on ep1
-            std::list<ClusterId> allowedClusterList = { kClusterIdDescriptor,      kClusterIdOnOff,      kClusterIdWakeOnLAN,
-                                                        kClusterIdMediaPlayback,   kClusterIdLowPower,   kClusterIdKeypadInput,
-                                                        kClusterIdContentLauncher, kClusterIdAudioOutput };
+            std::list<ClusterId> allowedClusterList = mContentAppFactory->GetAllowedClusterListForStaticEndpoint(
+                kLocalVideoPlayerEndpointId, targetVendorId, targetProductId);
 
             for (const auto & clusterId : allowedClusterList)
             {
@@ -611,16 +594,21 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
                                                                 .cluster  = clusterId,
                                                                 .endpoint = kLocalVideoPlayerEndpointId };
                 ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
+                hasClusterAccess = true;
             }
         }
 
-        bindings.push_back(Binding::Structs::TargetStruct::Type{
-            .node        = MakeOptional(localNodeId),
-            .group       = NullOptional,
-            .endpoint    = MakeOptional(kLocalVideoPlayerEndpointId),
-            .cluster     = NullOptional,
-            .fabricIndex = kUndefinedFabricIndex,
-        });
+        if (hasClusterAccess)
+        {
+            ChipLogProgress(Controller, "ContentAppPlatform::ManageClientAccess adding a binding on ep1");
+            bindings.push_back(Binding::Structs::TargetStruct::Type{
+                .node        = MakeOptional(localNodeId),
+                .group       = NullOptional,
+                .endpoint    = MakeOptional(kLocalVideoPlayerEndpointId),
+                .cluster     = NullOptional,
+                .fabricIndex = kUndefinedFabricIndex,
+            });
+        }
     }
 
     ChipLogProgress(Controller, "Create speaker endpoint ACL and binding");

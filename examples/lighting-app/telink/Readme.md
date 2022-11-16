@@ -1,3 +1,10 @@
+# Matter Telink Lighting Example Application
+
+The Telink Lighting Example demonstrates how to remotely control a white
+dimmable light bulb. It uses buttons to test changing the lighting and device
+states and LEDs to show the state of these changes. You can use this example as
+a reference for creating your own application.
+
 ![Telink B91 EVK](http://wiki.telink-semi.cn/wiki/assets/Hardware/B91_Generic_Starter_Kit_Hardware_Guide/connection_chart.png)
 
 ## Build and flash
@@ -75,15 +82,18 @@ following states:
 
 1. Build
    [chip-tool cli](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
+
 2. Pair with device
 
     ```
-    ${CHIP_TOOL_DIR}/chip-tool pairing code ${NODE_ID_TO_ASSIGN} MT:D8XA0CQM00KA0648G00
+    ${CHIP_TOOL_DIR}/chip-tool pairing ble-thread ${NODE_ID} hex:${DATASET} ${PIN_CODE} ${DISCRIMINATOR}
     ```
 
-    here:
+    Example:
 
-    - \${NODE_ID_TO_ASSIGN} is the node id to assign to the lightbulb
+    ```
+    ./chip-tool pairing ble-thread 1234 hex:0e080000000000010000000300000f35060004001fffe0020811111111222222220708fd61f77bd3df233e051000112233445566778899aabbccddeeff030e4f70656e54687265616444656d6f010212340410445f2b5ca6f2a93a55ce570a70efeecb0c0402a0fff8 20202021 3840
+    ```
 
 3. Switch on the light:
 
@@ -155,14 +165,15 @@ feature for another Telink example:
 
 -   set CONFIG_CHIP_OTA_REQUESTOR=y in corresponding "prj.conf" configuration
     file.
--   remove "boards/tlsr9518adk80d.overlay" file to enable 2MB flash storage.
 
 After build application with enabled OTA feature, use next binary files:
 
--   zephyr_final.bin - main binary to flash PCB (Use 2MB PCB).
+-   zephyr.bin - main binary to flash PCB (Use 2MB PCB).
 -   zephyr-ota.bin - binary for OTA Provider
--   zephyr.bin - ignore this file.
--   zephyr.signed.bin - ignore this file.
+
+All binaries has the same SW version. To test OTA “zephyr-ota.bin” should have
+higher SW version than base SW. Set CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 in
+corresponding “prj.conf” conﬁguration file.
 
 Usage of OTA:
 

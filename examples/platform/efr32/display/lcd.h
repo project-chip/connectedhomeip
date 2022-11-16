@@ -33,12 +33,15 @@ class SilabsLCD
 {
 
 public:
+    typedef void (*customUICB)(GLIB_Context_t * context);
     CHIP_ERROR Init(uint8_t * name = nullptr, bool initialState = false);
     void * Context();
     int Clear(void);
     int DrawPixel(void * pContext, int32_t x, int32_t y);
     int Update(void);
     void WriteDemoUI(bool state);
+    void SetCustomUI(customUICB cb);
+
 #ifdef QR_CODE_ENABLED
     void SetQRCode(uint8_t * str, uint32_t size);
     void ShowQRCode(bool show, bool forceRefresh = false);
@@ -66,6 +69,6 @@ private:
 #else
     uint8_t mName[APP_NAME_MAX_LENGTH + 1];
 #endif
-
-        DemoState_t dState;
+        customUICB customUI = nullptr;
+    DemoState_t dState;
 };

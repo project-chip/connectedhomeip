@@ -21,7 +21,7 @@ limitations under the License.
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements.</description>
     <code>0x0402</code>
-    <define>TEMP_MEASUREMENT_CLUSTER</define>
+    <define>TEMPERATURE_MEASUREMENT_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <attribute side="server" code="0x0000" define="TEMP_MEASURED_VALUE" type="INT16S" min="0x954d" max="0x7fff" writable="false" isNullable="true" optional="false">MeasuredValue</attribute>

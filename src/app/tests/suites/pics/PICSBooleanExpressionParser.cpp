@@ -39,9 +39,8 @@ void PICSBooleanExpressionParser::Tokenize(std::string & expression, std::vector
 
     std::string s;
 
-    for (size_t i = 0; i < expression.size(); i++)
+    for (char c : expression)
     {
-        char c = expression[i];
         switch (c)
         {
         case ' ':

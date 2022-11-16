@@ -24,8 +24,6 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <hal/wiced_hal_eflash.h>
-#include <platform/Infineon/CYW30739/CYW30739Config.h>
-#include <platform_nvram.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -58,10 +56,14 @@ CHIP_ERROR CYW30739Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t buf
 CHIP_ERROR CYW30739Config::ReadConfigValueBin(Key key, void * buf, size_t bufSize, size_t & outLen)
 {
     wiced_result_t result;
-    uint16_t read_count = wiced_hal_read_nvram(PLATFORM_NVRAM_VSID_MATTER_BASE + key, bufSize, (uint8_t *) buf, &result);
-    if (kMinConfigKey_ChipFactory <= key && key <= kMaxConfigKey_ChipFactory && result != WICED_SUCCESS)
+    uint16_t read_count;
+    if (kMinConfigKey_ChipFactory <= key && key <= kMaxConfigKey_ChipFactory)
     {
-        read_count = wiced_hal_read_nvram_static(PLATFORM_NVRAM_SSID_MATTER_BASE + key, bufSize, buf, &result);
+        read_count = wiced_hal_read_nvram_static(key, bufSize, buf, &result);
+    }
+    else
+    {
+        read_count = wiced_hal_read_nvram(key, bufSize, (uint8_t *) buf, &result);
     }
     if (result == WICED_SUCCESS)
     {
@@ -124,7 +126,7 @@ CHIP_ERROR CYW30739Config::WriteConfigValueBin(Key key, const void * data, size_
     }
 
     wiced_result_t result;
-    const uint16_t write_count = wiced_hal_write_nvram(PLATFORM_NVRAM_VSID_MATTER_BASE + key, dataLen, (uint8_t *) data, &result);
+    const uint16_t write_count = wiced_hal_write_nvram(key, dataLen, (uint8_t *) data, &result);
     if (result == WICED_SUCCESS && write_count == dataLen)
         return CHIP_NO_ERROR;
 
@@ -135,7 +137,7 @@ CHIP_ERROR CYW30739Config::WriteConfigValueBin(Key key, const void * data, size_
 CHIP_ERROR CYW30739Config::ClearConfigValue(Key key)
 {
     wiced_result_t result;
-    wiced_hal_delete_nvram(PLATFORM_NVRAM_VSID_MATTER_BASE + key, &result);
+    wiced_hal_delete_nvram(key, &result);
     if (result == WICED_SUCCESS)
     {
         return CHIP_NO_ERROR;

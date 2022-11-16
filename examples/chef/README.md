@@ -137,7 +137,7 @@ chef_$PLATFORM:
         options: --user root
 
     steps:
-        - uses: Wandalen/wretry.action@v1.0.15
+        - uses: Wandalen/wretry.action@v1.0.36
           name: Checkout
           with:
               action: actions/checkout@v3

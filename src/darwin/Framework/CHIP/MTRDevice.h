@@ -140,8 +140,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
-                        clientQueue:(dispatch_queue_t)clientQueue
-                         completion:(MTRDeviceResponseHandler)completion;
+                              queue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
 
 /**
  * Open a commissioning window on the device.
@@ -163,17 +163,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                                            queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
     API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
-
-@end
-
-@interface MTRDevice (Deprecated)
-
-/**
- * Deprecated MTRDevice APIs.
- */
-+ (instancetype)deviceWithNodeID:(uint64_t)nodeID
-                deviceController:(MTRDeviceController *)deviceController
-    MTR_NEWLY_DEPRECATED("Please use deviceWithNodeID:controller:");
 
 @end
 
@@ -203,6 +192,30 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * @param eventReport  An array of response-value objects as described in MTRDeviceResponseHandler
  */
 - (void)device:(MTRDevice *)device receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
+
+@end
+
+@interface MTRDevice (Deprecated)
+
+/**
+ * Deprecated MTRDevice APIs.
+ */
++ (instancetype)deviceWithNodeID:(uint64_t)nodeID
+                deviceController:(MTRDeviceController *)deviceController
+    MTR_NEWLY_DEPRECATED("Please use deviceWithNodeID:controller:");
+
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
+                      commandFields:(id)commandFields
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
+                        clientQueue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion
+    MTR_NEWLY_DEPRECATED("Please use "
+                         "invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:"
+                         "timedInvokeTimeout:queue:completion:");
 
 @end
 

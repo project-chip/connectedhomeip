@@ -428,22 +428,18 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
                                                                          { TestCert::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       } } },
     };
     // clang-format on
-    static const size_t sNumValidationTestCases = ArraySize(sValidationTestCases);
 
-    for (unsigned i = 0; i < sNumValidationTestCases; i++)
+    for (const auto & testCase : sValidationTestCases)
     {
         const ChipCertificateData * resultCert = nullptr;
-        const ValidationTestCase & testCase    = sValidationTestCases[i];
-
-        err = certSet.Init(kMaxCertsPerTestCase);
+        err                                    = certSet.Init(kMaxCertsPerTestCase);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        for (size_t i2 = 0; i2 < kMaxCertsPerTestCase; i2++)
+        for (auto inputCert : testCase.InputCerts)
         {
-            if (testCase.InputCerts[i2].Type != TestCert::kNone)
+            if (inputCert.Type != TestCert::kNone)
             {
-                err = LoadTestCert(certSet, testCase.InputCerts[i2].Type, testCase.InputCerts[i2].LoadFlags,
-                                   testCase.InputCerts[i2].DecodeFlags);
+                err = LoadTestCert(certSet, inputCert.Type, inputCert.LoadFlags, inputCert.DecodeFlags);
                 NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
             }
         }
@@ -1137,11 +1133,8 @@ static void TestChipCert_CertType(nlTestSuite * inSuite, void * inContext)
         {  TestCert::kNode02_02,       kCertType_Node            },
     };
     // clang-format on
-    static const size_t sNumTestCases = ArraySize(sTestCases);
-
-    for (unsigned i = 0; i < sNumTestCases; i++)
+    for (const auto & testCase : sTestCases)
     {
-        const TestCase & testCase = sTestCases[i];
         uint8_t certType;
 
         err = certSet.Init(1);
@@ -1186,11 +1179,8 @@ static void TestChipCert_CertId(nlTestSuite * inSuite, void * inContext)
         {  TestCert::kNode02_02,       0xDEDEDEDE00020002 },
     };
     // clang-format on
-    static const size_t sNumTestCases = ArraySize(sTestCases);
-
-    for (unsigned i = 0; i < sNumTestCases; i++)
+    for (const auto & testCase : sTestCases)
     {
-        const TestCase & testCase = sTestCases[i];
         uint64_t chipId;
 
         err = certSet.Init(certData, 1);

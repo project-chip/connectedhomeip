@@ -20,12 +20,17 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef void (^MTRFetchControllerIDCompletion)(id _Nullable controllerID, NSError * _Nullable error);
+
 @interface MTRDeviceControllerOverXPC ()
 
-@property (nonatomic, readwrite, strong) id<NSCopying> _Nullable controllerId;
+@property (nonatomic, readwrite, strong) id<NSCopying> _Nullable controllerID;
 @property (nonatomic, readonly, strong) dispatch_queue_t workQueue;
 @property (nonatomic, readonly, strong) MTRDeviceControllerXPCConnection * xpcConnection;
 
+// Guarantees that completion is called with either a non-nil controllerID or a
+// non-nil error.
+- (void)fetchControllerIdWithQueue:(dispatch_queue_t)queue completion:(MTRFetchControllerIDCompletion)completion;
 @end
 
 NS_ASSUME_NONNULL_END

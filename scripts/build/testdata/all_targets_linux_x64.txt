@@ -3,7 +3,7 @@ android-{arm,arm64,x86,x64,androidstudio-arm,androidstudio-arm64,androidstudio-x
 bouffalolab-{bl602-iot-matter-v1,bl602-iot-dvk-3s,bl602-night-light,xt-zb6-devkit,bl706-iot-dvk,bl706-night-light}-light[-shell][-115200][-rpc]
 cc13x2x7_26x2x7-{all-clusters,all-clusters-minimal,lock,pump,pump-controller,shell}[-ftd][-mtd]
 cyw30739-cyw930739m2evb_01-{light,lock,ota-requestor}[-no-progress-logging]
-efr32-{brd4161a,brd4187c,brd4163a,brd4164a,brd4166a,brd4170a,brd4186a,brd4187a,brd4304a}-{window-covering,switch,unit-test,light,lock}[-rpc][-with-ota-requestor]
+efr32-{brd4161a,brd4187c,brd4163a,brd4164a,brd4166a,brd4170a,brd4186a,brd4187a,brd4304a}-{window-covering,switch,unit-test,light,lock}[-rpc][-with-ota-requestor][-sed][-low-power]
 esp32-{m5stack,c3devkit,devkitc,qemu}-{all-clusters,all-clusters-minimal,ota-requestor,ota-requestor,shell,light,lock,bridge,temperature-measurement,ota-requestor,tests}[-rpc][-ipv6only]
 genio-lighting-app
 linux-fake-tests[-mbedtls][-boringssl][-asan][-tsan][-libfuzzer][-coverage][-dmalloc][-clang]
@@ -18,4 +18,4 @@ nrf-{nrf5340dk,nrf52840dk,nrf52840dongle}-{all-clusters,all-clusters-minimal,loc
 nrf-native-posix-64-tests
 qpg-qpg6105-{lock,light,shell,persistent-storage}
 tizen-arm-{all-clusters,all-clusters-minimal,chip-tool,light}[-no-ble][-no-wifi][-asan]
-telink-tlsr9518adk80d-{light,light-switch,ota-requestor}
+telink-tlsr9518adk80d-{all-clusters,all-clusters-minimal,light,light-switch,ota-requestor}

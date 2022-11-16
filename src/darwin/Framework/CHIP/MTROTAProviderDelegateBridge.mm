@@ -16,7 +16,7 @@
  */
 
 #import "MTROTAProviderDelegateBridge.h"
-#import "MTRControllerFactory_Internal.h"
+#import "MTRDeviceControllerFactory_Internal.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 
@@ -149,17 +149,26 @@ private:
             });
         };
 
-        auto * controller = [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
+        auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
         auto nodeId = @(mNodeId.Value());
 
         auto strongDelegate = mDelegate;
         dispatch_async(mWorkQueue, ^{
-            [strongDelegate handleBDXTransferSessionBeginForNodeID:nodeId
-                                                        controller:controller
-                                                    fileDesignator:fileDesignator
-                                                            offset:offset
-                                                 completionHandler:completionHandler];
+            if ([strongDelegate respondsToSelector:@selector
+                                (handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:)]) {
+                [strongDelegate handleBDXTransferSessionBeginForNodeID:nodeId
+                                                            controller:controller
+                                                        fileDesignator:fileDesignator
+                                                                offset:offset
+                                                            completion:completionHandler];
+            } else {
+                [strongDelegate handleBDXTransferSessionBeginForNodeID:nodeId
+                                                            controller:controller
+                                                        fileDesignator:fileDesignator
+                                                                offset:offset
+                                                     completionHandler:completionHandler];
+            }
         });
 
         return CHIP_NO_ERROR;
@@ -177,7 +186,7 @@ private:
             error = CHIP_ERROR_INTERNAL;
         }
 
-        auto * controller = [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
+        auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
         auto nodeId = @(mNodeId.Value());
 
@@ -227,18 +236,28 @@ private:
 
         // TODO Handle MaxLength
 
-        auto * controller = [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
+        auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
         auto nodeId = @(mNodeId.Value());
 
         auto strongDelegate = mDelegate;
         dispatch_async(mWorkQueue, ^{
-            [strongDelegate handleBDXQueryForNodeID:nodeId
-                                         controller:controller
-                                          blockSize:blockSize
-                                         blockIndex:blockIndex
-                                        bytesToSkip:bytesToSkip
-                                  completionHandler:completionHandler];
+            if ([strongDelegate respondsToSelector:@selector
+                                (handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completion:)]) {
+                [strongDelegate handleBDXQueryForNodeID:nodeId
+                                             controller:controller
+                                              blockSize:blockSize
+                                             blockIndex:blockIndex
+                                            bytesToSkip:bytesToSkip
+                                             completion:completionHandler];
+            } else {
+                [strongDelegate handleBDXQueryForNodeID:nodeId
+                                             controller:controller
+                                              blockSize:blockSize
+                                             blockIndex:blockIndex
+                                            bytesToSkip:bytesToSkip
+                                      completionHandler:completionHandler];
+            }
         });
 
         return CHIP_NO_ERROR;
@@ -368,7 +387,7 @@ bool GetPeerNodeInfo(CommandHandler * commandHandler, const ConcreteCommandPath 
     }
 
     auto * controller =
-        [[MTRControllerFactory sharedInstance] runningControllerForFabricIndex:commandHandler->GetAccessingFabricIndex()];
+        [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:commandHandler->GetAccessingFabricIndex()];
     if (controller == nil) {
         commandHandler->AddStatus(commandPath, Status::Failure);
         return false;
@@ -506,10 +525,17 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
 
     auto strongDelegate = mDelegate;
     dispatch_async(mWorkQueue, ^{
-        [strongDelegate handleQueryImageForNodeID:@(nodeId)
-                                       controller:controller
-                                           params:commandParams
-                                completionHandler:completionHandler];
+        if ([strongDelegate respondsToSelector:@selector(handleQueryImageForNodeID:controller:params:completion:)]) {
+            [strongDelegate handleQueryImageForNodeID:@(nodeId)
+                                           controller:controller
+                                               params:commandParams
+                                           completion:completionHandler];
+        } else {
+            [strongDelegate handleQueryImageForNodeID:@(nodeId)
+                                           controller:controller
+                                               params:commandParams
+                                    completionHandler:completionHandler];
+        }
     });
 }
 
@@ -547,10 +573,17 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * com
 
     auto strongDelegate = mDelegate;
     dispatch_async(mWorkQueue, ^{
-        [strongDelegate handleApplyUpdateRequestForNodeID:@(nodeId)
-                                               controller:controller
-                                                   params:commandParams
-                                        completionHandler:completionHandler];
+        if ([strongDelegate respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completion:)]) {
+            [strongDelegate handleApplyUpdateRequestForNodeID:@(nodeId)
+                                                   controller:controller
+                                                       params:commandParams
+                                                   completion:completionHandler];
+        } else {
+            [strongDelegate handleApplyUpdateRequestForNodeID:@(nodeId)
+                                                   controller:controller
+                                                       params:commandParams
+                                            completionHandler:completionHandler];
+        }
     });
 }
 
@@ -582,10 +615,17 @@ void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * co
 
     auto strongDelegate = mDelegate;
     dispatch_async(mWorkQueue, ^{
-        [strongDelegate handleNotifyUpdateAppliedForNodeID:@(nodeId)
-                                                controller:controller
-                                                    params:commandParams
-                                         completionHandler:completionHandler];
+        if ([strongDelegate respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:controller:params:completion:)]) {
+            [strongDelegate handleNotifyUpdateAppliedForNodeID:@(nodeId)
+                                                    controller:controller
+                                                        params:commandParams
+                                                    completion:completionHandler];
+        } else {
+            [strongDelegate handleNotifyUpdateAppliedForNodeID:@(nodeId)
+                                                    controller:controller
+                                                        params:commandParams
+                                             completionHandler:completionHandler];
+        }
     });
 }
 

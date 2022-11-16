@@ -59,6 +59,12 @@ static_assert(LWIP_VERSION_MAJOR > 1, "CHIP requires LwIP 2.0 or later");
 #undef HAVE_IPV6_MULTICAST
 #endif
 
+#if (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
+#define PBUF_STRUCT_DATA_CONTIGUOUS(pbuf) (pbuf)->type == PBUF_RAM || (pbuf)->type == PBUF_POOL
+#else // (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
+#define PBUF_STRUCT_DATA_CONTIGUOUS(pbuf) (pbuf)->type_internal & PBUF_TYPE_FLAG_STRUCT_DATA_CONTIGUOUS
+#endif // (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
+
 namespace chip {
 namespace Platform {
 template <>
@@ -366,6 +372,7 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
 {
     Platform::UniquePtr<struct pbuf> pbufFreeGuard(p);
     UDPEndPointImplLwIP * ep = static_cast<UDPEndPointImplLwIP *>(arg);
+    System::PacketBufferHandle buf;
     if (ep->mState == State::kClosed)
     {
         return;
@@ -378,14 +385,38 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
         return;
     }
 
-    // TODO: Skip copying the buffer if the pbuf already meets the PacketBuffer memory model
-    System::PacketBufferHandle buf = System::PacketBufferHandle::New(p->tot_len, 0);
-    if (buf.IsNull() || pbuf_copy_partial(p, buf->Start(), p->tot_len, 0) != p->tot_len)
+    if (PBUF_STRUCT_DATA_CONTIGUOUS(p))
     {
-        ChipLogError(Inet, "Cannot copy received pbuf of size %u", p->tot_len);
-        return;
+        buf = System::PacketBufferHandle::Adopt(p);
+        // Release pbufFreeGuard since the buf has the ownership of the pbuf.
+        pbufFreeGuard.release();
+        if (buf->HasChainedBuffer())
+        {
+            buf->CompactHead();
+        }
+        if (buf->HasChainedBuffer())
+        {
+            // Have to allocate a new big-enough buffer and copy.
+            uint16_t messageSize            = buf->TotalLength();
+            System::PacketBufferHandle copy = System::PacketBufferHandle::New(messageSize, 0);
+            if (copy.IsNull() || buf->Read(copy->Start(), messageSize) != CHIP_NO_ERROR)
+            {
+                ChipLogError(Inet, "No memory to flatten incoming packet buffer chain of size %u", buf->TotalLength());
+                return;
+            }
+            buf = std::move(copy);
+        }
     }
-    buf->SetDataLength(p->tot_len);
+    else
+    {
+        buf = System::PacketBufferHandle::New(p->tot_len, 0);
+        if (buf.IsNull() || pbuf_copy_partial(p, buf->Start(), p->tot_len, 0) != p->tot_len)
+        {
+            ChipLogError(Inet, "Cannot copy received pbuf of size %u", p->tot_len);
+            return;
+        }
+        buf->SetDataLength(p->tot_len);
+    }
 
     pktInfo->SrcAddress  = IPAddress(*addr);
     pktInfo->DestAddress = IPAddress(*ip_current_dest_addr());

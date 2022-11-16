@@ -26,6 +26,10 @@
 #include <platform/CHIPDeviceLayer.h>
 #ifdef QR_CODE_ENABLED
 #include <qrcodegen.h>
+#else
+#include "EFR32DeviceDataProvider.h"
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <setup_payload/SetupPayload.h>
 #endif // QR_CODE_ENABLED
 #include <sl_simple_button_instances.h>
 
@@ -54,6 +58,8 @@ SilabsLCD slLCD;
 #define LCD_ICON_TIMEOUT 1000
 
 using namespace chip::app::Clusters::WindowCovering;
+using namespace chip;
+using namespace ::chip::DeviceLayer;
 #define APP_STATE_LED &sl_led_led0
 #define APP_ACTION_LED &sl_led_led1
 
@@ -211,6 +217,21 @@ CHIP_ERROR WindowAppImpl::Init()
 #ifdef DISPLAY_ENABLED
     slLCD.Init();
 #endif
+
+#ifndef QR_CODE_ENABLED
+    // Create buffer for QR code that can fit max size and null terminator.
+    char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
+    chip::MutableCharSpan QRCode(qrCodeBuffer);
+
+    if (EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(QRCode) == CHIP_NO_ERROR)
+    {
+        PrintQrCodeURL(QRCode);
+    }
+    else
+    {
+        EFR32_LOG("Getting QR code failed!");
+    }
+#endif // QR_CODE_ENABLED
 
     return CHIP_NO_ERROR;
 }

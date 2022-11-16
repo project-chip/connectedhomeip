@@ -36,7 +36,7 @@ void TestTask(void * pvParameter)
         P6_LOG("PersistedStorage::KeyValueStoreMgrImpl().Init() failed");
         return;
     }
-    while (1)
+    while (true)
     {
         P6_LOG("Running Tests:");
         chip::RunKvsTest();

@@ -228,7 +228,7 @@ void TestPayloadParser_FullPayload(nlTestSuite * inSuite, void * inContext)
 
     // The same thing, but with dashes separating digit groups.
     decimalString = "6361-0875-3545-3671-4526";
-    decimalString += ComputeCheckChar(decimalString.c_str());
+    decimalString += ComputeCheckChar(decimalString);
     err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -309,7 +309,7 @@ void TestPayloadParser_PartialPayload(nlTestSuite * inSuite, void * inContext)
 
     // The same thing, but with dashes separating digit groups.
     decimalString = "236-108753-5";
-    decimalString += ComputeCheckChar(decimalString.c_str());
+    decimalString += ComputeCheckChar(decimalString);
     NL_TEST_ASSERT(inSuite, decimalString.length() == 13);
     err = ManualSetupPayloadParser(decimalString).populatePayload(payload);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);

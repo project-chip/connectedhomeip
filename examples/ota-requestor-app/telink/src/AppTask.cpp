@@ -140,6 +140,8 @@ CHIP_ERROR AppTask::Init()
     chip::Server::GetInstance().Init(initParams);
 
     // We only have network commissioning on endpoint 0.
+    // Set up a valid Network Commissioning cluster on endpoint 0 is done in
+    // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 
     // Initialize device attestation config

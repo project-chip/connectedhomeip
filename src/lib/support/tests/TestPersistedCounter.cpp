@@ -101,8 +101,7 @@ static void CheckOOB(nlTestSuite * inSuite, void * inContext)
 
     chip::PersistedCounter<uint64_t> counter;
 
-    auto testKey   = &chip::DefaultStorageKeyAllocator::IMEventNumber;
-    CHIP_ERROR err = counter.Init(sPersistentStore, testKey, 0x10000);
+    CHIP_ERROR err = counter.Init(sPersistentStore, chip::DefaultStorageKeyAllocator::IMEventNumber(), 0x10000);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     auto value = counter.GetValue();
@@ -120,9 +119,7 @@ static void CheckReboot(nlTestSuite * inSuite, void * inContext)
     // When initializing the first time out of the box, we should have
     // a count of 0.
 
-    auto testKey = &chip::DefaultStorageKeyAllocator::IMEventNumber;
-
-    CHIP_ERROR err = counter.Init(sPersistentStore, testKey, 0x10000);
+    CHIP_ERROR err = counter.Init(sPersistentStore, chip::DefaultStorageKeyAllocator::IMEventNumber(), 0x10000);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     auto value = counter.GetValue();
@@ -130,7 +127,7 @@ static void CheckReboot(nlTestSuite * inSuite, void * inContext)
 
     // Now we "reboot", and we should get a count of 0x10000.
 
-    err = counter2.Init(sPersistentStore, testKey, 0x10000);
+    err = counter2.Init(sPersistentStore, chip::DefaultStorageKeyAllocator::IMEventNumber(), 0x10000);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     value = counter2.GetValue();
@@ -148,8 +145,7 @@ static void CheckWriteNextCounterStart(nlTestSuite * inSuite, void * inContext)
     // When initializing the first time out of the box, we should have
     // a count of 0.
 
-    auto testKey   = &chip::DefaultStorageKeyAllocator::IMEventNumber;
-    CHIP_ERROR err = counter.Init(sPersistentStore, testKey, 0x10000);
+    CHIP_ERROR err = counter.Init(sPersistentStore, chip::DefaultStorageKeyAllocator::IMEventNumber(), 0x10000);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     auto value = counter.GetValue();

@@ -37,6 +37,7 @@ class AppTask
 {
 
 public:
+    CHIP_ERROR Init();
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
 
@@ -49,7 +50,6 @@ public:
 private:
     friend AppTask & GetAppTask(void);
 
-    CHIP_ERROR Init();
     static void InitServer(intptr_t arg);
     static void OpenCommissioning(intptr_t arg);
 
@@ -63,6 +63,9 @@ private:
 
     static void LightingActionEventHandler(AppEvent * aEvent);
     static void TimerEventHandler(chip::System::Layer * aLayer, void * aAppState);
+
+    static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    static void UpdateLEDs(void);
 
     void StartTimer(uint32_t aTimeoutMs);
     void CancelTimer(void);
