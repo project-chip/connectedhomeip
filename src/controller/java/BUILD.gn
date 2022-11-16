@@ -14,13 +14,11 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("${build_root}/config/android_abi.gni")
+import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 
-if (defined(build_java_matter_controller)) {
-  build_java_matter_controller = build_java_matter_controller
-} else {
-  build_java_matter_controller = false
+if (!build_java_matter_controller) {
+  import("${build_root}/config/android_abi.gni")
 }
 
 shared_library("jni") {
@@ -60,12 +58,24 @@ shared_library("jni") {
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
-    "${chip_root}/src/platform/android",
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]
 
-  output_dir = "${root_out_dir}/lib/jni/${android_abi}"
+  if (build_java_matter_controller) {
+    defines = [ "JAVA_MATTER_CONTROLLER_TEST" ]
+    include_dirs = java_matter_controller_dependent_paths
+
+    deps += [ "${chip_root}/src/platform/Linux" ]
+
+    cflags = [ "-Wno-unknown-pragmas" ]
+
+    output_dir = "${root_out_dir}/lib/jni"
+  } else {
+    deps += [ "${chip_root}/src/platform/android" ]
+
+    output_dir = "${root_out_dir}/lib/jni/${android_abi}"
+  }
 
   ldflags = [ "-Wl,--gc-sections" ]
 }
@@ -75,10 +85,7 @@ android_library("java") {
 
   deps = [ "${chip_root}/third_party/java_deps:annotation" ]
 
-  data_deps = [
-    ":jni",
-    "${chip_root}/build/chip/java:shared_cpplib",
-  ]
+  data_deps = [ ":jni" ]
 
   sources = [
     "src/chip/clusterinfo/ClusterCommandCallback.java",

@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+java_path = getenv("JAVA_PATH")
 declare_args() {
-  # Root directory for build files.
-  build_root = "//third_party/connectedhomeip/build"
+  java_matter_controller_dependent_paths = []
+  build_java_matter_controller = false
+  if (java_path != "") {
+    java_matter_controller_dependent_paths += [
+      "${java_path}/include/",
+      "${java_path}/include/linux/",
+    ]
+    build_java_matter_controller = true
+  }
 }
