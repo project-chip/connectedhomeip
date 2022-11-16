@@ -33,9 +33,6 @@
 #include "ThreadStackManagerImpl.h"
 #include <lib/dnssd/platform/Dnssd.h>
 
-using namespace ::chip::DeviceLayer::Internal;
-using namespace chip::DeviceLayer::NetworkCommissioning;
-
 namespace chip {
 namespace DeviceLayer {
 
@@ -454,7 +451,7 @@ CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(ThreadDriver::ScanCallback * callback)
+CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
 {
     ChipLogError(DeviceLayer, "Not implemented");
     return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -489,12 +486,12 @@ ThreadStackManagerImpl::_AttachToThreadNetwork(const Thread::OperationalDataset 
 
 ThreadStackManager & ThreadStackMgr()
 {
-    return chip::DeviceLayer::ThreadStackManagerImpl::sInstance;
+    return DeviceLayer::ThreadStackManagerImpl::sInstance;
 }
 
 ThreadStackManagerImpl & ThreadStackMgrImpl()
 {
-    return chip::DeviceLayer::ThreadStackManagerImpl::sInstance;
+    return DeviceLayer::ThreadStackManagerImpl::sInstance;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
