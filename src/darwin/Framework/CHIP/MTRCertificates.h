@@ -141,6 +141,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (MTRCertificateTLVBytes _Nullable)convertX509Certificate:(MTRCertificateDERBytes)x509Certificate;
 
+/**
+ * Convert the given Matter TLV encoded certificate to the X.509v3 DER encoded
+ * format.
+ *
+ * Returns nil if the conversion fails (e.g. if the input data cannot be parsed
+ * as a Matter TLV encoded certificate, or if the certificate cannot be
+ * represented in the X.509v3 DER format).
+ */
++ (MTRCertificateDERBytes _Nullable)convertMatterCertificate:(MTRCertificateTLVBytes)matterCertificate MTR_NEWLY_AVAILABLE;
+
 @end
 
 @interface MTRCertificates (Deprecated)

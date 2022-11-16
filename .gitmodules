@@ -52,7 +52,7 @@
 [submodule "qpg_sdk"]
 	path = third_party/qpg_sdk/repo
 	url = https://github.com/Qorvo/QMatter
-	branch  = v0.9.0.0-libs
+	branch  = vlatest-libs
 	platforms = qpg
 [submodule "zap"]
 	path = third_party/zap/repo

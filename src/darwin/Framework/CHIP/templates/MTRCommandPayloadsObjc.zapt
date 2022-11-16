@@ -7,6 +7,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{#zcl_clusters}}
 {{#zcl_commands}}
+{{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}
+MTR_NEWLY_AVAILABLE
+{{/if}}
 @interface MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params : NSObject <NSCopying>
 {{#zcl_command_arguments}}
 
@@ -33,6 +36,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+{{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingCluster{{asUpperCamelCase name}}Params")
+@interface MTRTestClusterCluster{{asUpperCamelCase name}}Params : MTRUnitTestingCluster{{asUpperCamelCase name}}Params
+@end
+
+{{/if}}
 {{/zcl_commands}}
 {{/zcl_clusters}}
 
