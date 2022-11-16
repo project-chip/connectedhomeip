@@ -13,11 +13,9 @@ public class AttributeHolder {
   // The following are the various values of the target list that can be set using the UI of the
   // content app for testing.
   // We have a short version (TL_SHORT) which is a simple target list. A long version (TL_LONG)
-  // which has several large
-  // values in the target list but always less than the single message limit(can be chunked) and a
-  // bad version (TL_LONG_BAD)
-  // which puts a value that is larger than can be handled by a single message and hence cannot be
-  // chunked.
+  // which has several large values in the target list but always less than the single message
+  // limit(can be chunked) and a bad version (TL_LONG_BAD) which puts a value that is larger
+  // than can be handled by a single message and hence cannot be chunked.
   // This is only for testing. These are public since they are used in the Main Activity(which
   // renders the UI).
   public static final String TL_LONG =
