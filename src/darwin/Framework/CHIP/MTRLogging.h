@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #import <os/log.h>
 
 #define MTR_LOG_FAULT(format, ...) os_log_fault(OS_LOG_DEFAULT, format, ##__VA_ARGS__)
