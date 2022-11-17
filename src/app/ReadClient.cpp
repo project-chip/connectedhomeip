@@ -143,7 +143,14 @@ CHIP_ERROR ReadClient::ScheduleResubscription(uint32_t aTimeTillNextResubscripti
         mReadPrepareParams.mSessionHolder.Grab(aNewSessionHandle.Value());
     }
 
-    mDoCaseOnNextResub = aReestablishCASE;
+    mForceCaseOnNextResub = aReestablishCASE;
+    if (mForceCaseOnNextResub && mReadPrepareParams.mSessionHolder)
+    {
+        // Mark our existing session defunct, so that we will try to
+        // re-establish it when the timer fires (unless something re-establishes
+        // before then).
+        mReadPrepareParams.mSessionHolder->AsSecureSession()->MarkAsDefunct();
+    }
 
     ReturnErrorOnFailure(
         InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
@@ -1013,7 +1020,16 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
     VerifyOrReturnError(aReadPrepareParams.mSessionHolder, CHIP_ERROR_MISSING_SECURE_SESSION);
 
     auto exchange = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHolder.Get().Value(), this);
-    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_NO_MEMORY);
+    if (exchange == nullptr)
+    {
+        if (aReadPrepareParams.mSessionHolder->AsSecureSession()->IsActiveSession())
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        // Trying to subscribe with a defunct session somehow.
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
     mExchange.Grab(exchange);
 
@@ -1081,30 +1097,34 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void 
 
     CHIP_ERROR err;
 
-    ChipLogProgress(DataManagement, "OnResubscribeTimerCallback: DoCASE = %d", _this->mDoCaseOnNextResub);
+    ChipLogProgress(DataManagement, "OnResubscribeTimerCallback: ForceCASE = %d", _this->mForceCaseOnNextResub);
     _this->mNumRetries++;
 
-    if (_this->mDoCaseOnNextResub)
+    bool allowResubscribeOnError = true;
+    if (!_this->mReadPrepareParams.mSessionHolder ||
+        !_this->mReadPrepareParams.mSessionHolder->AsSecureSession()->IsActiveSession())
     {
+        // We don't have an active CASE session.  We need to go ahead and set
+        // one up, if we can.
+        ChipLogProgress(DataManagement, "Trying to establish a CASE session");
         auto * caseSessionManager = InteractionModelEngine::GetInstance()->GetCASESessionManager();
-        VerifyOrExit(caseSessionManager != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-        //
-        // We need to mark our session as defunct explicitly since the assessment of a liveness failure
-        // is usually triggered by the absence of any exchange activity that would have otherwise
-        // automatically marked the session as defunct on a response timeout.
-        //
-        // Doing so will ensure that the subsequent call to FindOrEstablishSession will not bind to
-        // an existing established session but rather trigger establishing a new one.
-        //
-        if (_this->mReadPrepareParams.mSessionHolder)
+        if (caseSessionManager)
         {
-            _this->mReadPrepareParams.mSessionHolder->AsSecureSession()->MarkAsDefunct();
+            caseSessionManager->FindOrEstablishSession(_this->mPeer, &_this->mOnConnectedCallback,
+                                                       &_this->mOnConnectionFailureCallback);
+            return;
         }
 
-        caseSessionManager->FindOrEstablishSession(_this->mPeer, &_this->mOnConnectedCallback,
-                                                   &_this->mOnConnectionFailureCallback);
-        return;
+        if (_this->mForceCaseOnNextResub)
+        {
+            // Caller asked us to force CASE but we have no way to do CASE.
+            // Just stop trying.
+            allowResubscribeOnError = false;
+        }
+
+        // No way to send our subscribe request.
+        err = CHIP_ERROR_INCORRECT_STATE;
+        ExitNow();
     }
 
     err = _this->SendSubscribeRequest(_this->mReadPrepareParams);
@@ -1114,11 +1134,11 @@ exit:
     {
         //
         // Call Close (which should trigger re-subscription again) EXCEPT if we got here because we didn't have a valid
-        // CASESessionManager pointer when mDoCaseOnNextResub was true.
+        // CASESessionManager pointer when mForceCaseOnNextResub was true.
         //
         // In that case, don't permit re-subscription to occur.
         //
-        _this->Close(err, err != CHIP_ERROR_INCORRECT_STATE);
+        _this->Close(err, allowResubscribeOnError);
     }
 }
 
