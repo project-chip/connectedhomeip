@@ -18,7 +18,6 @@
  */
 
 #include "AppConfig.h"
-#include "sl_system_init.h"
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -36,12 +35,10 @@ void initAntenna(void);
 
 void init_ccpPlatform(void)
 {
-    sl_ccp_system_init();
 
 #if SILABS_LOG_ENABLED
     silabsInitLog();
 #endif
-
 }
 
 #ifdef __cplusplus

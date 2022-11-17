@@ -87,6 +87,7 @@ template("efr32_sdk") {
       "HARD_FAULT_LOG_ENABLE",
       "CORTEXM3_EFM32_MICRO",
       "SILABS_LOG_ENABLED=1",
+      #Matter required at least 40960 but SiWx917 SoC requires an extra 20k to resolve nvm3_open() error, Need to be checked.
       "NVM3_DEFAULT_NVM_SIZE=73728",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
       "KVS_MAX_ENTRIES=${kvs_max_entries}",
@@ -133,7 +134,6 @@ template("efr32_sdk") {
       "${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver/CMSIS/Driver/Include",
       "${wiseconnect_sdk_root}/platforms/si91x/boards/brd4325a/inc",
       "${wiseconnect_sdk_root}/platforms/si91x/core/cmsis",
-      "${wiseconnect_sdk_root}/platforms/si91x/service/system/inc",
       "${wiseconnect_sdk_root}/third_party/freertos/include",
       "${wiseconnect_sdk_root}/third_party/freertos/portable/GCC/ARM_CM4F",
       "${examples_plat_dir}/device/inc",
@@ -267,7 +267,6 @@ template("efr32_sdk") {
       "${wiseconnect_sdk_root}/platforms/si91x/core/chip/src/rsi_ps_ram_func.c",
       "${wiseconnect_sdk_root}/platforms/si91x/core/chip/src/rsi_system_config.c",
       "${wiseconnect_sdk_root}/platforms/si91x/core/chip/src/system_RS1xxxx.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/service/system/src/sl_system_init.c",
       #"${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver/UDMA.c",
       #"${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver/USART.c",
 

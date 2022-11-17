@@ -120,6 +120,8 @@ extern "C" {
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
 
+extern uint32_t SystemCoreClock;
+
 /* Energy saving modes. */
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #define configUSE_TICKLESS_IDLE 1
