@@ -6,7 +6,7 @@ VOLUME "/var/source"
 # base build and check tools and libraries layer
 RUN set -x \
     && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --fix-missing \
     autoconf \
     automake \
     bison \
@@ -19,12 +19,14 @@ RUN set -x \
     flex \
     g++ \
     git \
+    git-lfs \
     gperf \
     iproute2 \
     jq \
     lcov \
     libavahi-client-dev \
     libavahi-common-dev \
+    libcairo-dev \
     libcairo2-dev \
     libdbus-1-dev \
     libdbus-glib-1-dev \
@@ -42,6 +44,7 @@ RUN set -x \
     libpango1.0-dev \
     libpixman-1-dev \
     libreadline-dev \
+    libsdl-pango-dev \
     libssl-dev \
     libtool \
     libudev-dev \
@@ -64,7 +67,6 @@ RUN set -x \
     udev \
     unzip \
     wget \
-    git-lfs \
     zlib1g-dev \
     && rm -rf /var/lib/apt/lists/ \
     && git lfs install \
@@ -118,21 +120,6 @@ RUN set -x \
     && rm -rf bloaty \
     && : # last line
 
-# NodeJS: install a newer version than what apt-get would read
-# This installs the latest LTS version of nodejs
-ENV CHIP_NODE_VERSION=v16.13.2
-RUN set -x \
-    && mkdir node_js \
-    && cd node_js \
-    && wget https://nodejs.org/dist/$CHIP_NODE_VERSION/node-$CHIP_NODE_VERSION-linux-x64.tar.xz \
-    && tar xfvJ node-$CHIP_NODE_VERSION-linux-x64.tar.xz \
-    && mv node-$CHIP_NODE_VERSION-linux-x64 /opt/ \
-    && ln -s /opt/node-$CHIP_NODE_VERSION-linux-x64 /opt/node \
-    && ln -s /opt/node/bin/* /usr/bin \
-    && cd .. \
-    && rm -rf node_js \
-    && : # last line
-
 # Build glib-2.0 from source with enabled thread sanitizer. This is needed for
 # running CHIP tests with TSAN enabled. When running applications with TSAN
 # all shared libraries should be built with TSAN enabled, otherwise TSAN might
@@ -147,4 +134,17 @@ RUN set -x \
     && DESTDIR=../build-image ninja -C glib/build install \
     && mv glib/build-image/usr/local/lib/x86_64-linux-gnu/lib* $LD_LIBRARY_PATH_TSAN \
     && rm -rf glib \
+    && : # last line
+
+# Install a known ZAP release
+# Only keep the cli version, since `zap` is 143MB and not usable (UI)
+ENV ZAP_VERSION=v2022.11.16
+RUN set -x \
+    && mkdir -p /opt/zap-${ZAP_VERSION} \
+    && cd /opt/zap-${ZAP_VERSION} \
+    && wget https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-linux.zip \
+    && unzip zap-linux.zip \
+    && rm zap-linux.zip \
+    && rm zap \
+    && ln -s /opt/zap-${ZAP_VERSION}/zap /usr/bin/ \
     && : # last line
