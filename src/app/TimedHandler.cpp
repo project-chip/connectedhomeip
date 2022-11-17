@@ -114,8 +114,8 @@ CHIP_ERROR TimedHandler::HandleTimedRequestAction(Messaging::ExchangeContext * a
     TimedRequestMessage::Parser parser;
     ReturnErrorOnFailure(parser.Init(reader));
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    ReturnErrorOnFailure(parser.CheckSchemaValidity());
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    parser.PrettyPrint();
 #endif
 
     uint16_t timeoutMs;
