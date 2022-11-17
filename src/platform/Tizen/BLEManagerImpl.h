@@ -35,8 +35,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-using namespace chip::Ble;
-
 /**
  * enum Class for BLE Scanning state. CHIP supports Scanning by Discriminator or Address
  */
@@ -127,7 +125,7 @@ private:
     CHIP_ERROR CancelConnection() override;
 
     //  ===== Members that implement virtual methods on ChipDeviceScannerDelegate
-    void OnChipDeviceScanned(void * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
+    void OnChipDeviceScanned(void * device, const Ble::ChipBLEDeviceIdentificationInfo & info) override;
     void OnChipScanComplete() override;
 
     // ===== Members for internal use by the following friends.
@@ -180,7 +178,7 @@ private:
     void HandleC1CharWriteEvent(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
     void HandleRXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
     void HandleConnectionEvent(bool connected, const char * remoteAddress);
-    static void HandleConnectionTimeout(chip::System::Layer * layer, void * data);
+    static void HandleConnectionTimeout(System::Layer * layer, void * data);
     static bool IsDeviceChipPeripheral(BLE_CONNECTION_OBJECT conId);
 
     // ==== BLE Adv & GATT Server.
