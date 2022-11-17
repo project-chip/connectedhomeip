@@ -148,3 +148,23 @@ RUN set -x \
     && rm zap \
     && ln -s /opt/zap-${ZAP_VERSION}/zap-cli /usr/bin/ \
     && : # last line
+
+# NodeJS: install a newer version than what apt-get would read
+# This installs the latest LTS version of nodejs
+#
+# NodeJS is required by github actions, we use Wandalen/wretry.action@v1.0.36
+# and that seems to use the built-in node installation in the image
+#
+# This is not a CHIP dependency directly, but used by CI
+ENV CHIP_NODE_VERSION=v16.13.2
+RUN set -x \
+    && mkdir node_js \
+    && cd node_js \
+    && wget https://nodejs.org/dist/$CHIP_NODE_VERSION/node-$CHIP_NODE_VERSION-linux-x64.tar.xz \
+    && tar xfvJ node-$CHIP_NODE_VERSION-linux-x64.tar.xz \
+    && mv node-$CHIP_NODE_VERSION-linux-x64 /opt/ \
+    && ln -s /opt/node-$CHIP_NODE_VERSION-linux-x64 /opt/node \
+    && ln -s /opt/node/bin/* /usr/bin \
+    && cd .. \
+    && rm -rf node_js \
+    && : # last line
