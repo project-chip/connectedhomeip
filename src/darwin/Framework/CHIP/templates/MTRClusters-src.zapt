@@ -125,7 +125,7 @@ using chip::SessionHandle;
 {{!Backwards compat for now: Treat DeviceTypeList as DeviceList.  Ideally we would have both, not just DeviceList. }}
 {{#*inline "attribute"}}Attribute{{#if (isStrEqual (asUpperCamelCase parent.name) "Descriptor")}}{{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeList")}}DeviceList{{else}}{{asUpperCamelCase name}}{{/if}}{{else}}{{asUpperCamelCase name}}{{/if}}{{/inline}}
 - (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {
-    return [self.device readAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRCluster{{asUpperCamelCase parent.name}}ID) attributeID:@(MTRCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) params:params];
+    return [self.device readAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRClusterIDType{{asUpperCamelCase parent.name}}ID) attributeID:@(MTRAttributeIDTypeCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) params:params];
 }
 
 {{#if isWritableAttribute}}
@@ -143,7 +143,7 @@ using chip::SessionHandle;
     }
     {{/if}}
 
-    [self.device writeAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRCluster{{asUpperCamelCase parent.name}}ID) attributeID:@(MTRCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+    [self.device writeAttributeWithEndpointID:@(_endpoint) clusterID:@(MTRClusterIDType{{asUpperCamelCase parent.name}}ID) attributeID:@(MTRAttributeIDTypeCluster{{asUpperCamelCase parent.name}}Attribute{{asUpperCamelCase name}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 {{/if}}
