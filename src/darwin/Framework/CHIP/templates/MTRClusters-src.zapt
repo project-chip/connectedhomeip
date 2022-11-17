@@ -151,8 +151,13 @@ using chip::SessionHandle;
 {{/chip_server_cluster_attributes}}
 
 @end
+{{#if (isStrEqual (asUpperCamelCase name) "UnitTesting")}}
 
-@implementation MTRCluster{{asUpperCamelCase name}} (Deprecated)
+@implementation MTRClusterTestCluster
+@end
+{{/if}}
+
+@implementation MTRCluster{{compatClusterNameRemapping name}} (Deprecated)
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpoint:(uint16_t)endpoint queue:(dispatch_queue_t)queue
 {
@@ -160,18 +165,28 @@ using chip::SessionHandle;
 }
 
 {{#chip_cluster_commands}}
-- (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=.}})completionHandler
+- (void){{asLowerCamelCase name}}WithParams:(MTR{{compatClusterNameRemapping parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapClusterName=true}})completionHandler
 {
-  [self {{asLowerCamelCase name}}WithParams:params expectedValues:expectedDataValueDictionaries expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+  [self {{asLowerCamelCase name}}WithParams:params expectedValues:expectedDataValueDictionaries expectedValueInterval:expectedValueIntervalMs completion:
+      {{#if hasSpecificResponse}}
+    ^(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}Params * _Nullable data, NSError * _Nullable error) {
+      // Cast is safe because subclass does not add any selectors.
+      completionHandler(static_cast<MTR{{compatClusterNameRemapping parent.name}}Cluster{{asUpperCamelCase responseName}}Params *>(data), error);
+    }
+    {{else}}
+    completionHandler
+    {{/if}}
+    ];
 }
 {{#unless (hasArguments)}}
-- (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=.}})completionHandler
+- (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapClusterName=true}})completionHandler
 {
-  [self {{asLowerCamelCase name}}WithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+  [self {{asLowerCamelCase name}}WithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completionHandler:completionHandler];
 }
 {{/unless}}
 {{/chip_cluster_commands}}
 @end
 
 {{/chip_client_clusters}}
+
 // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)

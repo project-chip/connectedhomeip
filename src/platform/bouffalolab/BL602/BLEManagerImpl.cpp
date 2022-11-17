@@ -384,7 +384,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 
-    ChipLogDetail(DeviceLayer, "Device name set to: %s", deviceName);
+    ChipLogDetail(DeviceLayer, "Device name set to: %s", StringOrNullMarker(deviceName));
     return MapErrorZephyr(bt_set_name(deviceName));
 }
 

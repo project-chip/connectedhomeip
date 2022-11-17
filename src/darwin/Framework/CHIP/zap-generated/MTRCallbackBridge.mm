@@ -35,19 +35,18 @@ void MTROctetStringAttributeCallbackBridge::OnSuccessFn(void * context, chip::By
     DispatchSuccess(context, objCValue);
 };
 
-void MTROctetStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROctetStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROctetStringAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -63,19 +62,18 @@ void MTRNullableOctetStringAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOctetStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableOctetStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableOctetStringAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -86,19 +84,18 @@ void MTRCharStringAttributeCallbackBridge::OnSuccessFn(void * context, chip::Cha
     DispatchSuccess(context, objCValue);
 };
 
-void MTRCharStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRCharStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRCharStringAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -114,19 +111,18 @@ void MTRNullableCharStringAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableCharStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableCharStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableCharStringAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -137,19 +133,18 @@ void MTRBooleanAttributeCallbackBridge::OnSuccessFn(void * context, bool value)
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBooleanAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBooleanAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBooleanAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -164,19 +159,18 @@ void MTRNullableBooleanAttributeCallbackBridge::OnSuccessFn(void * context, cons
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableBooleanAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableBooleanAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableBooleanAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -187,19 +181,18 @@ void MTRInt8uAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
     DispatchSuccess(context, objCValue);
 };
 
-void MTRInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRInt8uAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -214,19 +207,18 @@ void MTRNullableInt8uAttributeCallbackBridge::OnSuccessFn(void * context, const 
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableInt8uAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -237,19 +229,18 @@ void MTRInt8sAttributeCallbackBridge::OnSuccessFn(void * context, int8_t value)
     DispatchSuccess(context, objCValue);
 };
 
-void MTRInt8sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRInt8sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRInt8sAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -264,19 +255,18 @@ void MTRNullableInt8sAttributeCallbackBridge::OnSuccessFn(void * context, const 
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableInt8sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableInt8sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableInt8sAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -287,19 +277,18 @@ void MTRInt16uAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t valu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRInt16uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRInt16uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRInt16uAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -314,19 +303,18 @@ void MTRNullableInt16uAttributeCallbackBridge::OnSuccessFn(void * context, const
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableInt16uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableInt16uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableInt16uAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -337,19 +325,18 @@ void MTRInt16sAttributeCallbackBridge::OnSuccessFn(void * context, int16_t value
     DispatchSuccess(context, objCValue);
 };
 
-void MTRInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRInt16sAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -364,19 +351,18 @@ void MTRNullableInt16sAttributeCallbackBridge::OnSuccessFn(void * context, const
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableInt16sAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -387,19 +373,18 @@ void MTRInt32uAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t valu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRInt32uAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -414,19 +399,18 @@ void MTRNullableInt32uAttributeCallbackBridge::OnSuccessFn(void * context, const
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableInt32uAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -437,19 +421,18 @@ void MTRInt32sAttributeCallbackBridge::OnSuccessFn(void * context, int32_t value
     DispatchSuccess(context, objCValue);
 };
 
-void MTRInt32sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRInt32sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRInt32sAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -464,19 +447,18 @@ void MTRNullableInt32sAttributeCallbackBridge::OnSuccessFn(void * context, const
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableInt32sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableInt32sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableInt32sAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -487,19 +469,18 @@ void MTRInt64uAttributeCallbackBridge::OnSuccessFn(void * context, uint64_t valu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRInt64uAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -514,19 +495,18 @@ void MTRNullableInt64uAttributeCallbackBridge::OnSuccessFn(void * context, const
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableInt64uAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -537,19 +517,18 @@ void MTRInt64sAttributeCallbackBridge::OnSuccessFn(void * context, int64_t value
     DispatchSuccess(context, objCValue);
 };
 
-void MTRInt64sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRInt64sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRInt64sAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -564,19 +543,18 @@ void MTRNullableInt64sAttributeCallbackBridge::OnSuccessFn(void * context, const
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableInt64sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableInt64sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableInt64sAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -587,19 +565,18 @@ void MTRFloatAttributeCallbackBridge::OnSuccessFn(void * context, float value)
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFloatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRFloatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRFloatAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -614,19 +591,18 @@ void MTRNullableFloatAttributeCallbackBridge::OnSuccessFn(void * context, const 
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFloatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableFloatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableFloatAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -637,19 +613,18 @@ void MTRDoubleAttributeCallbackBridge::OnSuccessFn(void * context, double value)
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoubleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoubleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoubleAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -664,19 +639,18 @@ void MTRNullableDoubleAttributeCallbackBridge::OnSuccessFn(void * context, const
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoubleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDoubleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoubleAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -687,19 +661,18 @@ void MTRVendorIdAttributeCallbackBridge::OnSuccessFn(void * context, chip::Vendo
     DispatchSuccess(context, objCValue);
 };
 
-void MTRVendorIdAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRVendorIdAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRVendorIdAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -715,19 +688,18 @@ void MTRNullableVendorIdAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableVendorIdAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableVendorIdAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableVendorIdAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -754,19 +726,18 @@ void MTRIdentifyGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRIdentifyGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRIdentifyGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRIdentifyGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -793,19 +764,18 @@ void MTRIdentifyAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRIdentifyAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRIdentifyAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRIdentifyAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -832,19 +802,18 @@ void MTRIdentifyAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRIdentifyAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRIdentifyAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRIdentifyAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -871,19 +840,18 @@ void MTRGroupsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGroupsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGroupsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGroupsGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -910,19 +878,18 @@ void MTRGroupsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGroupsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGroupsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGroupsAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -949,19 +916,18 @@ void MTRGroupsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGroupsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGroupsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGroupsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -988,19 +954,18 @@ void MTRScenesGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRScenesGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRScenesGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRScenesGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1027,19 +992,18 @@ void MTRScenesAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRScenesAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRScenesAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRScenesAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1066,19 +1030,18 @@ void MTRScenesAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRScenesAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRScenesAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRScenesAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1105,19 +1068,18 @@ void MTROnOffGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTROnOffGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROnOffGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROnOffGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1144,19 +1106,18 @@ void MTROnOffAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTROnOffAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROnOffAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROnOffAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1183,19 +1144,18 @@ void MTROnOffAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTROnOffAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROnOffAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROnOffAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1222,20 +1182,18 @@ void MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1262,20 +1220,18 @@ void MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
-void MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1302,19 +1258,18 @@ void MTROnOffSwitchConfigurationAttributeListListAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void MTROnOffSwitchConfigurationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROnOffSwitchConfigurationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROnOffSwitchConfigurationAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1341,19 +1296,18 @@ void MTRLevelControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLevelControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRLevelControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRLevelControlGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1380,19 +1334,18 @@ void MTRLevelControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLevelControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRLevelControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRLevelControlAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1419,19 +1372,18 @@ void MTRLevelControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLevelControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRLevelControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRLevelControlAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1458,19 +1410,18 @@ void MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1497,19 +1448,18 @@ void MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1536,19 +1486,18 @@ void MTRBinaryInputBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBinaryInputBasicAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBinaryInputBasicAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBinaryInputBasicAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1577,19 +1526,18 @@ void MTRDescriptorDeviceTypeListListAttributeCallbackBridge::OnSuccessFn(void * 
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDescriptorDeviceTypeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDescriptorDeviceTypeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDescriptorDeviceTypeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1616,19 +1564,18 @@ void MTRDescriptorServerListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDescriptorServerListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDescriptorServerListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDescriptorServerListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1655,19 +1602,18 @@ void MTRDescriptorClientListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDescriptorClientListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDescriptorClientListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDescriptorClientListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1694,19 +1640,18 @@ void MTRDescriptorPartsListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDescriptorPartsListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDescriptorPartsListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDescriptorPartsListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1733,19 +1678,18 @@ void MTRDescriptorGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDescriptorGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDescriptorGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDescriptorGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1772,19 +1716,18 @@ void MTRDescriptorAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDescriptorAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDescriptorAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDescriptorAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1811,19 +1754,18 @@ void MTRDescriptorAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDescriptorAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDescriptorAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDescriptorAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1871,19 +1813,18 @@ void MTRBindingBindingListAttributeCallbackBridge::OnSuccessFn(void * context,
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBindingBindingListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBindingBindingListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBindingBindingListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1910,19 +1851,18 @@ void MTRBindingGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBindingGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBindingGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBindingGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1949,19 +1889,18 @@ void MTRBindingAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBindingAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBindingAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBindingAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -1988,19 +1927,18 @@ void MTRBindingAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBindingAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBindingAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBindingAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2086,19 +2024,18 @@ void MTRAccessControlAclListAttributeCallbackBridge::OnSuccessFn(void * context,
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAccessControlAclListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRAccessControlAclListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAccessControlAclListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2127,19 +2064,18 @@ void MTRAccessControlExtensionListAttributeCallbackBridge::OnSuccessFn(void * co
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAccessControlExtensionListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRAccessControlExtensionListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAccessControlExtensionListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2166,19 +2102,18 @@ void MTRAccessControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAccessControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRAccessControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAccessControlGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2205,19 +2140,18 @@ void MTRAccessControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAccessControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRAccessControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAccessControlAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2244,19 +2178,18 @@ void MTRAccessControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAccessControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRAccessControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAccessControlAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2291,19 +2224,18 @@ void MTRActionsActionListListAttributeCallbackBridge::OnSuccessFn(void * context
     DispatchSuccess(context, objCValue);
 };
 
-void MTRActionsActionListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRActionsActionListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRActionsActionListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2351,19 +2283,18 @@ void MTRActionsEndpointListsListAttributeCallbackBridge::OnSuccessFn(void * cont
     DispatchSuccess(context, objCValue);
 };
 
-void MTRActionsEndpointListsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRActionsEndpointListsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRActionsEndpointListsListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2390,19 +2321,18 @@ void MTRActionsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2429,19 +2359,18 @@ void MTRActionsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2468,19 +2397,18 @@ void MTRActionsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRActionsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRActionsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRActionsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2494,19 +2422,18 @@ void MTRBasicCapabilityMinimaStructAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2533,19 +2460,18 @@ void MTRBasicGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2572,19 +2498,18 @@ void MTRBasicAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2611,19 +2536,18 @@ void MTRBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBasicAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBasicAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBasicAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2650,20 +2574,18 @@ void MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2690,20 +2612,18 @@ void MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2730,19 +2650,18 @@ void MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2773,20 +2692,18 @@ void MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2813,20 +2730,18 @@ void MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2853,20 +2768,18 @@ void MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2893,19 +2806,18 @@ void MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2932,19 +2844,18 @@ void MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge::On
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -2971,20 +2882,18 @@ void MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3011,20 +2920,18 @@ void MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3051,19 +2958,18 @@ void MTRLocalizationConfigurationAttributeListListAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLocalizationConfigurationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRLocalizationConfigurationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRLocalizationConfigurationAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3090,20 +2996,18 @@ void MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3130,19 +3034,18 @@ void MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3169,19 +3072,18 @@ void MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge::On
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3208,19 +3110,18 @@ void MTRTimeFormatLocalizationAttributeListListAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTimeFormatLocalizationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRTimeFormatLocalizationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRTimeFormatLocalizationAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3247,19 +3148,18 @@ void MTRUnitLocalizationGeneratedCommandListListAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3286,19 +3186,18 @@ void MTRUnitLocalizationAcceptedCommandListListAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3325,19 +3224,18 @@ void MTRUnitLocalizationAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitLocalizationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitLocalizationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitLocalizationAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3364,19 +3262,18 @@ void MTRPowerSourceConfigurationSourcesListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceConfigurationSourcesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceConfigurationSourcesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPowerSourceConfigurationSourcesListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3403,20 +3300,18 @@ void MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3443,20 +3338,18 @@ void MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3483,19 +3376,18 @@ void MTRPowerSourceConfigurationAttributeListListAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceConfigurationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceConfigurationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPowerSourceConfigurationAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3522,19 +3414,18 @@ void MTRPowerSourceActiveWiredFaultsListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceActiveWiredFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceActiveWiredFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPowerSourceActiveWiredFaultsListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3561,19 +3452,18 @@ void MTRPowerSourceActiveBatFaultsListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceActiveBatFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceActiveBatFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPowerSourceActiveBatFaultsListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3600,19 +3490,18 @@ void MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3639,19 +3528,18 @@ void MTRPowerSourceGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPowerSourceGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3678,19 +3566,18 @@ void MTRPowerSourceAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPowerSourceAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3717,19 +3604,18 @@ void MTRPowerSourceAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPowerSourceAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3743,20 +3629,18 @@ void MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3783,19 +3667,18 @@ void MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3822,19 +3705,18 @@ void MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3861,19 +3743,18 @@ void MTRGeneralCommissioningAttributeListListAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3903,19 +3784,18 @@ void MTRNetworkCommissioningNetworksListAttributeCallbackBridge::OnSuccessFn(voi
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNetworkCommissioningNetworksListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNetworkCommissioningNetworksListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNetworkCommissioningNetworksListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3942,19 +3822,18 @@ void MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -3981,19 +3860,18 @@ void MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4020,19 +3898,18 @@ void MTRNetworkCommissioningAttributeListListAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNetworkCommissioningAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNetworkCommissioningAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNetworkCommissioningAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4059,19 +3936,18 @@ void MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4098,19 +3974,18 @@ void MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4137,19 +4012,18 @@ void MTRDiagnosticLogsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDiagnosticLogsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDiagnosticLogsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDiagnosticLogsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4228,19 +4102,18 @@ void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4267,19 +4140,18 @@ void MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4306,19 +4178,18 @@ void MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4345,19 +4216,18 @@ void MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4384,19 +4254,18 @@ void MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4423,19 +4292,18 @@ void MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4462,19 +4330,18 @@ void MTRGeneralDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4525,19 +4392,18 @@ void MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4564,19 +4430,18 @@ void MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4603,19 +4468,18 @@ void MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4642,19 +4506,18 @@ void MTRSoftwareDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4704,19 +4567,18 @@ void MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::On
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4754,19 +4616,18 @@ void MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4785,19 +4646,18 @@ void MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4826,21 +4686,18 @@ void MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallb
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4867,20 +4724,18 @@ void MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4907,20 +4762,18 @@ void MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4947,20 +4800,18 @@ void MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -4987,19 +4838,18 @@ void MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5026,19 +4876,18 @@ void MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5065,19 +4914,18 @@ void MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::On
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5104,19 +4952,18 @@ void MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5143,20 +4990,18 @@ void MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
-void MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5183,20 +5028,18 @@ void MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5223,19 +5066,18 @@ void MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5262,19 +5104,18 @@ void MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5301,19 +5142,18 @@ void MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5340,19 +5180,18 @@ void MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5379,19 +5218,18 @@ void MTRSwitchGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSwitchGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRSwitchGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRSwitchGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5418,19 +5256,18 @@ void MTRSwitchAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSwitchAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRSwitchAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRSwitchAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5457,19 +5294,18 @@ void MTRSwitchAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSwitchAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRSwitchAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRSwitchAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5496,20 +5332,18 @@ void MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5536,20 +5370,18 @@ void MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5576,19 +5408,18 @@ void MTRAdministratorCommissioningAttributeListListAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5623,19 +5454,18 @@ void MTROperationalCredentialsNOCsListAttributeCallbackBridge::OnSuccessFn(void 
     DispatchSuccess(context, objCValue);
 };
 
-void MTROperationalCredentialsNOCsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROperationalCredentialsNOCsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROperationalCredentialsNOCsListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5671,19 +5501,18 @@ void MTROperationalCredentialsFabricsListAttributeCallbackBridge::OnSuccessFn(vo
     DispatchSuccess(context, objCValue);
 };
 
-void MTROperationalCredentialsFabricsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROperationalCredentialsFabricsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROperationalCredentialsFabricsListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5710,20 +5539,18 @@ void MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5750,19 +5577,18 @@ void MTROperationalCredentialsGeneratedCommandListListAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTROperationalCredentialsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROperationalCredentialsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROperationalCredentialsGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5789,19 +5615,18 @@ void MTROperationalCredentialsAcceptedCommandListListAttributeCallbackBridge::On
     DispatchSuccess(context, objCValue);
 };
 
-void MTROperationalCredentialsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROperationalCredentialsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROperationalCredentialsAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5828,19 +5653,18 @@ void MTROperationalCredentialsAttributeListListAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTROperationalCredentialsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROperationalCredentialsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROperationalCredentialsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5871,19 +5695,18 @@ void MTRGroupKeyManagementGroupKeyMapListAttributeCallbackBridge::OnSuccessFn(vo
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5936,19 +5759,18 @@ void MTRGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(voi
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGroupKeyManagementGroupTableListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGroupKeyManagementGroupTableListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGroupKeyManagementGroupTableListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -5975,19 +5797,18 @@ void MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6014,19 +5835,18 @@ void MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6053,19 +5873,18 @@ void MTRGroupKeyManagementAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6098,19 +5917,18 @@ void MTRFixedLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * conte
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFixedLabelLabelListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRFixedLabelLabelListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRFixedLabelLabelListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6137,19 +5955,18 @@ void MTRFixedLabelGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFixedLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRFixedLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRFixedLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6176,19 +5993,18 @@ void MTRFixedLabelAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFixedLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRFixedLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRFixedLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6215,19 +6031,18 @@ void MTRFixedLabelAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFixedLabelAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRFixedLabelAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRFixedLabelAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6260,19 +6075,18 @@ void MTRUserLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * contex
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUserLabelLabelListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUserLabelLabelListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUserLabelLabelListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6299,19 +6113,18 @@ void MTRUserLabelGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUserLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUserLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUserLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6338,19 +6151,18 @@ void MTRUserLabelAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUserLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUserLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUserLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6377,19 +6189,18 @@ void MTRUserLabelAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUserLabelAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUserLabelAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUserLabelAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6416,19 +6227,18 @@ void MTRBooleanStateGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBooleanStateGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBooleanStateGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBooleanStateGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6455,19 +6265,18 @@ void MTRBooleanStateAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBooleanStateAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBooleanStateAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBooleanStateAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6494,19 +6303,18 @@ void MTRBooleanStateAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBooleanStateAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBooleanStateAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBooleanStateAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6555,19 +6363,18 @@ void MTRModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * 
     DispatchSuccess(context, objCValue);
 };
 
-void MTRModeSelectSupportedModesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRModeSelectSupportedModesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRModeSelectSupportedModesListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6594,19 +6401,18 @@ void MTRModeSelectGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6633,19 +6439,18 @@ void MTRModeSelectAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6672,19 +6477,18 @@ void MTRModeSelectAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRModeSelectAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRModeSelectAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRModeSelectAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6696,19 +6500,18 @@ void MTRDoorLockCredentialRulesSupportAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockCredentialRulesSupportAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockCredentialRulesSupportAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockCredentialRulesSupportAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6720,19 +6523,18 @@ void MTRDoorLockSupportedOperatingModesAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6744,19 +6546,18 @@ void MTRDoorLockDefaultConfigurationRegisterAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockDefaultConfigurationRegisterAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockDefaultConfigurationRegisterAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockDefaultConfigurationRegisterAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6768,19 +6569,18 @@ void MTRDoorLockLocalProgrammingFeaturesAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockLocalProgrammingFeaturesAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockLocalProgrammingFeaturesAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockLocalProgrammingFeaturesAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6807,19 +6607,18 @@ void MTRDoorLockGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6846,19 +6645,18 @@ void MTRDoorLockAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6885,19 +6683,18 @@ void MTRDoorLockAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6909,19 +6706,18 @@ void MTRWindowCoveringConfigStatusAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6933,19 +6729,18 @@ void MTRWindowCoveringOperationalStatusAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6957,19 +6752,18 @@ void MTRWindowCoveringModeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWindowCoveringModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWindowCoveringModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRWindowCoveringModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -6981,19 +6775,18 @@ void MTRWindowCoveringSafetyStatusAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWindowCoveringSafetyStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWindowCoveringSafetyStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRWindowCoveringSafetyStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7020,19 +6813,18 @@ void MTRWindowCoveringGeneratedCommandListListAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWindowCoveringGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWindowCoveringGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRWindowCoveringGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7059,19 +6851,18 @@ void MTRWindowCoveringAcceptedCommandListListAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWindowCoveringAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWindowCoveringAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRWindowCoveringAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7098,19 +6889,18 @@ void MTRWindowCoveringAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWindowCoveringAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWindowCoveringAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRWindowCoveringAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7137,19 +6927,18 @@ void MTRBarrierControlGeneratedCommandListListAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBarrierControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBarrierControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBarrierControlGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7176,19 +6965,18 @@ void MTRBarrierControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBarrierControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBarrierControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBarrierControlAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7215,19 +7003,18 @@ void MTRBarrierControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBarrierControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBarrierControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBarrierControlAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7239,19 +7026,18 @@ void MTRPumpConfigurationAndControlPumpStatusAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7278,20 +7064,18 @@ void MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7318,20 +7102,18 @@ void MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7358,19 +7140,18 @@ void MTRPumpConfigurationAndControlAttributeListListAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPumpConfigurationAndControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPumpConfigurationAndControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPumpConfigurationAndControlAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7397,19 +7178,18 @@ void MTRThermostatGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThermostatGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRThermostatGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRThermostatGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7436,19 +7216,18 @@ void MTRThermostatAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThermostatAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRThermostatAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRThermostatAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7475,19 +7254,18 @@ void MTRThermostatAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThermostatAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRThermostatAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRThermostatAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7514,19 +7292,18 @@ void MTRFanControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFanControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRFanControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRFanControlGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7553,19 +7330,18 @@ void MTRFanControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFanControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRFanControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRFanControlAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7592,19 +7368,18 @@ void MTRFanControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFanControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRFanControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRFanControlAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7631,21 +7406,18 @@ void MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(
-        context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7672,21 +7444,18 @@ void MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCall
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7713,21 +7482,18 @@ void MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7754,19 +7520,18 @@ void MTRColorControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRColorControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRColorControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRColorControlGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7793,19 +7558,18 @@ void MTRColorControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRColorControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRColorControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRColorControlAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7832,19 +7596,18 @@ void MTRColorControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRColorControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRColorControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRColorControlAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7871,19 +7634,18 @@ void MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBallastConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBallastConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBallastConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7910,19 +7672,18 @@ void MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBallastConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBallastConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBallastConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7949,19 +7710,18 @@ void MTRBallastConfigurationAttributeListListAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBallastConfigurationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRBallastConfigurationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRBallastConfigurationAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -7988,19 +7748,18 @@ void MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8027,19 +7786,18 @@ void MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge::On
     DispatchSuccess(context, objCValue);
 };
 
-void MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8066,19 +7824,18 @@ void MTRIlluminanceMeasurementAttributeListListAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRIlluminanceMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRIlluminanceMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRIlluminanceMeasurementAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8105,19 +7862,18 @@ void MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8144,19 +7900,18 @@ void MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge::On
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8183,19 +7938,18 @@ void MTRTemperatureMeasurementAttributeListListAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8222,19 +7976,18 @@ void MTRPressureMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPressureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPressureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPressureMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8261,19 +8014,18 @@ void MTRPressureMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPressureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPressureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPressureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8300,19 +8052,18 @@ void MTRPressureMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8339,19 +8090,18 @@ void MTRFlowMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFlowMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRFlowMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRFlowMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8378,19 +8128,18 @@ void MTRFlowMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFlowMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRFlowMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRFlowMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8417,19 +8166,18 @@ void MTRFlowMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFlowMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRFlowMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRFlowMeasurementAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8456,20 +8204,18 @@ void MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8496,20 +8242,18 @@ void MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8536,19 +8280,18 @@ void MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8575,19 +8318,18 @@ void MTROccupancySensingGeneratedCommandListListAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTROccupancySensingGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROccupancySensingGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROccupancySensingGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8614,19 +8356,18 @@ void MTROccupancySensingAcceptedCommandListListAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTROccupancySensingAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROccupancySensingAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROccupancySensingAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8653,19 +8394,18 @@ void MTROccupancySensingAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTROccupancySensingAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROccupancySensingAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROccupancySensingAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8692,19 +8432,18 @@ void MTRWakeOnLanGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWakeOnLanGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWakeOnLanGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRWakeOnLanGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8731,19 +8470,18 @@ void MTRWakeOnLanAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWakeOnLanAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWakeOnLanAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRWakeOnLanAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8770,19 +8508,18 @@ void MTRWakeOnLanAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWakeOnLanAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWakeOnLanAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRWakeOnLanAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8832,19 +8569,18 @@ void MTRChannelChannelListListAttributeCallbackBridge::OnSuccessFn(void * contex
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChannelChannelListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRChannelChannelListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRChannelChannelListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8878,19 +8614,18 @@ void MTRChannelLineupStructAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChannelLineupStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRChannelLineupStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRChannelLineupStructAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8929,19 +8664,18 @@ void MTRChannelCurrentChannelStructAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChannelCurrentChannelStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRChannelCurrentChannelStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRChannelCurrentChannelStructAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -8968,19 +8702,18 @@ void MTRChannelGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChannelGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRChannelGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRChannelGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9007,19 +8740,18 @@ void MTRChannelAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChannelAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRChannelAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRChannelAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9046,19 +8778,18 @@ void MTRChannelAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChannelAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRChannelAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRChannelAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9089,19 +8820,18 @@ void MTRTargetNavigatorTargetListListAttributeCallbackBridge::OnSuccessFn(void *
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTargetNavigatorTargetListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRTargetNavigatorTargetListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRTargetNavigatorTargetListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9128,19 +8858,18 @@ void MTRTargetNavigatorGeneratedCommandListListAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTargetNavigatorGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRTargetNavigatorGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRTargetNavigatorGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9167,19 +8896,18 @@ void MTRTargetNavigatorAcceptedCommandListListAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTargetNavigatorAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRTargetNavigatorAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRTargetNavigatorAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9206,19 +8934,18 @@ void MTRTargetNavigatorAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTargetNavigatorAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRTargetNavigatorAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRTargetNavigatorAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9240,19 +8967,18 @@ void MTRMediaPlaybackSampledPositionStructAttributeCallbackBridge::OnSuccessFn(v
     DispatchSuccess(context, objCValue);
 };
 
-void MTRMediaPlaybackSampledPositionStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRMediaPlaybackSampledPositionStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRMediaPlaybackSampledPositionStructAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9279,19 +9005,18 @@ void MTRMediaPlaybackGeneratedCommandListListAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRMediaPlaybackGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRMediaPlaybackGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRMediaPlaybackGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9318,19 +9043,18 @@ void MTRMediaPlaybackAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRMediaPlaybackAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRMediaPlaybackAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRMediaPlaybackAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9357,19 +9081,18 @@ void MTRMediaPlaybackAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRMediaPlaybackAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRMediaPlaybackAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRMediaPlaybackAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9404,19 +9127,18 @@ void MTRMediaInputInputListListAttributeCallbackBridge::OnSuccessFn(void * conte
     DispatchSuccess(context, objCValue);
 };
 
-void MTRMediaInputInputListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRMediaInputInputListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRMediaInputInputListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9443,19 +9165,18 @@ void MTRMediaInputGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRMediaInputGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRMediaInputGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRMediaInputGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9482,19 +9203,18 @@ void MTRMediaInputAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRMediaInputAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRMediaInputAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRMediaInputAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9521,19 +9241,18 @@ void MTRMediaInputAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRMediaInputAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRMediaInputAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRMediaInputAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9560,19 +9279,18 @@ void MTRLowPowerGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLowPowerGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRLowPowerGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRLowPowerGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9599,19 +9317,18 @@ void MTRLowPowerAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLowPowerAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRLowPowerAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRLowPowerAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9638,19 +9355,18 @@ void MTRLowPowerAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLowPowerAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRLowPowerAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRLowPowerAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9677,19 +9393,18 @@ void MTRKeypadInputGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRKeypadInputGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRKeypadInputGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRKeypadInputGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9716,19 +9431,18 @@ void MTRKeypadInputAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRKeypadInputAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRKeypadInputAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRKeypadInputAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9755,19 +9469,18 @@ void MTRKeypadInputAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRKeypadInputAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRKeypadInputAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRKeypadInputAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9794,19 +9507,18 @@ void MTRContentLauncherAcceptHeaderListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRContentLauncherAcceptHeaderListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRContentLauncherAcceptHeaderListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRContentLauncherAcceptHeaderListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9833,19 +9545,18 @@ void MTRContentLauncherGeneratedCommandListListAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRContentLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRContentLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRContentLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9872,19 +9583,18 @@ void MTRContentLauncherAcceptedCommandListListAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, objCValue);
 };
 
-void MTRContentLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRContentLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRContentLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9911,19 +9621,18 @@ void MTRContentLauncherAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRContentLauncherAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRContentLauncherAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRContentLauncherAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9955,19 +9664,18 @@ void MTRAudioOutputOutputListListAttributeCallbackBridge::OnSuccessFn(void * con
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAudioOutputOutputListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRAudioOutputOutputListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAudioOutputOutputListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -9994,19 +9702,18 @@ void MTRAudioOutputGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAudioOutputGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRAudioOutputGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAudioOutputGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10033,19 +9740,18 @@ void MTRAudioOutputAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAudioOutputAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRAudioOutputAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAudioOutputAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10072,19 +9778,18 @@ void MTRAudioOutputAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAudioOutputAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRAudioOutputAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAudioOutputAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10111,19 +9816,18 @@ void MTRApplicationLauncherCatalogListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRApplicationLauncherCatalogListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRApplicationLauncherCatalogListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRApplicationLauncherCatalogListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10149,19 +9853,18 @@ void MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10188,19 +9891,18 @@ void MTRApplicationLauncherGeneratedCommandListListAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRApplicationLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRApplicationLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRApplicationLauncherGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10227,19 +9929,18 @@ void MTRApplicationLauncherAcceptedCommandListListAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRApplicationLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRApplicationLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRApplicationLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10266,19 +9967,18 @@ void MTRApplicationLauncherAttributeListListAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10294,19 +9994,18 @@ void MTRApplicationBasicApplicationStructAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRApplicationBasicApplicationStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRApplicationBasicApplicationStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRApplicationBasicApplicationStructAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10333,19 +10032,18 @@ void MTRApplicationBasicAllowedVendorListListAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRApplicationBasicAllowedVendorListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRApplicationBasicAllowedVendorListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRApplicationBasicAllowedVendorListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10372,19 +10070,18 @@ void MTRApplicationBasicGeneratedCommandListListAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTRApplicationBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRApplicationBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRApplicationBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10411,19 +10108,18 @@ void MTRApplicationBasicAcceptedCommandListListAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRApplicationBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRApplicationBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRApplicationBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10450,19 +10146,18 @@ void MTRApplicationBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRApplicationBasicAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRApplicationBasicAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRApplicationBasicAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10489,19 +10184,18 @@ void MTRAccountLoginGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAccountLoginGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRAccountLoginGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAccountLoginGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10528,19 +10222,18 @@ void MTRAccountLoginAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAccountLoginAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRAccountLoginAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAccountLoginAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10567,19 +10260,18 @@ void MTRAccountLoginAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAccountLoginAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRAccountLoginAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAccountLoginAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10606,19 +10298,18 @@ void MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge::On
     DispatchSuccess(context, objCValue);
 };
 
-void MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10645,19 +10336,18 @@ void MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10684,19 +10374,18 @@ void MTRElectricalMeasurementAttributeListListAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, objCValue);
 };
 
-void MTRElectricalMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRElectricalMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRElectricalMeasurementAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10708,19 +10397,18 @@ void MTRUnitTestingBitmap8AttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingBitmap8AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingBitmap8AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingBitmap8AttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10732,19 +10420,18 @@ void MTRUnitTestingBitmap16AttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingBitmap16AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingBitmap16AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingBitmap16AttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10756,19 +10443,18 @@ void MTRUnitTestingBitmap32AttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingBitmap32AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingBitmap32AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingBitmap32AttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10780,19 +10466,18 @@ void MTRUnitTestingBitmap64AttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingBitmap64AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingBitmap64AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingBitmap64AttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10819,19 +10504,18 @@ void MTRUnitTestingListInt8uListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingListInt8uListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingListInt8uListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingListInt8uListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10858,19 +10542,18 @@ void MTRUnitTestingListOctetStringListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingListOctetStringListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingListOctetStringListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingListOctetStringListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -10900,19 +10583,18 @@ void MTRUnitTestingListStructOctetStringListAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingListStructOctetStringListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingListStructOctetStringListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingListStructOctetStringListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -11112,19 +10794,18 @@ void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -11144,19 +10825,18 @@ void MTRUnitTestingStructAttrStructAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingStructAttrStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingStructAttrStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingStructAttrStructAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -11183,19 +10863,18 @@ void MTRUnitTestingListLongOctetStringListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingListLongOctetStringListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingListLongOctetStringListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingListLongOctetStringListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -11278,19 +10957,18 @@ void MTRUnitTestingListFabricScopedListAttributeCallbackBridge::OnSuccessFn(void
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingListFabricScopedListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingListFabricScopedListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingListFabricScopedListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -11306,19 +10984,18 @@ void MTRUnitTestingNullableBitmap8AttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingNullableBitmap8AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingNullableBitmap8AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingNullableBitmap8AttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -11334,19 +11011,18 @@ void MTRUnitTestingNullableBitmap16AttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingNullableBitmap16AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingNullableBitmap16AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingNullableBitmap16AttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -11362,19 +11038,18 @@ void MTRUnitTestingNullableBitmap32AttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingNullableBitmap32AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingNullableBitmap32AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingNullableBitmap32AttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -11390,19 +11065,18 @@ void MTRUnitTestingNullableBitmap64AttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingNullableBitmap64AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingNullableBitmap64AttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingNullableBitmap64AttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -11428,19 +11102,18 @@ void MTRUnitTestingNullableStructStructAttributeCallbackBridge::OnSuccessFn(void
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingNullableStructStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingNullableStructStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingNullableStructStructAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -11467,19 +11140,18 @@ void MTRUnitTestingGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -11506,19 +11178,18 @@ void MTRUnitTestingAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -11545,19 +11216,18 @@ void MTRUnitTestingAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingAttributeListListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13371,19 +13041,18 @@ void MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13399,20 +13068,18 @@ void MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13424,19 +13091,18 @@ void MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13452,19 +13118,18 @@ void MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13476,19 +13141,18 @@ void MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13504,19 +13168,18 @@ void MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13528,19 +13191,18 @@ void MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13556,20 +13218,18 @@ void MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13581,19 +13241,18 @@ void MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13609,20 +13268,18 @@ void MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13634,19 +13291,18 @@ void MTROnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTROnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13662,19 +13318,18 @@ void MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13686,19 +13341,18 @@ void MTROnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTROnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13714,19 +13368,18 @@ void MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13738,19 +13391,18 @@ void MTRLevelControlClusterMoveModeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13766,19 +13418,18 @@ void MTRNullableLevelControlClusterMoveModeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13790,19 +13441,18 @@ void MTRLevelControlClusterStepModeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLevelControlClusterStepModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRLevelControlClusterStepModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRLevelControlClusterStepModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13818,19 +13468,18 @@ void MTRNullableLevelControlClusterStepModeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableLevelControlClusterStepModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableLevelControlClusterStepModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableLevelControlClusterStepModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13842,19 +13491,18 @@ void MTRAccessControlClusterAuthModeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13870,19 +13518,18 @@ void MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13894,19 +13541,18 @@ void MTRAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13922,19 +13568,18 @@ void MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13946,19 +13591,18 @@ void MTRAccessControlClusterPrivilegeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13974,19 +13618,18 @@ void MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -13998,19 +13641,18 @@ void MTRActionsClusterActionErrorEnumAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14026,19 +13668,18 @@ void MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14050,19 +13691,18 @@ void MTRActionsClusterActionStateEnumAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14078,19 +13718,18 @@ void MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14102,19 +13741,18 @@ void MTRActionsClusterActionTypeEnumAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14130,19 +13768,18 @@ void MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14154,19 +13791,18 @@ void MTRActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14182,19 +13818,18 @@ void MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14206,21 +13841,18 @@ void MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBri
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14236,21 +13868,18 @@ void MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge *>(
-        context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14262,20 +13891,18 @@ void MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14291,21 +13918,18 @@ void MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCall
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14317,19 +13941,18 @@ void MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14345,21 +13968,18 @@ void MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackB
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14371,21 +13991,18 @@ void MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackB
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14402,21 +14019,18 @@ void MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeC
 };
 
 void MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished(void * context)
+    OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge *>(
-            context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14428,21 +14042,18 @@ void MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBri
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14458,21 +14069,18 @@ void MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge *>(
-        context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14484,20 +14092,18 @@ void MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14513,21 +14119,18 @@ void MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCall
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14539,19 +14142,18 @@ void MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14567,20 +14169,18 @@ void MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14592,19 +14192,18 @@ void MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14620,20 +14219,18 @@ void MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14645,19 +14242,18 @@ void MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14673,19 +14269,18 @@ void MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14697,19 +14292,18 @@ void MTRPowerSourceClusterBatChargeFaultAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14725,19 +14319,18 @@ void MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14749,19 +14342,18 @@ void MTRPowerSourceClusterBatChargeLevelAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14777,19 +14369,18 @@ void MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14801,19 +14392,18 @@ void MTRPowerSourceClusterBatChargeStateAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14829,19 +14419,18 @@ void MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14853,19 +14442,18 @@ void MTRPowerSourceClusterBatFaultAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14881,19 +14469,18 @@ void MTRNullablePowerSourceClusterBatFaultAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullablePowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullablePowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14905,19 +14492,18 @@ void MTRPowerSourceClusterBatReplaceabilityAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14933,19 +14519,18 @@ void MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14957,19 +14542,18 @@ void MTRPowerSourceClusterPowerSourceStatusAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -14985,19 +14569,18 @@ void MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15009,19 +14592,18 @@ void MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15037,19 +14619,18 @@ void MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15061,19 +14642,18 @@ void MTRPowerSourceClusterWiredFaultAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15089,19 +14669,18 @@ void MTRNullablePowerSourceClusterWiredFaultAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullablePowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullablePowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15113,19 +14692,18 @@ void MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::On
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15141,21 +14719,18 @@ void MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15167,20 +14742,18 @@ void MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15196,21 +14769,18 @@ void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallba
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15222,21 +14792,18 @@ void MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15252,22 +14819,19 @@ void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCa
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge::
+    OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge *>(
-            context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15279,19 +14843,18 @@ void MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15307,19 +14870,18 @@ void MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15331,19 +14893,18 @@ void MTRDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15359,19 +14920,18 @@ void MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15383,19 +14943,18 @@ void MTRDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15411,19 +14970,18 @@ void MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15435,19 +14993,18 @@ void MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15463,20 +15020,18 @@ void MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15488,19 +15043,18 @@ void MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15516,20 +15070,18 @@ void MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15541,19 +15093,18 @@ void MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15569,20 +15120,18 @@ void MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15594,19 +15143,18 @@ void MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15622,19 +15170,18 @@ void MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15646,19 +15193,18 @@ void MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15674,20 +15220,18 @@ void MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15699,19 +15243,18 @@ void MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15727,20 +15270,18 @@ void MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15752,19 +15293,18 @@ void MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15780,20 +15320,18 @@ void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15805,19 +15343,18 @@ void MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15833,20 +15370,18 @@ void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15858,21 +15393,18 @@ void MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15888,22 +15420,19 @@ void MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCa
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge::
+    OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge *>(
-            context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15915,21 +15444,18 @@ void MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBri
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15945,21 +15471,18 @@ void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge *>(
-        context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15971,19 +15494,18 @@ void MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -15999,20 +15521,18 @@ void MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16024,20 +15544,18 @@ void MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16053,21 +15571,18 @@ void MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallba
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16079,19 +15594,18 @@ void MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16107,21 +15621,18 @@ void MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBri
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16133,19 +15644,18 @@ void MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16161,21 +15671,18 @@ void MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBri
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16187,19 +15694,18 @@ void MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16215,20 +15721,18 @@ void MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16240,19 +15744,18 @@ void MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16268,20 +15771,18 @@ void MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16293,21 +15794,18 @@ void MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallb
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16324,21 +15822,18 @@ void MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttrib
 };
 
 void MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished(void * context)
+    OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge *>(
-            context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16350,19 +15845,18 @@ void MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16378,20 +15872,18 @@ void MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16403,20 +15895,18 @@ void MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
-void MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16432,21 +15922,18 @@ void MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallb
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16458,20 +15945,18 @@ void MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16487,21 +15972,18 @@ void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16513,19 +15995,18 @@ void MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16541,19 +16022,18 @@ void MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16565,19 +16045,18 @@ void MTRDoorLockClusterDlCredentialRuleAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16593,19 +16072,18 @@ void MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16617,19 +16095,18 @@ void MTRDoorLockClusterDlCredentialTypeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16645,19 +16122,18 @@ void MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16669,19 +16145,18 @@ void MTRDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16697,19 +16172,18 @@ void MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16721,19 +16195,18 @@ void MTRDoorLockClusterDlDoorStateAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16749,19 +16222,18 @@ void MTRNullableDoorLockClusterDlDoorStateAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16773,19 +16245,18 @@ void MTRDoorLockClusterDlLockDataTypeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16801,19 +16272,18 @@ void MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16825,19 +16295,18 @@ void MTRDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16853,19 +16322,18 @@ void MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16877,19 +16345,18 @@ void MTRDoorLockClusterDlLockStateAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16905,19 +16372,18 @@ void MTRNullableDoorLockClusterDlLockStateAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16929,19 +16395,18 @@ void MTRDoorLockClusterDlLockTypeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16957,19 +16422,18 @@ void MTRNullableDoorLockClusterDlLockTypeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -16981,19 +16445,18 @@ void MTRDoorLockClusterDlOperatingModeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17009,19 +16472,18 @@ void MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17033,19 +16495,18 @@ void MTRDoorLockClusterDlOperationErrorAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17061,19 +16522,18 @@ void MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17085,19 +16545,18 @@ void MTRDoorLockClusterDlOperationSourceAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17113,19 +16572,18 @@ void MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17136,19 +16594,18 @@ void MTRDoorLockClusterDlStatusAttributeCallbackBridge::OnSuccessFn(void * conte
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17164,19 +16621,18 @@ void MTRNullableDoorLockClusterDlStatusAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17188,19 +16644,18 @@ void MTRDoorLockClusterDlUserStatusAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17216,19 +16671,18 @@ void MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17240,19 +16694,18 @@ void MTRDoorLockClusterDlUserTypeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17268,19 +16721,18 @@ void MTRNullableDoorLockClusterDlUserTypeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17292,19 +16744,18 @@ void MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17320,20 +16771,18 @@ void MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17345,19 +16794,18 @@ void MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17373,20 +16821,18 @@ void MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17398,19 +16844,18 @@ void MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17426,20 +16871,18 @@ void MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17451,19 +16894,18 @@ void MTRDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17479,19 +16921,18 @@ void MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17503,19 +16944,18 @@ void MTRDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17531,19 +16971,18 @@ void MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17555,19 +16994,18 @@ void MTRWindowCoveringClusterEndProductTypeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17583,19 +17021,18 @@ void MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17607,19 +17044,18 @@ void MTRWindowCoveringClusterTypeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17635,19 +17071,18 @@ void MTRNullableWindowCoveringClusterTypeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17659,20 +17094,18 @@ void MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17688,21 +17121,18 @@ void MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallba
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17714,20 +17144,18 @@ void MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17743,21 +17171,18 @@ void MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCall
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17769,19 +17194,18 @@ void MTRThermostatClusterSetpointAdjustModeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17797,19 +17221,18 @@ void MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17821,19 +17244,18 @@ void MTRThermostatClusterThermostatControlSequenceAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17849,20 +17271,18 @@ void MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17874,19 +17294,18 @@ void MTRThermostatClusterThermostatRunningModeAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17902,19 +17321,18 @@ void MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17926,19 +17344,18 @@ void MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17954,19 +17371,18 @@ void MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge::On
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -17978,19 +17394,18 @@ void MTRFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18006,19 +17421,18 @@ void MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18030,19 +17444,18 @@ void MTRFanControlClusterFanModeTypeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18058,19 +17471,18 @@ void MTRNullableFanControlClusterFanModeTypeAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18082,19 +17494,18 @@ void MTRColorControlClusterColorLoopActionAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18110,19 +17521,18 @@ void MTRNullableColorControlClusterColorLoopActionAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18134,19 +17544,18 @@ void MTRColorControlClusterColorLoopDirectionAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18162,19 +17571,18 @@ void MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackBridge::On
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18186,19 +17594,18 @@ void MTRColorControlClusterColorModeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRColorControlClusterColorModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRColorControlClusterColorModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRColorControlClusterColorModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18214,19 +17621,18 @@ void MTRNullableColorControlClusterColorModeAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableColorControlClusterColorModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableColorControlClusterColorModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableColorControlClusterColorModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18238,19 +17644,18 @@ void MTRColorControlClusterHueDirectionAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18266,19 +17671,18 @@ void MTRNullableColorControlClusterHueDirectionAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18290,19 +17694,18 @@ void MTRColorControlClusterHueMoveModeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18318,19 +17721,18 @@ void MTRNullableColorControlClusterHueMoveModeAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18342,19 +17744,18 @@ void MTRColorControlClusterHueStepModeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18370,19 +17771,18 @@ void MTRNullableColorControlClusterHueStepModeAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18394,19 +17794,18 @@ void MTRColorControlClusterSaturationMoveModeAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18422,19 +17821,18 @@ void MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackBridge::On
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18446,19 +17844,18 @@ void MTRColorControlClusterSaturationStepModeAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18474,19 +17871,18 @@ void MTRNullableColorControlClusterSaturationStepModeAttributeCallbackBridge::On
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18498,19 +17894,18 @@ void MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18526,21 +17921,18 @@ void MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBri
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18552,19 +17944,18 @@ void MTRChannelClusterChannelStatusEnumAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18580,19 +17971,18 @@ void MTRNullableChannelClusterChannelStatusEnumAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18604,19 +17994,18 @@ void MTRChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18632,19 +18021,18 @@ void MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18656,20 +18044,18 @@ void MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18685,21 +18071,18 @@ void MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallback
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18711,19 +18094,18 @@ void MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18739,20 +18121,18 @@ void MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18764,19 +18144,18 @@ void MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18792,19 +18171,18 @@ void MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::On
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18816,19 +18194,18 @@ void MTRMediaInputClusterInputTypeEnumAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18844,19 +18221,18 @@ void MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18868,19 +18244,18 @@ void MTRKeypadInputClusterCecKeyCodeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18896,19 +18271,18 @@ void MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18920,19 +18294,18 @@ void MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18948,20 +18321,18 @@ void MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -18973,19 +18344,18 @@ void MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::On
     DispatchSuccess(context, objCValue);
 };
 
-void MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -19001,21 +18371,18 @@ void MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -19027,19 +18394,18 @@ void MTRContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -19055,19 +18421,18 @@ void MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -19079,19 +18444,18 @@ void MTRContentLauncherClusterParameterEnumAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -19107,19 +18471,18 @@ void MTRNullableContentLauncherClusterParameterEnumAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -19131,19 +18494,18 @@ void MTRAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -19159,19 +18521,18 @@ void MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -19183,21 +18544,18 @@ void MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback
     DispatchSuccess(context, objCValue);
 };
 
-void MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -19214,21 +18572,18 @@ void MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttribute
 };
 
 void MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished(void * context)
+    OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge *>(
-            context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -19240,19 +18595,18 @@ void MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -19268,21 +18622,18 @@ void MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackBri
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self
-        = static_cast<MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -19294,19 +18645,18 @@ void MTRUnitTestingClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -19322,19 +18672,18 @@ void MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -19346,19 +18695,18 @@ void MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }
 
@@ -19374,18 +18722,17 @@ void MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
-    auto * self = static_cast<MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
+    if (!mQueue) {
         return;
     }
 
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
         // On failure, mEstablishedHandler will be cleaned up by our destructor,
         // but we can clean it up earlier on successful subscription
         // establishment.
-        self->mEstablishedHandler = nil;
+        mEstablishedHandler = nil;
     }
 }

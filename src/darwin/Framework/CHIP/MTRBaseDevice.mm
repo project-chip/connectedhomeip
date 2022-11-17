@@ -21,6 +21,7 @@
 #import "MTRBaseSubscriptionCallback.h"
 #import "MTRCallbackBridgeBase_internal.h"
 #import "MTRCluster.h"
+#import "MTRCluster_internal.h"
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
 #import "MTRLogging.h"
@@ -302,14 +303,11 @@ public:
                                       // We want to get event reports at the minInterval, not the maxInterval.
                                       eventPath->mIsUrgentEvent = true;
                                       ReadPrepareParams readParams(session.Value());
-                                      readParams.mMinIntervalFloorSeconds = [params.minInterval unsignedShortValue];
-                                      readParams.mMaxIntervalCeilingSeconds = [params.maxInterval unsignedShortValue];
+                                      [params toReadPrepareParams:readParams];
                                       readParams.mpAttributePathParamsList = attributePath.get();
                                       readParams.mAttributePathParamsListSize = 1;
                                       readParams.mpEventPathParamsList = eventPath.get();
                                       readParams.mEventPathParamsListSize = 1;
-                                      readParams.mIsFabricFiltered = params.filterByFabric;
-                                      readParams.mKeepSubscriptions = !params.replaceExistingSubscriptions;
 
                                       std::unique_ptr<ClusterStateCache> attributeCache;
                                       ReadClient::Callback * callbackForReadClient = nullptr;
@@ -831,9 +829,9 @@ private:
             CHIP_ERROR err = CHIP_NO_ERROR;
 
             chip::app::ReadPrepareParams readParams(session);
+            [params toReadPrepareParams:readParams];
             readParams.mpAttributePathParamsList = &attributePath;
             readParams.mAttributePathParamsListSize = 1;
-            readParams.mIsFabricFiltered = params.filterByFabric;
 
             auto onDone = [resultArray, resultSuccess, resultFailure, bridge, successCb, failureCb](
                               BufferedReadAttributeCallback<MTRDataValueDictionaryDecodableType> * callback) {
@@ -1200,12 +1198,9 @@ exit:
                    CHIP_ERROR err = CHIP_NO_ERROR;
 
                    chip::app::ReadPrepareParams readParams(session.Value());
+                   [params toReadPrepareParams:readParams];
                    readParams.mpAttributePathParamsList = container.pathParams;
                    readParams.mAttributePathParamsListSize = 1;
-                   readParams.mMinIntervalFloorSeconds = static_cast<uint16_t>([params.minInterval unsignedShortValue]);
-                   readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>([params.maxInterval unsignedShortValue]);
-                   readParams.mIsFabricFiltered = params.filterByFabric;
-                   readParams.mKeepSubscriptions = !params.replaceExistingSubscriptions;
 
                    auto onDone = [container](BufferedReadAttributeCallback<MTRDataValueDictionaryDecodableType> * callback) {
                        [container onDone];

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -151,7 +151,7 @@ static void __ReadValueRequestedCb(const char * remoteAddress, int requestId, bt
 
     VerifyOrReturn(__GetAttInfo(gattHandle, &uuid, &type) == BT_ERROR_NONE,
                    ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from GATT handle"));
-    ChipLogProgress(DeviceLayer, "Read Requested on %s: %s", __ConvertAttTypeToStr(type), uuid);
+    ChipLogProgress(DeviceLayer, "Read Requested on %s: %s", __ConvertAttTypeToStr(type), StringOrNullMarker(uuid));
     g_free(uuid);
 
     ret = bt_gatt_get_value(gattHandle, &value, &len);
@@ -178,7 +178,7 @@ void BLEManagerImpl::WriteValueRequestedCb(const char * remoteAddress, int reque
     VerifyOrReturn(__GetAttInfo(gattHandle, &uuid, &type) == BT_ERROR_NONE,
                    ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from GATT handle"));
 
-    ChipLogProgress(DeviceLayer, "Write Requested on %s: %s", __ConvertAttTypeToStr(type), uuid);
+    ChipLogProgress(DeviceLayer, "Write Requested on %s: %s", __ConvertAttTypeToStr(type), StringOrNullMarker(uuid));
     ChipLogProgress(DeviceLayer, "Write Value (len: %d): %.*s ", len, len, value);
     g_free(uuid);
 
@@ -212,7 +212,8 @@ void BLEManagerImpl::NotificationStateChangedCb(bool notify, bt_gatt_server_h se
     VerifyOrReturn(__GetAttInfo(gattHandle, &uuid, &type) == BT_ERROR_NONE,
                    ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from GATT handle"));
 
-    ChipLogProgress(DeviceLayer, "Notification State Changed %d on %s: %s", notify, __ConvertAttTypeToStr(type), uuid);
+    ChipLogProgress(DeviceLayer, "Notification State Changed %d on %s: %s", notify, __ConvertAttTypeToStr(type),
+                    StringOrNullMarker(uuid));
     g_free(uuid);
     sInstance.NotifyBLESubscribed(notify ? true : false, conn);
 }
@@ -249,7 +250,8 @@ void BLEManagerImpl::IndicationConfirmationCb(int result, const char * remoteAdd
 
     conn = static_cast<BLEConnection *>(g_hash_table_lookup(sInstance.mConnectionMap, remoteAddress));
 
-    VerifyOrReturn(conn != nullptr, ChipLogError(DeviceLayer, "Could not find connection for [%s]", remoteAddress));
+    VerifyOrReturn(conn != nullptr,
+                   ChipLogError(DeviceLayer, "Could not find connection for [%s]", StringOrNullMarker(remoteAddress)));
     VerifyOrReturn(sInstance.mGattCharC2Handle == characteristic,
                    ChipLogError(DeviceLayer, "Gatt characteristic handle did not match"));
 
@@ -418,7 +420,7 @@ gboolean BLEManagerImpl::ConnectChipThing(gpointer userData)
     int ret = BT_ERROR_NONE;
 
     char * address = reinterpret_cast<char *>(userData);
-    ChipLogProgress(DeviceLayer, "ConnectRequest: Addr [%s]", address);
+    ChipLogProgress(DeviceLayer, "ConnectRequest: Addr [%s]", StringOrNullMarker(address));
 
     ret = bt_gatt_client_create(address, &sInstance.mGattClient);
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Failed to create GATT client. ret [%d]", ret));
@@ -685,12 +687,12 @@ static bool __GattClientForeachCharCb(int total, int index, bt_gatt_h charHandle
 
     if (strcasecmp(uuid, chip_ble_char_c1_tx_uuid) == 0)
     {
-        ChipLogProgress(DeviceLayer, "CHIP Char C1 TX Found [%s]", uuid);
+        ChipLogProgress(DeviceLayer, "CHIP Char C1 TX Found [%s]", StringOrNullMarker(uuid));
         conn->gattCharC1Handle = charHandle;
     }
     else if (strcasecmp(uuid, chip_ble_char_c2_rx_uuid) == 0)
     {
-        ChipLogProgress(DeviceLayer, "CHIP Char C2 RX Found [%s]", uuid);
+        ChipLogProgress(DeviceLayer, "CHIP Char C2 RX Found [%s]", StringOrNullMarker(uuid));
         conn->gattCharC2Handle = charHandle;
     }
     g_free(uuid);
@@ -712,7 +714,7 @@ static bool __GattClientForeachServiceCb(int total, int index, bt_gatt_h svcHand
 
     if (strcasecmp(uuid, chip_ble_service_uuid) == 0)
     {
-        ChipLogProgress(DeviceLayer, "CHIP Service UUID Found [%s]", uuid);
+        ChipLogProgress(DeviceLayer, "CHIP Service UUID Found [%s]", StringOrNullMarker(uuid));
 
         if (bt_gatt_service_foreach_characteristics(svcHandle, __GattClientForeachCharCb, conn) == BT_ERROR_NONE)
             conn->isChipDevice = true;
@@ -741,11 +743,11 @@ bool BLEManagerImpl::IsDeviceChipPeripheral(BLE_CONNECTION_OBJECT conId)
 void BLEManagerImpl::AddConnectionData(const char * remoteAddr)
 {
     BLEConnection * conn;
-    ChipLogProgress(DeviceLayer, "AddConnectionData for [%s]", remoteAddr);
+    ChipLogProgress(DeviceLayer, "AddConnectionData for [%s]", StringOrNullMarker(remoteAddr));
 
     if (!g_hash_table_lookup(mConnectionMap, remoteAddr))
     {
-        ChipLogProgress(DeviceLayer, "Connection not found in map [%s]", remoteAddr);
+        ChipLogProgress(DeviceLayer, "Connection not found in map [%s]", StringOrNullMarker(remoteAddr));
         conn           = static_cast<BLEConnection *>(g_malloc0(sizeof(BLEConnection)));
         conn->peerAddr = g_strdup(remoteAddr);
 
@@ -755,7 +757,7 @@ void BLEManagerImpl::AddConnectionData(const char * remoteAddr)
             if (IsDeviceChipPeripheral(conn))
             {
                 g_hash_table_insert(mConnectionMap, (gpointer) conn->peerAddr, conn);
-                ChipLogProgress(DeviceLayer, "New Connection Added for [%s]", remoteAddr);
+                ChipLogProgress(DeviceLayer, "New Connection Added for [%s]", StringOrNullMarker(remoteAddr));
                 NotifyHandleNewConnection(conn);
             }
             else
@@ -774,7 +776,7 @@ void BLEManagerImpl::AddConnectionData(const char * remoteAddr)
             conn->gattCharC2Handle = mGattCharC2Handle;
 
             g_hash_table_insert(mConnectionMap, (gpointer) conn->peerAddr, conn);
-            ChipLogProgress(DeviceLayer, "New Connection Added for [%s]", remoteAddr);
+            ChipLogProgress(DeviceLayer, "New Connection Added for [%s]", StringOrNullMarker(remoteAddr));
         }
     }
 }
@@ -782,12 +784,13 @@ void BLEManagerImpl::AddConnectionData(const char * remoteAddr)
 void BLEManagerImpl::RemoveConnectionData(const char * remoteAddr)
 {
     BLEConnection * conn = nullptr;
-    ChipLogProgress(DeviceLayer, "Connection Remove Request for [%s]", remoteAddr);
+    ChipLogProgress(DeviceLayer, "Connection Remove Request for [%s]", StringOrNullMarker(remoteAddr));
 
     VerifyOrReturn(mConnectionMap != nullptr, ChipLogError(DeviceLayer, "Connection map does not exist"));
 
     conn = static_cast<BLEConnection *>(g_hash_table_lookup(mConnectionMap, remoteAddr));
-    VerifyOrReturn(conn != nullptr, ChipLogError(DeviceLayer, "Connection does not exist for [%s]", remoteAddr));
+    VerifyOrReturn(conn != nullptr,
+                   ChipLogError(DeviceLayer, "Connection does not exist for [%s]", StringOrNullMarker(remoteAddr)));
 
     g_hash_table_remove(mConnectionMap, conn->peerAddr);
 
@@ -842,12 +845,12 @@ void BLEManagerImpl::HandleConnectionEvent(bool connected, const char * remoteAd
 {
     if (connected)
     {
-        ChipLogProgress(DeviceLayer, "Device Connected [%s]", remoteAddress);
+        ChipLogProgress(DeviceLayer, "Device Connected [%s]", StringOrNullMarker(remoteAddress));
         AddConnectionData(remoteAddress);
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "Device DisConnected [%s]", remoteAddress);
+        ChipLogProgress(DeviceLayer, "Device DisConnected [%s]", StringOrNullMarker(remoteAddress));
         RemoveConnectionData(remoteAddress);
     }
 }
