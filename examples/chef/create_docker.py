@@ -15,8 +15,7 @@
 # limitations under the License.
 
 import os
-import sys
-import optparse
+import argparse
 import tarfile
 import shutil
 import docker
@@ -26,36 +25,31 @@ client = docker.from_env()
 _CREATE_DOCKER_SCRIPT_PATH = os.path.dirname(__file__)
 _SUPPORTED_PLATFORM = 'linux_x86'
 
-parser = optparse.OptionParser()
-parser.add_option('-c', '--commit_sha', type='string',
-                  action='store',
-                  dest='commit_sha')
-parser.add_option('-s', '--short_sha', type='string',
-                  action='store',
-                  dest='short_sha')
-parser.add_option('-r', '--revision_id', type='string',
-                  action='store',
-                  dest='revision_id')
-parser.add_option('-b', '--build_id', type='string',
-                  action='store',
-                  dest='build_id')
-parser.add_option('-i', '--image_name', type='string',
-                  action='store',
-                  dest='image_name')
-parser.add_option('-t', '--tar_path', type='string',
-                  action='store',
-                  dest='tar_path')
+parser = argparse.ArgumentParser()
+parser.add_argument('-c', '--commit_sha', required=True,
+                    action='store',
+                    dest='commit_sha')
+parser.add_argument('-s', '--short_sha', required=True,
+                    action='store',
+                    dest='short_sha')
+parser.add_argument('-r', '--revision_id', required=True,
+                    action='store',
+                    dest='revision_id')
+parser.add_argument('-b', '--build_id', required=True,
+                    action='store',
+                    dest='build_id')
+parser.add_argument('-i', '--image_name', required=True,
+                    action='store',
+                    dest='image_name')
+parser.add_argument('-t', '--tar_path', required=True,
+                    action='store',
+                    dest='tar_path')
 
-options, args = parser.parse_args(sys.argv[1:])
-
-# Check that all options are set
-for option, value in options.__dict__.items():
-    if (value is None):
-        parser.error(f'--{option} is not set')
+args = parser.parse_args()
 
 out_directory = f'{_CREATE_DOCKER_SCRIPT_PATH}/out'
 
-for device_file_name in os.listdir(options.tar_path):
+for device_file_name in os.listdir(args.tar_path):
     # Clean up the out directory before extracting device files
     shutil.rmtree(out_directory)
     os.mkdir(out_directory)
@@ -67,20 +61,20 @@ for device_file_name in os.listdir(options.tar_path):
     device = device.replace('.tar.gz', '')
 
     print(f'Extracting {platform} files of {device}')
-    my_tar = tarfile.open(f'{options.tar_path}/{device_file_name}')
+    my_tar = tarfile.open(f'{args.tar_path}/{device_file_name}')
     my_tar.extractall(out_directory)
     my_tar.close()
 
-    docker_image_name = f'{options.image_name}/{platform}/{device}'.lower()
+    docker_image_name = f'{args.image_name}/{platform}/{device}'.lower()
 
     print(f'Building {platform} docker image for {device}')
     image = client.images.build(path=_CREATE_DOCKER_SCRIPT_PATH, buildargs={
         'DEVICE_NAME': f'{device}'})
     image[0].tag(docker_image_name, tag='latest')
-    image[0].tag(docker_image_name, tag=f'short-sha_{options.short_sha}')
-    image[0].tag(docker_image_name, tag=f'build-id_{options.build_id}')
-    image[0].tag(docker_image_name, tag=f'commit-sha_{options.commit_sha}')
-    image[0].tag(docker_image_name, tag=f'revision-id_{options.revision_id}')
+    image[0].tag(docker_image_name, tag=f'short-sha_{args.short_sha}')
+    image[0].tag(docker_image_name, tag=f'build-id_{args.build_id}')
+    image[0].tag(docker_image_name, tag=f'commit-sha_{args.commit_sha}')
+    image[0].tag(docker_image_name, tag=f'revision-id_{args.revision_id}')
 
     print(f'Pushing image: {docker_image_name}')
     client.images.push(docker_image_name)
