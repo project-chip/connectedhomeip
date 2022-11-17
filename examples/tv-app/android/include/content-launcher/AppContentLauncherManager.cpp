@@ -95,15 +95,15 @@ CHIP_ERROR AppContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEn
         if (reader.parse(resStr, value))
         {
             std::string attrId = to_string(chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::Id);
-            ChipLogProgress(
-                Zcl, "AppContentLauncherManager::HandleGetAcceptHeaderList response parsing done. reading attr %s",
-                attrId.c_str());
+            ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetAcceptHeaderList response parsing done. reading attr %s",
+                            attrId.c_str());
             if (value[attrId].isArray())
             {
                 mAcceptHeaderList.clear();
                 for (Json::Value & entry : value[attrId])
                 {
-                    if (entry.isString()){
+                    if (entry.isString())
+                    {
                         mAcceptHeaderList.push_back(entry.asString());
                     }
                 }

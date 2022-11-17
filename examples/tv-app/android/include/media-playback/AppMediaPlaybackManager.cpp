@@ -195,7 +195,8 @@ CHIP_ERROR AppMediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncod
                     static_cast<uint32_t>(chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Fields::kUpdatedAt));
                 std::string position = to_string(
                     static_cast<uint32_t>(chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Fields::kPosition));
-                if (!value[attrId][updatedAt].empty() && !value[attrId][position].empty() && value[attrId][updatedAt].isUInt() && value[attrId][position].isUInt())
+                if (!value[attrId][updatedAt].empty() && !value[attrId][position].empty() && value[attrId][updatedAt].isUInt() &&
+                    value[attrId][position].isUInt())
                 {
                     // valid response
                     response.updatedAt = value[attrId][updatedAt].asUInt();
