@@ -1,1 +1,1 @@
-0.6.09 Version bump reason: Install zap v2022.11.16 in docker images.
+0.6.10 Version bump reason: Fix zap link (link zap-cli into /usr/bin instead of zap)
