@@ -7003,6 +7003,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRTestClusterClusterTestParams
+@end
 @implementation MTRUnitTestingClusterTestSpecificResponseParams
 - (instancetype)init
 {
@@ -7032,6 +7035,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRTestClusterClusterTestSpecificResponseParams
+@end
 @implementation MTRUnitTestingClusterTestNotHandledParams
 - (instancetype)init
 {
@@ -7056,6 +7062,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterTestNotHandledParams
 @end
 @implementation MTRUnitTestingClusterTestAddArgumentsResponseParams
 - (instancetype)init
@@ -7086,6 +7095,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRTestClusterClusterTestAddArgumentsResponseParams
+@end
 @implementation MTRUnitTestingClusterTestSpecificParams
 - (instancetype)init
 {
@@ -7110,6 +7122,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterTestSpecificParams
 @end
 @implementation MTRUnitTestingClusterTestSimpleArgumentResponseParams
 - (instancetype)init
@@ -7140,6 +7155,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRTestClusterClusterTestSimpleArgumentResponseParams
+@end
 @implementation MTRUnitTestingClusterTestUnknownCommandParams
 - (instancetype)init
 {
@@ -7164,6 +7182,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterTestUnknownCommandParams
 @end
 @implementation MTRUnitTestingClusterTestStructArrayArgumentResponseParams
 - (instancetype)init
@@ -7209,6 +7230,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRTestClusterClusterTestStructArrayArgumentResponseParams
+@end
 @implementation MTRUnitTestingClusterTestAddArgumentsParams
 - (instancetype)init
 {
@@ -7241,6 +7265,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRTestClusterClusterTestAddArgumentsParams
+@end
 @implementation MTRUnitTestingClusterTestListInt8UReverseResponseParams
 - (instancetype)init
 {
@@ -7269,6 +7296,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRTestClusterClusterTestListInt8UReverseResponseParams
+@end
 @implementation MTRUnitTestingClusterTestSimpleArgumentRequestParams
 - (instancetype)init
 {
@@ -7296,6 +7326,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterTestSimpleArgumentRequestParams
 @end
 @implementation MTRUnitTestingClusterTestEnumsResponseParams
 - (instancetype)init
@@ -7328,6 +7361,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterTestEnumsResponseParams
 @end
 @implementation MTRUnitTestingClusterTestStructArrayArgumentRequestParams
 - (instancetype)init
@@ -7373,6 +7409,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRTestClusterClusterTestStructArrayArgumentRequestParams
+@end
 @implementation MTRUnitTestingClusterTestNullableOptionalResponseParams
 - (instancetype)init
 {
@@ -7411,6 +7450,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRTestClusterClusterTestNullableOptionalResponseParams
+@end
 @implementation MTRUnitTestingClusterTestStructArgumentRequestParams
 - (instancetype)init
 {
@@ -7438,6 +7480,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterTestStructArgumentRequestParams
 @end
 @implementation MTRUnitTestingClusterTestComplexNullableOptionalResponseParams
 - (instancetype)init
@@ -7563,6 +7608,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRTestClusterClusterTestComplexNullableOptionalResponseParams
+@end
 @implementation MTRUnitTestingClusterTestNestedStructArgumentRequestParams
 - (instancetype)init
 {
@@ -7590,6 +7638,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterTestNestedStructArgumentRequestParams
 @end
 @implementation MTRUnitTestingClusterBooleanResponseParams
 - (instancetype)init
@@ -7619,6 +7670,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRTestClusterClusterBooleanResponseParams
+@end
 @implementation MTRUnitTestingClusterTestListStructArgumentRequestParams
 - (instancetype)init
 {
@@ -7646,6 +7700,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterTestListStructArgumentRequestParams
 @end
 @implementation MTRUnitTestingClusterSimpleStructResponseParams
 - (instancetype)init
@@ -7675,6 +7732,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRTestClusterClusterSimpleStructResponseParams
+@end
 @implementation MTRUnitTestingClusterTestListInt8UArgumentRequestParams
 - (instancetype)init
 {
@@ -7702,6 +7762,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterTestListInt8UArgumentRequestParams
 @end
 @implementation MTRUnitTestingClusterTestEmitTestEventResponseParams
 - (instancetype)init
@@ -7731,6 +7794,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRTestClusterClusterTestEmitTestEventResponseParams
+@end
 @implementation MTRUnitTestingClusterTestNestedStructListArgumentRequestParams
 - (instancetype)init
 {
@@ -7758,6 +7824,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterTestNestedStructListArgumentRequestParams
 @end
 @implementation MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams
 - (instancetype)init
@@ -7787,6 +7856,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams
+@end
 @implementation MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams
 - (instancetype)init
 {
@@ -7815,6 +7887,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRTestClusterClusterTestListNestedStructListArgumentRequestParams
+@end
 @implementation MTRUnitTestingClusterTestListInt8UReverseRequestParams
 - (instancetype)init
 {
@@ -7842,6 +7917,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterTestListInt8UReverseRequestParams
 @end
 @implementation MTRUnitTestingClusterTestEnumsRequestParams
 - (instancetype)init
@@ -7875,6 +7953,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRTestClusterClusterTestEnumsRequestParams
+@end
 @implementation MTRUnitTestingClusterTestNullableOptionalRequestParams
 - (instancetype)init
 {
@@ -7902,6 +7983,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterTestNullableOptionalRequestParams
 @end
 @implementation MTRUnitTestingClusterTestComplexNullableOptionalRequestParams
 - (instancetype)init
@@ -7970,6 +8054,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRTestClusterClusterTestComplexNullableOptionalRequestParams
+@end
 @implementation MTRUnitTestingClusterSimpleStructEchoRequestParams
 - (instancetype)init
 {
@@ -7998,6 +8085,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRTestClusterClusterSimpleStructEchoRequestParams
+@end
 @implementation MTRUnitTestingClusterTimedInvokeRequestParams
 - (instancetype)init
 {
@@ -8022,6 +8112,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterTimedInvokeRequestParams
 @end
 @implementation MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams
 - (instancetype)init
@@ -8050,6 +8143,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams
 @end
 @implementation MTRUnitTestingClusterTestEmitTestEventRequestParams
 - (instancetype)init
@@ -8086,6 +8182,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRTestClusterClusterTestEmitTestEventRequestParams
+@end
 @implementation MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams
 - (instancetype)init
 {
@@ -8113,6 +8212,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams
 @end
 @implementation MTRFaultInjectionClusterFailAtFaultParams
 - (instancetype)init

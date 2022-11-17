@@ -653,7 +653,10 @@ using chip::SessionHandle;
     [self addGroupWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTRGroupsClusterAddGroupResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTRGroupsClusterAddGroupResponseParams *>(data), error);
+                   }];
 }
 - (void)viewGroupWithParams:(MTRGroupsClusterViewGroupParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -664,7 +667,10 @@ using chip::SessionHandle;
     [self viewGroupWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTRGroupsClusterViewGroupResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTRGroupsClusterViewGroupResponseParams *>(data), error);
+                   }];
 }
 - (void)getGroupMembershipWithParams:(MTRGroupsClusterGetGroupMembershipParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -675,7 +681,11 @@ using chip::SessionHandle;
     [self getGroupMembershipWithParams:params
                         expectedValues:expectedDataValueDictionaries
                  expectedValueInterval:expectedValueIntervalMs
-                            completion:completionHandler];
+                            completion:^(
+                                MTRGroupsClusterGetGroupMembershipResponseParams * _Nullable data, NSError * _Nullable error) {
+                                // Cast is safe because subclass does not add any selectors.
+                                completionHandler(static_cast<MTRGroupsClusterGetGroupMembershipResponseParams *>(data), error);
+                            }];
 }
 - (void)removeGroupWithParams:(MTRGroupsClusterRemoveGroupParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -686,7 +696,10 @@ using chip::SessionHandle;
     [self removeGroupWithParams:params
                  expectedValues:expectedDataValueDictionaries
           expectedValueInterval:expectedValueIntervalMs
-                     completion:completionHandler];
+                     completion:^(MTRGroupsClusterRemoveGroupResponseParams * _Nullable data, NSError * _Nullable error) {
+                         // Cast is safe because subclass does not add any selectors.
+                         completionHandler(static_cast<MTRGroupsClusterRemoveGroupResponseParams *>(data), error);
+                     }];
 }
 - (void)removeAllGroupsWithParams:(MTRGroupsClusterRemoveAllGroupsParams * _Nullable)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -702,9 +715,10 @@ using chip::SessionHandle;
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self removeAllGroupsWithExpectedValues:expectedValues
-                      expectedValueInterval:expectedValueIntervalMs
-                                 completion:completionHandler];
+    [self removeAllGroupsWithParams:nil
+                     expectedValues:expectedValues
+              expectedValueInterval:expectedValueIntervalMs
+                  completionHandler:completionHandler];
 }
 - (void)addGroupIfIdentifyingWithParams:(MTRGroupsClusterAddGroupIfIdentifyingParams *)params
                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -1469,7 +1483,10 @@ using chip::SessionHandle;
     [self addSceneWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTRScenesClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTRScenesClusterAddSceneResponseParams *>(data), error);
+                   }];
 }
 - (void)viewSceneWithParams:(MTRScenesClusterViewSceneParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -1480,7 +1497,10 @@ using chip::SessionHandle;
     [self viewSceneWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTRScenesClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTRScenesClusterViewSceneResponseParams *>(data), error);
+                   }];
 }
 - (void)removeSceneWithParams:(MTRScenesClusterRemoveSceneParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -1491,7 +1511,10 @@ using chip::SessionHandle;
     [self removeSceneWithParams:params
                  expectedValues:expectedDataValueDictionaries
           expectedValueInterval:expectedValueIntervalMs
-                     completion:completionHandler];
+                     completion:^(MTRScenesClusterRemoveSceneResponseParams * _Nullable data, NSError * _Nullable error) {
+                         // Cast is safe because subclass does not add any selectors.
+                         completionHandler(static_cast<MTRScenesClusterRemoveSceneResponseParams *>(data), error);
+                     }];
 }
 - (void)removeAllScenesWithParams:(MTRScenesClusterRemoveAllScenesParams *)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -1502,7 +1525,10 @@ using chip::SessionHandle;
     [self removeAllScenesWithParams:params
                      expectedValues:expectedDataValueDictionaries
               expectedValueInterval:expectedValueIntervalMs
-                         completion:completionHandler];
+                         completion:^(MTRScenesClusterRemoveAllScenesResponseParams * _Nullable data, NSError * _Nullable error) {
+                             // Cast is safe because subclass does not add any selectors.
+                             completionHandler(static_cast<MTRScenesClusterRemoveAllScenesResponseParams *>(data), error);
+                         }];
 }
 - (void)storeSceneWithParams:(MTRScenesClusterStoreSceneParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -1513,7 +1539,10 @@ using chip::SessionHandle;
     [self storeSceneWithParams:params
                 expectedValues:expectedDataValueDictionaries
          expectedValueInterval:expectedValueIntervalMs
-                    completion:completionHandler];
+                    completion:^(MTRScenesClusterStoreSceneResponseParams * _Nullable data, NSError * _Nullable error) {
+                        // Cast is safe because subclass does not add any selectors.
+                        completionHandler(static_cast<MTRScenesClusterStoreSceneResponseParams *>(data), error);
+                    }];
 }
 - (void)recallSceneWithParams:(MTRScenesClusterRecallSceneParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -1534,7 +1563,11 @@ using chip::SessionHandle;
     [self getSceneMembershipWithParams:params
                         expectedValues:expectedDataValueDictionaries
                  expectedValueInterval:expectedValueIntervalMs
-                            completion:completionHandler];
+                            completion:^(
+                                MTRScenesClusterGetSceneMembershipResponseParams * _Nullable data, NSError * _Nullable error) {
+                                // Cast is safe because subclass does not add any selectors.
+                                completionHandler(static_cast<MTRScenesClusterGetSceneMembershipResponseParams *>(data), error);
+                            }];
 }
 - (void)enhancedAddSceneWithParams:(MTRScenesClusterEnhancedAddSceneParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -1545,7 +1578,10 @@ using chip::SessionHandle;
     [self enhancedAddSceneWithParams:params
                       expectedValues:expectedDataValueDictionaries
                expectedValueInterval:expectedValueIntervalMs
-                          completion:completionHandler];
+                          completion:^(MTRScenesClusterEnhancedAddSceneResponseParams * _Nullable data, NSError * _Nullable error) {
+                              // Cast is safe because subclass does not add any selectors.
+                              completionHandler(static_cast<MTRScenesClusterEnhancedAddSceneResponseParams *>(data), error);
+                          }];
 }
 - (void)enhancedViewSceneWithParams:(MTRScenesClusterEnhancedViewSceneParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -1553,10 +1589,14 @@ using chip::SessionHandle;
                   completionHandler:(void (^)(MTRScenesClusterEnhancedViewSceneResponseParams * _Nullable data,
                                         NSError * _Nullable error))completionHandler
 {
-    [self enhancedViewSceneWithParams:params
-                       expectedValues:expectedDataValueDictionaries
-                expectedValueInterval:expectedValueIntervalMs
-                           completion:completionHandler];
+    [self
+        enhancedViewSceneWithParams:params
+                     expectedValues:expectedDataValueDictionaries
+              expectedValueInterval:expectedValueIntervalMs
+                         completion:^(MTRScenesClusterEnhancedViewSceneResponseParams * _Nullable data, NSError * _Nullable error) {
+                             // Cast is safe because subclass does not add any selectors.
+                             completionHandler(static_cast<MTRScenesClusterEnhancedViewSceneResponseParams *>(data), error);
+                         }];
 }
 - (void)copySceneWithParams:(MTRScenesClusterCopySceneParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -1567,7 +1607,10 @@ using chip::SessionHandle;
     [self copySceneWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTRScenesClusterCopySceneResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTRScenesClusterCopySceneResponseParams *>(data), error);
+                   }];
 }
 @end
 
@@ -2069,7 +2112,10 @@ using chip::SessionHandle;
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
             completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self offWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self offWithParams:nil
+               expectedValues:expectedValues
+        expectedValueInterval:expectedValueIntervalMs
+            completionHandler:completionHandler];
 }
 - (void)onWithParams:(MTROnOffClusterOnParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -2085,7 +2131,10 @@ using chip::SessionHandle;
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
            completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self onWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self onWithParams:nil
+               expectedValues:expectedValues
+        expectedValueInterval:expectedValueIntervalMs
+            completionHandler:completionHandler];
 }
 - (void)toggleWithParams:(MTROnOffClusterToggleParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -2101,7 +2150,10 @@ using chip::SessionHandle;
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self toggleWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self toggleWithParams:nil
+               expectedValues:expectedValues
+        expectedValueInterval:expectedValueIntervalMs
+            completionHandler:completionHandler];
 }
 - (void)offWithEffectWithParams:(MTROnOffClusterOffWithEffectParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -2127,9 +2179,10 @@ using chip::SessionHandle;
                             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                 completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self onWithRecallGlobalSceneWithExpectedValues:expectedValues
-                              expectedValueInterval:expectedValueIntervalMs
-                                         completion:completionHandler];
+    [self onWithRecallGlobalSceneWithParams:nil
+                             expectedValues:expectedValues
+                      expectedValueInterval:expectedValueIntervalMs
+                          completionHandler:completionHandler];
 }
 - (void)onWithTimedOffWithParams:(MTROnOffClusterOnWithTimedOffParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -4932,9 +4985,10 @@ using chip::SessionHandle;
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self mfgSpecificPingWithExpectedValues:expectedValues
-                      expectedValueInterval:expectedValueIntervalMs
-                                 completion:completionHandler];
+    [self mfgSpecificPingWithParams:nil
+                     expectedValues:expectedValues
+              expectedValueInterval:expectedValueIntervalMs
+                  completionHandler:completionHandler];
 }
 @end
 
@@ -5196,7 +5250,11 @@ using chip::SessionHandle;
     [self queryImageWithParams:params
                 expectedValues:expectedDataValueDictionaries
          expectedValueInterval:expectedValueIntervalMs
-                    completion:completionHandler];
+                    completion:^(
+                        MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error) {
+                        // Cast is safe because subclass does not add any selectors.
+                        completionHandler(static_cast<MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams *>(data), error);
+                    }];
 }
 - (void)applyUpdateRequestWithParams:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -5207,7 +5265,12 @@ using chip::SessionHandle;
     [self applyUpdateRequestWithParams:params
                         expectedValues:expectedDataValueDictionaries
                  expectedValueInterval:expectedValueIntervalMs
-                            completion:completionHandler];
+                            completion:^(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                NSError * _Nullable error) {
+                                // Cast is safe because subclass does not add any selectors.
+                                completionHandler(
+                                    static_cast<MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams *>(data), error);
+                            }];
 }
 - (void)notifyUpdateAppliedWithParams:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -6403,7 +6466,11 @@ using chip::SessionHandle;
     [self armFailSafeWithParams:params
                  expectedValues:expectedDataValueDictionaries
           expectedValueInterval:expectedValueIntervalMs
-                     completion:completionHandler];
+                     completion:^(
+                         MTRGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable data, NSError * _Nullable error) {
+                         // Cast is safe because subclass does not add any selectors.
+                         completionHandler(static_cast<MTRGeneralCommissioningClusterArmFailSafeResponseParams *>(data), error);
+                     }];
 }
 - (void)setRegulatoryConfigWithParams:(MTRGeneralCommissioningClusterSetRegulatoryConfigParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -6414,7 +6481,12 @@ using chip::SessionHandle;
     [self setRegulatoryConfigWithParams:params
                          expectedValues:expectedDataValueDictionaries
                   expectedValueInterval:expectedValueIntervalMs
-                             completion:completionHandler];
+                             completion:^(MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams * _Nullable data,
+                                 NSError * _Nullable error) {
+                                 // Cast is safe because subclass does not add any selectors.
+                                 completionHandler(
+                                     static_cast<MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams *>(data), error);
+                             }];
 }
 - (void)commissioningCompleteWithParams:(MTRGeneralCommissioningClusterCommissioningCompleteParams * _Nullable)params
                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -6423,10 +6495,16 @@ using chip::SessionHandle;
                           (void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
                               NSError * _Nullable error))completionHandler
 {
-    [self commissioningCompleteWithParams:params
-                           expectedValues:expectedDataValueDictionaries
-                    expectedValueInterval:expectedValueIntervalMs
-                               completion:completionHandler];
+    [self
+        commissioningCompleteWithParams:params
+                         expectedValues:expectedDataValueDictionaries
+                  expectedValueInterval:expectedValueIntervalMs
+                             completion:^(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
+                                 NSError * _Nullable error) {
+                                 // Cast is safe because subclass does not add any selectors.
+                                 completionHandler(
+                                     static_cast<MTRGeneralCommissioningClusterCommissioningCompleteResponseParams *>(data), error);
+                             }];
 }
 - (void)commissioningCompleteWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
@@ -6434,9 +6512,10 @@ using chip::SessionHandle;
                                   (void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
                                       NSError * _Nullable error))completionHandler
 {
-    [self commissioningCompleteWithExpectedValues:expectedValues
-                            expectedValueInterval:expectedValueIntervalMs
-                                       completion:completionHandler];
+    [self commissioningCompleteWithParams:nil
+                           expectedValues:expectedValues
+                    expectedValueInterval:expectedValueIntervalMs
+                        completionHandler:completionHandler];
 }
 @end
 
@@ -6908,7 +6987,11 @@ using chip::SessionHandle;
     [self scanNetworksWithParams:params
                   expectedValues:expectedDataValueDictionaries
            expectedValueInterval:expectedValueIntervalMs
-                      completion:completionHandler];
+                      completion:^(
+                          MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data, NSError * _Nullable error) {
+                          // Cast is safe because subclass does not add any selectors.
+                          completionHandler(static_cast<MTRNetworkCommissioningClusterScanNetworksResponseParams *>(data), error);
+                      }];
 }
 - (void)addOrUpdateWiFiNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams *)params
                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -6919,7 +7002,12 @@ using chip::SessionHandle;
     [self addOrUpdateWiFiNetworkWithParams:params
                             expectedValues:expectedDataValueDictionaries
                      expectedValueInterval:expectedValueIntervalMs
-                                completion:completionHandler];
+                                completion:^(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                    NSError * _Nullable error) {
+                                    // Cast is safe because subclass does not add any selectors.
+                                    completionHandler(
+                                        static_cast<MTRNetworkCommissioningClusterNetworkConfigResponseParams *>(data), error);
+                                }];
 }
 - (void)addOrUpdateThreadNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams *)params
                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -6930,7 +7018,12 @@ using chip::SessionHandle;
     [self addOrUpdateThreadNetworkWithParams:params
                               expectedValues:expectedDataValueDictionaries
                        expectedValueInterval:expectedValueIntervalMs
-                                  completion:completionHandler];
+                                  completion:^(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                      NSError * _Nullable error) {
+                                      // Cast is safe because subclass does not add any selectors.
+                                      completionHandler(
+                                          static_cast<MTRNetworkCommissioningClusterNetworkConfigResponseParams *>(data), error);
+                                  }];
 }
 - (void)removeNetworkWithParams:(MTRNetworkCommissioningClusterRemoveNetworkParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -6941,7 +7034,11 @@ using chip::SessionHandle;
     [self removeNetworkWithParams:params
                    expectedValues:expectedDataValueDictionaries
             expectedValueInterval:expectedValueIntervalMs
-                       completion:completionHandler];
+                       completion:^(
+                           MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data, NSError * _Nullable error) {
+                           // Cast is safe because subclass does not add any selectors.
+                           completionHandler(static_cast<MTRNetworkCommissioningClusterNetworkConfigResponseParams *>(data), error);
+                       }];
 }
 - (void)connectNetworkWithParams:(MTRNetworkCommissioningClusterConnectNetworkParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -6949,10 +7046,15 @@ using chip::SessionHandle;
                completionHandler:(void (^)(MTRNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler
 {
-    [self connectNetworkWithParams:params
-                    expectedValues:expectedDataValueDictionaries
-             expectedValueInterval:expectedValueIntervalMs
-                        completion:completionHandler];
+    [self
+        connectNetworkWithParams:params
+                  expectedValues:expectedDataValueDictionaries
+           expectedValueInterval:expectedValueIntervalMs
+                      completion:^(
+                          MTRNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable data, NSError * _Nullable error) {
+                          // Cast is safe because subclass does not add any selectors.
+                          completionHandler(static_cast<MTRNetworkCommissioningClusterConnectNetworkResponseParams *>(data), error);
+                      }];
 }
 - (void)reorderNetworkWithParams:(MTRNetworkCommissioningClusterReorderNetworkParams *)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -6960,10 +7062,15 @@ using chip::SessionHandle;
                completionHandler:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler
 {
-    [self reorderNetworkWithParams:params
-                    expectedValues:expectedDataValueDictionaries
-             expectedValueInterval:expectedValueIntervalMs
-                        completion:completionHandler];
+    [self
+        reorderNetworkWithParams:params
+                  expectedValues:expectedDataValueDictionaries
+           expectedValueInterval:expectedValueIntervalMs
+                      completion:^(
+                          MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data, NSError * _Nullable error) {
+                          // Cast is safe because subclass does not add any selectors.
+                          completionHandler(static_cast<MTRNetworkCommissioningClusterNetworkConfigResponseParams *>(data), error);
+                      }];
 }
 @end
 
@@ -7089,7 +7196,11 @@ using chip::SessionHandle;
     [self retrieveLogsRequestWithParams:params
                          expectedValues:expectedDataValueDictionaries
                   expectedValueInterval:expectedValueIntervalMs
-                             completion:completionHandler];
+                             completion:^(
+                                 MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data, NSError * _Nullable error) {
+                                 // Cast is safe because subclass does not add any selectors.
+                                 completionHandler(static_cast<MTRDiagnosticLogsClusterRetrieveLogsResponseParams *>(data), error);
+                             }];
 }
 @end
 
@@ -7458,9 +7569,10 @@ using chip::SessionHandle;
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self resetWatermarksWithExpectedValues:expectedValues
-                      expectedValueInterval:expectedValueIntervalMs
-                                 completion:completionHandler];
+    [self resetWatermarksWithParams:nil
+                     expectedValues:expectedValues
+              expectedValueInterval:expectedValueIntervalMs
+                  completionHandler:completionHandler];
 }
 @end
 
@@ -8104,7 +8216,10 @@ using chip::SessionHandle;
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self resetCountsWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self resetCountsWithParams:nil
+                 expectedValues:expectedValues
+          expectedValueInterval:expectedValueIntervalMs
+              completionHandler:completionHandler];
 }
 @end
 
@@ -8347,7 +8462,10 @@ using chip::SessionHandle;
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self resetCountsWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self resetCountsWithParams:nil
+                 expectedValues:expectedValues
+          expectedValueInterval:expectedValueIntervalMs
+              completionHandler:completionHandler];
 }
 @end
 
@@ -8558,7 +8676,10 @@ using chip::SessionHandle;
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self resetCountsWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self resetCountsWithParams:nil
+                 expectedValues:expectedValues
+          expectedValueInterval:expectedValueIntervalMs
+              completionHandler:completionHandler];
 }
 @end
 
@@ -9147,9 +9268,10 @@ using chip::SessionHandle;
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self revokeCommissioningWithExpectedValues:expectedValues
-                          expectedValueInterval:expectedValueIntervalMs
-                                     completion:completionHandler];
+    [self revokeCommissioningWithParams:nil
+                         expectedValues:expectedValues
+                  expectedValueInterval:expectedValueIntervalMs
+                      completionHandler:completionHandler];
 }
 @end
 
@@ -9661,7 +9783,12 @@ using chip::SessionHandle;
     [self attestationRequestWithParams:params
                         expectedValues:expectedDataValueDictionaries
                  expectedValueInterval:expectedValueIntervalMs
-                            completion:completionHandler];
+                            completion:^(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data,
+                                NSError * _Nullable error) {
+                                // Cast is safe because subclass does not add any selectors.
+                                completionHandler(
+                                    static_cast<MTROperationalCredentialsClusterAttestationResponseParams *>(data), error);
+                            }];
 }
 - (void)certificateChainRequestWithParams:(MTROperationalCredentialsClusterCertificateChainRequestParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -9669,10 +9796,16 @@ using chip::SessionHandle;
                         completionHandler:(void (^)(MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable data,
                                               NSError * _Nullable error))completionHandler
 {
-    [self certificateChainRequestWithParams:params
-                             expectedValues:expectedDataValueDictionaries
-                      expectedValueInterval:expectedValueIntervalMs
-                                 completion:completionHandler];
+    [self
+        certificateChainRequestWithParams:params
+                           expectedValues:expectedDataValueDictionaries
+                    expectedValueInterval:expectedValueIntervalMs
+                               completion:^(MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable data,
+                                   NSError * _Nullable error) {
+                                   // Cast is safe because subclass does not add any selectors.
+                                   completionHandler(
+                                       static_cast<MTROperationalCredentialsClusterCertificateChainResponseParams *>(data), error);
+                               }];
 }
 - (void)CSRRequestWithParams:(MTROperationalCredentialsClusterCSRRequestParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -9683,7 +9816,10 @@ using chip::SessionHandle;
     [self CSRRequestWithParams:params
                 expectedValues:expectedDataValueDictionaries
          expectedValueInterval:expectedValueIntervalMs
-                    completion:completionHandler];
+                    completion:^(MTROperationalCredentialsClusterCSRResponseParams * _Nullable data, NSError * _Nullable error) {
+                        // Cast is safe because subclass does not add any selectors.
+                        completionHandler(static_cast<MTROperationalCredentialsClusterCSRResponseParams *>(data), error);
+                    }];
 }
 - (void)addNOCWithParams:(MTROperationalCredentialsClusterAddNOCParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -9694,7 +9830,10 @@ using chip::SessionHandle;
     [self addNOCWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTROperationalCredentialsClusterNOCResponseParams *>(data), error);
+                   }];
 }
 - (void)updateNOCWithParams:(MTROperationalCredentialsClusterUpdateNOCParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -9705,7 +9844,10 @@ using chip::SessionHandle;
     [self updateNOCWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTROperationalCredentialsClusterNOCResponseParams *>(data), error);
+                   }];
 }
 - (void)updateFabricLabelWithParams:(MTROperationalCredentialsClusterUpdateFabricLabelParams *)params
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -9716,7 +9858,11 @@ using chip::SessionHandle;
     [self updateFabricLabelWithParams:params
                        expectedValues:expectedDataValueDictionaries
                 expectedValueInterval:expectedValueIntervalMs
-                           completion:completionHandler];
+                           completion:^(
+                               MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error) {
+                               // Cast is safe because subclass does not add any selectors.
+                               completionHandler(static_cast<MTROperationalCredentialsClusterNOCResponseParams *>(data), error);
+                           }];
 }
 - (void)removeFabricWithParams:(MTROperationalCredentialsClusterRemoveFabricParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -9727,7 +9873,10 @@ using chip::SessionHandle;
     [self removeFabricWithParams:params
                   expectedValues:expectedDataValueDictionaries
            expectedValueInterval:expectedValueIntervalMs
-                      completion:completionHandler];
+                      completion:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error) {
+                          // Cast is safe because subclass does not add any selectors.
+                          completionHandler(static_cast<MTROperationalCredentialsClusterNOCResponseParams *>(data), error);
+                      }];
 }
 - (void)addTrustedRootCertificateWithParams:(MTROperationalCredentialsClusterAddTrustedRootCertificateParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -10125,7 +10274,10 @@ using chip::SessionHandle;
     [self keySetReadWithParams:params
                 expectedValues:expectedDataValueDictionaries
          expectedValueInterval:expectedValueIntervalMs
-                    completion:completionHandler];
+                    completion:^(MTRGroupKeyManagementClusterKeySetReadResponseParams * _Nullable data, NSError * _Nullable error) {
+                        // Cast is safe because subclass does not add any selectors.
+                        completionHandler(static_cast<MTRGroupKeyManagementClusterKeySetReadResponseParams *>(data), error);
+                    }];
 }
 - (void)keySetRemoveWithParams:(MTRGroupKeyManagementClusterKeySetRemoveParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -10146,7 +10298,12 @@ using chip::SessionHandle;
     [self keySetReadAllIndicesWithParams:params
                           expectedValues:expectedDataValueDictionaries
                    expectedValueInterval:expectedValueIntervalMs
-                              completion:completionHandler];
+                              completion:^(MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data,
+                                  NSError * _Nullable error) {
+                                  // Cast is safe because subclass does not add any selectors.
+                                  completionHandler(
+                                      static_cast<MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams *>(data), error);
+                              }];
 }
 @end
 
@@ -12345,7 +12502,11 @@ using chip::SessionHandle;
     [self getWeekDayScheduleWithParams:params
                         expectedValues:expectedDataValueDictionaries
                  expectedValueInterval:expectedValueIntervalMs
-                            completion:completionHandler];
+                            completion:^(
+                                MTRDoorLockClusterGetWeekDayScheduleResponseParams * _Nullable data, NSError * _Nullable error) {
+                                // Cast is safe because subclass does not add any selectors.
+                                completionHandler(static_cast<MTRDoorLockClusterGetWeekDayScheduleResponseParams *>(data), error);
+                            }];
 }
 - (void)clearWeekDayScheduleWithParams:(MTRDoorLockClusterClearWeekDayScheduleParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -12376,7 +12537,11 @@ using chip::SessionHandle;
     [self getYearDayScheduleWithParams:params
                         expectedValues:expectedDataValueDictionaries
                  expectedValueInterval:expectedValueIntervalMs
-                            completion:completionHandler];
+                            completion:^(
+                                MTRDoorLockClusterGetYearDayScheduleResponseParams * _Nullable data, NSError * _Nullable error) {
+                                // Cast is safe because subclass does not add any selectors.
+                                completionHandler(static_cast<MTRDoorLockClusterGetYearDayScheduleResponseParams *>(data), error);
+                            }];
 }
 - (void)clearYearDayScheduleWithParams:(MTRDoorLockClusterClearYearDayScheduleParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -12407,7 +12572,11 @@ using chip::SessionHandle;
     [self getHolidayScheduleWithParams:params
                         expectedValues:expectedDataValueDictionaries
                  expectedValueInterval:expectedValueIntervalMs
-                            completion:completionHandler];
+                            completion:^(
+                                MTRDoorLockClusterGetHolidayScheduleResponseParams * _Nullable data, NSError * _Nullable error) {
+                                // Cast is safe because subclass does not add any selectors.
+                                completionHandler(static_cast<MTRDoorLockClusterGetHolidayScheduleResponseParams *>(data), error);
+                            }];
 }
 - (void)clearHolidayScheduleWithParams:(MTRDoorLockClusterClearHolidayScheduleParams *)params
                         expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -12438,7 +12607,10 @@ using chip::SessionHandle;
     [self getUserWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTRDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTRDoorLockClusterGetUserResponseParams *>(data), error);
+                   }];
 }
 - (void)clearUserWithParams:(MTRDoorLockClusterClearUserParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -12459,7 +12631,10 @@ using chip::SessionHandle;
     [self setCredentialWithParams:params
                    expectedValues:expectedDataValueDictionaries
             expectedValueInterval:expectedValueIntervalMs
-                       completion:completionHandler];
+                       completion:^(MTRDoorLockClusterSetCredentialResponseParams * _Nullable data, NSError * _Nullable error) {
+                           // Cast is safe because subclass does not add any selectors.
+                           completionHandler(static_cast<MTRDoorLockClusterSetCredentialResponseParams *>(data), error);
+                       }];
 }
 - (void)getCredentialStatusWithParams:(MTRDoorLockClusterGetCredentialStatusParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -12470,7 +12645,11 @@ using chip::SessionHandle;
     [self getCredentialStatusWithParams:params
                          expectedValues:expectedDataValueDictionaries
                   expectedValueInterval:expectedValueIntervalMs
-                             completion:completionHandler];
+                             completion:^(
+                                 MTRDoorLockClusterGetCredentialStatusResponseParams * _Nullable data, NSError * _Nullable error) {
+                                 // Cast is safe because subclass does not add any selectors.
+                                 completionHandler(static_cast<MTRDoorLockClusterGetCredentialStatusResponseParams *>(data), error);
+                             }];
 }
 - (void)clearCredentialWithParams:(MTRDoorLockClusterClearCredentialParams *)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -13121,7 +13300,10 @@ using chip::SessionHandle;
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                  completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self upOrOpenWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self upOrOpenWithParams:nil
+               expectedValues:expectedValues
+        expectedValueInterval:expectedValueIntervalMs
+            completionHandler:completionHandler];
 }
 - (void)downOrCloseWithParams:(MTRWindowCoveringClusterDownOrCloseParams * _Nullable)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -13137,7 +13319,10 @@ using chip::SessionHandle;
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self downOrCloseWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self downOrCloseWithParams:nil
+                 expectedValues:expectedValues
+          expectedValueInterval:expectedValueIntervalMs
+              completionHandler:completionHandler];
 }
 - (void)stopMotionWithParams:(MTRWindowCoveringClusterStopMotionParams * _Nullable)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -13153,7 +13338,10 @@ using chip::SessionHandle;
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self stopMotionWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self stopMotionWithParams:nil
+                expectedValues:expectedValues
+         expectedValueInterval:expectedValueIntervalMs
+             completionHandler:completionHandler];
 }
 - (void)goToLiftValueWithParams:(MTRWindowCoveringClusterGoToLiftValueParams *)params
                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -13589,9 +13777,10 @@ using chip::SessionHandle;
                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self barrierControlStopWithExpectedValues:expectedValues
-                         expectedValueInterval:expectedValueIntervalMs
-                                    completion:completionHandler];
+    [self barrierControlStopWithParams:nil
+                        expectedValues:expectedValues
+                 expectedValueInterval:expectedValueIntervalMs
+                     completionHandler:completionHandler];
 }
 @end
 
@@ -15184,7 +15373,11 @@ using chip::SessionHandle;
     [self getWeeklyScheduleWithParams:params
                        expectedValues:expectedDataValueDictionaries
                 expectedValueInterval:expectedValueIntervalMs
-                           completion:completionHandler];
+                           completion:^(
+                               MTRThermostatClusterGetWeeklyScheduleResponseParams * _Nullable data, NSError * _Nullable error) {
+                               // Cast is safe because subclass does not add any selectors.
+                               completionHandler(static_cast<MTRThermostatClusterGetWeeklyScheduleResponseParams *>(data), error);
+                           }];
 }
 - (void)clearWeeklyScheduleWithParams:(MTRThermostatClusterClearWeeklyScheduleParams * _Nullable)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -15200,9 +15393,10 @@ using chip::SessionHandle;
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self clearWeeklyScheduleWithExpectedValues:expectedValues
-                          expectedValueInterval:expectedValueIntervalMs
-                                     completion:completionHandler];
+    [self clearWeeklyScheduleWithParams:nil
+                         expectedValues:expectedValues
+                  expectedValueInterval:expectedValueIntervalMs
+                      completionHandler:completionHandler];
 }
 @end
 
@@ -19145,7 +19339,10 @@ using chip::SessionHandle;
     [self changeChannelWithParams:params
                    expectedValues:expectedDataValueDictionaries
             expectedValueInterval:expectedValueIntervalMs
-                       completion:completionHandler];
+                       completion:^(MTRChannelClusterChangeChannelResponseParams * _Nullable data, NSError * _Nullable error) {
+                           // Cast is safe because subclass does not add any selectors.
+                           completionHandler(static_cast<MTRChannelClusterChangeChannelResponseParams *>(data), error);
+                       }];
 }
 - (void)changeChannelByNumberWithParams:(MTRChannelClusterChangeChannelByNumberParams *)params
                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -19308,7 +19505,11 @@ using chip::SessionHandle;
     [self navigateTargetWithParams:params
                     expectedValues:expectedDataValueDictionaries
              expectedValueInterval:expectedValueIntervalMs
-                        completion:completionHandler];
+                        completion:^(
+                            MTRTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data, NSError * _Nullable error) {
+                            // Cast is safe because subclass does not add any selectors.
+                            completionHandler(static_cast<MTRTargetNavigatorClusterNavigateTargetResponseParams *>(data), error);
+                        }];
 }
 @end
 
@@ -20004,14 +20205,20 @@ using chip::SessionHandle;
     [self playWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTRMediaPlaybackClusterPlaybackResponseParams *>(data), error);
+                   }];
 }
 - (void)playWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
              completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler
 {
-    [self playWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self playWithParams:nil
+               expectedValues:expectedValues
+        expectedValueInterval:expectedValueIntervalMs
+            completionHandler:completionHandler];
 }
 - (void)pauseWithParams:(MTRMediaPlaybackClusterPauseParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -20022,14 +20229,20 @@ using chip::SessionHandle;
     [self pauseWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTRMediaPlaybackClusterPlaybackResponseParams *>(data), error);
+                   }];
 }
 - (void)pauseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
               completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                     NSError * _Nullable error))completionHandler
 {
-    [self pauseWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self pauseWithParams:nil
+               expectedValues:expectedValues
+        expectedValueInterval:expectedValueIntervalMs
+            completionHandler:completionHandler];
 }
 - (void)stopPlaybackWithParams:(MTRMediaPlaybackClusterStopPlaybackParams * _Nullable)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -20040,14 +20253,20 @@ using chip::SessionHandle;
     [self stopPlaybackWithParams:params
                   expectedValues:expectedDataValueDictionaries
            expectedValueInterval:expectedValueIntervalMs
-                      completion:completionHandler];
+                      completion:^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error) {
+                          // Cast is safe because subclass does not add any selectors.
+                          completionHandler(static_cast<MTRMediaPlaybackClusterPlaybackResponseParams *>(data), error);
+                      }];
 }
 - (void)stopPlaybackWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                            NSError * _Nullable error))completionHandler
 {
-    [self stopPlaybackWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self stopPlaybackWithParams:nil
+                  expectedValues:expectedValues
+           expectedValueInterval:expectedValueIntervalMs
+               completionHandler:completionHandler];
 }
 - (void)startOverWithParams:(MTRMediaPlaybackClusterStartOverParams * _Nullable)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -20058,14 +20277,20 @@ using chip::SessionHandle;
     [self startOverWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTRMediaPlaybackClusterPlaybackResponseParams *>(data), error);
+                   }];
 }
 - (void)startOverWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                   completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                         NSError * _Nullable error))completionHandler
 {
-    [self startOverWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self startOverWithParams:nil
+               expectedValues:expectedValues
+        expectedValueInterval:expectedValueIntervalMs
+            completionHandler:completionHandler];
 }
 - (void)previousWithParams:(MTRMediaPlaybackClusterPreviousParams * _Nullable)params
             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -20076,14 +20301,20 @@ using chip::SessionHandle;
     [self previousWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTRMediaPlaybackClusterPlaybackResponseParams *>(data), error);
+                   }];
 }
 - (void)previousWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                  completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler
 {
-    [self previousWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self previousWithParams:nil
+               expectedValues:expectedValues
+        expectedValueInterval:expectedValueIntervalMs
+            completionHandler:completionHandler];
 }
 - (void)nextWithParams:(MTRMediaPlaybackClusterNextParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -20094,14 +20325,20 @@ using chip::SessionHandle;
     [self nextWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTRMediaPlaybackClusterPlaybackResponseParams *>(data), error);
+                   }];
 }
 - (void)nextWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
              completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler
 {
-    [self nextWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self nextWithParams:nil
+               expectedValues:expectedValues
+        expectedValueInterval:expectedValueIntervalMs
+            completionHandler:completionHandler];
 }
 - (void)rewindWithParams:(MTRMediaPlaybackClusterRewindParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -20112,14 +20349,20 @@ using chip::SessionHandle;
     [self rewindWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTRMediaPlaybackClusterPlaybackResponseParams *>(data), error);
+                   }];
 }
 - (void)rewindWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler
 {
-    [self rewindWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self rewindWithParams:nil
+               expectedValues:expectedValues
+        expectedValueInterval:expectedValueIntervalMs
+            completionHandler:completionHandler];
 }
 - (void)fastForwardWithParams:(MTRMediaPlaybackClusterFastForwardParams * _Nullable)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -20130,14 +20373,20 @@ using chip::SessionHandle;
     [self fastForwardWithParams:params
                  expectedValues:expectedDataValueDictionaries
           expectedValueInterval:expectedValueIntervalMs
-                     completion:completionHandler];
+                     completion:^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error) {
+                         // Cast is safe because subclass does not add any selectors.
+                         completionHandler(static_cast<MTRMediaPlaybackClusterPlaybackResponseParams *>(data), error);
+                     }];
 }
 - (void)fastForwardWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                           NSError * _Nullable error))completionHandler
 {
-    [self fastForwardWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self fastForwardWithParams:nil
+                 expectedValues:expectedValues
+          expectedValueInterval:expectedValueIntervalMs
+              completionHandler:completionHandler];
 }
 - (void)skipForwardWithParams:(MTRMediaPlaybackClusterSkipForwardParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -20148,7 +20397,10 @@ using chip::SessionHandle;
     [self skipForwardWithParams:params
                  expectedValues:expectedDataValueDictionaries
           expectedValueInterval:expectedValueIntervalMs
-                     completion:completionHandler];
+                     completion:^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error) {
+                         // Cast is safe because subclass does not add any selectors.
+                         completionHandler(static_cast<MTRMediaPlaybackClusterPlaybackResponseParams *>(data), error);
+                     }];
 }
 - (void)skipBackwardWithParams:(MTRMediaPlaybackClusterSkipBackwardParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -20159,7 +20411,10 @@ using chip::SessionHandle;
     [self skipBackwardWithParams:params
                   expectedValues:expectedDataValueDictionaries
            expectedValueInterval:expectedValueIntervalMs
-                      completion:completionHandler];
+                      completion:^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error) {
+                          // Cast is safe because subclass does not add any selectors.
+                          completionHandler(static_cast<MTRMediaPlaybackClusterPlaybackResponseParams *>(data), error);
+                      }];
 }
 - (void)seekWithParams:(MTRMediaPlaybackClusterSeekParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -20170,7 +20425,10 @@ using chip::SessionHandle;
     [self seekWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTRMediaPlaybackClusterPlaybackResponseParams *>(data), error);
+                   }];
 }
 @end
 
@@ -20491,9 +20749,10 @@ using chip::SessionHandle;
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self showInputStatusWithExpectedValues:expectedValues
-                      expectedValueInterval:expectedValueIntervalMs
-                                 completion:completionHandler];
+    [self showInputStatusWithParams:nil
+                     expectedValues:expectedValues
+              expectedValueInterval:expectedValueIntervalMs
+                  completionHandler:completionHandler];
 }
 - (void)hideInputStatusWithParams:(MTRMediaInputClusterHideInputStatusParams * _Nullable)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -20509,9 +20768,10 @@ using chip::SessionHandle;
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self hideInputStatusWithExpectedValues:expectedValues
-                      expectedValueInterval:expectedValueIntervalMs
-                                 completion:completionHandler];
+    [self hideInputStatusWithParams:nil
+                     expectedValues:expectedValues
+              expectedValueInterval:expectedValueIntervalMs
+                  completionHandler:completionHandler];
 }
 - (void)renameInputWithParams:(MTRMediaInputClusterRenameInputParams *)params
                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -20657,7 +20917,10 @@ using chip::SessionHandle;
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
               completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self sleepWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self sleepWithParams:nil
+               expectedValues:expectedValues
+        expectedValueInterval:expectedValueIntervalMs
+            completionHandler:completionHandler];
 }
 @end
 
@@ -20780,7 +21043,10 @@ using chip::SessionHandle;
     [self sendKeyWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTRKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTRKeypadInputClusterSendKeyResponseParams *>(data), error);
+                   }];
 }
 @end
 
@@ -21141,7 +21407,10 @@ using chip::SessionHandle;
     [self launchContentWithParams:params
                    expectedValues:expectedDataValueDictionaries
             expectedValueInterval:expectedValueIntervalMs
-                       completion:completionHandler];
+                       completion:^(MTRContentLauncherClusterLaunchResponseParams * _Nullable data, NSError * _Nullable error) {
+                           // Cast is safe because subclass does not add any selectors.
+                           completionHandler(static_cast<MTRContentLauncherClusterLaunchResponseParams *>(data), error);
+                       }];
 }
 - (void)launchURLWithParams:(MTRContentLauncherClusterLaunchURLParams *)params
              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -21152,7 +21421,10 @@ using chip::SessionHandle;
     [self launchURLWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTRContentLauncherClusterLaunchResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTRContentLauncherClusterLaunchResponseParams *>(data), error);
+                   }];
 }
 @end
 
@@ -21610,7 +21882,10 @@ using chip::SessionHandle;
     [self launchAppWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTRApplicationLauncherClusterLauncherResponseParams *>(data), error);
+                   }];
 }
 - (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -21621,7 +21896,10 @@ using chip::SessionHandle;
     [self stopAppWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTRApplicationLauncherClusterLauncherResponseParams *>(data), error);
+                   }];
 }
 - (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -21632,7 +21910,10 @@ using chip::SessionHandle;
     [self hideAppWithParams:params
                expectedValues:expectedDataValueDictionaries
         expectedValueInterval:expectedValueIntervalMs
-                   completion:completionHandler];
+                   completion:^(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error) {
+                       // Cast is safe because subclass does not add any selectors.
+                       completionHandler(static_cast<MTRApplicationLauncherClusterLauncherResponseParams *>(data), error);
+                   }];
 }
 @end
 
@@ -21998,7 +22279,10 @@ using chip::SessionHandle;
     [self getSetupPINWithParams:params
                  expectedValues:expectedDataValueDictionaries
           expectedValueInterval:expectedValueIntervalMs
-                     completion:completionHandler];
+                     completion:^(MTRAccountLoginClusterGetSetupPINResponseParams * _Nullable data, NSError * _Nullable error) {
+                         // Cast is safe because subclass does not add any selectors.
+                         completionHandler(static_cast<MTRAccountLoginClusterGetSetupPINResponseParams *>(data), error);
+                     }];
 }
 - (void)loginWithParams:(MTRAccountLoginClusterLoginParams *)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -22024,7 +22308,10 @@ using chip::SessionHandle;
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self logoutWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self logoutWithParams:nil
+               expectedValues:expectedValues
+        expectedValueInterval:expectedValueIntervalMs
+            completionHandler:completionHandler];
 }
 @end
 
@@ -23402,9 +23689,10 @@ using chip::SessionHandle;
                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                               completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self getProfileInfoCommandWithExpectedValues:expectedValues
-                            expectedValueInterval:expectedValueIntervalMs
-                                       completion:completionHandler];
+    [self getProfileInfoCommandWithParams:nil
+                           expectedValues:expectedValues
+                    expectedValueInterval:expectedValueIntervalMs
+                        completionHandler:completionHandler];
 }
 - (void)getMeasurementProfileCommandWithParams:(MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams *)params
                                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
@@ -27517,14 +27805,17 @@ using chip::SessionHandle;
 
 @end
 
-@implementation MTRClusterUnitTesting (Deprecated)
+@implementation MTRClusterTestCluster
+@end
+
+@implementation MTRClusterTestCluster (Deprecated)
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpoint:(uint16_t)endpoint queue:(dispatch_queue_t)queue
 {
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
-- (void)testWithParams:(MTRUnitTestingClusterTestParams * _Nullable)params
+- (void)testWithParams:(MTRTestClusterClusterTestParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
         completionHandler:(MTRStatusCompletion)completionHandler
@@ -27538,9 +27829,12 @@ using chip::SessionHandle;
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
              completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self testWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self testWithParams:nil
+               expectedValues:expectedValues
+        expectedValueInterval:expectedValueIntervalMs
+            completionHandler:completionHandler];
 }
-- (void)testNotHandledWithParams:(MTRUnitTestingClusterTestNotHandledParams * _Nullable)params
+- (void)testNotHandledWithParams:(MTRTestClusterClusterTestNotHandledParams * _Nullable)params
                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                completionHandler:(MTRStatusCompletion)completionHandler
@@ -27554,29 +27848,36 @@ using chip::SessionHandle;
                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self testNotHandledWithExpectedValues:expectedValues
-                     expectedValueInterval:expectedValueIntervalMs
-                                completion:completionHandler];
+    [self testNotHandledWithParams:nil
+                    expectedValues:expectedValues
+             expectedValueInterval:expectedValueIntervalMs
+                 completionHandler:completionHandler];
 }
-- (void)testSpecificWithParams:(MTRUnitTestingClusterTestSpecificParams * _Nullable)params
+- (void)testSpecificWithParams:(MTRTestClusterClusterTestSpecificParams * _Nullable)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-             completionHandler:(void (^)(MTRUnitTestingClusterTestSpecificResponseParams * _Nullable data,
+             completionHandler:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler
 {
     [self testSpecificWithParams:params
                   expectedValues:expectedDataValueDictionaries
            expectedValueInterval:expectedValueIntervalMs
-                      completion:completionHandler];
+                      completion:^(MTRUnitTestingClusterTestSpecificResponseParams * _Nullable data, NSError * _Nullable error) {
+                          // Cast is safe because subclass does not add any selectors.
+                          completionHandler(static_cast<MTRTestClusterClusterTestSpecificResponseParams *>(data), error);
+                      }];
 }
 - (void)testSpecificWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                     completionHandler:(void (^)(MTRUnitTestingClusterTestSpecificResponseParams * _Nullable data,
+                     completionHandler:(void (^)(MTRTestClusterClusterTestSpecificResponseParams * _Nullable data,
                                            NSError * _Nullable error))completionHandler
 {
-    [self testSpecificWithExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completionHandler];
+    [self testSpecificWithParams:nil
+                  expectedValues:expectedValues
+           expectedValueInterval:expectedValueIntervalMs
+               completionHandler:completionHandler];
 }
-- (void)testUnknownCommandWithParams:(MTRUnitTestingClusterTestUnknownCommandParams * _Nullable)params
+- (void)testUnknownCommandWithParams:(MTRTestClusterClusterTestUnknownCommandParams * _Nullable)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(MTRStatusCompletion)completionHandler
@@ -27590,171 +27891,240 @@ using chip::SessionHandle;
                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self testUnknownCommandWithExpectedValues:expectedValues
-                         expectedValueInterval:expectedValueIntervalMs
-                                    completion:completionHandler];
+    [self testUnknownCommandWithParams:nil
+                        expectedValues:expectedValues
+                 expectedValueInterval:expectedValueIntervalMs
+                     completionHandler:completionHandler];
 }
-- (void)testAddArgumentsWithParams:(MTRUnitTestingClusterTestAddArgumentsParams *)params
+- (void)testAddArgumentsWithParams:(MTRTestClusterClusterTestAddArgumentsParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                 completionHandler:(void (^)(MTRUnitTestingClusterTestAddArgumentsResponseParams * _Nullable data,
+                 completionHandler:(void (^)(MTRTestClusterClusterTestAddArgumentsResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler
 {
     [self testAddArgumentsWithParams:params
                       expectedValues:expectedDataValueDictionaries
                expectedValueInterval:expectedValueIntervalMs
-                          completion:completionHandler];
+                          completion:^(
+                              MTRUnitTestingClusterTestAddArgumentsResponseParams * _Nullable data, NSError * _Nullable error) {
+                              // Cast is safe because subclass does not add any selectors.
+                              completionHandler(static_cast<MTRTestClusterClusterTestAddArgumentsResponseParams *>(data), error);
+                          }];
 }
-- (void)testSimpleArgumentRequestWithParams:(MTRUnitTestingClusterTestSimpleArgumentRequestParams *)params
+- (void)testSimpleArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleArgumentRequestParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                          completionHandler:(void (^)(MTRUnitTestingClusterTestSimpleArgumentResponseParams * _Nullable data,
+                          completionHandler:(void (^)(MTRTestClusterClusterTestSimpleArgumentResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completionHandler
 {
     [self testSimpleArgumentRequestWithParams:params
                                expectedValues:expectedDataValueDictionaries
                         expectedValueInterval:expectedValueIntervalMs
-                                   completion:completionHandler];
+                                   completion:^(MTRUnitTestingClusterTestSimpleArgumentResponseParams * _Nullable data,
+                                       NSError * _Nullable error) {
+                                       // Cast is safe because subclass does not add any selectors.
+                                       completionHandler(
+                                           static_cast<MTRTestClusterClusterTestSimpleArgumentResponseParams *>(data), error);
+                                   }];
 }
-- (void)testStructArrayArgumentRequestWithParams:(MTRUnitTestingClusterTestStructArrayArgumentRequestParams *)params
+- (void)testStructArrayArgumentRequestWithParams:(MTRTestClusterClusterTestStructArrayArgumentRequestParams *)params
                                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                completionHandler:
-                                   (void (^)(MTRUnitTestingClusterTestStructArrayArgumentResponseParams * _Nullable data,
+                                   (void (^)(MTRTestClusterClusterTestStructArrayArgumentResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler
 {
     [self testStructArrayArgumentRequestWithParams:params
                                     expectedValues:expectedDataValueDictionaries
                              expectedValueInterval:expectedValueIntervalMs
-                                        completion:completionHandler];
+                                        completion:^(MTRUnitTestingClusterTestStructArrayArgumentResponseParams * _Nullable data,
+                                            NSError * _Nullable error) {
+                                            // Cast is safe because subclass does not add any selectors.
+                                            completionHandler(
+                                                static_cast<MTRTestClusterClusterTestStructArrayArgumentResponseParams *>(data),
+                                                error);
+                                        }];
 }
-- (void)testStructArgumentRequestWithParams:(MTRUnitTestingClusterTestStructArgumentRequestParams *)params
+- (void)testStructArgumentRequestWithParams:(MTRTestClusterClusterTestStructArgumentRequestParams *)params
                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                          completionHandler:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+                          completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completionHandler
 {
     [self testStructArgumentRequestWithParams:params
                                expectedValues:expectedDataValueDictionaries
                         expectedValueInterval:expectedValueIntervalMs
-                                   completion:completionHandler];
+                                   completion:^(
+                                       MTRUnitTestingClusterBooleanResponseParams * _Nullable data, NSError * _Nullable error) {
+                                       // Cast is safe because subclass does not add any selectors.
+                                       completionHandler(static_cast<MTRTestClusterClusterBooleanResponseParams *>(data), error);
+                                   }];
 }
-- (void)testNestedStructArgumentRequestWithParams:(MTRUnitTestingClusterTestNestedStructArgumentRequestParams *)params
+- (void)testNestedStructArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructArgumentRequestParams *)params
                                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                                completionHandler:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+                                completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                       NSError * _Nullable error))completionHandler
 {
     [self testNestedStructArgumentRequestWithParams:params
                                      expectedValues:expectedDataValueDictionaries
                               expectedValueInterval:expectedValueIntervalMs
-                                         completion:completionHandler];
+                                         completion:^(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+                                             NSError * _Nullable error) {
+                                             // Cast is safe because subclass does not add any selectors.
+                                             completionHandler(
+                                                 static_cast<MTRTestClusterClusterBooleanResponseParams *>(data), error);
+                                         }];
 }
-- (void)testListStructArgumentRequestWithParams:(MTRUnitTestingClusterTestListStructArgumentRequestParams *)params
+- (void)testListStructArgumentRequestWithParams:(MTRTestClusterClusterTestListStructArgumentRequestParams *)params
                                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                           expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                              completionHandler:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+                              completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                     NSError * _Nullable error))completionHandler
 {
-    [self testListStructArgumentRequestWithParams:params
-                                   expectedValues:expectedDataValueDictionaries
-                            expectedValueInterval:expectedValueIntervalMs
-                                       completion:completionHandler];
+    [self
+        testListStructArgumentRequestWithParams:params
+                                 expectedValues:expectedDataValueDictionaries
+                          expectedValueInterval:expectedValueIntervalMs
+                                     completion:^(
+                                         MTRUnitTestingClusterBooleanResponseParams * _Nullable data, NSError * _Nullable error) {
+                                         // Cast is safe because subclass does not add any selectors.
+                                         completionHandler(static_cast<MTRTestClusterClusterBooleanResponseParams *>(data), error);
+                                     }];
 }
-- (void)testListInt8UArgumentRequestWithParams:(MTRUnitTestingClusterTestListInt8UArgumentRequestParams *)params
+- (void)testListInt8UArgumentRequestWithParams:(MTRTestClusterClusterTestListInt8UArgumentRequestParams *)params
                                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                             completionHandler:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+                             completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                    NSError * _Nullable error))completionHandler
 {
     [self testListInt8UArgumentRequestWithParams:params
                                   expectedValues:expectedDataValueDictionaries
                            expectedValueInterval:expectedValueIntervalMs
-                                      completion:completionHandler];
+                                      completion:^(
+                                          MTRUnitTestingClusterBooleanResponseParams * _Nullable data, NSError * _Nullable error) {
+                                          // Cast is safe because subclass does not add any selectors.
+                                          completionHandler(static_cast<MTRTestClusterClusterBooleanResponseParams *>(data), error);
+                                      }];
 }
-- (void)testNestedStructListArgumentRequestWithParams:(MTRUnitTestingClusterTestNestedStructListArgumentRequestParams *)params
+- (void)testNestedStructListArgumentRequestWithParams:(MTRTestClusterClusterTestNestedStructListArgumentRequestParams *)params
                                        expectedValues:
                                            (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                                    completionHandler:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+                                    completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                           NSError * _Nullable error))completionHandler
 {
     [self testNestedStructListArgumentRequestWithParams:params
                                          expectedValues:expectedDataValueDictionaries
                                   expectedValueInterval:expectedValueIntervalMs
-                                             completion:completionHandler];
+                                             completion:^(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+                                                 NSError * _Nullable error) {
+                                                 // Cast is safe because subclass does not add any selectors.
+                                                 completionHandler(
+                                                     static_cast<MTRTestClusterClusterBooleanResponseParams *>(data), error);
+                                             }];
 }
 - (void)testListNestedStructListArgumentRequestWithParams:
-            (MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams *)params
+            (MTRTestClusterClusterTestListNestedStructListArgumentRequestParams *)params
                                            expectedValues:
                                                (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                                        completionHandler:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+                                        completionHandler:(void (^)(MTRTestClusterClusterBooleanResponseParams * _Nullable data,
                                                               NSError * _Nullable error))completionHandler
 {
     [self testListNestedStructListArgumentRequestWithParams:params
                                              expectedValues:expectedDataValueDictionaries
                                       expectedValueInterval:expectedValueIntervalMs
-                                                 completion:completionHandler];
+                                                 completion:^(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
+                                                     NSError * _Nullable error) {
+                                                     // Cast is safe because subclass does not add any selectors.
+                                                     completionHandler(
+                                                         static_cast<MTRTestClusterClusterBooleanResponseParams *>(data), error);
+                                                 }];
 }
-- (void)testListInt8UReverseRequestWithParams:(MTRUnitTestingClusterTestListInt8UReverseRequestParams *)params
+- (void)testListInt8UReverseRequestWithParams:(MTRTestClusterClusterTestListInt8UReverseRequestParams *)params
                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                            completionHandler:(void (^)(MTRUnitTestingClusterTestListInt8UReverseResponseParams * _Nullable data,
+                            completionHandler:(void (^)(MTRTestClusterClusterTestListInt8UReverseResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completionHandler
 {
     [self testListInt8UReverseRequestWithParams:params
                                  expectedValues:expectedDataValueDictionaries
                           expectedValueInterval:expectedValueIntervalMs
-                                     completion:completionHandler];
+                                     completion:^(MTRUnitTestingClusterTestListInt8UReverseResponseParams * _Nullable data,
+                                         NSError * _Nullable error) {
+                                         // Cast is safe because subclass does not add any selectors.
+                                         completionHandler(
+                                             static_cast<MTRTestClusterClusterTestListInt8UReverseResponseParams *>(data), error);
+                                     }];
 }
-- (void)testEnumsRequestWithParams:(MTRUnitTestingClusterTestEnumsRequestParams *)params
+- (void)testEnumsRequestWithParams:(MTRTestClusterClusterTestEnumsRequestParams *)params
                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
              expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                 completionHandler:(void (^)(MTRUnitTestingClusterTestEnumsResponseParams * _Nullable data,
+                 completionHandler:(void (^)(MTRTestClusterClusterTestEnumsResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler
 {
     [self testEnumsRequestWithParams:params
                       expectedValues:expectedDataValueDictionaries
                expectedValueInterval:expectedValueIntervalMs
-                          completion:completionHandler];
+                          completion:^(MTRUnitTestingClusterTestEnumsResponseParams * _Nullable data, NSError * _Nullable error) {
+                              // Cast is safe because subclass does not add any selectors.
+                              completionHandler(static_cast<MTRTestClusterClusterTestEnumsResponseParams *>(data), error);
+                          }];
 }
-- (void)testNullableOptionalRequestWithParams:(MTRUnitTestingClusterTestNullableOptionalRequestParams * _Nullable)params
+- (void)testNullableOptionalRequestWithParams:(MTRTestClusterClusterTestNullableOptionalRequestParams * _Nullable)params
                                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                            completionHandler:(void (^)(MTRUnitTestingClusterTestNullableOptionalResponseParams * _Nullable data,
+                            completionHandler:(void (^)(MTRTestClusterClusterTestNullableOptionalResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completionHandler
 {
     [self testNullableOptionalRequestWithParams:params
                                  expectedValues:expectedDataValueDictionaries
                           expectedValueInterval:expectedValueIntervalMs
-                                     completion:completionHandler];
+                                     completion:^(MTRUnitTestingClusterTestNullableOptionalResponseParams * _Nullable data,
+                                         NSError * _Nullable error) {
+                                         // Cast is safe because subclass does not add any selectors.
+                                         completionHandler(
+                                             static_cast<MTRTestClusterClusterTestNullableOptionalResponseParams *>(data), error);
+                                     }];
 }
-- (void)testComplexNullableOptionalRequestWithParams:(MTRUnitTestingClusterTestComplexNullableOptionalRequestParams *)params
+- (void)testComplexNullableOptionalRequestWithParams:(MTRTestClusterClusterTestComplexNullableOptionalRequestParams *)params
                                       expectedValues:
                                           (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                    completionHandler:
-                                       (void (^)(MTRUnitTestingClusterTestComplexNullableOptionalResponseParams * _Nullable data,
+                                       (void (^)(MTRTestClusterClusterTestComplexNullableOptionalResponseParams * _Nullable data,
                                            NSError * _Nullable error))completionHandler
 {
     [self testComplexNullableOptionalRequestWithParams:params
                                         expectedValues:expectedDataValueDictionaries
                                  expectedValueInterval:expectedValueIntervalMs
-                                            completion:completionHandler];
+                                            completion:^(
+                                                MTRUnitTestingClusterTestComplexNullableOptionalResponseParams * _Nullable data,
+                                                NSError * _Nullable error) {
+                                                // Cast is safe because subclass does not add any selectors.
+                                                completionHandler(
+                                                    static_cast<MTRTestClusterClusterTestComplexNullableOptionalResponseParams *>(
+                                                        data),
+                                                    error);
+                                            }];
 }
-- (void)simpleStructEchoRequestWithParams:(MTRUnitTestingClusterSimpleStructEchoRequestParams *)params
+- (void)simpleStructEchoRequestWithParams:(MTRTestClusterClusterSimpleStructEchoRequestParams *)params
                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                        completionHandler:(void (^)(MTRUnitTestingClusterSimpleStructResponseParams * _Nullable data,
+                        completionHandler:(void (^)(MTRTestClusterClusterSimpleStructResponseParams * _Nullable data,
                                               NSError * _Nullable error))completionHandler
 {
     [self simpleStructEchoRequestWithParams:params
                              expectedValues:expectedDataValueDictionaries
                       expectedValueInterval:expectedValueIntervalMs
-                                 completion:completionHandler];
+                                 completion:^(
+                                     MTRUnitTestingClusterSimpleStructResponseParams * _Nullable data, NSError * _Nullable error) {
+                                     // Cast is safe because subclass does not add any selectors.
+                                     completionHandler(static_cast<MTRTestClusterClusterSimpleStructResponseParams *>(data), error);
+                                 }];
 }
-- (void)timedInvokeRequestWithParams:(MTRUnitTestingClusterTimedInvokeRequestParams * _Nullable)params
+- (void)timedInvokeRequestWithParams:(MTRTestClusterClusterTimedInvokeRequestParams * _Nullable)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                    completionHandler:(MTRStatusCompletion)completionHandler
@@ -27768,11 +28138,12 @@ using chip::SessionHandle;
                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self timedInvokeRequestWithExpectedValues:expectedValues
-                         expectedValueInterval:expectedValueIntervalMs
-                                    completion:completionHandler];
+    [self timedInvokeRequestWithParams:nil
+                        expectedValues:expectedValues
+                 expectedValueInterval:expectedValueIntervalMs
+                     completionHandler:completionHandler];
 }
-- (void)testSimpleOptionalArgumentRequestWithParams:(MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
+- (void)testSimpleOptionalArgumentRequestWithParams:(MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
                                      expectedValues:
                                          (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
@@ -27783,30 +28154,44 @@ using chip::SessionHandle;
                                 expectedValueInterval:expectedValueIntervalMs
                                            completion:completionHandler];
 }
-- (void)testEmitTestEventRequestWithParams:(MTRUnitTestingClusterTestEmitTestEventRequestParams *)params
+- (void)testEmitTestEventRequestWithParams:(MTRTestClusterClusterTestEmitTestEventRequestParams *)params
                             expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                      expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                         completionHandler:(void (^)(MTRUnitTestingClusterTestEmitTestEventResponseParams * _Nullable data,
+                         completionHandler:(void (^)(MTRTestClusterClusterTestEmitTestEventResponseParams * _Nullable data,
                                                NSError * _Nullable error))completionHandler
 {
     [self testEmitTestEventRequestWithParams:params
                               expectedValues:expectedDataValueDictionaries
                        expectedValueInterval:expectedValueIntervalMs
-                                  completion:completionHandler];
+                                  completion:^(MTRUnitTestingClusterTestEmitTestEventResponseParams * _Nullable data,
+                                      NSError * _Nullable error) {
+                                      // Cast is safe because subclass does not add any selectors.
+                                      completionHandler(
+                                          static_cast<MTRTestClusterClusterTestEmitTestEventResponseParams *>(data), error);
+                                  }];
 }
-- (void)testEmitTestFabricScopedEventRequestWithParams:(MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams *)params
+- (void)testEmitTestFabricScopedEventRequestWithParams:(MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams *)params
                                         expectedValues:
                                             (NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                                  expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                                      completionHandler:
                                          (void (^)(
-                                             MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
+                                             MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
                                              NSError * _Nullable error))completionHandler
 {
-    [self testEmitTestFabricScopedEventRequestWithParams:params
-                                          expectedValues:expectedDataValueDictionaries
-                                   expectedValueInterval:expectedValueIntervalMs
-                                              completion:completionHandler];
+    [self
+        testEmitTestFabricScopedEventRequestWithParams:params
+                                        expectedValues:expectedDataValueDictionaries
+                                 expectedValueInterval:expectedValueIntervalMs
+                                            completion:^(
+                                                MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
+                                                NSError * _Nullable error) {
+                                                // Cast is safe because subclass does not add any selectors.
+                                                completionHandler(
+                                                    static_cast<MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams *>(
+                                                        data),
+                                                    error);
+                                            }];
 }
 @end
 

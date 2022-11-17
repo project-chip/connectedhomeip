@@ -216,7 +216,7 @@ CHIP_ERROR BL602Config::WriteConfigValue(Key key, uint64_t val)
     EfErrCode ret = ef_set_env_blob(key.name, &val, sizeof(val));
     if (ret != EF_NO_ERR)
     {
-        log_error("WriteConfigValue() failed. key: %s, ret: %d\r\n", key.name, ret);
+        log_error("WriteConfigValue() failed. key: %s, ret: %d\r\n", StringOrNullMarker(key.name), ret);
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
     SuccessOrExit(err);
@@ -339,7 +339,7 @@ CHIP_ERROR BL602Config::ClearConfigValue(Key key)
 
     SuccessOrExit(err);
 
-    ChipLogProgress(DeviceLayer, "Easyflash erase: %s", key.name);
+    ChipLogProgress(DeviceLayer, "Easyflash erase: %s", StringOrNullMarker(key.name));
 
 exit:
     return err;

@@ -7,7 +7,10 @@
 
 typedef NS_ENUM(uint32_t, MTRClusterIDType) {
 {{#zcl_clusters}}
-MTRCluster{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
+MTRCluster{{asUpperCamelCase label}}ID {{#if (isStrEqual (asUpperCamelCase label) "UnitTesting")}}MTR_NEWLY_AVAILABLE{{/if}}= {{asMEI manufacturerCode code}},
+{{#if (isStrEqual (asUpperCamelCase label) "UnitTesting")}}
+MTRClusterTestClusterID MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingID") = {{asMEI manufacturerCode code}},
+{{/if}}
 {{/zcl_clusters}}
 };
 
@@ -22,26 +25,44 @@ MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode
 {{/zcl_attributes_server}}
 
 {{#zcl_clusters}}
+{{#*inline "attributeIDs"}}
 {{#zcl_attributes_server}}
 {{#first}}
-// Cluster {{asUpperCamelCase parent.label}} attributes
+// Cluster {{asUpperCamelCase ../clusterName}} attributes
 {{/first}}
 {{#if clusterRef}}
 {{! TODO: We need a better setup for the API_AVALABLE annotations here; this does not scale at all sanely. }}
-MTRCluster{{asUpperCamelCase parent.label}}Attribute{{asUpperCamelCase label}}ID {{#if (isStrEqual (asUpperCamelCase parent.label) "Descriptor")}} {{#if (isStrEqual (asUpperCamelCase label) "DeviceTypeList")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}} = {{asMEI manufacturerCode code}},
+MTRCluster{{asUpperCamelCase ../clusterName}}Attribute{{asUpperCamelCase label}}ID
+{{#if (isStrEqual (asUpperCamelCase ../clusterName) "Descriptor")}}
+{{#if (isStrEqual (asUpperCamelCase label) "DeviceTypeList")}}
+API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
+{{/if}}
+{{else if (isStrEqual (asUpperCamelCase ../clusterName) "TestCluster")}}
+MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingAttribute{{asUpperCamelCase label}}ID")
+{{else if (isStrEqual (asUpperCamelCase ../clusterName) "UnitTesting")}}
+MTR_NEWLY_AVAILABLE
+{{/if}}
+= {{asMEI manufacturerCode code}},
 {{!Backwards compat for now: DeviceList as an alias for DeviceTypeList}}
-{{#if (isStrEqual (asUpperCamelCase parent.label) "Descriptor")}}
+{{#if (isStrEqual (asUpperCamelCase ../clusterName) "Descriptor")}}
 {{#if (isStrEqual (asUpperCamelCase label) "DeviceTypeList")}}
 MTRClusterDescriptorAttributeDeviceListID = {{asMEI manufacturerCode code}},
 {{/if}}
 {{/if}}
 {{else}}
-MTRCluster{{asUpperCamelCase parent.label}}Attribute{{asUpperCamelCase label}}ID = MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID,
+MTRCluster{{asUpperCamelCase ../clusterName}}Attribute{{asUpperCamelCase label}}ID = MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID,
 {{/if}}
 {{#last}}
 
 {{/last}}
 {{/zcl_attributes_server}}
+{{/inline}}
+
+{{> attributeIDs clusterName=label}}
+{{#if (isStrEqual (asUpperCamelCase label) "UnitTesting")}}
+
+{{> attributeIDs clusterName="TestCluster"}}
+{{/if}}
 {{/zcl_clusters}}
 };
 
@@ -49,15 +70,29 @@ MTRCluster{{asUpperCamelCase parent.label}}Attribute{{asUpperCamelCase label}}ID
 
 typedef NS_ENUM(uint32_t, MTRClusterCommandIDType) {
 {{#zcl_clusters}}
+{{#*inline "commandIDs"}}
 {{#zcl_commands}}
 {{#first}}
-// Cluster {{asUpperCamelCase parent.label}} commands
+// Cluster {{asUpperCamelCase ../clusterName}} commands
 {{/first}}
-MTRCluster{{asUpperCamelCase parent.label}}Command{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
+MTRCluster{{asUpperCamelCase ../clusterName}}Command{{asUpperCamelCase label}}ID
+{{#if (isStrEqual (asUpperCamelCase ../clusterName) "TestCluster")}}
+MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingCommand{{asUpperCamelCase label}}ID")
+{{else if (isStrEqual (asUpperCamelCase ../clusterName) "UnitTesting")}}
+MTR_NEWLY_AVAILABLE
+{{/if}}
+= {{asMEI manufacturerCode code}},
 {{#last}}
 
 {{/last}}
 {{/zcl_commands}}
+{{/inline}}
+
+{{> commandIDs clusterName=label}}
+{{#if (isStrEqual (asUpperCamelCase label) "UnitTesting")}}
+
+{{> commandIDs clusterName="TestCluster"}}
+{{/if}}
 {{/zcl_clusters}}
 };
 
@@ -65,14 +100,28 @@ MTRCluster{{asUpperCamelCase parent.label}}Command{{asUpperCamelCase label}}ID =
 
 typedef NS_ENUM(uint32_t, MTRClusterEventIDType) {
 {{#zcl_clusters}}
+{{#*inline "eventIDs"}}
 {{#zcl_events}}
 {{#first}}
-// Cluster {{asUpperCamelCase parent.label}} events
+// Cluster {{asUpperCamelCase ../clusterName}} events
 {{/first}}
-MTRCluster{{asUpperCamelCase parent.label}}Event{{asUpperCamelCase name}}ID = {{asMEI manufacturerCode code}},
+MTRCluster{{asUpperCamelCase ../clusterName}}Event{{asUpperCamelCase name}}ID
+{{#if (isStrEqual (asUpperCamelCase ../clusterName) "TestCluster")}}
+MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTestingEvent{{asUpperCamelCase name}}ID")
+{{else if (isStrEqual (asUpperCamelCase ../clusterName) "UnitTesting")}}
+MTR_NEWLY_AVAILABLE
+{{/if}}
+= {{asMEI manufacturerCode code}},
 {{#last}}
 
 {{/last}}
 {{/zcl_events}}
+{{/inline}}
+
+{{> eventIDs clusterName=label}}
+{{#if (isStrEqual (asUpperCamelCase label) "UnitTesting")}}
+
+{{> eventIDs clusterName="TestCluster"}}
+{{/if}}
 {{/zcl_clusters}}
 };

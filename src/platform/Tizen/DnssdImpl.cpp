@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -136,7 +136,8 @@ gboolean OnBrowseTimeout(void * userData)
 
 void OnBrowseAdd(BrowseContext * context, const char * type, const char * name, uint32_t interfaceId)
 {
-    ChipLogDetail(DeviceLayer, "DNSsd %s: name: %s, type: %s, interfaceId: %u", __func__, name, type, interfaceId);
+    ChipLogDetail(DeviceLayer, "DNSsd %s: name: %s, type: %s, interfaceId: %u", __func__, StringOrNullMarker(name),
+                  StringOrNullMarker(type), interfaceId);
 
     char * tokens  = strdup(type);
     char * regtype = strtok(tokens, ".");
@@ -154,7 +155,8 @@ void OnBrowseAdd(BrowseContext * context, const char * type, const char * name, 
 
 void OnBrowseRemove(BrowseContext * context, const char * type, const char * name, uint32_t interfaceId)
 {
-    ChipLogDetail(DeviceLayer, "DNSsd %s: name: %s, type: %s, interfaceId: %u", __func__, name, type, interfaceId);
+    ChipLogDetail(DeviceLayer, "DNSsd %s: name: %s, type: %s, interfaceId: %u", __func__, StringOrNullMarker(name),
+                  StringOrNullMarker(type), interfaceId);
     context->mServices.erase(std::remove_if(
         context->mServices.begin(), context->mServices.end(), [name, type, interfaceId](const DnssdService & service) {
             return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol) &&
@@ -343,7 +345,8 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     }
 #endif
 
-    ChipLogDetail(DeviceLayer, "DNSsd %s: IPv4: %s, IPv6: %s, ret: %d", __func__, ipv4, ipv6, ret);
+    ChipLogDetail(DeviceLayer, "DNSsd %s: IPv4: %s, IPv6: %s, ret: %d", __func__, StringOrNullMarker(ipv4),
+                  StringOrNullMarker(ipv6), ret);
 
     g_free(ipv4);
     g_free(ipv6);
