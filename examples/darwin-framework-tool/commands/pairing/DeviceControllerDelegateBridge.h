@@ -26,8 +26,7 @@
 @property MTRDeviceController * commissioner;
 @property MTRCommissioningParameters * params;
 
-- (void)onPairingComplete:(NSError *)error;
-- (void)onPairingDeleted:(NSError *)error;
+- (void)onCommissioningSessionEstablishmentDone:(NSError *)error;
 - (void)onCommissioningComplete:(NSError *)error;
 
 @end

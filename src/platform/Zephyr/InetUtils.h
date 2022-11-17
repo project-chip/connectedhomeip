@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,26 +15,18 @@
  *    limitations under the License.
  */
 
-/ {
-	chosen {
-		nordic,pm-ext-flash = &mx25r64;
-	};
+#include <inet/InetInterface.h>
 
-};
+struct in6_addr;
+struct net_if;
 
-/* Disable unused peripherals to reduce power consumption */
-&adc {
-	status = "disabled";
-};
-&i2c1 {
-	status = "disabled";
-};
-&pwm0 {
-	status = "disabled";
-};
-&spi2 {
-	status = "disabled";
-};
-&usbd {
-	status = "disabled";
-};
+namespace chip {
+namespace DeviceLayer {
+namespace InetUtils {
+
+in6_addr ToZephyrAddr(const chip::Inet::IPAddress & address);
+net_if * GetInterface(chip::Inet::InterfaceId ifaceId = chip::Inet::InterfaceId::Null());
+
+} // namespace InetUtils
+} // namespace DeviceLayer
+} // namespace chip

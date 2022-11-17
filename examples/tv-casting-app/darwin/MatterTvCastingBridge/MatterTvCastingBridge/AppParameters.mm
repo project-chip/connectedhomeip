@@ -1,5 +1,6 @@
-/*
- *    Copyright (c) 2022 Project CHIP Authors
+/**
+ *
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,26 +15,18 @@
  *    limitations under the License.
  */
 
-/ {
-	chosen {
-		nordic,pm-ext-flash = &mx25r64;
-	};
+#import <Foundation/Foundation.h>
 
-};
+#import "AppParameters.h"
 
-/* Disable unused peripherals to reduce power consumption */
-&adc {
-	status = "disabled";
-};
-&i2c1 {
-	status = "disabled";
-};
-&pwm0 {
-	status = "disabled";
-};
-&spi2 {
-	status = "disabled";
-};
-&usbd {
-	status = "disabled";
-};
+@implementation AppParameters
+
+/**
+ * Initialize with default values
+ */
+- (AppParameters *)init
+{
+    return [super init];
+}
+
+@end

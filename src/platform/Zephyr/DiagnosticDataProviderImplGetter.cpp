@@ -1,6 +1,6 @@
-/**
+/*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,19 +15,15 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
+#include "DiagnosticDataProviderImpl.h"
 
-#import "AppParameters.h"
+namespace chip {
+namespace DeviceLayer {
 
-@implementation AppParameters
-
-- (AppParameters *)initWithRotatingDeviceIdUniqueId:(NSData *)rotatingDeviceIdUniqueId
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
 {
-    self = [super init];
-    if (self) {
-        _rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueId;
-    }
-    return self;
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
 }
 
-@end
+} // namespace DeviceLayer
+} // namespace chip
