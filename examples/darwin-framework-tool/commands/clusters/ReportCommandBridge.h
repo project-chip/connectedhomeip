@@ -54,7 +54,9 @@ public:
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         MTRReadParams * params = [[MTRReadParams alloc] init];
-        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        if (mFabricFiltered.HasValue()) {
+            params.filterByFabric = mFabricFiltered.Value();
+        }
         [device
             readAttributesWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
                                clusterID:[NSNumber numberWithUnsignedInteger:mClusterId]
@@ -124,16 +126,20 @@ public:
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
 
-        MTRSubscribeParams * params = [[MTRSubscribeParams alloc] init];
-        params.keepPreviousSubscriptions
-            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
-        params.autoResubscribe = mAutoResubscribe.HasValue() ? [NSNumber numberWithBool:mAutoResubscribe.Value()] : nil;
+        MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
+        if (mFabricFiltered.HasValue()) {
+            params.filterByFabric = mFabricFiltered.Value();
+        }
+        if (mKeepSubscriptions.HasValue()) {
+            params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
+        }
+        if (mAutoResubscribe.HasValue()) {
+            params.resubscribeIfLost = mAutoResubscribe.Value();
+        }
 
         [device subscribeToAttributesWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
             clusterID:[NSNumber numberWithUnsignedInteger:mClusterId]
             attributeID:[NSNumber numberWithUnsignedInteger:mAttributeId]
-            minInterval:[NSNumber numberWithUnsignedInteger:mMinInterval]
-            maxInterval:[NSNumber numberWithUnsignedInteger:mMaxInterval]
             params:params
             queue:callbackQueue
             reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
@@ -192,16 +198,17 @@ public:
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
 
-        MTRSubscribeParams * params = [[MTRSubscribeParams alloc] init];
-        params.keepPreviousSubscriptions
-            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
-        params.autoResubscribe = mAutoResubscribe.HasValue() ? [NSNumber numberWithBool:mAutoResubscribe.Value()] : nil;
+        MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
+        if (mKeepSubscriptions.HasValue()) {
+            params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
+        }
+        if (mAutoResubscribe.HasValue()) {
+            params.resubscribeIfLost = mAutoResubscribe.Value();
+        }
 
         [device subscribeWithQueue:callbackQueue
-            minInterval:@(mMinInterval)
-            maxInterval:@(mMaxInterval)
             params:params
-            attributeCacheContainer:nil
+            clusterStateCacheContainer:nil
             attributeReportHandler:^(NSArray * value) {
                 SetCommandExitStatus(CHIP_NO_ERROR);
             }

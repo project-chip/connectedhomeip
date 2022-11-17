@@ -36,8 +36,8 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR AttributeDataIBs::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR AttributeDataIBs::Parser::PrettyPrint() const
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
     size_t numDataElement = 0;
@@ -59,7 +59,7 @@ CHIP_ERROR AttributeDataIBs::Parser::CheckSchemaValidity() const
             ReturnErrorOnFailure(data.Init(reader));
 
             PRETTY_PRINT_INCDEPTH();
-            ReturnErrorOnFailure(data.CheckSchemaValidity());
+            ReturnErrorOnFailure(data.PrettyPrint());
             PRETTY_PRINT_DECDEPTH();
         }
 
@@ -81,7 +81,7 @@ CHIP_ERROR AttributeDataIBs::Parser::CheckSchemaValidity() const
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 AttributeDataIB::Builder & AttributeDataIBs::Builder::CreateAttributeDataIBBuilder()
 {

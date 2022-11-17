@@ -29,7 +29,7 @@ jobs:
         timeout-minutes: 90
 
         env:
-            DOCKER_RUN_VERSION: 0.6.05
+            DOCKER_RUN_VERSION: 0.6.06
             GITHUB_CACHE_PATH: /tmp/cirque-cache/
 
         runs-on: ubuntu-latest
@@ -38,7 +38,7 @@ jobs:
         # need to run with privilege, which isn't supported by job.XXX.contaner
         #  https://github.com/actions/container-action/issues/2
         #         container:
-        #             image: connectedhomeip/chip-build-cirque:0.6.05
+        #             image: connectedhomeip/chip-build-cirque:0.6.06
         #             volumes:
         #                 - "/tmp:/tmp"
         #                 - "/dev/pts:/dev/pts"
@@ -48,7 +48,7 @@ jobs:
         #             options: "--privileged"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.15
+            - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -125,7 +125,7 @@ jobs:
                      --volume /dev/pts:/dev/pts \
                      -- scripts/tests/cirque_tests.sh run_all_tests
             - name: Uploading Binaries
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
               with:
                   name: cirque_log-${{steps.outsuffix.outputs.value}}-logs

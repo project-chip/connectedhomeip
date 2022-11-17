@@ -55,9 +55,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign, readonly) chip::NodeId nodeID;
 
-/**
- * Controllers are created via the MTRControllerFactory object.
- */
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
@@ -69,6 +66,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
+@end
+
+@interface MTRClusterPath ()
+- (instancetype)initWithPath:(const chip::app::ConcreteClusterPath &)path;
 @end
 
 @interface MTRAttributePath ()

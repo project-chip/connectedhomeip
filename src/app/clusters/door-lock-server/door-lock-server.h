@@ -571,12 +571,12 @@ struct EmberAfPluginDoorLockCredentialInfo
  */
 struct EmberAfPluginDoorLockUserInfo
 {
-    chip::CharSpan userName;                    /**< Name of the user. */
-    chip::Span<const DlCredential> credentials; /**< Credentials that are associated with user (without data).*/
-    uint32_t userUniqueId;                      /**< Unique user identifier. */
-    DlUserStatus userStatus;                    /**< Status of the user slot (available/occupied). */
-    DlUserType userType;                        /**< Type of the user. */
-    DlCredentialRule credentialRule;            /**< Number of supported credentials. */
+    chip::CharSpan userName;                            /**< Name of the user. */
+    chip::Span<const DlCredential> credentials;         /**< Credentials that are associated with user (without data).*/
+    uint32_t userUniqueId;                              /**< Unique user identifier. */
+    DlUserStatus userStatus = DlUserStatus::kAvailable; /**< Status of the user slot (available/occupied). */
+    DlUserType userType;                                /**< Type of the user. */
+    DlCredentialRule credentialRule;                    /**< Number of supported credentials. */
 
     DlAssetSource creationSource;
     chip::FabricIndex createdBy; /**< ID of the fabric that created the user. */

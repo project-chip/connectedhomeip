@@ -274,7 +274,7 @@ CHIP_ERROR GroupOutgoingCounters::Init(chip::PersistentStorageDelegate * storage
     uint16_t size = static_cast<uint16_t>(sizeof(uint32_t));
     uint32_t temp;
     CHIP_ERROR err;
-    err = mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::GroupControlCounter(), &temp, size);
+    err = mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::GroupControlCounter().KeyName(), &temp, size);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         // might be the first time we retrieve the value
@@ -290,7 +290,7 @@ CHIP_ERROR GroupOutgoingCounters::Init(chip::PersistentStorageDelegate * storage
         mGroupControlCounter = temp;
     }
 
-    err = mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::GroupDataCounter(), &temp, size);
+    err = mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::GroupDataCounter().KeyName(), &temp, size);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         // might be the first time we retrieve the value
@@ -308,11 +308,11 @@ CHIP_ERROR GroupOutgoingCounters::Init(chip::PersistentStorageDelegate * storage
 
     temp = mGroupControlCounter + GROUP_MSG_COUNTER_MIN_INCREMENT;
     size = static_cast<uint16_t>(sizeof(temp));
-    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::GroupControlCounter(), &temp, size));
+    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::GroupControlCounter().KeyName(), &temp, size));
 
     temp = mGroupDataCounter + GROUP_MSG_COUNTER_MIN_INCREMENT;
 
-    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::GroupDataCounter(), &temp, size);
+    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::GroupDataCounter().KeyName(), &temp, size);
 }
 
 uint32_t GroupOutgoingCounters::GetCounter(bool isControl)
@@ -346,11 +346,11 @@ CHIP_ERROR GroupOutgoingCounters::IncrementCounter(bool isControl)
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(key, &temp, size));
+    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(key.KeyName(), &temp, size));
     if (temp == value)
     {
         temp = value + GROUP_MSG_COUNTER_MIN_INCREMENT;
-        return mStorage->SyncSetKeyValue(key, &temp, sizeof(uint32_t));
+        return mStorage->SyncSetKeyValue(key.KeyName(), &temp, sizeof(uint32_t));
     }
     return CHIP_NO_ERROR;
 }

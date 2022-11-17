@@ -76,7 +76,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 }
 @end
 
-@interface MTRAttributeCacheContainer (Test)
+@interface MTRClusterStateCacheContainer (Test)
 // Obsolete method is moved to this test suite to keep tests compatible
 - (void)subscribeWithDeviceController:(MTRDeviceController *)deviceController
                              deviceID:(NSNumber *)deviceID
@@ -85,56 +85,46 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                            completion:(void (^)(NSError * _Nullable error))completion;
 @end
 
-@implementation MTRAttributeCacheContainer (Test)
+@implementation MTRClusterStateCacheContainer (Test)
 - (void)subscribeWithDeviceController:(MTRDeviceController *)deviceController
                              deviceID:(NSNumber *)deviceID
                                params:(MTRSubscribeParams * _Nullable)params
                                 queue:queue
                            completion:(void (^)(NSError * _Nullable error))completion
 {
-    __auto_type workQueue = dispatch_get_main_queue();
     __auto_type completionHandler = ^(NSError * _Nullable error) {
         dispatch_async(queue, ^{
             completion(error);
         });
     };
-    [deviceController
-        getBaseDevice:deviceID.unsignedLongLongValue
-                queue:workQueue
-           completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-               if (error) {
-                   NSLog(@"Error: Failed to get connected device (%llu) for attribute cache: %@", deviceID.unsignedLongLongValue,
-                       error);
-                   completionHandler(error);
-                   return;
-               }
-               __auto_type established = [NSMutableArray arrayWithCapacity:1];
-               [established addObject:@NO];
-               [device subscribeWithQueue:queue
-                   minInterval:@(1)
-                   maxInterval:@(43200)
-                   params:params
-                   attributeCacheContainer:self
-                   attributeReportHandler:^(NSArray * value) {
-                       NSLog(@"Report received for attribute cache: %@", value);
-                   }
-                   eventReportHandler:nil
-                   errorHandler:^(NSError * error) {
-                       NSLog(@"Report error received for attribute cache: %@", error);
-                       if (![established[0] boolValue]) {
-                           established[0] = @YES;
-                           completionHandler(error);
-                       }
-                   }
-                   subscriptionEstablished:^() {
-                       NSLog(@"Attribute cache subscription succeeded for device %llu", deviceID.unsignedLongLongValue);
-                       if (![established[0] boolValue]) {
-                           established[0] = @YES;
-                           completionHandler(nil);
-                       }
-                   }
-                   resubscriptionScheduled:nil];
-           }];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:deviceID controller:deviceController];
+
+    __auto_type * subscriptionParams
+        = (params == nil) ? [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(43200)] : params;
+    __auto_type established = [NSMutableArray arrayWithCapacity:1];
+    [established addObject:@NO];
+    [device subscribeWithQueue:queue
+        params:subscriptionParams
+        clusterStateCacheContainer:self
+        attributeReportHandler:^(NSArray * value) {
+            NSLog(@"Report received for attribute cache: %@", value);
+        }
+        eventReportHandler:nil
+        errorHandler:^(NSError * error) {
+            NSLog(@"Report error received for attribute cache: %@", error);
+            if (![established[0] boolValue]) {
+                established[0] = @YES;
+                completionHandler(error);
+            }
+        }
+        subscriptionEstablished:^() {
+            NSLog(@"Attribute cache subscription succeeded for device %llu", [deviceID unsignedLongLongValue]);
+            if (![established[0] boolValue]) {
+                established[0] = @YES;
+                completionHandler(nil);
+            }
+        }
+        resubscriptionScheduled:nil];
 }
 @end
 
@@ -161,13 +151,13 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 @property (readwrite, strong) void (^handleInvokeCommand)
     (id controller, NSNumber * nodeId, NSNumber * endpointId, NSNumber * clusterId, NSNumber * commandId, id fields,
         NSNumber * _Nullable timedInvokeTimeout, void (^completion)(id _Nullable values, NSError * _Nullable error));
-@property (readwrite, strong) void (^handleSubscribeAttribute)(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId,
-    NSNumber * _Nullable clusterId, NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval,
-    MTRSubscribeParams * _Nullable params, void (^establishedHandler)(void));
+@property (readwrite, strong) void (^handleSubscribeAttribute)
+    (id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nonnull params, void (^establishedHandler)(void));
 @property (readwrite, strong) void (^handleStopReports)(id controller, NSNumber * nodeId, void (^completion)(void));
-@property (readwrite, strong) void (^handleSubscribeAll)(id controller, NSNumber * nodeId, NSNumber * minInterval,
-    NSNumber * maxInterval, MTRSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error));
-@property (readwrite, strong) void (^handleReadAttributeCache)
+@property (readwrite, strong) void (^handleSubscribeAll)(id controller, NSNumber * nodeId, MTRSubscribeParams * _Nonnull params,
+    BOOL shouldCache, void (^completion)(NSError * _Nullable error));
+@property (readwrite, strong) void (^handleReadClusterStateCache)
     (id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
         NSNumber * _Nullable attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error));
 
@@ -274,8 +264,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         XCTAssertNotNil(self.handleSubscribeAttribute);
-        self.handleSubscribeAttribute(controller, @(nodeId), endpointId, clusterId, attributeId, minInterval, maxInterval,
-            [MTRDeviceController decodeXPCSubscribeParams:params], establishedHandler);
+        __auto_type * subscriptionParams = [MTRDeviceController decodeXPCSubscribeParams:params];
+        if (subscriptionParams == nil) {
+            subscriptionParams = [[MTRSubscribeParams alloc] initWithMinInterval:minInterval maxInterval:maxInterval];
+        } else {
+            subscriptionParams.minInterval = minInterval;
+            subscriptionParams.maxInterval = maxInterval;
+        }
+        self.handleSubscribeAttribute(
+            controller, @(nodeId), endpointId, clusterId, attributeId, subscriptionParams, establishedHandler);
     });
 }
 
@@ -297,8 +294,14 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         XCTAssertNotNil(self.handleSubscribeAll);
-        self.handleSubscribeAll(controller, @(nodeId), minInterval, maxInterval,
-            [MTRDeviceController decodeXPCSubscribeParams:params], shouldCache, completion);
+        MTRSubscribeParams * subscribeParams = [MTRDeviceController decodeXPCSubscribeParams:params];
+        if (params == nil) {
+            subscribeParams = [[MTRSubscribeParams alloc] initWithMinInterval:minInterval maxInterval:maxInterval];
+        } else {
+            subscribeParams.minInterval = minInterval;
+            subscribeParams.maxInterval = maxInterval;
+        }
+        self.handleSubscribeAll(controller, @(nodeId), subscribeParams, shouldCache, completion);
     });
 }
 
@@ -310,8 +313,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                               completion:(MTRValuesHandler)completion
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        XCTAssertNotNil(self.handleReadAttributeCache);
-        self.handleReadAttributeCache(controller, @(nodeId), endpointId, clusterId, attributeId, completion);
+        XCTAssertNotNil(self.handleReadClusterStateCache);
+        self.handleReadClusterStateCache(controller, @(nodeId), endpointId, clusterId, attributeId, completion);
     });
 }
 
@@ -370,27 +373,21 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         completion([MTRDeviceController encodeXPCResponseValues:myValues], nil);
     };
 
-    [_remoteDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    XCTAssertNotNil(device);
-                                    XCTAssertNil(error);
-                                    NSLog(@"Device acquired. Reading...");
-                                    [device readAttributesWithEndpointID:myEndpointId
-                                                               clusterID:myClusterId
-                                                             attributeID:myAttributeId
-                                                                  params:nil
-                                                                   queue:dispatch_get_main_queue()
-                                                              completion:^(id _Nullable value, NSError * _Nullable error) {
-                                                                  NSLog(@"Read value: %@", value);
-                                                                  XCTAssertNotNil(value);
-                                                                  XCTAssertNil(error);
-                                                                  XCTAssertTrue([myValues isEqual:value]);
-                                                                  [responseExpectation fulfill];
-                                                                  self.xpcDisconnectExpectation =
-                                                                      [self expectationWithDescription:@"XPC Disconnected"];
-                                                              }];
-                                }];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Reading...");
+    [device readAttributesWithEndpointID:myEndpointId
+                               clusterID:myClusterId
+                             attributeID:myAttributeId
+                                  params:nil
+                                   queue:dispatch_get_main_queue()
+                              completion:^(id _Nullable value, NSError * _Nullable error) {
+                                  NSLog(@"Read value: %@", value);
+                                  XCTAssertNotNil(value);
+                                  XCTAssertNil(error);
+                                  XCTAssertTrue([myValues isEqual:value]);
+                                  [responseExpectation fulfill];
+                                  self.xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
+                              }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, responseExpectation, nil] timeout:kTimeoutInSeconds];
 
@@ -412,7 +409,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
     } ];
     MTRReadParams * myParams = [[MTRReadParams alloc] init];
-    myParams.fabricFiltered = @NO;
+    myParams.filterByFabric = NO;
 
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
     XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
@@ -427,32 +424,26 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
         XCTAssertNotNil(params);
-        XCTAssertEqual([params.fabricFiltered boolValue], [myParams.fabricFiltered boolValue]);
+        XCTAssertEqual(params.filterByFabric, myParams.filterByFabric);
         [callExpectation fulfill];
         completion([MTRDeviceController encodeXPCResponseValues:myValues], nil);
     };
 
-    [_remoteDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    XCTAssertNotNil(device);
-                                    XCTAssertNil(error);
-                                    NSLog(@"Device acquired. Reading...");
-                                    [device readAttributesWithEndpointID:myEndpointId
-                                                               clusterID:myClusterId
-                                                             attributeID:myAttributeId
-                                                                  params:myParams
-                                                                   queue:dispatch_get_main_queue()
-                                                              completion:^(id _Nullable value, NSError * _Nullable error) {
-                                                                  NSLog(@"Read value: %@", value);
-                                                                  XCTAssertNotNil(value);
-                                                                  XCTAssertNil(error);
-                                                                  XCTAssertTrue([myValues isEqual:value]);
-                                                                  [responseExpectation fulfill];
-                                                                  self.xpcDisconnectExpectation =
-                                                                      [self expectationWithDescription:@"XPC Disconnected"];
-                                                              }];
-                                }];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Reading...");
+    [device readAttributesWithEndpointID:myEndpointId
+                               clusterID:myClusterId
+                             attributeID:myAttributeId
+                                  params:myParams
+                                   queue:dispatch_get_main_queue()
+                              completion:^(id _Nullable value, NSError * _Nullable error) {
+                                  NSLog(@"Read value: %@", value);
+                                  XCTAssertNotNil(value);
+                                  XCTAssertNil(error);
+                                  XCTAssertTrue([myValues isEqual:value]);
+                                  [responseExpectation fulfill];
+                                  self.xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
+                              }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, responseExpectation, nil] timeout:kTimeoutInSeconds];
 
@@ -485,26 +476,20 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         completion(nil, myError);
     };
 
-    [_remoteDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    XCTAssertNotNil(device);
-                                    XCTAssertNil(error);
-                                    NSLog(@"Device acquired. Reading...");
-                                    [device readAttributesWithEndpointID:myEndpointId
-                                                               clusterID:myClusterId
-                                                             attributeID:myAttributeId
-                                                                  params:nil
-                                                                   queue:dispatch_get_main_queue()
-                                                              completion:^(id _Nullable value, NSError * _Nullable error) {
-                                                                  NSLog(@"Read value: %@", value);
-                                                                  XCTAssertNil(value);
-                                                                  XCTAssertNotNil(error);
-                                                                  [responseExpectation fulfill];
-                                                                  self.xpcDisconnectExpectation =
-                                                                      [self expectationWithDescription:@"XPC Disconnected"];
-                                                              }];
-                                }];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Reading...");
+    [device readAttributesWithEndpointID:myEndpointId
+                               clusterID:myClusterId
+                             attributeID:myAttributeId
+                                  params:nil
+                                   queue:dispatch_get_main_queue()
+                              completion:^(id _Nullable value, NSError * _Nullable error) {
+                                  NSLog(@"Read value: %@", value);
+                                  XCTAssertNil(value);
+                                  XCTAssertNotNil(error);
+                                  [responseExpectation fulfill];
+                                  self.xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
+                              }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, responseExpectation, nil] timeout:kTimeoutInSeconds];
 
@@ -544,28 +529,22 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         completion([MTRDeviceController encodeXPCResponseValues:myResults], nil);
     };
 
-    [_remoteDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    XCTAssertNotNil(device);
-                                    XCTAssertNil(error);
-                                    NSLog(@"Device acquired. Writing...");
-                                    [device writeAttributeWithEndpointID:myEndpointId
-                                                               clusterID:myClusterId
-                                                             attributeID:myAttributeId
-                                                                   value:myValue
-                                                       timedWriteTimeout:nil
-                                                                   queue:dispatch_get_main_queue()
-                                                              completion:^(id _Nullable value, NSError * _Nullable error) {
-                                                                  NSLog(@"Write response: %@", value);
-                                                                  XCTAssertNotNil(value);
-                                                                  XCTAssertNil(error);
-                                                                  XCTAssertTrue([myResults isEqual:value]);
-                                                                  [responseExpectation fulfill];
-                                                                  self.xpcDisconnectExpectation =
-                                                                      [self expectationWithDescription:@"XPC Disconnected"];
-                                                              }];
-                                }];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Writing...");
+    [device writeAttributeWithEndpointID:myEndpointId
+                               clusterID:myClusterId
+                             attributeID:myAttributeId
+                                   value:myValue
+                       timedWriteTimeout:nil
+                                   queue:dispatch_get_main_queue()
+                              completion:^(id _Nullable value, NSError * _Nullable error) {
+                                  NSLog(@"Write response: %@", value);
+                                  XCTAssertNotNil(value);
+                                  XCTAssertNil(error);
+                                  XCTAssertTrue([myResults isEqual:value]);
+                                  [responseExpectation fulfill];
+                                  self.xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
+                              }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, responseExpectation, nil] timeout:kTimeoutInSeconds];
 
@@ -607,28 +586,22 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         completion([MTRDeviceController encodeXPCResponseValues:myResults], nil);
     };
 
-    [_remoteDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    XCTAssertNotNil(device);
-                                    XCTAssertNil(error);
-                                    NSLog(@"Device acquired. Writing...");
-                                    [device writeAttributeWithEndpointID:myEndpointId
-                                                               clusterID:myClusterId
-                                                             attributeID:myAttributeId
-                                                                   value:myValue
-                                                       timedWriteTimeout:myTimedWriteTimeout
-                                                                   queue:dispatch_get_main_queue()
-                                                              completion:^(id _Nullable value, NSError * _Nullable error) {
-                                                                  NSLog(@"Write response: %@", value);
-                                                                  XCTAssertNotNil(value);
-                                                                  XCTAssertNil(error);
-                                                                  XCTAssertTrue([myResults isEqual:value]);
-                                                                  [responseExpectation fulfill];
-                                                                  self.xpcDisconnectExpectation =
-                                                                      [self expectationWithDescription:@"XPC Disconnected"];
-                                                              }];
-                                }];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Writing...");
+    [device writeAttributeWithEndpointID:myEndpointId
+                               clusterID:myClusterId
+                             attributeID:myAttributeId
+                                   value:myValue
+                       timedWriteTimeout:myTimedWriteTimeout
+                                   queue:dispatch_get_main_queue()
+                              completion:^(id _Nullable value, NSError * _Nullable error) {
+                                  NSLog(@"Write response: %@", value);
+                                  XCTAssertNotNil(value);
+                                  XCTAssertNil(error);
+                                  XCTAssertTrue([myResults isEqual:value]);
+                                  [responseExpectation fulfill];
+                                  self.xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
+                              }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, responseExpectation, nil] timeout:kTimeoutInSeconds];
 
@@ -663,27 +636,21 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         completion(nil, myError);
     };
 
-    [_remoteDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    XCTAssertNotNil(device);
-                                    XCTAssertNil(error);
-                                    NSLog(@"Device acquired. Writing...");
-                                    [device writeAttributeWithEndpointID:myEndpointId
-                                                               clusterID:myClusterId
-                                                             attributeID:myAttributeId
-                                                                   value:myValue
-                                                       timedWriteTimeout:nil
-                                                                   queue:dispatch_get_main_queue()
-                                                              completion:^(id _Nullable value, NSError * _Nullable error) {
-                                                                  NSLog(@"Write response: %@", value);
-                                                                  XCTAssertNil(value);
-                                                                  XCTAssertNotNil(error);
-                                                                  [responseExpectation fulfill];
-                                                                  self.xpcDisconnectExpectation =
-                                                                      [self expectationWithDescription:@"XPC Disconnected"];
-                                                              }];
-                                }];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Writing...");
+    [device writeAttributeWithEndpointID:myEndpointId
+                               clusterID:myClusterId
+                             attributeID:myAttributeId
+                                   value:myValue
+                       timedWriteTimeout:nil
+                                   queue:dispatch_get_main_queue()
+                              completion:^(id _Nullable value, NSError * _Nullable error) {
+                                  NSLog(@"Write response: %@", value);
+                                  XCTAssertNil(value);
+                                  XCTAssertNotNil(error);
+                                  [responseExpectation fulfill];
+                                  self.xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
+                              }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, responseExpectation, nil] timeout:kTimeoutInSeconds];
 
@@ -723,28 +690,22 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
               completion([MTRDeviceController encodeXPCResponseValues:myResults], nil);
           };
 
-    [_remoteDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    XCTAssertNotNil(device);
-                                    XCTAssertNil(error);
-                                    NSLog(@"Device acquired. Invoking command...");
-                                    [device invokeCommandWithEndpointID:myEndpointId
-                                                              clusterID:myClusterId
-                                                              commandID:myCommandId
-                                                          commandFields:myFields
-                                                     timedInvokeTimeout:nil
-                                                                  queue:dispatch_get_main_queue()
-                                                             completion:^(id _Nullable value, NSError * _Nullable error) {
-                                                                 NSLog(@"Command response: %@", value);
-                                                                 XCTAssertNotNil(value);
-                                                                 XCTAssertNil(error);
-                                                                 XCTAssertTrue([myResults isEqual:value]);
-                                                                 [responseExpectation fulfill];
-                                                                 self.xpcDisconnectExpectation =
-                                                                     [self expectationWithDescription:@"XPC Disconnected"];
-                                                             }];
-                                }];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Invoking command...");
+    [device invokeCommandWithEndpointID:myEndpointId
+                              clusterID:myClusterId
+                              commandID:myCommandId
+                          commandFields:myFields
+                     timedInvokeTimeout:nil
+                                  queue:dispatch_get_main_queue()
+                             completion:^(id _Nullable value, NSError * _Nullable error) {
+                                 NSLog(@"Command response: %@", value);
+                                 XCTAssertNotNil(value);
+                                 XCTAssertNil(error);
+                                 XCTAssertTrue([myResults isEqual:value]);
+                                 [responseExpectation fulfill];
+                                 self.xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
+                             }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, responseExpectation, nil] timeout:kTimeoutInSeconds];
 
@@ -786,28 +747,22 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
               completion([MTRDeviceController encodeXPCResponseValues:myResults], nil);
           };
 
-    [_remoteDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    XCTAssertNotNil(device);
-                                    XCTAssertNil(error);
-                                    NSLog(@"Device acquired. Invoking command...");
-                                    [device invokeCommandWithEndpointID:myEndpointId
-                                                              clusterID:myClusterId
-                                                              commandID:myCommandId
-                                                          commandFields:myFields
-                                                     timedInvokeTimeout:myTimedInvokeTimeout
-                                                                  queue:dispatch_get_main_queue()
-                                                             completion:^(id _Nullable value, NSError * _Nullable error) {
-                                                                 NSLog(@"Command response: %@", value);
-                                                                 XCTAssertNotNil(value);
-                                                                 XCTAssertNil(error);
-                                                                 XCTAssertTrue([myResults isEqual:value]);
-                                                                 [responseExpectation fulfill];
-                                                                 self.xpcDisconnectExpectation =
-                                                                     [self expectationWithDescription:@"XPC Disconnected"];
-                                                             }];
-                                }];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Invoking command...");
+    [device invokeCommandWithEndpointID:myEndpointId
+                              clusterID:myClusterId
+                              commandID:myCommandId
+                          commandFields:myFields
+                     timedInvokeTimeout:myTimedInvokeTimeout
+                                  queue:dispatch_get_main_queue()
+                             completion:^(id _Nullable value, NSError * _Nullable error) {
+                                 NSLog(@"Command response: %@", value);
+                                 XCTAssertNotNil(value);
+                                 XCTAssertNil(error);
+                                 XCTAssertTrue([myResults isEqual:value]);
+                                 [responseExpectation fulfill];
+                                 self.xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
+                             }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, responseExpectation, nil] timeout:kTimeoutInSeconds];
 
@@ -845,27 +800,21 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
               completion(nil, myError);
           };
 
-    [_remoteDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    XCTAssertNotNil(device);
-                                    XCTAssertNil(error);
-                                    NSLog(@"Device acquired. Invoking command...");
-                                    [device invokeCommandWithEndpointID:myEndpointId
-                                                              clusterID:myClusterId
-                                                              commandID:myCommandId
-                                                          commandFields:myFields
-                                                     timedInvokeTimeout:nil
-                                                                  queue:dispatch_get_main_queue()
-                                                             completion:^(id _Nullable value, NSError * _Nullable error) {
-                                                                 NSLog(@"Command response: %@", value);
-                                                                 XCTAssertNil(value);
-                                                                 XCTAssertNotNil(error);
-                                                                 [responseExpectation fulfill];
-                                                                 self.xpcDisconnectExpectation =
-                                                                     [self expectationWithDescription:@"XPC Disconnected"];
-                                                             }];
-                                }];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Invoking command...");
+    [device invokeCommandWithEndpointID:myEndpointId
+                              clusterID:myClusterId
+                              commandID:myCommandId
+                          commandFields:myFields
+                     timedInvokeTimeout:nil
+                                  queue:dispatch_get_main_queue()
+                             completion:^(id _Nullable value, NSError * _Nullable error) {
+                                 NSLog(@"Command response: %@", value);
+                                 XCTAssertNil(value);
+                                 XCTAssertNotNil(error);
+                                 [responseExpectation fulfill];
+                                 self.xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
+                             }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, responseExpectation, nil] timeout:kTimeoutInSeconds];
 
@@ -894,47 +843,38 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nonnull params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
 
-    [_remoteDeviceController
-        getBaseDevice:myNodeId
-                queue:dispatch_get_main_queue()
-           completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-               XCTAssertNotNil(device);
-               XCTAssertNil(error);
-               NSLog(@"Device acquired. Subscribing...");
-               [device subscribeToAttributesWithEndpointID:myEndpointId
-                   clusterID:myClusterId
-                   attributeID:myAttributeId
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
-                   params:nil
-                   queue:dispatch_get_main_queue()
-                   reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                       NSLog(@"Report value: %@", values);
-                       XCTAssertNotNil(values);
-                       XCTAssertNil(error);
-                       XCTAssertTrue([myReport isEqual:values]);
-                       [reportExpectation fulfill];
-                   }
-                   subscriptionEstablished:^{
-                       [establishExpectation fulfill];
-                   }];
-           }];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Subscribing...");
+    [device subscribeToAttributesWithEndpointID:myEndpointId
+        clusterID:myClusterId
+        attributeID:myAttributeId
+        params:params
+        queue:dispatch_get_main_queue()
+        reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            NSLog(@"Report value: %@", values);
+            XCTAssertNotNil(values);
+            XCTAssertNil(error);
+            XCTAssertTrue([myReport isEqual:values]);
+            [reportExpectation fulfill];
+        }
+        subscriptionEstablished:^{
+            [establishExpectation fulfill];
+        }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
@@ -974,15 +914,12 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     };
 
     // Deregister report handler
-    [_remoteDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    NSLog(@"Device acquired. Deregistering...");
-                                    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
-                                                                   completion:^{
-                                                                       NSLog(@"Deregistered");
-                                                                   }];
-                                }];
+    device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Deregistering...");
+    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
+                                   completion:^{
+                                       NSLog(@"Deregistered");
+                                   }];
 
     // Wait for disconnection
     [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
@@ -997,9 +934,9 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     NSNumber * myAttributeId = @300;
     NSNumber * myMinInterval = @5;
     NSNumber * myMaxInterval = @60;
-    MTRSubscribeParams * myParams = [[MTRSubscribeParams alloc] init];
-    myParams.fabricFiltered = @NO;
-    myParams.keepPreviousSubscriptions = @NO;
+    MTRSubscribeParams * myParams = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
+    myParams.filterByFabric = NO;
+    myParams.replaceExistingSubscriptions = YES;
     __block NSArray * myReport = @[ @{
         @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
                                                                clusterID:myClusterId
@@ -1012,49 +949,39 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nonnull params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNotNil(params);
-        XCTAssertEqual([params.fabricFiltered boolValue], [myParams.fabricFiltered boolValue]);
-        XCTAssertEqual([params.keepPreviousSubscriptions boolValue], [myParams.keepPreviousSubscriptions boolValue]);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
+        XCTAssertEqual(params.filterByFabric, myParams.filterByFabric);
+        XCTAssertEqual(params.replaceExistingSubscriptions, myParams.replaceExistingSubscriptions);
         [callExpectation fulfill];
         establishedHandler();
     };
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
 
-    [_remoteDeviceController
-        getBaseDevice:myNodeId
-                queue:dispatch_get_main_queue()
-           completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-               XCTAssertNotNil(device);
-               XCTAssertNil(error);
-               NSLog(@"Device acquired. Subscribing...");
-               [device subscribeToAttributesWithEndpointID:myEndpointId
-                   clusterID:myClusterId
-                   attributeID:myAttributeId
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
-                   params:myParams
-                   queue:dispatch_get_main_queue()
-                   reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                       NSLog(@"Report value: %@", values);
-                       XCTAssertNotNil(values);
-                       XCTAssertNil(error);
-                       XCTAssertTrue([myReport isEqual:values]);
-                       [reportExpectation fulfill];
-                   }
-                   subscriptionEstablished:^{
-                       [establishExpectation fulfill];
-                   }];
-           }];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Subscribing...");
+    [device subscribeToAttributesWithEndpointID:myEndpointId
+        clusterID:myClusterId
+        attributeID:myAttributeId
+        params:myParams
+        queue:dispatch_get_main_queue()
+        reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            NSLog(@"Report value: %@", values);
+            XCTAssertNotNil(values);
+            XCTAssertNil(error);
+            XCTAssertTrue([myReport isEqual:values]);
+            [reportExpectation fulfill];
+        }
+        subscriptionEstablished:^{
+            [establishExpectation fulfill];
+        }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
@@ -1094,15 +1021,12 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     };
 
     // Deregister report handler
-    [_remoteDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    NSLog(@"Device acquired. Deregistering...");
-                                    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
-                                                                   completion:^{
-                                                                       NSLog(@"Deregistered");
-                                                                   }];
-                                }];
+    device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Deregistering...");
+    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
+                                   completion:^{
+                                       NSLog(@"Deregistered");
+                                   }];
 
     // Wait for disconnection
     [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
@@ -1129,47 +1053,38 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nonnull params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
 
-    [_remoteDeviceController
-        getBaseDevice:myNodeId
-                queue:dispatch_get_main_queue()
-           completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-               XCTAssertNotNil(device);
-               XCTAssertNil(error);
-               NSLog(@"Device acquired. Subscribing...");
-               [device subscribeToAttributesWithEndpointID:myEndpointId
-                   clusterID:myClusterId
-                   attributeID:myAttributeId
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
-                   params:nil
-                   queue:dispatch_get_main_queue()
-                   reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                       NSLog(@"Report value: %@", values);
-                       XCTAssertNotNil(values);
-                       XCTAssertNil(error);
-                       XCTAssertTrue([myReport isEqual:values]);
-                       [reportExpectation fulfill];
-                   }
-                   subscriptionEstablished:^{
-                       [establishExpectation fulfill];
-                   }];
-           }];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Subscribing...");
+    [device subscribeToAttributesWithEndpointID:myEndpointId
+        clusterID:myClusterId
+        attributeID:myAttributeId
+        params:params
+        queue:dispatch_get_main_queue()
+        reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            NSLog(@"Report value: %@", values);
+            XCTAssertNotNil(values);
+            XCTAssertNil(error);
+            XCTAssertTrue([myReport isEqual:values]);
+            [reportExpectation fulfill];
+        }
+        subscriptionEstablished:^{
+            [establishExpectation fulfill];
+        }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
@@ -1207,15 +1122,12 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     // Deregister report handler
     _xpcDisconnectExpectation.inverted = NO;
-    [_remoteDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    NSLog(@"Device acquired. Deregistering...");
-                                    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
-                                                                   completion:^{
-                                                                       NSLog(@"Deregistered");
-                                                                   }];
-                                }];
+    device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Deregistering...");
+    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
+                                   completion:^{
+                                       NSLog(@"Deregistered");
+                                   }];
 
     // Wait for disconnection
     [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
@@ -1243,47 +1155,38 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nullable params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
 
-    [_remoteDeviceController
-        getBaseDevice:myNodeId
-                queue:dispatch_get_main_queue()
-           completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-               XCTAssertNotNil(device);
-               XCTAssertNil(error);
-               NSLog(@"Device acquired. Subscribing...");
-               [device subscribeToAttributesWithEndpointID:myEndpointId
-                   clusterID:myClusterId
-                   attributeID:myAttributeId
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
-                   params:nil
-                   queue:dispatch_get_main_queue()
-                   reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                       NSLog(@"Report value: %@", values);
-                       XCTAssertNotNil(values);
-                       XCTAssertNil(error);
-                       XCTAssertTrue([myReport isEqual:values]);
-                       [reportExpectation fulfill];
-                   }
-                   subscriptionEstablished:^{
-                       [establishExpectation fulfill];
-                   }];
-           }];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Subscribing...");
+    [device subscribeToAttributesWithEndpointID:myEndpointId
+        clusterID:myClusterId
+        attributeID:myAttributeId
+        params:params
+        queue:dispatch_get_main_queue()
+        reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            NSLog(@"Report value: %@", values);
+            XCTAssertNotNil(values);
+            XCTAssertNil(error);
+            XCTAssertTrue([myReport isEqual:values]);
+            [reportExpectation fulfill];
+        }
+        subscriptionEstablished:^{
+            [establishExpectation fulfill];
+        }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
@@ -1323,15 +1226,12 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     };
 
     // Deregister report handler
-    [_remoteDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    NSLog(@"Device acquired. Deregistering...");
-                                    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
-                                                                   completion:^{
-                                                                       NSLog(@"Deregistered");
-                                                                   }];
-                                }];
+    device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Deregistering...");
+    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
+                                   completion:^{
+                                       NSLog(@"Deregistered");
+                                   }];
 
     // Wait for disconnection
     [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
@@ -1359,47 +1259,38 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nonnull params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
 
-    [_remoteDeviceController
-        getBaseDevice:myNodeId
-                queue:dispatch_get_main_queue()
-           completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-               XCTAssertNotNil(device);
-               XCTAssertNil(error);
-               NSLog(@"Device acquired. Subscribing...");
-               [device subscribeToAttributesWithEndpointID:myEndpointId
-                   clusterID:myClusterId
-                   attributeID:myAttributeId
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
-                   params:nil
-                   queue:dispatch_get_main_queue()
-                   reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                       NSLog(@"Report value: %@", values);
-                       XCTAssertNotNil(values);
-                       XCTAssertNil(error);
-                       XCTAssertTrue([myReport isEqual:values]);
-                       [reportExpectation fulfill];
-                   }
-                   subscriptionEstablished:^{
-                       [establishExpectation fulfill];
-                   }];
-           }];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Subscribing...");
+    [device subscribeToAttributesWithEndpointID:myEndpointId
+        clusterID:myClusterId
+        attributeID:myAttributeId
+        params:params
+        queue:dispatch_get_main_queue()
+        reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            NSLog(@"Report value: %@", values);
+            XCTAssertNotNil(values);
+            XCTAssertNil(error);
+            XCTAssertTrue([myReport isEqual:values]);
+            [reportExpectation fulfill];
+        }
+        subscriptionEstablished:^{
+            [establishExpectation fulfill];
+        }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
@@ -1439,15 +1330,12 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     };
 
     // Deregister report handler
-    [_remoteDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    NSLog(@"Device acquired. Deregistering...");
-                                    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
-                                                                   completion:^{
-                                                                       NSLog(@"Deregistered");
-                                                                   }];
-                                }];
+    device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Deregistering...");
+    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
+                                   completion:^{
+                                       NSLog(@"Deregistered");
+                                   }];
 
     // Wait for disconnection
     [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
@@ -1475,47 +1363,38 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nonnull params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
 
-    [_remoteDeviceController
-        getBaseDevice:myNodeId
-                queue:dispatch_get_main_queue()
-           completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-               XCTAssertNotNil(device);
-               XCTAssertNil(error);
-               NSLog(@"Device acquired. Subscribing...");
-               [device subscribeToAttributesWithEndpointID:myEndpointId
-                   clusterID:myClusterId
-                   attributeID:myAttributeId
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
-                   params:nil
-                   queue:dispatch_get_main_queue()
-                   reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                       NSLog(@"Report value: %@", values);
-                       XCTAssertNotNil(values);
-                       XCTAssertNil(error);
-                       XCTAssertTrue([myReport isEqual:values]);
-                       [reportExpectation fulfill];
-                   }
-                   subscriptionEstablished:^{
-                       [establishExpectation fulfill];
-                   }];
-           }];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Subscribing...");
+    [device subscribeToAttributesWithEndpointID:myEndpointId
+        clusterID:myClusterId
+        attributeID:myAttributeId
+        params:params
+        queue:dispatch_get_main_queue()
+        reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            NSLog(@"Report value: %@", values);
+            XCTAssertNotNil(values);
+            XCTAssertNil(error);
+            XCTAssertTrue([myReport isEqual:values]);
+            [reportExpectation fulfill];
+        }
+        subscriptionEstablished:^{
+            [establishExpectation fulfill];
+        }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
@@ -1555,15 +1434,12 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     };
 
     // Deregister report handler
-    [_remoteDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    NSLog(@"Device acquired. Deregistering...");
-                                    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
-                                                                   completion:^{
-                                                                       NSLog(@"Deregistered");
-                                                                   }];
-                                }];
+    device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Deregistering...");
+    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
+                                   completion:^{
+                                       NSLog(@"Deregistered");
+                                   }];
 
     // Wait for disconnection
     [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
@@ -1591,47 +1467,38 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nullable params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
 
-    [_remoteDeviceController
-        getBaseDevice:myNodeId
-                queue:dispatch_get_main_queue()
-           completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-               XCTAssertNotNil(device);
-               XCTAssertNil(error);
-               NSLog(@"Device acquired. Subscribing...");
-               [device subscribeToAttributesWithEndpointID:myEndpointId
-                   clusterID:myClusterId
-                   attributeID:myAttributeId
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
-                   params:nil
-                   queue:dispatch_get_main_queue()
-                   reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                       NSLog(@"Report value: %@", values);
-                       XCTAssertNotNil(values);
-                       XCTAssertNil(error);
-                       XCTAssertTrue([myReport isEqual:values]);
-                       [reportExpectation fulfill];
-                   }
-                   subscriptionEstablished:^{
-                       [establishExpectation fulfill];
-                   }];
-           }];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Subscribing...");
+    [device subscribeToAttributesWithEndpointID:myEndpointId
+        clusterID:myClusterId
+        attributeID:myAttributeId
+        params:params
+        queue:dispatch_get_main_queue()
+        reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            NSLog(@"Report value: %@", values);
+            XCTAssertNotNil(values);
+            XCTAssertNil(error);
+            XCTAssertTrue([myReport isEqual:values]);
+            [reportExpectation fulfill];
+        }
+        subscriptionEstablished:^{
+            [establishExpectation fulfill];
+        }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
@@ -1671,15 +1538,12 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     };
 
     // Deregister report handler
-    [_remoteDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    NSLog(@"Device acquired. Deregistering...");
-                                    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
-                                                                   completion:^{
-                                                                       NSLog(@"Deregistered");
-                                                                   }];
-                                }];
+    device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Deregistering...");
+    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
+                                   completion:^{
+                                       NSLog(@"Deregistered");
+                                   }];
 
     // Wait for disconnection
     [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
@@ -1706,47 +1570,38 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nullable params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertNil(endpointId);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
 
-    [_remoteDeviceController
-        getBaseDevice:myNodeId
-                queue:dispatch_get_main_queue()
-           completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-               XCTAssertNotNil(device);
-               XCTAssertNil(error);
-               NSLog(@"Device acquired. Subscribing...");
-               [device subscribeToAttributesWithEndpointID:nil
-                   clusterID:myClusterId
-                   attributeID:myAttributeId
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
-                   params:nil
-                   queue:dispatch_get_main_queue()
-                   reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                       NSLog(@"Report value: %@", values);
-                       XCTAssertNotNil(values);
-                       XCTAssertNil(error);
-                       XCTAssertTrue([myReport isEqual:values]);
-                       [reportExpectation fulfill];
-                   }
-                   subscriptionEstablished:^{
-                       [establishExpectation fulfill];
-                   }];
-           }];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Subscribing...");
+    [device subscribeToAttributesWithEndpointID:nil
+        clusterID:myClusterId
+        attributeID:myAttributeId
+        params:params
+        queue:dispatch_get_main_queue()
+        reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            NSLog(@"Report value: %@", values);
+            XCTAssertNotNil(values);
+            XCTAssertNil(error);
+            XCTAssertTrue([myReport isEqual:values]);
+            [reportExpectation fulfill];
+        }
+        subscriptionEstablished:^{
+            [establishExpectation fulfill];
+        }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
@@ -1786,15 +1641,12 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     };
 
     // Deregister report handler
-    [_remoteDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    NSLog(@"Device acquired. Deregistering...");
-                                    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
-                                                                   completion:^{
-                                                                       NSLog(@"Deregistered");
-                                                                   }];
-                                }];
+    device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Deregistering...");
+    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
+                                   completion:^{
+                                       NSLog(@"Deregistered");
+                                   }];
 
     // Wait for disconnection
     [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
@@ -1821,47 +1673,38 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nullable params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertNil(clusterId);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
 
-    [_remoteDeviceController
-        getBaseDevice:myNodeId
-                queue:dispatch_get_main_queue()
-           completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-               XCTAssertNotNil(device);
-               XCTAssertNil(error);
-               NSLog(@"Device acquired. Subscribing...");
-               [device subscribeToAttributesWithEndpointID:myEndpointId
-                   clusterID:nil
-                   attributeID:myAttributeId
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
-                   params:nil
-                   queue:dispatch_get_main_queue()
-                   reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                       NSLog(@"Report value: %@", values);
-                       XCTAssertNotNil(values);
-                       XCTAssertNil(error);
-                       XCTAssertTrue([myReport isEqual:values]);
-                       [reportExpectation fulfill];
-                   }
-                   subscriptionEstablished:^{
-                       [establishExpectation fulfill];
-                   }];
-           }];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Subscribing...");
+    [device subscribeToAttributesWithEndpointID:myEndpointId
+        clusterID:nil
+        attributeID:myAttributeId
+        params:params
+        queue:dispatch_get_main_queue()
+        reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            NSLog(@"Report value: %@", values);
+            XCTAssertNotNil(values);
+            XCTAssertNil(error);
+            XCTAssertTrue([myReport isEqual:values]);
+            [reportExpectation fulfill];
+        }
+        subscriptionEstablished:^{
+            [establishExpectation fulfill];
+        }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
@@ -1901,15 +1744,12 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     };
 
     // Deregister report handler
-    [_remoteDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    NSLog(@"Device acquired. Deregistering...");
-                                    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
-                                                                   completion:^{
-                                                                       NSLog(@"Deregistered");
-                                                                   }];
-                                }];
+    device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Deregistering...");
+    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
+                                   completion:^{
+                                       NSLog(@"Deregistered");
+                                   }];
 
     // Wait for disconnection
     [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
@@ -1936,47 +1776,38 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nullable params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertNil(attributeId);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
 
-    [_remoteDeviceController
-        getBaseDevice:myNodeId
-                queue:dispatch_get_main_queue()
-           completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-               XCTAssertNotNil(device);
-               XCTAssertNil(error);
-               NSLog(@"Device acquired. Subscribing...");
-               [device subscribeToAttributesWithEndpointID:myEndpointId
-                   clusterID:myClusterId
-                   attributeID:nil
-                   minInterval:myMinInterval
-                   maxInterval:myMaxInterval
-                   params:nil
-                   queue:dispatch_get_main_queue()
-                   reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                       NSLog(@"Report value: %@", values);
-                       XCTAssertNotNil(values);
-                       XCTAssertNil(error);
-                       XCTAssertTrue([myReport isEqual:values]);
-                       [reportExpectation fulfill];
-                   }
-                   subscriptionEstablished:^{
-                       [establishExpectation fulfill];
-                   }];
-           }];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Subscribing...");
+    [device subscribeToAttributesWithEndpointID:myEndpointId
+        clusterID:myClusterId
+        attributeID:nil
+        params:params
+        queue:dispatch_get_main_queue()
+        reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            NSLog(@"Report value: %@", values);
+            XCTAssertNotNil(values);
+            XCTAssertNil(error);
+            XCTAssertTrue([myReport isEqual:values]);
+            [reportExpectation fulfill];
+        }
+        subscriptionEstablished:^{
+            [establishExpectation fulfill];
+        }];
 
     [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
 
@@ -2016,15 +1847,12 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     };
 
     // Deregister report handler
-    [_remoteDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    NSLog(@"Device acquired. Deregistering...");
-                                    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
-                                                                   completion:^{
-                                                                       NSLog(@"Deregistered");
-                                                                   }];
-                                }];
+    device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Deregistering...");
+    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
+                                   completion:^{
+                                       NSLog(@"Deregistered");
+                                   }];
 
     // Wait for disconnection
     [self waitForExpectations:@[ _xpcDisconnectExpectation, stopExpectation ] timeout:kTimeoutInSeconds];
@@ -2052,16 +1880,14 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     __auto_type uuid = self.controllerUUID;
     _handleSubscribeAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, NSNumber * minInterval, NSNumber * maxInterval, MTRSubscribeParams * _Nullable params,
-        void (^establishedHandler)(void)) {
+        NSNumber * _Nullable attributeId, MTRSubscribeParams * _Nullable params, void (^establishedHandler)(void)) {
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
         XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
         XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
         XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        XCTAssertEqual([minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
-        XCTAssertEqual([maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
-        XCTAssertNil(params);
+        XCTAssertEqual([params.minInterval unsignedShortValue], [myMinInterval unsignedShortValue]);
+        XCTAssertEqual([params.maxInterval unsignedShortValue], [myMaxInterval unsignedShortValue]);
         [callExpectation fulfill];
         establishedHandler();
     };
@@ -2078,31 +1904,24 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         myMaxInterval = maxIntervals[i];
         callExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"XPC call (%u) received", i]];
         establishExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Established (%u) called", i]];
-        [_remoteDeviceController
-            getBaseDevice:myNodeId
-                    queue:dispatch_get_main_queue()
-               completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                   XCTAssertNotNil(device);
-                   XCTAssertNil(error);
-                   NSLog(@"Device acquired. Subscribing...");
-                   [device subscribeToAttributesWithEndpointID:myEndpointId
-                       clusterID:myClusterId
-                       attributeID:myAttributeId
-                       minInterval:myMinInterval
-                       maxInterval:myMaxInterval
-                       params:nil
-                       queue:dispatch_get_main_queue()
-                       reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                           NSLog(@"Subscriber [%d] report value: %@", i, values);
-                           XCTAssertNotNil(values);
-                           XCTAssertNil(error);
-                           XCTAssertTrue([myReports[i] isEqual:values]);
-                           [reportExpectations[i] fulfill];
-                       }
-                       subscriptionEstablished:^{
-                           [establishExpectation fulfill];
-                       }];
-               }];
+        __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:myMinInterval maxInterval:myMaxInterval];
+        __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:_remoteDeviceController];
+        NSLog(@"Device acquired. Subscribing...");
+        [device subscribeToAttributesWithEndpointID:myEndpointId
+            clusterID:myClusterId
+            attributeID:myAttributeId
+            params:params
+            queue:dispatch_get_main_queue()
+            reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                NSLog(@"Subscriber [%d] report value: %@", i, values);
+                XCTAssertNotNil(values);
+                XCTAssertNil(error);
+                XCTAssertTrue([myReports[i] isEqual:values]);
+                [reportExpectations[i] fulfill];
+            }
+            subscriptionEstablished:^{
+                [establishExpectation fulfill];
+            }];
 
         [self waitForExpectations:[NSArray arrayWithObjects:callExpectation, establishExpectation, nil] timeout:kTimeoutInSeconds];
     }
@@ -2153,16 +1972,12 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     // Deregister report handler for first subscriber
     __auto_type deregisterExpectation = [self expectationWithDescription:@"First subscriber deregistered"];
-    [_remoteDeviceController getBaseDevice:nodeToStop
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    NSLog(@"Device acquired. Deregistering...");
-                                    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
-                                                                   completion:^{
-                                                                       NSLog(@"Deregistered");
-                                                                       [deregisterExpectation fulfill];
-                                                                   }];
-                                }];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(nodeToStop) controller:_remoteDeviceController];
+    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
+                                   completion:^{
+                                       NSLog(@"Deregistered");
+                                       [deregisterExpectation fulfill];
+                                   }];
 
     [self waitForExpectations:@[ stopExpectation, deregisterExpectation ] timeout:kTimeoutInSeconds];
 
@@ -2211,16 +2026,13 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     // Deregister report handler for second subscriber
     __auto_type secondDeregisterExpectation = [self expectationWithDescription:@"Second subscriber deregistered"];
-    [_remoteDeviceController getBaseDevice:nodeToStop
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    NSLog(@"Device acquired. Deregistering...");
-                                    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
-                                                                   completion:^{
-                                                                       NSLog(@"Deregistered");
-                                                                       [secondDeregisterExpectation fulfill];
-                                                                   }];
-                                }];
+    device = [MTRBaseDevice deviceWithNodeID:@(nodeToStop) controller:_remoteDeviceController];
+    NSLog(@"Device acquired. Deregistering...");
+    [device deregisterReportHandlersWithQueue:dispatch_get_main_queue()
+                                   completion:^{
+                                       NSLog(@"Deregistered");
+                                       [secondDeregisterExpectation fulfill];
+                                   }];
 
     // Wait for deregistration and disconnection
     [self waitForExpectations:@[ secondDeregisterExpectation, _xpcDisconnectExpectation, stopExpectation ]
@@ -2266,6 +2078,31 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 {
     NSString * myUUID = [[NSUUID UUID] UUIDString];
     uint64_t myNodeId = 9876543210;
+    NSNumber * myEndpointId = @100;
+    NSNumber * myClusterId = @200;
+    NSNumber * myAttributeId = @300;
+    NSArray * myValues = @[ @{
+        @"attributePath" : [MTRAttributePath attributePathWithEndpointID:myEndpointId
+                                                               clusterID:myClusterId
+                                                             attributeID:myAttributeId],
+        @"data" : @ { @"type" : @"SignedInteger", @"value" : @123456 }
+    } ];
+
+    XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
+    XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
+
+    _handleReadAttribute = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+        NSNumber * _Nullable attributeId, MTRReadParams * _Nullable params,
+        void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+        XCTAssertTrue([controller isEqualToString:myUUID]);
+        XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
+        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
+        XCTAssertNil(params);
+        [callExpectation fulfill];
+        completion([MTRDeviceController encodeXPCResponseValues:myValues], nil);
+    };
 
     __auto_type unspecifiedRemoteDeviceController =
         [MTRDeviceController sharedControllerWithID:nil
@@ -2280,91 +2117,102 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         [anySharedRemoteControllerCallExpectation fulfill];
     };
 
-    __auto_type deviceAcquired = [self expectationWithDescription:@"Connected device was acquired"];
-    [unspecifiedRemoteDeviceController getBaseDevice:myNodeId
-                                               queue:dispatch_get_main_queue()
-                                          completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                              XCTAssertNotNil(device);
-                                              XCTAssertNil(error);
-                                              [deviceAcquired fulfill];
-                                          }];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:unspecifiedRemoteDeviceController];
+    // Do a read to exercise the device.
+    NSLog(@"Device acquired. Reading...");
+    [device readAttributesWithEndpointID:myEndpointId
+                               clusterID:myClusterId
+                             attributeID:myAttributeId
+                                  params:nil
+                                   queue:dispatch_get_main_queue()
+                              completion:^(id _Nullable value, NSError * _Nullable error) {
+                                  NSLog(@"Read value: %@", value);
+                                  XCTAssertNotNil(value);
+                                  XCTAssertNil(error);
+                                  XCTAssertTrue([myValues isEqual:value]);
+                                  [responseExpectation fulfill];
+                                  self.xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
+                              }];
 
-    [self waitForExpectations:[NSArray arrayWithObjects:anySharedRemoteControllerCallExpectation, deviceAcquired, nil]
+    [self waitForExpectations:[NSArray arrayWithObjects:anySharedRemoteControllerCallExpectation, callExpectation,
+                                       responseExpectation, nil]
                       timeout:kTimeoutInSeconds];
+
+    // When read is done, connection should have been released
+    [self waitForExpectations:[NSArray arrayWithObject:_xpcDisconnectExpectation] timeout:kTimeoutInSeconds];
+    XCTAssertNil(_xpcConnection);
 }
 
-- (void)testSubscribeAttributeCacheSuccess
+- (void)testSubscribeClusterStateCacheSuccess
 {
     uint64_t myNodeId = 9876543210;
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
     XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
 
     __auto_type uuid = self.controllerUUID;
-    __auto_type attributeCacheContainer = [[MTRAttributeCacheContainer alloc] init];
-    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, NSNumber * minInterval, NSNumber * maxInterval,
-        MTRSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error)) {
+    __auto_type clusterStateCacheContainer = [[MTRClusterStateCacheContainer alloc] init];
+    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, MTRSubscribeParams * _Nonnull params, BOOL shouldCache,
+        void (^completion)(NSError * _Nullable error)) {
         NSLog(@"Subscribe called");
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
-        XCTAssertNil(params);
         [callExpectation fulfill];
         completion(nil);
     };
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
-    [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
-                                                  deviceID:@(myNodeId)
-                                                    params:nil
-                                                     queue:dispatch_get_main_queue()
-                                                completion:^(NSError * _Nullable error) {
-                                                    NSLog(@"Subscribe completion called with error: %@", error);
-                                                    XCTAssertNil(error);
-                                                    [responseExpectation fulfill];
-                                                }];
+    [clusterStateCacheContainer subscribeWithDeviceController:_remoteDeviceController
+                                                     deviceID:@(myNodeId)
+                                                       params:nil
+                                                        queue:dispatch_get_main_queue()
+                                                   completion:^(NSError * _Nullable error) {
+                                                       NSLog(@"Subscribe completion called with error: %@", error);
+                                                       XCTAssertNil(error);
+                                                       [responseExpectation fulfill];
+                                                   }];
 
     [self waitForExpectations:@[ callExpectation, responseExpectation, self.xpcDisconnectExpectation ] timeout:kTimeoutInSeconds];
     XCTAssertNil(_xpcConnection);
 }
 
-- (void)testSubscribeAttributeCacheWithParamsSuccess
+- (void)testSubscribeClusterStateCacheWithParamsSuccess
 {
     uint64_t myNodeId = 9876543210;
-    MTRSubscribeParams * myParams = [[MTRSubscribeParams alloc] init];
-    myParams.fabricFiltered = @YES;
-    myParams.keepPreviousSubscriptions = @YES;
+    MTRSubscribeParams * myParams = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(43200)];
+    myParams.filterByFabric = YES;
+    myParams.replaceExistingSubscriptions = NO;
     XCTestExpectation * callExpectation = [self expectationWithDescription:@"XPC call received"];
     XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
 
     __auto_type uuid = self.controllerUUID;
-    __auto_type attributeCacheContainer = [[MTRAttributeCacheContainer alloc] init];
-    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, NSNumber * minInterval, NSNumber * maxInterval,
-        MTRSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error)) {
+    __auto_type clusterStateCacheContainer = [[MTRClusterStateCacheContainer alloc] init];
+    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, MTRSubscribeParams * _Nonnull params, BOOL shouldCache,
+        void (^completion)(NSError * _Nullable error)) {
         NSLog(@"Subscribe attribute cache called");
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
-        XCTAssertNotNil(params);
-        XCTAssertEqual([params.fabricFiltered boolValue], [myParams.fabricFiltered boolValue]);
-        XCTAssertEqual([params.keepPreviousSubscriptions boolValue], [myParams.keepPreviousSubscriptions boolValue]);
+        XCTAssertEqual(params.filterByFabric, myParams.filterByFabric);
+        XCTAssertEqual(params.replaceExistingSubscriptions, myParams.replaceExistingSubscriptions);
         [callExpectation fulfill];
         completion(nil);
     };
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
-    [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
-                                                  deviceID:@(myNodeId)
-                                                    params:myParams
-                                                     queue:dispatch_get_main_queue()
-                                                completion:^(NSError * _Nullable error) {
-                                                    NSLog(@"Subscribe completion called with error: %@", error);
-                                                    XCTAssertNil(error);
-                                                    [responseExpectation fulfill];
-                                                }];
+    [clusterStateCacheContainer subscribeWithDeviceController:_remoteDeviceController
+                                                     deviceID:@(myNodeId)
+                                                       params:myParams
+                                                        queue:dispatch_get_main_queue()
+                                                   completion:^(NSError * _Nullable error) {
+                                                       NSLog(@"Subscribe completion called with error: %@", error);
+                                                       XCTAssertNil(error);
+                                                       [responseExpectation fulfill];
+                                                   }];
 
     [self waitForExpectations:@[ callExpectation, responseExpectation, self.xpcDisconnectExpectation ] timeout:kTimeoutInSeconds];
     XCTAssertNil(_xpcConnection);
 }
 
-- (void)testSubscribeAttributeCacheFailure
+- (void)testSubscribeClusterStateCacheFailure
 {
     uint64_t myNodeId = 9876543210;
     NSError * myError = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil];
@@ -2372,33 +2220,32 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
 
     __auto_type uuid = self.controllerUUID;
-    __auto_type attributeCacheContainer = [[MTRAttributeCacheContainer alloc] init];
-    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, NSNumber * minInterval, NSNumber * maxInterval,
-        MTRSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error)) {
+    __auto_type clusterStateCacheContainer = [[MTRClusterStateCacheContainer alloc] init];
+    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, MTRSubscribeParams * _Nonnull params, BOOL shouldCache,
+        void (^completion)(NSError * _Nullable error)) {
         NSLog(@"Subscribe attribute cache called");
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
-        XCTAssertNil(params);
         [callExpectation fulfill];
         completion(myError);
     };
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
-    [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
-                                                  deviceID:@(myNodeId)
-                                                    params:nil
-                                                     queue:dispatch_get_main_queue()
-                                                completion:^(NSError * _Nullable error) {
-                                                    NSLog(@"Subscribe completion called with error: %@", error);
-                                                    XCTAssertNotNil(error);
-                                                    [responseExpectation fulfill];
-                                                }];
+    [clusterStateCacheContainer subscribeWithDeviceController:_remoteDeviceController
+                                                     deviceID:@(myNodeId)
+                                                       params:nil
+                                                        queue:dispatch_get_main_queue()
+                                                   completion:^(NSError * _Nullable error) {
+                                                       NSLog(@"Subscribe completion called with error: %@", error);
+                                                       XCTAssertNotNil(error);
+                                                       [responseExpectation fulfill];
+                                                   }];
 
     [self waitForExpectations:@[ callExpectation, responseExpectation, _xpcDisconnectExpectation ] timeout:kTimeoutInSeconds];
     XCTAssertNil(_xpcConnection);
 }
 
-- (void)testReadAttributeCacheSuccess
+- (void)testReadClusterStateCacheSuccess
 {
     uint64_t myNodeId = 9876543210;
     NSNumber * myEndpointId = @100;
@@ -2416,59 +2263,59 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
 
     __auto_type uuid = self.controllerUUID;
-    __auto_type attributeCacheContainer = [[MTRAttributeCacheContainer alloc] init];
-    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, NSNumber * minInterval, NSNumber * maxInterval,
-        MTRSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error)) {
+    __auto_type clusterStateCacheContainer = [[MTRClusterStateCacheContainer alloc] init];
+    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, MTRSubscribeParams * _Nonnull params, BOOL shouldCache,
+        void (^completion)(NSError * _Nullable error)) {
         NSLog(@"Subscribe attribute cache called");
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
-        XCTAssertNil(params);
         completion(nil);
     };
 
-    _handleReadAttributeCache = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
-        NSLog(@"Read attribute cache called");
-        XCTAssertTrue([controller isEqualToString:uuid]);
-        XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
-        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
-        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
-        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        [callExpectation fulfill];
-        completion([MTRDeviceController encodeXPCResponseValues:myValues], nil);
-    };
+    _handleReadClusterStateCache
+        = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+            NSNumber * _Nullable attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+              NSLog(@"Read attribute cache called");
+              XCTAssertTrue([controller isEqualToString:uuid]);
+              XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
+              XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+              XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+              XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
+              [callExpectation fulfill];
+              completion([MTRDeviceController encodeXPCResponseValues:myValues], nil);
+          };
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
 
-    [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
-                                                  deviceID:@(myNodeId)
-                                                    params:nil
-                                                     queue:dispatch_get_main_queue()
-                                                completion:^(NSError * _Nullable error) {
-                                                    NSLog(@"Subscribe completion called with error: %@", error);
-                                                    XCTAssertNil(error);
-                                                    [subscribeExpectation fulfill];
-                                                }];
+    [clusterStateCacheContainer subscribeWithDeviceController:_remoteDeviceController
+                                                     deviceID:@(myNodeId)
+                                                       params:nil
+                                                        queue:dispatch_get_main_queue()
+                                                   completion:^(NSError * _Nullable error) {
+                                                       NSLog(@"Subscribe completion called with error: %@", error);
+                                                       XCTAssertNil(error);
+                                                       [subscribeExpectation fulfill];
+                                                   }];
     [self waitForExpectations:@[ subscribeExpectation, _xpcDisconnectExpectation ] timeout:kTimeoutInSeconds];
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
-    [attributeCacheContainer
-        readAttributeWithEndpointID:myEndpointId
-                          clusterID:myClusterId
-                        attributeID:myAttributeId
-                              queue:dispatch_get_main_queue()
-                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                             NSLog(@"Read cached value: %@", values);
-                             XCTAssertNotNil(values);
-                             XCTAssertNil(error);
-                             XCTAssertTrue([myValues isEqual:values]);
-                             [responseExpectation fulfill];
-                         }];
+    [clusterStateCacheContainer
+        readAttributesWithEndpointID:myEndpointId
+                           clusterID:myClusterId
+                         attributeID:myAttributeId
+                               queue:dispatch_get_main_queue()
+                          completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                              NSLog(@"Read cached value: %@", values);
+                              XCTAssertNotNil(values);
+                              XCTAssertNil(error);
+                              XCTAssertTrue([myValues isEqual:values]);
+                              [responseExpectation fulfill];
+                          }];
     [self waitForExpectations:@[ callExpectation, responseExpectation, _xpcDisconnectExpectation ] timeout:kTimeoutInSeconds];
     XCTAssertNil(_xpcConnection);
 }
 
-- (void)testReadAttributeCacheFailure
+- (void)testReadClusterStateCacheFailure
 {
     uint64_t myNodeId = 9876543210;
     NSNumber * myEndpointId = @100;
@@ -2480,51 +2327,51 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     XCTestExpectation * responseExpectation = [self expectationWithDescription:@"XPC response received"];
 
     __auto_type uuid = self.controllerUUID;
-    __auto_type attributeCacheContainer = [[MTRAttributeCacheContainer alloc] init];
-    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, NSNumber * minInterval, NSNumber * maxInterval,
-        MTRSubscribeParams * _Nullable params, BOOL shouldCache, void (^completion)(NSError * _Nullable error)) {
+    __auto_type clusterStateCacheContainer = [[MTRClusterStateCacheContainer alloc] init];
+    _handleSubscribeAll = ^(id controller, NSNumber * nodeId, MTRSubscribeParams * _Nonnull params, BOOL shouldCache,
+        void (^completion)(NSError * _Nullable error)) {
         NSLog(@"Subscribe attribute cache called");
         XCTAssertTrue([controller isEqualToString:uuid]);
         XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
-        XCTAssertNil(params);
         completion(nil);
     };
 
-    _handleReadAttributeCache = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
-        NSNumber * _Nullable attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
-        NSLog(@"Read attribute cache called");
-        XCTAssertTrue([controller isEqualToString:uuid]);
-        XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
-        XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
-        XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
-        XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
-        [callExpectation fulfill];
-        completion(nil, myError);
-    };
+    _handleReadClusterStateCache
+        = ^(id controller, NSNumber * nodeId, NSNumber * _Nullable endpointId, NSNumber * _Nullable clusterId,
+            NSNumber * _Nullable attributeId, void (^completion)(id _Nullable values, NSError * _Nullable error)) {
+              NSLog(@"Read attribute cache called");
+              XCTAssertTrue([controller isEqualToString:uuid]);
+              XCTAssertEqual([nodeId unsignedLongLongValue], myNodeId);
+              XCTAssertEqual([endpointId unsignedShortValue], [myEndpointId unsignedShortValue]);
+              XCTAssertEqual([clusterId unsignedLongValue], [myClusterId unsignedLongValue]);
+              XCTAssertEqual([attributeId unsignedLongValue], [myAttributeId unsignedLongValue]);
+              [callExpectation fulfill];
+              completion(nil, myError);
+          };
 
-    [attributeCacheContainer subscribeWithDeviceController:_remoteDeviceController
-                                                  deviceID:@(myNodeId)
-                                                    params:nil
-                                                     queue:dispatch_get_main_queue()
-                                                completion:^(NSError * _Nullable error) {
-                                                    NSLog(@"Subscribe completion called with error: %@", error);
-                                                    XCTAssertNil(error);
-                                                    [subscribeExpectation fulfill];
-                                                }];
+    [clusterStateCacheContainer subscribeWithDeviceController:_remoteDeviceController
+                                                     deviceID:@(myNodeId)
+                                                       params:nil
+                                                        queue:dispatch_get_main_queue()
+                                                   completion:^(NSError * _Nullable error) {
+                                                       NSLog(@"Subscribe completion called with error: %@", error);
+                                                       XCTAssertNil(error);
+                                                       [subscribeExpectation fulfill];
+                                                   }];
     [self waitForExpectations:@[ subscribeExpectation ] timeout:kTimeoutInSeconds];
 
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
-    [attributeCacheContainer
-        readAttributeWithEndpointID:myEndpointId
-                          clusterID:myClusterId
-                        attributeID:myAttributeId
-                              queue:dispatch_get_main_queue()
-                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                             NSLog(@"Read cached value: %@", values);
-                             XCTAssertNil(values);
-                             XCTAssertNotNil(error);
-                             [responseExpectation fulfill];
-                         }];
+    [clusterStateCacheContainer
+        readAttributesWithEndpointID:myEndpointId
+                           clusterID:myClusterId
+                         attributeID:myAttributeId
+                               queue:dispatch_get_main_queue()
+                          completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                              NSLog(@"Read cached value: %@", values);
+                              XCTAssertNil(values);
+                              XCTAssertNotNil(error);
+                              [responseExpectation fulfill];
+                          }];
     [self waitForExpectations:@[ callExpectation, responseExpectation, _xpcDisconnectExpectation ] timeout:kTimeoutInSeconds];
     XCTAssertNil(_xpcConnection);
 }
@@ -2543,24 +2390,19 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                                                                           return nil;
                                                                       }];
 
-    [failingDeviceController getBaseDevice:myNodeId
-                                     queue:dispatch_get_main_queue()
-                                completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                    XCTAssertNotNil(device);
-                                    XCTAssertNil(error);
-                                    NSLog(@"Device acquired. Reading...");
-                                    [device readAttributesWithEndpointID:myEndpointId
-                                                               clusterID:myClusterId
-                                                             attributeID:myAttributeId
-                                                                  params:nil
-                                                                   queue:dispatch_get_main_queue()
-                                                              completion:^(id _Nullable value, NSError * _Nullable error) {
-                                                                  NSLog(@"Read value: %@", value);
-                                                                  XCTAssertNil(value);
-                                                                  XCTAssertNotNil(error);
-                                                                  [responseExpectation fulfill];
-                                                              }];
-                                }];
+    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(myNodeId) controller:failingDeviceController];
+    NSLog(@"Device acquired. Reading...");
+    [device readAttributesWithEndpointID:myEndpointId
+                               clusterID:myClusterId
+                             attributeID:myAttributeId
+                                  params:nil
+                                   queue:dispatch_get_main_queue()
+                              completion:^(id _Nullable value, NSError * _Nullable error) {
+                                  NSLog(@"Read value: %@", value);
+                                  XCTAssertNil(value);
+                                  XCTAssertNotNil(error);
+                                  [responseExpectation fulfill];
+                              }];
 
     [self waitForExpectations:@[ responseExpectation ] timeout:kTimeoutInSeconds];
 }

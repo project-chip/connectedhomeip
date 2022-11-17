@@ -74,10 +74,10 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
         break;
-    case ZCL_OTA_PROVIDER_CLUSTER_ID:
+    case ZCL_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_ID:
         emberAfOtaSoftwareUpdateProviderClusterInitCallback(endpoint);
         break;
-    case ZCL_OTA_REQUESTOR_CLUSTER_ID:
+    case ZCL_OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_ID:
         emberAfOtaSoftwareUpdateRequestorClusterInitCallback(endpoint);
         break;
     case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
@@ -91,6 +91,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_THERMOSTAT_CLUSTER_ID:
         emberAfThermostatClusterInitCallback(endpoint);
+        break;
+    case ZCL_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_ID:
+        emberAfThermostatUserInterfaceConfigurationClusterInitCallback(endpoint);
         break;
     case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfThreadNetworkDiagnosticsClusterInitCallback(endpoint);
@@ -214,6 +217,11 @@ void __attribute__((weak)) emberAfSoftwareDiagnosticsClusterInitCallback(Endpoin
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfThermostatClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfThermostatUserInterfaceConfigurationClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

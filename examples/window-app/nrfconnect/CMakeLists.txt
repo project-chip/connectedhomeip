@@ -68,7 +68,7 @@ chip_configure_data_model(app
     ZAP_FILE ${WIN_APP_COMMON_DIR}/window-app.zap
 )
 
-if(CONFIG_CHIP_OTA_REQUESTOR)
+if(CONFIG_CHIP_OTA_REQUESTOR OR CONFIG_MCUMGR_SMP_BT)
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/OTAUtil.cpp)
 endif()
 

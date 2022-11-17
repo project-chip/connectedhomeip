@@ -35,12 +35,7 @@ namespace Internal {
 // // Prefix used for Easyflash keys that contain Chip group encryption keys.
 CHIP_ERROR BL702Config::Init()
 {
-    // EfErrCode err = easyflash_init();
-
-    // if (EF_NO_ERR == err)
     return CHIP_NO_ERROR;
-
-    // return CHIP_ERROR_NO_MEMORY;
 }
 
 CHIP_ERROR BL702Config::ReadConfigValue(const char * key, uint8_t * val, size_t size, size_t & readsize)

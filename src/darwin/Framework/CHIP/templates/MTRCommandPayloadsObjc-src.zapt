@@ -38,6 +38,11 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+{{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}
+
+@implementation MTRTestClusterCluster{{asUpperCamelCase name}}Params
+@end
+{{/if}}
 {{/zcl_commands}}
 {{/zcl_clusters}}
 

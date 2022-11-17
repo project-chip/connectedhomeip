@@ -20,6 +20,7 @@
 #import <Matter/MTRCluster.h>
 
 @class MTRSetupPayload;
+@class MTRDeviceController;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -116,6 +117,7 @@ extern NSString * const MTRNullValueType;
 extern NSString * const MTRStructureValueType;
 extern NSString * const MTRArrayValueType;
 
+@class MTRClusterStateCacheContainer;
 @class MTRAttributeCacheContainer;
 @class MTRReadParams;
 @class MTRSubscribeParams;
@@ -124,6 +126,14 @@ extern NSString * const MTRArrayValueType;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * Create a device object with the given node id and controller.  This
+ * will always succeed, even if there is no such node id on the controller's
+ * fabric, but attempts to actually use the MTRBaseDevice will fail
+ * (asynchronously) in that case.
+ */
++ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller MTR_NEWLY_AVAILABLE;
 
 /**
  * Subscribe to receive attribute reports for everything (all endpoints, all
@@ -165,15 +175,13 @@ extern NSString * const MTRArrayValueType;
  * attempts fail.
  */
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                minInterval:(NSNumber *)minInterval
-                maxInterval:(NSNumber *)maxInterval
-                     params:(MTRSubscribeParams * _Nullable)params
-    attributeCacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
-     attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
-         eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
-               errorHandler:(MTRDeviceErrorHandler)errorHandler
-    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-    resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduled MTR_NEWLY_AVAILABLE;
+                        params:(MTRSubscribeParams *)params
+    clusterStateCacheContainer:(MTRClusterStateCacheContainer * _Nullable)clusterStateCacheContainer
+        attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
+            eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
+                  errorHandler:(MTRDeviceErrorHandler)errorHandler
+       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+       resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduled MTR_NEWLY_AVAILABLE;
 
 /**
  * Reads attributes from the device.
@@ -258,8 +266,6 @@ extern NSString * const MTRArrayValueType;
 - (void)subscribeToAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
                                   clusterID:(NSNumber * _Nullable)clusterID
                                 attributeID:(NSNumber * _Nullable)attributeID
-                                minInterval:(NSNumber *)minInterval
-                                maxInterval:(NSNumber *)maxInterval
                                      params:(MTRSubscribeParams * _Nullable)params
                                       queue:(dispatch_queue_t)queue
                               reportHandler:(MTRDeviceResponseHandler)reportHandler
@@ -298,9 +304,26 @@ extern NSString * const MTRArrayValueType;
 
 @end
 
-@interface MTRAttributePath : NSObject <NSCopying>
+/**
+ * A path indicating a specific cluster on a device (i.e. without any
+ * wildcards).
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRClusterPath : NSObject <NSCopying>
 @property (nonatomic, readonly, copy) NSNumber * endpoint;
 @property (nonatomic, readonly, copy) NSNumber * cluster;
+
++ (instancetype)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+@end
+
+/**
+ * A path indicating a specific attribute on a device (i.e. without any
+ * wildcards).
+ */
+@interface MTRAttributePath : MTRClusterPath <NSCopying>
 @property (nonatomic, readonly, copy) NSNumber * attribute;
 
 + (instancetype)attributePathWithEndpointID:(NSNumber *)endpointID
@@ -311,9 +334,12 @@ extern NSString * const MTRArrayValueType;
 + (instancetype)new NS_UNAVAILABLE;
 @end
 
-@interface MTREventPath : NSObject
-@property (nonatomic, readonly, copy) NSNumber * endpoint;
-@property (nonatomic, readonly, copy) NSNumber * cluster;
+/**
+ * A path indicating a specific event that can be emitted on a device
+ * (i.e. without any wildcards).  There can be multiple instances of actual
+ * events for a given event path.
+ */
+@interface MTREventPath : MTRClusterPath <NSCopying>
 @property (nonatomic, readonly, copy) NSNumber * event;
 
 + (instancetype)eventPathWithEndpointID:(NSNumber *)endpointID
@@ -324,9 +350,11 @@ extern NSString * const MTRArrayValueType;
 + (instancetype)new NS_UNAVAILABLE;
 @end
 
-@interface MTRCommandPath : NSObject
-@property (nonatomic, readonly, copy) NSNumber * endpoint;
-@property (nonatomic, readonly, copy) NSNumber * cluster;
+/**
+ * A path indicating a specific command on a device (i.e. without any
+ * wildcards).
+ */
+@interface MTRCommandPath : MTRClusterPath <NSCopying>
 @property (nonatomic, readonly, copy) NSNumber * command;
 
 + (instancetype)commandPathWithEndpointID:(NSNumber *)endpointID
@@ -376,9 +404,10 @@ extern NSString * const MTRArrayValueType;
                errorHandler:(MTRDeviceErrorHandler)errorHandler
     subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
     resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
-    MTR_NEWLY_DEPRECATED("Please use "
-                         "subscribeWithQueue:params:attributeCacheContainer:attributeReportHandler:eventReportHandler:errorHandler:"
-                         "subscriptionEstablished:resubscriptionScheduled:");
+    MTR_NEWLY_DEPRECATED(
+        "Please use "
+        "subscribeWithQueue:params:clusterStateCacheContainer:attributeReportHandler:eventReportHandler:errorHandler:"
+        "subscriptionEstablished:resubscriptionScheduled:");
 
 - (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
                           clusterId:(NSNumber * _Nullable)clusterId
@@ -417,7 +446,7 @@ extern NSString * const MTRArrayValueType;
                            reportHandler:(MTRDeviceResponseHandler)reportHandler
                  subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
     MTR_NEWLY_DEPRECATED("Please use "
-                         "subscribeToAttributesWithEndpointID:clusterID:attributeID:params:minInterval:maxInterval:queue:"
+                         "subscribeToAttributesWithEndpointID:clusterID:attributeID:params:queue:"
                          "reportHandler:subscriptionEstablished:");
 
 - (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)queue

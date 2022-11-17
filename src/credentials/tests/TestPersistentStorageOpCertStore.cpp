@@ -65,7 +65,7 @@ void TestAddNocFlow(nlTestSuite * inSuite, void * inContext)
     // same fabric but succeed GetCertificate.
     const uint8_t kTestRcacBufExists[] = { 'r', 'c', 'a', 'c', ' ', 'e', 'x', 'i', 's', 't', 's' };
 
-    err = storageDelegate.SyncSetKeyValue(DefaultStorageKeyAllocator::FabricRCAC(kFabricIndex1), kTestRcacBufExists,
+    err = storageDelegate.SyncSetKeyValue(DefaultStorageKeyAllocator::FabricRCAC(kFabricIndex1).KeyName(), kTestRcacBufExists,
                                           sizeof(kTestRcacBufExists));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 1);
@@ -123,12 +123,12 @@ void TestAddNocFlow(nlTestSuite * inSuite, void * inContext)
     const uint8_t kTestIcacBufExists[] = { 'i', 'c', 'a', 'c', ' ', 'e', 'x', 'i', 's', 't', 's' };
     const uint8_t kTestNocBufExists[]  = { 'n', 'o', 'c', ' ', 'e', 'x', 'i', 's', 't', 's' };
 
-    err = storageDelegate.SyncSetKeyValue(DefaultStorageKeyAllocator::FabricICAC(kFabricIndex2), kTestIcacBufExists,
+    err = storageDelegate.SyncSetKeyValue(DefaultStorageKeyAllocator::FabricICAC(kFabricIndex2).KeyName(), kTestIcacBufExists,
                                           sizeof(kTestIcacBufExists));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 1);
 
-    err = storageDelegate.SyncSetKeyValue(DefaultStorageKeyAllocator::FabricNOC(kFabricIndex2), kTestNocBufExists,
+    err = storageDelegate.SyncSetKeyValue(DefaultStorageKeyAllocator::FabricNOC(kFabricIndex2).KeyName(), kTestNocBufExists,
                                           sizeof(kTestNocBufExists));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 2);
@@ -142,8 +142,8 @@ void TestAddNocFlow(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !opCertStore.HasPendingNocChain());
     NL_TEST_ASSERT(inSuite, opCertStore.HasPendingRootCert() == true);
 
-    storageDelegate.SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICAC(kFabricIndex2));
-    storageDelegate.SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricNOC(kFabricIndex2));
+    storageDelegate.SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICAC(kFabricIndex2).KeyName());
+    storageDelegate.SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricNOC(kFabricIndex2).KeyName());
     NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 0);
 
     // Trying to do AddNewOpCertsForFabric for same fabric as that with pending RCAC should succeed
@@ -257,21 +257,21 @@ void TestUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
     MutableByteSpan largeSpan{ largeBuf };
 
     {
-        err = storageDelegate.SyncSetKeyValue(DefaultStorageKeyAllocator::FabricRCAC(kFabricIndex1), kTestRcacBufExists,
+        err = storageDelegate.SyncSetKeyValue(DefaultStorageKeyAllocator::FabricRCAC(kFabricIndex1).KeyName(), kTestRcacBufExists,
                                               sizeof(kTestRcacBufExists));
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 1);
         NL_TEST_ASSERT(inSuite,
                        opCertStore.HasCertificateForFabric(kFabricIndex1, CertChainElement::kRcac) == true); //< From manual add
 
-        err = storageDelegate.SyncSetKeyValue(DefaultStorageKeyAllocator::FabricICAC(kFabricIndex1), kTestIcacBufExists,
+        err = storageDelegate.SyncSetKeyValue(DefaultStorageKeyAllocator::FabricICAC(kFabricIndex1).KeyName(), kTestIcacBufExists,
                                               sizeof(kTestIcacBufExists));
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 2);
         NL_TEST_ASSERT(inSuite,
                        opCertStore.HasCertificateForFabric(kFabricIndex1, CertChainElement::kIcac) == true); //< From manual add
 
-        err = storageDelegate.SyncSetKeyValue(DefaultStorageKeyAllocator::FabricNOC(kFabricIndex1), kTestNocBufExists,
+        err = storageDelegate.SyncSetKeyValue(DefaultStorageKeyAllocator::FabricNOC(kFabricIndex1).KeyName(), kTestNocBufExists,
                                               sizeof(kTestNocBufExists));
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 3);
@@ -347,8 +347,8 @@ void TestUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     // Committing writes the new values (we even "background-remove" the old ICAC/NOC before commit)
-    storageDelegate.SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICAC(kFabricIndex1));
-    storageDelegate.SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricNOC(kFabricIndex1));
+    storageDelegate.SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICAC(kFabricIndex1).KeyName());
+    storageDelegate.SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricNOC(kFabricIndex1).KeyName());
     NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 1); //< Root remains
 
     err = opCertStore.CommitOpCertsForFabric(kFabricIndex1);
