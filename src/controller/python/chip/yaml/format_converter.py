@@ -20,39 +20,26 @@ from chip.clusters.Types import Nullable, NullValue
 from chip.tlv import uint, float32
 import enum
 from chip.yaml.errors import ValidationError
-from binascii import unhexlify
-import re
+import binascii
 
 
 def convert_yaml_octet_string_to_bytes(s: str) -> bytes:
     """Convert YAML octet string body to bytes, handling any c-style hex escapes (e.g. \x5a) and hex: prefix"""
-    is_hex_string_re = r"^hex:(?P<hex_content>[A-Fa-f0-9]*)$"
-
-    hex_prefixed_match = re.match(is_hex_string_re, s)
-
     # Step 1: handle explicit "hex:" prefix
-    if hex_prefixed_match:
-        hex_content = hex_prefixed_match.group("hex_content")
-        if (len(hex_content) % 2) != 0:
-            raise ValueError("Hex literal is not even length!")
-        return unhexlify(hex_content)
+    if s.startswith('hex:'):
+        return binascii.unhexlify(s[4:])
 
     # Step 2: convert non-hex-prefixed to bytes
     # TODO(#23669): This does not properly support utf8 octet strings. We mimic
     # javascript codegen behavior. Behavior or javascript is:
     #   * Octet string character >= u+0200 errors out.
     #   * Any character greater than 0xFF has the upper bytes chopped off.
-    known_javascript_max_char_value = 0x200
-    accumulated_hex = ""
-    for char in s:
-        char_value = ord(char)
-        if char_value >= known_javascript_max_char_value:
-            # If you got here see TODO #23669 mentioned above.
-            raise ValueError("Unsupport char in octet string")
-        char_value_lsb = char_value & 0xFF
-        hex_with_leading_0x = '{0:02x}'.format(char_value_lsb)
-        accumulated_hex += hex_with_leading_0x
-    return unhexlify(accumulated_hex)
+    as_bytes = [ord(c) for c in s]
+
+    if any([value > 0x200 for value in as_bytes]):
+        raise ValueError('Unsupported char in octet string %r' % as_bytes)
+    accumulated_hex = ''.join([f"{(v & 0xFF):02x}" for v in as_bytes])
+    return binascii.unhexlify(accumulated_hex)
 
 
 def convert_name_value_pair_to_dict(arg_values):
