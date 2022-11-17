@@ -16,7 +16,7 @@ import stringcase
 
 
 def normalize_acronyms(s: str) -> str:
-    """Replaces variatiosn of acronyms when converting various words.
+    """Replaces variations of acronyms when converting various words.
 
        Specifically when considering how to generate a CONST_CASE constant,
        strings such as WiFi should not be WI_FI but rather WIFI
