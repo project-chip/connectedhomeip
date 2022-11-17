@@ -13,8 +13,8 @@
 #include <lib/support/UnitTestRegistration.h>
 
 // Mocks
-#include "MockMqtt.hpp"
 #include "MockNodeStateMonitor.hpp"
+#include "MockUnifyMqtt.hpp"
 
 // Third party library
 #include <iostream>
@@ -42,9 +42,10 @@ chip::app::AttributeValueEncoder setupEncoder(chip::EndpointId endpoint, chip::a
 
 void TestTemperatureMeasurementAttributes(nlTestSuite * inSuite, void * aContext)
 {
+
     // 1
-    MockNodeStateMonitor test_matter_node_state_monitor(dev_translator, ember_interface);
-    MockUnifyMqtt test_unify_mqtt;
+    Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator, ember_interface);
+    Test::MockUnifyMqtt test_unify_mqtt;
 
     unify::matter_bridge::TemperatureMeasurementAttributeAccess test_temperature_measurement_attributes(
         test_matter_node_state_monitor, test_unify_mqtt);
@@ -93,8 +94,8 @@ void TestTemperatureMeasurementReadFailures(nlTestSuite * inSuite, void * aConte
 {
 
     // Setup
-    MockNodeStateMonitor test_matter_node_state_monitor(dev_translator, ember_interface);
-    MockUnifyMqtt test_unify_mqtt;
+    Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator, ember_interface);
+    Test::MockUnifyMqtt test_unify_mqtt;
 
     unify::matter_bridge::TemperatureMeasurementAttributeAccess test_temperature_measurement_attributes(
         test_matter_node_state_monitor, test_unify_mqtt);

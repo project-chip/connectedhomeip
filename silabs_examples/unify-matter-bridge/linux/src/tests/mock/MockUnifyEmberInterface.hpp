@@ -16,10 +16,13 @@
 
 #include "unify_ember_interface.hpp"
 
-class MockedUnifyEmberInterface : public UnifyEmberInterface
+namespace unify::matter_bridge {
+namespace Test {
+
+class MockUnifyEmberInterface : public UnifyEmberInterface
 {
 public:
-    MockedUnifyEmberInterface() : UnifyEmberInterface(){};
+    MockUnifyEmberInterface() : UnifyEmberInterface(){};
 
     chip::EndpointId calledWithId = 101;
     uint16_t calledWithIndex;
@@ -60,4 +63,6 @@ public:
     chip::EndpointId getLastReturnedAvailableEndpointId() { return last_returned_available_endpoint_id; }
 };
 
+} // namespace Test
+} // namespace unify::matter_bridge
 #endif

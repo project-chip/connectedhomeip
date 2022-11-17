@@ -7,18 +7,18 @@
 #include <lib/support/UnitTestRegistration.h>
 
 // Mocks
-#include "MockMqtt.hpp"
 #include "MockNodeStateMonitor.hpp"
+#include "MockUnifyMqtt.hpp"
 
 // Third party library
 #include <iostream>
-#include <string>
 #include <nlunit-test.h>
+#include <string>
 
 using namespace unify::matter_bridge;
 
 static UnifyEmberInterface ember_interface = UnifyEmberInterface();
-static device_translator dev_translator = device_translator();
+static device_translator dev_translator    = device_translator();
 class MockCommandHandlerCallback : public chip::app::CommandHandler::Callback
 {
 public:
@@ -38,16 +38,16 @@ void TestOnOffClusterCommandHandler(nlTestSuite * inSuite, void * aContext)
 {
     // 1
     // Execute command ON with onoff device
-    MockNodeStateMonitor test_matter_node_state_monitor(dev_translator, ember_interface);
-    MockUnifyMqtt mqtt_publish_test;
+    Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator, ember_interface);
+    Test::MockUnifyMqtt mqtt_publish_test;
     OnOffClusterCommandHandler on_cmd_handler(test_matter_node_state_monitor, mqtt_publish_test);
-    
+
     // Create a node with cluster endpoints resembling On/Off.
     const std::string node_id = "zw-0x0002";
-    const uint8_t endpoint = 4;
+    const uint8_t endpoint    = 4;
     unify::node_state_monitor::node node_ember_1(node_id);
-    auto &ep                        = node_ember_1.emplace_endpoint(endpoint);
-    auto &onoff_cluster             = ep.emplace_cluster("OnOff");
+    auto & ep                        = node_ember_1.emplace_endpoint(endpoint);
+    auto & onoff_cluster             = ep.emplace_cluster("OnOff");
     onoff_cluster.supported_commands = { "On", "Off", "Toggle" };
     onoff_cluster.attributes.emplace("OnOff");
 
@@ -55,8 +55,8 @@ void TestOnOffClusterCommandHandler(nlTestSuite * inSuite, void * aContext)
     auto bridged_ep = test_matter_node_state_monitor.bridged_endpoint(node_id, endpoint);
     NL_TEST_ASSERT(inSuite, bridged_ep != nullptr);
 
-    chip::app::ConcreteCommandPath test_command_path =
-        chip::app::ConcreteCommandPath(bridged_ep->matter_endpoint, chip::app::Clusters::OnOff::Id, chip::app::Clusters::OnOff::Commands::On::Id);
+    chip::app::ConcreteCommandPath test_command_path = chip::app::ConcreteCommandPath(
+        bridged_ep->matter_endpoint, chip::app::Clusters::OnOff::Id, chip::app::Clusters::OnOff::Commands::On::Id);
     MockCommandHandlerCallback mockCommandHandlerDelegate;
     chip::app::CommandHandler test_commandHandler(&mockCommandHandlerDelegate);
     chip::TLV::TLVReader test_tlv_reader;
@@ -66,9 +66,8 @@ void TestOnOffClusterCommandHandler(nlTestSuite * inSuite, void * aContext)
     on_cmd_handler.InvokeCommand(ctxt);
 
     NL_TEST_ASSERT(inSuite, mqtt_publish_test.nNumerUicMqttPublishCall == 1);
-    NL_TEST_ASSERT(inSuite, mqtt_publish_test.publish_topic == "ucl/by-unid/zw-0x0002/ep4/OnOff/Commands/On" );
+    NL_TEST_ASSERT(inSuite, mqtt_publish_test.publish_topic == "ucl/by-unid/zw-0x0002/ep4/OnOff/Commands/On");
     NL_TEST_ASSERT(inSuite, mqtt_publish_test.publish_payload.compare("{}") == 0);
-
 }
 
 class TestContext

@@ -11,18 +11,21 @@
  *
  *****************************************************************************/
 
-
-#ifndef MOCK_MQTT_HPP
-#define MOCK_MQTT_HPP
+#ifndef MOCK_UNIFY_MQTT_HPP
+#define MOCK_UNIFY_MQTT_HPP
 
 #include "unify_mqtt_wrapper.hpp"
 
-class MockUnifyMqtt : public unify::matter_bridge::UnifyMqtt {
+namespace unify::matter_bridge {
+namespace Test {
+
+class MockUnifyMqtt : public unify::matter_bridge::UnifyMqtt
+{
 public:
-    // Overwriting publish function and saving specifics of the function 
+    // Overwriting publish function and saving specifics of the function
     void Publish(std::string topic, std::string payload, bool retain) override
     {
-        publish_topic = topic;
+        publish_topic   = topic;
         publish_payload = payload;
         ++nNumerUicMqttPublishCall;
     }
@@ -36,7 +39,7 @@ public:
                      void * user) override
     {
         subscribe_topic = topic;
-        subscribeCB    = callback;
+        subscribeCB     = callback;
         ++nNumerUicMqttSubscribeCall;
     }
     int nNumerUicMqttSubscribeCall = 0;
@@ -53,8 +56,9 @@ public:
     }
     int nNumerUicMqttUnsubscribeCall = 0;
     std::string unsubscribe_topic;
-
-
 };
+
+} // namespace Test
+} // namespace unify::matter_bridge
 
 #endif

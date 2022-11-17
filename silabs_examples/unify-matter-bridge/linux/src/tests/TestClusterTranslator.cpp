@@ -10,8 +10,8 @@
 
 #include "attribute_translator.hpp"
 // Mocks
-#include "MockMqtt.hpp"
 #include "MockNodeStateMonitor.hpp"
+#include "MockUnifyMqtt.hpp"
 
 using namespace unify::matter_bridge;
 
@@ -37,13 +37,13 @@ chip::app::AttributeValueEncoder setupEncoder(chip::EndpointId endpoint, chip::a
     return encoder;
 }
 
-static void TestClusterTranslatorRevision(nlTestSuite *inSuite, void *aContext)
+static void TestClusterTranslatorRevision(nlTestSuite * inSuite, void * aContext)
 {
-    MockNodeStateMonitor test_matter_node_state_monitor(dev_translator, ember_interface);
-    MockUnifyMqtt mqtt_publish_test;
+    Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator, ember_interface);
+    Test::MockUnifyMqtt mqtt_publish_test;
     // testing Identify Cluster revision
     IdentifyAttributeAccess test_identify_attribute_handler(test_matter_node_state_monitor, mqtt_publish_test);
-    const uint16_t endpoint    = 4;
+    const uint16_t endpoint                             = 4;
     chip::app::ConcreteReadAttributePath test_attr_path = chip::app::ConcreteReadAttributePath(
         endpoint, chip::app::Clusters::Identify::Id, chip::app::Clusters::Identify::Attributes::ClusterRevision::Id);
 
@@ -55,16 +55,15 @@ static void TestClusterTranslatorRevision(nlTestSuite *inSuite, void *aContext)
 
 class TestContext
 {
- public:
-     nlTestSuite * mTestSuite;
+public:
+    nlTestSuite * mTestSuite;
 };
 
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = {
-    NL_TEST_DEF("ClusterTranslator::TestClusterTranslatorRevision", TestClusterTranslatorRevision), NL_TEST_SENTINEL()
-};
+static const nlTest sTests[] = { NL_TEST_DEF("ClusterTranslator::TestClusterTranslatorRevision", TestClusterTranslatorRevision),
+                                 NL_TEST_SENTINEL() };
 
 static nlTestSuite kTheSuite = { "ClusterTranslatorTests", &sTests[0], nullptr, nullptr };
 

@@ -16,15 +16,20 @@
 
 #include "matter_node_state_monitor.hpp"
 
+namespace unify::matter_bridge {
+namespace Test {
+
 class MockNodeStateMonitor : public unify::matter_bridge::matter_node_state_monitor
 {
 public:
-    MockNodeStateMonitor(unify::matter_bridge::device_translator device_translator, UnifyEmberInterface ember_interface) :
-        matter_node_state_monitor(device_translator, ember_interface)
+    MockNodeStateMonitor(const unify::matter_bridge::device_translator & device_translator, UnifyEmberInterface & ember_interface) :
+        unify::matter_bridge::matter_node_state_monitor(device_translator, ember_interface)
     {}
 
     void call_on_unify_node_added(const unify::node_state_monitor::node & node) { this->on_unify_node_added(node); }
-
 };
+
+} // namespace Test
+} // namespace unify::matter_bridge
 
 #endif
