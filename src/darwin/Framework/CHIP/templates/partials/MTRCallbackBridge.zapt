@@ -47,7 +47,7 @@ public:
         mEstablishedHandler(establishedHandler)
       {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTR{{> @partial-block}}Bridge::OnDone;
     using MTR{{> @partial-block}}Bridge::KeepAliveOnCallback;
 
@@ -97,19 +97,18 @@ void MTR{{> @partial-block}}Bridge::OnSuccessFn(void * context
 };
 
 {{#unless partial-type}}
-void MTR{{> @partial-block}}SubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTR{{> @partial-block}}SubscriptionBridge::OnSubscriptionEstablished()
 {
-     auto * self = static_cast<MTR{{> @partial-block}}SubscriptionBridge *>(context);
-     if (!self->mQueue) {
+     if (!mQueue) {
          return;
      }
 
-     if (self->mEstablishedHandler != nil) {
-         dispatch_async(self->mQueue, self->mEstablishedHandler);
+     if (mEstablishedHandler != nil) {
+         dispatch_async(mQueue, mEstablishedHandler);
          // On failure, mEstablishedHandler will be cleaned up by our destructor,
          // but we can clean it up earlier on successful subscription
          // establishment.
-         self->mEstablishedHandler = nil;
+         mEstablishedHandler = nil;
      }
 }
 

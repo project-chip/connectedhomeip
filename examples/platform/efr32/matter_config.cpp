@@ -130,6 +130,8 @@ void EFR32MatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event,
 
 CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
 {
+    CHIP_ERROR err;
+
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
     EFR32_LOG("==================================================");
@@ -186,8 +188,10 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
 #endif
 
     // Init Matter Server and Start Event Loop
-    chip::Server::GetInstance().Init(initParams);
+    err = chip::Server::GetInstance().Init(initParams);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    ReturnErrorOnFailure(err);
 
     // OTA Requestor initialization will be triggered by the connectivity events
     PlatformMgr().AddEventHandler(ConnectivityEventCallback, reinterpret_cast<intptr_t>(nullptr));

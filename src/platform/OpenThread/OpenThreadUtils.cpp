@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -237,13 +237,13 @@ void LogOpenThreadPacket(const char * titleStr, otMessage * pkt)
             snprintf(destStr + strlen(destStr), 13, ", port %u", Encoding::BigEndian::Get16(IPv6_DestPort));
         }
 
-        ChipLogDetail(DeviceLayer, "%s: %s, len %u", titleStr, type, pktLen);
+        ChipLogDetail(DeviceLayer, "%s: %s, len %u", StringOrNullMarker(titleStr), type, pktLen);
         ChipLogDetail(DeviceLayer, "    src  %s", srcStr);
         ChipLogDetail(DeviceLayer, "    dest %s", destStr);
     }
     else
     {
-        ChipLogDetail(DeviceLayer, "%s: %s, len %u", titleStr, "(decode error)", pktLen);
+        ChipLogDetail(DeviceLayer, "%s: %s, len %u", StringOrNullMarker(titleStr), "(decode error)", pktLen);
     }
 
 #endif // CHIP_DETAIL_LOGGING

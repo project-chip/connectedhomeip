@@ -2,7 +2,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import <Matter/MTRAttributeCacheContainer.h>
+#import <Matter/MTRClusterStateCacheContainer.h>
 
 #import <Matter/MTRCluster.h>
 #import <Matter/MTRCommandPayloadsObjc.h>
@@ -46,13 +46,9 @@ MTR_NEWLY_AVAILABLE
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 {{/if}}
 {{#if isReportableAttribute}}
-/**
- * This API does not support setting resubscribeIfLost to NO in the
- * MTRSubscribeParams.
- */
 - (void) subscribe{{>attribute}}WithParams:(MTRSubscribeParams *)params
 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
-+ (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
++ (void) read{{>attribute}}WithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 {{/if}}
 {{/chip_server_cluster_attributes}}
 

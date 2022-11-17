@@ -334,7 +334,7 @@ private:
 
                                   std::unique_ptr<SubscriptionCallback> callback;
                                   std::unique_ptr<ReadClient> readClient;
-                                  std::unique_ptr<ClusterStateCache> attributeCache;
+                                  std::unique_ptr<ClusterStateCache> clusterStateCache;
                                   callback = std::make_unique<SubscriptionCallback>(
                                       ^(NSArray * value) {
                                           dispatch_async(self.queue, ^{

@@ -24,6 +24,8 @@
 #import "zap-generated/CHIPClusters.h"
 #import "zap-generated/MTRBaseClusters.h"
 
+#include <app/ReadPrepareParams.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRCluster ()
@@ -31,6 +33,20 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype _Nullable)initWithQueue:(dispatch_queue_t)queue;
 - (chip::ByteSpan)asByteSpan:(NSData *)value;
 - (chip::CharSpan)asCharSpan:(NSString *)value;
+@end
+
+@interface MTRReadParams ()
+/**
+ * Copy state from this MTRReadParams to the ReadPreparaParams.
+ */
+- (void)toReadPrepareParams:(chip::app::ReadPrepareParams &)readPrepareParams;
+@end
+
+@interface MTRSubscribeParams ()
+/**
+ * Copy state from this MTRReadParams to the ReadPreparaParams.
+ */
+- (void)toReadPrepareParams:(chip::app::ReadPrepareParams &)readPrepareParams;
 @end
 
 NS_ASSUME_NONNULL_END

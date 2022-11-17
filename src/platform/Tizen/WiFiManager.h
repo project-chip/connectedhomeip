@@ -28,8 +28,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-using namespace chip::DeviceLayer::NetworkCommissioning::Internal;
-
 class WiFiManager
 {
     friend class ConnectivityManagerImpl;
@@ -41,7 +39,8 @@ public:
     CHIP_ERROR IsActivated(bool * isWiFiActivated);
     CHIP_ERROR Activate(void);
     CHIP_ERROR Deactivate(void);
-    CHIP_ERROR Connect(const char * ssid, const char * key, WirelessDriver::ConnectCallback * apCallback = nullptr);
+    CHIP_ERROR Connect(const char * ssid, const char * key,
+                       NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * apCallback = nullptr);
     CHIP_ERROR Disconnect(const char * ssid);
     CHIP_ERROR RemoveAllConfigs(void);
 
@@ -93,7 +92,7 @@ private:
     char mWiFiSSID[kMaxWiFiSSIDLength + 1];
     char mWiFiKey[kMaxWiFiKeyLength + 1];
 
-    WirelessDriver::ConnectCallback * mpConnectCallback;
+    NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
 };
 
 inline WiFiManager & WiFiMgr()
