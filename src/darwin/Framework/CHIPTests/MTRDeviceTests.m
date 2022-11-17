@@ -770,6 +770,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // reportHandler returns TRUE if it got the things it was looking for or if there's an error.
     __block BOOL (^reportHandler)(NSArray * _Nullable value, NSError * _Nullable error);
     __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(60)];
+    params.resubscribeIfLost = NO;
     [device subscribeWithQueue:queue
         params:params
         clusterStateCacheContainer:clusterStateCacheContainer
@@ -836,6 +837,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * newSubscriptionEstablished = [self expectationWithDescription:@"New subscription established"];
     MTRSubscribeParams * newParams = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(60)];
     newParams.replaceExistingSubscriptions = NO;
+    newParams.resubscribeIfLost = NO;
     [cluster subscribeAttributeOnOffWithParams:newParams
         subscriptionEstablished:^{
             NSLog(@"New subscription was established");
@@ -1023,6 +1025,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Subscribe
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
     MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
+    params.resubscribeIfLost = NO;
     [device subscribeToAttributesWithEndpointID:@1
         clusterID:@6
         attributeID:@0
@@ -1432,6 +1435,91 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ errorExpectation ] timeout:60];
 }
 
+- (void)test019_MTRDeviceMultipleCommands
+{
+#if MANUAL_INDIVIDUAL_TEST
+    [self initStack];
+    [self waitForCommissionee];
+#endif
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * opcredsCluster = [[MTRClusterOperationalCredentials alloc] initWithDevice:device endpointID:@(0) queue:queue];
+    __auto_type * onOffCluster = [[MTRClusterOnOff alloc] initWithDevice:device endpointID:@(1) queue:queue];
+    __auto_type * badOnOffCluster = [[MTRClusterOnOff alloc] initWithDevice:device endpointID:@(0) queue:queue];
+
+    XCTestExpectation * onExpectation = [self expectationWithDescription:@"On command executed"];
+    [onOffCluster onWithParams:nil
+                expectedValues:nil
+         expectedValueInterval:nil
+                    completion:^(NSError * _Nullable error) {
+                        XCTAssertNil(error);
+                        [onExpectation fulfill];
+                    }];
+
+    XCTestExpectation * offFailedExpectation = [self expectationWithDescription:@"Off command failed"];
+    [badOnOffCluster offWithParams:nil
+                    expectedValues:nil
+             expectedValueInterval:nil
+                        completion:^(NSError * _Nullable error) {
+                            XCTAssertNotNil(error);
+                            [offFailedExpectation fulfill];
+                        }];
+
+    XCTestExpectation * updateLabelExpectation = [self expectationWithDescription:@"Fabric label updated"];
+    __auto_type * params = [[MTROperationalCredentialsClusterUpdateFabricLabelParams alloc] init];
+    params.label = @("Test");
+    [opcredsCluster updateFabricLabelWithParams:params
+                                 expectedValues:nil
+                          expectedValueInterval:nil
+                                     completion:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                         NSError * _Nullable error) {
+                                         XCTAssertNil(error);
+                                         XCTAssertNotNil(data);
+                                         XCTAssertEqualObjects(data.statusCode, @(0));
+                                         XCTAssertNotNil(data.fabricIndex);
+                                         [updateLabelExpectation fulfill];
+                                     }];
+
+    XCTestExpectation * offExpectation = [self expectationWithDescription:@"Off command executed"];
+    [onOffCluster offWithParams:nil
+                 expectedValues:nil
+          expectedValueInterval:nil
+                     completion:^(NSError * _Nullable error) {
+                         XCTAssertNil(error);
+                         [offExpectation fulfill];
+                     }];
+
+    XCTestExpectation * onFailedExpectation = [self expectationWithDescription:@"On command failed"];
+    [badOnOffCluster onWithParams:nil
+                   expectedValues:nil
+            expectedValueInterval:nil
+                       completion:^(NSError * _Nullable error) {
+                           XCTAssertNotNil(error);
+                           [onFailedExpectation fulfill];
+                       }];
+
+    XCTestExpectation * updateLabelFailedExpectation = [self expectationWithDescription:@"Fabric label update failed"];
+    params.label = @("12345678901234567890123445678901234567890"); // Too long
+    [opcredsCluster updateFabricLabelWithParams:params
+                                 expectedValues:nil
+                          expectedValueInterval:nil
+                                     completion:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                         NSError * _Nullable error) {
+                                         XCTAssertNotNil(error);
+                                         XCTAssertNil(data);
+                                         [updateLabelFailedExpectation fulfill];
+                                     }];
+
+    [self waitForExpectations:@[
+        onExpectation, offFailedExpectation, updateLabelExpectation, offExpectation, onFailedExpectation,
+        updateLabelFailedExpectation
+    ]
+                      timeout:60
+                 enforceOrder:YES];
+}
+
 - (void)test900_SubscribeAllAttributes
 {
 #if MANUAL_INDIVIDUAL_TEST
@@ -1453,6 +1541,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __block void (^reportHandler)(id _Nullable values, NSError * _Nullable error) = nil;
 
     MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(2) maxInterval:@(10)];
+    params.resubscribeIfLost = NO;
     [device subscribeToAttributesWithEndpointID:@1
         clusterID:@6
         attributeID:@0xffffffff
