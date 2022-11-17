@@ -146,5 +146,5 @@ RUN set -x \
     && unzip zap-linux.zip \
     && rm zap-linux.zip \
     && rm zap \
-    && ln -s /opt/zap-${ZAP_VERSION}/zap /usr/bin/ \
+    && ln -s /opt/zap-${ZAP_VERSION}/zap-cli /usr/bin/ \
     && : # last line
