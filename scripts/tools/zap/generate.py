@@ -31,7 +31,6 @@ class CmdLineArgs:
     zclFile: str
     templateFile: str
     outputDir: str
-    runBootstrap: bool
 
 
 CHIP_ROOT_DIR = os.path.realpath(
@@ -220,15 +219,9 @@ def runJavaPrettifier(templates_file, output_dir):
         print('google-java-format error:', err)
 
 
-def runBootstrap():
-    subprocess.check_call(getFilePath("scripts/tools/zap/zap_bootstrap.sh"), shell=True)
-
-
 def main():
     checkPythonVersion()
     cmdLineArgs = runArgumentsParser()
-    if cmdLineArgs.runBootstrap:
-        runBootstrap()
     # The maximum memory usage is over 4GB (#15620)
     os.environ["NODE_OPTIONS"] = "--max-old-space-size=8192"
     runGeneration(cmdLineArgs.zapFile, cmdLineArgs.zclFile, cmdLineArgs.templateFile, cmdLineArgs.outputDir)

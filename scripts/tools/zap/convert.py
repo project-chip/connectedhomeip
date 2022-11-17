@@ -92,21 +92,13 @@ def runConversion(zap_file):
     templates_file = getFilePath('src/app/zap-templates/app-templates.json')
     zcl_file = detectZclFile(zap_file)
 
-    generator_dir = getDirPath('third_party/zap/repo')
-    os.chdir(generator_dir)
-    subprocess.check_call(['node', './src-script/zap-convert.js',
+    subprocess.check_call(['zap-cli', 'convert',
                           '-z', zcl_file, '-g', templates_file, '-o', zap_file, zap_file])
-
-
-def runBootstrap():
-    subprocess.check_call(getFilePath("scripts/tools/zap/zap_bootstrap.sh"), shell=True)
 
 
 def main():
     checkPythonVersion()
     zap_file, run_bootstrap = runArgumentsParser()
-    if run_bootstrap:
-        runBootstrap()
     os.chdir(CHIP_ROOT_DIR)
 
     runConversion(zap_file)
