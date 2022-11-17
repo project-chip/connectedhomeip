@@ -26,9 +26,6 @@
 #include <string>
 #include <vector>
 
-using namespace chip;
-using namespace chip::Thread;
-
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
@@ -59,15 +56,15 @@ CHIP_ERROR TizenThreadDriver::RevertConfiguration()
 
 Status TizenThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
-    uint8_t extpanid[kSizeExtendedPanId];
-    uint8_t newExtpanid[kSizeExtendedPanId];
+    uint8_t extpanid[Thread::kSizeExtendedPanId];
+    uint8_t newExtpanid[Thread::kSizeExtendedPanId];
     Thread::OperationalDataset newDataset;
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
     newDataset.Init(operationalDataset);
     VerifyOrReturnError(newDataset.IsCommissioned(), Status::kOutOfRange);
 
-    VerifyOrReturnError(!mStagingNetwork.IsCommissioned() || memcmp(extpanid, newExtpanid, kSizeExtendedPanId) == 0,
+    VerifyOrReturnError(!mStagingNetwork.IsCommissioned() || memcmp(extpanid, newExtpanid, Thread::kSizeExtendedPanId) == 0,
                         Status::kBoundsExceeded);
 
     mStagingNetwork = newDataset;
@@ -78,7 +75,7 @@ Status TizenThreadDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & ou
 {
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
-    uint8_t extpanid[kSizeExtendedPanId];
+    uint8_t extpanid[Thread::kSizeExtendedPanId];
     if (!mStagingNetwork.IsCommissioned())
     {
         return Status::kNetworkNotFound;
@@ -88,7 +85,8 @@ Status TizenThreadDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & ou
         return Status::kUnknownError;
     }
 
-    VerifyOrReturnError(networkId.size() == kSizeExtendedPanId && memcmp(networkId.data(), extpanid, kSizeExtendedPanId) == 0,
+    VerifyOrReturnError(networkId.size() == Thread::kSizeExtendedPanId &&
+                            memcmp(networkId.data(), extpanid, Thread::kSizeExtendedPanId) == 0,
                         Status::kNetworkNotFound);
     mStagingNetwork.Clear();
     return Status::kSuccess;
@@ -97,7 +95,7 @@ Status TizenThreadDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & ou
 Status TizenThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
     outDebugText.reduce_size(0);
-    uint8_t extpanid[kSizeExtendedPanId];
+    uint8_t extpanid[Thread::kSizeExtendedPanId];
     if (!mStagingNetwork.IsCommissioned())
     {
         return Status::kNetworkNotFound;
@@ -107,7 +105,8 @@ Status TizenThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, Muta
         return Status::kUnknownError;
     }
 
-    VerifyOrReturnError(networkId.size() == kSizeExtendedPanId && memcmp(networkId.data(), extpanid, kSizeExtendedPanId) == 0,
+    VerifyOrReturnError(networkId.size() == Thread::kSizeExtendedPanId &&
+                            memcmp(networkId.data(), extpanid, Thread::kSizeExtendedPanId) == 0,
                         Status::kNetworkNotFound);
 
     return Status::kSuccess;
@@ -116,7 +115,7 @@ Status TizenThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, Muta
 void TizenThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
 {
     NetworkCommissioning::Status status = Status::kSuccess;
-    uint8_t extpanid[kSizeExtendedPanId];
+    uint8_t extpanid[Thread::kSizeExtendedPanId];
     if (!mStagingNetwork.IsCommissioned())
     {
         ExitNow(status = Status::kNetworkNotFound);
@@ -126,8 +125,9 @@ void TizenThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * cal
         ExitNow(status = Status::kUnknownError);
     }
 
-    VerifyOrExit((networkId.size() == kSizeExtendedPanId && memcmp(networkId.data(), extpanid, kSizeExtendedPanId) == 0),
-                 status = Status::kNetworkNotFound);
+    VerifyOrExit(
+        (networkId.size() == Thread::kSizeExtendedPanId && memcmp(networkId.data(), extpanid, Thread::kSizeExtendedPanId) == 0),
+        status = Status::kNetworkNotFound);
 
     VerifyOrExit(DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork, callback) == CHIP_NO_ERROR,
                  status = Status::kUnknownError);

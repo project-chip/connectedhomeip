@@ -31,10 +31,7 @@ public:
         mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
     {}
 
-    bool operator==(const TargetVideoPlayerInfo & other)
-    {
-        return this->mNodeId == other.mNodeId && this->mFabricIndex == other.mFabricIndex;
-    }
+    bool operator==(const TargetVideoPlayerInfo & other) { return this->mNodeId == other.mNodeId; }
 
     bool IsInitialized() { return mInitialized; }
     uint16_t GetVendorId() const { return mVendorId; }

@@ -13,7 +13,6 @@ FROM connectedhomeip/chip-build-k32w:${VERSION} AS k32w
 FROM connectedhomeip/chip-build-imx:${VERSION} AS imx
 FROM connectedhomeip/chip-build-ti:${VERSION} AS ti
 FROM connectedhomeip/chip-build-openiotsdk:${VERSION} AS openiotsdk
-FROM connectedhomeip/chip-build-zap:${VERSION} AS zap
 FROM connectedhomeip/chip-build:${VERSION}
 
 # qemu-src copied over because qemu directory contains symlinks to the src
@@ -50,8 +49,6 @@ COPY --from=ti /opt/ti/sysconfig_1.13.0 /opt/ti/sysconfig_1.13.0
 
 COPY --from=openiotsdk /opt/gcc-arm-none-eabi-10.3-2021.10/ /opt/gcc-arm-none-eabi-10.3-2021.10/
 COPY --from=openiotsdk /opt/FVP_Corstone_SSE-300/ /opt/FVP_Corstone_SSE-300/
-
-COPY --from=zap /opt/zap /opt/zap
 
 # Android license file "acceping" is done by writing license hashes
 # into the 'licenses' subfolder. This allows any user (in particular
