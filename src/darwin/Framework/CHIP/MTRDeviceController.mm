@@ -850,16 +850,12 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
         return [self.delegate respondsToSelector:@selector(onStatusUpdate:)];
     }
 
-    if (selector == @selector(onPairingComplete:)) {
+    if (selector == @selector(onCommissioningSessionEstablishmentDone:)) {
         return [self.delegate respondsToSelector:@selector(onPairingComplete:)];
     }
 
     if (selector == @selector(onCommissioningComplete:)) {
         return [self.delegate respondsToSelector:@selector(onCommissioningComplete:)];
-    }
-
-    if (selector == @selector(onPairingDeleted:)) {
-        return [self.delegate respondsToSelector:@selector(onPairingDeleted:)];
     }
 
     return [super respondsToSelector:selector];
@@ -870,7 +866,7 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
     [self.delegate onStatusUpdate:static_cast<MTRPairingStatus>(status)];
 }
 
-- (void)onPairingComplete:(NSError * _Nullable)error
+- (void)onCommissioningSessionEstablishmentDone:(NSError * _Nullable)error
 {
     [self.delegate onPairingComplete:error];
 }
