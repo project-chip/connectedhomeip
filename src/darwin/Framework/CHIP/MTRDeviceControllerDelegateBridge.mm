@@ -73,11 +73,11 @@ void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error)
     NSLog(@"DeviceControllerDelegate Pairing complete. Status %s", chip::ErrorStr(error));
 
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
-    if ([strongDelegate respondsToSelector:@selector(onPairingComplete:)]) {
+    if ([strongDelegate respondsToSelector:@selector(onCommissioningSessionEstablishmentDone:)]) {
         if (strongDelegate && mQueue) {
             dispatch_async(mQueue, ^{
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
-                [strongDelegate onPairingComplete:nsError];
+                [strongDelegate onCommissioningSessionEstablishmentDone:nsError];
             });
         }
     }
@@ -87,15 +87,7 @@ void MTRDeviceControllerDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
 {
     NSLog(@"DeviceControllerDelegate Pairing deleted. Status %s", chip::ErrorStr(error));
 
-    id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
-    if ([strongDelegate respondsToSelector:@selector(onPairingDeleted:)]) {
-        if (strongDelegate && mQueue) {
-            dispatch_async(mQueue, ^{
-                NSError * nsError = [MTRError errorForCHIPErrorCode:error];
-                [strongDelegate onPairingDeleted:nsError];
-            });
-        }
-    }
+    // This is never actually called; just do nothing.
 }
 
 void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR error)

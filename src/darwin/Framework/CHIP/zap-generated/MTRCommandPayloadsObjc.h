@@ -109,7 +109,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -157,7 +158,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -203,7 +205,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -249,7 +252,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -349,7 +353,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -405,7 +410,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -455,7 +461,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -501,7 +508,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -551,7 +559,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -627,7 +636,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -683,7 +693,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -739,7 +750,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -795,7 +807,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -1557,7 +1570,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -1605,7 +1619,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -1707,7 +1722,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -1757,7 +1773,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -1801,7 +1818,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -1853,7 +1871,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -1953,7 +1972,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -2003,7 +2023,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -2083,7 +2104,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -2331,7 +2353,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -2375,7 +2398,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -2423,7 +2447,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -2503,7 +2528,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -2635,7 +2661,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -2701,7 +2728,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -2885,7 +2913,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -2991,7 +3020,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -3095,7 +3125,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -3213,7 +3244,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -3293,7 +3325,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -3345,7 +3378,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -3609,7 +3643,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -4289,7 +4324,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -4383,7 +4419,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -4611,7 +4648,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -4783,7 +4821,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -4859,7 +4898,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -4997,7 +5037,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -5041,7 +5082,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -5113,7 +5155,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -5165,7 +5208,8 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -5240,7 +5284,8 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -5294,7 +5339,8 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -5348,7 +5394,8 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -5412,7 +5459,8 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -5470,7 +5518,8 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -5528,7 +5577,8 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -5600,7 +5650,8 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -5710,7 +5761,8 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -5767,7 +5819,8 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -5823,7 +5876,8 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -5879,7 +5933,8 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
@@ -5936,7 +5991,8 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@property (nonatomic, copy, nullable)
+    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;

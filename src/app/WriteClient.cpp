@@ -53,8 +53,8 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
 
     ReturnErrorOnFailure(writeResponse.Init(reader));
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    ReturnErrorOnFailure(writeResponse.CheckSchemaValidity());
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    writeResponse.PrettyPrint();
 #endif
 
     err = writeResponse.GetWriteResponses(&attributeStatusesParser);
