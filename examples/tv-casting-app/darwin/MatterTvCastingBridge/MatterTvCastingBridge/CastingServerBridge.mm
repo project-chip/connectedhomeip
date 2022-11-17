@@ -18,6 +18,7 @@
 #import "CastingServerBridge.h"
 #import "CastingServer.h"
 
+#import "CommissionableDataProviderImpl.hpp"
 #import "ConversionUtils.hpp"
 #import "MatterCallbacks.h"
 #import "OnboardingPayload.h"
@@ -29,14 +30,17 @@
 #include <lib/support/CHIPListUtils.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
-#include <platform/TestOnlyCommissionableDataProvider.h>
 
 @interface CastingServerBridge ()
 
-// queue used to serialize all work performed by the CastingServerBridge
-@property (atomic, readonly) dispatch_queue_t chipWorkQueue;
+@property AppParameters * appParameters;
 
 @property OnboardingPayload * _Nonnull onboardingPayload;
+
+@property chip::DeviceLayer::CommissionableDataProviderImpl * commissionableDataProvider;
+
+// queue used to serialize all work performed by the CastingServerBridge
+@property (atomic) dispatch_queue_t chipWorkQueue;
 
 @property void (^_Nonnull commissioningCompleteCallback)(bool);
 
@@ -87,47 +91,12 @@
             return nil;
         }
 
-        chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
-        uint32_t defaultTestPasscode = 0;
-        VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupPasscode(defaultTestPasscode) == CHIP_NO_ERROR);
-        uint16_t defaultTestSetupDiscriminator = 0;
-        VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupDiscriminator(defaultTestSetupDiscriminator) == CHIP_NO_ERROR);
-        _onboardingPayload = [[OnboardingPayload alloc] initWithSetupPasscode:defaultTestPasscode
-                                                           setupDiscriminator:defaultTestSetupDiscriminator];
-
-        // Initialize device attestation config
-        SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
-
-        // Initialize device attestation verifier from a constant version
-        {
-            // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
-            const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-            SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
-        }
-
-        // init app Server
-        static chip::CommonCaseDeviceServerInitParams initParams;
-        err = initParams.InitializeStaticResourcesBeforeServerInit();
-        if (err != CHIP_NO_ERROR) {
-            ChipLogError(AppServer, "InitializeStaticResourcesBeforeServerInit failed: %s", ErrorStr(err));
-            return nil;
-        }
-        err = chip::Server::GetInstance().Init(initParams);
-        if (err != CHIP_NO_ERROR) {
-            ChipLogError(AppServer, "chip::Server init failed: %s", ErrorStr(err));
-            return nil;
-        }
-
-        _chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
-
         _commandResponseCallbacks = [NSMutableDictionary dictionary];
         _subscriptionEstablishedCallbacks = [NSMutableDictionary dictionary];
         _subscriptionReadSuccessCallbacks = [NSMutableDictionary dictionary];
         _subscriptionReadFailureCallbacks = [NSMutableDictionary dictionary];
         _readSuccessCallbacks = [NSMutableDictionary dictionary];
         _readFailureCallbacks = [NSMutableDictionary dictionary];
-
-        chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
     }
     return self;
 }
@@ -138,17 +107,82 @@
 {
     ChipLogProgress(AppServer, "CastingServerBridge().initApp() called");
 
-    dispatch_async(_chipWorkQueue, ^{
-        bool initAppStatus = true;
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        AppParams appParams;
-        if (appParameters == nil) {
-            err = CastingServer::GetInstance()->Init();
-        } else if ((err = [ConversionUtils convertToCppAppParamsInfoFrom:appParameters outAppParams:appParams]) == CHIP_NO_ERROR) {
-            err = CastingServer::GetInstance()->Init(&appParams);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    _commissionableDataProvider = new chip::DeviceLayer::CommissionableDataProviderImpl();
+    _appParameters = appParameters;
+    AppParams cppAppParams;
+    if (_appParameters != nil) {
+        err = [ConversionUtils convertToCppAppParamsInfoFrom:_appParameters outAppParams:cppAppParams];
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(AppServer, "AppParameters conversion failed: %s", ErrorStr(err));
+            return;
         }
 
+        // set fields in commissionableDataProvider
+        _commissionableDataProvider->SetSpake2pIterationCount(_appParameters.spake2pIterationCount);
+        if (_appParameters.spake2pSalt != nil) {
+            chip::ByteSpan spake2pSaltSpan
+                = chip::ByteSpan(static_cast<const uint8_t *>(_appParameters.spake2pSalt.bytes), _appParameters.spake2pSalt.length);
+            _commissionableDataProvider->SetSpake2pSalt(spake2pSaltSpan);
+        }
+
+        if (_appParameters.spake2pVerifier != nil) {
+            chip::ByteSpan spake2pVerifierSpan = chip::ByteSpan(
+                static_cast<const uint8_t *>(_appParameters.spake2pVerifier.bytes), _appParameters.spake2pVerifier.length);
+            _commissionableDataProvider->SetSpake2pSalt(spake2pVerifierSpan);
+        }
+
+        if (_appParameters.onboardingPayload != nil) {
+            _commissionableDataProvider->SetSetupPasscode(_appParameters.onboardingPayload.setupPasscode);
+            _commissionableDataProvider->SetSetupDiscriminator(_appParameters.onboardingPayload.setupDiscriminator);
+        }
+
+        uint32_t setupPasscode = 0;
+        uint16_t setupDiscriminator = 0;
+        _commissionableDataProvider->GetSetupPasscode(setupPasscode);
+        _commissionableDataProvider->GetSetupDiscriminator(setupDiscriminator);
+        _onboardingPayload = [[OnboardingPayload alloc] initWithSetupPasscode:setupPasscode setupDiscriminator:setupDiscriminator];
+    }
+    chip::DeviceLayer::SetCommissionableDataProvider(_commissionableDataProvider);
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+
+    // Initialize device attestation verifier from a constant version
+    {
+        // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+        const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+        SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+    }
+
+    // init app Server
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    err = initParams.InitializeStaticResourcesBeforeServerInit();
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(AppServer, "InitializeStaticResourcesBeforeServerInit failed: %s", ErrorStr(err));
+        return;
+    }
+
+    err = chip::Server::GetInstance().Init(initParams);
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(AppServer, "chip::Server init failed: %s", ErrorStr(err));
+        return;
+    }
+
+    _chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
+
+    chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
+
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        AppParams appParam;
+        if (appParameters != nil) {
+            err = CastingServer::GetInstance()->Init();
+        } else if ((err = [ConversionUtils convertToCppAppParamsInfoFrom:appParameters outAppParams:appParam]) == CHIP_NO_ERROR) {
+            err = CastingServer::GetInstance()->Init(&appParam);
+        }
+
+        Boolean initAppStatus = true;
         if (err != CHIP_NO_ERROR) {
             ChipLogError(AppServer, "CastingServerBridge().initApp() failed: %" CHIP_ERROR_FORMAT, err.Format());
             initAppStatus = false;

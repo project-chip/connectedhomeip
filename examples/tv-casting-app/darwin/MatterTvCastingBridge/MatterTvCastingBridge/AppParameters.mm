@@ -21,13 +21,12 @@
 
 @implementation AppParameters
 
-- (AppParameters *)initWithRotatingDeviceIdUniqueId:(NSData *)rotatingDeviceIdUniqueId
+/**
+ * Initialize with default values
+ */
+- (AppParameters *)init
 {
-    self = [super init];
-    if (self) {
-        _rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueId;
-    }
-    return self;
+    return [super init];
 }
 
 @end

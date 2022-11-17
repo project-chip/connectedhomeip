@@ -46,6 +46,10 @@ public class TvCastingApp {
   private NsdManagerServiceResolver.NsdManagerResolverAvailState nsdManagerResolverAvailState;
 
   public boolean initApp(Context applicationContext, AppParameters appParameters) {
+    if (applicationContext == null || appParameters == null) {
+      return false;
+    }
+
     this.applicationContext = applicationContext;
     nsdManagerResolverAvailState = new NsdManagerServiceResolver.NsdManagerResolverAvailState();
     NsdManagerServiceResolver nsdManagerServiceResolver =
@@ -62,7 +66,11 @@ public class TvCastingApp {
             new DiagnosticDataProviderImpl(applicationContext));
 
     chipPlatform.updateCommissionableDataProviderData(
-        null, null, 0, appParameters.getSetupPasscode(), appParameters.getDiscriminator());
+        appParameters.getSpake2pVerifierBase64(),
+        appParameters.getSpake2pSaltBase64(),
+        appParameters.getSpake2pIterationCount(),
+        appParameters.getSetupPasscode(),
+        appParameters.getDiscriminator());
 
     chipAppServer = new ChipAppServer();
     chipAppServer.startApp();
